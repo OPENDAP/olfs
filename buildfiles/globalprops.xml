@@ -1,0 +1,129 @@
+<!-- Global Properties for Java-OPeNDAP software development -->
+
+
+<!-- ********************************************* -->
+<!-- Project-wide settings. All directories are    -->
+<!-- relative to the project "Basedir" directory,  -->
+<!-- which is assumed (by this file) to be set to  -->
+<!-- ".."                                          -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+<!-- Version Tag: Used for doing distribution builds.
+     This property should be set from the command
+     line by the distribution build script using
+     tag information from CVS.
+-->
+<property name="VERSION" value="Not.A.Release"/>
+<property name="CVSTag" value="$Name:  $"/>
+
+
+<!-- Compiler Settings -->
+
+<property name="compile.debug" value="on"/>
+<property name="compile.debuglevel" value="lines,vars,source"/>
+<property name="compile.deprecation" value="on"/>
+
+<property name="modern.compiler" value="modern"/>
+<property name="classic.compiler" value="classic"/>
+
+<!--  build.compiler: This is a "magic" property.
+     In the javac task, if the "compiler" property is not
+     explicitly set, then javac will use the value of this
+     property ("build.compiler") to set the compiler type.
+
+See the online ANT Users Manual.
+Read the section the comipler attribute of the javac task.
+http://ant.apache.org/manual/index.html
+-->
+<property name="build.compiler" value="${modern.compiler}"/>
+
+
+
+<!-- build.sysclasspath
+     This is a "magic" property. The value of the build.sysclasspath
+     property controls how the system classpath, ie. the classpath in
+     effect when Ant is run, affects the behaviour of classpaths in
+     Ant. The default behavior varies from Ant to Ant task.
+
+     The values and their meanings are:
+        only -   Only the system classpath is used and classpaths
+                 specified in build files, etc are ignored. This
+                 situation could be considered as the person running
+                 the build file knows more about the environment
+                 than the person writing the build file
+        ignore - The system classpath is ignored. This situation is
+                 the reverse of the above. The person running the
+                 build trusts the build file writer to get the build
+                 file right
+        last -   The classpath is concatenated to any specified
+                 classpaths at the end. This is a compromise, where
+                 the build file writer has priority.
+        first -  Any specified classpaths are concatenated to the
+                 system classpath. This is the other form of compromise
+                 where the build runner has priority.
+
+Excerpted from the online ANT users Manual
+http://ant.apache.org/manual/sysclasspath.html
+-->
+<property name="build.sysclasspath" value="ignore"/>
+
+
+
+<!-- Project directories -->
+<property name="src.dir" location="src"/>
+<property name="doc.dir" location="doc"/>
+<property name="lib.dir" location="lib"/>
+<property name="bin.dir" location="bin"/>
+<property name="dist.dir" location="dist"/>
+<property name="datasets.dir" location="datasets"/>
+<property name="schema.dir" location="schema"/>
+<property name="buildfiles.dir" location="buildfiles"/>
+
+<property name="build.dir" location="build"/>
+<property name="build.classes" location="${build.dir}/classes"/>
+<property name="build.doc" location="${build.dir}/doc"/>
+<property name="build.dist" location="${build.dir}/dist"/>
+<property name="build.lib" location="${build.dir}/lib"/>
+
+
+
+
+<!-- Properties for web deployment -->
+<property name="webapp.name" value="opendap"/>
+<property name="webapp.path" value="/${webapp.name}"/>
+<property name="webapp.war.url" value="file://${build.webapps}/${webapp.name}.war"/>
+
+
+
+<!-- Libraries -->
+<property name="regexp.lib" value="gnu-regexp-1.1.4.jar"/>
+<property name="getopt.lib" value="gnu-getopt-1.0.6.jar"/>
+<property name="jdom.lib" value="jdom-b9.jar"/>
+<property name="servlet.lib" value="tomcat-4.1.18-servlet.jar"/>
+<property name="soap.lib" value="apache-soap-2.3.1.jar"/>
+<property name="xercesImpl.lib" value="xerces-2.5.0_xercesImpl.jar"/>
+<property name="xercesXmlApis.lib" value="xerces-2.5.0_xml-apis.jar"/>
+<property name="crimson.lib" value="crimson-1.1.3.jar"/>
+<property name="javamail.lib" value="javamail-1.3.1.jar"/>
+<property name="echo.lib" value="echosoap.jar"/>
+<property name="opendap.lib" value="opendap-0.0.0.jar"/>
+
+
+
+
+
+
+<!-- Catalina.config:
+
+    Jakarta-Tomcat (aka Catalina) properties file. This file must contain
+    the three ANT properties used to access Catalina's manager application.
+    They are: the URL of the interface, username, and password.
+    For example:
+    Catalina.url=http://localhost:8080/manager
+    Catalina.username=admin
+    Catalina.password=somethingsecret
+
+-->
+<property name="Catalina.config" location="${buildfiles.dir}/catalina-config"/>
+
+

@@ -1,0 +1,223 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE project [
+    <!ENTITY globalprops      SYSTEM "file:./globalprops.xml">
+    <!ENTITY globaltargets    SYSTEM "file:./globaltargets.xml">
+]>
+
+<!-- Build file for OPeNDAP core software -->
+
+
+<project name="OPeNDAP Core Software" default="all" basedir="..">
+
+    <!-- Global Properties -->
+    &globalprops;
+
+    <!-- Global Targets -->
+    &globaltargets;
+
+    <!-- Library (class)paths -->
+    <path id="drds.compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <fileset dir="${lib.dir}">
+            <include name="${getopt.lib}"/>
+            <include name="${servlet.lib}"/>
+            <include name="${opendap.lib}"/>
+        </fileset>
+    </path>
+
+
+    <target name="compile" depends="drds" description="Compiles the DRDS software."/>
+
+
+
+
+    <target
+        name="drds"
+        depends="init"
+        description="Compiles the DRDS."
+        >
+        <echo level="info" message="AntFile: ${ant.file} Compiling DRDS"/>
+        <echo level="info" message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+            destdir="${build.classes}"
+            debug="${compile.debug}"
+            debuglevel="${compile.debuglevel}"
+            deprecation="${compile.deprecation}">
+
+            <classpath refid="drds.compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/servers/sql/**/*.java"/>
+        </javac>
+
+    </target>
+
+
+    <target name="drds-lib" depends="clean,drds">
+        <jar destfile="${build.lib}/drds-${VERSION}.jar">
+            <fileset dir="${build.classes}"/>
+        </jar>
+    </target>
+
+
+    <target
+        name="doc"
+        depends="init,IsJavaDocUpToDate"
+        description="Builds JavaDoc for the core OPeNDAP software packages, if missing or out of date."
+        unless="JavaDocIsUpToDate"
+        >
+
+        <javadoc destdir="${build.doc}/drds"
+            author="true"
+            version="true"
+            use="true"
+            Verbose="false">
+
+            <classpath refid="drds.compile.classpath"/>
+
+            <fileset dir="${src.dir}/opendap/servers/sql"/>
+        </javadoc>
+
+        <copy todir="${build.doc}">
+            <fileset dir="${doc.dir}">
+                <exclude name="src.distribution.readme"/>
+                <exclude name="servlet-index.html"/>
+            </fileset>
+        </copy>
+
+
+    </target>
+    
+    <target
+        name="doc-dist"
+        depends="doc"
+        description="Builds documentation distribution"
+        >
+
+        <jar destfile="${build.dist}/drds-${VERSION}-doc.jar">
+            <zipfileset dir="${build.doc}" prefix="drds-${VERSION}-doc"/>
+        </jar>
+
+    </target>
+
+
+
+    <target
+        name="IsJavaDocUpToDate"
+        description="Checks to see if the JavaDoc is out of date."
+        >
+        <uptodate property="JavaDocIsUpToDate" targetfile="${build.doc}/opendap/index.html">
+            <srcfiles dir="${src.dir}">
+                <include name="opendap/servers/sql/**/*.java"/>
+            </srcfiles>
+        </uptodate>
+
+    </target>
+
+
+
+
+    <target name="src-dist"
+        depends="init,doc"
+        description="Builds the source code distribution including the build file and libs."
+        >
+        <copy file="${doc.dir}/src.distribution.readme" tofile="${build.dist}/README"/>
+
+        <jar destfile="${build.dist}/drds-${VERSION}-src.jar">
+
+            <zipfileset dir="${src.dir}" prefix="drds-${VERSION}-src/src">
+                <include name="opendap/servers/sql/*.java"/>
+            </zipfileset>
+
+            <zipfileset dir="${lib.dir}" prefix="drds-${VERSION}-src/lib">
+                <include name="${getopt.lib}"/>
+                <include name="${servlet.lib}"/>
+                <include name="${opendap.lib}"/>
+            </zipfileset>
+
+            <zipfileset dir="${buildfiles.dir}" prefix="drds-${VERSION}-src/buildfiles">
+                <include name="drds.xml"/>
+                <include name="globalprops.xml"/>
+                <include name="globaltargets.xml"/>
+                <include name="catalina-targets.xml"/>
+            </zipfileset>
+
+            <zipfileset dir="${build.doc}" prefix="drds-${VERSION}-src/doc">
+                <exclude name="servlet-index.html"/>
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
+
+            <zipfileset dir="${build.dist}" prefix="drds-${VERSION}-src">
+                <include name="README"/>
+            </zipfileset>
+
+        </jar>
+
+        <delete file="${build.dist}/README"/>
+
+    </target>
+
+
+    <target
+        name="war"
+        depends="drds-lib,doc"
+        description="Performs an incremental build of the core software and assembles the WAR file."
+        >
+        <copy file="${doc.dir}/servlet-index.html" tofile="${build.dist}/index.html"/>
+        <war destfile="${build.dist}/opendap.war"
+            webxml="${src.dir}/WEB-INF/drdsweb.xml"
+            >
+
+            <lib dir="${lib.dir}">
+                <include name="${regexp.lib}"/>
+                <include name="${getopt.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${soap.lib}"/>
+                <include name="${opendap.lib}"/>
+            </lib>
+            <classes dir="${build.classes}"/>
+
+
+            <fileset dir="${doc.dir}">
+                <exclude name="src.distribution.readme"/>
+                <exclude name="index.html"/>
+            </fileset>
+
+            <fileset file="${build.dist}/index.html"/>
+
+            <zipfileset dir="${schema.dir}" prefix="schema" />
+
+            <zipfileset dir="${build.doc}/drds" prefix="javadocs/drds"/>
+
+            <zipfileset dir="${datasets.dir}" prefix="datasets"/>
+
+            <zipfileset dir="${build.lib}" prefix="drds-libraries"/>
+
+            <zipfileset dir="${lib.dir}" prefix="drds-libraries">
+                <include name="${getopt.lib}"/>
+                <include name="${regexp.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${soap.lib}"/>
+                <include name="${opendap.lib}"/>
+           </zipfileset>
+
+
+        </war>
+        <delete file="${build.dist}/index.html"/>
+    </target>
+
+
+
+</project>
+
+
+
+
+
+
+
+
+
+
