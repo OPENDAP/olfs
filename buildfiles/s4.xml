@@ -8,7 +8,7 @@
 <!-- Build file for OPeNDAP core software -->
 
 
-<project name="OPeNDAP Core Software" default="all" basedir="..">
+<project name="Server4 OPeNDAP Server Prototype" default="all" basedir="..">
 
     <!-- Global Properties -->
     &globalprops;
@@ -17,25 +17,25 @@
     &globaltargets;
 
     <!-- Library (class)paths -->
-    <path id="drds.compile.classpath">
+    <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
-            <include name="${getopt.lib}"/>
             <include name="${servlet.lib}"/>
             <include name="${opendap.lib}"/>
         </fileset>
     </path>
 
 
-    <target name="compile" depends="drds" description="Compiles the DRDS software."/>
+    <target name="all" depends="clean,war" description="Compiles the DRDS software."/>
+    <target name="compile" depends="s4" description="Compiles the DRDS software."/>
 
 
 
 
     <target
-        name="drds"
+        name="s4"
         depends="init"
-        description="Compiles the DRDS."
+        description="Compiles Server 4."
         >
         <echo level="info" message="AntFile: ${ant.file} Compiling DRDS"/>
         <echo level="info" message="Using the ${build.compiler} javac compiler"/>
@@ -46,19 +46,20 @@
             debuglevel="${compile.debuglevel}"
             deprecation="${compile.deprecation}">
 
-            <classpath refid="drds.compile.classpath"/>
+            <classpath refid="compile.classpath"/>
 
             <src path="${src.dir}"/>
-            <include name="opendap/servers/sql/**/*.java"/>
+            <include name="opendap/**/*.java"/>
         </javac>
 
     </target>
 
 
-    <target name="drds-lib" depends="clean,drds">
-        <jar destfile="${build.lib}/drds-${VERSION}.jar">
+    <target name="s4-lib" depends="clean,compile">
+        <jar destfile="${build.lib}/s4-${VERSION}.jar">
             <fileset dir="${build.classes}"/>
         </jar>
+
     </target>
 
 
@@ -69,15 +70,15 @@
         unless="JavaDocIsUpToDate"
         >
 
-        <javadoc destdir="${build.doc}/drds"
+        <javadoc destdir="${build.doc}/server4"
             author="true"
             version="true"
             use="true"
             Verbose="false">
 
-            <classpath refid="drds.compile.classpath"/>
+            <classpath refid="compile.classpath"/>
 
-            <fileset dir="${src.dir}/opendap/servers/sql"/>
+            <fileset dir="${src.dir}/opendap/"/>
         </javadoc>
 
         <copy todir="${build.doc}">
@@ -89,7 +90,7 @@
 
 
     </target>
-    
+
     <target
         name="doc-dist"
         depends="doc"
@@ -117,64 +118,20 @@
     </target>
 
 
-
-
-    <target name="src-dist"
-        depends="init,doc"
-        description="Builds the source code distribution including the build file and libs."
-        >
-        <copy file="${doc.dir}/src.distribution.readme" tofile="${build.dist}/README"/>
-
-        <jar destfile="${build.dist}/drds-${VERSION}-src.jar">
-
-            <zipfileset dir="${src.dir}" prefix="drds-${VERSION}-src/src">
-                <include name="opendap/servers/sql/*.java"/>
-            </zipfileset>
-
-            <zipfileset dir="${lib.dir}" prefix="drds-${VERSION}-src/lib">
-                <include name="${getopt.lib}"/>
-                <include name="${servlet.lib}"/>
-                <include name="${opendap.lib}"/>
-            </zipfileset>
-
-            <zipfileset dir="${buildfiles.dir}" prefix="drds-${VERSION}-src/buildfiles">
-                <include name="drds.xml"/>
-                <include name="globalprops.xml"/>
-                <include name="globaltargets.xml"/>
-                <include name="catalina-targets.xml"/>
-            </zipfileset>
-
-            <zipfileset dir="${build.doc}" prefix="drds-${VERSION}-src/doc">
-                <exclude name="servlet-index.html"/>
-                <exclude name="src.distribution.readme"/>
-            </zipfileset>
-
-            <zipfileset dir="${build.dist}" prefix="drds-${VERSION}-src">
-                <include name="README"/>
-            </zipfileset>
-
-        </jar>
-
-        <delete file="${build.dist}/README"/>
-
-    </target>
-
-
     <target
         name="war"
-        depends="drds-lib,doc"
-        description="Performs an incremental build of the core software and assembles the WAR file."
+        depends="s4-lib,doc"
+        description="Performs a clean build of the core software and assembles the WAR file."
         >
         <copy file="${doc.dir}/servlet-index.html" tofile="${build.dist}/index.html"/>
-        <war destfile="${build.dist}/opendap.war"
-            webxml="${src.dir}/WEB-INF/drdsweb.xml"
+        <war destfile="${build.dist}/s4.war"
+            webxml="${src.dir}/WEB-INF/s4web.xml"
             >
 
             <lib dir="${lib.dir}">
                 <include name="${regexp.lib}"/>
                 <include name="${getopt.lib}"/>
                 <include name="${jdom.lib}"/>
-                <include name="${soap.lib}"/>
                 <include name="${opendap.lib}"/>
             </lib>
             <classes dir="${build.classes}"/>
@@ -189,13 +146,11 @@
 
             <zipfileset dir="${schema.dir}" prefix="schema" />
 
-            <zipfileset dir="${build.doc}/drds" prefix="javadocs/drds"/>
+            <zipfileset dir="${build.doc}/server4" prefix="javadocs/server4"/>
 
-            <zipfileset dir="${datasets.dir}" prefix="datasets"/>
+            <zipfileset dir="${build.lib}" prefix="s4-libraries"/>
 
-            <zipfileset dir="${build.lib}" prefix="drds-libraries"/>
-
-            <zipfileset dir="${lib.dir}" prefix="drds-libraries">
+            <zipfileset dir="${lib.dir}" prefix="s4-libraries">
                 <include name="${getopt.lib}"/>
                 <include name="${regexp.lib}"/>
                 <include name="${jdom.lib}"/>

@@ -9,11 +9,11 @@
 
     <servlet>
         <servlet-name>
-            dts
+            s4
         </servlet-name>
 
         <servlet-class>
-            opendap.servers.test.dts
+            opendap.olfs.OLFS
         </servlet-class>
 
         <init-param>
@@ -22,85 +22,38 @@
         </init-param>
 
         <init-param>
-            <param-name>SequenceLength</param-name>
-            <param-value>100</param-value>
+            <param-name>BackEndServer</param-name>
+            <param-value>dataportal.ucar.edu</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>BackEndServerPort</param-name>
+            <param-value>2002</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>FileSystemPrefix</param-name>
+            <param-value>/home/pwest/tests/data</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>TargetPathSeperator</param-name>
+            <param-value>/</param-value>
         </init-param>
 
 
     </servlet>
 
 
-    <servlet>
-        <servlet-name>
-            drds
-        </servlet-name>
-
-        <servlet-class>
-            opendap.servers.sql.drds
-        </servlet-class>
-
-        <init-param>
-            <param-name>JDBCdriver</param-name>
-            <param-value> com.merant.sequelink.jdbc.SequeLinkDriver</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>JDBCconnectionURL</param-name>
-            <param-value>jdbc:sequelink://sugar.coas.oregonstate.edu:19996</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>JDBCusername</param-name>
-            <param-value>guest</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>JDBCpassword</param-name>
-            <param-value></param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>JDBCMaxResponseLength</param-name>
-            <param-value>300</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>UseDatasetName</param-name>
-            <param-value></param-value>
-        </init-param>
-
-
-        <init-param>
-            <param-name>SchemaLocation</param-name>
-            <param-value>http://dods.coas.oregonstate.edu:8080/opendap/opendap.xsd</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value>showRequest  JDBC probeRequest</param-value>
-        </init-param>
-
-    </servlet>
-
-
     <servlet-mapping>
-        <servlet-name>dts</servlet-name>
-        <url-pattern>/dts</url-pattern>
+        <servlet-name>s4</servlet-name>
+        <url-pattern>/s4</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>dts</servlet-name>
-        <url-pattern>/dts/*</url-pattern>
+        <servlet-name>s4</servlet-name>
+        <url-pattern>/s4/*</url-pattern>
     </servlet-mapping>
 
-
-    <servlet-mapping>
-        <servlet-name>drds</servlet-name>
-        <url-pattern>/drds</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>drds</servlet-name>
-        <url-pattern>/drds/*</url-pattern>
-    </servlet-mapping>
 
 
 
