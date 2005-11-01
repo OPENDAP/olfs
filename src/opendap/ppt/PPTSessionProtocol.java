@@ -22,22 +22,17 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-
-package opendap.ppt ;
+package opendap.ppt;
 
 class PPTSessionProtocol {
     // Message when the mapper fails to find the proper protocol string
     public static final String PPT_PROTOCOL_UNDEFINED = "PPT_PROTOCOL_UNDEFINED";
 
-    // From client to server
     public static final String PPTCLIENT_TESTING_CONNECTION = "PPTCLIENT_TESTING_CONNECTION";
-    public static final String PPTCLIENT_COMPLETE_DATA_TRANSMITION = "PPTCLIENT_COMPLETE_DATA_TRANSMITION";
-    public static final String PPTCLIENT_EXIT_NOW = "PPTCLIENT_EXIT_NOW";
-
-    // From server to client
 
     public static final String PPTSERVER_CONNECTION_OK = "PPTSERVER_CONNECTION_OK";
-    public static final String PPTSERVER_COMPLETE_DATA_TRANSMITION = "PPTSERVER_COMPLETE_DATA_TRANSMITION";
-    public static final String PPTSERVER_EXIT_NOW = "PPTSERVER_EXIT_NOW";
-}
 
+    public static final String PPT_COMPLETE_DATA_TRANSMITION = "PPT_COMPLETE_DATA_TRANSMITION";
+    
+    public static final String PPT_EXIT_NOW = "PPT_EXIT_NOW";
+}

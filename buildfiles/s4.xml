@@ -22,11 +22,13 @@
         <fileset dir="${lib.dir}">
             <include name="${servlet.lib}"/>
             <include name="${opendap.lib}"/>
+            <include name="${jdom.lib}"/>
+            <include name="${cli.lib}"/>
         </fileset>
     </path>
 
 
-    <target name="all" depends="clean,war" description="Compiles the DRDS software."/>
+    <target name="all" depends="clean,client,server" description="Compiles the DRDS software."/>
     <target name="compile" depends="s4" description="Compiles the DRDS software."/>
 
 
@@ -50,6 +52,7 @@
 
             <src path="${src.dir}"/>
             <include name="opendap/**/*.java"/>
+            <include name="hao/**/*.java"/>
         </javac>
 
     </target>
@@ -57,7 +60,9 @@
 
     <target name="s4-lib" depends="clean,compile">
         <jar destfile="${build.lib}/s4-${VERSION}.jar">
-            <fileset dir="${build.classes}"/>
+            <fileset dir="${build.classes}">
+                <exclude name="hao/**/*.class"/>
+            </fileset>
         </jar>
 
     </target>
@@ -119,7 +124,27 @@
 
 
     <target
-        name="war"
+        name="client"
+        depends="s4-lib"
+        description="Build and package the back end client."
+        >
+
+        <copy file="${lib.dir}/${cli.lib}" tofile="${build.dist}/${cli.lib}"/>
+
+        <jar destfile="${build.dist}/beclient.jar"
+            manifest="jar/MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/ppt/**/*.class"/>
+                <include name="hao/**/*.class"/>
+            </fileset>
+        </jar>
+
+
+    </target>
+
+
+    <target
+        name="server"
         depends="s4-lib,doc"
         description="Performs a clean build of the core software and assembles the WAR file."
         >

@@ -98,7 +98,7 @@ http://ant.apache.org/manual/sysclasspath.html
 <!-- Libraries -->
 <property name="regexp.lib" value="gnu-regexp-1.1.4.jar"/>
 <property name="getopt.lib" value="gnu-getopt-1.0.6.jar"/>
-<property name="jdom.lib" value="jdom-b9.jar"/>
+<property name="jdom.lib" value="jdom-1.0.jar"/>
 <property name="servlet.lib" value="tomcat-4.1.18-servlet.jar"/>
 <property name="soap.lib" value="apache-soap-2.3.1.jar"/>
 <property name="xercesImpl.lib" value="xerces-2.5.0_xercesImpl.jar"/>
@@ -108,6 +108,7 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="echo.lib" value="echosoap.jar"/>
 <property name="opendap.lib" value="opendap-0.0.0.jar"/>
 
+<property name="cli.lib" value="apache-commons-cli-1.0.jar"/>
 
 
 

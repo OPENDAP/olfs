@@ -22,20 +22,19 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-
 package opendap.ppt ;
 
 import java.io.*;
 import java.net.*;
 
 class PPTClient {
+
     private Socket _mySock = null;
     private BufferedWriter _out = null;
     private BufferedReader _in = null;
 
-
     PPTClient(String hostStr, int portVal) throws PPTException {
-        InetAddress addr = null;
+        InetAddress addr;
         try {
             addr = InetAddress.getByName(hostStr);
         }
@@ -64,7 +63,6 @@ class PPTClient {
             throw(new PPTException(msg));
         }
     }
-
 
     public boolean initConnection() throws PPTException {
         try {
@@ -96,10 +94,9 @@ class PPTClient {
         return true;
     }
 
-
     public void closeConnection() {
         try {
-            this.writeBuffer(PPTSessionProtocol.PPTCLIENT_EXIT_NOW);
+            this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
             System.err.println("Failed to inform server that client is exiting, continuing");
@@ -133,7 +130,7 @@ class PPTClient {
 
     public boolean sendRequest(String buffer) throws PPTException {
         this.writeBuffer(buffer);
-        this.writeBuffer(PPTSessionProtocol.PPTCLIENT_COMPLETE_DATA_TRANSMITION);
+        this.writeBuffer(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION);
 
         return true;
     }
@@ -159,23 +156,23 @@ class PPTClient {
             pstrm = new PrintStream(strm, true);
         }
         boolean done = false;
-        while (done == false) {
+        while (!done) {
             char[] inBuff = new char[4096];
             int bytesRead = this.readBuffer(inBuff);
             if (bytesRead != 0) {
-                int termlen = PPTSessionProtocol.PPTSERVER_COMPLETE_DATA_TRANSMITION.length();
+                int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
                 int writeBytes = bytesRead;
                 if (bytesRead >= termlen) {
-                    String inEnd = new String();
+                    String inEnd = "";
                     for (int j = 0; j < termlen; j++)
                         inEnd += inBuff[(bytesRead - termlen) + j];
-                    if (inEnd.equals(PPTSessionProtocol.PPTSERVER_COMPLETE_DATA_TRANSMITION)) {
+                    if (inEnd.equals(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION)) {
                         done = true;
                         writeBytes = bytesRead - termlen;
                     }
                 }
                 for (int j = 0; j < writeBytes; j++)
-                    pstrm.write((int) inBuff[j]);
+                    pstrm.write(inBuff[j]);
             } else {
                 done = true;
             }
@@ -183,7 +180,7 @@ class PPTClient {
     }
 
     public int readBuffer(char[] inBuff) throws PPTException {
-        int bytesRead = 0;
+        int bytesRead;
         try {
             bytesRead = _in.read(inBuff, 0, 4096);
         }

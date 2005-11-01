@@ -48,7 +48,7 @@ import java.io.PrintWriter;
 public class S4Dir {
 
     private static final boolean _Debug = false;
-    private String separator = "/";
+    private static String separator = "/";
 
 
     /**
@@ -62,7 +62,7 @@ public class S4Dir {
      * @param rs       The request state object for this client request.
      * @see ReqState
      */
-    public void sendDIR(HttpServletRequest request,
+    public static void sendDIR(HttpServletRequest request,
                         HttpServletResponse response,
                         ReqState rs)
             throws DODSException, ParseException {
@@ -88,6 +88,8 @@ public class S4Dir {
 
             pw.println("<h1>Server4 Directory for:</h1>");
             pw.println("<h2>" + thisServer + "</h2>");
+            pw.println("<hr>");
+            pw.println("<h2>Directory Service Not yet implmented.</h2>");
 
             //printDIR(pw, ddxCacheDir, "DDX", thisServer);
 
@@ -108,7 +110,7 @@ public class S4Dir {
     }
 
 
-    private void printDIR(PrintWriter pw, String dirName, String dirType, String thisServer) {
+    private static void printDIR(PrintWriter pw, String dirName, String dirType, String thisServer) {
 
         pw.println("<hr>");
         pw.println("<h3>" + dirType + "</h3>");

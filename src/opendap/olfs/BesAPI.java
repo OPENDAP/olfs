@@ -62,17 +62,48 @@ public class BesAPI {
         besGetTransaction("dods",rs,os);
     }
 
-    public static void showVersion(ReqState rs,
-                               OutputStream os)
+/*
+    public static InputStream getDODSStream(ReqState rs)
             throws BadConfigurationException, PPTException {
 
-        besShowTransaction("version",rs,os);
+        besGetStream("dods",rs,os);
+    }
+
+    public static void closeDODSStream(ReqState rs)
+            throws BadConfigurationException, PPTException {
+
+        besCloseStream("dods",rs,os);
+    }
+*/
+
+
+
+    public static void showVersion(ReqState rs,
+                                   OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+        String besIP = rs.getInitParameter("BackEndServer");
+        if (besIP == null)
+            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
+
+        String besPort = rs.getInitParameter("BackEndServerPort");
+        if (besPort == null)
+            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
+
+        besShowTransaction("version",besIP, Integer.parseInt(besPort) ,os);
+    }
+
+    public static void showVersion(String host,
+                                   int port,
+                                   OutputStream os) throws PPTException {
+
+        besShowTransaction("version",host, port ,os);
     }
 
 
     private static void besGetTransaction(String product,
-                                       ReqState rs,
-                                       OutputStream os)
+                                          ReqState rs,
+                                          OutputStream os)
             throws BadConfigurationException,PPTException {
 
         System.out.println("Entered besGetTransaction().");
@@ -87,6 +118,7 @@ public class BesAPI {
 
         OPeNDAPClient oc = new OPeNDAPClient();
 
+        System.out.println("BES at "+besIP+":"+besPort);
 
         oc.startClient(besIP, Integer.parseInt(besPort));
 
@@ -103,7 +135,7 @@ public class BesAPI {
         String ce = rs.getConstraintExpression();
 
         String cmd = "set container values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
-        if(Debug.isSet("showRequest")) System.out.print(cmd);
+        if(Debug.isSet("showRequest")) System.out.print("Sending command: " + cmd);
         oc.executeCommand(cmd);
 
 
@@ -118,11 +150,11 @@ public class BesAPI {
 
         }
 
-        if(Debug.isSet("showRequest")) System.out.print(cmd);
+        if(Debug.isSet("showRequest")) System.out.print("Sending command: " +cmd);
         oc.executeCommand(cmd);
 
         cmd = "get "+product+" for d1;\n";
-        if(Debug.isSet("showRequest")) System.err.print(cmd);
+        if(Debug.isSet("showRequest")) System.err.print("Sending command: " +cmd);
 
         oc.setOutputStomp(os);
         oc.executeCommand(cmd);
@@ -139,22 +171,17 @@ public class BesAPI {
 
 
     private static void besShowTransaction(String product,
-                                       ReqState rs,
-                                       OutputStream os)
-            throws BadConfigurationException,PPTException {
+                                           String host,
+                                           int port,
+                                           OutputStream os)
+            throws PPTException {
 
-        String besIP = rs.getInitParameter("BackEndServer");
-        if (besIP == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
-
-        String besPort = rs.getInitParameter("BackEndServerPort");
-        if (besPort == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
 
         OPeNDAPClient oc = new OPeNDAPClient();
 
+        System.out.println("BES at "+host+":"+port);
 
-        oc.startClient(besIP, Integer.parseInt(besPort));
+        oc.startClient(host, port);
 
         if(Debug.isSet("showRequest"))
             oc.setOutput(System.out);
@@ -164,11 +191,14 @@ public class BesAPI {
         }
 
         String cmd = "show "+product+";\n";
-        if(Debug.isSet("showRequest")) System.err.print(cmd);
-        oc.setOutput(os);
+        if(Debug.isSet("showRequest")) System.err.print("Sending command: "+cmd);
+        oc.setOutputStomp(os);
         oc.executeCommand(cmd);
 
+        System.out.print("Shutting down client...");
+        oc.setOutputStomp(null);
         oc.shutdownClient();
+        System.out.println("Done.");
 
     }
 

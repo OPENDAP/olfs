@@ -3,7 +3,7 @@
 // OPeNDAP Data Access Protocol.
 //
 // Copyright (c) 2005 OPeNDAP, Inc.
-// Author:  Patrick West <pwest@hao.ucar.edu>
+// Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,29 +22,47 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
+package opendap.olfs;
 
-package opendap.ppt ;
-
+import org.jdom.Element;
+import org.jdom.Text;
 
 /**
- * Exception used with DODS client and server request handline.
- *
- * @author Patrick West <A * HREF="mailto:pwest@hao.ucar.edu">pwest@hao.ucar.edu</A>
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: Oct 31, 2005
+ * Time: 3:35:50 PM
+ * To change this template use File | Settings | File Templates.
  */
+public class Version {
 
-public class PPTException  extends Exception{
-    /**
-     * Exception used with DODS client and server request handling where the
-     * msg passed to the constructor represents the error that has occurred
-     * in handling the DODS request.
-     *
-     * @param msg The error message assoicated with this exception. In many
-     *            cases this message includes exception messages handled
-     *            within DODS methods, including client server connection
-     *            errors, send and receive error messages, etc...
-     */
-    public PPTException(String msg) {
-        super(msg);
+
+    private static String version = "0.0.0";
+
+    public static String getVersionString(){
+        return(version);
     }
-}
 
+    public static Element getVersionElement(){
+
+        Element olfs = new Element("OLFS");
+
+        Element lib = new Element("lib");
+        Element name = new Element("name");
+        Element ver = new Element("version");
+
+        name.addContent(new Text("olfs"));
+        lib.addContent(name);
+
+        ver.addContent(new Text(version));
+        lib.addContent(ver);
+
+        olfs.addContent(lib);
+
+        return (olfs);
+
+    }
+
+
+
+}

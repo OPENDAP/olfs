@@ -9,7 +9,7 @@
 
     <servlet>
         <servlet-name>
-            s4
+            hao
         </servlet-name>
 
         <servlet-class>
@@ -45,13 +45,60 @@
     </servlet>
 
 
+    <servlet>
+        <servlet-name>
+            xray
+        </servlet-name>
+
+        <servlet-class>
+            opendap.olfs.OLFS
+        </servlet-class>
+
+        <init-param>
+            <param-name>DebugOn</param-name>
+            <param-value>showRequest showResponse CE</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>BackEndServer</param-name>
+            <param-value>127.0.0.1</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>BackEndServerPort</param-name>
+            <param-value>10002</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>FileSystemPrefix</param-name>
+            <param-value>/Users/ndp/OPeNDAP/Projects/Server4/data/nc</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>TargetPathSeperator</param-name>
+            <param-value>/</param-value>
+        </init-param>
+
+
+    </servlet>
+
+
     <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4</url-pattern>
+        <servlet-name>hao</servlet-name>
+        <url-pattern>/hao</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4/*</url-pattern>
+        <servlet-name>hao</servlet-name>
+        <url-pattern>/hao/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>xray</servlet-name>
+        <url-pattern>/xray</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>xray</servlet-name>
+        <url-pattern>/xray/*</url-pattern>
     </servlet-mapping>
 
 

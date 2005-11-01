@@ -49,7 +49,7 @@ import opendap.dap.DAS;
  * throws IOException, ServletException {
  * <p/>
  * response.setContentType("text/plain");
- * response.setHeader("XDODS-Server",  getServerVersion() );
+ * response.setHeader("XDODS-Server",  getXDODSServer() );
  * response.setHeader("Content-Description", "dods_dds");
  * OutputStream Out = new BufferedOutputStream(response.getOutputStream());
  * <p/>
