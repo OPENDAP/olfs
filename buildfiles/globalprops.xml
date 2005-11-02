@@ -106,7 +106,7 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="crimson.lib" value="crimson-1.1.3.jar"/>
 <property name="javamail.lib" value="javamail-1.3.1.jar"/>
 <property name="echo.lib" value="echosoap.jar"/>
-<property name="opendap.lib" value="opendap-0.0.0.jar"/>
+<property name="opendap.lib" value="opendap-0.0.1.jar"/>
 
 <property name="cli.lib" value="apache-commons-cli-1.0.jar"/>
 

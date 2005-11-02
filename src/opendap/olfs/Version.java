@@ -57,7 +57,9 @@ public class Version {
         ver.addContent(new Text(version));
         lib.addContent(ver);
 
+
         olfs.addContent(lib);
+        olfs.addContent(opendap.dap.Version.getVersionElement());
 
         return (olfs);
 

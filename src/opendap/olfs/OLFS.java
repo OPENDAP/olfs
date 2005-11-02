@@ -196,7 +196,10 @@ public class OLFS extends HttpServlet {
         double hval = 0.0;
         String hver = "";
 
-        String clientDapVer = request.getHeader("XDAP");
+        String clientDapVer = null;
+
+        if(request != null)
+            clientDapVer = request.getHeader("XDAP");
 
         if(getVersionDocument() != null) {
 
@@ -322,6 +325,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_error");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "none");
@@ -367,6 +372,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -417,6 +424,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -470,6 +479,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("application/octet-stream");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_data");
 
         ServletOutputStream sOut = response.getOutputStream();
@@ -528,6 +539,8 @@ public class OLFS extends HttpServlet {
 
 
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_directory");
 
@@ -565,6 +578,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("text/xml");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_version");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -615,6 +630,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_help");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -651,6 +668,8 @@ public class OLFS extends HttpServlet {
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "BadURL");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -692,8 +711,10 @@ public class OLFS extends HttpServlet {
         if (Debug.isSet("showResponse"))
             System.out.println("doGetASC For: " + rs.getDataSet());
 
-        response.setHeader("XDODS-Server", getXDODSServer());
         response.setContentType("text/plain");
+        response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_ascii");
 
         System.out.println("Flow in doGetASC()");
@@ -728,8 +749,10 @@ public class OLFS extends HttpServlet {
 
         PrintStream pw = new PrintStream(response.getOutputStream());
 
-        response.setHeader("XDODS-Server", getXDODSServer());
         response.setContentType("text/html");
+        response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_description");
 
         /*
@@ -776,8 +799,10 @@ public class OLFS extends HttpServlet {
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", getXDODSServer());
         response.setContentType("text/html");
+        response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_form");
 /*
         try {
@@ -820,8 +845,10 @@ public class OLFS extends HttpServlet {
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", getXDODSServer());
         response.setContentType("text/xml");
+        response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_catalog");
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
@@ -851,8 +878,10 @@ public class OLFS extends HttpServlet {
                         ReqState rs) throws IOException {
 
 
-        response.setHeader("XDODS-Server", getXDODSServer());
         response.setContentType("text/html");
+        response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setHeader("Content-Description", "dods_debug");
 
         PrintStream pw = new PrintStream(response.getOutputStream());
@@ -938,6 +967,8 @@ public class OLFS extends HttpServlet {
 
 
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 
@@ -995,6 +1026,8 @@ public class OLFS extends HttpServlet {
 
 
         response.setHeader("XDODS-Server", getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
+        response.setHeader("XDAP", getXDAP(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 
