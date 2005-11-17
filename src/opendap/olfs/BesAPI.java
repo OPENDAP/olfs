@@ -40,11 +40,19 @@ import java.io.OutputStream;
  */
 public class BesAPI {
 
-    public static void getDDS(ReqState rs,
-                              OutputStream os)
+
+    public static void getDDX(ReqState rs,
+                              OutputStream os, boolean constrained)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction("dds",rs,os);
+        besGetTransaction(getAPINameForDDX(),rs,os,constrained);
+    }
+
+    public static void getDDS(ReqState rs,
+                              OutputStream os, boolean constrained)
+            throws BadConfigurationException, PPTException {
+
+        besGetTransaction(getAPINameForDDS(),rs,os,constrained);
     }
 
 
@@ -52,29 +60,15 @@ public class BesAPI {
                               OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction("das",rs,os);
+        besGetTransaction(getAPINameForDAS(),rs,os, true);
     }
 
     public static void getDODS(ReqState rs,
                                OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction("dods",rs,os);
+        besGetTransaction(getAPINameForDODS(),rs,os,true);
     }
-
-/*
-    public static InputStream getDODSStream(ReqState rs)
-            throws BadConfigurationException, PPTException {
-
-        besGetStream("dods",rs,os);
-    }
-
-    public static void closeDODSStream(ReqState rs)
-            throws BadConfigurationException, PPTException {
-
-        besCloseStream("dods",rs,os);
-    }
-*/
 
 
 
@@ -101,12 +95,8 @@ public class BesAPI {
     }
 
 
-    private static void besGetTransaction(String product,
-                                          ReqState rs,
-                                          OutputStream os)
+    public static OPeNDAPClient startClient(ReqState rs)
             throws BadConfigurationException,PPTException {
-
-        System.out.println("Entered besGetTransaction().");
 
         String besIP = rs.getInitParameter("BackEndServer");
         if (besIP == null)
@@ -123,12 +113,18 @@ public class BesAPI {
         oc.startClient(besIP, Integer.parseInt(besPort));
 
         if(Debug.isSet("showRequest"))
-            oc.setOutput(System.out);
+            oc.setOutput(System.out,true);
         else {
             DevNull devNull = new DevNull();
-            oc.setOutput(devNull);
+            oc.setOutput(devNull,true);
         }
 
+
+        return oc;
+    }
+
+
+    public static void configureTransaction(OPeNDAPClient oc, ReqState rs, boolean constrained) throws PPTException {
         String datasetPath = rs.getFileSystemPrefix() + rs.getDataSet();
         String datasetType = "nc";
         String cName = rs.getDataSet();
@@ -142,7 +138,7 @@ public class BesAPI {
         System.out.println("ConstraintExpression: "+ce);
 
 
-        if(ce.equalsIgnoreCase("")){
+        if(ce.equalsIgnoreCase("") || !constrained){
             cmd = "define d1 as "+rs.getDataSet() + ";\n";
         }
         else {
@@ -153,18 +149,69 @@ public class BesAPI {
         if(Debug.isSet("showRequest")) System.out.print("Sending command: " +cmd);
         oc.executeCommand(cmd);
 
-        cmd = "get "+product+" for d1;\n";
+    }
+
+    public static String getGetCmd(String product){
+        return "get "+product+" for d1;\n";
+
+    }
+
+    public static String getAPINameForDDS(){
+        return "dds";
+    }
+
+    public static String getAPINameForDAS(){
+        return "das";
+    }
+
+    public static String getAPINameForDODS(){
+        return "dods";
+    }
+
+    public static String getAPINameForDDX(){
+        return "ddx";
+    }
+
+
+    public static void getDataProduct(OPeNDAPClient oc,
+                                      String product,
+                                      OutputStream os) throws PPTException {
+
+        String cmd = getGetCmd(product);
         if(Debug.isSet("showRequest")) System.err.print("Sending command: " +cmd);
 
-        oc.setOutputStomp(os);
+        oc.setOutput(os,false);
         oc.executeCommand(cmd);
 
+    }
+
+    public static void shutdownClient(OPeNDAPClient oc) throws PPTException {
         System.out.print("Shutting down client...");
 
-        oc.setOutputStomp(null);
+        oc.setOutput(null,false);
 
         oc.shutdownClient();
         System.out.println("Done.");
+
+
+    }
+
+    private static void besGetTransaction(String product,
+                                          ReqState rs,
+                                          OutputStream os,
+                                          boolean constrained)
+            throws BadConfigurationException,PPTException {
+
+        System.out.println("Entered besGetTransaction().");
+
+
+        OPeNDAPClient oc = startClient(rs);
+
+        configureTransaction(oc,rs,constrained);
+
+        getDataProduct(oc,product,os);
+
+        shutdownClient(oc);
 
     }
 
@@ -184,19 +231,19 @@ public class BesAPI {
         oc.startClient(host, port);
 
         if(Debug.isSet("showRequest"))
-            oc.setOutput(System.out);
+            oc.setOutput(System.out,true);
         else {
             DevNull devNull = new DevNull();
-            oc.setOutput(devNull);
+            oc.setOutput(devNull,true);
         }
 
         String cmd = "show "+product+";\n";
         if(Debug.isSet("showRequest")) System.err.print("Sending command: "+cmd);
-        oc.setOutputStomp(os);
+        oc.setOutput(os,false);
         oc.executeCommand(cmd);
 
         System.out.print("Shutting down client...");
-        oc.setOutputStomp(null);
+        oc.setOutput(null,false);
         oc.shutdownClient();
         System.out.println("Done.");
 

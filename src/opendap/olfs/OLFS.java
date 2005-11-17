@@ -28,6 +28,7 @@ package opendap.olfs;
 import java.io.*;
 import java.util.*;
 import java.util.zip.DeflaterOutputStream;
+import java.rmi.server.UID;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -108,12 +109,6 @@ import org.jdom.output.Format;
 public class OLFS extends HttpServlet {
 
 
-    /**
-     * ************************************************************************
-     * Debugging
-     */
-    private Document serverVersionDoc = null;
-
 
     /**
      * ************************************************************************
@@ -139,147 +134,6 @@ public class OLFS extends HttpServlet {
      */
     private int HitCounter = 0;
 
-
-    /**
-     *
-     * @return A string containing the value of the XDODS-Server MIME header as ascertained
-     * by querying the BES.
-     */
-    public String getXDODSServer() {
-
-        if(getVersionDocument() != null) {
-            Iterator i = getVersionDocument().getRootElement().getChild("BES").getChildren("lib").iterator();
-
-            while(i.hasNext()){
-                Element e = (Element) i.next();
-                if(e.getChildTextTrim("name").equalsIgnoreCase("libdap")){
-                    return("dods/"+e.getChildTextTrim("version"));
-                }
-            }
-        }
-
-        return ("Server-Version-Unknown");
-    }
-
-    /**
-     *
-     * @return A String containing the value of the XOPeNDAP-Server MIME header ascertained by querying
-     * the BES and conforming to the DAP4 specification.
-     */
-    public String getXOPeNDAPServer() {
-        if(getVersionDocument() != null) {
-
-            String opsrv = "";
-
-            Iterator i = getVersionDocument().getRootElement().getChildren().iterator();
-
-            while(i.hasNext()){
-                Element pkg = (Element) i.next();
-                Iterator j = pkg.getChildren("lib").iterator();
-                while(j.hasNext()){
-                    Element lib = (Element) j.next();
-                    opsrv += " "+lib.getChildTextTrim("name")+"/"+lib.getChildTextTrim("version");
-                }
-            }
-            return(opsrv);
-        }
-        return ("Server-Version-Unknown");
-    }
-
-    /**
-     *
-     * @return A String containing the XDAP MIME header value that describes the DAP specifcation that
-     * the server response conforms to.
-     */
-    public String getXDAP(HttpServletRequest request) {
-
-        double hval = 0.0;
-        String hver = "";
-
-        String clientDapVer = null;
-
-        if(request != null)
-            clientDapVer = request.getHeader("XDAP");
-
-        if(getVersionDocument() != null) {
-
-            String responseDAP = null;
-
-            Iterator i = getVersionDocument().getRootElement().getChild("DAP").getChildren("version").iterator();
-
-            while(i.hasNext()){
-                Element v = (Element) i.next();
-                String ver  = v.getTextTrim();
-                double vval = Double.parseDouble(ver);
-                if(hval < vval){
-                    hval = vval;
-                    hver = ver;
-                }
-
-                if(clientDapVer != null && clientDapVer.equals(ver))
-                    responseDAP = ver;
-            }
-            if(responseDAP == null)
-                return(hver);
-            return(responseDAP);
-        }
-
-        return ("DAP-Version-Unknown");
-
-    }
-
-    /**
-     *
-     * @return The OLFS version Document object created and cached shortly after entering the doGet()
-     * method of this object. This method will return <coe>null</code> if it is called prior to the
-     * call of the private method of the same name.
-     */
-    public  Document getVersionDocument(){
-        return(serverVersionDoc);
-    }
-
-
-    /**
-     *
-     * @return The OLFS version Document object. Calling this method ccauses the OLFS to query
-     * the BES to determine the various version components located there.
-     */
-    private Document getVersionDocument(ReqState rs) throws IOException,
-                                                            PPTException,
-                                                            BadConfigurationException,
-                                                            JDOMException {
-
-        System.out.println("Getting Server Version Document.");
-
-        // Get the version response from the BES (an XML doc)
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.showVersion(rs, os);
-
-        //System.out.println(os);
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
-
-        // Tweak it!
-
-        // First find the response Element
-        Element ver = doc.getRootElement().getChild("response");
-
-        // Disconnect it from it's parent and then rename it.
-        ver.detach();
-        ver.setName("OPeNDAP-Version");
-
-        // Add a version element for this, the OLFS server
-        ver.addContent(opendap.olfs.Version.getVersionElement());
-
-        doc.detachRootElement();
-        doc.setRootElement(ver);
-
-        return (doc);
-
-
-    }
 
 
     /**
@@ -319,14 +173,15 @@ public class OLFS extends HttpServlet {
      */
     public void sendOPeNDAPError(HttpServletRequest request,
                                  HttpServletResponse response,
+                                 ReqState rs,
                                  String clientMsg,
                                  String serverMsg)
             throws IOException, ServletException {
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_error");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "none");
@@ -371,9 +226,9 @@ public class OLFS extends HttpServlet {
             System.out.println("doGetDAS for dataset: " + rs.getDataSet());
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -423,16 +278,16 @@ public class OLFS extends HttpServlet {
             System.out.println("doGetDDS for dataset: " + rs.getDataSet());
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDDS(rs, Out);
+            BesAPI.getDDS(rs, Out, true);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -478,9 +333,9 @@ public class OLFS extends HttpServlet {
             System.out.println("doGetOPeNDAP For: " + rs.getDataSet());
 
         response.setContentType("application/octet-stream");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_data");
 
         ServletOutputStream sOut = response.getOutputStream();
@@ -538,9 +393,9 @@ public class OLFS extends HttpServlet {
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_directory");
 
@@ -577,30 +432,30 @@ public class OLFS extends HttpServlet {
             System.out.println("Sending Version Document:");
 
         response.setContentType("text/xml");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_version");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         PrintStream ps = new PrintStream(response.getOutputStream());
 
-        Document vdoc = getVersionDocument();
+        Document vdoc = rs.getVersionDocument();
         if(vdoc == null){
             throw new DODSException("Internal Error: Version Document not initialized.");
         }
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        xout.output(getVersionDocument(),ps);
+        xout.output(rs.getVersionDocument(),ps);
         ps.flush();
 
         if (Debug.isSet("showResponse")){
-            xout.output(getVersionDocument(),System.out);
+            xout.output(rs.getVersionDocument(),System.out);
             System.out.println("Document Sent.");
             System.out.println("\nMIME Headers:");
-            System.out.println("    XDODS-Server: "+getXDODSServer());
-            System.out.println("    XOPeNDAP-Server: "+getXOPeNDAPServer());
-            System.out.println("    XDAP: "+getXDAP(request));
+            System.out.println("    XDODS-Server: "+rs.getXDODSServer());
+            System.out.println("    XOPeNDAP-Server: "+rs.getXOPeNDAPServer());
+            System.out.println("    XDAP: "+rs.getXDAP(request));
             System.out.println("\nEnd Response.");
         }
 
@@ -622,16 +477,17 @@ public class OLFS extends HttpServlet {
      *                 object.
      */
     public void doGetHELP(HttpServletRequest request,
-                          HttpServletResponse response)
+                          HttpServletResponse response,
+                          ReqState rs)
             throws IOException, ServletException {
 
         if (Debug.isSet("showResponse"))
             System.out.println("Sending Help Page.");
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_help");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -660,16 +516,17 @@ public class OLFS extends HttpServlet {
      *                 object.
      */
     public void badURL(HttpServletRequest request,
-                       HttpServletResponse response)
+                       HttpServletResponse response,
+                       ReqState rs)
             throws IOException, ServletException {
 
         if (Debug.isSet("showResponse"))
             System.out.println("Sending Bad URL Page.");
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "BadURL");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -705,20 +562,20 @@ public class OLFS extends HttpServlet {
     public void doGetASC(HttpServletRequest request,
                          HttpServletResponse response,
                          ReqState rs)
-            throws IOException, ServletException {
+            throws IOException, ServletException, PPTException, DODSException, ParseException {
 
 
         if (Debug.isSet("showResponse"))
             System.out.println("doGetASC For: " + rs.getDataSet());
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_ascii");
 
         System.out.println("Flow in doGetASC()");
-        S4Ascii.sendASCII(request, response, rs.getDataSet());
+        S4Ascii.sendASCII(request, response, rs);
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
@@ -742,37 +599,12 @@ public class OLFS extends HttpServlet {
     public void doGetINFO(HttpServletRequest request,
                           HttpServletResponse response,
                           ReqState rs)
-            throws IOException, ServletException {
+            throws IOException, ServletException, PPTException, ParseException, DODSException {
 
-        if (Debug.isSet("showResponse"))
-            System.out.println("doGetINFO For: " + rs.getDataSet());
-
-        PrintStream pw = new PrintStream(response.getOutputStream());
-
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
-        response.setHeader("Content-Description", "dods_description");
-
-        /*
-        try {
-
-            //ds = getDataset(rs);
-            //S4Info di = new S4Info();
-            //di.sendINFO(pw, ds, rs);
-            //response.setStatus(HttpServletResponse.SC_OK);
+        S4Info.sendINFO(request,response, rs);
+        response.setStatus(HttpServletResponse.SC_OK);
 
 
-        } catch (OPeNDAPException de) {
-            Util.dodsExceptionHandler(de, response);
-        } catch (IOException pe) {
-            Util.IOExceptionHandler(pe, response, rs);
-        } catch (ParseException pe) {
-            Util.parseExceptionHandler(pe, response);
-        }
-
-*/
 
 
     }
@@ -800,9 +632,9 @@ public class OLFS extends HttpServlet {
 
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_form");
 /*
         try {
@@ -841,14 +673,15 @@ public class OLFS extends HttpServlet {
      * @see S4Html
      */
     public void doGetCatalog(HttpServletRequest request,
-                             HttpServletResponse response)
+                             HttpServletResponse response,
+                             ReqState rs)
             throws IOException, ServletException {
 
 
         response.setContentType("text/xml");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_catalog");
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
@@ -861,7 +694,6 @@ public class OLFS extends HttpServlet {
     // to be overridden by servers that implement catalogs
     protected void printCatalog(HttpServletRequest request, PrintWriter os) throws IOException {
         os.println("Catalog not available for this server");
-        os.println("Server version = " + getXDODSServer());
     }
 
     /***************************************************************************/
@@ -879,9 +711,9 @@ public class OLFS extends HttpServlet {
 
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_debug");
 
         PrintStream pw = new PrintStream(response.getOutputStream());
@@ -962,13 +794,14 @@ public class OLFS extends HttpServlet {
      * @see S4Html
      */
     public void doGetSystemProps(HttpServletRequest request,
-                                 HttpServletResponse response)
+                                 HttpServletResponse response,
+                                 ReqState rs)
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 
@@ -1021,13 +854,14 @@ public class OLFS extends HttpServlet {
      * @see S4Html
      */
     public void doGetStatus(HttpServletRequest request,
-                            HttpServletResponse response)
+                            HttpServletResponse response,
+                            ReqState rs)
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServer());
-        response.setHeader("XDAP", getXDAP(request));
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 
@@ -1044,7 +878,6 @@ public class OLFS extends HttpServlet {
 
     // to be overridden by servers that implement status report
     protected void printStatus(PrintWriter os) throws IOException {
-        os.println("<h2>Server version = " + getXDODSServer() + "</h2>");
         os.println("<h2>Number of Requests Received = " + HitCounter + "</h2>");
         if (track) {
             int n = prArr.size();
@@ -1163,7 +996,6 @@ public class OLFS extends HttpServlet {
             } // synch
 
             if (rs != null) {
-                serverVersionDoc = getVersionDocument(rs);
                 String dataSet = rs.getDataSet();
                 String requestSuffix = rs.getRequestSuffix();
 
@@ -1176,19 +1008,19 @@ public class OLFS extends HttpServlet {
                 } else if (dataSet.equalsIgnoreCase("/version") || dataSet.equalsIgnoreCase("/version/")) {
                     doGetVER(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("/help") || dataSet.equalsIgnoreCase("/help/")) {
-                    doGetHELP(request, response);
+                    doGetHELP(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("/" + requestSuffix)) {
-                    doGetHELP(request, response);
+                    doGetHELP(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("dds")) {
                     doGetDDS(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("das")) {
                     doGetDAS(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("ddx")) {
                     //doGetDDX(request, response, rs);
-                    badURL(request, response);
+                    badURL(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("blob")) {
                     //doGetBLOB(request, response, rs);
-                    badURL(request, response);
+                    badURL(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("dods")) {
                     doGetDODS(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("asc") ||
@@ -1202,25 +1034,25 @@ public class OLFS extends HttpServlet {
                 } else if (requestSuffix.equalsIgnoreCase("ver") || requestSuffix.equalsIgnoreCase("version")) {
                     doGetVER(request, response, rs);
                 } else if (requestSuffix.equalsIgnoreCase("help")) {
-                    doGetHELP(request, response);
+                    doGetHELP(request, response, rs);
                 }
 
                 // JC added
                 else if (dataSet.equalsIgnoreCase("catalog") && requestSuffix.equalsIgnoreCase("xml")) {
-                    doGetCatalog(request, response);
+                    doGetCatalog(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("status")) {
-                    doGetStatus(request, response);
+                    doGetStatus(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("systemproperties")) {
-                    doGetSystemProps(request, response);
+                    doGetSystemProps(request, response, rs);
                 } else if (isDebug) {
                     doDebug(request, response, rs);
                 } else if (requestSuffix.equals("")) {
-                    badURL(request, response);
+                    badURL(request, response, rs);
                 } else {
-                    badURL(request, response);
+                    badURL(request, response, rs);
                 }
             } else {
-                badURL(request, response);
+                badURL(request, response, rs);
             }
 
             if (reqD != null) reqD.done = true;
@@ -1230,7 +1062,8 @@ public class OLFS extends HttpServlet {
 
     }
 
-    private ReqState getRequestState(HttpServletRequest request) {
+    private ReqState getRequestState(HttpServletRequest request)
+            throws IOException, PPTException, BadConfigurationException, JDOMException {
 
         ReqState rs;
 

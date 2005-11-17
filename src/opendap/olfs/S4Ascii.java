@@ -31,8 +31,12 @@ import java.util.*;
 import javax.servlet.http.*;
 
 import opendap.dap.*;
+import opendap.dap.parser.ParseException;
 import opendap.util.*;
-import opendap.servers.ascii.*;
+import opendap.servers.ascii.asciiFactory;
+import opendap.servers.ascii.toASCII;
+import opendap.ppt.PPTException;
+
 
 /**
  * Default handler for OPeNDAP ascii requests. This class is used
@@ -54,14 +58,95 @@ public class S4Ascii {
      * comma delimited ascii columns for ingestion into some not so
      * OPeNDAP enabled application such as MS-Excel. Accepts constraint expressions
      * in exactly the same way as the regular OPeNDAP dataserver.
-     *
      */
     public static void sendASCII(HttpServletRequest request,
                                  HttpServletResponse response,
-                                 String dataSet){
+                                 ReqState rs) throws PPTException, DODSException, DDSException, ParseException, IOException {
 
         if (Debug.isSet("showResponse"))
-            System.out.println("Sending OPeNDAP ASCII Data For: " + dataSet +
+            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataSet() +
+                    "    CE: '" + request.getQueryString() + "'");
+
+
+        String requestURL, ce;
+        DConnect url;
+        DataDDS dds;
+
+        if (request.getQueryString() == null) {
+            ce = "";
+        } else {
+            ce = "?" + request.getQueryString();
+        }
+
+        int suffixIndex = request.getRequestURL().toString().lastIndexOf(".");
+
+        requestURL = request.getRequestURL().substring(0, suffixIndex);
+
+        if (Debug.isSet("showResponse")) {
+            System.out.println("New Request URL Resource: '" + requestURL + "'");
+            System.out.println("New Request Constraint Expression: '" + ce + "'");
+        }
+
+        ServerVersion sv = new ServerVersion(rs.getXDODSServer());
+
+        if (Debug.isSet("asciiResponse")) {
+            System.out.println("    Major Server Version: " + sv.getMajor());
+            System.out.println("    Minor Server Version: " + sv.getMinor());
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDODS(rs, os);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        dds = new DataDDS(sv, new asciiFactory());
+        dds.parse(new HeaderInputStream(is));
+        dds.readData(is, null);
+
+
+        if (Debug.isSet("asciiResponse")) System.out.println(" ASCII DDS: ");
+        if (Debug.isSet("asciiResponse")) dds.print(System.out);
+
+        PrintWriter pw = new PrintWriter(response.getOutputStream());
+        PrintWriter pwDebug = new PrintWriter(System.out);
+
+        //pw.println("<pre>");
+        dds.print(pw);
+        pw.println("---------------------------------------------");
+
+
+        String s = "";
+        Enumeration e = dds.getVariables();
+
+        while (e.hasMoreElements()) {
+            BaseType bt = (BaseType) e.nextElement();
+            if (Debug.isSet("asciiResponse")) ((toASCII) bt).toASCII(pwDebug, true, null, true);
+            //bt.toASCII(pw,addName,getNAme(),true);
+            ((toASCII) bt).toASCII(pw, true, null, true);
+        }
+
+        //pw.println("</pre>");
+        pw.flush();
+        if (Debug.isSet("asciiResponse")) pwDebug.flush();
+
+
+        if (Debug.isSet("asciiResponse")) System.out.println(" dodsASCII done");
+    }
+    /***************************************************************************/
+
+
+    /**
+     * ************************************************************************
+     * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
+     * comma delimited ascii columns for ingestion into some not so
+     * OPeNDAP enabled application such as MS-Excel. Accepts constraint expressions
+     * in exactly the same way as the regular OPeNDAP dataserver.
+     */
+    public static void sendASCII_old(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     ReqState rs) {
+
+        if (Debug.isSet("showResponse"))
+            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataSet() +
                     "    CE: '" + request.getQueryString() + "'");
 
 
@@ -86,14 +171,14 @@ public class S4Ascii {
 
         try {
 
-            if (_Debug) System.out.println("Making connection to .dods service...");
+            if (Debug.isSet("asciiResponse")) System.out.println("Making connection to .dods service...");
             url = new DConnect(requestURL, true);
 
-            if (_Debug) System.out.println("Requesting data...");
+            if (Debug.isSet("asciiResponse")) System.out.println("Requesting data...");
             dds = url.getData(ce, null, new asciiFactory());
 
-            if (_Debug) System.out.println(" ASC DDS: ");
-            if (_Debug) dds.print(System.out);
+            if (Debug.isSet("asciiResponse")) System.out.println(" ASC DDS: ");
+            if (Debug.isSet("asciiResponse")) dds.print(System.out);
 
             PrintWriter pw = new PrintWriter(response.getOutputStream());
             PrintWriter pwDebug = new PrintWriter(System.out);
@@ -108,14 +193,14 @@ public class S4Ascii {
 
             while (e.hasMoreElements()) {
                 BaseType bt = (BaseType) e.nextElement();
-                if (_Debug) ((toASCII) bt).toASCII(pwDebug, true, null, true);
+                if (Debug.isSet("asciiResponse")) ((toASCII) bt).toASCII(pwDebug, true, null, true);
                 //bt.toASCII(pw,addName,getNAme(),true);
                 ((toASCII) bt).toASCII(pw, true, null, true);
             }
 
             //pw.println("</pre>");
             pw.flush();
-            if (_Debug) pwDebug.flush();
+            if (Debug.isSet("asciiResponse")) pwDebug.flush();
 
         }
         catch (FileNotFoundException fnfe) {
@@ -135,7 +220,7 @@ public class S4Ascii {
             t.printStackTrace(System.out);
         }
 
-        if (_Debug) System.out.println(" dodsASCII done");
+        if (Debug.isSet("asciiResponse")) System.out.println(" dodsASCII done");
     }
     /***************************************************************************/
 

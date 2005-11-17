@@ -25,11 +25,23 @@
 
 package opendap.olfs;
 
+import org.jdom.Element;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
 import java.util.Enumeration;
 import java.util.StringTokenizer;
+import java.util.Iterator;
 import java.io.File;
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.rmi.server.UID;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
+
+import opendap.ppt.PPTException;
 
 /**
  * User requests get cached here so that downstream code can access
@@ -44,15 +56,17 @@ public class ReqState {
     private String defaultFileSystemPrefix;
 
 
-    /**
-     * ************************************************************************
+
+    /***************************************************************************
      * Default directory for the cached INFO files. This
      * presupposes that the server is going to use locally
      * cached INFO files.
      *
      * @serial
      */
-    // private  String defaultINFOcache;
+    private  String defaultINFOcache;
+
+    private Document serverVersionDoc = null;
 
     private final String defaultSchemaName = "opendap-0.0.0.xsd";
     private String defaultSchemaLocation;
@@ -71,7 +85,12 @@ public class ReqState {
 
     public ReqState(HttpServletRequest myRequest,
                     ServletConfig sc,
-                    String serverClassName) throws BadURLException {
+                    String serverClassName)
+            throws BadURLException,
+            IOException,
+            PPTException,
+            BadConfigurationException,
+            JDOMException {
 
         this.myServletConfig = sc;
         this.myHttpRequest = myRequest;
@@ -90,8 +109,10 @@ public class ReqState {
 
         processDodsURL();
 
+        
+        defaultINFOcache = this.myServletConfig.getServletContext().getRealPath("datasets" +
+                myHttpRequest.getServletPath() + "/info") + "/";
 
-        String servletPath = myHttpRequest.getServletPath();
 
         int index = myHttpRequest.getRequestURL().lastIndexOf(
                 myHttpRequest.getServletPath());
@@ -106,9 +127,185 @@ public class ReqState {
         defaultFileSystemPrefix = "/usr/local/opendap/data";
 
         requestURL = myHttpRequest.getRequestURL().toString();
+        serverVersionDoc = getVersionDocument(this);
+
 
 
     }
+
+    /**
+     *  This method will attempt to get the INFO cache directory
+     *  name from the servlet's InitParameters. Failing this it
+     *  will return the default INFO cache directory name.
+     *
+     * @return The name of the INFO cache directory.
+     */
+    public String getINFOCache() {
+        String cacheDir = getInitParameter("INFOcache");
+        if (cacheDir == null)
+            cacheDir = defaultINFOcache;
+        return (cacheDir);
+    }
+
+    /**
+     * Sets the default INFO Cache directory name to
+     * the string <i>cachedir</i>. Note that if the servlet configuration
+     * conatins an Init Parameter <i>INFOcache</i> the default
+     * value will be ingnored.
+     * @param cachedir
+     */
+    public void setDefaultINFOCache(String cachedir){
+        defaultINFOcache = cachedir;
+    }
+
+
+
+    /**
+     *
+     * @return A string containing the value of the XDODS-Server MIME header as ascertained
+     * by querying the BES.
+     */
+    public String getXDODSServer() {
+
+        if(getVersionDocument() != null) {
+            Iterator i = getVersionDocument().getRootElement().getChild("BES").getChildren("lib").iterator();
+
+            while(i.hasNext()){
+                Element e = (Element) i.next();
+                if(e.getChildTextTrim("name").equalsIgnoreCase("libdap")){
+                    return("dods/"+e.getChildTextTrim("version"));
+                }
+            }
+        }
+
+        return ("Server-Version-Unknown");
+    }
+
+    /**
+     *
+     * @return A String containing the value of the XOPeNDAP-Server MIME header ascertained by querying
+     * the BES and conforming to the DAP4 specification.
+     */
+    public String getXOPeNDAPServer() {
+        if(getVersionDocument() != null) {
+
+            String opsrv = "";
+
+            Iterator i = getVersionDocument().getRootElement().getChildren().iterator();
+
+            while(i.hasNext()){
+                Element pkg = (Element) i.next();
+                Iterator j = pkg.getChildren("lib").iterator();
+                while(j.hasNext()){
+                    Element lib = (Element) j.next();
+                    opsrv += " "+lib.getChildTextTrim("name")+"/"+lib.getChildTextTrim("version");
+                }
+            }
+            return(opsrv);
+        }
+        return ("Server-Version-Unknown");
+    }
+
+    /**
+     *
+     * @return A String containing the XDAP MIME header value that describes the DAP specifcation that
+     * the server response conforms to.
+     */
+    public String getXDAP(HttpServletRequest request) {
+
+        double hval = 0.0;
+        String hver = "";
+
+        String clientDapVer = null;
+
+        if(request != null)
+            clientDapVer = request.getHeader("XDAP");
+
+        if(getVersionDocument() != null) {
+
+            String responseDAP = null;
+
+            Iterator i = getVersionDocument().getRootElement().getChild("DAP").getChildren("version").iterator();
+
+            while(i.hasNext()){
+                Element v = (Element) i.next();
+                String ver  = v.getTextTrim();
+                double vval = Double.parseDouble(ver);
+                if(hval < vval){
+                    hval = vval;
+                    hver = ver;
+                }
+
+                if(clientDapVer != null && clientDapVer.equals(ver))
+                    responseDAP = ver;
+            }
+            if(responseDAP == null)
+                return(hver);
+            return(responseDAP);
+        }
+
+        return ("DAP-Version-Unknown");
+
+    }
+
+    /**
+      *
+      * @return The OLFS version Document object created and cached shortly after entering the doGet()
+      * method of this object. This method will return <coe>null</code> if it is called prior to the
+      * call of the private method of the same name.
+      */
+     public  Document getVersionDocument(){
+         return(serverVersionDoc);
+     }
+
+    /**
+     *
+     * @return The OLFS version Document object. Calling this method ccauses the OLFS to query
+     * the BES to determine the various version components located there.
+     */
+    private Document getVersionDocument(ReqState rs) throws IOException,
+                                                            PPTException,
+                                                            BadConfigurationException,
+                                                            JDOMException {
+
+        System.out.println("Getting Server Version Document.");
+
+
+        UID reqid = new UID();
+
+        System.out.println("    RequestID: "+reqid);
+
+        // Get the version response from the BES (an XML doc)
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.showVersion(rs, os);
+
+        //System.out.println(os);
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
+
+        // Tweak it!
+
+        // First find the response Element
+        Element ver = doc.getRootElement().getChild("response");
+
+        // Disconnect it from it's parent and then rename it.
+        ver.detach();
+        ver.setName("OPeNDAP-Version");
+
+        // Add a version element for this, the OLFS server
+        ver.addContent(opendap.olfs.Version.getVersionElement());
+
+        doc.detachRootElement();
+        doc.setRootElement(ver);
+
+        return (doc);
+
+
+    }
+
+
 
     public String getDataSet() {
         return dataSetName;

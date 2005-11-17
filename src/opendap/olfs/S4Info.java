@@ -33,6 +33,12 @@ import opendap.dap.*;
 import opendap.util.*;
 import opendap.dap.Server.*;
 import opendap.dap.parser.ParseException;
+import opendap.ppt.PPTException;
+import opendap.ppt.OPeNDAPClient;
+import opendap.servers.ascii.asciiFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Default handler for DODS info requests. This class is used
@@ -46,8 +52,6 @@ import opendap.dap.parser.ParseException;
 public class S4Info {
 
     private static final boolean _Debug = true;
-
-    private String infoDir = null;
 
     /**
      * ************************************************************************
@@ -85,29 +89,59 @@ public class S4Info {
      * <p/>
      * <h3>Look for the user supplied Server- and dataset-specific HTML* documents.</h3>
      *
-     * @param pw  The PrintStream to which the output should be written.
-     * @param gds The thread safe dataset.
      * @param rs  The ReqState object for theis client request.
      * @see GuardedDataset
      * @see ReqState
      */
-    public void sendINFO(PrintStream pw, GuardedDataset gds, ReqState rs) throws DODSException, ParseException {
-
-        if (_Debug) System.out.println("opendap.servlet.S4Info.sendINFO() reached.");
-
-        String responseDoc = null;
-        ServerDDS myDDS = null;
-        DAS myDAS = null;
+    public static void sendINFO(HttpServletRequest request,
+                                HttpServletResponse response,
+                                ReqState rs)
+            throws DODSException, ParseException, PPTException, IOException {
 
 
-        myDDS = gds.getDDS();
-        myDAS = gds.getDAS();
+        if (Debug.isSet("showResponse"))
+            System.out.println("doGetINFO For: " + rs.getDataSet());
 
 
-        infoDir = "Fix this dude!"; //rs.getINFOCache();
+        response.setContentType("text/html");
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("Content-Description", "dods_description");
+
+        String responseDoc;
+        ServerDDS myDDS;
+        DAS myDAS;
+
+
+        OPeNDAPClient oc = BesAPI.startClient(rs);
+
+        BesAPI.configureTransaction(oc,rs,false);
+
+
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDDS(),os);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        myDDS = new ServerDDS(new DefaultFactory());
+        myDDS.parse(is);
+
+        os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDAS(),os);
+        BesAPI.shutdownClient(oc);
+
+        is = new ByteArrayInputStream(os.toByteArray());
+        myDAS = new DAS();
+        myDAS.parse(is);
+
+        String infoDir = rs.getINFOCache();
 
 
         responseDoc = loadOverrideDoc(infoDir, rs.getDataSet());
+
+        PrintStream pw = new PrintStream(response.getOutputStream());
+
 
         if (responseDoc != null) {
             if (_Debug) System.out.println("override document: " + responseDoc);
@@ -115,7 +149,7 @@ public class S4Info {
         } else {
 
 
-            String user_html = get_user_supplied_docs(rs.getServerClassName(), rs.getDataSet());
+            String user_html = get_user_supplied_docs(infoDir, rs.getServerClassName(), rs.getDataSet());
 
             String global_attrs = buildGlobalAttributes(myDAS, myDDS);
 
@@ -128,6 +162,7 @@ public class S4Info {
             pw.println("</style>");
             pw.println("</head>");
             pw.println("<body>");
+            pw.println("<h1><center>"+rs.getDataSet()+"</center></h1>");
 
             if (global_attrs.length() > 0) {
                 pw.println(global_attrs);
@@ -158,13 +193,14 @@ public class S4Info {
      *
      * @param dataSet The name of the dataset.
      */
-    public String loadOverrideDoc(String infoDir, String dataSet) throws DODSException {
+    public static String loadOverrideDoc(String infoDir, String dataSet) throws DODSException {
 
         String userDoc = "";
         String overrideFile = dataSet + ".ovr";
 
         //Try to open and read the override file for this dataset.
         try {
+
             File fin = new File(infoDir + overrideFile);
             BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
 
@@ -196,26 +232,26 @@ public class S4Info {
     /**
      */
 
-    private String get_user_supplied_docs(String serverName, String dataSet) throws DODSException {
+    private static String get_user_supplied_docs(String infoDir, String serverName, String dataSet) throws DODSException {
 
         String userDoc = "";
 
         //Try to open and read the Dataset specific information file.
         try {
-            File fin = new File(infoDir + dataSet + ".html");
-            BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
+                File fin = new File(infoDir + dataSet + ".html");
+                BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
 
-            boolean done = false;
+                boolean done = false;
 
-            while (!done) {
-                String line = svIn.readLine();
-                if (line == null) {
-                    done = true;
-                } else {
-                    userDoc += line + "\n";
+                while (!done) {
+                    String line = svIn.readLine();
+                    if (line == null) {
+                        done = true;
+                    } else {
+                        userDoc += line + "\n";
+                    }
                 }
-            }
-            svIn.close();
+                svIn.close();
 
         } catch (FileNotFoundException fnfe) {
             userDoc += "<h2>No Dataset Specific Information Available.</h2><hr>";
@@ -227,22 +263,22 @@ public class S4Info {
 
         //Try to open and read the server specific information file.
         try {
-            String serverFile = infoDir + serverName + ".html";
-            if (_Debug) System.out.println("Server Info File: " + serverFile);
-            File fin = new File(serverFile);
-            BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
+                String serverFile = infoDir + serverName + ".html";
+                if (_Debug) System.out.println("Server Info File: " + serverFile);
+                File fin = new File(serverFile);
+                BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
 
-            boolean done = false;
+                boolean done = false;
 
-            while (!done) {
-                String line = svIn.readLine();
-                if (line == null) {
-                    done = true;
-                } else {
-                    userDoc += line + "\n";
+                while (!done) {
+                    String line = svIn.readLine();
+                    if (line == null) {
+                        done = true;
+                    } else {
+                        userDoc += line + "\n";
+                    }
                 }
-            }
-            svIn.close();
+                svIn.close();
 
         } catch (FileNotFoundException fnfe) {
             userDoc += "<h2>No Server Specific Information Available.</h2><hr>";
@@ -257,7 +293,7 @@ public class S4Info {
 
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private String buildGlobalAttributes(DAS das, ServerDDS dds) {
+    private static String buildGlobalAttributes(DAS das, ServerDDS dds) {
 
         boolean found = false;
         String ga;
@@ -312,7 +348,7 @@ public class S4Info {
 
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private String buildVariableSummaries(DAS das, ServerDDS dds) {
+    private static String buildVariableSummaries(DAS das, ServerDDS dds) {
 
 
         String vs = "<h3>Variables in this Dataset</h3>\n<table>\n";
@@ -339,7 +375,7 @@ public class S4Info {
     }
 
 
-    private String summarizeAttributes(AttributeTable attr, String vOut) {
+    private static String summarizeAttributes(AttributeTable attr, String vOut) {
 
         if (attr != null) {
 
@@ -387,7 +423,7 @@ public class S4Info {
     }
 
 
-    private String summarizeVariable(BaseType bt, DAS das) {
+    private static String summarizeVariable(BaseType bt, DAS das) {
 
         String vOut;
 

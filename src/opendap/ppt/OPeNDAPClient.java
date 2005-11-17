@@ -125,34 +125,53 @@ public class OPeNDAPClient {
      * @see OutputStream
      * @see PPTException
      */
-    public void setOutput(OutputStream strm) throws PPTException {
-        if (strm != null) {
-            try {
-                if (_stream != null) {
-                    _stream.close();
+    public void setOutput(OutputStream strm, boolean nice) throws PPTException {
+        if(nice){
+            if (strm != null) {
+                try {
+                    if (_stream != null) {
+                        _stream.close();
+                    }
+                    _stream = strm;
                 }
-                _stream = strm;
-            }
-            catch (IOException e) {
-                throw(new PPTException(e.getMessage()));
-            }
-        } else {
-            try {
-                if (_stream != null) {
-                    _stream.close();
+                catch (IOException e) {
+                    throw(new PPTException(e.getMessage()));
                 }
-                _stream = null;
-            }
-            catch (IOException e) {
-                throw(new PPTException(e.getMessage()));
+            } else {
+                try {
+                    if (_stream != null) {
+                        _stream.close();
+                    }
+                    _stream = null;
+                }
+                catch (IOException e) {
+                    throw(new PPTException(e.getMessage()));
+                }
             }
         }
+        else {
+            _stream  = strm;
+
+        }
     }
+    /**
+      * @deprecated
+      * @param os
+      */
+     public void setOutputStomp(OutputStream os) throws PPTException {
+         setOutput(os,false);
+     }
+
+     /**
+      * @deprecated
+      * @param os
+      * @throws PPTException
+      */
+     public void setOutput(OutputStream os) throws PPTException {
+         setOutput(os,true);
+     }
 
 
-    public void setOutputStomp(OutputStream os){
-        _stream  = os;
-    }
 
 
     /**
@@ -197,6 +216,11 @@ public class OPeNDAPClient {
             }
         }
     }
+
+
+
+
+
 
     /**
      * Sends a single OpeNDAP request ending in a semicolon (;) to the
