@@ -217,7 +217,7 @@ public class BesAPI {
 
 
 
-    private static void besShowTransaction(String product,
+    public static void besShowTransaction(String product,
                                            String host,
                                            int port,
                                            OutputStream os)
