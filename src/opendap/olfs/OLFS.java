@@ -28,7 +28,6 @@ package opendap.olfs;
 import java.io.*;
 import java.util.*;
 import java.util.zip.DeflaterOutputStream;
-import java.rmi.server.UID;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -36,10 +35,9 @@ import opendap.dap.*;
 import opendap.dap.parser.ParseException;
 import opendap.util.*;
 import opendap.ppt.PPTException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.*;
 import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
+import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
  * OLFS is the base servlet class for all OPeNDAP
@@ -445,7 +443,8 @@ public class OLFS extends HttpServlet {
         if(vdoc == null){
             throw new DODSException("Internal Error: Version Document not initialized.");
         }
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        //XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        XMLOutputter xout = new XMLOutputter();
         xout.output(rs.getVersionDocument(),ps);
         ps.flush();
 
@@ -675,7 +674,7 @@ public class OLFS extends HttpServlet {
     public void doGetCatalog(HttpServletRequest request,
                              HttpServletResponse response,
                              ReqState rs)
-            throws IOException, ServletException {
+            throws IOException, ServletException, BadConfigurationException, PPTException, JDOMException {
 
 
         response.setContentType("text/xml");
@@ -685,7 +684,43 @@ public class OLFS extends HttpServlet {
         response.setHeader("Content-Description", "dods_catalog");
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
-        printCatalog(request, pw);
+
+
+        if (Debug.isSet("showResponse")){
+            System.out.println("doGetCatalog() - configuring S4Catalog object (a CrawlableDataset)");
+        }
+
+
+
+        S4Catalog s4c = new S4Catalog( "/"+rs.getDataSet());
+
+        s4c.configure(rs);
+
+        if (Debug.isSet("showResponse")){
+            System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
+        }
+
+
+        SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
+                    "wingnut",
+                    s4c,
+                    "THREDDS",
+                    "OPENDAP",
+                    rs.getRequestURL());
+
+        if (Debug.isSet("showResponse")){
+            System.out.println("doGetCatalog() - Generating catalog");
+        }
+
+
+        pw.print(scb.generateCatalogAsString(s4c));
+
+
+
+
+
+
+        //printCatalog(request, pw);
         pw.flush();
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -693,6 +728,13 @@ public class OLFS extends HttpServlet {
 
     // to be overridden by servers that implement catalogs
     protected void printCatalog(HttpServletRequest request, PrintWriter os) throws IOException {
+
+
+
+
+
+
+
         os.println("Catalog not available for this server");
     }
 
@@ -1038,7 +1080,8 @@ public class OLFS extends HttpServlet {
                 }
 
                 // JC added
-                else if (dataSet.equalsIgnoreCase("catalog") && requestSuffix.equalsIgnoreCase("xml")) {
+                //else if (dataSet.equalsIgnoreCase("catalog") && requestSuffix.equalsIgnoreCase("xml")) {
+                else if (dataSet.endsWith("catalog") && requestSuffix.equalsIgnoreCase("xml")) {
                     doGetCatalog(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("status")) {
                     doGetStatus(request, response, rs);

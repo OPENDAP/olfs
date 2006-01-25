@@ -53,7 +53,6 @@ import opendap.ppt.PPTException;
 public class ReqState {
 
 
-    private String defaultFileSystemPrefix;
 
 
 
@@ -109,7 +108,7 @@ public class ReqState {
 
         processDodsURL();
 
-        
+
         defaultINFOcache = this.myServletConfig.getServletContext().getRealPath("datasets" +
                 myHttpRequest.getServletPath() + "/info") + "/";
 
@@ -124,13 +123,15 @@ public class ReqState {
         //System.out.println("Default Schema Location: "+defaultSchemaLocation);
         //System.out.println("Schema Location: "+getSchemaLocation());
 
-        defaultFileSystemPrefix = "/usr/local/opendap/data";
-
         requestURL = myHttpRequest.getRequestURL().toString();
         serverVersionDoc = getVersionDocument(this);
 
 
 
+    }
+
+    public String getRequestURL(){
+        return requestURL;
     }
 
     /**
@@ -351,27 +352,6 @@ public class ReqState {
     }
 
 
-    public String getFileSystemPrefix() {
-        String prefix = getInitParameter("FileSystemPrefix");
-        if (prefix == null)
-            prefix = defaultFileSystemPrefix;
-
-        if (prefix.lastIndexOf(getTargetPathSeparator()) != prefix.length())
-            prefix = prefix + getTargetPathSeparator();
-        return (prefix);
-    }
-
-    public void setDefaultFileSystemPrefix(String prefix) {
-        defaultFileSystemPrefix = prefix;
-    }
-
-
-    public String getTargetPathSeparator() {
-        String prefix = getInitParameter("TargetPathSeperator");
-        if (prefix == null)
-            prefix = File.pathSeparator;
-        return (prefix);
-    }
 
 
     /**

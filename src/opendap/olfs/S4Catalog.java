@@ -42,6 +42,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import opendap.ppt.PPTException;
+import opendap.util.Debug;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,42 +60,97 @@ public class S4Catalog implements CrawlableDataset {
 
     private boolean _isContainer;
 
-    private String    _parentName;
+    private String    _parentPath;
     private S4Catalog _parent;
 
     private String   _besHost;
     private int      _besPort;
     private List     _childDatasetElements;
 
+    private boolean  _isConfigured;
+    private boolean  _haveCatalog;
+
+    private ReqState _configRS;
 
 
 
-    public S4Catalog(String path, String besHost, int besPort) throws IOException, PPTException, JDOMException {
-        _path = path;
+    public S4Catalog(String path)  {
+
+        // Strip off the catalog request
+        _path = path.endsWith("/catalog") ? path.substring( 0, path.length() - 8 ) : path;
+
+        // Is path empty? Then make it "/"
+        _path = _path.equals("") ? "/" : _path;
+
         // Determine name (i.e., last name in the path name sequence).
-        _name = path.endsWith( "/" ) ? path.substring( 0, path.length() - 1 ) : path;
+        _name = _path.endsWith( "/" ) ? _path.substring( 0, _path.length() - 1 ) : _path;
+
+        _name = _name.equals("") ? "/" : _name;
+
+
+
         int index = _name.lastIndexOf( "/" );
 
-        _parentName = null;
-        if ( index != -1 ){
-            _name = _name.substring( index + 1 );
-
-            if(index > 0)
-                _parentName = _name.substring(0,index);
-
+        _parentPath = null;
+        if ( index > 0){
+            _parentPath = _name.substring(0,index);
+            _name = _name.substring( index );
         }
 
+
+        _besPort      = -1;
+        _besHost      = null;
+        _configRS     = null;
+        _isConfigured = false;
+        _haveCatalog  = false;
+
+        if(Debug.isSet("showResponse")){
+            System.out.println("S4Catalog:");
+            System.out.println("    _path       = "+_path);
+            System.out.println("    _name       = "+_name);
+            System.out.println("    _parentPath = "+_parentPath);
+        }
+
+    }
+
+
+    public void configure(ReqState rs) throws BadConfigurationException,
+            IOException, PPTException, JDOMException {
+
+        if(_isConfigured) {
+            throw new BadConfigurationException("Error: You may not call S4Catalog.configure() more " +
+            "than once for a given instance of S4Catalog.");
+        }
+
+        _configRS = rs;
+
+        String besHost = _configRS.getInitParameter("BackEndServer");
+        if (besHost == null)
+            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
+
+        String besPort = _configRS.getInitParameter("BackEndServerPort");
+        if (besPort == null)
+            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
+
         _besHost     = besHost;
-        _besPort     = besPort;
-        getCatalog(besHost,besPort);
+        _besPort     = Integer.parseInt(besPort);
 
+        if(Debug.isSet("showResponse")){
+            System.out.println("S4Catalog:");
+            System.out.println("    _besHost    = "+_besHost);
+            System.out.println("    _besPort    = "+_besPort);
+        }
 
+        getInfo(_besHost,_besPort);
+
+        _isConfigured = true;
     }
 
-    public S4Catalog(){
 
+
+    public Object getConfigObject(){
+        return _configRS;
     }
-
 
 
 
@@ -104,9 +160,12 @@ public class S4Catalog implements CrawlableDataset {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        String product = " for "+"\""+_path+"\";";
+        String product = "catalog for "+"\""+_path+"\"";
 
         BesAPI.besShowTransaction(product,host,port,baos);
+
+        System.out.println("BES returned:\n"+baos);
+
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -123,8 +182,56 @@ public class S4Catalog implements CrawlableDataset {
         doc.detachRootElement();
         doc.setRootElement(topDataset);
 
-        if(!_name.equals(topDataset.getChild("name").getTextTrim())){
-            throw new IOException ("Returned dataset name does not match requested name.");
+        if(!_path.equals(topDataset.getChild("name").getTextTrim())){
+            throw new IOException ("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + _path + "  "+
+                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+        }
+
+        processDatasetElement(topDataset,this);
+
+        _haveCatalog = true;
+
+
+    }
+
+
+
+    private void getInfo(String host, int port) throws PPTException, IOException, JDOMException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String product = "info for "+"\""+_path+"\"";
+
+        BesAPI.besShowTransaction(product,host,port,baos);
+
+        System.out.println("BES returned:\n"+baos);
+
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        // Tweak it!
+
+        // First find the response Element
+
+        Element topDataset = doc.getRootElement().getChild("response").getChild("dataset");
+
+        // Disconnect it from it's parent and then rename it.
+        topDataset.detach();
+        doc.detachRootElement();
+        doc.setRootElement(topDataset);
+
+        if(!_path.equals(topDataset.getChild("name").getTextTrim())){
+            throw new IOException ("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + _path + "  "+
+                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+/*
+            System.out.println("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + _name + "  "+
+                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+*/
         }
 
         processDatasetElement(topDataset,this);
@@ -145,10 +252,14 @@ public class S4Catalog implements CrawlableDataset {
         dataset.getChild("lastmodified").getChild("time").getTextTrim(),
         new ParsePosition(0));
 
-        s4c._childDatasetElements = dataset.getChildren("dataset");
+        String isContainer = dataset.getAttributeValue("thredds_container");
 
-        s4c._isContainer = !s4c._childDatasetElements.isEmpty();
+        if(isContainer.equalsIgnoreCase("true")){
 
+            s4c._isContainer = true;
+            s4c._childDatasetElements = dataset.getChildren("dataset");
+
+        }
     }
 
 
@@ -157,6 +268,7 @@ public class S4Catalog implements CrawlableDataset {
 
 
     public String getPath() {
+
         return _path;
     }
 
@@ -170,14 +282,19 @@ public class S4Catalog implements CrawlableDataset {
             return _parent;
         }
 
-        if(_parentName == null)
+        if(_parentPath == null)
             return null;
 
         try {
-            return new S4Catalog(_parentName,_besHost,_besPort);
+            S4Catalog s4c = new S4Catalog(_parentPath);
+            s4c.configure(_configRS);
+            _parent = s4c;
+            return s4c;
         } catch (PPTException e) {
             throw new IOException(e.getMessage());
         } catch (JDOMException e) {
+            throw new IOException(e.getMessage());
+        } catch (BadConfigurationException e) {
             throw new IOException(e.getMessage());
         }
 
@@ -191,38 +308,49 @@ public class S4Catalog implements CrawlableDataset {
 
     public List listDatasets()  {
 
+        Element e;
+        S4Catalog dataset;
+
+
         if(!isCollection())
             return null;
 
         try {
-            if(_childDatasetElements == null)
+            if(!_haveCatalog)
                 getCatalog(_besHost,_besPort);
         }
-        catch(Exception e){
-            e.printStackTrace();
+        catch(Exception ex){
+            ex.printStackTrace();
             return null;
         }
 
+        int j = 0;
         Vector childDatasets = new Vector();
         Iterator i = _childDatasetElements.iterator();
-
-        Element e;
-        S4Catalog dataset;
         while(i.hasNext()){
             e  = (Element) i.next();
-            dataset = new S4Catalog();
+
+
+            String newPath = this._path + (_path.equals("/") ? "" : "/") + e.getChild("name").getTextTrim();
+
+            System.out.println("Making new dataset \""+newPath+"\" in listDatasets.");
+
+            dataset = new S4Catalog(newPath);
 
             processDatasetElement(e,dataset);
 
             dataset._parent     = this;
-            dataset._parentName = this._name;
-            dataset._path       = this._path + "/"+this._name;
+
             dataset._besHost    = this._besHost;
             dataset._besPort    = this._besPort;
 
             childDatasets.add(dataset);
 
+            j++;
+
         }
+
+        if(Debug.isSet("showResponse")) System.out.println("List Datasets found "+j+" member(s).");
 
         return childDatasets;
     }
@@ -238,7 +366,7 @@ public class S4Catalog implements CrawlableDataset {
 
         while(i.hasNext()){
             CrawlableDataset cd = (CrawlableDataset) i.next();
-            if(!crawlableDatasetFilter.accept(cd))
+            if(crawlableDatasetFilter != null && !crawlableDatasetFilter.accept(cd))
                 l.remove(cd);
         }
 

@@ -24,6 +24,7 @@
             <include name="${opendap.lib}"/>
             <include name="${jdom.lib}"/>
             <include name="${cli.lib}"/>
+            <include name="${thredds.lib}"/>
         </fileset>
     </path>
 
@@ -158,6 +159,7 @@
                 <include name="${getopt.lib}"/>
                 <include name="${jdom.lib}"/>
                 <include name="${opendap.lib}"/>
+                <include name="${thredds.lib}"/>
             </lib>
             <classes dir="${build.classes}"/>
 

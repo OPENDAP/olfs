@@ -125,13 +125,14 @@ public class BesAPI {
 
 
     public static void configureTransaction(OPeNDAPClient oc, ReqState rs, boolean constrained) throws PPTException {
-        String datasetPath = rs.getFileSystemPrefix() + rs.getDataSet();
-        String datasetType = "nc";
+        String datasetPath = rs.getDataSet();
+        //String datasetType = "nc"; // No longer required as BES will determine data formats
         String cName = rs.getDataSet();
         String ce = rs.getConstraintExpression();
 
-        String cmd = "set container values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
-        if(Debug.isSet("showRequest")) System.out.print("Sending command: " + cmd);
+        //String cmd = "set container in catalog values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
+        String cmd = "set container in catalog values "+cName + ", " + datasetPath + ";\n";
+        if(Debug.isSet("showRequest")) System.out.print("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
 
 
@@ -146,7 +147,7 @@ public class BesAPI {
 
         }
 
-        if(Debug.isSet("showRequest")) System.out.print("Sending command: " +cmd);
+        if(Debug.isSet("showRequest")) System.out.print("Sending BES command: " +cmd);
         oc.executeCommand(cmd);
 
     }
