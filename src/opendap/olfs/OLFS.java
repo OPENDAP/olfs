@@ -121,7 +121,7 @@ public class OLFS extends ThreddsServlet {
      *
      * @serial
      */
-    private Object syncLock = new Object();
+    private static final Object syncLock = new Object();
 
 
     /**
