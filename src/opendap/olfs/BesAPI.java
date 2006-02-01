@@ -40,77 +40,104 @@ import java.io.OutputStream;
  */
 public class BesAPI {
 
+    private static int _besPort = -1;
+    private static String _besHost = "Not Configured!";
+    private static boolean _configured = false;
 
-    public static void getDDX(ReqState rs,
-                              OutputStream os, boolean constrained)
-            throws BadConfigurationException, PPTException {
+    public static boolean configure(String host, int port){
+        if(_configured)
+            return false;
+        _besHost = host;
+        _besPort = port;
+        _configured = true;
 
-        besGetTransaction(getAPINameForDDX(),rs,os,constrained);
+        System.out.println("BES is configured - Host: "+_besHost+"   Port: "+_besPort);
+        return true;
+
     }
 
-    public static void getDDS(ReqState rs,
-                              OutputStream os, boolean constrained)
-            throws BadConfigurationException, PPTException {
+    public static boolean configure(ReqState rs) throws BadConfigurationException {
 
-        besGetTransaction(getAPINameForDDS(),rs,os,constrained);
+        String besHost = rs.getInitParameter("BackEndServer");
+        if (besHost == null)
+            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
+
+        String besPort = rs.getInitParameter("BackEndServerPort");
+        if (besPort == null)
+            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
+
+
+        return configure(besHost, Integer.parseInt(besPort));
+
+    }
+
+    public static String getHost() throws BadConfigurationException {
+        if(!_configured)
+            throw new BadConfigurationException("BES must be configured before use!\n");
+
+        return _besHost;
+    }
+
+    public static int getPort() throws BadConfigurationException {
+        if(!_configured)
+            throw new BadConfigurationException("BES must be configured before use!\n");
+        return _besPort;
     }
 
 
-    public static void getDAS(ReqState rs,
+    public static void getDDX(String dataset,
+                              String constraintExpression,
                               OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction(getAPINameForDAS(),rs,os, true);
+        besGetTransaction(getAPINameForDDX(),dataset, constraintExpression,os);
     }
 
-    public static void getDODS(ReqState rs,
+    public static void getDDS(String dataset,
+                              String constraintExpression,
+                              OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+        besGetTransaction(getAPINameForDDS(),dataset, constraintExpression,os);
+    }
+
+
+    public static void getDAS(String dataset,
+                              String constraintExpression,
+                              OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+        besGetTransaction(getAPINameForDAS(),dataset, constraintExpression,os);
+    }
+
+    public static void getDODS(String dataset,
+                               String constraintExpression,
                                OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction(getAPINameForDODS(),rs,os,true);
+        besGetTransaction(getAPINameForDODS(),dataset, constraintExpression,os);
     }
 
 
 
-    public static void showVersion(ReqState rs,
-                                   OutputStream os)
+    public static void showVersion(OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        String besIP = rs.getInitParameter("BackEndServer");
-        if (besIP == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
 
-        String besPort = rs.getInitParameter("BackEndServerPort");
-        if (besPort == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
-
-        besShowTransaction("version",besIP, Integer.parseInt(besPort) ,os);
-    }
-
-    public static void showVersion(String host,
-                                   int port,
-                                   OutputStream os) throws PPTException {
-
-        besShowTransaction("version",host, port ,os);
+        besShowTransaction("version",os);
     }
 
 
-    public static OPeNDAPClient startClient(ReqState rs)
+
+    public static OPeNDAPClient startClient()
             throws BadConfigurationException,PPTException {
 
-        String besIP = rs.getInitParameter("BackEndServer");
-        if (besIP == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
-
-        String besPort = rs.getInitParameter("BackEndServerPort");
-        if (besPort == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
 
         OPeNDAPClient oc = new OPeNDAPClient();
 
-        System.out.println("BES at "+besIP+":"+besPort);
+        //System.out.println("BES - Host: "+_besHost+"  Port:"+_besPort);
 
-        oc.startClient(besIP, Integer.parseInt(besPort));
+        oc.startClient(getHost(), getPort());
 
         if(Debug.isSet("showRequest"))
             oc.setOutput(System.out,true);
@@ -124,26 +151,27 @@ public class BesAPI {
     }
 
 
-    public static void configureTransaction(OPeNDAPClient oc, ReqState rs, boolean constrained) throws PPTException {
-        String datasetPath = rs.getDataSet();
+    public static void configureTransaction(OPeNDAPClient oc, String dataset, String constraintExpression)
+            throws PPTException {
+        //String datasetPath = rs.getDataSet();
         //String datasetType = "nc"; // No longer required as BES will determine data formats
-        String cName = rs.getDataSet();
-        String ce = rs.getConstraintExpression();
+        //String cName = rs.getDataSet();
+        //String ce = rs.getConstraintExpression();
 
         //String cmd = "set container in catalog values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
-        String cmd = "set container in catalog values "+cName + ", " + datasetPath + ";\n";
+        String cmd = "set container in catalog values "+dataset + ", " + dataset + ";\n";
         if(Debug.isSet("showRequest")) System.out.print("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
 
 
-        System.out.println("ConstraintExpression: "+ce);
+        System.out.println("ConstraintExpression: "+constraintExpression);
 
 
-        if(ce.equalsIgnoreCase("") || !constrained){
-            cmd = "define d1 as "+rs.getDataSet() + ";\n";
+        if(constraintExpression== null || constraintExpression.equalsIgnoreCase("") ){
+            cmd = "define d1 as "+dataset + ";\n";
         }
         else {
-            cmd = "define d1 as "+rs.getDataSet() + " with "+cName+".constraint=\"" + ce + "\"  ;\n";
+            cmd = "define d1 as "+dataset + " with "+dataset+".constraint=\"" + constraintExpression + "\"  ;\n";
 
         }
 
@@ -198,17 +226,16 @@ public class BesAPI {
     }
 
     private static void besGetTransaction(String product,
-                                          ReqState rs,
-                                          OutputStream os,
-                                          boolean constrained)
+                                          String dataset, String constraintExpression,
+                                          OutputStream os)
             throws BadConfigurationException,PPTException {
 
         System.out.println("Entered besGetTransaction().");
 
 
-        OPeNDAPClient oc = startClient(rs);
+        OPeNDAPClient oc = startClient();
 
-        configureTransaction(oc,rs,constrained);
+        configureTransaction(oc, dataset,  constraintExpression);
 
         getDataProduct(oc,product,os);
 
@@ -218,18 +245,15 @@ public class BesAPI {
 
 
 
-    public static void besShowTransaction(String product,
-                                           String host,
-                                           int port,
-                                           OutputStream os)
-            throws PPTException {
+    public static void besShowTransaction(String product, OutputStream os)
+            throws PPTException, BadConfigurationException {
 
 
         OPeNDAPClient oc = new OPeNDAPClient();
 
-        System.out.println("BES at "+host+":"+port);
+        //System.out.println("BES - Host: "+_besHost+"  Port:"+_besPort);
 
-        oc.startClient(host, port);
+        oc.startClient(getHost(), getPort());
 
         if(Debug.isSet("showRequest"))
             oc.setOutput(System.out,true);

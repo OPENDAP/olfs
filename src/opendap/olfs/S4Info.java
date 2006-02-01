@@ -35,7 +35,6 @@ import opendap.dap.Server.*;
 import opendap.dap.parser.ParseException;
 import opendap.ppt.PPTException;
 import opendap.ppt.OPeNDAPClient;
-import opendap.servers.ascii.asciiFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,8 +49,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 public class S4Info {
-
-    private static final boolean _Debug = true;
 
     /**
      * ************************************************************************
@@ -114,9 +111,9 @@ public class S4Info {
         DAS myDAS;
 
 
-        OPeNDAPClient oc = BesAPI.startClient(rs);
+        OPeNDAPClient oc = BesAPI.startClient();
 
-        BesAPI.configureTransaction(oc,rs,false);
+        BesAPI.configureTransaction(oc,rs.getDataSet(), rs.getConstraintExpression());
 
 
 
@@ -144,7 +141,7 @@ public class S4Info {
 
 
         if (responseDoc != null) {
-            if (_Debug) System.out.println("override document: " + responseDoc);
+            if (Debug.isSet("showResponse")) System.out.println("override document: " + responseDoc);
             pw.print(responseDoc);
         } else {
 
@@ -264,7 +261,7 @@ public class S4Info {
         //Try to open and read the server specific information file.
         try {
                 String serverFile = infoDir + serverName + ".html";
-                if (_Debug) System.out.println("Server Info File: " + serverFile);
+                if (Debug.isSet("showResponse")) System.out.println("Server Info File: " + serverFile);
                 File fin = new File(serverFile);
                 BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
 

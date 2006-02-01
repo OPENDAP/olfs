@@ -95,7 +95,7 @@ public class S4Ascii {
         }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDODS(rs, os);
+        BesAPI.getDODS(rs.getDataSet(), rs.getConstraintExpression(), os);
 
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
         dds = new DataDDS(sv, new asciiFactory());

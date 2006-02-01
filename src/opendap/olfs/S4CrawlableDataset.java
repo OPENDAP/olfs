@@ -63,14 +63,13 @@ public class S4CrawlableDataset implements CrawlableDataset {
     private String    _parentPath;
     private S4CrawlableDataset _parent;
 
-    private String   _besHost;
-    private int      _besPort;
     private List     _childDatasetElements;
 
     private boolean  _isConfigured;
     private boolean  _haveCatalog;
 
-    private ReqState _configRS;
+
+    private Element _config;
 
 
 
@@ -78,10 +77,12 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
         this(path);
 
-        configure((ReqState)o);
+        _config = (Element)o;
+
+        configure();
 
     }
-    public S4CrawlableDataset(String path) {
+    private S4CrawlableDataset(String path) {
 
         // Strip off the catalog request
         _path = path.endsWith("/catalog") ? path.substring( 0, path.length() - 8 ) : path;
@@ -110,9 +111,6 @@ public class S4CrawlableDataset implements CrawlableDataset {
             _parentPath = "/";
 
 
-        _besPort      = -1;
-        _besHost      = null;
-        _configRS     = null;
         _isConfigured = false;
         _haveCatalog  = false;
 
@@ -127,7 +125,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
     }
 
 
-    private void configure(ReqState rs) throws BadConfigurationException,
+    private void configure() throws BadConfigurationException,
             IOException, PPTException, JDOMException {
 
         if(_isConfigured) {
@@ -135,29 +133,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             "than once for a given instance of S4CrawlableDataset.");
         }
 
-        _configRS = rs;
-
-        String besHost = _configRS.getInitParameter("BackEndServer");
-        if (besHost == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServer\n");
-
-        String besPort = _configRS.getInitParameter("BackEndServerPort");
-        if (besPort == null)
-            throw new BadConfigurationException("Servlet configuration must included BackEndServerPort\n");
-
-        _besHost     = besHost;
-        _besPort     = Integer.parseInt(besPort);
-
-        if(Debug.isSet("showResponse")){
-            System.out.println("    _besHost    = "+_besHost);
-            System.out.println("    _besPort    = "+_besPort);
-        }
-
-
-        if(Debug.isSet("showResponse"))
-            System.out.println("Calling: S4CrawlableDatset.getInfo("+_besHost+","+_besPort+")");
-
-        getInfo(_besHost,_besPort);
+        getInfo();
 
         _isConfigured = true;
     }
@@ -165,20 +141,20 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
 
     public Object getConfigObject(){
-        return _configRS;
+        return _config;
     }
 
 
 
 
 
-    private void getCatalog(String host, int port) throws PPTException, IOException, JDOMException {
+    private void getCatalog() throws PPTException, IOException, JDOMException, BadConfigurationException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         String product = "catalog for "+"\""+_path+"\"";
 
-        BesAPI.besShowTransaction(product,host,port,baos);
+        BesAPI.besShowTransaction(product,baos);
 
         System.out.println("BES returned:\n"+baos);
 
@@ -216,13 +192,13 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
 
 
-    private void getInfo(String host, int port) throws PPTException, IOException, JDOMException {
+    private void getInfo() throws PPTException, IOException, JDOMException, BadConfigurationException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         String product = "info for "+"\""+_path+"\"";
 
-        BesAPI.besShowTransaction(product,host,port,baos);
+        BesAPI.besShowTransaction(product,baos);
 
         System.out.println("BES returned:\n"+baos);
 
@@ -308,7 +284,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             return null;
 
         try {
-            S4CrawlableDataset s4c = new S4CrawlableDataset(_parentPath,_configRS);
+            S4CrawlableDataset s4c = new S4CrawlableDataset(_parentPath,_config);
             _parent = s4c;
             return s4c;
         } catch (PPTException e) {
@@ -338,7 +314,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
         try {
             if(!_haveCatalog)
-                getCatalog(_besHost,_besPort);
+                getCatalog();
         }
         catch(Exception ex){
             ex.printStackTrace();
@@ -360,10 +336,8 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
             processDatasetElement(e,dataset);
 
-            dataset._parent     = this;
-
-            dataset._besHost    = this._besHost;
-            dataset._besPort    = this._besPort;
+            dataset._parent = this;
+            dataset._config = this._config;
 
             childDatasets.add(dataset);
 

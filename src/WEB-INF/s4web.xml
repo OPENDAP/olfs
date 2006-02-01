@@ -18,7 +18,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest CE</param-value>
+            <param-value>showRequest showResponse BES CE</param-value>
         </init-param>
 
         <init-param>
@@ -51,7 +51,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse CE </param-value>
+            <param-value>showRequest BES showResponse CE </param-value>
         </init-param>
 
         <init-param>
@@ -82,7 +82,7 @@
         <url-pattern>/test/*</url-pattern>
     </servlet-mapping>
 
-    
+
     <servlet-mapping>
         <servlet-name>xray</servlet-name>
         <url-pattern>/xray</url-pattern>

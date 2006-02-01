@@ -147,13 +147,35 @@ public class OLFS extends ThreddsServlet {
 
         super.init();
 
-        // debuggering
-        String debugOn = getInitParameter("DebugOn");
-        if (debugOn != null) {
-            System.out.println("** DebugOn **");
-            StringTokenizer toker = new StringTokenizer(debugOn);
-            while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
+        String besHost = getInitParameter("BackEndServer");
+        if (besHost == null)
+            throw new ServletException("Servlet configuration must included BackEndServer\n");
+
+        String besPort = getInitParameter("BackEndServerPort");
+        if (besPort == null)
+            throw new ServletException("Servlet configuration must included BackEndServerPort\n");
+
+
+        System.out.print("Configuring BES ... ");
+        boolean result;
+
+        synchronized (syncLock) {
+            result = BesAPI.configure(besHost, Integer.parseInt(besPort));
         }
+
+        if(result)
+            System.out.println("");
+        else
+            System.out.println("Odd. It was already done!");
+
+
+        // debuggering
+        //String debugOn = getInitParameter("DebugOn");
+        //if (debugOn != null) {
+        //    System.out.println("** DebugOn **");
+        //    StringTokenizer toker = new StringTokenizer(debugOn);
+        //    while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
+        //}
 
 
 
@@ -239,7 +261,7 @@ public class OLFS extends ThreddsServlet {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDAS(rs, Out);
+            BesAPI.getDAS(rs.getDataSet(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -291,7 +313,7 @@ public class OLFS extends ThreddsServlet {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDDS(rs, Out, true);
+            BesAPI.getDDS(rs.getDataSet(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -358,7 +380,7 @@ public class OLFS extends ThreddsServlet {
         }
 
         try {
-            BesAPI.getDODS(rs, bOut);
+            BesAPI.getDODS(rs.getDataSet(), rs.getConstraintExpression(), bOut);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -700,26 +722,22 @@ public class OLFS extends ThreddsServlet {
 
 
 
-        /*
+/*
         if(catHandler.processReqForCatalog(this,request,response, contentPath)){
             System.out.println("Processed Catalog Request");
         }
         else {
             System.out.println("Rejected Catalog Request");
-
         }
-        */
-
-
 
 
         if (Debug.isSet("showResponse")){
             System.out.println("doGetCatalog() - Instantiating S4CrawlableDataset object (a CrawlableDataset)");
         }
 
+*/
 
-
-        S4CrawlableDataset s4c = new S4CrawlableDataset( "/"+rs.getDataSet(),rs);
+        S4CrawlableDataset s4c = new S4CrawlableDataset( "/"+rs.getDataSet(),null);
 
         if (Debug.isSet("showResponse")){
             System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");

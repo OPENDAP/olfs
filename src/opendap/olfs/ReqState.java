@@ -279,7 +279,7 @@ public class ReqState {
 
         // Get the version response from the BES (an XML doc)
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.showVersion(rs, os);
+        BesAPI.showVersion(os);
 
         //System.out.println(os);
 
