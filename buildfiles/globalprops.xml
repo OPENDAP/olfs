@@ -107,7 +107,9 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="javamail.lib" value="javamail-1.3.1.jar"/>
 <property name="echo.lib" value="echosoap.jar"/>
 <property name="opendap.lib" value="opendap-0.0.1.jar"/>
-<property name="thredds.lib" value="thredds-3.5.jar"/>
+<property name="thredds.lib" value="threddsCatalog-3.7.jar"/>
+<property name="threddsResources.lib" value="threddsResources-3.7.jar"/>
+<property name="nlog4j.lib" value="nlog4j-1.2.21.jar"/>
 
 <property name="cli.lib" value="apache-commons-cli-1.0.jar"/>
 

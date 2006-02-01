@@ -51,7 +51,7 @@ import opendap.util.Debug;
  * Time: 8:08:25 AM
  * To change this template use File | Settings | File Templates.
  */
-public class S4Catalog implements CrawlableDataset {
+public class S4CrawlableDataset implements CrawlableDataset {
 
     private String _path;
     private String _name;
@@ -61,7 +61,7 @@ public class S4Catalog implements CrawlableDataset {
     private boolean _isContainer;
 
     private String    _parentPath;
-    private S4Catalog _parent;
+    private S4CrawlableDataset _parent;
 
     private String   _besHost;
     private int      _besPort;
@@ -74,18 +74,27 @@ public class S4Catalog implements CrawlableDataset {
 
 
 
-    public S4Catalog(String path)  {
+    public S4CrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException {
+
+        new S4CrawlableDataset(path);
+
+        configure((ReqState)o);
+
+    }
+    public S4CrawlableDataset(String path) {
 
         // Strip off the catalog request
         _path = path.endsWith("/catalog") ? path.substring( 0, path.length() - 8 ) : path;
 
         // Is path empty? Then make it "/"
-        _path = _path.equals("") ? "/" : _path;
+        //_path = _path.equals("") ? "/" : _path;
+        _path = _path.equals("/") ? "" : _path;
 
         // Determine name (i.e., last name in the path name sequence).
         _name = _path.endsWith( "/" ) ? _path.substring( 0, _path.length() - 1 ) : _path;
 
-        _name = _name.equals("") ? "/" : _name;
+        //_name = _name.equals("") ? "/" : _name;
+        _name = _name.equals("/") ? "" : _name;
 
 
 
@@ -105,7 +114,7 @@ public class S4Catalog implements CrawlableDataset {
         _haveCatalog  = false;
 
         if(Debug.isSet("showResponse")){
-            System.out.println("S4Catalog:");
+            System.out.println("S4CrawlableDataset:");
             System.out.println("    _path       = "+_path);
             System.out.println("    _name       = "+_name);
             System.out.println("    _parentPath = "+_parentPath);
@@ -114,12 +123,12 @@ public class S4Catalog implements CrawlableDataset {
     }
 
 
-    public void configure(ReqState rs) throws BadConfigurationException,
+    private void configure(ReqState rs) throws BadConfigurationException,
             IOException, PPTException, JDOMException {
 
         if(_isConfigured) {
-            throw new BadConfigurationException("Error: You may not call S4Catalog.configure() more " +
-            "than once for a given instance of S4Catalog.");
+            throw new BadConfigurationException("Error: You may not call S4CrawlableDataset.configure() more " +
+            "than once for a given instance of S4CrawlableDataset.");
         }
 
         _configRS = rs;
@@ -136,7 +145,6 @@ public class S4Catalog implements CrawlableDataset {
         _besPort     = Integer.parseInt(besPort);
 
         if(Debug.isSet("showResponse")){
-            System.out.println("S4Catalog:");
             System.out.println("    _besHost    = "+_besHost);
             System.out.println("    _besPort    = "+_besPort);
         }
@@ -183,8 +191,11 @@ public class S4Catalog implements CrawlableDataset {
         doc.setRootElement(topDataset);
 
         if(!_path.equals(topDataset.getChild("name").getTextTrim())){
-            throw new IOException ("Returned dataset name does not match requested name.\n"+
-                                   "Requested: " + _path + "  "+
+//            throw new IOException ("Returned dataset name does not match requested name.\n"+
+//                                   "Requested: " + _path + "  "+
+//                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+            System.out.println("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + _name + "  "+
                                    "Returned: "+topDataset.getChild("name").getTextTrim());
         }
 
@@ -224,14 +235,14 @@ public class S4Catalog implements CrawlableDataset {
         doc.setRootElement(topDataset);
 
         if(!_path.equals(topDataset.getChild("name").getTextTrim())){
-            throw new IOException ("Returned dataset name does not match requested name.\n"+
-                                   "Requested: " + _path + "  "+
-                                   "Returned: "+topDataset.getChild("name").getTextTrim());
-/*
+  //          throw new IOException ("Returned dataset name does not match requested name.\n"+
+    //                               "Requested: " + _path + "  "+
+      //                             "Returned: "+topDataset.getChild("name").getTextTrim());
+
             System.out.println("Returned dataset name does not match requested name.\n"+
                                    "Requested: " + _name + "  "+
                                    "Returned: "+topDataset.getChild("name").getTextTrim());
-*/
+
         }
 
         processDatasetElement(topDataset,this);
@@ -240,9 +251,12 @@ public class S4Catalog implements CrawlableDataset {
     }
 
 
-    private void processDatasetElement(Element dataset, S4Catalog s4c){
+    private void processDatasetElement(Element dataset, S4CrawlableDataset s4c){
 
         s4c._name = dataset.getChild("name").getTextTrim();
+
+        s4c._name = s4c._name.equals("/") ? "" : _name;
+
         s4c._size = Integer.parseInt(dataset.getChild("size").getTextTrim());
 
         SimpleDateFormat sdf = new SimpleDateFormat();
@@ -286,8 +300,7 @@ public class S4Catalog implements CrawlableDataset {
             return null;
 
         try {
-            S4Catalog s4c = new S4Catalog(_parentPath);
-            s4c.configure(_configRS);
+            S4CrawlableDataset s4c = new S4CrawlableDataset(_parentPath,_configRS);
             _parent = s4c;
             return s4c;
         } catch (PPTException e) {
@@ -309,7 +322,7 @@ public class S4Catalog implements CrawlableDataset {
     public List listDatasets()  {
 
         Element e;
-        S4Catalog dataset;
+        S4CrawlableDataset dataset;
 
 
         if(!isCollection())
@@ -335,7 +348,7 @@ public class S4Catalog implements CrawlableDataset {
 
             System.out.println("Making new dataset \""+newPath+"\" in listDatasets.");
 
-            dataset = new S4Catalog(newPath);
+            dataset = new S4CrawlableDataset(newPath);
 
             processDatasetElement(e,dataset);
 

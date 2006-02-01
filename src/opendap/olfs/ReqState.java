@@ -70,6 +70,7 @@ public class ReqState {
     private final String defaultSchemaName = "opendap-0.0.0.xsd";
     private String defaultSchemaLocation;
 
+    protected String rootPath, contentPath;
 
     private String dataSetName;
     private String requestSuffix;

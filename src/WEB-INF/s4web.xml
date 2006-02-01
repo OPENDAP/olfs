@@ -9,11 +9,11 @@
 
     <servlet>
         <servlet-name>
-            hao
+            test
         </servlet-name>
 
         <servlet-class>
-            opendap.olfs.OLFS
+            opendap.olfs.TestServletResponse
         </servlet-class>
 
         <init-param>
@@ -23,17 +23,12 @@
 
         <init-param>
             <param-name>BackEndServer</param-name>
-            <param-value>dataportal.ucar.edu</param-value>
+            <param-value>127.0.0.1</param-value>
         </init-param>
 
         <init-param>
             <param-name>BackEndServerPort</param-name>
-            <param-value>2002</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>FileSystemPrefix</param-name>
-            <param-value>/home/pwest/tests/data</param-value>
+            <param-value>10002</param-value>
         </init-param>
 
         <init-param>
@@ -70,11 +65,6 @@
         </init-param>
 
         <init-param>
-            <param-name>FileSystemPrefix</param-name>
-            <param-value>/Users/ndp/OPeNDAP/Projects/Server4/data/nc</param-value>
-        </init-param>
-
-        <init-param>
             <param-name>TargetPathSeperator</param-name>
             <param-value>/</param-value>
         </init-param>
@@ -84,14 +74,15 @@
 
 
     <servlet-mapping>
-        <servlet-name>hao</servlet-name>
-        <url-pattern>/hao</url-pattern>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>hao</servlet-name>
-        <url-pattern>/hao/*</url-pattern>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test/*</url-pattern>
     </servlet-mapping>
 
+    
     <servlet-mapping>
         <servlet-name>xray</servlet-name>
         <url-pattern>/xray</url-pattern>

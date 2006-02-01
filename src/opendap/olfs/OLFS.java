@@ -104,7 +104,7 @@ import thredds.cataloggen.SimpleCatalogBuilder;
  */
 
 
-public class OLFS extends HttpServlet {
+public class OLFS extends ThreddsServlet {
 
 
 
@@ -142,6 +142,7 @@ public class OLFS extends HttpServlet {
      * impunity) from any of the dods code...
      */
 
+
     public void init() throws ServletException {
 
         super.init();
@@ -155,8 +156,13 @@ public class OLFS extends HttpServlet {
         }
 
 
+
     }
+
+
+
     /***************************************************************************/
+
 
 
     /**
@@ -686,15 +692,34 @@ public class OLFS extends HttpServlet {
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
 
+
+
+        System.out.println("rootPath:    "+rootPath);
+        System.out.println("contentPath: "+contentPath);
+        System.out.println("myPath:      "+"/"+rs.getDataSet());
+
+
+
+        /*
+        if(catHandler.processReqForCatalog(this,request,response, contentPath)){
+            System.out.println("Processed Catalog Request");
+        }
+        else {
+            System.out.println("Rejected Catalog Request");
+
+        }
+        */
+
+
+
+
         if (Debug.isSet("showResponse")){
-            System.out.println("doGetCatalog() - configuring S4Catalog object (a CrawlableDataset)");
+            System.out.println("doGetCatalog() - configuring S4CrawlableDataset object (a CrawlableDataset)");
         }
 
 
 
-        S4Catalog s4c = new S4Catalog( "/"+rs.getDataSet());
-
-        s4c.configure(rs);
+        S4CrawlableDataset s4c = new S4CrawlableDataset( "/"+rs.getDataSet(),rs);
 
         if (Debug.isSet("showResponse")){
             System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
@@ -928,7 +953,7 @@ public class OLFS extends HttpServlet {
             for (int i = 0; i < n; i++) {
                 ReqState rs = (ReqState) prArr.get(i);
                 RequestDebug reqD = (RequestDebug) rs.getUserObject();
-                if ((rs != null) && !reqD.done) {
+                if (!reqD.done) {
                     preqs += "<pre>-----------------------\n";
                     preqs += "Request[" + reqD.reqno + "](" + reqD.threadDesc + ") is pending.\n";
                     preqs += rs.toString();

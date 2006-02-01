@@ -25,6 +25,7 @@
             <include name="${jdom.lib}"/>
             <include name="${cli.lib}"/>
             <include name="${thredds.lib}"/>
+            <include name="${nlog4j.lib}"/>
         </fileset>
     </path>
 
@@ -160,6 +161,8 @@
                 <include name="${jdom.lib}"/>
                 <include name="${opendap.lib}"/>
                 <include name="${thredds.lib}"/>
+                <include name="${threddsResources.lib}"/>
+                <include name="${nlog4j.lib}"/>
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -184,6 +187,10 @@
                 <include name="${soap.lib}"/>
                 <include name="${opendap.lib}"/>
            </zipfileset>
+
+            <webinf dir="${src.dir}/WEB-INF">
+                <include name="log4j.xml"/>
+            </webinf>
 
 
         </war>
