@@ -714,7 +714,7 @@ public class OLFS extends ThreddsServlet {
 
 
         if (Debug.isSet("showResponse")){
-            System.out.println("doGetCatalog() - configuring S4CrawlableDataset object (a CrawlableDataset)");
+            System.out.println("doGetCatalog() - Instantiating S4CrawlableDataset object (a CrawlableDataset)");
         }
 
 

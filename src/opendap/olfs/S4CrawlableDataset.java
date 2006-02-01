@@ -76,7 +76,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
     public S4CrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException {
 
-        new S4CrawlableDataset(path);
+        this(path);
 
         configure((ReqState)o);
 
@@ -87,24 +87,27 @@ public class S4CrawlableDataset implements CrawlableDataset {
         _path = path.endsWith("/catalog") ? path.substring( 0, path.length() - 8 ) : path;
 
         // Is path empty? Then make it "/"
-        //_path = _path.equals("") ? "/" : _path;
-        _path = _path.equals("/") ? "" : _path;
+        _path = _path.equals("") ? "/" : _path;
+
+
+        //_path = _path.equals("/") ? "" : _path;   // Does THREDDS want the top to / or empty??
 
         // Determine name (i.e., last name in the path name sequence).
         _name = _path.endsWith( "/" ) ? _path.substring( 0, _path.length() - 1 ) : _path;
 
-        //_name = _name.equals("") ? "/" : _name;
-        _name = _name.equals("/") ? "" : _name;
+        _name = _name.equals("") ? "/" : _name;
+        //_name = _name.equals("/") ? "" : _name;   // Does THREDDS want the top to / or empty??
 
 
-
-        int index = _name.lastIndexOf( "/" );
 
         _parentPath = null;
+        int index = _name.lastIndexOf( "/" );
         if ( index > 0){
             _parentPath = _name.substring(0,index);
             _name = _name.substring( index );
         }
+        else
+            _parentPath = "/";
 
 
         _besPort      = -1;
@@ -115,9 +118,10 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
         if(Debug.isSet("showResponse")){
             System.out.println("S4CrawlableDataset:");
-            System.out.println("    _path       = "+_path);
-            System.out.println("    _name       = "+_name);
-            System.out.println("    _parentPath = "+_parentPath);
+            System.out.println("    _path            = "+_path);
+            System.out.println("    _name            = "+_name);
+            System.out.println("    lastIndexOf(\"/\") = "+index);
+            System.out.println("    _parentPath      = "+_parentPath);
         }
 
     }
@@ -148,6 +152,10 @@ public class S4CrawlableDataset implements CrawlableDataset {
             System.out.println("    _besHost    = "+_besHost);
             System.out.println("    _besPort    = "+_besPort);
         }
+
+
+        if(Debug.isSet("showResponse"))
+            System.out.println("Calling: S4CrawlableDatset.getInfo("+_besHost+","+_besPort+")");
 
         getInfo(_besHost,_besPort);
 
