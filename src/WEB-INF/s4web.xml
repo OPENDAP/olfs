@@ -9,7 +9,7 @@
 
     <servlet>
         <servlet-name>
-            test
+            s4test
         </servlet-name>
 
         <servlet-class>
@@ -42,7 +42,7 @@
 
     <servlet>
         <servlet-name>
-            xray
+            s4
         </servlet-name>
 
         <servlet-class>
@@ -74,22 +74,22 @@
 
 
     <servlet-mapping>
-        <servlet-name>test</servlet-name>
-        <url-pattern>/test</url-pattern>
+        <servlet-name>s4test</servlet-name>
+        <url-pattern>/s4test</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>test</servlet-name>
-        <url-pattern>/test/*</url-pattern>
+        <servlet-name>s4test</servlet-name>
+        <url-pattern>/s4test/*</url-pattern>
     </servlet-mapping>
 
 
     <servlet-mapping>
-        <servlet-name>xray</servlet-name>
-        <url-pattern>/xray</url-pattern>
+        <servlet-name>s4</servlet-name>
+        <url-pattern>/s4</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>xray</servlet-name>
-        <url-pattern>/xray/*</url-pattern>
+        <servlet-name>s4</servlet-name>
+        <url-pattern>/s4/*</url-pattern>
     </servlet-mapping>
 
 
