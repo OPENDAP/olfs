@@ -256,52 +256,6 @@ public class ReqState {
          return(serverVersionDoc);
      }
 
-    /**
-     *
-     * @return The OLFS version Document object. Calling this method ccauses the OLFS to query
-     * the BES to determine the various version components located there.
-     */
-    public Document getBESVersionDocument() throws IOException,
-                                                            PPTException,
-                                                            BadConfigurationException,
-                                                            JDOMException {
-
-        System.out.println("Getting Server Version Document.");
-
-
-        //UID reqid = new UID();
-        //System.out.println("    RequestID: "+reqid);
-
-        // Get the version response from the BES (an XML doc)
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.showVersion(os);
-
-        //System.out.println(os);
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
-
-        // Tweak it!
-
-        // First find the response Element
-        Element ver = doc.getRootElement().getChild("response");
-
-        // Disconnect it from it's parent and then rename it.
-        ver.detach();
-        ver.setName("OPeNDAP-Version");
-
-        // Add a version element for this, the OLFS server
-        ver.addContent(opendap.olfs.Version.getVersionElement());
-
-        doc.detachRootElement();
-        doc.setRootElement(ver);
-
-        return (doc);
-
-
-    }
-
 
 
     public String getDataSet() {

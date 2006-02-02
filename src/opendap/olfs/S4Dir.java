@@ -28,6 +28,7 @@ package opendap.olfs;
 
 import opendap.dap.DODSException;
 import opendap.dap.parser.ParseException;
+import opendap.ppt.PPTException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +36,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import org.jdom.JDOMException;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * Default handler for OPeNDAP directory requests. This class is used
@@ -63,9 +68,9 @@ public class S4Dir {
      * @see ReqState
      */
     public static void sendDIR(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs)
-            throws DODSException, ParseException {
+                               HttpServletResponse response,
+                               ReqState rs)
+            throws DODSException, PPTException, JDOMException, BESException {
 
         if (_Debug) System.out.println("sendDIR request = " + request);
 
@@ -77,25 +82,16 @@ public class S4Dir {
             PrintWriter pw = new PrintWriter(response.getOutputStream());
 
             String thisServer = request.getRequestURL().toString();
-            pw.println("<html>");
-            pw.println("<head>");
-            pw.println("<title>OPeNDAP Directory</title>");
-            pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html\">");
-            pw.println("</head>");
-
-            pw.println("<body bgcolor=\"#FFFFFF\">");
+            printHTMLHeader(thisServer,pw);
 
 
-            pw.println("<h1>Server4 Directory for:</h1>");
-            pw.println("<h2>" + thisServer + "</h2>");
-            pw.println("<hr>");
-            pw.println("<h2>Directory Service Not yet implmented.</h2>");
+            Element dataset = BesAPI.showCatalog(rs.contentPath).getRootElement();
 
-            //printDIR(pw, ddxCacheDir, "DDX", thisServer);
+            pw.println(dataset);
 
-            //printDIR(pw, ddsCacheDir, "DDS", thisServer);
-            pw.println("<hr>");
-            pw.println("</html>");
+
+
+            printHTMLFooter(pw);
             pw.flush();
 
         } catch (FileNotFoundException fnfe) {
@@ -109,114 +105,27 @@ public class S4Dir {
 
     }
 
+    private static void printHTMLHeader(String thisServer, PrintWriter pw){
+        pw.println("<html>");
+        pw.println("<head>");
+        pw.println("<title>OPeNDAP Directory</title>");
+        pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html\">");
+        pw.println("</head>");
 
-    private static void printDIR(PrintWriter pw, String dirName, String dirType, String thisServer) {
+        pw.println("<body bgcolor=\"#FFFFFF\">");
 
+
+        pw.println("<h1>Server4 Directory for:</h1>");
+        pw.println("<h2>" + thisServer + "</h2>");
         pw.println("<hr>");
-        pw.println("<h3>" + dirType + "</h3>");
-
-        File dir = new File(dirName);
-
-        if (dir.exists()) {
-
-            if (dir.isDirectory()) {
-
-                if (_Debug) System.out.println("lastIndexOf(" + separator + "): " + thisServer.lastIndexOf(separator));
-                if (_Debug) System.out.println("length: " + thisServer.length());
-
-                if (thisServer.lastIndexOf(separator) != (thisServer.length() - 1)) {
-                    if (_Debug) System.out.println("Server URL does not end with: " + separator);
-                    thisServer += separator;
-                } else {
-                    if (_Debug) System.out.println("Server URL ends with: " + separator);
-                }
-
-
-                File fList[] = dir.listFiles();
-
-                pw.println("<table border=\"0\">");
-
-                for (int i = 0; i < fList.length; i++) {
-                    if (fList[i].isFile()) {
-
-                        pw.println("<tr>");
-
-                        pw.print("    <td>");
-                        pw.print("<div align='right'>");
-                        pw.print("<b>" +
-                                fList[i].getName() +
-                                ":</b> ");
-                        pw.print("</div>");
-                        pw.println("</td>");
-
-
-                        pw.print("    <td>");
-                        pw.print("<div align='center'>");
-                        pw.print("<a href='" +
-                                thisServer +
-                                fList[i].getName() +
-                                ".ddx'> DDX </a>");
-                        pw.print("</div>");
-                        pw.println("</td>");
-
-                        pw.print("    <td>");
-                        pw.print("<div align='center'>");
-                        pw.print("<a href='" +
-                                thisServer +
-                                fList[i].getName() +
-                                ".dds'> DDS </a>");
-                        pw.print("</div>");
-                        pw.println("</td>");
-
-                        pw.print("    <td>");
-                        pw.print("<div align='center'>");
-                        pw.print("<a href='" +
-                                thisServer +
-                                fList[i].getName() +
-                                ".das'> DAS </a>");
-                        pw.print("</div>");
-                        pw.println("</td>");
-
-                        pw.print("    <td>");
-                        pw.print("<div align='center'>");
-                        pw.print("<a href='" +
-                                thisServer +
-                                fList[i].getName() +
-                                ".info'> Information </a>");
-                        pw.print("</div>");
-                        pw.println("</td>");
-
-                        pw.print("    <td>");
-                        pw.print("<div align='center'>");
-                        pw.print("<a href='" +
-                                thisServer +
-                                fList[i].getName() +
-                                ".html'> HTML Data Request Form </a>");
-                        pw.print("</div>");
-                        pw.println("</td>");
-
-                        pw.println("</tr>");
-                    }
-                }
-                pw.println("</table>");
-
-            } else {
-                pw.println("<h3>");
-                pw.println("Specified " + dirType + " cache:<br>");
-                pw.println("<i>" + dirName + "</i><br>");
-                pw.println("is not a directory!");
-                pw.println("</h3>");
-            }
-        } else {
-            pw.println("<h4>");
-            pw.println("Cannot Find " + dirType + " Directory:<br>");
-            pw.println("<i>" + dirName + "</i><br>");
-            pw.println("</h4>");
-        }
-
+        pw.println("<h2>Directory Service Not yet implmented.</h2>");
 
     }
+    private static void printHTMLFooter( PrintWriter pw){
+        pw.println("<hr>");
+        pw.println("</html>");
 
+    }
 
 }
 

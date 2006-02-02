@@ -33,11 +33,15 @@ import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.util.Iterator;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.Element;
+import org.jdom.filter.Filter;
+import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -137,15 +141,134 @@ public class BesAPI {
 
 
 
-    public static void showVersion(OutputStream os)
-            throws BadConfigurationException, PPTException {
+
+    public static Document showVersion()
+            throws BadConfigurationException, PPTException, IOException, JDOMException, BESException {
 
 
+        // Get the version response from the BES (an XML doc)
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         besShowTransaction("version",os);
+
+        //System.out.println(os);
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
+
+        // Check for an exception:
+        besExceptionHandler(doc);
+        // Tweak it!
+
+        // First find the response Element
+        Element ver = doc.getRootElement().getChild("response");
+
+        // Disconnect it from it's parent and then rename it.
+        ver.detach();
+        ver.setName("OPeNDAP-Version");
+
+        doc.detachRootElement();
+        doc.setRootElement(ver);
+
+        return doc;
+    }
+
+
+    public static Document showInfo(String path)
+            throws PPTException, BadConfigurationException, IOException, JDOMException, BESException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String product = "info for "+"\""+path+"\"";
+
+        System.out.println("S4CrawlableDataset sending BES cmd: show "+product);
+        BesAPI.besShowTransaction(product,baos);
+
+
+        System.out.println("BES returned:\n"+baos);
+
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+
+        // Check for an exception:
+        besExceptionHandler(doc);
+
+        // Tweak it!
+
+        // First find the response Element
+
+        Element topDataset = doc.getRootElement().getChild("response").getChild("dataset");
+
+        // Disconnect it from it's parent and then rename it.
+        topDataset.detach();
+        doc.detachRootElement();
+        doc.setRootElement(topDataset);
+
+        return doc;
+
+    }
+
+
+    private static void besExceptionHandler(Document doc) throws BESException {
+
+        ElementFilter exceptionFilter = new ElementFilter("BESException");
+        Iterator i = doc.getDescendants(exceptionFilter);
+        if(i.hasNext()){
+
+            String msg = "";
+            int j = 0;
+            while(i.hasNext()){
+                if(j>0)
+                    msg += "\n";
+                Element exception = (Element) i.next();
+                msg +=  "[BESException: "+ j++ +"]" +
+                        "[Type: " + exception.getChild("Type").getTextTrim()+ "]" +
+                        "[Message: " + exception.getChild("Message").getTextTrim() + "]" +
+                        "[Location: " + exception.getChild("Location").getTextTrim() + "]";
+
+
+            }
+            throw new BESException(msg);
+        }
+
     }
 
 
 
+    public static Document showCatalog(String path)
+            throws PPTException, BadConfigurationException, IOException, JDOMException, BESException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String product = "catalog for "+"\""+path+"\"";
+
+        BesAPI.besShowTransaction(product,baos);
+
+        System.out.println("BES returned:\n"+baos);
+
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        // Check for an exception:
+        besExceptionHandler(doc);
+        // Tweak it!
+
+        // First find the response Element
+
+        Element topDataset = doc.getRootElement().getChild("response").getChild("dataset");
+
+        // Disconnect it from it's parent and then rename it.
+        topDataset.detach();
+        doc.detachRootElement();
+        doc.setRootElement(topDataset);
+
+        return doc;
+
+    }
 
     public static OPeNDAPClient startClient()
             throws BadConfigurationException,PPTException {

@@ -36,8 +36,6 @@ import java.io.*;
 
 import org.jdom.JDOMException;
 import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
@@ -108,7 +106,7 @@ public class TestServletResponse extends ThreddsServlet {
         configBES();
 
         try {
-            _serverVersionDocument = getServerVersionDocument();
+            cacheServerVersionDocument();
         } catch (Exception e) {
             e.printStackTrace();
             throw new ServletException("Could not get version document from BES.",e);
@@ -135,16 +133,15 @@ public class TestServletResponse extends ThreddsServlet {
 
     }
 
-    /***************************************************************************/
     /**
      *
-     * @return The OLFS version Document object. Calling this method ccauses the OLFS to query
+     * Caches the OLFS version Document object. Calling this method ccauses the OLFS to query
      * the BES to determine the various version components located there.
      */
-    private Document getServerVersionDocument() throws IOException,
-                                                            PPTException,
-                                                            BadConfigurationException,
-                                                            JDOMException {
+    private void cacheServerVersionDocument() throws IOException,
+            PPTException,
+            BadConfigurationException,
+            JDOMException, BESException {
 
         System.out.println("Getting Server Version Document.");
 
@@ -152,37 +149,21 @@ public class TestServletResponse extends ThreddsServlet {
         //UID reqid = new UID();
         //System.out.println("    RequestID: "+reqid);
 
-        // Get the version response from the BES (an XML doc)
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.showVersion(os);
 
-        //System.out.println(os);
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
-
-        // Tweak it!
-
-        // First find the response Element
-        Element ver = doc.getRootElement().getChild("response");
-
-        // Disconnect it from it's parent and then rename it.
-        ver.detach();
-        ver.setName("OPeNDAP-Version");
+        // Get the Version info from the BES.
+        Document doc = BesAPI.showVersion();
 
         // Add a version element for this, the OLFS server
-        ver.addContent(opendap.olfs.Version.getVersionElement());
+        doc.getRootElement().addContent(opendap.olfs.Version.getVersionElement());
 
-        doc.detachRootElement();
-        doc.setRootElement(ver);
 
-        return (doc);
+        _serverVersionDocument = doc;
 
 
     }
 
     /***************************************************************************/
+
 
 
     /**
@@ -262,7 +243,7 @@ public class TestServletResponse extends ThreddsServlet {
             System.out.println("Rejected Catalog Request");
 
         }
-        
+
 
 
 

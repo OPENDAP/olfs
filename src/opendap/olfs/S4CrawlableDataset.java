@@ -73,7 +73,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
 
 
-    public S4CrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException {
+    public S4CrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException, BESException {
 
         this(path);
 
@@ -129,7 +129,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
 
     private void configure() throws BadConfigurationException,
-            IOException, PPTException, JDOMException {
+            IOException, PPTException, JDOMException, BESException {
 
         //if(_isConfigured) {
         //    throw new BadConfigurationException("Error: You may not call S4CrawlableDataset.configure() more " +
@@ -158,31 +158,10 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
 
 
-    private void getCatalog() throws PPTException, IOException, JDOMException, BadConfigurationException {
+    private void getCatalog() throws PPTException, IOException, JDOMException, BadConfigurationException, BESException {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        String product = "catalog for "+"\""+_path+"\"";
-
-        BesAPI.besShowTransaction(product,baos);
-
-        System.out.println("BES returned:\n"+baos);
-
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-        // Tweak it!
-
-        // First find the response Element
-
-        Element topDataset = doc.getRootElement().getChild("response").getChild("dataset");
-
-        // Disconnect it from it's parent and then rename it.
-        topDataset.detach();
-        doc.detachRootElement();
-        doc.setRootElement(topDataset);
+        Document doc = BesAPI.showCatalog(_path);
+        Element topDataset = doc.getRootElement();
 
         if(!_path.equals(topDataset.getChild("name").getTextTrim())){
             throw new IOException ("Returned dataset name does not match requested name.\n"+
@@ -202,33 +181,10 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
 
 
-    private void getInfo() throws PPTException, IOException, JDOMException, BadConfigurationException {
+    private void getInfo() throws PPTException, IOException, JDOMException, BadConfigurationException, BESException {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        String product = "info for "+"\""+_path+"\"";
-
-        System.out.println("S4CrawlableDataset sending BES cmd: show "+product);
-        BesAPI.besShowTransaction(product,baos);
-
-
-        System.out.println("BES returned:\n"+baos);
-
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-        // Tweak it!
-
-        // First find the response Element
-
-        Element topDataset = doc.getRootElement().getChild("response").getChild("dataset");
-
-        // Disconnect it from it's parent and then rename it.
-        topDataset.detach();
-        doc.detachRootElement();
-        doc.setRootElement(topDataset);
+        Document doc = BesAPI.showInfo(_path);
+        Element topDataset = doc.getRootElement();
 
         if(!_path.equals(topDataset.getChild("name").getTextTrim())){
             throw new IOException ("Returned dataset name does not match requested name.\n"+
@@ -304,6 +260,8 @@ public class S4CrawlableDataset implements CrawlableDataset {
         } catch (JDOMException e) {
             throw new IOException(e.getMessage());
         } catch (BadConfigurationException e) {
+            throw new IOException(e.getMessage());
+        } catch (BESException e) {
             throw new IOException(e.getMessage());
         }
 

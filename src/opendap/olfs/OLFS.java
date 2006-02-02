@@ -36,7 +36,6 @@ import opendap.dap.parser.ParseException;
 import opendap.util.*;
 import opendap.ppt.PPTException;
 import org.jdom.*;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
@@ -202,9 +201,9 @@ public class OLFS extends HttpServlet {
      * the BES to determine the various version components located there.
      */
     private void cacheServerVersionDocument() throws IOException,
-                                                            PPTException,
-                                                            BadConfigurationException,
-                                                            JDOMException {
+            PPTException,
+            BadConfigurationException,
+            JDOMException, BESException {
 
         System.out.println("Getting Server Version Document.");
 
@@ -212,30 +211,13 @@ public class OLFS extends HttpServlet {
         //UID reqid = new UID();
         //System.out.println("    RequestID: "+reqid);
 
-        // Get the version response from the BES (an XML doc)
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.showVersion(os);
 
-        //System.out.println(os);
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
-
-        // Tweak it!
-
-        // First find the response Element
-        Element ver = doc.getRootElement().getChild("response");
-
-        // Disconnect it from it's parent and then rename it.
-        ver.detach();
-        ver.setName("OPeNDAP-Version");
+        // Get the Version info from the BES.
+        Document doc = BesAPI.showVersion();
 
         // Add a version element for this, the OLFS server
-        ver.addContent(opendap.olfs.Version.getVersionElement());
+        doc.getRootElement().addContent(opendap.olfs.Version.getVersionElement());
 
-        doc.detachRootElement();
-        doc.setRootElement(ver);
 
         _serverVersionDocument = doc;
 
@@ -475,7 +457,7 @@ public class OLFS extends HttpServlet {
     public void doGetDIR(HttpServletRequest request,
                          HttpServletResponse response,
                          ReqState rs)
-            throws IOException, ServletException {
+            throws IOException, ServletException, PPTException, DODSException, JDOMException, BESException {
 
 
         response.setHeader("XDODS-Server", rs.getXDODSServer());
@@ -484,13 +466,7 @@ public class OLFS extends HttpServlet {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_directory");
 
-        try {
-            S4Dir.sendDIR(request, response, rs);
-        } catch (ParseException pe) {
-            Util.parseExceptionHandler(pe, response);
-        } catch (DODSException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        S4Dir.sendDIR(request, response, rs);
 
     }
     /***************************************************************************/
@@ -761,7 +737,7 @@ public class OLFS extends HttpServlet {
     public void doGetCatalog(HttpServletRequest request,
                              HttpServletResponse response,
                              ReqState rs)
-            throws IOException, ServletException, BadConfigurationException, PPTException, JDOMException {
+            throws IOException, ServletException, BadConfigurationException, PPTException, JDOMException, BESException {
 
 
         response.setContentType("text/xml");
@@ -796,7 +772,7 @@ public class OLFS extends HttpServlet {
 
 */
 
-        S4CrawlableDataset s4c = new S4CrawlableDataset( "/"+rs.getDataSet(),null);
+        S4CrawlableDataset s4cd = new S4CrawlableDataset( "/"+rs.getDataSet(),null);
 
         if (Debug.isSet("showResponse")){
             System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
@@ -804,8 +780,8 @@ public class OLFS extends HttpServlet {
 
 
         SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                    "wingnut",
-                    s4c,
+                    s4cd.getPath(),
+                    s4cd,
                     "THREDDS",
                     "OPENDAP",
                     rs.getRequestURL());
@@ -815,7 +791,7 @@ public class OLFS extends HttpServlet {
         }
 
 
-        pw.print(scb.generateCatalogAsString(s4c));
+        pw.print(scb.generateCatalogAsString(s4cd));
 
 
 
