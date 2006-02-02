@@ -36,6 +36,7 @@ import opendap.dap.parser.ParseException;
 import opendap.util.*;
 import opendap.ppt.PPTException;
 import org.jdom.*;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
@@ -104,7 +105,7 @@ import thredds.cataloggen.SimpleCatalogBuilder;
  */
 
 
-public class OLFS extends ThreddsServlet {
+public class OLFS extends HttpServlet {
 
 
 
@@ -133,6 +134,15 @@ public class OLFS extends ThreddsServlet {
     private int HitCounter = 0;
 
 
+    /**
+     * ************************************************************************
+     * Server Version Document, Cached at servlet startup
+     *
+     * @serial
+     */
+    private Document _serverVersionDocument = null;
+
+
 
     /**
      * ************************************************************************
@@ -147,6 +157,26 @@ public class OLFS extends ThreddsServlet {
 
         super.init();
 
+        // debuggering
+        String debugOn = getInitParameter("DebugOn");
+        if (debugOn != null) {
+            System.out.println("** DebugOn **");
+            StringTokenizer toker = new StringTokenizer(debugOn);
+            while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
+        }
+
+        configBES();
+
+        try {
+            cacheServerVersionDocument();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("Could not get version document from BES.",e);
+        }
+
+    }
+
+    private void configBES() throws ServletException {
         String besHost = getInitParameter("BackEndServer");
         if (besHost == null)
             throw new ServletException("Servlet configuration must included BackEndServer\n");
@@ -157,31 +187,60 @@ public class OLFS extends ThreddsServlet {
 
 
         System.out.print("Configuring BES ... ");
-        boolean result;
 
-        synchronized (syncLock) {
-            result = BesAPI.configure(besHost, Integer.parseInt(besPort));
-        }
-
-        if(result)
+        if(BesAPI.configure(besHost, Integer.parseInt(besPort)))
             System.out.println("");
         else
-            System.out.println("Odd. It was already done!");
-
-
-        // debuggering
-        //String debugOn = getInitParameter("DebugOn");
-        //if (debugOn != null) {
-        //    System.out.println("** DebugOn **");
-        //    StringTokenizer toker = new StringTokenizer(debugOn);
-        //    while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
-        //}
-
-
+            System.out.println("That's odd, it was already done...");
 
     }
 
 
+    /**
+     *
+     * Caches the OLFS version Document object. Calling this method ccauses the OLFS to query
+     * the BES to determine the various version components located there.
+     */
+    private void cacheServerVersionDocument() throws IOException,
+                                                            PPTException,
+                                                            BadConfigurationException,
+                                                            JDOMException {
+
+        System.out.println("Getting Server Version Document.");
+
+
+        //UID reqid = new UID();
+        //System.out.println("    RequestID: "+reqid);
+
+        // Get the version response from the BES (an XML doc)
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.showVersion(os);
+
+        //System.out.println(os);
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
+
+        // Tweak it!
+
+        // First find the response Element
+        Element ver = doc.getRootElement().getChild("response");
+
+        // Disconnect it from it's parent and then rename it.
+        ver.detach();
+        ver.setName("OPeNDAP-Version");
+
+        // Add a version element for this, the OLFS server
+        ver.addContent(opendap.olfs.Version.getVersionElement());
+
+        doc.detachRootElement();
+        doc.setRootElement(ver);
+
+        _serverVersionDocument = doc;
+
+
+    }
 
     /***************************************************************************/
 
@@ -716,9 +775,9 @@ public class OLFS extends ThreddsServlet {
 
 
 
-        System.out.println("rootPath:    "+rootPath);
-        System.out.println("contentPath: "+contentPath);
-        System.out.println("myPath:      "+"/"+rs.getDataSet());
+//        System.out.println("rootPath:    "+rootPath);
+//        System.out.println("contentPath: "+contentPath);
+//        System.out.println("myPath:      "+"/"+rs.getDataSet());
 
 
 
@@ -1148,13 +1207,12 @@ public class OLFS extends ThreddsServlet {
 
     }
 
-    private ReqState getRequestState(HttpServletRequest request)
-            throws IOException, PPTException, BadConfigurationException, JDOMException {
+    private ReqState getRequestState(HttpServletRequest request) {
 
         ReqState rs;
 
         try {
-            rs = new ReqState(request, getServletConfig(), getServerName());
+            rs = new ReqState(request, getServletConfig(), getServerName(), _serverVersionDocument);
         } catch (BadURLException bue) {
             rs = null;
         }

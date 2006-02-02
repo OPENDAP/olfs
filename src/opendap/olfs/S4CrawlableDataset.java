@@ -65,7 +65,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
     private List     _childDatasetElements;
 
-    private boolean  _isConfigured;
+    //private boolean  _isConfigured;
     private boolean  _haveCatalog;
 
 
@@ -78,6 +78,9 @@ public class S4CrawlableDataset implements CrawlableDataset {
         this(path);
 
         _config = (Element)o;
+
+        //System.out.println("\n\n\n\n\nS4CrawlableDataset config: "+_config);
+        //System.out.println("\n\n\n\n\n");
 
         configure();
 
@@ -111,7 +114,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             _parentPath = "/";
 
 
-        _isConfigured = false;
+        //_isConfigured = false;
         _haveCatalog  = false;
 
         if(Debug.isSet("showResponse")){
@@ -128,14 +131,21 @@ public class S4CrawlableDataset implements CrawlableDataset {
     private void configure() throws BadConfigurationException,
             IOException, PPTException, JDOMException {
 
-        if(_isConfigured) {
-            throw new BadConfigurationException("Error: You may not call S4CrawlableDataset.configure() more " +
-            "than once for a given instance of S4CrawlableDataset.");
-        }
+        //if(_isConfigured) {
+        //    throw new BadConfigurationException("Error: You may not call S4CrawlableDataset.configure() more " +
+        //    "than once for a given instance of S4CrawlableDataset.");
+        //}
 
+
+        if(_config != null){
+            String besHost = _config.getChildTextTrim("besHost");
+            int    besPort = Integer.parseInt(_config.getChildTextTrim("besPost"));
+
+            BesAPI.configure(besHost,besPort);
+        }
         getInfo();
 
-        _isConfigured = true;
+        //_isConfigured = true;
     }
 
 
@@ -175,12 +185,12 @@ public class S4CrawlableDataset implements CrawlableDataset {
         doc.setRootElement(topDataset);
 
         if(!_path.equals(topDataset.getChild("name").getTextTrim())){
-//            throw new IOException ("Returned dataset name does not match requested name.\n"+
-//                                   "Requested: " + _path + "  "+
-//                                   "Returned: "+topDataset.getChild("name").getTextTrim());
-            System.out.println("Returned dataset name does not match requested name.\n"+
-                                   "Requested: " + _name + "  "+
+            throw new IOException ("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + _path + "  "+
                                    "Returned: "+topDataset.getChild("name").getTextTrim());
+//            System.out.println("Returned dataset name does not match requested name.\n"+
+//                                   "Requested: " + _name + "  "+
+//                                   "Returned: "+topDataset.getChild("name").getTextTrim());
         }
 
         processDatasetElement(topDataset,this);
@@ -198,7 +208,9 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
         String product = "info for "+"\""+_path+"\"";
 
+        System.out.println("S4CrawlableDataset sending BES cmd: show "+product);
         BesAPI.besShowTransaction(product,baos);
+
 
         System.out.println("BES returned:\n"+baos);
 
@@ -219,13 +231,13 @@ public class S4CrawlableDataset implements CrawlableDataset {
         doc.setRootElement(topDataset);
 
         if(!_path.equals(topDataset.getChild("name").getTextTrim())){
-  //          throw new IOException ("Returned dataset name does not match requested name.\n"+
-    //                               "Requested: " + _path + "  "+
-      //                             "Returned: "+topDataset.getChild("name").getTextTrim());
-
-            System.out.println("Returned dataset name does not match requested name.\n"+
-                                   "Requested: " + _name + "  "+
+            throw new IOException ("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + _path + "  "+
                                    "Returned: "+topDataset.getChild("name").getTextTrim());
+
+//            System.out.println("Returned dataset name does not match requested name.\n"+
+//                                   "Requested: " + _name + "  "+
+//                                   "Returned: "+topDataset.getChild("name").getTextTrim());
 
         }
 

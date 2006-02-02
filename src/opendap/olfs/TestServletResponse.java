@@ -35,6 +35,9 @@ import java.util.*;
 import java.io.*;
 
 import org.jdom.JDOMException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
@@ -71,6 +74,15 @@ public class TestServletResponse extends ThreddsServlet {
      */
     private int HitCounter = 0;
 
+    /**
+     * ************************************************************************
+     * Server Version Document, Cached at servlet startup
+     *
+     * @serial
+     */
+    private Document _serverVersionDocument = null;
+
+
 
     /**
      * ************************************************************************
@@ -84,7 +96,27 @@ public class TestServletResponse extends ThreddsServlet {
     public void init() throws ServletException {
 
         super.init();
-        
+
+        // debuggering
+        //String debugOn = getInitParameter("DebugOn");
+        //if (debugOn != null) {
+        //    System.out.println("** DebugOn **");
+        //    StringTokenizer toker = new StringTokenizer(debugOn);
+        //    while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
+       // }
+
+        configBES();
+
+        try {
+            _serverVersionDocument = getServerVersionDocument();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("Could not get version document from BES.",e);
+        }
+
+    }
+
+    private void configBES() throws ServletException {
         String besHost = getInitParameter("BackEndServer");
         if (besHost == null)
             throw new ServletException("Servlet configuration must included BackEndServer\n");
@@ -95,25 +127,57 @@ public class TestServletResponse extends ThreddsServlet {
 
 
         System.out.print("Configuring BES ... ");
-        boolean result;
 
-        synchronized (syncLock) {
-            result = BesAPI.configure(besHost, Integer.parseInt(besPort));
-        }
-
-        if(result)
+        if(BesAPI.configure(besHost, Integer.parseInt(besPort)))
             System.out.println("");
         else
             System.out.println("Odd. It was already done!");
 
+    }
 
-        // debuggering
-        //String debugOn = getInitParameter("DebugOn");
-        //if (debugOn != null) {
-        //    System.out.println("** DebugOn **");
-        //    StringTokenizer toker = new StringTokenizer(debugOn);
-        //    while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
-        //}
+    /***************************************************************************/
+    /**
+     *
+     * @return The OLFS version Document object. Calling this method ccauses the OLFS to query
+     * the BES to determine the various version components located there.
+     */
+    private Document getServerVersionDocument() throws IOException,
+                                                            PPTException,
+                                                            BadConfigurationException,
+                                                            JDOMException {
+
+        System.out.println("Getting Server Version Document.");
+
+
+        //UID reqid = new UID();
+        //System.out.println("    RequestID: "+reqid);
+
+        // Get the version response from the BES (an XML doc)
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.showVersion(os);
+
+        //System.out.println(os);
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
+
+        // Tweak it!
+
+        // First find the response Element
+        Element ver = doc.getRootElement().getChild("response");
+
+        // Disconnect it from it's parent and then rename it.
+        ver.detach();
+        ver.setName("OPeNDAP-Version");
+
+        // Add a version element for this, the OLFS server
+        ver.addContent(opendap.olfs.Version.getVersionElement());
+
+        doc.detachRootElement();
+        doc.setRootElement(ver);
+
+        return (doc);
 
 
     }
@@ -198,6 +262,7 @@ public class TestServletResponse extends ThreddsServlet {
             System.out.println("Rejected Catalog Request");
 
         }
+        
 
 
 
@@ -503,13 +568,12 @@ public class TestServletResponse extends ThreddsServlet {
 
     }
 
-    private ReqState getRequestState(HttpServletRequest request)
-            throws IOException, PPTException, BadConfigurationException, JDOMException {
+    private ReqState getRequestState(HttpServletRequest request) {
 
         ReqState rs;
 
         try {
-            rs = new ReqState(request, getServletConfig(), getServerName());
+            rs = new ReqState(request, getServletConfig(), getServerName(),_serverVersionDocument);
         } catch (BadURLException bue) {
             rs = null;
         }

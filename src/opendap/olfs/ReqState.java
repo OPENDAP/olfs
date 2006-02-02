@@ -85,12 +85,8 @@ public class ReqState {
 
     public ReqState(HttpServletRequest myRequest,
                     ServletConfig sc,
-                    String serverClassName)
-            throws BadURLException,
-            IOException,
-            PPTException,
-            BadConfigurationException,
-            JDOMException {
+                    String serverClassName, Document svd)
+            throws BadURLException {
 
         this.myServletConfig = sc;
         this.myHttpRequest = myRequest;
@@ -125,7 +121,7 @@ public class ReqState {
         //System.out.println("Schema Location: "+getSchemaLocation());
 
         requestURL = myHttpRequest.getRequestURL().toString();
-        serverVersionDoc = getVersionDocument(this);
+        serverVersionDoc = svd;
 
 
 
@@ -265,7 +261,7 @@ public class ReqState {
      * @return The OLFS version Document object. Calling this method ccauses the OLFS to query
      * the BES to determine the various version components located there.
      */
-    private Document getVersionDocument(ReqState rs) throws IOException,
+    public Document getBESVersionDocument() throws IOException,
                                                             PPTException,
                                                             BadConfigurationException,
                                                             JDOMException {
@@ -273,9 +269,8 @@ public class ReqState {
         System.out.println("Getting Server Version Document.");
 
 
-        UID reqid = new UID();
-
-        System.out.println("    RequestID: "+reqid);
+        //UID reqid = new UID();
+        //System.out.println("    RequestID: "+reqid);
 
         // Get the version response from the BES (an XML doc)
         ByteArrayOutputStream os = new ByteArrayOutputStream();

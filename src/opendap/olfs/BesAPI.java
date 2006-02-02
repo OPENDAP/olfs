@@ -30,6 +30,14 @@ import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
 import java.io.OutputStream;
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,19 +51,27 @@ public class BesAPI {
     private static int _besPort = -1;
     private static String _besHost = "Not Configured!";
     private static boolean _configured = false;
+    private static final Object syncLock = new Object();
 
     public static boolean configure(String host, int port){
-        if(_configured)
-            return false;
-        _besHost = host;
-        _besPort = port;
-        _configured = true;
 
-        System.out.println("BES is configured - Host: "+_besHost+"   Port: "+_besPort);
+        synchronized(syncLock){
+
+            if(_configured)
+                return false;
+
+            _besHost = host;
+            _besPort = port;
+            _configured = true;
+
+            System.out.println("BES is configured - Host: "+_besHost+"   Port: "+_besPort);
+         }
+
         return true;
 
     }
 
+/*
     public static boolean configure(ReqState rs) throws BadConfigurationException {
 
         String besHost = rs.getInitParameter("BackEndServer");
@@ -70,6 +86,7 @@ public class BesAPI {
         return configure(besHost, Integer.parseInt(besPort));
 
     }
+*/
 
     public static String getHost() throws BadConfigurationException {
         if(!_configured)
@@ -126,6 +143,7 @@ public class BesAPI {
 
         besShowTransaction("version",os);
     }
+
 
 
 
