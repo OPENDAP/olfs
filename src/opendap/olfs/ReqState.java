@@ -27,21 +27,13 @@ package opendap.olfs;
 
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Iterator;
-import java.io.File;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import java.rmi.server.UID;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
-import opendap.ppt.PPTException;
 
 /**
  * User requests get cached here so that downstream code can access
@@ -406,8 +398,16 @@ public class ReqState {
 
         // Figure out the data set name.
         this.dataSetName = myHttpRequest.getPathInfo();
+
+        System.out.println("myHttpRequest.getPathInfo() = "+this.dataSetName);
         this.requestSuffix = null;
-        if (this.dataSetName != null) {
+
+
+        //Are they looking for a directory?
+        if(this.dataSetName == null || this.dataSetName.endsWith("/")){
+            //return;
+        }
+        else {
             // Break the path up and find the last (terminal)
             // end.
             StringTokenizer st = new StringTokenizer(this.dataSetName, "/");
@@ -429,11 +429,18 @@ public class ReqState {
 
                 // Set the data set name to the entire path minus the
                 // suffix which we know exists in the last element
-                // of the path.
-                this.dataSetName = this.dataSetName.substring(1, this.dataSetName.lastIndexOf('.'));
+                // of the path. Remove the leading slash
+
+                //this.dataSetName = this.dataSetName.substring(1, this.dataSetName.lastIndexOf('.'));
+
+                //Changed to not remove the leading slash! ndp 2/3/06
+                this.dataSetName = this.dataSetName.substring(0, this.dataSetName.lastIndexOf('.'));
+
             } else { // strip the leading slash (/) from the dataset name and set the suffix to an empty string
                 requestSuffix = "";
-                this.dataSetName = this.dataSetName.substring(1, this.dataSetName.length());
+
+                // No longer shall we strip the leadin slash! ndp 2/3/06
+                //this.dataSetName = this.dataSetName.substring(1, this.dataSetName.length());
             }
         }
     }
@@ -451,7 +458,6 @@ public class ReqState {
 
         boolean isTiny;
 
-        isTiny = false;
         String Encoding = this.myHttpRequest.getHeader("Accept-Encoding");
 
         if (Encoding != null)

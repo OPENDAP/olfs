@@ -51,7 +51,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest BES showResponse CE </param-value>
+            <param-value>showRequest showResponse CE </param-value>
         </init-param>
 
         <init-param>

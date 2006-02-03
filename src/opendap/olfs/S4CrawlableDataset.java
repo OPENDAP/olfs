@@ -28,8 +28,6 @@ import thredds.crawlabledataset.CrawlableDataset;
 import thredds.crawlabledataset.CrawlableDatasetFilter;
 
 import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Date;
 import java.util.Iterator;
@@ -40,7 +38,6 @@ import java.text.ParsePosition;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import opendap.ppt.PPTException;
 import opendap.util.Debug;
 
@@ -218,7 +215,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
         dataset.getChild("lastmodified").getChild("time").getTextTrim(),
         new ParsePosition(0));
 
-        String isContainer = dataset.getAttributeValue("thredds_container");
+        String isContainer = dataset.getAttributeValue("thredds_collection");
 
         if(isContainer.equalsIgnoreCase("true")){
 

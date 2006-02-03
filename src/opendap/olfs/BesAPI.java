@@ -38,7 +38,6 @@ import java.util.Iterator;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.Element;
-import org.jdom.filter.Filter;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 
@@ -150,7 +149,7 @@ public class BesAPI {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         besShowTransaction("version",os);
 
-        //System.out.println(os);
+        if(Debug.isSet("BES")) System.out.println(os);
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -180,11 +179,11 @@ public class BesAPI {
 
         String product = "info for "+"\""+path+"\"";
 
-        System.out.println("S4CrawlableDataset sending BES cmd: show "+product);
+        if(Debug.isSet("BES")) System.out.println("S4CrawlableDataset sending BES cmd: show "+product);
         BesAPI.besShowTransaction(product,baos);
 
 
-        System.out.println("BES returned:\n"+baos);
+        if(Debug.isSet("BES")) System.out.println("BES returned:\n"+baos);
 
 
         // Parse the XML doc into a Document object.
@@ -246,7 +245,7 @@ public class BesAPI {
 
         BesAPI.besShowTransaction(product,baos);
 
-        System.out.println("BES returned:\n"+baos);
+        if(Debug.isSet("BES")) System.out.println("BES returned:\n"+baos);
 
 
         // Parse the XML doc into a Document object.
@@ -276,11 +275,11 @@ public class BesAPI {
 
         OPeNDAPClient oc = new OPeNDAPClient();
 
-        //System.out.println("BES - Host: "+_besHost+"  Port:"+_besPort);
+        if(Debug.isSet("BES")) System.out.println("Starting OPeNDAPClient. BES - Host: "+_besHost+"  Port:"+_besPort);
 
         oc.startClient(getHost(), getPort());
 
-        if(Debug.isSet("showRequest"))
+        if(Debug.isSet("BES"))
             oc.setOutput(System.out,true);
         else {
             DevNull devNull = new DevNull();
@@ -301,11 +300,11 @@ public class BesAPI {
 
         //String cmd = "set container in catalog values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
         String cmd = "set container in catalog values "+dataset + ", " + dataset + ";\n";
-        if(Debug.isSet("showRequest")) System.out.print("Sending BES command: " + cmd);
+        if(Debug.isSet("BES")) System.out.print("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
 
 
-        System.out.println("ConstraintExpression: "+constraintExpression);
+        if(Debug.isSet("BES")) System.out.println("ConstraintExpression: "+constraintExpression);
 
 
         if(constraintExpression== null || constraintExpression.equalsIgnoreCase("") ){
@@ -316,7 +315,7 @@ public class BesAPI {
 
         }
 
-        if(Debug.isSet("showRequest")) System.out.print("Sending BES command: " +cmd);
+        if(Debug.isSet("BES")) System.out.print("Sending BES command: " +cmd);
         oc.executeCommand(cmd);
 
     }
@@ -348,7 +347,7 @@ public class BesAPI {
                                       OutputStream os) throws PPTException {
 
         String cmd = getGetCmd(product);
-        if(Debug.isSet("showRequest")) System.err.print("Sending command: " +cmd);
+        if(Debug.isSet("BES")) System.err.print("Sending command: " +cmd);
 
         oc.setOutput(os,false);
         oc.executeCommand(cmd);
@@ -356,12 +355,12 @@ public class BesAPI {
     }
 
     public static void shutdownClient(OPeNDAPClient oc) throws PPTException {
-        System.out.print("Shutting down client...");
+        if(Debug.isSet("BES")) System.out.print("Shutting down client...");
 
         oc.setOutput(null,false);
 
         oc.shutdownClient();
-        System.out.println("Done.");
+        if(Debug.isSet("BES")) System.out.println("Done.");
 
 
     }
@@ -371,7 +370,7 @@ public class BesAPI {
                                           OutputStream os)
             throws BadConfigurationException,PPTException {
 
-        System.out.println("Entered besGetTransaction().");
+        if(Debug.isSet("BES")) System.out.println("Entered besGetTransaction().");
 
 
         OPeNDAPClient oc = startClient();
@@ -396,7 +395,7 @@ public class BesAPI {
 
         oc.startClient(getHost(), getPort());
 
-        if(Debug.isSet("showRequest"))
+        if(Debug.isSet("BES"))
             oc.setOutput(System.out,true);
         else {
             DevNull devNull = new DevNull();
@@ -404,14 +403,14 @@ public class BesAPI {
         }
 
         String cmd = "show "+product+";\n";
-        if(Debug.isSet("showRequest")) System.err.print("Sending command: "+cmd);
+        if(Debug.isSet("BES")) System.err.print("Sending command: "+cmd);
         oc.setOutput(os,false);
         oc.executeCommand(cmd);
 
-        System.out.print("Shutting down client...");
+        if(Debug.isSet("BES")) System.out.print("Shutting down client...");
         oc.setOutput(null,false);
         oc.shutdownClient();
-        System.out.println("Done.");
+        if(Debug.isSet("BES")) System.out.println("Done.");
 
     }
 

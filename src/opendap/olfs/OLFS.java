@@ -1125,6 +1125,10 @@ public class OLFS extends HttpServlet {
                     doGetDIR(request, response, rs);
                 } else if (dataSet.equals("")) {
                     doGetDIR(request, response, rs);
+                } else if (dataSet.endsWith("/")) {
+                    doGetDIR(request, response, rs);
+                } else if (requestSuffix.equals("")) {
+                    doGetDIR(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("/version") || dataSet.equalsIgnoreCase("/version/")) {
                     doGetVER(request, response, rs);
                 } else if (dataSet.equalsIgnoreCase("/help") || dataSet.equalsIgnoreCase("/help/")) {

@@ -23,22 +23,19 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-
 package opendap.olfs;
 
 import opendap.dap.DODSException;
-import opendap.dap.parser.ParseException;
 import opendap.ppt.PPTException;
+import opendap.util.Debug;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 
 import org.jdom.JDOMException;
-import org.jdom.Document;
 import org.jdom.Element;
 
 /**
@@ -52,8 +49,6 @@ import org.jdom.Element;
 
 public class S4Dir {
 
-    private static final boolean _Debug = false;
-    private static String separator = "/";
 
 
     /**
@@ -70,62 +65,248 @@ public class S4Dir {
     public static void sendDIR(HttpServletRequest request,
                                HttpServletResponse response,
                                ReqState rs)
-            throws DODSException, PPTException, JDOMException, BESException {
+            throws DODSException, PPTException, JDOMException, BESException, IOException {
 
-        if (_Debug) System.out.println("sendDIR request = " + request);
+        if (Debug.isSet("showResponse")) System.out.println("sendDIR request = " + request);
 
         //String ddxCacheDir = rs.getDDXCache();
         //String ddsCacheDir = rs.getDDSCache();
 
-        try {
-
-            PrintWriter pw = new PrintWriter(response.getOutputStream());
-
-            String thisServer = request.getRequestURL().toString();
-            printHTMLHeader(thisServer,pw);
-
-
-            Element dataset = BesAPI.showCatalog(rs.contentPath).getRootElement();
-
-            pw.println(dataset);
+        String name, collectionName;
+        String size;
+        String lastModified;
+        String link;
+        String responseLinks;
 
 
+        Iterator it;
+        Element childDataset;
 
-            printHTMLFooter(pw);
-            pw.flush();
+        String requestURL = rs.getRequestURL();
 
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("OUCH! FileNotFoundException: " + fnfe.getMessage());
-            fnfe.printStackTrace(System.out);
-        } catch (IOException ioe) {
-            System.out.println("OUCH! IOException: " + ioe.getMessage());
-            ioe.printStackTrace(System.out);
+
+        if(requestURL.endsWith("/"))
+            requestURL = requestURL.substring(0,requestURL.length()-1);
+
+
+
+        PrintWriter pw = new PrintWriter(response.getOutputStream());
+
+
+        if(rs.getDataSet() == null)
+            name = "/";
+        else
+            name = rs.getDataSet();
+
+
+        Element dataset = BesAPI.showCatalog(name).getRootElement();
+
+
+
+
+        // Compute White Space
+        int headerSpace=0;
+        it = dataset.getChildren("dataset").iterator();
+        while(it.hasNext()){
+            childDataset = (Element) it.next();
+            name = childDataset.getChildTextTrim("name");
+            if(headerSpace < name.length())
+                headerSpace = name.length();
+        }
+        headerSpace += 10;
+
+
+
+
+
+        name = dataset.getChildTextTrim("name");
+//        size = dataset.getChildTextTrim("size");
+//        lastModified = dataset.getChild("lastmodified").getChildTextTrim("date") + " " +
+//                dataset.getChild("lastmodified").getChildTextTrim("time");
+
+
+        // Figure out what the link to the parent directory looks like.
+        if (name.endsWith("/"))
+            collectionName = name.substring(0, name.length() - 1);
+        else
+            collectionName = name;
+
+        String baseName;
+        if(collectionName.endsWith("/"))
+                baseName = collectionName.substring(0,collectionName.length()-1);
+        else
+            baseName = collectionName;
+
+        if(baseName.lastIndexOf("/") > 0)
+            baseName = baseName.substring(baseName.lastIndexOf("/"),baseName.length());
+
+
+
+
+        link = requestURL.substring(0, requestURL.lastIndexOf(baseName));
+
+        // Set up the page.
+        printHTMLHeader(collectionName, headerSpace, link, pw);
+
+
+        it = dataset.getChildren("dataset").iterator();
+        while(it.hasNext()){
+
+            childDataset = (Element) it.next();
+
+            name = childDataset.getChildTextTrim("name");
+            size = childDataset.getChildTextTrim("size");
+            lastModified = childDataset.getChild("lastmodified").getChildTextTrim("date") + " " +
+                    childDataset.getChild("lastmodified").getChildTextTrim("time");
+
+            if(childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")){
+
+
+                link = requestURL+"/"+name+"/";
+
+                responseLinks = "        " +
+                        " -  "+
+                        " -  "+
+                        " -  "+
+                        " -   "+
+                        " -   ";
+
+
+                name += "/";
+                size = " -";
+            }
+            else {
+                link = requestURL+"/"+name+".html";
+
+                // Build response links
+
+                responseLinks = "      " +
+                        "<a href=\"" + requestURL + "/" + name + ".ddx"  + "\">ddx</a> "+
+                        "<a href=\"" + requestURL + "/" + name + ".dds"  + "\">dds</a> "+
+                        "<a href=\"" + requestURL + "/" + name + ".das"  + "\">das</a> "+
+                        "<a href=\"" + requestURL + "/" + name + ".info" + "\">info</a> "+
+                        "<a href=\"" + requestURL + "/" + name + ".html" + "\">html</a> ";
+
+
+                size = computeSizeString(size);
+            }
+
+            pw.print("<A HREF=\"");
+            pw.print(link);
+            pw.print("\">" + name + "</a>" + getWhiteSpacePadding(name,headerSpace));
+            pw.print(lastModified);
+            pw.print("      " + size);
+
+            pw.print(responseLinks);
+
+            pw.print("\n");
+
         }
 
+        printHTMLFooter(pw);
+        pw.flush();
+
 
     }
 
-    private static void printHTMLHeader(String thisServer, PrintWriter pw){
+    private static void printHTMLHeader(String collectionName, int headerSpace, String parentLink, PrintWriter pw) {
+
+
+        pw.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
         pw.println("<html>");
-        pw.println("<head>");
-        pw.println("<title>OPeNDAP Directory</title>");
-        pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html\">");
-        pw.println("</head>");
+        pw.println("    <head>");
+        pw.println("        <title>OPeNDAP Server4 Index of " + collectionName + "</title>");
+        pw.println("    </head>");
+        pw.println("    <body>");
+        pw.println("        <h1>OPeNDAP Server4 Index of " + collectionName + "</h1>");
+        pw.println("        <pre>");
 
-        pw.println("<body bgcolor=\"#FFFFFF\">");
+        // original line with images
+        //pw.println("<img src=\"/icons/blank.gif\" alt=\"Icon \" /> <A HREF=\"?C=N;O=D\">Name</a>                      <A HREF=\"?C=M;O=A\">Last modified</a>      <A HREF=\"?C=S;O=A\">Size</a>  <A HREF=\"?C=D;O=A\">Description</a><hr /><img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://test.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
+        // Original line, sans images
+        //pw.println("<A HREF=\"?C=N;O=D\">Name</a>"+getWhiteSpacePadding("Name",headerSpace)+"<A HREF=\"?C=M;O=A\">Last modified</a>            <A HREF=\"?C=S;O=A\">Size</a>        <A HREF=\"?C=D;O=A\">Description</a>");
 
-        pw.println("<h1>Server4 Directory for:</h1>");
-        pw.println("<h2>" + thisServer + "</h2>");
-        pw.println("<hr>");
-        pw.println("<h2>Directory Service Not yet implmented.</h2>");
+        //No Images, No sorting links.
+        pw.println("Name"+getWhiteSpacePadding("Name",headerSpace)+"Last modified            Size        Response Links");
+        pw.println("<hr />");
+        //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://test.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
+        pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>"+getWhiteSpacePadding("Parent Directory",headerSpace+26)+"-");
+
 
     }
-    private static void printHTMLFooter( PrintWriter pw){
-        pw.println("<hr>");
-        pw.println("</html>");
+
+    private static void printHTMLFooter(PrintWriter pw) {
+        /*
+        <hr /></pre>
+        <address>Apache/2.0.46 (Red Hat) Server at test.opendap.org Port 80</address>
+        </body></html>
+        */
+        pw.println("<hr /></pre>");
+        //pw.println("<address>Apache/2.0.46 (Red Hat) Server at test.opendap.org Port 80</address>");
+        pw.println("</body></html>");
 
     }
+
+    private static String getWhiteSpacePadding(String stringToPad, int desiredSize){
+
+        String result = "";
+
+        //System.out.println("stringToPad.length(): "+stringToPad.length()+"    desiredSize: "+desiredSize);
+
+
+        if(stringToPad.length() >= desiredSize)
+            return(result);
+
+
+        for(int i=0; i<(desiredSize - stringToPad.length());i++)
+            result += " ";
+
+        //System.out.println("result.length(): "+result.length()+"    desiredSize: "+desiredSize);
+
+        return result;
+    }
+
+
+
+
+    private static String computeSizeString(String size){
+
+        int sz = Integer.parseInt(size);
+        String result;
+
+        int mag = 0;
+
+        while(sz >= 1024){
+            sz /= 1024;
+            mag++;
+        }
+        switch(mag){
+            case 0:
+                result = sz + " ";
+                break;
+            case 1:
+                result = sz+"K";
+                break;
+            case 2:
+                result = sz+"M";
+                break;
+            case 3:
+                result = sz+"G";
+                break;
+            case 4:
+                result = sz+"P";
+                break;
+            default:
+                result = "Way to big!";
+                break;
+        }
+
+        result = getWhiteSpacePadding(result,4) +result;
+        return result;
+
+    }
+
 
 }
 
