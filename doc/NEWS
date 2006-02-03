@@ -1,5 +1,0 @@
-
-Version 1.0
-
-This version of the server returns only DAP 2.0 compliant responses with the
-exception that it also returns the XDAP and XOPeNDAP-Server headers.
