@@ -85,26 +85,27 @@ public class S4Dir {
         String requestURL = rs.getRequestURL();
 
 
+        // clean up the url
         if(requestURL.endsWith("/"))
             requestURL = requestURL.substring(0,requestURL.length()-1);
-
-
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
 
+        // Make shure the dataset name is not null
         if(rs.getDataSet() == null)
             name = "/";
         else
             name = rs.getDataSet();
 
 
+        // Get the catalog for this collection
         Element dataset = BesAPI.showCatalog(name).getRootElement();
 
 
 
 
-        // Compute White Space
+        // Compute White Space required for correct formating
         int headerSpace=0;
         it = dataset.getChildren("dataset").iterator();
         while(it.hasNext()){
@@ -118,17 +119,13 @@ public class S4Dir {
 
 
 
-
+        // get the name of the collection
         name = dataset.getChildTextTrim("name");
-//        size = dataset.getChildTextTrim("size");
-//        lastModified = dataset.getChild("lastmodified").getChildTextTrim("date") + " " +
-//                dataset.getChild("lastmodified").getChildTextTrim("time");
-
 
         // Figure out what the link to the parent directory looks like.
-        if (name.endsWith("/"))
-            collectionName = name.substring(0, name.length() - 1);
-        else
+//        if (name.endsWith("/"))
+//            collectionName = name.substring(0, name.length() - 1);
+//        else
             collectionName = name;
 
         String baseName;
@@ -142,13 +139,14 @@ public class S4Dir {
 
 
 
-
+        // Strip off the basename to make the link
         link = requestURL.substring(0, requestURL.lastIndexOf(baseName));
 
         // Set up the page.
         printHTMLHeader(collectionName, headerSpace, link, pw);
 
 
+        // Build a line in the page for each child dataset/collection
         it = dataset.getChildren("dataset").iterator();
         while(it.hasNext()){
 
@@ -159,6 +157,7 @@ public class S4Dir {
             lastModified = childDataset.getChild("lastmodified").getChildTextTrim("date") + " " +
                     childDataset.getChild("lastmodified").getChildTextTrim("time");
 
+            // Is it a collection?
             if(childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")){
 
 
@@ -175,7 +174,7 @@ public class S4Dir {
                 name += "/";
                 size = " -";
             }
-            else {
+            else { /// It must be a dataset
                 link = requestURL+"/"+name+".html";
 
                 // Build response links
@@ -215,10 +214,10 @@ public class S4Dir {
         pw.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
         pw.println("<html>");
         pw.println("    <head>");
-        pw.println("        <title>OPeNDAP Server4 Index of " + collectionName + "</title>");
+        pw.println("        <title>OPeNDAP Server4:  Index of " + collectionName + "</title>");
         pw.println("    </head>");
         pw.println("    <body>");
-        pw.println("        <h1>OPeNDAP Server4 Index of " + collectionName + "</h1>");
+        pw.println("        <h1>OPeNDAP Server4:  Index of " + collectionName + "</h1>");
         pw.println("        <pre>");
 
         // original line with images
