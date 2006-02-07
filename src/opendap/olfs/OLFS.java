@@ -737,7 +737,7 @@ public class OLFS extends HttpServlet {
     public void doGetCatalog(HttpServletRequest request,
                              HttpServletResponse response,
                              ReqState rs)
-            throws IOException, ServletException, BadConfigurationException, PPTException, JDOMException, BESException {
+            throws IOException, ServletException, DODSException, PPTException, JDOMException, BESException {
 
 
         response.setContentType("text/xml");
@@ -772,31 +772,38 @@ public class OLFS extends HttpServlet {
 
 */
 
-        S4CrawlableDataset s4cd = new S4CrawlableDataset( "/"+rs.getDataSet(),null);
+        S4CrawlableDataset s4cd = new S4CrawlableDataset( rs.getDataSet(),null);
 
-        if (Debug.isSet("showResponse")){
-            System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
+
+
+        if(s4cd.isCollection()){
+
+            if (Debug.isSet("showResponse")){
+                System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
+            }
+
+
+            SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
+                        s4cd.getPath(),
+                        s4cd,
+                        "THREDDS",
+                        "OPENDAP",
+                        rs.getRequestURL());
+
+            if (Debug.isSet("showResponse")){
+                System.out.println("doGetCatalog() - Generating catalog");
+            }
+
+
+            pw.print(scb.generateCatalogAsString(s4cd));
+
+
         }
-
-
-        SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                    s4cd.getPath(),
-                    s4cd,
-                    "THREDDS",
-                    "OPENDAP",
-                    rs.getRequestURL());
-
-        if (Debug.isSet("showResponse")){
-            System.out.println("doGetCatalog() - Generating catalog");
+        else {
+            response.setContentType("text/html");
+            String msg = "ERROR: THREDDS catalogs may only be requested for collections, not for individual data sets.";
+            throw new DODSException(msg);
         }
-
-
-        pw.print(scb.generateCatalogAsString(s4cd));
-
-
-
-
-
 
         //printCatalog(request, pw);
         pw.flush();
