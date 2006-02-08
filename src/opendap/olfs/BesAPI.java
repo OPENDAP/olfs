@@ -60,7 +60,7 @@ public class BesAPI {
 
         synchronized(syncLock){
 
-            if(_configured)
+            if(isConfigured())
                 return false;
 
             _besHost = host;
@@ -72,6 +72,10 @@ public class BesAPI {
 
         return true;
 
+    }
+
+    public static boolean isConfigured(){
+        return _configured;
     }
 
 /*
@@ -92,14 +96,14 @@ public class BesAPI {
 */
 
     public static String getHost() throws BadConfigurationException {
-        if(!_configured)
+        if(!isConfigured())
             throw new BadConfigurationException("BES must be configured before use!\n");
 
         return _besHost;
     }
 
     public static int getPort() throws BadConfigurationException {
-        if(!_configured)
+        if(!isConfigured())
             throw new BadConfigurationException("BES must be configured before use!\n");
         return _besPort;
     }

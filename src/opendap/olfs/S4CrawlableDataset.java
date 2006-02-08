@@ -38,6 +38,8 @@ import java.text.ParsePosition;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import opendap.ppt.PPTException;
 import opendap.util.Debug;
 
@@ -77,9 +79,18 @@ public class S4CrawlableDataset implements CrawlableDataset {
         _config = (Element)o;
 
         //System.out.println("\n\n\n\n\nS4CrawlableDataset config: "+_config);
-        //System.out.println("\n\n\n\n\n");
 
-        configure();
+        //XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
+        //xo.output(_config,System.out);
+
+        //try{
+            configure();
+        //}
+        //catch(Exception e){
+        //    System.out.println("OOPS!");
+        //    e.printStackTrace(System.out);
+        //}
+        //System.out.println("\n\n\n\n\n");
 
     }
     private S4CrawlableDataset(String path) {
@@ -114,13 +125,13 @@ public class S4CrawlableDataset implements CrawlableDataset {
         //_isConfigured = false;
         _haveCatalog  = false;
 
-        if(Debug.isSet("showResponse")){
+        //if(Debug.isSet("showResponse")){
             System.out.println("S4CrawlableDataset:");
             System.out.println("    _path            = "+_path);
             System.out.println("    _name            = "+_name);
             System.out.println("    lastIndexOf(\"/\") = "+index);
             System.out.println("    _parentPath      = "+_parentPath);
-        }
+        //}
 
     }
 
@@ -128,21 +139,29 @@ public class S4CrawlableDataset implements CrawlableDataset {
     private void configure() throws BadConfigurationException,
             IOException, PPTException, JDOMException, BESException {
 
-        //if(_isConfigured) {
-        //    throw new BadConfigurationException("Error: You may not call S4CrawlableDataset.configure() more " +
-        //    "than once for a given instance of S4CrawlableDataset.");
-        //}
 
 
         if(_config != null){
-            String besHost = _config.getChildTextTrim("besHost");
-            int    besPort = Integer.parseInt(_config.getChildTextTrim("besPost"));
+
+            //System.out.println("Configuring BES...");
+            String besHost = _config.getChildTextTrim("besHost",_config.getNamespace());
+            String besPortString = _config.getChildTextTrim("besPort",_config.getNamespace());
+            //System.out.println("besHost: "+besHost+"   besPortString: "+besPortString);
+
+            int    besPort = Integer.parseInt(besPortString);
+
+            //System.out.println("besHost: "+besHost+"   besPort: "+besPort+"\n\n");
 
             BesAPI.configure(besHost,besPort);
         }
+        else {
+            System.out.println("Looks like we are already configured, checking...");
+            if(!BesAPI.isConfigured())
+                System.out.println("BES IS NOT CONFIGURED!\n\n\n");
+        }
+
         getInfo();
 
-        //_isConfigured = true;
     }
 
 
@@ -307,6 +326,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             dataset._config = this._config;
 
             childDatasets.add(dataset);
+
 
             j++;
 

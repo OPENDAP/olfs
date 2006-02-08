@@ -115,7 +115,7 @@ public class TestServletResponse extends ThreddsServlet {
     }
 
     private void configBES() throws ServletException {
-        String besHost = getInitParameter("BackEndServer");
+        String besHost = getInitParameter("BackEndServerHost");
         if (besHost == null)
             throw new ServletException("Servlet configuration must included BackEndServer\n");
 

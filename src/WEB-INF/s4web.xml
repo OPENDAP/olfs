@@ -22,18 +22,13 @@
         </init-param>
 
         <init-param>
-            <param-name>BackEndServer</param-name>
+            <param-name>BackEndServerHost</param-name>
             <param-value>127.0.0.1</param-value>
         </init-param>
 
         <init-param>
             <param-name>BackEndServerPort</param-name>
             <param-value>10002</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>TargetPathSeperator</param-name>
-            <param-value>/</param-value>
         </init-param>
 
 
@@ -55,18 +50,13 @@
         </init-param>
 
         <init-param>
-            <param-name>BackEndServer</param-name>
+            <param-name>BackEndServerHost</param-name>
             <param-value>127.0.0.1</param-value>
         </init-param>
 
         <init-param>
             <param-name>BackEndServerPort</param-name>
             <param-value>10002</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>TargetPathSeperator</param-name>
-            <param-value>/</param-value>
         </init-param>
 
 

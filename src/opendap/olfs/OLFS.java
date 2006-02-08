@@ -176,7 +176,7 @@ public class OLFS extends HttpServlet {
     }
 
     private void configBES() throws ServletException {
-        String besHost = getInitParameter("BackEndServer");
+        String besHost = getInitParameter("BackEndServerHost");
         if (besHost == null)
             throw new ServletException("Servlet configuration must included BackEndServer\n");
 
@@ -813,8 +813,6 @@ public class OLFS extends HttpServlet {
 
     // to be overridden by servers that implement catalogs
     protected void printCatalog(HttpServletRequest request, PrintWriter os) throws IOException {
-
-
 
 
 
