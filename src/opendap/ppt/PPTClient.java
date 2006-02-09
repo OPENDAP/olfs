@@ -30,8 +30,8 @@ import java.net.*;
 class PPTClient {
 
     private Socket _mySock = null;
-    private BufferedWriter _out = null;
-    private BufferedReader _in = null;
+    private BufferedOutputStream _out = null;
+    private BufferedInputStream _in = null;
 
     PPTClient(String hostStr, int portVal) throws PPTException {
         InetAddress addr;
@@ -54,8 +54,8 @@ class PPTClient {
         }
 
         try {
-            _out = new BufferedWriter(new OutputStreamWriter(_mySock.getOutputStream()));
-            _in = new BufferedReader(new InputStreamReader(_mySock.getInputStream()));
+            _out = new BufferedOutputStream(new DataOutputStream(_mySock.getOutputStream()));
+            _in = new BufferedInputStream(new DataInputStream(_mySock.getInputStream()));
         }
         catch (IOException e) {
             String msg = "Couldn't get I/O for the connection to: " + hostStr + "\n";
@@ -75,7 +75,7 @@ class PPTClient {
         }
 
         try {
-            char[] inBuff = new char[4096];
+            byte[] inBuff = new byte[4096];
             int bytesRead = this.readBuffer(inBuff);
             String status = new String(inBuff, 0, bytesRead);
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
@@ -137,7 +137,7 @@ class PPTClient {
 
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
-            char[] a = buffer.toCharArray();
+            byte[] a = buffer.getBytes();
             _out.write(a, 0, a.length);
             _out.flush();
         }
@@ -156,8 +156,8 @@ class PPTClient {
             pstrm = new PrintStream(strm, true);
         }
         boolean done = false;
-        while (!done) {
-            char[] inBuff = new char[4096];
+        while (!done && pstrm!=null) {
+            byte[] inBuff = new byte[4096];
             int bytesRead = this.readBuffer(inBuff);
             if (bytesRead != 0) {
                 int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
@@ -179,7 +179,7 @@ class PPTClient {
         }
     }
 
-    public int readBuffer(char[] inBuff) throws PPTException {
+    public int readBuffer(byte[] inBuff) throws PPTException {
         int bytesRead;
         try {
             bytesRead = _in.read(inBuff, 0, 4096);
