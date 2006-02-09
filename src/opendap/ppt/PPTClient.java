@@ -54,8 +54,8 @@ class PPTClient {
         }
 
         try {
-            _out = new BufferedOutputStream(new DataOutputStream(_mySock.getOutputStream()));
-            _in = new BufferedInputStream(new DataInputStream(_mySock.getInputStream()));
+            _out = new BufferedOutputStream(_mySock.getOutputStream());
+            _in = new BufferedInputStream(_mySock.getInputStream());
         }
         catch (IOException e) {
             String msg = "Couldn't get I/O for the connection to: " + hostStr + "\n";
@@ -138,8 +138,10 @@ class PPTClient {
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
             byte[] a = buffer.getBytes();
+            System.out.print("PPTClient writing "+a.length+"  bytes ...");
             _out.write(a, 0, a.length);
             _out.flush();
+            System.out.println(" done.");
         }
         catch (IOException e) {
             String msg = "Failed to write to socket\n";
@@ -166,6 +168,8 @@ class PPTClient {
                     String inEnd = "";
                     for (int j = 0; j < termlen; j++)
                         inEnd += inBuff[(bytesRead - termlen) + j];
+                    System.out.println("inEnd:        "+inEnd+" (length: "+inEnd.length()+")");
+                    System.out.println("search value: "+PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION + " (length: "+PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length()+") ");
                     if (inEnd.equals(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION)) {
                         done = true;
                         writeBytes = bytesRead - termlen;
@@ -179,10 +183,15 @@ class PPTClient {
         }
     }
 
+
+
     public int readBuffer(byte[] inBuff) throws PPTException {
         int bytesRead;
         try {
-            bytesRead = _in.read(inBuff, 0, 4096);
+            System.out.print("PPTClient reading bytes ...");
+            bytesRead = _in.read(inBuff,0,4096);
+            System.out.println(" got "+bytesRead+" bytes.");
+            System.out.println("Read: "+ new String(inBuff));
         }
         catch (IOException e) {
             String msg = "Failed to read response from server\n";
