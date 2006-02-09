@@ -304,27 +304,29 @@ public class OPeNDAPClient {
                     }
                     done = true;
                 } else {
-                    int i = nextLine.lastIndexOf(';');
-                    if (i == -1) {
-                        if (cmd == null) {
-                            cmd = nextLine;
-                        } else {
-                            cmd += " " + nextLine;
-                        }
-                    } else {
-                        String sub = nextLine.substring(0, i);
-                        if (cmd == null) {
-                            cmd = sub;
-                        } else {
-                            cmd += " " + sub;
-                        }
-                        this.executeCommands(cmd);
-                        if (i == nextLine.length() || i == nextLine.length() - 1) {
-                            cmd = null;
-                        } else {
-                            cmd = nextLine.substring(i + 1, nextLine.length());
-                        }
-                    }
+		    if( !nextLine.equals("") ) {
+			int i = nextLine.lastIndexOf(';');
+			if (i == -1) {
+			    if (cmd == null) {
+				cmd = nextLine;
+			    } else {
+				cmd += " " + nextLine;
+			    }
+			} else {
+			    String sub = nextLine.substring(0, i);
+			    if (cmd == null) {
+				cmd = sub;
+			    } else {
+				cmd += " " + sub;
+			    }
+			    this.executeCommands(cmd);
+			    if (i == nextLine.length() || i == nextLine.length() - 1) {
+				cmd = null;
+			    } else {
+				cmd = nextLine.substring(i + 1, nextLine.length());
+			    }
+			}
+		    }
                 }
             }
         }

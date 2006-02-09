@@ -138,10 +138,8 @@ class PPTClient {
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
             byte[] a = buffer.getBytes();
-            System.out.print("PPTClient writing "+a.length+"  bytes ...");
             _out.write(a, 0, a.length);
             _out.flush();
-            System.out.println(" done.");
         }
         catch (IOException e) {
             String msg = "Failed to write to socket\n";
@@ -158,40 +156,32 @@ class PPTClient {
             pstrm = new PrintStream(strm, true);
         }
         boolean done = false;
-        while (!done && pstrm!=null) {
+        while (!done) {
             byte[] inBuff = new byte[4096];
             int bytesRead = this.readBuffer(inBuff);
-            if (bytesRead != 0) {
-                int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
-                int writeBytes = bytesRead;
-                if (bytesRead >= termlen) {
-                    String inEnd = "";
-                    for (int j = 0; j < termlen; j++)
-                        inEnd += inBuff[(bytesRead - termlen) + j];
-                    System.out.println("inEnd:        "+inEnd+" (length: "+inEnd.length()+")");
-                    System.out.println("search value: "+PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION + " (length: "+PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length()+") ");
-                    if (inEnd.equals(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION)) {
-                        done = true;
-                        writeBytes = bytesRead - termlen;
-                    }
-                }
-                for (int j = 0; j < writeBytes; j++)
-                    pstrm.write(inBuff[j]);
+            if (bytesRead != -1) {
+		if( bytesRead != 0 ) {
+		    int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
+		    int writeBytes = bytesRead;
+		    if (bytesRead >= termlen) {
+			String status = new String(inBuff, bytesRead - termlen, termlen);
+			if( status.compareTo(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION) == 0) {
+			    done = true;
+			    writeBytes = bytesRead - termlen;
+			}
+		    }
+		    if( pstrm != null ) pstrm.write(inBuff,0,writeBytes) ;
+		}
             } else {
                 done = true;
             }
         }
     }
 
-
-
     public int readBuffer(byte[] inBuff) throws PPTException {
         int bytesRead;
         try {
-            System.out.print("PPTClient reading bytes ...");
             bytesRead = _in.read(inBuff,0,4096);
-            System.out.println(" got "+bytesRead+" bytes.");
-            System.out.println("Read: "+ new String(inBuff));
         }
         catch (IOException e) {
             String msg = "Failed to read response from server\n";
