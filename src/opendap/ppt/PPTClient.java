@@ -138,8 +138,10 @@ class PPTClient {
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
             byte[] a = buffer.getBytes();
+            //System.out.print("PPTClient writing "+a.length+"  bytes ...");
             _out.write(a, 0, a.length);
             _out.flush();
+            //System.out.println(" done.");
         }
         catch (IOException e) {
             String msg = "Failed to write to socket\n";
@@ -156,32 +158,82 @@ class PPTClient {
             pstrm = new PrintStream(strm, true);
         }
         boolean done = false;
-        while (!done) {
+        while (!done && pstrm != null) {
             byte[] inBuff = new byte[4096];
             int bytesRead = this.readBuffer(inBuff);
-            if (bytesRead != -1) {
-		if( bytesRead != 0 ) {
-		    int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
-		    int writeBytes = bytesRead;
-		    if (bytesRead >= termlen) {
-			String status = new String(inBuff, bytesRead - termlen, termlen);
-			if( status.compareTo(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION) == 0) {
-			    done = true;
-			    writeBytes = bytesRead - termlen;
-			}
-		    }
-		    if( pstrm != null ) pstrm.write(inBuff,0,writeBytes) ;
-		}
+            if (bytesRead != 0) {
+                int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
+                int writeBytes = bytesRead;
+                if (bytesRead >= termlen) {
+                    String inEnd = "";
+                    for (int j = 0; j < termlen; j++)
+                        inEnd += inBuff[(bytesRead - termlen) + j];
+                    System.out.println("inEnd:        " + inEnd + " (length: " + inEnd.length() + ")");
+                    System.out.println("search value: " + PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION + " (length: " + PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length() + ") ");
+                    if (inEnd.equals(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION)) {
+                        done = true;
+                        writeBytes = bytesRead - termlen;
+                    }
+                }
+                for (int j = 0; j < writeBytes; j++)
+                    pstrm.write(inBuff[j]);
             } else {
                 done = true;
             }
         }
     }
 
+
+    public void getResponseNew(OutputStream strm) throws PPTException {
+
+        if(strm == null)
+            throw new PPTException("Cannot write response to \"null\" OutputStream.");
+
+        MarkFinder mfinder = new MarkFinder(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.getBytes());
+        byte[] markBuffer = new byte[PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length()];
+        PrintStream pstrm = new PrintStream(strm, true);
+        byte[] inBuff = new byte[4096];
+        int bytesRead, markBufBytes, i;
+
+        markBufBytes = 0; // zero byte count in the mark buffer
+        boolean done = false;
+        while (!done) {
+            bytesRead = this.readBuffer(inBuff);                          // Read the response.
+            if (bytesRead != 0) {                                         // Got something?
+
+                for ( i = 0; i < bytesRead && !done; i++) {               // look at what we got...
+                    done = mfinder.markCheck(inBuff[i]);                  // check for the mark
+                    if (!done) {                                          // didn't find the mark?
+                        if (mfinder.getMarkIndex() > 0) {                 // did ya find part of it?
+                            markBuffer[markBufBytes++] = inBuff[i];       // cache it in case this fragment
+                                                                          // isn't the whole mark.
+                        } else {
+                            if (markBufBytes > 0) {                       // if we found part of the mark (but got fooled)
+                                pstrm.write(markBuffer, 0, markBufBytes); // send the fragment.
+                                markBufBytes = 0;
+                            }
+
+                            pstrm.write(inBuff[i]);                       // send this byte that's not part of a mark.
+                        }
+                    }
+
+                }
+            } else {
+                done = true;
+            }
+        }
+
+        pstrm.flush();
+    }
+
+
     public int readBuffer(byte[] inBuff) throws PPTException {
         int bytesRead;
         try {
-            bytesRead = _in.read(inBuff,0,4096);
+            //System.out.print("PPTClient reading bytes ...");
+            bytesRead = _in.read(inBuff);
+            //System.out.println(" got "+bytesRead+" bytes.");
+            //System.out.println("Read: "+ new String(inBuff));
         }
         catch (IOException e) {
             String msg = "Failed to read response from server\n";
