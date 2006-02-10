@@ -39,70 +39,65 @@ class PPTClient {
         InetAddress addr;
 
         try {
-            try {
-                addr = InetAddress.getByName(hostStr);
-            }
-            catch (UnknownHostException e) {
-                String msg = "Don't know about host: " + hostStr + "\n";
-                msg += e.getMessage();
-                throw new PPTException(msg,e);
-            }
-
-            try {
-                _mySock = new Socket(addr, portVal);
-            }
-            catch (IOException e) {
-                String msg = "Could not connect to host " + hostStr + " on port " + portVal + "\n";
-                msg += e.getMessage();
-                throw new PPTException(msg,e);
-            }
-
-            try {
-                _out = new BufferedOutputStream(_mySock.getOutputStream());
-                _in = new BufferedInputStream(_mySock.getInputStream());
-            }
-            catch (IOException e) {
-                String msg = "Couldn't get I/O for the connection to: " + hostStr + "\n";
-                msg += e.getMessage();
-                throw new PPTException(msg,e);
-            }
+            addr = InetAddress.getByName(hostStr);
         }
-        finally {
+        catch (UnknownHostException e) {
+            String msg = "Don't know about host: " + hostStr + "\n";
+            msg += e.getMessage();
             closeConnection();
+            throw new PPTException(msg, e);
+        }
+
+        try {
+            _mySock = new Socket(addr, portVal);
+        }
+        catch (IOException e) {
+            String msg = "Could not connect to host " + hostStr + " on port " + portVal + "\n";
+            msg += e.getMessage();
+            closeConnection();
+            throw new PPTException(msg, e);
+        }
+
+        try {
+            _out = new BufferedOutputStream(_mySock.getOutputStream());
+            _in = new BufferedInputStream(_mySock.getInputStream());
+        }
+        catch (IOException e) {
+            String msg = "Couldn't get I/O for the connection to: " + hostStr + "\n";
+            msg += e.getMessage();
+            closeConnection();
+            throw new PPTException(msg, e);
         }
 
     }
 
     public boolean initConnection() throws PPTException {
         try {
-            try {
-                this.writeBuffer(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION);
-            }
-            catch (PPTException e) {
-                String msg = "Failed to initialize connection to server\n";
-                msg += e.getMessage();
-                throw new PPTException(msg,e);
-            }
+            this.writeBuffer(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION);
+        }
+        catch (PPTException e) {
+            String msg = "Failed to initialize connection to server\n";
+            msg += e.getMessage();
+            closeConnection();
+            throw new PPTException(msg, e);
+        }
 
-            try {
-                byte[] inBuff = new byte[4096];
-                int bytesRead = this.readBuffer(inBuff);
-                String status = new String(inBuff, 0, bytesRead);
-                if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
-                    throw new PPTException("Could not connect to server, server may be down or busy");
-                }
-                if (status.compareTo(PPTSessionProtocol.PPTSERVER_CONNECTION_OK) != 0) {
-                    throw new PPTException("Server reported an invalid connection, \"" + status + "\"");
-                }
+        try {
+            byte[] inBuff = new byte[4096];
+            int bytesRead = this.readBuffer(inBuff);
+            String status = new String(inBuff, 0, bytesRead);
+            if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
+                throw new PPTException("Could not connect to server, server may be down or busy");
             }
-            catch (PPTException e) {
-                String msg = "Failed to receive initialization response from server\n";
-                msg += e.getMessage();
-                throw new PPTException(msg,e);
+            if (status.compareTo(PPTSessionProtocol.PPTSERVER_CONNECTION_OK) != 0) {
+                throw new PPTException("Server reported an invalid connection, \"" + status + "\"");
             }
         }
-        finally {
+        catch (PPTException e) {
+            String msg = "Failed to receive initialization response from server\n";
+            msg += e.getMessage();
             closeConnection();
+            throw new PPTException(msg, e);
         }
 
         return true;
@@ -110,7 +105,8 @@ class PPTClient {
 
     public void closeConnection() {
         try {
-            this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
+            if(_out != null)
+                this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
             System.err.println("Failed to inform server that client is exiting, continuing");
@@ -118,7 +114,7 @@ class PPTClient {
         }
 
         try {
-            if(_out != null)
+            if (_out != null)
                 _out.close();
             _out = null;
         }
@@ -128,8 +124,8 @@ class PPTClient {
         }
 
         try {
-            if(_in != null)
-                 _in.close();
+            if (_in != null)
+                _in.close();
             _in = null;
         }
         catch (IOException e) {
@@ -138,8 +134,8 @@ class PPTClient {
         }
 
         try {
-            if(_mySock != null)
-                 _mySock.close();
+            if (_mySock != null)
+                _mySock.close();
             _mySock = null;
         }
         catch (IOException e) {
@@ -158,20 +154,17 @@ class PPTClient {
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
             byte[] a = buffer.getBytes();
-            if(Debug.isSet("PPTClient")) System.out.print("PPTClient writing "+a.length+"  bytes ...");
+            if (Debug.isSet("PPTClient")) System.out.print("PPTClient writing " + a.length + "  bytes ...");
             _out.write(a, 0, a.length);
             _out.flush();
-            if(Debug.isSet("PPTClient")) System.out.println(" done.");
+            if (Debug.isSet("PPTClient")) System.out.println(" done.");
         }
         catch (IOException e) {
             String msg = "Failed to write to socket\n";
             msg += e.getMessage();
-            throw new PPTException(msg,e);
-        }
-        finally {
             closeConnection();
+            throw new PPTException(msg, e);
         }
-
         return true;
     }
 
@@ -209,13 +202,14 @@ class PPTClient {
 
     /**
      * Get the response from the BES and write it to the passed OutputStream
+     *
      * @param strm The stream to which to write the response.
      * @throws PPTException
      */
     public void getResponse(OutputStream strm) throws PPTException {
 
         try {
-            if(strm == null)
+            if (strm == null)
                 throw new PPTException("Cannot write response to \"null\" OutputStream.");
 
             int bytesRead, markBufBytes, i;
@@ -232,22 +226,22 @@ class PPTClient {
                 bytesRead = this.readBuffer(inBuff);                          // Read the response.
                 if (bytesRead != 0) {                                         // Got something?
 
-                    for ( i = 0; i < bytesRead && !done; i++) {               // look at what we got...
+                    for (i = 0; i < bytesRead && !done; i++) {               // look at what we got...
                         done = mfinder.markCheck(inBuff[i]);                  // check for the mark
                         if (!done) {                                          // didn't find the mark?
                             if (mfinder.getMarkIndex() > 0) {                 // did ya find part of it?
                                 markBuffer[markBufBytes++] = inBuff[i];       // cache it in case this fragment
-                                                                              // isn't part of the whole mark.
+                                // isn't part of the whole mark.
                             } else {
                                 if (markBufBytes > 0) {                       // if we found part of the mark
-                                                                              // (but got fooled) then
-                                    
+                                    // (but got fooled) then
+
                                     bstrm.write(markBuffer, 0, markBufBytes); // send the fragment.
                                     markBufBytes = 0;
                                 }
 
                                 bstrm.write(inBuff[i]);                       // send this byte that's not part
-                                                                              // of a mark.
+                                // of a mark.
                             }
                         }
 
@@ -259,11 +253,9 @@ class PPTClient {
 
             bstrm.flush();
         }
-        catch(IOException e){
-            throw new PPTException("Cannot transmit response to designated stream.",e);
-        }
-        finally{
+        catch (IOException e) {
             closeConnection();
+            throw new PPTException("Cannot transmit response to designated stream.", e);
         }
     }
 
@@ -272,18 +264,17 @@ class PPTClient {
 
         int bytesRead;
         try {
-            if(Debug.isSet("PPTClient")) System.out.print("PPTClient reading bytes ...");
+            if (Debug.isSet("PPTClient")) System.out.print("PPTClient reading bytes ...");
             bytesRead = _in.read(inBuff);
-            if(Debug.isSet("PPTClient")) System.out.println(" got "+bytesRead+" bytes.");
-            if(Debug.isSet("PPTClient")) System.out.println("Read: "+ new String(inBuff));
+            if (Debug.isSet("PPTClient")) System.out.println(" got " + bytesRead + " bytes.");
+            if (Debug.isSet("PPTClient")) System.out.println("Read: " + new String(inBuff));
         }
         catch (IOException e) {
             String msg = "Failed to read response from server\n";
             msg += e.getMessage();
-            throw new PPTException(msg,e);
-        }
-        finally{
             closeConnection();
+
+            throw new PPTException(msg, e);
         }
 
 
