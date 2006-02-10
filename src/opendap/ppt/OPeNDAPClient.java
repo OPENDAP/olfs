@@ -360,8 +360,9 @@ public class OPeNDAPClient {
                 }
             }
         }
-        catch (IOException e) {
-            throw(new PPTException(e.getMessage()));
+        catch (Exception e) {
+            _client.closeConnection();
+            throw(new PPTException(e.getMessage(),e));
         }
     }
 }
