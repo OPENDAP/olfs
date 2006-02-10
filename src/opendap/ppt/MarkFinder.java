@@ -47,7 +47,7 @@ public class MarkFinder {
         if(Debug.isSet("MarkFinder")) System.out.println("New MarkFinder. _mark="+new String(_mark));
     }
 
-    public byte[] getSyncValue(){
+    public byte[] getMark(){
 
         return (byte[])_mark.clone();
     }
