@@ -226,22 +226,22 @@ class PPTClient {
                 bytesRead = this.readBuffer(inBuff);                          // Read the response.
                 if (bytesRead != 0) {                                         // Got something?
 
-                    for (i = 0; i < bytesRead && !done; i++) {               // look at what we got...
+                    for (i = 0; i < bytesRead && !done; i++) {                // look at what we got...
                         done = mfinder.markCheck(inBuff[i]);                  // check for the mark
                         if (!done) {                                          // didn't find the mark?
                             if (mfinder.getMarkIndex() > 0) {                 // did ya find part of it?
                                 markBuffer[markBufBytes++] = inBuff[i];       // cache it in case this fragment
-                                // isn't part of the whole mark.
+                                                                              // isn't part of the whole mark.
                             } else {
                                 if (markBufBytes > 0) {                       // if we found part of the mark
-                                    // (but got fooled) then
+                                                                              // (but got fooled) then
 
                                     bstrm.write(markBuffer, 0, markBufBytes); // send the fragment.
                                     markBufBytes = 0;
                                 }
 
                                 bstrm.write(inBuff[i]);                       // send this byte that's not part
-                                // of a mark.
+                                                                              // of a mark.
                             }
                         }
 
