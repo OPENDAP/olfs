@@ -26,7 +26,6 @@
 package opendap.ppt ;
 
 import java.io.*;
-import java.net.*;
 
 /**
  * OpenDAPClient is an object that handles the connection to, sending requests
@@ -154,13 +153,6 @@ public class OPeNDAPClient {
 
         }
     }
-    /**
-      * @deprecated
-      * @param os
-      */
-     public void setOutputStomp(OutputStream os) throws PPTException {
-         setOutput(os,false);
-     }
 
      /**
       * @deprecated
@@ -285,7 +277,7 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void executeCommands(File inputFile) throws PPTException {
-        BufferedReader reader = null;
+        BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(inputFile));
         }
@@ -296,7 +288,7 @@ public class OPeNDAPClient {
         try {
             String cmd = null;
             boolean done = false;
-            while (done == false) {
+            while (!done) {
                 String nextLine = reader.readLine();
                 if (nextLine == null) {
                     if (cmd != null) {
@@ -356,13 +348,13 @@ public class OPeNDAPClient {
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         try {
             boolean done = false;
-            while (done == false) {
+            while (!done) {
                 System.out.print("OPeNDAP> ");
                 String fromUser = stdIn.readLine();
                 if (fromUser.compareTo("exit") == 0) {
                     done = true;
                 } else if (fromUser.compareTo("") == 0) {
-                    continue;
+                    //continue;
                 } else {
                     this.executeCommands(fromUser);
                 }

@@ -97,7 +97,7 @@ public class S4Info {
 
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetINFO For: " + rs.getDataSet());
+            System.out.println("doGetINFO For: " + rs.getDataset());
 
 
         response.setContentType("text/html");
@@ -113,7 +113,7 @@ public class S4Info {
 
         OPeNDAPClient oc = BesAPI.startClient();
 
-        BesAPI.configureTransaction(oc,rs.getDataSet(), rs.getConstraintExpression());
+        BesAPI.configureTransaction(oc,rs.getDataset(), rs.getConstraintExpression());
 
 
 
@@ -135,7 +135,7 @@ public class S4Info {
         String infoDir = rs.getINFOCache();
 
 
-        responseDoc = loadOverrideDoc(infoDir, rs.getDataSet());
+        responseDoc = loadOverrideDoc(infoDir, rs.getDataset());
 
         PrintStream pw = new PrintStream(response.getOutputStream());
 
@@ -146,7 +146,7 @@ public class S4Info {
         } else {
 
 
-            String user_html = get_user_supplied_docs(infoDir, rs.getServerClassName(), rs.getDataSet());
+            String user_html = get_user_supplied_docs(infoDir, rs.getServerClassName(), rs.getDataset());
 
             String global_attrs = buildGlobalAttributes(myDAS, myDDS);
 
@@ -159,7 +159,7 @@ public class S4Info {
             pw.println("</style>");
             pw.println("</head>");
             pw.println("<body>");
-            pw.println("<h1><center>"+rs.getDataSet()+"</center></h1>");
+            pw.println("<h1><center>"+rs.getDataset()+"</center></h1>");
 
             if (global_attrs.length() > 0) {
                 pw.println(global_attrs);

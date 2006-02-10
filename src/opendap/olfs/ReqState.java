@@ -62,7 +62,7 @@ public class ReqState {
     private final String defaultSchemaName = "opendap-0.0.0.xsd";
     private String defaultSchemaLocation;
 
-    protected String rootPath, contentPath;
+    //protected String rootPath, contentPath;
 
     private String dataSetName;
     private String requestSuffix;
@@ -250,7 +250,7 @@ public class ReqState {
 
 
 
-    public String getDataSet() {
+    public String getDataset() {
         return dataSetName;
     }
 
@@ -374,7 +374,7 @@ public class ReqState {
      * <ul>
      * <li> <b>dataSet</b> The data set name.(Accessible using
      * <code> setDataSet() </code>
-     * and <code>getDataSet()</code>)</li>
+     * and <code>getDataset()</code>)</li>
      * <li> <b>CE</b> The constraint expression.(Accessible using
      * <code> setCE() </code>
      * and <code>getCE()</code>)</li>

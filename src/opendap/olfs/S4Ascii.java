@@ -64,7 +64,7 @@ public class S4Ascii {
                                  ReqState rs) throws PPTException, DODSException, DDSException, ParseException, IOException {
 
         if (Debug.isSet("showResponse"))
-            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataSet() +
+            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
                     "    CE: '" + request.getQueryString() + "'");
 
 
@@ -95,7 +95,7 @@ public class S4Ascii {
         }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDODS(rs.getDataSet(), rs.getConstraintExpression(), os);
+        BesAPI.getDODS(rs.getDataset(), rs.getConstraintExpression(), os);
 
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
         dds = new DataDDS(sv, new asciiFactory());
@@ -146,7 +146,7 @@ public class S4Ascii {
                                      ReqState rs) {
 
         if (Debug.isSet("showResponse"))
-            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataSet() +
+            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
                     "    CE: '" + request.getQueryString() + "'");
 
 

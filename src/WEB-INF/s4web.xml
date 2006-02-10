@@ -46,7 +46,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse CE </param-value>
+            <param-value>showRequest probeRequest showResponse CE </param-value>
         </init-param>
 
         <init-param>

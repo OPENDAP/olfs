@@ -121,7 +121,7 @@ public class TestClient {
             if (outputFile != null) {
                 client.setOutput(outputFile);
             } else {
-                client.setOutput(System.out);
+                client.setOutput(System.out,true);
             }
         }
         catch (PPTException e) {

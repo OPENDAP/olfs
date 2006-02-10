@@ -36,7 +36,6 @@ import java.io.*;
 
 import org.jdom.JDOMException;
 import org.jdom.Document;
-import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
  * Created by IntelliJ IDEA.
@@ -231,7 +230,7 @@ public class TestServletResponse extends ThreddsServlet {
 
         System.out.println("rootPath:    " + rootPath);
         System.out.println("contentPath: " + contentPath);
-        System.out.println("myPath:      " + "/" + rs.getDataSet());
+        System.out.println("myPath:      " + "/" + rs.getDataset());
 
 
 
@@ -253,7 +252,7 @@ public class TestServletResponse extends ThreddsServlet {
         if (Debug.isSet("showResponse")) {
             System.out.println("doGetCatalog() - configuring S4CrawlableDataset object (a CrawlableDataset)");
         }
-        S4CrawlableDataset s4c = new S4CrawlableDataset("/" + rs.getDataSet(), null);
+        S4CrawlableDataset s4c = new S4CrawlableDataset("/" + rs.getDataset(), null);
 
         if (Debug.isSet("showResponse")) {
             System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
@@ -495,7 +494,7 @@ public class TestServletResponse extends ThreddsServlet {
 
             rs = getRequestState(request);
             if (rs != null) {
-                String ds = rs.getDataSet();
+                String ds = rs.getDataset();
                 String suff = rs.getRequestSuffix();
                 isDebug = ((ds != null) && ds.equals("debug") && (suff != null) && suff.equals(""));
             }
@@ -516,14 +515,14 @@ public class TestServletResponse extends ThreddsServlet {
                         System.out.println("Server: " + getServerName() + "   Request #" + reqno);
                         System.out.println("Client: " + request.getRemoteHost());
                         System.out.println(rs.toString());
-                        Log.println("Request dataset: '" + rs.getDataSet() + "' suffix: '" + rs.getRequestSuffix() +
+                        Log.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
                                 "' CE: '" + rs.getConstraintExpression() + "'");
                     }
                 }
             } // synch
 
             if (rs != null) {
-                String dataSet = rs.getDataSet();
+                String dataSet = rs.getDataset();
                 String requestSuffix = rs.getRequestSuffix();
 
 

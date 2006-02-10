@@ -34,17 +34,30 @@ package opendap.ppt ;
 
 public class PPTException  extends Exception{
     /**
-     * Exception used with DODS client and server request handling where the
+     * Exception used with OPeNDAP client and server request handling where the
      * msg passed to the constructor represents the error that has occurred
-     * in handling the DODS request.
+     * in handling the OPeNDAP request.
      *
      * @param msg The error message assoicated with this exception. In many
      *            cases this message includes exception messages handled
-     *            within DODS methods, including client server connection
+     *            within OPeNDAP methods, including client server connection
      *            errors, send and receive error messages, etc...
      */
     public PPTException(String msg) {
         super(msg);
+    }
+    /**
+     * Exception used with OPeNDAP client and server request handling where the
+     * msg passed to the constructor represents the error that has occurred
+     * in handling the OPeNDAP request.
+     *
+     * @param msg The error message assoicated with this exception. In many
+     *            cases this message includes exception messages handled
+     *            within OPeNDAP methods, including client server connection
+     *            errors, send and receive error messages, etc...
+     */
+    public PPTException(String msg,Exception e) {
+        super(msg,e);
     }
 }
 

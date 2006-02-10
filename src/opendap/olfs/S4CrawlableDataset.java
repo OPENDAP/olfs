@@ -28,10 +28,7 @@ import thredds.crawlabledataset.CrawlableDataset;
 import thredds.crawlabledataset.CrawlableDatasetFilter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
 import java.text.SimpleDateFormat;
 import java.text.ParsePosition;
 
@@ -54,37 +51,38 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
     private String _path;
     private String _name;
-    private int    _size;
-    private Date   _lastModified;
+    private int _size;
+    private Date _lastModified;
 
-    private boolean _isContainer;
+    private boolean _isCollection;
 
-    private String    _parentPath;
+    private String _parentPath;
     private S4CrawlableDataset _parent;
 
-    private List     _childDatasetElements;
+    private List _childDatasetElements;
 
     //private boolean  _isConfigured;
-    private boolean  _haveCatalog;
+    private boolean _haveCatalog;
+    private boolean _haveInfo;
 
 
     private Element _config;
 
 
-
     public S4CrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException, BESException {
 
-        this(path);
+        Debug.set("CrawlableDataset",true);
+        init();
 
-        _config = (Element)o;
+        _config = (Element) o;
 
-        //System.out.println("\n\n\n\n\nS4CrawlableDataset config: "+_config);
+        if(Debug.isSet("CrawlableDataset")) System.out.println("\n\n\n\n\nS4CrawlableDataset config: "+_config);
 
         //XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
         //xo.output(_config,System.out);
 
         //try{
-            configure();
+        configure();
         //}
         //catch(Exception e){
         //    System.out.println("OOPS!");
@@ -92,103 +90,137 @@ public class S4CrawlableDataset implements CrawlableDataset {
         //}
         //System.out.println("\n\n\n\n\n");
 
-    }
-    private S4CrawlableDataset(String path) {
-
-        // Strip off the catalog request
-        _path = path.endsWith("/catalog") ? path.substring( 0, path.length() - 8 ) : path;
-
-        // Is path empty? Then make it "/"
-        _path = _path.equals("") ? "/" : _path;
-
-
-        //_path = _path.equals("/") ? "" : _path;   // Does THREDDS want the top to / or empty??
-
-        // Determine name (i.e., last name in the path name sequence).
-        _name = _path.endsWith( "/" ) ? _path.substring( 0, _path.length() - 1 ) : _path;
-
-        _name = _name.equals("") ? "/" : _name;
-        //_name = _name.equals("/") ? "" : _name;   // Does THREDDS want the top to / or empty??
-
-
-
-        _parentPath = null;
-        int index = _name.lastIndexOf( "/" );
-        if ( index > 0){
-            _parentPath = _name.substring(0,index);
-            _name = _name.substring( index );
-        }
-        else
-            _parentPath = "/";
-
-
-        //_isConfigured = false;
-        _haveCatalog  = false;
-
-        //if(Debug.isSet("showResponse")){
-            System.out.println("S4CrawlableDataset:");
-            System.out.println("    _path            = "+_path);
-            System.out.println("    _name            = "+_name);
-            System.out.println("    lastIndexOf(\"/\") = "+index);
-            System.out.println("    _parentPath      = "+_parentPath);
-        //}
-
-    }
-
-
-    private void configure() throws BadConfigurationException,
-            IOException, PPTException, JDOMException, BESException {
-
-
-
-        if(_config != null){
-
-            //System.out.println("Configuring BES...");
-            String besHost = _config.getChildTextTrim("besHost",_config.getNamespace());
-            String besPortString = _config.getChildTextTrim("besPort",_config.getNamespace());
-            //System.out.println("besHost: "+besHost+"   besPortString: "+besPortString);
-
-            int    besPort = Integer.parseInt(besPortString);
-
-            //System.out.println("besHost: "+besHost+"   besPort: "+besPort+"\n\n");
-
-            BesAPI.configure(besHost,besPort);
-        }
-        else {
-            System.out.println("Looks like we are already configured, checking...");
-            if(!BesAPI.isConfigured())
-                System.out.println("BES IS NOT CONFIGURED!\n\n\n");
-        }
+        processPath(path);
 
         getInfo();
 
     }
 
+    private void init(){
+        _path                 = null;
+        _name                 = null;
+        _parentPath           = null;
+        _lastModified         = null;
+        _parent               = null;
+        _childDatasetElements = null;
+        _isCollection         = false;
+        _haveCatalog          = false;
+        _haveInfo             = false;
+        _config               = null;
+        _size                 = -1;
+
+    }
+
+    private S4CrawlableDataset(String path)  {
+
+        init();
+
+        processPath(path);
+        //getInfo();
+
+    }
+
+    private void processPath(String path) {
 
 
-    public Object getConfigObject(){
-        return _config;
+        // Is path empty? Then make it "/"
+        _path = path.equals("") ? "/" : path;     // Does THREDDS want the top to be "/" or empty??
+
+        //_path = _path.equals("/") ? "" : _path;   // Does THREDDS want the top to be "/" or empty??
+
+        _name = getNameFromPath(_path);
+
+        _parentPath = getParentPath(_path,_name);
+
+        //Got the catalog yet?
+        _haveCatalog = false;
+
+        if(Debug.isSet("CrawlableDataset")) {
+            System.out.println("S4CrawlableDataset:");
+            System.out.println("    _path            = " + _path);
+            System.out.println("    _name            = " + _name);
+            System.out.println("    _parentPath      = " + _parentPath);
+        }
+
+    }
+
+    private String getParentPath(String path, String name){
+
+        String pp = path.substring(0,path.lastIndexOf(name));
+        if(pp.endsWith("/") && !pp.equals("/"))
+            pp = path.substring(0,pp.lastIndexOf("/"));
+        return pp;
+
+    }
+
+    private String getNameFromPath(String path){
+
+        // Determine name (i.e., last name in the path name sequence).
+        String name = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+
+        name = name.equals("") ? "/" : name;
+
+        //_name = _name.equals("/") ? "" : _name;   // Does THREDDS want the top to be "/" or empty??
+
+        int index = name.lastIndexOf("/");
+        if (index > 0)
+            name = name.substring(index+1,name.length());
+
+        return name;
+
     }
 
 
 
+    private void configure() {
+
+
+        if (_config != null) {
+
+            //System.out.println("Configuring BES...");
+            String besHost = _config.getChildTextTrim("besHost", _config.getNamespace());
+            String besPortString = _config.getChildTextTrim("besPort", _config.getNamespace());
+            //System.out.println("besHost: "+besHost+"   besPortString: "+besPortString);
+
+            int besPort = Integer.parseInt(besPortString);
+
+            //System.out.println("besHost: "+besHost+"   besPort: "+besPort+"\n\n");
+
+            BesAPI.configure(besHost, besPort);
+        } else {
+            if(Debug.isSet("CrawlableDataset")) System.out.println("Looks like we are already configured, checking...");
+            if (!BesAPI.isConfigured())
+                System.out.println("BES IS NOT CONFIGURED!\n\n\n");
+        }
+
+
+    }
+
+
+    public Object getConfigObject() {
+        return _config;
+    }
 
 
     private void getCatalog() throws PPTException, IOException, JDOMException, BadConfigurationException, BESException {
 
+        if(_haveCatalog)
+            return;
+
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting catalog for: "+_path);
         Document doc = BesAPI.showCatalog(_path);
         Element topDataset = doc.getRootElement();
 
-        if(!_path.equals(topDataset.getChild("name").getTextTrim())){
-            throw new IOException ("Returned dataset name does not match requested name.\n"+
-                                   "Requested: " + _path + "  "+
-                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+        if (!_path.equals(topDataset.getChild("name").getTextTrim())) {
+            throw new IOException("Returned dataset name does not match requested name.\n" +
+                    "Requested: " + _path + "  " +
+                    "Returned: " + topDataset.getChild("name").getTextTrim());
 //            System.out.println("Returned dataset name does not match requested name.\n"+
 //                                   "Requested: " + _name + "  "+
 //                                   "Returned: "+topDataset.getChild("name").getTextTrim());
         }
 
-        processDatasetElement(topDataset,this);
+        processDatasetElement(topDataset, this);
 
         _haveCatalog = true;
 
@@ -196,16 +228,19 @@ public class S4CrawlableDataset implements CrawlableDataset {
     }
 
 
-
     private void getInfo() throws PPTException, IOException, JDOMException, BadConfigurationException, BESException {
 
+        if(_haveInfo)
+            return;
+
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting info for: "+_path);
         Document doc = BesAPI.showInfo(_path);
         Element topDataset = doc.getRootElement();
 
-        if(!_path.equals(topDataset.getChild("name").getTextTrim())){
-            throw new IOException ("Returned dataset name does not match requested name.\n"+
-                                   "Requested: " + _path + "  "+
-                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+        if (!_path.equals(topDataset.getChild("name").getTextTrim())) {
+            throw new IOException("Returned dataset name does not match requested name.\n" +
+                    "Requested: " + _path + "  " +
+                    "Returned: " + topDataset.getChild("name").getTextTrim());
 
 //            System.out.println("Returned dataset name does not match requested name.\n"+
 //                                   "Requested: " + _name + "  "+
@@ -213,45 +248,45 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
         }
 
-        processDatasetElement(topDataset,this);
-
+        processDatasetElement(topDataset, this);
 
     }
 
+    private void processDatasetElement(Element dataset, S4CrawlableDataset s4c) {
 
-    private void processDatasetElement(Element dataset, S4CrawlableDataset s4c){
+        // Process name
+        s4c._name = getNameFromPath(dataset.getChild("name").getTextTrim());
+        s4c._name = s4c._name.equals("/") ? "" : s4c._name;
 
-        s4c._name = dataset.getChild("name").getTextTrim();
-
-        s4c._name = s4c._name.equals("/") ? "" : _name;
-
+        // Process size
         s4c._size = Integer.parseInt(dataset.getChild("size").getTextTrim());
 
-        SimpleDateFormat sdf = new SimpleDateFormat();
+        // process date and time
+        String date = dataset.getChild("lastmodified").getChild("date").getTextTrim();
+        String time = dataset.getChild("lastmodified").getChild("time").getTextTrim();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        s4c._lastModified = sdf.parse(date + " " +time, new ParsePosition(0));
 
-        s4c._lastModified = sdf.parse(
-        dataset.getChild("lastmodified").getChild("date").getTextTrim() +
-        dataset.getChild("lastmodified").getChild("time").getTextTrim(),
-        new ParsePosition(0));
-
-        String isContainer = dataset.getAttributeValue("thredds_collection");
-
-        if(isContainer.equalsIgnoreCase("true")){
-
-            s4c._isContainer = true;
+        // Process collection (if it is one)
+        String isCollection = dataset.getAttributeValue("thredds_collection");
+        if (isCollection.equalsIgnoreCase("true")) {
+            s4c._isCollection = true;
             s4c._childDatasetElements = dataset.getChildren("dataset");
-
         }
+
+        s4c._haveInfo = true;
+
+
     }
-
-
-
-
 
 
     public String getPath() {
 
         return _path;
+    }
+
+    public String getParentPath(){
+        return _parentPath;
     }
 
     public String getName() {
@@ -260,15 +295,15 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
     public CrawlableDataset getParentDataset() throws IOException {
 
-        if(_parent != null){
+        if (_parent != null) {
             return _parent;
         }
 
-        if(_parentPath == null)
+        if (_parentPath == null)
             return null;
 
         try {
-            S4CrawlableDataset s4c = new S4CrawlableDataset(_parentPath,_config);
+            S4CrawlableDataset s4c = new S4CrawlableDataset(_parentPath, _config);
             _parent = s4c;
             return s4c;
         } catch (PPTException e) {
@@ -285,24 +320,24 @@ public class S4CrawlableDataset implements CrawlableDataset {
     }
 
     public boolean isCollection() {
-        return _isContainer;
+        return _isCollection;
     }
 
 
-    public List listDatasets()  {
+    public List listDatasets() {
 
         Element e;
         S4CrawlableDataset dataset;
 
 
-        if(!isCollection())
+        if (!isCollection())
             return null;
 
         try {
-            if(!_haveCatalog)
+            if (!_haveCatalog)
                 getCatalog();
         }
-        catch(Exception ex){
+        catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
@@ -310,20 +345,31 @@ public class S4CrawlableDataset implements CrawlableDataset {
         int j = 0;
         Vector childDatasets = new Vector();
         Iterator i = _childDatasetElements.iterator();
-        while(i.hasNext()){
-            e  = (Element) i.next();
+        while (i.hasNext()) {
+
+            e = (Element) i.next();
 
 
-            String newPath = this._path + (_path.equals("/") ? "" : "/") + e.getChild("name").getTextTrim();
+            String newPath = this._path + (_path.endsWith("/") ? "" : "/") + e.getChild("name").getTextTrim();
 
-            System.out.println("Making new dataset \""+newPath+"\" in listDatasets.");
+            if(Debug.isSet("CrawlableDataset")) System.out.println("\n\n\nMaking new dataset \"" + newPath + "\" in listDatasets().");
+
+            // Show me what I've got...
+            //XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
+            //try {
+            //    xo.output(e,System.out);
+            //    System.out.println("\n");
+            //} catch (IOException e1) {
+            //    e1.printStackTrace();
+            //}
+            //------
 
             dataset = new S4CrawlableDataset(newPath);
-
             processDatasetElement(e,dataset);
 
             dataset._parent = this;
             dataset._config = this._config;
+            if(Debug.isSet("CrawlableDataset")) System.out.println("Made: "+dataset);
 
             childDatasets.add(dataset);
 
@@ -332,29 +378,37 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
         }
 
-        if(Debug.isSet("showResponse")) System.out.println("List Datasets found "+j+" member(s).");
+        if(Debug.isSet("CrawlableDataset")) System.out.println("List Datasets found " + j + " member(s).");
 
         return childDatasets;
     }
 
-    public List listDatasets(CrawlableDatasetFilter crawlableDatasetFilter) {
+    public List listDatasets(CrawlableDatasetFilter cdf) {
 
-        if(!isCollection())
+        if (!isCollection())
             return null;
 
-        List l = listDatasets();
+        List list = this.listDatasets();
 
-        Iterator i = l.iterator();
+        if (cdf == null) return list;
 
-        while(i.hasNext()){
-            CrawlableDataset cd = (CrawlableDataset) i.next();
-            if(crawlableDatasetFilter != null && !crawlableDatasetFilter.accept(cd))
-                l.remove(cd);
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Filtering CrawlableDataset list.");
+
+        List retList = new ArrayList();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            CrawlableDataset curDs = (CrawlableDataset) it.next();
+            if (cdf.accept(curDs)) {
+                if(Debug.isSet("CrawlableDataset")) System.out.println("    Filter found matching dataset: "+curDs);
+                retList.add(curDs);
+            }
+            else {
+                if(Debug.isSet("CrawlableDataset")) System.out.println("    Filter discarded dataset: "+curDs);
+
+            }
         }
-
-
-        return l;
+        return (retList);
     }
+
 
     public long length() {
         return _size;
@@ -363,4 +417,23 @@ public class S4CrawlableDataset implements CrawlableDataset {
     public Date lastModified() {
         return _lastModified;
     }
+
+    public String toString(){
+        String s="";
+
+        s += "[CrawlableDataset  ";
+        s += "<Path: "+getPath()+ "> ";
+        s += "<Name: "+getName()+ "> ";
+        s += "<Size: "+ length() + "> ";
+        s += "<LastModified: "+lastModified()+ "> ";
+        s += "<Collection: "+isCollection()+ "> ";
+        s += "<_haveCatalog: "+_haveCatalog+ "> ";
+        s += "<_haveInfo: "+_haveInfo+ "> ";
+        s += "<_parentPath: "+_parentPath+ "> ";
+        s += "<_parent.getName(): "+ (_parent==null ? "null" :_parent.getName() )+ "> ";
+        s += "]";
+        return s;
+
+    }
+
 }

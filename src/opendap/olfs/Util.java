@@ -82,7 +82,8 @@ public class Util {
 
 
         ps.println("####################### PROBE ##################################");
-        ps.println("The HttpServletRequest object is actually a: " + request.getClass().getName());
+        ps.println("The HttpServletRequest object is actually an instance of:");
+        ps.println("    " + request.getClass().getName());
         ps.println("");
         ps.println("HttpServletRequest Interface:");
         ps.println("    getAuthType:           " + request.getAuthType());

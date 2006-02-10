@@ -93,10 +93,10 @@ public class S4Dir {
 
 
         // Make shure the dataset name is not null
-        if(rs.getDataSet() == null)
+        if(rs.getDataset() == null)
             name = "/";
         else
-            name = rs.getDataSet();
+            name = rs.getDataset();
 
 
         // Get the catalog for this collection

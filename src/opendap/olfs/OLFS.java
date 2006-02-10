@@ -290,7 +290,7 @@ public class OLFS extends HttpServlet {
             throws IOException, ServletException {
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetDAS for dataset: " + rs.getDataSet());
+            System.out.println("doGetDAS for dataset: " + rs.getDataset());
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", rs.getXDODSServer());
@@ -302,7 +302,7 @@ public class OLFS extends HttpServlet {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDAS(rs.getDataSet(), rs.getConstraintExpression(), Out);
+            BesAPI.getDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -342,7 +342,7 @@ public class OLFS extends HttpServlet {
 
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetDDS for dataset: " + rs.getDataSet());
+            System.out.println("doGetDDS for dataset: " + rs.getDataset());
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", rs.getXDODSServer());
@@ -354,7 +354,7 @@ public class OLFS extends HttpServlet {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDDS(rs.getDataSet(), rs.getConstraintExpression(), Out);
+            BesAPI.getDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -397,7 +397,7 @@ public class OLFS extends HttpServlet {
 
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetOPeNDAP For: " + rs.getDataSet());
+            System.out.println("doGetOPeNDAP For: " + rs.getDataset());
 
         response.setContentType("application/octet-stream");
         response.setHeader("XDODS-Server", rs.getXDODSServer());
@@ -421,7 +421,7 @@ public class OLFS extends HttpServlet {
         }
 
         try {
-            BesAPI.getDODS(rs.getDataSet(), rs.getConstraintExpression(), bOut);
+            BesAPI.getDODS(rs.getDataset(), rs.getConstraintExpression(), bOut);
 
         } catch (DODSException de) {
             Util.dodsExceptionHandler(de, response);
@@ -628,7 +628,7 @@ public class OLFS extends HttpServlet {
 
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetASC For: " + rs.getDataSet());
+            System.out.println("doGetASC For: " + rs.getDataset());
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", rs.getXDODSServer());
@@ -709,7 +709,7 @@ public class OLFS extends HttpServlet {
             //ServerDDS myDDS = ds.getDDS();
             //DAS das = ds.getDAS();
             //S4Html di = new S4Html();
-            //di.sendDataRequestForm(request, response, rs.getDataSet(), myDDS, das);
+            //di.sendDataRequestForm(request, response, rs.getDataset(), myDDS, das);
             //response.setStatus(HttpServletResponse.SC_OK);
         } catch (OPeNDAPException de) {
             Util.dodsExceptionHandler(de, response);
@@ -753,7 +753,7 @@ public class OLFS extends HttpServlet {
 
 //        System.out.println("rootPath:    "+rootPath);
 //        System.out.println("contentPath: "+contentPath);
-//        System.out.println("myPath:      "+"/"+rs.getDataSet());
+//        System.out.println("myPath:      "+"/"+rs.getDataset());
 
 
 
@@ -772,7 +772,12 @@ public class OLFS extends HttpServlet {
 
 */
 
-        S4CrawlableDataset s4cd = new S4CrawlableDataset( rs.getDataSet(),null);
+        // Strip off the catalog request
+
+        String path = rs.getDataset();
+        path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
+
+        S4CrawlableDataset s4cd = new S4CrawlableDataset(path,null);
 
 
 
@@ -784,11 +789,11 @@ public class OLFS extends HttpServlet {
 
 
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                        s4cd.getPath(),
+                        s4cd.getParentPath(),
                         s4cd,
                         "THREDDS",
                         "OPENDAP",
-                        rs.getRequestURL());
+                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())));
 
             if (Debug.isSet("showResponse")){
                 System.out.println("doGetCatalog() - Generating catalog");
@@ -1093,7 +1098,7 @@ public class OLFS extends HttpServlet {
 
             rs = getRequestState(request);
             if (rs != null) {
-                String ds = rs.getDataSet();
+                String ds = rs.getDataset();
                 String suff = rs.getRequestSuffix();
                 isDebug = ((ds != null) && ds.equals("debug") && (suff != null) && suff.equals(""));
             }
@@ -1114,14 +1119,14 @@ public class OLFS extends HttpServlet {
                         System.out.println("Server: " + getServerName() + "   Request #" + reqno);
                         System.out.println("Client: " + request.getRemoteHost());
                         System.out.println(rs.toString());
-                        Log.println("Request dataset: '" + rs.getDataSet() + "' suffix: '" + rs.getRequestSuffix() +
+                        Log.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
                                 "' CE: '" + rs.getConstraintExpression() + "'");
                     }
                 }
             } // synch
 
             if (rs != null) {
-                String dataSet = rs.getDataSet();
+                String dataSet = rs.getDataset();
                 String requestSuffix = rs.getRequestSuffix();
 
                 if (dataSet == null) {

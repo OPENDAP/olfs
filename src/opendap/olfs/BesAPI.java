@@ -297,9 +297,9 @@ public class BesAPI {
 
     public static void configureTransaction(OPeNDAPClient oc, String dataset, String constraintExpression)
             throws PPTException {
-        //String datasetPath = rs.getDataSet();
+        //String datasetPath = rs.getDataset();
         //String datasetType = "nc"; // No longer required as BES will determine data formats
-        //String cName = rs.getDataSet();
+        //String cName = rs.getDataset();
         //String ce = rs.getConstraintExpression();
 
         //String cmd = "set container in catalog values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
