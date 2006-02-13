@@ -777,9 +777,9 @@ public class OLFS extends HttpServlet {
         String path = rs.getDataset();
         path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
 
+        path = S4CrawlableDataset.besPath2ThreddsPath(path);
+
         S4CrawlableDataset s4cd = new S4CrawlableDataset(path,null);
-
-
 
         if(s4cd.isCollection()){
 
@@ -789,11 +789,11 @@ public class OLFS extends HttpServlet {
 
 
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                        s4cd.getParentPath(),
-                        s4cd,
+                        "",
+                        S4CrawlableDataset.getRootDataset(),
                         "THREDDS",
                         "OPENDAP",
-                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())));
+                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())+1));
 
             if (Debug.isSet("showResponse")){
                 System.out.println("doGetCatalog() - Generating catalog");

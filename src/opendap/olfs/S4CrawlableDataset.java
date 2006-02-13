@@ -49,7 +49,8 @@ import opendap.util.Debug;
  */
 public class S4CrawlableDataset implements CrawlableDataset {
 
-    private String _path;
+    private String _threddsPath;
+    private String _besPath;
     private String _name;
     private int _size;
     private Date _lastModified;
@@ -68,6 +69,10 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
     private Element _config;
 
+
+    public static S4CrawlableDataset getRootDataset() throws IOException, PPTException, BadConfigurationException, BESException, JDOMException {
+        return new S4CrawlableDataset("/root",null);
+    }
 
     public S4CrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException, BESException {
 
@@ -97,7 +102,8 @@ public class S4CrawlableDataset implements CrawlableDataset {
     }
 
     private void init(){
-        _path                 = null;
+        _threddsPath          = null;
+        _besPath              = null;
         _name                 = null;
         _parentPath           = null;
         _lastModified         = null;
@@ -123,48 +129,86 @@ public class S4CrawlableDataset implements CrawlableDataset {
     private void processPath(String path) {
 
 
-        // Is path empty? Then make it "/"
-        _path = path.equals("") ? "/" : path;     // Does THREDDS want the top to be "/" or empty??
-
-        //_path = _path.equals("/") ? "" : _path;   // Does THREDDS want the top to be "/" or empty??
-
-        _name = getNameFromPath(_path);
-
-        _parentPath = getParentPath(_path,_name);
+        _threddsPath = path;
+        _besPath     = threddsPath2BesPath(getThreddsPath());
+        _name        = getNameFromPath(getBesPath());
+        _parentPath  = getParentPath(getBesPath(),getName());
 
         //Got the catalog yet?
         _haveCatalog = false;
 
         if(Debug.isSet("CrawlableDataset")) {
             System.out.println("S4CrawlableDataset:");
-            System.out.println("    _path            = " + _path);
-            System.out.println("    _name            = " + _name);
-            System.out.println("    _parentPath      = " + _parentPath);
+            System.out.println("     getPath()        = " + getPath());
+            System.out.println("     getThreddsPath() = " + getThreddsPath());
+            System.out.println("     getBesPath()     = " + getBesPath());
+            System.out.println("     getName()        = " + getName());
+            System.out.println("     getParentPath()  = " + getParentPath());
         }
 
     }
+
+
+    private String threddsPath2BesPath(String tpath){
+
+        return tpath.substring("/root".length());
+
+
+    }
+
+
+
+
+
+    public static String besPath2ThreddsPath(String path){
+        String threddsPath;
+
+        if(path.startsWith("/root"))
+                threddsPath = path;
+        else {
+            if(path.startsWith("/") || path.equals(""))
+                threddsPath = "/root" + path;
+            else
+                threddsPath = "/root/"+ path;
+        }
+        // Is path empty? Then make it "/"
+        //_path = path.equals("") ? "/root" : path;     // Does THREDDS want the top to be "/" or empty??
+
+        //_path = _path.equals("/") ? "" : _path;   // Does THREDDS want the top to be "/" or empty??
+        return threddsPath;
+    }
+
 
     private String getParentPath(String path, String name){
 
         String pp = path.substring(0,path.lastIndexOf(name));
         if(pp.endsWith("/") && !pp.equals("/"))
             pp = path.substring(0,pp.lastIndexOf("/"));
-        return pp;
+
+
+
+        return besPath2ThreddsPath(pp);
 
     }
 
     private String getNameFromPath(String path){
 
+        //System.out.println("path: "+path);
+        String name = path;
+
         // Determine name (i.e., last name in the path name sequence).
-        String name = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+        name = name.endsWith("/") ? name.substring(0, name.length() - 1) : name;
 
-        name = name.equals("") ? "/" : name;
+        //name = name.equals("") ? "/" : name;
 
-        //_name = _name.equals("/") ? "" : _name;   // Does THREDDS want the top to be "/" or empty??
+        name = name.equals("/") ? "" : name;   // Does THREDDS want the top to be "/" or empty??
 
         int index = name.lastIndexOf("/");
         if (index > 0)
             name = name.substring(index+1,name.length());
+
+        if(name.startsWith("/"))
+            name = name.substring(1);
 
         return name;
 
@@ -207,17 +251,19 @@ public class S4CrawlableDataset implements CrawlableDataset {
         if(_haveCatalog)
             return;
 
-        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting catalog for: "+_path);
-        Document doc = BesAPI.showCatalog(_path);
+        String besPath = getBesPath();
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting catalog for: "+besPath);
+        Document doc = BesAPI.showCatalog(besPath);
         Element topDataset = doc.getRootElement();
 
-        if (!_path.equals(topDataset.getChild("name").getTextTrim())) {
-            throw new IOException("Returned dataset name does not match requested name.\n" +
-                    "Requested: " + _path + "  " +
-                    "Returned: " + topDataset.getChild("name").getTextTrim());
-//            System.out.println("Returned dataset name does not match requested name.\n"+
-//                                   "Requested: " + _name + "  "+
-//                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+
+        if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
+//            throw new IOException("Returned dataset name does not match requested name.\n" +
+//                    "Requested: " + besPath + "  " +
+//                    "Returned: " + topDataset.getChild("name").getTextTrim());
+            System.out.println("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + besPath + "  "+
+                                   "Returned: "+topDataset.getChild("name").getTextTrim());
         }
 
         processDatasetElement(topDataset, this);
@@ -228,23 +274,26 @@ public class S4CrawlableDataset implements CrawlableDataset {
     }
 
 
+
+
     private void getInfo() throws PPTException, IOException, JDOMException, BadConfigurationException, BESException {
 
         if(_haveInfo)
             return;
 
-        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting info for: "+_path);
-        Document doc = BesAPI.showInfo(_path);
+        String besPath = getBesPath();
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting info for: "+besPath);
+        Document doc = BesAPI.showInfo(besPath);
         Element topDataset = doc.getRootElement();
 
-        if (!_path.equals(topDataset.getChild("name").getTextTrim())) {
-            throw new IOException("Returned dataset name does not match requested name.\n" +
-                    "Requested: " + _path + "  " +
-                    "Returned: " + topDataset.getChild("name").getTextTrim());
+        if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
+//            throw new IOException("Returned dataset name does not match requested name.\n" +
+//                    "Requested: " + besPath + "  " +
+//                    "Returned: " + topDataset.getChild("name").getTextTrim());
 
-//            System.out.println("Returned dataset name does not match requested name.\n"+
-//                                   "Requested: " + _name + "  "+
-//                                   "Returned: "+topDataset.getChild("name").getTextTrim());
+            System.out.println("Returned dataset name does not match requested name.\n"+
+                                   "Requested: " + besPath + "  "+
+                                   "Returned: "+topDataset.getChild("name").getTextTrim());
 
         }
 
@@ -255,8 +304,10 @@ public class S4CrawlableDataset implements CrawlableDataset {
     private void processDatasetElement(Element dataset, S4CrawlableDataset s4c) {
 
         // Process name
-        s4c._name = getNameFromPath(dataset.getChild("name").getTextTrim());
-        s4c._name = s4c._name.equals("/") ? "" : s4c._name;
+        String path = besPath2ThreddsPath(dataset.getChild("name").getTextTrim());
+
+        s4c._name = getNameFromPath(path);
+        //s4c._name = s4c._name.equals("/") ? "" : s4c._name;
 
         // Process size
         s4c._size = Integer.parseInt(dataset.getChild("size").getTextTrim());
@@ -282,7 +333,17 @@ public class S4CrawlableDataset implements CrawlableDataset {
 
     public String getPath() {
 
-        return _path;
+        return getThreddsPath();
+    }
+
+    private String getThreddsPath() {
+
+        return _threddsPath;
+    }
+
+    private String getBesPath() {
+
+        return _besPath;
     }
 
     public String getParentPath(){
@@ -299,11 +360,11 @@ public class S4CrawlableDataset implements CrawlableDataset {
             return _parent;
         }
 
-        if (_parentPath == null)
+        if (getParentPath() == null)
             return null;
 
         try {
-            S4CrawlableDataset s4c = new S4CrawlableDataset(_parentPath, _config);
+            S4CrawlableDataset s4c = new S4CrawlableDataset(getParentPath(), _config);
             _parent = s4c;
             return s4c;
         } catch (PPTException e) {
@@ -350,7 +411,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             e = (Element) i.next();
 
 
-            String newPath = this._path + (_path.endsWith("/") ? "" : "/") + e.getChild("name").getTextTrim();
+            String newPath = this.getThreddsPath() + (this.getThreddsPath().endsWith("/") ? "" : "/") + e.getChild("name").getTextTrim();
 
             if(Debug.isSet("CrawlableDataset")) System.out.println("\n\n\nMaking new dataset \"" + newPath + "\" in listDatasets().");
 
