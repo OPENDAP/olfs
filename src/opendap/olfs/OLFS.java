@@ -789,11 +789,11 @@ public class OLFS extends HttpServlet {
 
 
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                        "",
-                        S4CrawlableDataset.getRootDataset(),
-                        "THREDDS",
-                        "OPENDAP",
-                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())+1));
+                        "",                                  // CollectionID, which for us needs to be empty.
+                        S4CrawlableDataset.getRootDataset(), // Root dataset of this collection
+                        "OPeNDAP-Server4",                   // Service Name
+                        "OPeNDAP",                           // Service Type Name
+                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())+1)); // Base URL for this service
 
             if (Debug.isSet("showResponse")){
                 System.out.println("doGetCatalog() - Generating catalog");

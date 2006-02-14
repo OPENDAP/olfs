@@ -230,7 +230,7 @@ public class TestServletResponse extends ThreddsServlet {
 
         System.out.println("rootPath:    " + rootPath);
         System.out.println("contentPath: " + contentPath);
-        System.out.println("myPath:      " + "/" + rs.getDataset());
+        System.out.println("dataset:     " + rs.getDataset());
 
 
 
@@ -248,32 +248,42 @@ public class TestServletResponse extends ThreddsServlet {
 
 
 /*
-        // This works. It returns a SimpleCatalog
-        if (Debug.isSet("showResponse")) {
-            System.out.println("doGetCatalog() - configuring S4CrawlableDataset object (a CrawlableDataset)");
+        String path = rs.getDataset();
+        path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
+
+        path = S4CrawlableDataset.besPath2ThreddsPath(path);
+
+        S4CrawlableDataset s4cd = new S4CrawlableDataset(path,null);
+
+        if(s4cd.isCollection()){
+
+            if (Debug.isSet("showResponse")){
+                System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
+            }
+
+
+            SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
+                        "",                                  // CollectionID, which for us needs to be empty.
+                        S4CrawlableDataset.getRootDataset(), // Root dataset of this collection
+                        "OPeNDAP-Server4",                   // Service Name
+                        "OPeNDAP",                           // Service Type Name
+                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())+1)); // Base URL for this service
+
+            if (Debug.isSet("showResponse")){
+                System.out.println("doGetCatalog() - Generating catalog");
+            }
+
+
+            pw.print(scb.generateCatalogAsString(s4cd));
+
+
         }
-        S4CrawlableDataset s4c = new S4CrawlableDataset("/" + rs.getDataset(), null);
-
-        if (Debug.isSet("showResponse")) {
-            System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
+        else {
+            response.setContentType("text/html");
+            String msg = "ERROR: THREDDS catalogs may only be requested for collections, not for individual data sets.";
+            throw new DODSException(msg);
         }
-        SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                "wingnut",
-                s4c,
-                "THREDDS",
-                "OPENDAP",
-                rs.getRequestURL());
 
-        if (Debug.isSet("showResponse")) {
-            System.out.println("doGetCatalog() - Generating catalog");
-        }
-        pw.print(scb.generateCatalogAsString(s4c));
-
-        //printCatalog(request, pw);
-        pw.flush();
-        response.setStatus(HttpServletResponse.SC_OK);
-
-    }
 
     */
 

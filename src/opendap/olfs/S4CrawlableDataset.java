@@ -252,7 +252,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             return;
 
         String besPath = getBesPath();
-        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting catalog for: "+besPath);
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting catalog for: \""+besPath+"\"");
         Document doc = BesAPI.showCatalog(besPath);
         Element topDataset = doc.getRootElement();
 
@@ -282,7 +282,7 @@ public class S4CrawlableDataset implements CrawlableDataset {
             return;
 
         String besPath = getBesPath();
-        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting info for: "+besPath);
+        if(Debug.isSet("CrawlableDataset")) System.out.println("Getting info for: \""+besPath+"\"");
         Document doc = BesAPI.showInfo(besPath);
         Element topDataset = doc.getRootElement();
 
