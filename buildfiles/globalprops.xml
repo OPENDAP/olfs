@@ -99,7 +99,7 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="regexp.lib" value="gnu-regexp-1.1.4.jar"/>
 <property name="getopt.lib" value="gnu-getopt-1.0.6.jar"/>
 <property name="jdom.lib" value="jdom-1.0.jar"/>
-<property name="servlet.lib" value="tomcat-4.1.18-servlet.jar"/>
+<property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
 <property name="soap.lib" value="apache-soap-2.3.1.jar"/>
 <property name="xercesImpl.lib" value="xerces-2.5.0_xercesImpl.jar"/>
 <property name="xercesXmlApis.lib" value="xerces-2.5.0_xml-apis.jar"/>

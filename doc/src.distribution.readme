@@ -5,8 +5,6 @@
 
                       Source Distribution README
 
-                           $Name:  $
-
 .......................................................................
 
 
@@ -38,12 +36,17 @@ which should be the Java-DODS and buildfiles directories) and run the
 command:
 
     ant -f buildfiles/s4.xml compile
+	
+To build the server as a .war file run the command:
+
+    ant -f buildfiles/s4.xml server
+
 
 Read the build file "buildfiles/s4.xml" to see what it all does.
 
 Happy Coding.
 
-N.
+Nathan
 
 ========================================================
 Nathan Potter                        The OPeNDAP Project

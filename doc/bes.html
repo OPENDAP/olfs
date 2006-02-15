@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>Untitled Document</title></head>
+
+<body>
+<h1 align="center"><img src="images/opendap_logo_masthead.gif" width="206" height="93" /><br />
+  BES</h1>
+<hr />
+
+<p>The reference implentation of the BES is based on the C++ implmentation of the OPeNDAP software. To install the BES you will need to download and installt the <a href="FIX THIS LINK">BES package</a> .</p>
+<p>Once installed the BES will require configuration. This achieved by editing a configuration file called &quot;opendap.ini&quot; which must be located in <em><strong>Tell Me Where</strong></em> . </p>
+<p>Here is an example opendap.ini file (<em><strong>We should add an extensive comment set to the default file (and this one here) so that we don't really have to go on and on about what's in it.)</strong></em> :</p>
+<p>&nbsp;   </p>
+<pre>
+   #-----------------------DODS Initialization file------------------------#
+   #                                                                       #
+   #       National Center for Atmospheric Research (NCAR)                 #
+   #       High Altitude Observatory (HAO)                                 #
+   #       Key entries for DODS server run time behavior                   #
+   #                                                                       #
+   #-----------------------------------------------------------------------#
+   
+OPeNDAP.Help.TXT=/Users/ndp/OPeNDAP/Projects/Server4/swdev/config/dispatch_help.txt
+OPeNDAP.Help.HTTP=/Users/ndp/OPeNDAP/Projects/Server4/swdev/config/dispatch_help.html</pre>
+<pre>Fits.Help.TXT=/Users/ndp/OPeNDAP/Projects/Server4/swdev/config/fits.txt
+Fits.Help.HTTP=/Users/ndp/OPeNDAP/Projects/Server4/swdev/config/fits.html</pre>
+<pre>DODS.Info.Buffered=no</pre>
+<pre># If the symbolic name cannot be found in persistence, nice means simply log
+   # an error, strict means throw an exception
+   DODS.Container.Persistence=strict</pre>
+<pre># Who is responsable for this server
+   DODS.ServerAdministrator=ndp@opendap.org</pre>
+<pre># Defines size of system global gool
+   DODS.Memory.GlobalArea.EmergencyPoolSize=1
+   DODS.Memory.GlobalArea.MaximunHeapSize=20
+   DODS.Memory.GlobalArea.Verbose=no
+   DODS.Memory.GlobalArea.ControlHeap=no</pre>
+<pre># Where we log the stuff...
+   DODS.LogName=/Users/ndp/OPeNDAP/Projects/Server4/swdev/config/opendap.log
+   DODS.LogVerbose=yes</pre>
+<pre># This key defines is the listener handles all client (therefore only one
+   # client can be connected at a given time) or if the listener forks other
+   # xdods process so multiple clients can be connected in other words the
+   # listener just listens... 
+   DODS.ProcessManagerMethod=single</pre>
+<pre># Location of the Unix socket for incoming connections.
+   DODS.ServerUnixSocket=/Users/ndp/OPeNDAP/Projects/Server4/swdev/config/opendap.socket
+ </pre>
+<pre># Catalog Configuration
+   Catalog.catalog.RootDirectory=/users/ndp/OPeNDAP/Projects/Server4/data
+   Catalog.catalog.TypeMatch=nc:.*\.nc;
+ </pre>
+<pre>NC.Catalog.Root=/Users/ndp/OPeNDAP/Projects/Server4/data</pre>
+</body>
+</html>
