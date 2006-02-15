@@ -225,7 +225,7 @@ public class TestServletResponse extends ThreddsServlet {
         response.setHeader("XDAP", rs.getXDAP(request));
         response.setHeader("Content-Description", "dods_catalog");
 
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
+//        PrintWriter pw = new PrintWriter(response.getOutputStream());
 
 
         System.out.println("rootPath:    " + rootPath);
