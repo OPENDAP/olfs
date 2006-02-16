@@ -13,7 +13,11 @@
 <p>Greetings,</p>
 <p>This is the <a href="http://www.opendap.org"><strong>OPeNDAP
   Project</strong></a> Server4 software. </p>
-<p>Server4 represents a new arrangement of the OPeNDAP server architecture. The old perl/cgi front end request handler that ran inside the Apache web server has been replaced with a Java servlet running inside of a servlet engine (such as <a href="http://tomcat.apache.org/">Tomcat</a>) . This servlet, called the <strong> O</strong>PeNDAP <strong>L</strong>ightweight <strong>F</strong>ront-end <strong>S</strong>erver (OLFS) works in conjunction with a <strong>B</strong>ack <strong>E</strong>nd <strong>S</strong>erver (BES) . The BES may (or may not) run on the same system as the OLFS. The OLFS and the BES communicate using TCP/IP sockets. The BES does all of the &quot;heavy lifting&quot; for Server4. Both the OLFS and the BES require installation and configuration before they can be run. </p>
+<p><br>
+Server4 is a new data server which combines the efforts at UCAR/HAO to build a high performance DAP-compliant data server for the Earth System Grid II
+project with existing software developed by OPeNDAP. The server is intended to be a replacement for the existing 3.x servers which OPeNDAP is distributing.</p>
+<p>The new server uses the Java servlet mechanism to hand off requests from general web daemon to DAP format-specific software. This results in higher performance for small requests. The servlet front end, which we call the <strong>O</strong>PeNDAP <strong>L</strong>ightweight <strong>F</strong>ront end <strong>S</strong>erver (OLFS) looks at each request and formulates a query to a second server (which may or may not on the same machine as the OLFS) called the <strong>B</strong>ack <strong>E</strong>nd <strong>S</strong>erver (BES). The BES is the high-performance server software from HAO. It's handles reading data from data stores and returning DAP-compliant responses. The OLFS may return those with little or no modification or it may use them to build more complex responses. The nature of the Interprocess Communication (IPC) between the OLFS and BES is such that they should both be on the same machine or be able to communicate over a very high bandwidth channel.</p>
+<p> Both the OLFS and the BES require installation and configuration before they can be run. </p>
 <p>Here you will find:</p>
 <ul>
   <li><a href="servlet.html">OLFS  configuration information.</a></li>
