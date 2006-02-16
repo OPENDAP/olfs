@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: "Courier New", Courier, mono;
+	font-size: 14px;
+}
+-->
+</style>
+</head>
+
+<body>
+<h1 align="center"><img src="images/opendap_logo_masthead.gif" alt="OPeNDAP Logo" width="206" height="93" /><br />
+Building and Installing <br />
+Server4, release 1.0</h1>
+<hr />
+<p><em>(Note: Releases 1.0 to 1.3 are alpha releases of server4 and assume that <br />
+  the builder is familar with OPeNDAP software. Release 1.4 will be a beta <br />
+release.</em>)</p>
+<p>There are two different components to server4, each of which must be built and installed to get a running server. See the README file for information on the server architecture and roles of the two parts of the server.</p>
+<p>What you will need:</p>
+<ul>
+  <li>  30 minutes</li>
+  <li>A <a href="http://subversion.tigris.org/">Subversion</a> client</li>
+  <li>C++ compiler</li>
+  <li>Java 1.4 or 1.5 Runtime or Development Environment</li>
+  <li><a href="http://tomcat.apache.org/">Tomcat 4.1.x or 5.5.x</a> </li>
+  <li>Data (netcdf files for version 1.0 of this software)</li>
+  <li>A web browser</li>
+</ul>
+<h2>&nbsp;</h2>
+<h2>Part I: Download, and install the OPeNDAP DAP library.</h2>
+<h2>&nbsp;</h2>
+<h2>Part II: Download, build, configure and test the BES</h2>
+<p>The BES software is contained in Subversion in the project 'bes.' Get this using <a href="http://scm.opendap.org:8090/svn/trunk/bes">http://scm.opendap.org:8090/svn/trunk/bes</a>. Once you have the software,
+  perform the usual autoreconf, configure, make and 'make install' steps to build 
+the code. This will install libraries needed by the server daemon.</p>
+<p>To build the server daemon itself, check out the netcdf_handler project 
+  from subversion: <a href="http://scm.opendap.org:8090/svn/trunk/netcdf_handler">http://scm.opendap.org:8090/svn/trunk/netcdf_handler</a>. Again,
+  use autoreconf to generate the configure and Makefile.in files. However, when
+  you run configure, make sure to use the --with-bes option, passing it the 
+  installation prefix of the bes software. Assuming you built the bes using the<br />
+  default prefix, configure should be run as './configure --with-bes=/usr/local'.
+  The configure script is not too smart about where to look for the bes libraries
+  and, if it cannot find them, it won't build the bes server daemon. After 
+running configure, run make; there's no need to run 'make install'.</p>
+<p>You should see two executables in the netcdf_handler directory at this point,
+  dap_nc_handler and opendapserver. The latter is the bes daemon (ignore
+dap_nc_handler).</p>
+<p>To run the daemon, you will need an configuration file. Look at the file 
+  named opendap.ini and edit its values to suit your system (note that as of
+  2/3/06 the bes only knows how to serve netCDF files). Most of the paths/values
+  in the sample file should be fine. Make sure 'Catalog.catalog.RootDirectory'<br />
+is the full path to the root of the data you want to serve.</p>
+<p>To point the daemon at the configuration file, set the environment variable
+  DODS_INI to the full path of the file. </p>
+<p>To start the server, you need to specify a port (the daemon's help says it can
+  use a Unix socket in addition to a TCP socket, but I've only tested the TCP 
+socket option). Run the server as:</p>
+<p> './opendapserver -d -p 10002<br />
+    <br />
+  You can use different port values, but the OLFS is configured by default for
+  10002. Note that -d puts the daemon in debugging mode and in that mode it can
+  handle only one client at a time. It also prints out a number of diagnostic
+  messages.</p>
+<h3>Part IIb: Configure the opendapserver daemon.</h3>
+<p><a href="bes.html">Configuration information is here. </a></p>
+<h3>Part IIc: Test the opendapserver daemon</h3>
+<p>Look in the directory bes/cmdln for the opendapserver test client. Run the client using '-p 10002 -h localhost'. At the OPeNDAP&gt; prompt, type 
+  'show version;' and you should see stuff about different versions. To test the
+data access, enter the following commands:</p>
+<blockquote>
+  <p class="style1"> set container in catalog values fnoc1,/data/nc/fnoc1.nc;<br />
+    define data as fnoc1;<br />
+    get das for data;<br />
+    get dds for data;<br />
+    define time as fnoc1 with fnoc1.constraint=&quot;time&quot;;<br />
+    get dods for time;</p>
+</blockquote>
+<p><br />
+  The last operation will spit out binary junk. If that all works, you have a
+  running BES. Of course, you should substitute a nerCDF file on your system for
+  /data/nc/fnoc1.nc. By release 1.3, the same set of formats currently served
+  by the 3.5 server should also work. Until then, probably only netCDF files<br />
+  will be served correctly.</p>
+<h2>Part III: Setting up the OLFS</h2>
+<p><em>Prolog: Exit the opendapserver client that you were running above (type 'exit' at the prompt).</em></p>
+<p>Check out the software in Server4 using <a href="http://scm.opendap.org:8090/svn/trunk/Server4">http://scm.opendap.org:8090/svn/trunk/Server4</a>. </p>
+<p>Change directory to Server4 and
+  build the code by issuing the command:</p>
+<blockquote>
+  <p class="style1">ant -f buildfiles/s4.xml server</p>
+</blockquote>
+<p>I used ant version 1.6.2
+  with Java 1.5.0_04. I had to edit the shell script 'ant' and replace '-cp' with
+  '-lib'. This is a known issue with these two versions. If you're using Java 1.4
+  you should not have to modify the ant script.</p>
+<p>Once built, copy the opendap.war file into the Tomcat Web Apps directory:</p>
+<blockquote>
+  <p class="style1"> cp build/dist/opendap.war /usr/local/jakarta-tomcat-4.1.31/webapps/</p>
+</blockquote>
+<p>If you're replacing an old copy, make sure that remove the 'opendap' director 
+that Tomcat will have created when it was started. </p>
+<p><em>(No Longer true: To run the OLFS, use Tomcat version 4.1. The code has not been tested with
+version 5 yet.) </em></p>
+<p>Configure the Tomcat environment by setting the environment variable CATALINA_HOME to the full
+path for the Tomcat distribution.<br />
+<br />
+In bash:</p>
+<blockquote>
+  <p class="style1">export CATALINA_HOME =
+    /usr/local/jakarta-tomcat-4.1.31</p>
+</blockquote>
+<p> In the top level tomcat directory
+    (jakarta-tomcat-4.1.31 on my machine) issue the command: </p>
+<blockquote>
+  <p class="style1"> bin/startup.sh; tail -f logs/catalina.out</p>
+</blockquote>
+<p>  Wait a few seconds while it all starts up.</p>
+<p>&nbsp;</p>
+<h3>Part IIIb: Configure the OLFS servlet.</h3>
+<p><a href="servlet.html">Configuration for the OLFS servlet is here. </a></p>
+<p>&nbsp;</p>
+<h3>Part IIIc: Test the OLFS servlet.</h3>
+<p>To test/use the server, open a web browser and open the URL: </p>
+<blockquote>
+  <p> <a href="http://localhost:8080/" class="style1">http://localhost:8080/</a></p>
+</blockquote>
+<p>and you should see the Tomcat default page. Open the URL:</p>
+<blockquote>
+  <p class="style1"><a href="http://localhost:8080/opendap/s4/data/nc/fnoc1.nc.das">http://localhost:8080/opendap/s4/data/nc/fnoc1.nc.das</a></p>
+</blockquote>
+<p>To see the DAS for fnoc1.nc (agian, adjust for you data). You can probably 
+  get a THREDDS catalog by using</p>
+<blockquote>
+  <p> <a href="http://localhost:8080/opendap/s4/catalog.xml" class="style1">http://localhost:8080/opendap/s4/catalog.xml</a><br />
+    <a href="http://localhost:8080/opendap/s4/data/catalog.xml" class="style1">http://localhost:8080/opendap/s4/data/catalog.xml</a><br />
+    <a href="http://localhost:8080/opendap/s4/data/nc/catalog.xml" class="style1">http://localhost:8080/opendap/s4/data/nc/catalog.xml</a></p>
+</blockquote>
+<p>Et cetera.</p>
+<p>Usage Note:  If you use ctrl-c to stop watching the tail of the servers output, make sure to run bin/shutdown.sh to 
+  shutdown Tomcat. If you don't, you may get errors when you next
+try to start the Tomcat server.</p>
+</body>
+</html>
