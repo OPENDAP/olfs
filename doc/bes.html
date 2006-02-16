@@ -6,11 +6,10 @@
 <style type="text/css">
 <!--
 .style1 {font-family: "Courier New", Courier, mono}
-.style2 {
-	color: #FF0000;
-	font-weight: bold;
+.style3 {	font-family: "Courier New", Courier, mono;
+	font-size: 14px;
 }
-.style3 {color: #FF0000}
+.style4 {color: #FF0000}
 -->
 </style>
 </head>
@@ -23,15 +22,34 @@
 <p>The reference implentation of the BES is based on the C++ implmentation of the OPeNDAP software. To install the BES you will need to download and installt the BES package . See the <a href="install.html">installation instructions</a> for where to get it and how to install it. </p>
 <p>&nbsp;</p>
 <h2>The <em>opendap.ini</em> configuration file</h2>
-<p>  Once installed the BES will require configuration. This achieved by editing a configuration file called <em>opendap.ini</em> which must be located in <span class="style3"><em><strong>Tell Me Where</strong></em> . </span></p>
-<p>The <em>opendap.ini</em> file is a file that contains key/value pairs used by the OPeNDAP server. For the most part you will need to make only two changes to this file.</p>
-<p>The first is to the key <span class="style1">OPeNDAP.ServerAdministrator</span>. This should be set to the email address of the person who will be administrating this OPeNDAP server.</p>
-<p>The other key is the <span class="style1">OPeNDAP.LogName</span> key, which defines the full path to the opendap log file. This log file will keep track of what requests are made and whether they are completed. The key right below this one, <span class="style1">OPeNDAP.LogVerbose</span>, defaults to no, meaning that the system won&rsquo;t dump debug information to the log file. If this key is set to yes then you will see much more information being dumped to the log file. This can be done in order to determine if there is a problem with the server and where it might be having that problem.</p>
-<p>The other keys that are in the file are described below.</p>
+<p>  Once installed the BES will require configuration. This achieved by editing a configuration file called <em class="style1">opendap.ini</em> To point the daemon at the configuration file, set  the environment variabple <strong>OPENDAP_INI</strong> to the full path of the file. For a bash shell that might look like:</p>
+<blockquote>
+  <p><span class="style3">export OPENDAP_INI =
+    /usr/local/Server/config/opendap.ini</span> </p>
+</blockquote>
+<p>(adjust to reflect your local installation location) </p>
+<p>The <em>opendap.ini</em> file is a file that contains key/value pairs used by the OPeNDAP server. </p>
+<h3>Server Administrator and Logging</h3>
+<p> For the most part you will only need to make only two changes to this file.</p>
+<p><span class="style1">OPeNDAP.ServerAdministrator=admin@email.address.for.admin</span></p>
+<blockquote>
+  <p>The first is to the key <span class="style1">OPeNDAP.ServerAdministrator</span>. This should be set to the email address of the person who will be administrating this OPeNDAP server.</p>
+</blockquote>
+<p><span class="style1">OPeNDAP.LogName=/usr/local/server4/log/openda.log</span></p>
+<blockquote>
+  <p>The other key is the <span class="style1">OPeNDAP.LogName</span> key, which defines the full path to the opendap log file. This log file will keep track of what requests are made and whether they are completed. </p>
+</blockquote>
+<p><span class="style1">OPeNDAP.LogVerbose=no</span></p>
+<blockquote>
+  <p>Defaults to no, meaning that the system won&rsquo;t dump debug information to the log file. If this key is set to yes then you will see much more information being dumped to the log file. This can be done in order to determine if there is a problem with the server and where it might be having that problem.</p>
+</blockquote>
+<p>&nbsp;</p>
 <h3>Help files</h3>
-<p>  There are two help files that contain information that is returned to a user who makes a &lsquo;show help&rsquo; request. One key represents a plain text version of the file while the other represents an html version. The keys are <span class="style1">OPeNDAP.Help.TXT</span> and <span class="style1">OPeNDAP.Help.HTTP</span>. These two files are located in the ${OPENDAP_ROOT}/info directory. <span class="style2">&lt;-- Where is this? In the BES dir? The netcdfhandler dir? What is OPENDAP_ROOT set to? Where is it set? </span></p>
-<p>By default, the request handler built for you contains code that will likewise read help information for your server from files. Again, one key represents a plain text version of the help information while the other represents an html version. These keys are <span class="style1">&lt;class_prefix&gt;.Help.TXT</span> and<span class="style1"> &lt;class_prefix&gt;.Help.HTTP</span> where <span class="style1">&lt;class_prefix</span>&gt; is the answer to the second question asked by the createServer script. <span class="style2">(Where and what is this <em>createServer</em> script?)</span> The default location specified in the initialization file is the same as the OPeNDAP help files.</p>
-<h3>Buffering</h3>
+<p><span class="style1">OPeNDAP.Help.TXT=/usr/local/Server4/bes/dispatch/dispatch_help.txt</span></p>
+<p><span class="style1">OPeNDAP.Help.HTTP=/usr/local/Server4/bes/dispatch/dispatch_help.html</span></p>
+<p>  There are two help files that contain information that is returned to a user who makes a &lsquo;show help&rsquo; request. One key represents a plain text version of the file while the other represents an html version. The keys are <span class="style1">OPeNDAP.Help.TXT</span> and <span class="style1">OPeNDAP.Help.HTTP</span>. These two files are located in the bes/dispatch directory as part of the BES source distribution. Reference them there, or copy them somwhere else and reference them accordingly. </p>
+<p>[<em>By default, the request handler built for you contains code that will likewise read help information for your server from files. Again, one key represents a plain text version of the help information while the other represents an html version. These keys are <span class="style1">&lt;class_prefix&gt;.Help.TXT</span> and<span class="style1"> &lt;class_prefix&gt;.Help.HTTP</span> where <span class="style1">&lt;class_prefix</span>&gt; is the answer to the second question asked by the createServer script. The default location specified in the initialization file is the same as the OPeNDAP help files.</em> <span class="style4">&lt;Patrick said to &quot;Skip that part ... I wrote a script that would generate source code for you in the new bes server format, generate makefiles, configure scripts, source files, etc... It's called createServer and lives in bes/bin and uses template files in bes/templates.&quot; I'm not sure what part I'm to skip. Comments?&gt;</span>]</p>
+<h3><em>Buffering</em></h3>
 <p>  <span class="style1">OPeNDAP.Info.Buffered=no</span></p>
 <blockquote>
   <p>Should the OPeNDAP server buffer requests for help, version and other informational requests? That&rsquo;s what this next key specifies. A value of no means that the information is not buffered and is transmitted as it is added to the informational response object.</p>
