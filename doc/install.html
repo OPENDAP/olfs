@@ -9,6 +9,8 @@
 	font-family: "Courier New", Courier, mono;
 	font-size: 14px;
 }
+.style2 {color: #FF0000}
+.style3 {font-family: "Courier New", Courier, mono; font-size: 14px; color: #FF0000; }
 -->
 </style>
 </head>
@@ -56,20 +58,23 @@ dap_nc_handler).</p>
   2/3/06 the bes only knows how to serve netCDF files). Most of the paths/values
   in the sample file should be fine. Make sure 'Catalog.catalog.RootDirectory'<br />
 is the full path to the root of the data you want to serve.</p>
-<p>To point the daemon at the configuration file, set the environment variable
-  DODS_INI to the full path of the file. </p>
-<p>To start the server, you need to specify a port (the daemon's help says it can
-  use a Unix socket in addition to a TCP socket, but I've only tested the TCP 
-socket option). Run the server as:</p>
-<p> './opendapserver -d -p 10002<br />
-    <br />
-  You can use different port values, but the OLFS is configured by default for
-  10002. Note that -d puts the daemon in debugging mode and in that mode it can
-  handle only one client at a time. It also prints out a number of diagnostic
-  messages.</p>
 <h3>Part IIb: Configure the opendapserver daemon.</h3>
 <p><a href="bes.html">Configuration information is here. </a></p>
-<h3>Part IIc: Test the opendapserver daemon</h3>
+<p>To point the daemon at the configuration file, set the environment variable
+  OPENDAP_INI to the full path of the file. </p>
+<h3>Part IIc: Start the opendapserver daemon.</h3>
+<p>To start the server, you need to specify a port (the daemon's help says it can
+  use a Unix socket in addition to a TCP socket, but I've only tested the TCP 
+  socket option). Start the server with a command like this:</p>
+<blockquote>
+  <p> <span class="style1">opendapserver -d -p 10002</span></p>
+</blockquote>
+<p>  You can use different port values, but the OLFS is configured by default for
+  10002. Note that -d puts the daemon in debugging mode and in that mode it can
+  handle only one client at a time. <span class="style2">(Is this true? I though the single connection was controlled by the </span><span class="style3">OPeNDAP.ProcessManagerMethod</span><span class="style2"> key in the </span><span class="style3">opendap.ini</span><span class="style2"> file.)</span> It also prints out a number of diagnostic
+messages.</p>
+<h3>&nbsp;</h3>
+<h3>Part IId: Test the opendapserver daemon</h3>
 <p>Look in the directory bes/cmdln for the opendapserver test client. Run the client using '-p 10002 -h localhost'. At the OPeNDAP&gt; prompt, type 
   'show version;' and you should see stuff about different versions. To test the
 data access, enter the following commands:</p>
