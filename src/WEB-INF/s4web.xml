@@ -13,7 +13,7 @@
         </servlet-name>
 
         <servlet-class>
-            opendap.olfs.TestServletResponse
+            opendap.olfs.ExampleServlet
         </servlet-class>
 
         <init-param>

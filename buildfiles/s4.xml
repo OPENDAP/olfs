@@ -96,12 +96,12 @@
         depends="clean,doc"
         description="Builds JavaDoc for the core OPeNDAP software packages, and puts it into the repository documentation directory."
         >
-        
+
         <copy todir="${doc.dir}/javadoc" >
             <fileset dir="${build.doc}/server4">
                 <include name="**/*"/>
             </fileset>
-        </copy>    
+        </copy>
      </target>
 
 
@@ -170,6 +170,8 @@
                 <include name="${thredds.lib}"/>
                 <include name="${threddsResources.lib}"/>
                 <include name="${nlog4j.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -193,6 +195,8 @@
                 <include name="${jdom.lib}"/>
                 <include name="${soap.lib}"/>
                 <include name="${opendap.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
            </zipfileset>
 
             <webinf dir="${src.dir}/WEB-INF">
