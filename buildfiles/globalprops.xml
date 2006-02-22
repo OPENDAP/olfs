@@ -101,8 +101,8 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="jdom.lib" value="jdom-1.0.jar"/>
 <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
 <property name="soap.lib" value="apache-soap-2.3.1.jar"/>
-<property name="xercesImpl.lib" value="xercesImpl.jar"/>
-<property name="xercesXmlApis.lib" value="xml-apis.jar"/>
+<property name="xercesImpl.lib" value="xercesImpl-2.7.1.jar"/>
+<property name="xercesXmlApis.lib" value="xml-apis-1.3.02.jar"/>
 <property name="crimson.lib" value="crimson-1.1.3.jar"/>
 <property name="javamail.lib" value="javamail-1.3.1.jar"/>
 <property name="echo.lib" value="echosoap.jar"/>
