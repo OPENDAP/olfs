@@ -95,7 +95,7 @@ public class ReqState {
         }
 
 
-        processDodsURL();
+        processOpendapURL();
 
 
         defaultINFOcache = this.myServletConfig.getServletContext().getRealPath("datasets" +
@@ -394,7 +394,7 @@ public class ReqState {
      * @see ReqState
      */
 
-    protected void processDodsURL() {
+    protected void processOpendapURL() {
 
         // Figure out the data set name.
         this.dataSetName = myHttpRequest.getPathInfo();

@@ -31,12 +31,16 @@ import opendap.util.Log;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -67,6 +71,65 @@ public class Util {
 
     /**
      * ************************************************************************
+     * Default handler for OPeNDAP status requests; not publically available,
+     * used only for debugging
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request
+     *                 object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @see S4Html
+     */
+    public static void doGetSystemProps(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        ReqState rs)
+            throws IOException {
+
+
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_status");
+
+        PrintWriter pw = new PrintWriter(response.getOutputStream());
+        pw.println("<html>");
+        pw.println("<title>System Properties</title>");
+        pw.println("<hr>");
+        pw.println("<body><h2>System Properties</h2>");
+        pw.println("<h3>Date: " + new Date() + "</h3>");
+
+        Properties sysp = System.getProperties();
+        Enumeration e = sysp.propertyNames();
+
+        pw.println("<ul>");
+        while (e.hasMoreElements()) {
+            String name = (String) e.nextElement();
+
+            String value = System.getProperty(name);
+
+            pw.println("<li>" + name + ": " + value + "</li>");
+        }
+        pw.println("</ul>");
+
+        pw.println("<h3>Runtime Info:</h3>");
+
+        Runtime rt = Runtime.getRuntime();
+        pw.println("JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)<br>");
+        pw.println("JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)<br>");
+        pw.println("JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)<br>");
+        pw.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)<br>");
+
+        pw.println("<hr>");
+        pw.println("</body>");
+        pw.println("</html>");
+        pw.flush();
+        response.setStatus(HttpServletResponse.SC_OK);
+
+    }
+
+    /**
+     * ************************************************************************
      * This is a bit of instrumentation that I kept around to let me look at the
      * state of the incoming <code>HttpServletRequest</code> from the client.
      * This method calls the <code>get*</code> methods of the request and prints
@@ -87,6 +150,7 @@ public class Util {
         ps.println("");
         ps.println("HttpServletRequest Interface:");
         ps.println("    getAuthType:           " + request.getAuthType());
+        ps.println("    getContextPath:        " + request.getContextPath());
         ps.println("    getMethod:             " + request.getMethod());
         ps.println("    getPathInfo:           " + request.getPathInfo());
         ps.println("    getPathTranslated:     " + request.getPathTranslated());
@@ -99,6 +163,18 @@ public class Util {
         ps.println("    isRequestedSessionIdFromCookie: " + request.isRequestedSessionIdFromCookie());
         ps.println("    isRequestedSessionIdValid:      " + request.isRequestedSessionIdValid());
         ps.println("    isRequestedSessionIdFromURL:    " + request.isRequestedSessionIdFromURL());
+        //ps.println("    isUserInRole:                   " + request.isUserInRole());
+
+        ps.println("");
+        ps.print("    Cookies:");
+        Cookie c[] = request.getCookies();
+        if(c==null)
+            ps.println("   None.");
+        else{
+            ps.println();
+            for(i=0; i<c.length ;i++)
+                ps.println("        cookie["+i+"]: " + c[i]);
+        }
 
         ps.println("");
         i = 0;
@@ -154,6 +230,11 @@ public class Util {
         ps.println("");
 
         ps.println("Servlet Context:");
+
+        ps.println("    getMajorVersion:       "+scntxt.getMajorVersion());
+        ps.println("    getMinorVersion:       "+scntxt.getMinorVersion());
+        ps.println("    getServerInfo:         "+scntxt.getServerInfo());
+        ps.println("    getServletContextName: "+scntxt.getServletContextName());
         ps.println("");
 
         i = 0;
@@ -168,7 +249,7 @@ public class Util {
 
         ps.println("    ServletContext.getRealPath(\".\"): " + scntxt.getRealPath("."));
         ps.println("    ServletContext.getMajorVersion(): " + scntxt.getMajorVersion());
-//        ps.println("ServletContext.getMimeType():     " + sc.getMimeType());
+//        ps.println("ServletContext.getMimeType():     " + scntxt.getMimeType());
         ps.println("    ServletContext.getMinorVersion(): " + scntxt.getMinorVersion());
 //        ps.println("ServletContext.getRealPath(): " + sc.getRealPath());
 

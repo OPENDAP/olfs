@@ -100,22 +100,13 @@ public class S4Info {
             System.out.println("doGetINFO For: " + rs.getDataset());
 
 
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
-        response.setHeader("Content-Description", "dods_description");
-
         String responseDoc;
         ServerDDS myDDS;
         DAS myDAS;
 
 
         OPeNDAPClient oc = BesAPI.startClient();
-
         BesAPI.configureTransaction(oc,rs.getDataset(), rs.getConstraintExpression());
-
-
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         BesAPI.getDataProduct(oc,BesAPI.getAPINameForDDS(),os);
@@ -133,7 +124,6 @@ public class S4Info {
         myDAS.parse(is);
 
         String infoDir = rs.getINFOCache();
-
 
         responseDoc = loadOverrideDoc(infoDir, rs.getDataset());
 
@@ -177,6 +167,7 @@ public class S4Info {
             // Flush the output buffer.
             pw.flush();
         }
+
 
     }
     /***************************************************************************/
@@ -365,8 +356,6 @@ public class S4Info {
         }
 
         vs += "</table>\n<p>\n";
-        ;
-
 
         return (vs);
     }

@@ -8,17 +8,12 @@
 
 
     <servlet>
-        <servlet-name>
-            s4test
-        </servlet-name>
-
-        <servlet-class>
-            opendap.olfs.ExampleServlet
-        </servlet-class>
+        <servlet-name>test</servlet-name>
+        <servlet-class>opendap.olfs.OLFS</servlet-class>
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse BES CE</param-value>
+            <param-value>showRequest probeRequest showResponse CE </param-value>
         </init-param>
 
         <init-param>
@@ -31,18 +26,17 @@
             <param-value>10002</param-value>
         </init-param>
 
-
     </servlet>
 
 
-    <servlet>
-        <servlet-name>
-            s4
-        </servlet-name>
 
-        <servlet-class>
-            opendap.olfs.OLFS
-        </servlet-class>
+
+    <!-- default servlet -->
+
+    <servlet>
+        <servlet-name>s4</servlet-name>
+
+        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
 
         <init-param>
             <param-name>DebugOn</param-name>
@@ -60,17 +54,22 @@
         </init-param>
 
 
+        <load-on-startup>1</load-on-startup>
+
+
     </servlet>
 
+    <servlet-mapping>
+       <servlet-name>test</servlet-name>
+       <url-pattern>/test/*</url-pattern>
+     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>s4test</servlet-name>
-        <url-pattern>/s4test</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>s4test</servlet-name>
-        <url-pattern>/s4test/*</url-pattern>
-    </servlet-mapping>
+       <servlet-name>test</servlet-name>
+       <url-pattern>/test</url-pattern>
+     </servlet-mapping>
+
+
 
 
     <servlet-mapping>

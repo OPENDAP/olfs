@@ -32,7 +32,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import opendap.dap.*;
-import opendap.dap.parser.ParseException;
 import opendap.util.*;
 import opendap.ppt.PPTException;
 import org.jdom.*;
@@ -52,7 +51,7 @@ import thredds.cataloggen.SimpleCatalogBuilder;
  * <p/>
  * This is an abstract class because it is left to the individual
  * server development efforts to write the getDDS() and
- * getXDODSServer() methods. The getDDS() method is intended to
+ * getXDODSServerVersion() methods. The getDDS() method is intended to
  * be where the server specific OPeNDAP server data types are
  * used via their associated class factory.
  * <p/>
@@ -96,7 +95,7 @@ import thredds.cataloggen.SimpleCatalogBuilder;
  * <h3>See the file <i>SERVLETS</i> in the top level directory of the
  * software distribution for more detailed information about servlet
  * configuration. </h3>
- * Also, the method <code>processDodsURL()</code> could be overloaded
+ * Also, the method <code>processOpendapURL()</code> could be overloaded
  * if some kind of special processing of the incoming request is needed
  * to ascertain the OPeNDAP URL information.
  *
@@ -373,6 +372,63 @@ public class OLFS extends HttpServlet {
     /***************************************************************************/
 
 
+
+    /**
+     * ************************************************************************
+     * Default handler for the client's DDS request. Requires the getDDS() method
+     * implemented by each server localization effort.
+     * <p/>
+     * <p>Once the DDS has been parsed and constrained it is sent to the
+     * requesting client.
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @param rs       The ReqState of this client request. Contains all kinds of
+     *                 important stuff.
+     * @see ReqState
+     */
+    public void doGetDDX(HttpServletRequest request,
+                         HttpServletResponse response,
+                         ReqState rs)
+            throws IOException, ServletException {
+
+        System.out.println("Flow in doGetDDX()");
+
+
+        if (Debug.isSet("showResponse"))
+            System.out.println("doGetDDX for dataset: " + rs.getDataset());
+
+        response.setContentType("text/plain");
+        response.setHeader("XDODS-Server", rs.getXDODSServer());
+        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
+        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("Content-Description", "dods_dds");
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
+
+        OutputStream Out = new BufferedOutputStream(response.getOutputStream());
+        try {
+            BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+        } catch (DODSException de) {
+            Util.dodsExceptionHandler(de, response);
+        } catch (PPTException e) {
+            DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
+            Util.dodsExceptionHandler(de, response);
+        } finally {
+            Out.flush();
+        }
+
+        System.out.println("Flow returned to doGetDDX()");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+    }
+    /***************************************************************************/
+
+
+
     /**
      * ************************************************************************
      * Default handler for the client's data request. Requires the getDDS()
@@ -432,41 +488,6 @@ public class OLFS extends HttpServlet {
             bOut.flush();
         }
         response.setStatus(HttpServletResponse.SC_OK);
-
-    }
-    /***************************************************************************/
-
-
-    /**
-     * ************************************************************************
-     * Default handler for the client's directory request.
-     * <p/>
-     * Returns an html document to the client showing (a possibly pseudo)
-     * listing of the datasets available on the server in a directory listing
-     * format.
-     * <p/>
-     * The bulk of this code resides in the class opendap.servlet.S4Dir and
-     * documentation may be found there.
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @see S4Dir
-     */
-    public void doGetDIR(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
-            throws IOException, ServletException, PPTException, DODSException, JDOMException, BESException {
-
-
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-
-        S4Dir.sendDIR(request, response, rs);
 
     }
     /***************************************************************************/
@@ -608,124 +629,6 @@ public class OLFS extends HttpServlet {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP ascii data requests. Returns the request data as
-     * a comma delimited ascii file. Note that this means that the more complex
-     * OPeNDAP structures such as Grids get flattened...
-     * <p/>
-     * The bulk of this code resides in the class opendap.servlet.dodsASCII and
-     * documentation may be found there.
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @see S4Ascii
-     */
-    public void doGetASC(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
-            throws IOException, ServletException, PPTException, DODSException, ParseException {
-
-
-        if (Debug.isSet("showResponse"))
-            System.out.println("doGetASC For: " + rs.getDataset());
-
-        response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
-        response.setHeader("Content-Description", "dods_ascii");
-
-        System.out.println("Flow in doGetASC()");
-        S4Ascii.sendASCII(request, response, rs);
-        response.setStatus(HttpServletResponse.SC_OK);
-
-    }
-    /***************************************************************************/
-
-
-    /**
-     * ************************************************************************
-     * Default handler for OPeNDAP info requests. Returns an html document
-     * describing the contents of the servers datasets.
-     * <p/>
-     * The bulk of this code resides in the class opendap.servlet.S4Info and
-     * documentation may be found there.
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @see S4Info
-     */
-    public void doGetINFO(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs)
-            throws IOException, ServletException, PPTException, ParseException, DODSException {
-
-        S4Info.sendINFO(request,response, rs);
-        response.setStatus(HttpServletResponse.SC_OK);
-
-
-
-
-    }
-    /**************************************************************************/
-
-
-    /**
-     * ************************************************************************
-     * Default handler for OPeNDAP .html requests. Returns the OPeNDAP Web Interface
-     * (aka The Interface From Hell) to the client.
-     * <p/>
-     * The bulk of this code resides in the class opendap.servlet.S4Html and
-     * documentation may be found there.
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @see S4Html
-     */
-    public void doGetHTML(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs)
-            throws IOException, ServletException {
-
-
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
-        response.setHeader("Content-Description", "dods_form");
-/*
-        try {
-
-
-            //ds = getDataset(rs);
-
-            // Utilize the getDDS() method to get	a parsed and populated DDS
-            // for this server.
-            //ServerDDS myDDS = ds.getDDS();
-            //DAS das = ds.getDAS();
-            //S4Html di = new S4Html();
-            //di.sendDataRequestForm(request, response, rs.getDataset(), myDDS, das);
-            //response.setStatus(HttpServletResponse.SC_OK);
-        } catch (OPeNDAPException de) {
-            Util.dodsExceptionHandler(de, response);
-        } catch (IOException pe) {
-            Util.IOExceptionHandler(pe, response, rs);
-        } catch (ParseException pe) {
-            Util.parseExceptionHandler(pe, response);
-        }
-*/
-
-    }
-    /***************************************************************************/
-
-
-    /**
-     * ************************************************************************
      * Default handler for OPeNDAP catalog.xml requests.
      *
      * @param request  The client's <code> HttpServletRequest</code> request
@@ -815,18 +718,10 @@ public class OLFS extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
-
-    // to be overridden by servers that implement catalogs
-    protected void printCatalog(HttpServletRequest request, PrintWriter os) throws IOException {
-
-
-
-
-
-        os.println("Catalog not available for this server");
-    }
-
     /***************************************************************************/
+
+
+
 
     /**
      * ************************************************************************
@@ -1038,7 +933,7 @@ public class OLFS extends HttpServlet {
      * In this (default) implementation of the getServerName() method we just get
      * the name of the servlet and pass it back. If something different is
      * required, override this method when implementing the getDDS() and
-     * getXDODSServer() methods.
+     * getXDODSServerVersion() methods.
      * <p/>
      * This is typically used by the getINFO() method to figure out if there is
      * information specific to this server residing in the info directory that
@@ -1063,16 +958,16 @@ public class OLFS extends HttpServlet {
      * an error is returned to the client.
      * <p/>
      * This method is the entry point for <code>OLFS</code>. It uses
-     * the methods <code>processDodsURL</code> to extract the OPeNDAP URL
+     * the methods <code>processOpendapURL</code> to extract the OPeNDAP URL
      * information from the incoming client request. This OPeNDAP URL information
      * is cached and made accessible through get and set methods.
      * <p/>
-     * After  <code>processDodsURL</code> is called <code>loadIniFile()</code>
+     * After  <code>processOpendapURL</code> is called <code>loadIniFile()</code>
      * is called to load configuration information from a .ini file,
      * <p/>
      * If the standard behaviour of the servlet (extracting the OPeNDAP URL
      * information from the client request, or loading the .ini file) then
-     * you should overload <code>processDodsURL</code> and <code>loadIniFile()
+     * you should overload <code>processOpendapURL</code> and <code>loadIniFile()
      * </code>. <b> We don't recommend overloading <code>doGet()</code> beacuse
      * the logic contained there may change in our core and cause your server
      * to behave unpredictably when future releases are installed.</b>
@@ -1129,58 +1024,99 @@ public class OLFS extends HttpServlet {
                 String dataSet = rs.getDataset();
                 String requestSuffix = rs.getRequestSuffix();
 
-                if (dataSet == null) {
-                    doGetDIR(request, response, rs);
-                } else if (dataSet.equals("/")) {
-                    doGetDIR(request, response, rs);
-                } else if (dataSet.equals("")) {
-                    doGetDIR(request, response, rs);
-                } else if (dataSet.endsWith("/")) {
-                    doGetDIR(request, response, rs);
-                } else if (requestSuffix.equals("")) {
-                    doGetDIR(request, response, rs);
-                } else if (dataSet.equalsIgnoreCase("/version") || dataSet.equalsIgnoreCase("/version/")) {
+                if ( // Directory response?
+                        dataSet == null          ||
+                        dataSet.equals("/")      ||
+                        dataSet.equals("")       ||
+                        dataSet.endsWith("/")    ||
+                        requestSuffix.equals("")
+                        ) {
+                    S4Dir.sendDIR(request, response, rs);
+
+
+                } else if ( // Version Response?
+                        dataSet.equalsIgnoreCase("/version")      ||
+                        dataSet.equalsIgnoreCase("/version/")     ||
+                        requestSuffix.equalsIgnoreCase("ver")     ||
+                        requestSuffix.equalsIgnoreCase("version")
+                        ) {
                     doGetVER(request, response, rs);
-                } else if (dataSet.equalsIgnoreCase("/help") || dataSet.equalsIgnoreCase("/help/")) {
+
+                } else if ( // Help Response?
+                        dataSet.equalsIgnoreCase("/help")             ||
+                        dataSet.equalsIgnoreCase("/help/")            ||
+                        dataSet.equalsIgnoreCase("/" + requestSuffix) ||
+                        requestSuffix.equalsIgnoreCase("help")
+                        ) {
                     doGetHELP(request, response, rs);
-                } else if (dataSet.equalsIgnoreCase("/" + requestSuffix)) {
-                    doGetHELP(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("dds")) {
+
+                } else if ( // DDS Response?
+                        requestSuffix.equalsIgnoreCase("dds")
+                        ) {
                     doGetDDS(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("das")) {
+
+                } else if ( // DAS Response?
+                        requestSuffix.equalsIgnoreCase("das")
+                        ) {
                     doGetDAS(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("ddx")) {
-                    //doGetDDX(request, response, rs);
-                    badURL(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("blob")) {
+
+                } else if (  // DDX Response?
+                        requestSuffix.equalsIgnoreCase("ddx")
+                        ) {
+                    doGetDDX(request, response, rs);
+
+                } else if ( // Blob Response?
+                        requestSuffix.equalsIgnoreCase("blob")
+                        ) {
                     //doGetBLOB(request, response, rs);
                     badURL(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("dods")) {
+
+                } else if ( // DataDDS (aka .dods) Response?
+                        requestSuffix.equalsIgnoreCase("dods")
+                        ) {
                     doGetDODS(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("asc") ||
-                        requestSuffix.equalsIgnoreCase("ascii")) {
 
-                    doGetASC(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("info")) {
-                    doGetINFO(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("html") || requestSuffix.equalsIgnoreCase("htm")) {
-                    doGetHTML(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("ver") || requestSuffix.equalsIgnoreCase("version")) {
-                    doGetVER(request, response, rs);
-                } else if (requestSuffix.equalsIgnoreCase("help")) {
-                    doGetHELP(request, response, rs);
-                }
+                } else if (  // ASCII Data Response.
+                        requestSuffix.equalsIgnoreCase("asc")    ||
+                        requestSuffix.equalsIgnoreCase("ascii")
+                        ) {
+                    S4Ascii.sendASCII(request, response, rs);
 
-                // JC added
-                //else if (dataSet.equalsIgnoreCase("catalog") && requestSuffix.equalsIgnoreCase("xml")) {
-                else if (dataSet.endsWith("catalog") && requestSuffix.equalsIgnoreCase("xml")) {
+                } else if (  // Info Response?
+                        requestSuffix.equalsIgnoreCase("info")
+                        ) {
+                    S4Info.sendINFO(request, response, rs);
+
+                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
+                        requestSuffix.equalsIgnoreCase("html")    ||
+                        requestSuffix.equalsIgnoreCase("htm")
+                        ){
+                    S4Html.sendDataRequestForm(request, response, rs);
+
+
+                } else if (  // THREDDS Catalog Response?
+                        dataSet.endsWith("catalog") &&
+                        requestSuffix.equalsIgnoreCase("xml")
+                        ) {
                     doGetCatalog(request, response, rs);
-                } else if (dataSet.equalsIgnoreCase("status")) {
+
+
+                } else if (  // Status Response?
+                        dataSet.equalsIgnoreCase("status")
+                        ) {
                     doGetStatus(request, response, rs);
-                } else if (dataSet.equalsIgnoreCase("systemproperties")) {
+
+
+                } else if ( // System Properties Response?
+                        dataSet.equalsIgnoreCase("systemproperties")
+                        ) {
                     doGetSystemProps(request, response, rs);
+
                 } else if (isDebug) {
                     doDebug(request, response, rs);
+
+
+
                 } else if (requestSuffix.equals("")) {
                     badURL(request, response, rs);
                 } else {

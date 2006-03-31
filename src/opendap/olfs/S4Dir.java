@@ -46,7 +46,6 @@ import org.jdom.Element;
  *
  * @author Nathan David Potter
  */
-
 public class S4Dir {
 
 
@@ -67,10 +66,8 @@ public class S4Dir {
                                ReqState rs)
             throws DODSException, PPTException, JDOMException, BESException, IOException {
 
-        if (Debug.isSet("showResponse")) System.out.println("sendDIR request = " + request);
-
-        //String ddxCacheDir = rs.getDDXCache();
-        //String ddsCacheDir = rs.getDDSCache();
+        if (Debug.isSet("showResponse"))
+            System.out.println("sendDIR request = " + request);
 
         String name, collectionName;
         String size;
@@ -230,7 +227,9 @@ public class S4Dir {
         pw.println("Name"+getWhiteSpacePadding("Name",headerSpace)+"Last modified            Size        Response Links");
         pw.println("<hr />");
         //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://test.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
-        pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>"+getWhiteSpacePadding("Parent Directory",headerSpace+26)+"-");
+
+        if(!collectionName.equals("/"))
+            pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>"+getWhiteSpacePadding("Parent Directory",headerSpace+26)+"-");
 
 
     }

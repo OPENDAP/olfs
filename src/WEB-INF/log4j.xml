@@ -67,23 +67,28 @@
 
   <logger name="dods.servers.netcdf">
     <level value="INFO"/>
-    <appender-ref ref="threddsServlet"/>
+    <appender-ref ref="ThreddsStdout"/>
   </logger>
 
   <logger name="thredds">
     <level value="ALL"/>
-    <appender-ref ref="threddsServlet"/>
+    <appender-ref ref="ThreddsStdout"/>
   </logger>
 
   <logger name="threddsAccessLogger">
     <level value="ALL"/>
-    <appender-ref ref="threddsAccess"/>
+    <appender-ref ref="ThreddsStdout"/>
   </logger>
 
-  <logger name="ucar.nc2">
-    <level value="INFO"/>
-    <appender-ref ref="threddsServlet"/>
-  </logger>
+    <logger name="ucar.nc2">
+      <level value="ALL"/>
+      <appender-ref ref="ThreddsStdout"/>
+    </logger>
+
+    <logger name="opendap">
+      <level value="ALL"/>
+      <appender-ref ref="ThreddsStdout"/>
+    </logger>
 
   <!-- Initialize a few loggers to make the servlet debug web interface more convenient. -->
   <logger name="thredds.catalog"/>
@@ -92,7 +97,7 @@
   <logger name="thredds.servlet"/>
 
   <logger name="thredds.dqc.server.DqcServletRedirect">
-    <level value="INFO"/>
+    <level value="ALL"/>
     <appender-ref ref="dqcServletRedirect"/>
   </logger>
 

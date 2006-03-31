@@ -28,6 +28,12 @@ package opendap.olfs;
 import opendap.util.Debug;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
+import opendap.dap.Server.ServerDDS;
+import opendap.dap.DefaultFactory;
+import opendap.dap.DDSException;
+import opendap.dap.BaseTypeFactory;
+import opendap.dap.DDS;
+import opendap.dap.parser.ParseException;
 
 import java.io.OutputStream;
 import java.io.IOException;
@@ -125,6 +131,33 @@ public class BesAPI {
         besGetTransaction(getAPINameForDDS(),dataset, constraintExpression,os);
     }
 
+/*
+
+    public static ServerDDS getDDS(String dataset,
+                              String constraintExpression)
+            throws BadConfigurationException, PPTException, DDSException, ParseException {
+
+        return getDDS(dataset,constraintExpression,new DefaultFactory());
+
+    }
+
+   public static ServerDDS getDDS(String dataset,
+                                  String constraintExpression, BaseTypeFactory btf)
+                throws BadConfigurationException, PPTException, DDSException, ParseException {
+        OPeNDAPClient oc = BesAPI.startClient();
+
+        BesAPI.configureTransaction(oc,dataset, constraintExpression);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDDS(),os);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        ServerDDS myDDS = new ServerDDS(btf);
+        myDDS.parse(is);
+
+        return myDDS;
+    }
+*/
 
     public static void getDAS(String dataset,
                               String constraintExpression,
@@ -198,7 +231,7 @@ public class BesAPI {
         // Check for an exception:
         besExceptionHandler(doc);
 
-        // Tweak it!
+        // Prepare the response:
 
         // First find the response Element
 

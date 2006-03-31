@@ -158,6 +158,9 @@
         description="Performs a clean build of the core software and assembles the WAR file."
         >
         <copy file="${doc.dir}/servlet-index.html" tofile="${build.dist}/index.html"/>
+
+
+
         <war destfile="${build.dist}/opendap.war"
             webxml="${src.dir}/WEB-INF/s4web.xml"
             >
@@ -205,7 +208,70 @@
 
 
         </war>
+
+
+
+        <war destfile="${build.dist}/tt.war"
+            webxml="${src.dir}/WEB-INF/combined-web.xml"
+            >
+
+            <lib dir="${lib.dir}">
+                <include name="${regexp.lib}"/>
+                <include name="${getopt.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${opendap.lib}"/>
+                <include name="${thredds.lib}"/>
+                <include name="${threddsResources.lib}"/>
+                <include name="${nlog4j.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+            </lib>
+            <classes dir="${build.classes}"/>
+
+
+            <fileset dir="${doc.dir}">
+                <exclude name="src.distribution.readme"/>
+                <exclude name="index.html"/>
+            </fileset>
+
+            <fileset file="${build.dist}/index.html"/>
+
+            <zipfileset dir="${schema.dir}" prefix="schema" />
+
+            <zipfileset dir="${build.doc}/server4" prefix="javadocs/server4"/>
+
+            <zipfileset dir="${build.lib}" prefix="s4-libraries"/>
+
+            <zipfileset dir="${lib.dir}" prefix="s4-libraries">
+                <include name="${getopt.lib}"/>
+                <include name="${regexp.lib}"/>
+                <include name="${jdom.lib}"/>
+                <include name="${soap.lib}"/>
+                <include name="${opendap.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+           </zipfileset>
+
+            <webinf dir="${src.dir}/WEB-INF">
+                <include name="log4j.xml"/>
+            </webinf>
+
+
+        </war>
+
+
+
+
+
+
         <delete file="${build.dist}/index.html"/>
+
+
+
+
+
+
+
     </target>
 
 

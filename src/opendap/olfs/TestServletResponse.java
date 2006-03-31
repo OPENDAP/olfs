@@ -444,7 +444,7 @@ public class TestServletResponse extends ThreddsServlet {
      * In this (default) implementation of the getServerName() method we just get
      * the name of the servlet and pass it back. If something different is
      * required, override this method when implementing the getDDS() and
-     * getXDODSServer() methods.
+     * getXDODSServerVersion() methods.
      * <p/>
      * This is typically used by the getINFO() method to figure out if there is
      * information specific to this server residing in the info directory that
@@ -469,16 +469,16 @@ public class TestServletResponse extends ThreddsServlet {
      * an error is returned to the client.
      * <p/>
      * This method is the entry point for <code>OLFS</code>. It uses
-     * the methods <code>processDodsURL</code> to extract the OPeNDAP URL
+     * the methods <code>processOpendapURL</code> to extract the OPeNDAP URL
      * information from the incoming client request. This OPeNDAP URL information
      * is cached and made accessible through get and set methods.
      * <p/>
-     * After  <code>processDodsURL</code> is called <code>loadIniFile()</code>
+     * After  <code>processOpendapURL</code> is called <code>loadIniFile()</code>
      * is called to load configuration information from a .ini file,
      * <p/>
      * If the standard behaviour of the servlet (extracting the OPeNDAP URL
      * information from the client request, or loading the .ini file) then
-     * you should overload <code>processDodsURL</code> and <code>loadIniFile()
+     * you should overload <code>processOpendapURL</code> and <code>loadIniFile()
      * </code>. <b> We don't recommend overloading <code>doGet()</code> beacuse
      * the logic contained there may change in our core and cause your server
      * to behave unpredictably when future releases are installed.</b>

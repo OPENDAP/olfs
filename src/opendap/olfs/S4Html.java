@@ -32,6 +32,8 @@ import opendap.servers.www.*;
 import opendap.dap.*;
 import opendap.dap.parser.ParseException;
 import opendap.dap.Server.ServerDDS;
+import opendap.ppt.OPeNDAPClient;
+import opendap.ppt.PPTException;
 
 /**
  * Default handler for OPeNDAP .html requests. This class is used
@@ -44,8 +46,8 @@ import opendap.dap.Server.ServerDDS;
 
 public class S4Html {
 
-    private static final boolean _Debug = false;
-    private String helpLocation = "http://unidata.ucar.edu/packages/dods/help_files/";
+    //private static final boolean _Debug = false;
+    private static String helpLocation = "http://unidata.ucar.edu/packages/dods/help_files/";
 
 
     /**
@@ -60,17 +62,36 @@ public class S4Html {
      * @param response The <code>HttpServletResponse</code> for the client.
      * @see opendap.servers.www
      */
-    public void sendDataRequestForm(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    String dataSet,
-                                    ServerDDS sdds,
-                                    DAS myDAS) // changed jc
-            throws DODSException, ParseException {
+    public static void sendDataRequestForm(HttpServletRequest request,
+                                           HttpServletResponse response,
+                                           ReqState rs)
+            throws DODSException, ParseException, PPTException {
 
-
-        System.out.println("Sending OPeNDAP Data Request Form For: " + dataSet +
+        System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
                 "    CE: '" + request.getQueryString() + "'");
         String requestURL;
+
+
+        OPeNDAPClient oc = BesAPI.startClient();
+        BesAPI.configureTransaction(oc,rs.getDataset(),null);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDDS(),os);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        ServerDDS wwwDDS = new ServerDDS(new wwwFactory());
+        wwwDDS.parse(is);
+
+        os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDAS(),os);
+
+        BesAPI.shutdownClient(oc);
+
+        is = new ByteArrayInputStream(os.toByteArray());
+        DAS das = new DAS();
+        das.parse(is);
+
+
 
 /*
         // Turn this on later if we discover we're supposed to accept
@@ -94,23 +115,23 @@ public class S4Html {
 
             //PrintWriter pw = new PrintWriter(response.getOutputStream());
             PrintWriter pw;
-            if (false) {
+ /*           if (false) {
                 pw = new PrintWriter(
                         new FileOutputStream(
                                 new File("debug.html")
                         )
                 );
             } else
-                pw = new PrintWriter(response.getOutputStream());
+ */
+            pw = new PrintWriter(response.getOutputStream());
 
 
             wwwOutPut wOut = new wwwOutPut(pw);
 
             // Get the DDS and the DAS (if one exists) for the dataSet.
-            DDS myDDS = getWebFormDDS(dataSet, sdds);
-            //DAS myDAS = dServ.getDAS(dataSet); // change jc
+            // DDS myDDS = getWebFormDDS(rs.getDataset(), wwwDDS);
+            // DAS myDAS = dServ.getDAS(dataSet); // change jc
 
-            jscriptCore jsc = new jscriptCore();
 
             pw.println(
                     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n"
@@ -122,7 +143,7 @@ public class S4Html {
             );
             pw.flush();
 
-            pw.println(jsc.jScriptCode);
+            pw.println(jscriptCore.jScriptCode);
             pw.flush();
 
             pw.println(
@@ -143,10 +164,10 @@ public class S4Html {
             wOut.writeDisposition(requestURL);
             pw.println("<tr><td><td><hr>\n");
 
-            wOut.writeGlobalAttributes(myDAS, myDDS);
+            wOut.writeGlobalAttributes(das, wwwDDS);
             pw.println("<tr><td><td><hr>\n");
 
-            wOut.writeVariableEntries(myDAS, myDDS);
+            wOut.writeVariableEntries(das, wwwDDS);
             pw.println("</table></form>\n");
             pw.println("<hr>\n");
 
@@ -163,7 +184,7 @@ public class S4Html {
             pw.println("<h2>DDS:</h2>");
 
             pw.println("<pre>");
-            myDDS.print(pw);
+            wwwDDS.print(pw);
             pw.println("</pre>");
             pw.println("<hr>");
             pw.flush();
@@ -194,13 +215,11 @@ public class S4Html {
      * @see opendap.dap.DDS
      * @see opendap.servers.www
      * @see opendap.servers.www.wwwFactory
+     * @deprecated
      */
-    public DDS getWebFormDDS(String dataSet, ServerDDS sDDS) // changed jc
+    public static DDS getWebFormDDS_NotNeeded(String dataSet, ServerDDS sDDS) // changed jc
             throws DODSException, ParseException {
 
-        // Get the DDS we need, using the getDDS method
-        // for this particular server
-        // ServerDDS sDDS = dServ.getDDS(dataSet);
 
         // Make a new DDS using the web form (www interface) class factory
         wwwFactory wfactory = new wwwFactory();

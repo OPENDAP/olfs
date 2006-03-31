@@ -49,7 +49,6 @@ import opendap.ppt.PPTException;
 
 public class S4Ascii {
 
-    private static final boolean _Debug = true;
 
 
     /**
@@ -63,13 +62,17 @@ public class S4Ascii {
                                  HttpServletResponse response,
                                  ReqState rs) throws PPTException, DODSException, DDSException, ParseException, IOException {
 
+
+        if (Debug.isSet("showResponse"))
+            System.out.println(" Flow in sendASCII()");
+
+
         if (Debug.isSet("showResponse"))
             System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
                     "    CE: '" + request.getQueryString() + "'");
 
 
         String requestURL, ce;
-        DConnect url;
         DataDDS dds;
 
         if (request.getQueryString() == null) {
@@ -114,7 +117,6 @@ public class S4Ascii {
         pw.println("---------------------------------------------");
 
 
-        String s = "";
         Enumeration e = dds.getVariables();
 
         while (e.hasMoreElements()) {
@@ -130,6 +132,8 @@ public class S4Ascii {
 
 
         if (Debug.isSet("asciiResponse")) System.out.println(" dodsASCII done");
+
+
     }
     /***************************************************************************/
 
@@ -187,8 +191,6 @@ public class S4Ascii {
             dds.print(pw);
             pw.println("---------------------------------------------");
 
-
-            String s = "";
             Enumeration e = dds.getVariables();
 
             while (e.hasMoreElements()) {
