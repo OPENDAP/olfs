@@ -90,9 +90,9 @@ public class DispatchServlet extends HttpServlet {
             Class classDefinition = Class.forName(className);
             odh = (OpendapHttpDispatchHandler) classDefinition.newInstance();
         } catch (InstantiationException e) {
-            throw new ServletException(e);
+            throw new ServletException("Cannot instantiate class: " + className,e);
         } catch (IllegalAccessException e) {
-            throw new ServletException(e);
+            throw new ServletException("Cannot access class: " + className,e);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Cannot find class: " + className, e);
         }
