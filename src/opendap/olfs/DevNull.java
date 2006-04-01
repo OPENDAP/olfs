@@ -35,7 +35,13 @@ import java.io.OutputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class DevNull extends OutputStream {
-    public void write(int i){
+    public void write(int i) {
+
+    }
+    public void write(String s) {
+
+    }
+    public void write(byte s) {
 
     }
 }

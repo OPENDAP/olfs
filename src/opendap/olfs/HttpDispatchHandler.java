@@ -25,10 +25,13 @@
 package opendap.olfs;
 
 import opendap.dap.DODSException;
+import opendap.dap.DAS;
+import opendap.dap.DefaultFactory;
+import opendap.dap.Server.ServerDDS;
 import opendap.ppt.PPTException;
+import opendap.ppt.OPeNDAPClient;
 import opendap.util.Debug;
-import opendap.coreServlet.OpendapDispatchHandler;
-import opendap.coreServlet.DispatchServlet;
+import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +56,7 @@ import thredds.cataloggen.SimpleCatalogBuilder;
  * Time: 12:42:23 PM
  * To change this template use File | Settings | File Templates.
  */
-public class S4DispatchHandler implements OpendapDispatchHandler {
+public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     /**
@@ -64,6 +67,11 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      */
     private Document _serverVersionDocument = null;
 
+
+    public HttpDispatchHandler() {
+        super();
+    }
+
     /**
      * ************************************************************************
      * Intitializes the servlet. Init (at this time) basically sets up
@@ -71,13 +79,7 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      */
-
-
     public void init(DispatchServlet ds) throws ServletException {
-
-
-
-
 
         // debuggering
         String debugOn = ds.getInitParameter("DebugOn");
@@ -93,7 +95,7 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
             cacheServerVersionDocument();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ServletException("Could not get version document from BES.",e);
+            throw new ServletException("Could not get version document from BES.", e);
         }
 
     }
@@ -110,7 +112,7 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
         System.out.print("Configuring BES ... ");
 
-        if(BesAPI.configure(besHost, Integer.parseInt(besPort)))
+        if (BesAPI.configure(besHost, Integer.parseInt(besPort)))
             System.out.println("");
         else
             System.out.println("That's odd, it was already done...");
@@ -118,9 +120,7 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
     }
 
 
-
     /**
-     *
      * Caches the OLFS version Document object. Calling this method ccauses the OLFS to query
      * the BES to determine the various version components located there.
      */
@@ -131,10 +131,8 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
         System.out.println("Getting Server Version Document.");
 
-
         //UID reqid = new UID();
         //System.out.println("    RequestID: "+reqid);
-
 
         // Get the Version info from the BES.
         Document doc = BesAPI.showVersion();
@@ -148,27 +146,24 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
     }
 
-    private Document getVersionDocument(){
+    private Document getVersionDocument() {
         return _serverVersionDocument;
     }
 
 
-
-
     /**
-     *
      * @return A string containing the value of the XDODS-Server MIME header as ascertained
-     * by querying the BES.
+     *         by querying the BES.
      */
-    public String getXDODSServerVersion(){
+    public String getXDODSServerVersion() {
 
-        if(getVersionDocument() != null) {
+        if (getVersionDocument() != null) {
             Iterator i = getVersionDocument().getRootElement().getChild("BES").getChildren("lib").iterator();
 
-            while(i.hasNext()){
+            while (i.hasNext()) {
                 Element e = (Element) i.next();
-                if(e.getChildTextTrim("name").equalsIgnoreCase("libdap")){
-                    return("dods/"+e.getChildTextTrim("version"));
+                if (e.getChildTextTrim("name").equalsIgnoreCase("libdap")) {
+                    return ("dods/" + e.getChildTextTrim("version"));
                 }
             }
         }
@@ -178,26 +173,25 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
     }
 
     /**
-     *
      * @return A String containing the value of the XOPeNDAP-Server MIME header ascertained by querying
-     * the BES and conforming to the DAP4 specification.
+     *         the BES and conforming to the DAP4 specification.
      */
-    public String getXOPeNDAPServerVersion(){
-        if(getVersionDocument() != null) {
+    public String getXOPeNDAPServerVersion() {
+        if (getVersionDocument() != null) {
 
             String opsrv = "";
 
             Iterator i = getVersionDocument().getRootElement().getChildren().iterator();
 
-            while(i.hasNext()){
+            while (i.hasNext()) {
                 Element pkg = (Element) i.next();
                 Iterator j = pkg.getChildren("lib").iterator();
-                while(j.hasNext()){
+                while (j.hasNext()) {
                     Element lib = (Element) j.next();
-                    opsrv += " "+lib.getChildTextTrim("name")+"/"+lib.getChildTextTrim("version");
+                    opsrv += " " + lib.getChildTextTrim("name") + "/" + lib.getChildTextTrim("version");
                 }
             }
-            return(opsrv);
+            return (opsrv);
         }
         return ("Server-Version-Unknown");
 
@@ -205,47 +199,45 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
 
     /**
-     *
      * @return A String containing the XDAP MIME header value that describes the DAP specifcation that
-     * the server response conforms to.
+     *         the server response conforms to.
      */
-    public String getXDAPVersion(HttpServletRequest request){
+    public String getXDAPVersion(HttpServletRequest request) {
         double hval = 0.0;
         String hver = "";
 
         String clientDapVer = null;
 
-        if(request != null)
+        if (request != null)
             clientDapVer = request.getHeader("XDAP");
 
-        if(getVersionDocument() != null) {
+        if (getVersionDocument() != null) {
 
             String responseDAP = null;
 
             Iterator i = getVersionDocument().getRootElement().getChild("DAP").getChildren("version").iterator();
 
-            while(i.hasNext()){
+            while (i.hasNext()) {
                 Element v = (Element) i.next();
-                String ver  = v.getTextTrim();
+                String ver = v.getTextTrim();
                 double vval = Double.parseDouble(ver);
-                if(hval < vval){
+                if (hval < vval) {
                     hval = vval;
                     hver = ver;
                 }
 
-                if(clientDapVer != null && clientDapVer.equals(ver))
+                if (clientDapVer != null && clientDapVer.equals(ver))
                     responseDAP = ver;
             }
-            if(responseDAP == null)
-                return(hver);
-            return(responseDAP);
+            if (responseDAP == null)
+                return (hver);
+            return (responseDAP);
         }
 
         return ("DAP-Version-Unknown");
 
 
     }
-
 
 
     /**
@@ -265,8 +257,8 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      * @see ReqState
      */
     public void sendDAS(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
+                        HttpServletResponse response,
+                        ReqState rs)
             throws IOException, ServletException {
 
         if (Debug.isSet("showResponse"))
@@ -285,10 +277,10 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
             BesAPI.getDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } catch (PPTException e) {
             DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } finally {
             Out.flush();
         }
@@ -314,8 +306,8 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      * @see ReqState
      */
     public void sendDDS(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
+                        HttpServletResponse response,
+                        ReqState rs)
             throws IOException, ServletException {
 
         System.out.println("Flow in doGetDDS()");
@@ -337,10 +329,10 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
             BesAPI.getDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } catch (PPTException e) {
             DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } finally {
             Out.flush();
         }
@@ -351,7 +343,6 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
     }
     /***************************************************************************/
-
 
 
     /**
@@ -370,8 +361,8 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      * @see ReqState
      */
     public void sendDDX(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
+                        HttpServletResponse response,
+                        ReqState rs)
             throws IOException, ServletException {
 
         System.out.println("Flow in doGetDDX()");
@@ -393,10 +384,10 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
             BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } catch (PPTException e) {
             DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } finally {
             Out.flush();
         }
@@ -407,7 +398,6 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
     }
     /***************************************************************************/
-
 
 
     /**
@@ -428,8 +418,8 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      * @see ReqState
      */
     public void sendDODS(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs)
+                         HttpServletResponse response,
+                         ReqState rs)
             throws IOException, ServletException {
 
 
@@ -461,10 +451,10 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
             BesAPI.getDODS(rs.getDataset(), rs.getConstraintExpression(), bOut);
 
         } catch (DODSException de) {
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } catch (PPTException e) {
             DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.dodsExceptionHandler(de, response);
+            Util.opendapExceptionHandler(de, response);
         } finally {
             bOut.flush();
         }
@@ -488,8 +478,8 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      *                 object.
      */
     public void sendVersion(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
+                            HttpServletResponse response,
+                            ReqState rs)
             throws IOException, ServletException, DODSException {
 
         if (Debug.isSet("showResponse"))
@@ -506,21 +496,21 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         PrintStream ps = new PrintStream(response.getOutputStream());
 
         Document vdoc = rs.getVersionDocument();
-        if(vdoc == null){
+        if (vdoc == null) {
             throw new DODSException("Internal Error: Version Document not initialized.");
         }
         //XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         XMLOutputter xout = new XMLOutputter();
-        xout.output(rs.getVersionDocument(),ps);
+        xout.output(rs.getVersionDocument(), ps);
         ps.flush();
 
-        if (Debug.isSet("showResponse")){
-            xout.output(rs.getVersionDocument(),System.out);
+        if (Debug.isSet("showResponse")) {
+            xout.output(rs.getVersionDocument(), System.out);
             System.out.println("Document Sent.");
             System.out.println("\nMIME Headers:");
-            System.out.println("    XDODS-Server: "+rs.getXDODSServer());
-            System.out.println("    XOPeNDAP-Server: "+rs.getXOPeNDAPServer());
-            System.out.println("    XDAP: "+rs.getXDAP(request));
+            System.out.println("    XDODS-Server: " + rs.getXDODSServer());
+            System.out.println("    XOPeNDAP-Server: " + rs.getXOPeNDAPServer());
+            System.out.println("    XDAP: " + rs.getXDAP(request));
             System.out.println("\nEnd Response.");
         }
 
@@ -539,11 +529,10 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see S4Html
      */
     public void sendCatalog(HttpServletRequest request,
-                             HttpServletResponse response,
-                             ReqState rs)
+                            HttpServletResponse response,
+                            ReqState rs)
             throws IOException, ServletException, DODSException, PPTException, JDOMException, BESException {
 
 
@@ -555,14 +544,9 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
-
-
-
 //        System.out.println("rootPath:    "+rootPath);
 //        System.out.println("contentPath: "+contentPath);
 //        System.out.println("myPath:      "+"/"+rs.getDataset());
-
-
 
 /*
         if(catHandler.processReqForCatalog(this,request,response, contentPath)){
@@ -574,7 +558,7 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
 
         if (Debug.isSet("showResponse")){
-            System.out.println("doGetCatalog() - Instantiating S4CrawlableDataset object (a CrawlableDataset)");
+            System.out.println("doGetCatalog() - Instantiating BESCrawlableDataset object (a CrawlableDataset)");
         }
 
 */
@@ -584,25 +568,25 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         String path = rs.getDataset();
         path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
 
-        path = S4CrawlableDataset.besPath2ThreddsPath(path);
+        path = BESCrawlableDataset.besPath2ThreddsPath(path);
 
-        S4CrawlableDataset s4cd = new S4CrawlableDataset(path,null);
+        BESCrawlableDataset s4cd = new BESCrawlableDataset(path, null);
 
-        if(s4cd.isCollection()){
+        if (s4cd.isCollection()) {
 
-            if (Debug.isSet("showResponse")){
+            if (Debug.isSet("showResponse")) {
                 System.out.println("doGetCatalog() - Instantiating SimpleCatalogBuilder");
             }
 
 
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                        "",                                  // CollectionID, which for us needs to be empty.
-                        S4CrawlableDataset.getRootDataset(), // Root dataset of this collection
-                        "OPeNDAP-Server4",                   // Service Name
-                        "OPeNDAP",                           // Service Type Name
-                        request.getRequestURI().substring(0,request.getRequestURI().indexOf(request.getPathInfo())+1)); // Base URL for this service
+                    "",                                  // CollectionID, which for us needs to be empty.
+                    BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
+                    "OPeNDAP-Server4",                   // Service Name
+                    "OPeNDAP",                           // Service Type Name
+                    request.getRequestURI().substring(0, request.getRequestURI().indexOf(request.getPathInfo()) + 1)); // Base URL for this service
 
-            if (Debug.isSet("showResponse")){
+            if (Debug.isSet("showResponse")) {
                 System.out.println("doGetCatalog() - Generating catalog");
             }
 
@@ -610,8 +594,7 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
             pw.print(scb.generateCatalogAsString(s4cd));
 
 
-        }
-        else {
+        } else {
             response.setContentType("text/html");
             String msg = "ERROR: THREDDS catalogs may only be requested for collections, not for individual data sets.";
             throw new DODSException(msg);
@@ -622,8 +605,10 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
-    /***************************************************************************/
 
+    /**
+     * ***********************************************************************
+     */
 
 
     public void sendDir(HttpServletRequest request,
@@ -638,11 +623,18 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_directory");
 
-        S4Dir.sendDIR(request,response,rs);
+        S4Dir.sendDIR(request, response, rs);
 
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
+
+    /**
+     * @param request
+     * @param response
+     * @param rs
+     * @throws Exception
+     */
     public void sendHTMLRequestForm(HttpServletRequest request,
                                     HttpServletResponse response,
                                     ReqState rs)
@@ -655,15 +647,58 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_form");
 
-        S4Html.sendDataRequestForm(request,response,rs);
+        System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
+                "    CE: '" + request.getQueryString() + "'");
+
+
+        OPeNDAPClient oc = BesAPI.startClient();
+        BesAPI.configureTransaction(oc, rs.getDataset(), null);
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDDS(), os);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        ServerDDS dds = new ServerDDS(new DefaultFactory());
+        dds.parse(is);
+
+        os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDAS(), os);
+
+        BesAPI.shutdownClient(oc);
+
+        is = new ByteArrayInputStream(os.toByteArray());
+        DAS das = new DAS();
+        das.parse(is);
+
+/*
+        // Turn this on later if we discover we're supposed to accept
+        // constraint expressions as input to the Data Request Web Form
+        String ce;
+        if(request.getQueryString() == null){
+            ce = "";
+            }
+        else {
+            ce = "?" + request.getQueryString();
+            }
+*/
+
+
+
+        PrintWriter pw = new PrintWriter(response.getOutputStream());
+
+        DefaultResponse.sendHtmlResponse(pw, rs, dds, das);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
 
 
-
-
+    /**
+     * @param request
+     * @param response
+     * @param rs
+     * @throws Exception
+     */
     public void sendInfo(HttpServletRequest request,
                          HttpServletResponse response,
                          ReqState rs)
@@ -676,7 +711,35 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_description");
 
-        S4Info.sendINFO(request,response,rs);
+        if (Debug.isSet("showResponse"))
+            System.out.println("doGetINFO For: " + rs.getDataset());
+
+
+        ServerDDS myDDS;
+        DAS myDAS;
+
+
+        OPeNDAPClient oc = BesAPI.startClient();
+        BesAPI.configureTransaction(oc, rs.getDataset(), rs.getConstraintExpression());
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDDS(), os);
+
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+        myDDS = new ServerDDS(new DefaultFactory());
+        myDDS.parse(is);
+
+        os = new ByteArrayOutputStream();
+        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDAS(), os);
+        BesAPI.shutdownClient(oc);
+
+        is = new ByteArrayInputStream(os.toByteArray());
+        myDAS = new DAS();
+        myDAS.parse(is);
+
+        PrintStream pw = new PrintStream(response.getOutputStream());
+
+        DefaultResponse.sendInfoResponse(pw, rs, myDDS, myDAS);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -696,13 +759,40 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_ascii");
 
-        S4Ascii.sendASCII(request,response,rs);
+        if (Debug.isSet("showResponse"))
+            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
+                    "    CE: '" + request.getQueryString() + "'");
+
+
+        String requestURL, ce;
+
+        if (request.getQueryString() == null) {
+            ce = "";
+        } else {
+            ce = "?" + request.getQueryString();
+        }
+
+
+        requestURL = rs.getRequestURL();
+
+        if (Debug.isSet("showResponse")) {
+            System.out.println("New Request URL Resource: '" + requestURL + "'");
+            System.out.println("New Request Constraint Expression: '" + ce + "'");
+        }
+
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.getDODS(rs.getDataset(), rs.getConstraintExpression(), os);
+        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+
+        PrintWriter pw = new PrintWriter(response.getOutputStream());
+
+
+        DefaultResponse.sendAsciiResponse(pw, rs, is);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
-
-
 
 
     public void sendHelpPage(HttpServletRequest request, HttpServletResponse response, ReqState rs) throws Exception {
@@ -726,7 +816,6 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
-
 
 
     /**
@@ -774,7 +863,6 @@ public class S4DispatchHandler implements OpendapDispatchHandler {
 
     }
     //**************************************************************************
-
 
 
 }

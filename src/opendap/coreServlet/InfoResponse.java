@@ -23,8 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-
-package opendap.olfs;
+package opendap.coreServlet;
 
 import java.io.*;
 import java.util.*;
@@ -34,10 +33,7 @@ import opendap.util.*;
 import opendap.dap.Server.*;
 import opendap.dap.parser.ParseException;
 import opendap.ppt.PPTException;
-import opendap.ppt.OPeNDAPClient;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Default handler for DODS info requests. This class is used
@@ -48,12 +44,12 @@ import javax.servlet.http.HttpServletResponse;
  * @author Nathan David Potter
  */
 
-public class S4Info {
+class InfoResponse {
 
     /**
-     * ************************************************************************
-     * Default handler for DODS info requests. Returns an html document
-     * describing the contents of the servers datasets.
+     * *****************************************************************************
+     * Default implmentation of the OPeNDAP .info reponse. Writes an html document
+     * describing the contents of the servers datasets to passed PrintStream.
      * <p/>
      * The "info_cache_dir" directory specified in the [Server] section
      * of the DODSiniFile is the designated location for:
@@ -86,14 +82,17 @@ public class S4Info {
      * <p/>
      * <h3>Look for the user supplied Server- and dataset-specific HTML* documents.</h3>
      *
-     * @param rs  The ReqState object for theis client request.
-     * @see GuardedDataset
+     * @param pw  Writes the .info document to this PrintStream.
+     * @param rs  The ReqState object for this client request. Used to determine the
+     *            location of the INFO directory adn anclillary .info documents.
+     * @param dds The DDS to build the response from.
+     * @param das The DAS to build the response from.
+     * @throws DODSException
      * @see ReqState
      */
-    public static void sendINFO(HttpServletRequest request,
-                                HttpServletResponse response,
-                                ReqState rs)
-            throws DODSException, ParseException, PPTException, IOException {
+    static void sendINFO(PrintStream pw,
+                         ReqState rs, ServerDDS dds, DAS das)
+            throws DODSException {
 
 
         if (Debug.isSet("showResponse"))
@@ -101,33 +100,10 @@ public class S4Info {
 
 
         String responseDoc;
-        ServerDDS myDDS;
-        DAS myDAS;
-
-
-        OPeNDAPClient oc = BesAPI.startClient();
-        BesAPI.configureTransaction(oc,rs.getDataset(), rs.getConstraintExpression());
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDDS(),os);
-
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        myDDS = new ServerDDS(new DefaultFactory());
-        myDDS.parse(is);
-
-        os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDAS(),os);
-        BesAPI.shutdownClient(oc);
-
-        is = new ByteArrayInputStream(os.toByteArray());
-        myDAS = new DAS();
-        myDAS.parse(is);
 
         String infoDir = rs.getINFOCache();
 
         responseDoc = loadOverrideDoc(infoDir, rs.getDataset());
-
-        PrintStream pw = new PrintStream(response.getOutputStream());
 
 
         if (responseDoc != null) {
@@ -138,9 +114,9 @@ public class S4Info {
 
             String user_html = get_user_supplied_docs(infoDir, rs.getServerClassName(), rs.getDataset());
 
-            String global_attrs = buildGlobalAttributes(myDAS, myDDS);
+            String global_attrs = buildGlobalAttributes(das, dds);
 
-            String variable_sum = buildVariableSummaries(myDAS, myDDS);
+            String variable_sum = buildVariableSummaries(das, dds);
 
             // Send the document back to the client.
             pw.println("<html><head><title>Dataset Information</title>");
@@ -149,7 +125,7 @@ public class S4Info {
             pw.println("</style>");
             pw.println("</head>");
             pw.println("<body>");
-            pw.println("<h1><center>"+rs.getDataset()+"</center></h1>");
+            pw.println("<h1><center>" + rs.getDataset() + "</center></h1>");
 
             if (global_attrs.length() > 0) {
                 pw.println(global_attrs);
@@ -226,20 +202,20 @@ public class S4Info {
 
         //Try to open and read the Dataset specific information file.
         try {
-                File fin = new File(infoDir + dataSet + ".html");
-                BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
+            File fin = new File(infoDir + dataSet + ".html");
+            BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
 
-                boolean done = false;
+            boolean done = false;
 
-                while (!done) {
-                    String line = svIn.readLine();
-                    if (line == null) {
-                        done = true;
-                    } else {
-                        userDoc += line + "\n";
-                    }
+            while (!done) {
+                String line = svIn.readLine();
+                if (line == null) {
+                    done = true;
+                } else {
+                    userDoc += line + "\n";
                 }
-                svIn.close();
+            }
+            svIn.close();
 
         } catch (FileNotFoundException fnfe) {
             userDoc += "<h2>No Dataset Specific Information Available.</h2><hr>";
@@ -251,22 +227,22 @@ public class S4Info {
 
         //Try to open and read the server specific information file.
         try {
-                String serverFile = infoDir + serverName + ".html";
-                if (Debug.isSet("showResponse")) System.out.println("Server Info File: " + serverFile);
-                File fin = new File(serverFile);
-                BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
+            String serverFile = infoDir + serverName + ".html";
+            if (Debug.isSet("showResponse")) System.out.println("Server Info File: " + serverFile);
+            File fin = new File(serverFile);
+            BufferedReader svIn = new BufferedReader(new InputStreamReader(new FileInputStream(fin)));
 
-                boolean done = false;
+            boolean done = false;
 
-                while (!done) {
-                    String line = svIn.readLine();
-                    if (line == null) {
-                        done = true;
-                    } else {
-                        userDoc += line + "\n";
-                    }
+            while (!done) {
+                String line = svIn.readLine();
+                if (line == null) {
+                    done = true;
+                } else {
+                    userDoc += line + "\n";
                 }
-                svIn.close();
+            }
+            svIn.close();
 
         } catch (FileNotFoundException fnfe) {
             userDoc += "<h2>No Server Specific Information Available.</h2><hr>";

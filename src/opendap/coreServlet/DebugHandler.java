@@ -24,7 +24,6 @@
 
 package opendap.coreServlet;
 
-import opendap.olfs.ReqState;
 import opendap.olfs.Util;
 import opendap.util.Log;
 import opendap.util.Debug;
@@ -47,7 +46,6 @@ import java.util.Iterator;
 public class DebugHandler {
 
 
-
     /**
      * ************************************************************************
      * Default handler for debug requests;
@@ -56,8 +54,8 @@ public class DebugHandler {
      * @param response The server's <code> HttpServletResponse</code> response object.
      */
     public static void doDebug(HttpServlet servlet, HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs) throws IOException {
+                               HttpServletResponse response,
+                               ReqState rs) throws IOException {
 
 
         response.setContentType("text/html");
@@ -104,10 +102,8 @@ public class DebugHandler {
             } else if (cmd.equals("showInitParameters")) {
                 pw.println(rs.toString());
             } else if (cmd.equals("showRequest")) {
-                Util.probeRequest(pw, request, servlet.getServletContext(), servlet.getServletConfig());
-            }
-
-            else if (!doDebugCmd(cmd, tz, pw)) { // for subclasses
+                ServletUtil.probeRequest(pw, request, servlet.getServletContext(), servlet.getServletConfig());
+            } else if (!doDebugCmd(cmd, tz, pw)) { // for subclasses
                 pw.println("  unrecognized command");
             }
         }

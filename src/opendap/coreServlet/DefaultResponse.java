@@ -22,21 +22,56 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.olfs;
+package opendap.coreServlet;
+
+import opendap.dap.DODSException;
+import opendap.dap.DAS;
+import opendap.dap.Server.ServerDDS;
+import opendap.dap.parser.ParseException;
+import opendap.ppt.PPTException;
+
+import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
- * Date: Feb 2, 2006
- * Time: 2:48:52 PM
+ * Date: Mar 31, 2006
+ * Time: 3:02:40 PM
  * To change this template use File | Settings | File Templates.
  */
-public class BESException extends Exception {
-    BESException(String msg) {
-        super(msg);
+public class DefaultResponse {
+
+
+    public static void sendAsciiResponse(PrintWriter pw,
+                                         ReqState rs,
+                                         InputStream is)
+            throws DODSException, ParseException, IOException {
+
+        AsciiResponse.sendASCII(pw, rs, is);
+
     }
 
-    BESException(String msg, Exception e) {
-        super(msg, e);
+    public static void sendHtmlResponse(PrintWriter pw,
+                                        ReqState rs,
+                                        ServerDDS dds,
+                                        DAS das)
+            throws DODSException, ParseException {
+
+
+        HtmlResponse.sendDataRequestForm(pw, rs, dds, das);
+
+
     }
+
+    public static void sendInfoResponse(PrintStream pw,
+                                        ReqState rs, ServerDDS dds, DAS das)
+            throws DODSException {
+
+        InfoResponse.sendINFO(pw, rs, dds, das);
+
+    }
+
 }

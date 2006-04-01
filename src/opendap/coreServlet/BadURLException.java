@@ -22,21 +22,24 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.olfs;
+
+package opendap.coreServlet;
+
+import opendap.dap.DODSException;
 
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
- * Date: Feb 2, 2006
- * Time: 2:48:52 PM
- * To change this template use File | Settings | File Templates.
+ * Date: Aug 25, 2003
+ * Time: 11:13:10 AM
+ * To change this template use Options | File Templates.
  */
-public class BESException extends Exception {
-    BESException(String msg) {
+public class BadURLException extends DODSException {
+    public BadURLException(String msg) {
         super(msg);
     }
 
-    BESException(String msg, Exception e) {
-        super(msg, e);
+    public BadURLException() {
+        super("");
     }
 }

@@ -24,7 +24,6 @@
 
 package opendap.coreServlet;
 
-import opendap.olfs.*;
 import opendap.util.Debug;
 import opendap.util.Log;
 import opendap.dap.DODSException;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.BufferedOutputStream;
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -67,10 +65,7 @@ public class DispatchServlet extends HttpServlet {
     private int HitCounter = 0;
 
 
-
-
-    private OpendapDispatchHandler odh = null;
-
+    private OpendapHttpDispatchHandler odh = null;
 
 
     /**
@@ -84,13 +79,24 @@ public class DispatchServlet extends HttpServlet {
 
     public void init() throws ServletException {
 
-
-
-
         super.init();
 
 
-        odh = new S4DispatchHandler();
+        String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
+
+        System.out.println("\n\nOpendapHttpDispatchHandlerImplementation: " + className);
+
+        try {
+            Class classDefinition = Class.forName(className);
+            odh = (OpendapHttpDispatchHandler) classDefinition.newInstance();
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (IllegalAccessException e) {
+            throw new ServletException(e);
+        } catch (ClassNotFoundException e) {
+            throw new ServletException("Cannot find class: " + className, e);
+        }
+
 
         odh.init(this);
 
@@ -99,33 +105,27 @@ public class DispatchServlet extends HttpServlet {
     /***************************************************************************/
 
 
-
-
-
-
-
-
     /**
-        * ************************************************************************
-        * <p/>
-        * In this (default) implementation of the getServerName() method we just get
-        * the name of the servlet and pass it back. If something different is
-        * required, override this method when implementing the getDDS() and
-        * getXDODSServerVersion() methods.
-        * <p/>
-        * This is typically used by the getINFO() method to figure out if there is
-        * information specific to this server residing in the info directory that
-        * needs to be returned to the client as part of the .info response.
-        *
-        * @return A string containing the name of the servlet class that is running.
-        */
-       public String getServerName() {
+     * ************************************************************************
+     * <p/>
+     * In this (default) implementation of the getServerName() method we just get
+     * the name of the servlet and pass it back. If something different is
+     * required, override this method when implementing the getDDS() and
+     * getXDODSServerVersion() methods.
+     * <p/>
+     * This is typically used by the getINFO() method to figure out if there is
+     * information specific to this server residing in the info directory that
+     * needs to be returned to the client as part of the .info response.
+     *
+     * @return A string containing the name of the servlet class that is running.
+     */
+    public String getServerName() {
 
-           // Ascertain the name of this server.
-           String servletName = this.getClass().getName();
+        // Ascertain the name of this server.
+        String servletName = this.getClass().getName();
 
-           return (servletName);
-       }
+        return (servletName);
+    }
 
 
     /**
@@ -167,7 +167,7 @@ public class DispatchServlet extends HttpServlet {
 
         try {
             if (Debug.isSet("probeRequest"))
-                Util.probeRequest(System.out, request, getServletContext(), getServletConfig());
+                ServletUtil.probeRequest(System.out, request, getServletContext(), getServletConfig());
 
             rs = getRequestState(request);
             if (rs != null) {
@@ -198,25 +198,25 @@ public class DispatchServlet extends HttpServlet {
 
                 if ( // Directory response?
                         dataSet == null ||
-                                dataSet.equals("/")      ||
-                                dataSet.equals("")       ||
-                                dataSet.endsWith("/")    ||
+                                dataSet.equals("/") ||
+                                dataSet.equals("") ||
+                                dataSet.endsWith("/") ||
                                 requestSuffix.equals("")
                         ) {
                     odh.sendDir(request, response, rs);
 
 
                 } else if ( // Version Response?
-                        dataSet.equalsIgnoreCase("/version")              ||
-                                dataSet.equalsIgnoreCase("/version/")     ||
-                                requestSuffix.equalsIgnoreCase("ver")     ||
+                        dataSet.equalsIgnoreCase("/version") ||
+                                dataSet.equalsIgnoreCase("/version/") ||
+                                requestSuffix.equalsIgnoreCase("ver") ||
                                 requestSuffix.equalsIgnoreCase("version")
                         ) {
                     odh.sendVersion(request, response, rs);
 
                 } else if ( // Help Response?
-                        dataSet.equalsIgnoreCase("/help")                     ||
-                                dataSet.equalsIgnoreCase("/help/")            ||
+                        dataSet.equalsIgnoreCase("/help") ||
+                                dataSet.equalsIgnoreCase("/help/") ||
                                 dataSet.equalsIgnoreCase("/" + requestSuffix) ||
                                 requestSuffix.equalsIgnoreCase("help")
                         ) {
@@ -281,7 +281,7 @@ public class DispatchServlet extends HttpServlet {
                 } else if ( // System Properties Response?
                         dataSet.equalsIgnoreCase("systemproperties")
                         ) {
-                    Util.doGetSystemProps(request, response, rs);
+                    ServletUtil.sendSystemProperties(request, response, rs);
 
                 } else if (isDebug) {
                     DebugHandler.doDebug(this, request, response, rs);
@@ -297,7 +297,7 @@ public class DispatchServlet extends HttpServlet {
             }
 
         } catch (Throwable e) {
-            Util.anyExceptionHandler(e, response, rs);
+            anyExceptionHandler(e, response, rs);
         }
 
     }
@@ -326,7 +326,6 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see S4Html
      */
     public void doGetStatus(HttpServletRequest request,
                             HttpServletResponse response,
@@ -357,8 +356,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
     /***************************************************************************/
-
-
 
 
     /**
@@ -407,11 +404,6 @@ public class DispatchServlet extends HttpServlet {
     /***************************************************************************/
 
 
-
-
-
-
-
     /**
      * ************************************************************************
      * Sends an error to the client.
@@ -453,11 +445,6 @@ public class DispatchServlet extends HttpServlet {
 
     }
     /***************************************************************************/
-
-
-
-
-
 
 
 }

@@ -28,6 +28,7 @@ package opendap.olfs;
 import opendap.dap.DODSException;
 import opendap.ppt.PPTException;
 import opendap.util.Debug;
+import opendap.coreServlet.ReqState;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +50,6 @@ import org.jdom.Element;
 public class S4Dir {
 
 
-
     /**
      * ************************************************************************
      * Default handler for OPeNDAP directory requests. Returns an html document
@@ -59,7 +59,7 @@ public class S4Dir {
      * @param request  The <code>HttpServletRequest</code> from the client.
      * @param response The <code>HttpServletResponse</code> for the client.
      * @param rs       The request state object for this client request.
-     * @see ReqState
+     * @see opendap.coreServlet.ReqState
      */
     public static void sendDIR(HttpServletRequest request,
                                HttpServletResponse response,
@@ -81,40 +81,31 @@ public class S4Dir {
 
         String requestURL = rs.getRequestURL();
 
-
         // clean up the url
-        if(requestURL.endsWith("/"))
-            requestURL = requestURL.substring(0,requestURL.length()-1);
+        if (requestURL.endsWith("/"))
+            requestURL = requestURL.substring(0, requestURL.length() - 1);
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
-
         // Make shure the dataset name is not null
-        if(rs.getDataset() == null)
+        if (rs.getDataset() == null)
             name = "/";
         else
             name = rs.getDataset();
 
-
         // Get the catalog for this collection
         Element dataset = BesAPI.showCatalog(name).getRootElement();
 
-
-
-
         // Compute White Space required for correct formating
-        int headerSpace=0;
+        int headerSpace = 0;
         it = dataset.getChildren("dataset").iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             childDataset = (Element) it.next();
             name = childDataset.getChildTextTrim("name");
-            if(headerSpace < name.length())
+            if (headerSpace < name.length())
                 headerSpace = name.length();
         }
         headerSpace += 10;
-
-
-
 
         // get the name of the collection
         name = dataset.getChildTextTrim("name");
@@ -123,18 +114,16 @@ public class S4Dir {
 //        if (name.endsWith("/"))
 //            collectionName = name.substring(0, name.length() - 1);
 //        else
-            collectionName = name;
+        collectionName = name;
 
         String baseName;
-        if(collectionName.endsWith("/"))
-                baseName = collectionName.substring(0,collectionName.length()-1);
+        if (collectionName.endsWith("/"))
+            baseName = collectionName.substring(0, collectionName.length() - 1);
         else
             baseName = collectionName;
 
-        if(baseName.lastIndexOf("/") > 0)
-            baseName = baseName.substring(baseName.lastIndexOf("/"),baseName.length());
-
-
+        if (baseName.lastIndexOf("/") > 0)
+            baseName = baseName.substring(baseName.lastIndexOf("/"), baseName.length());
 
         // Strip off the basename to make the link
         link = requestURL.substring(0, requestURL.lastIndexOf(baseName));
@@ -142,10 +131,9 @@ public class S4Dir {
         // Set up the page.
         printHTMLHeader(collectionName, headerSpace, link, pw);
 
-
         // Build a line in the page for each child dataset/collection
         it = dataset.getChildren("dataset").iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
 
             childDataset = (Element) it.next();
 
@@ -155,32 +143,31 @@ public class S4Dir {
                     childDataset.getChild("lastmodified").getChildTextTrim("time");
 
             // Is it a collection?
-            if(childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")){
+            if (childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")) {
 
 
-                link = requestURL+"/"+name+"/";
+                link = requestURL + "/" + name + "/";
 
                 responseLinks = "        " +
-                        " -  "+
-                        " -  "+
-                        " -  "+
-                        " -   "+
+                        " -  " +
+                        " -  " +
+                        " -  " +
+                        " -   " +
                         " -   ";
 
 
                 name += "/";
                 size = " -";
-            }
-            else { /// It must be a dataset
-                link = requestURL+"/"+name+".html";
+            } else { /// It must be a dataset
+                link = requestURL + "/" + name + ".html";
 
                 // Build response links
 
                 responseLinks = "      " +
-                        "<a href=\"" + requestURL + "/" + name + ".ddx"  + "\">ddx</a> "+
-                        "<a href=\"" + requestURL + "/" + name + ".dds"  + "\">dds</a> "+
-                        "<a href=\"" + requestURL + "/" + name + ".das"  + "\">das</a> "+
-                        "<a href=\"" + requestURL + "/" + name + ".info" + "\">info</a> "+
+                        "<a href=\"" + requestURL + "/" + name + ".ddx" + "\">ddx</a> " +
+                        "<a href=\"" + requestURL + "/" + name + ".dds" + "\">dds</a> " +
+                        "<a href=\"" + requestURL + "/" + name + ".das" + "\">das</a> " +
+                        "<a href=\"" + requestURL + "/" + name + ".info" + "\">info</a> " +
                         "<a href=\"" + requestURL + "/" + name + ".html" + "\">html</a> ";
 
 
@@ -189,7 +176,7 @@ public class S4Dir {
 
             pw.print("<A HREF=\"");
             pw.print(link);
-            pw.print("\">" + name + "</a>" + getWhiteSpacePadding(name,headerSpace));
+            pw.print("\">" + name + "</a>" + getWhiteSpacePadding(name, headerSpace));
             pw.print(lastModified);
             pw.print("      " + size);
 
@@ -224,12 +211,12 @@ public class S4Dir {
         //pw.println("<A HREF=\"?C=N;O=D\">Name</a>"+getWhiteSpacePadding("Name",headerSpace)+"<A HREF=\"?C=M;O=A\">Last modified</a>            <A HREF=\"?C=S;O=A\">Size</a>        <A HREF=\"?C=D;O=A\">Description</a>");
 
         //No Images, No sorting links.
-        pw.println("Name"+getWhiteSpacePadding("Name",headerSpace)+"Last modified            Size        Response Links");
+        pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified            Size        Response Links");
         pw.println("<hr />");
         //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://test.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
-        if(!collectionName.equals("/"))
-            pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>"+getWhiteSpacePadding("Parent Directory",headerSpace+26)+"-");
+        if (!collectionName.equals("/"))
+            pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>" + getWhiteSpacePadding("Parent Directory", headerSpace + 26) + "-");
 
 
     }
@@ -246,18 +233,18 @@ public class S4Dir {
 
     }
 
-    private static String getWhiteSpacePadding(String stringToPad, int desiredSize){
+    private static String getWhiteSpacePadding(String stringToPad, int desiredSize) {
 
         String result = "";
 
         //System.out.println("stringToPad.length(): "+stringToPad.length()+"    desiredSize: "+desiredSize);
 
 
-        if(stringToPad.length() >= desiredSize)
-            return(result);
+        if (stringToPad.length() >= desiredSize)
+            return (result);
 
 
-        for(int i=0; i<(desiredSize - stringToPad.length());i++)
+        for (int i = 0; i < (desiredSize - stringToPad.length()); i++)
             result += " ";
 
         //System.out.println("result.length(): "+result.length()+"    desiredSize: "+desiredSize);
@@ -266,41 +253,39 @@ public class S4Dir {
     }
 
 
-
-
-    private static String computeSizeString(String size){
+    private static String computeSizeString(String size) {
 
         int sz = Integer.parseInt(size);
         String result;
 
         int mag = 0;
 
-        while(sz >= 1024){
+        while (sz >= 1024) {
             sz /= 1024;
             mag++;
         }
-        switch(mag){
+        switch (mag) {
             case 0:
                 result = sz + " ";
                 break;
             case 1:
-                result = sz+"K";
+                result = sz + "K";
                 break;
             case 2:
-                result = sz+"M";
+                result = sz + "M";
                 break;
             case 3:
-                result = sz+"G";
+                result = sz + "G";
                 break;
             case 4:
-                result = sz+"P";
+                result = sz + "P";
                 break;
             default:
                 result = "Way to big!";
                 break;
         }
 
-        result = getWhiteSpacePadding(result,4) +result;
+        result = getWhiteSpacePadding(result, 4) + result;
         return result;
 
     }

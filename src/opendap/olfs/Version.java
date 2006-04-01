@@ -39,11 +39,11 @@ public class Version {
 
     private static String version = "0.0.0";
 
-    public static String getVersionString(){
-        return(version);
+    public static String getVersionString() {
+        return (version);
     }
 
-    public static Element getVersionElement(){
+    public static Element getVersionElement() {
 
         Element olfs = new Element("OLFS");
 
@@ -64,7 +64,6 @@ public class Version {
         return (olfs);
 
     }
-
 
 
 }

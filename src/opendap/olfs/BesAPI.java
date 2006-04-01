@@ -28,12 +28,6 @@ package opendap.olfs;
 import opendap.util.Debug;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
-import opendap.dap.Server.ServerDDS;
-import opendap.dap.DefaultFactory;
-import opendap.dap.DDSException;
-import opendap.dap.BaseTypeFactory;
-import opendap.dap.DDS;
-import opendap.dap.parser.ParseException;
 
 import java.io.OutputStream;
 import java.io.IOException;
@@ -62,25 +56,25 @@ public class BesAPI {
     private static boolean _configured = false;
     private static final Object syncLock = new Object();
 
-    public static boolean configure(String host, int port){
+    public static boolean configure(String host, int port) {
 
-        synchronized(syncLock){
+        synchronized (syncLock) {
 
-            if(isConfigured())
+            if (isConfigured())
                 return false;
 
             _besHost = host;
             _besPort = port;
             _configured = true;
 
-            System.out.println("BES is configured - Host: "+_besHost+"   Port: "+_besPort);
-         }
+            System.out.println("BES is configured - Host: " + _besHost + "   Port: " + _besPort);
+        }
 
         return true;
 
     }
 
-    public static boolean isConfigured(){
+    public static boolean isConfigured() {
         return _configured;
     }
 
@@ -102,14 +96,14 @@ public class BesAPI {
 */
 
     public static String getHost() throws BadConfigurationException {
-        if(!isConfigured())
+        if (!isConfigured())
             throw new BadConfigurationException("BES must be configured before use!\n");
 
         return _besHost;
     }
 
     public static int getPort() throws BadConfigurationException {
-        if(!isConfigured())
+        if (!isConfigured())
             throw new BadConfigurationException("BES must be configured before use!\n");
         return _besPort;
     }
@@ -120,7 +114,7 @@ public class BesAPI {
                               OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction(getAPINameForDDX(),dataset, constraintExpression,os);
+        besGetTransaction(getAPINameForDDX(), dataset, constraintExpression, os);
     }
 
     public static void getDDS(String dataset,
@@ -128,7 +122,7 @@ public class BesAPI {
                               OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction(getAPINameForDDS(),dataset, constraintExpression,os);
+        besGetTransaction(getAPINameForDDS(), dataset, constraintExpression, os);
     }
 
 /*
@@ -164,7 +158,7 @@ public class BesAPI {
                               OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction(getAPINameForDAS(),dataset, constraintExpression,os);
+        besGetTransaction(getAPINameForDAS(), dataset, constraintExpression, os);
     }
 
     public static void getDODS(String dataset,
@@ -172,21 +166,18 @@ public class BesAPI {
                                OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        besGetTransaction(getAPINameForDODS(),dataset, constraintExpression,os);
+        besGetTransaction(getAPINameForDODS(), dataset, constraintExpression, os);
     }
-
-
 
 
     public static Document showVersion()
             throws BadConfigurationException, PPTException, IOException, JDOMException, BESException {
 
-
         // Get the version response from the BES (an XML doc)
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        besShowTransaction("version",os);
+        besShowTransaction("version", os);
 
-        if(Debug.isSet("BES")) System.out.println(os);
+        if (Debug.isSet("BES")) System.out.println(os);
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -214,19 +205,17 @@ public class BesAPI {
             throws PPTException, BadConfigurationException, IOException, JDOMException, BESException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        String product = "info for "+"\""+path+"\"";
+        String product = "info for " + "\"" + path + "\"";
 
-        if(Debug.isSet("BES")) System.out.println("S4CrawlableDataset sending BES cmd: show "+product);
-        BesAPI.besShowTransaction(product,baos);
+        if (Debug.isSet("BES")) System.out.println("BESCrawlableDataset sending BES cmd: show " + product);
+        BesAPI.besShowTransaction(product, baos);
 
 
-        if(Debug.isSet("BES")) System.out.println("BES returned:\n"+baos);
-
+        if (Debug.isSet("BES")) System.out.println("BES returned:\n" + baos);
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
         Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
 
         // Check for an exception:
         besExceptionHandler(doc);
@@ -251,16 +240,16 @@ public class BesAPI {
 
         ElementFilter exceptionFilter = new ElementFilter("BESException");
         Iterator i = doc.getDescendants(exceptionFilter);
-        if(i.hasNext()){
+        if (i.hasNext()) {
 
             String msg = "";
             int j = 0;
-            while(i.hasNext()){
-                if(j>0)
+            while (i.hasNext()) {
+                if (j > 0)
                     msg += "\n";
                 Element exception = (Element) i.next();
-                msg +=  "[BESException: "+ j++ +"]" +
-                        "[Type: " + exception.getChild("Type").getTextTrim()+ "]" +
+                msg += "[BESException: " + j++ + "]" +
+                        "[Type: " + exception.getChild("Type").getTextTrim() + "]" +
                         "[Message: " + exception.getChild("Message").getTextTrim() + "]" +
                         "[Location: " + exception.getChild("Location").getTextTrim() + "]";
 
@@ -272,18 +261,16 @@ public class BesAPI {
     }
 
 
-
     public static Document showCatalog(String path)
             throws PPTException, BadConfigurationException, IOException, JDOMException, BESException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        String product = "catalog for "+"\""+path+"\"";
+        String product = "catalog for " + "\"" + path + "\"";
 
-        BesAPI.besShowTransaction(product,baos);
+        BesAPI.besShowTransaction(product, baos);
 
-        if(Debug.isSet("BES")) System.out.println("BES returned:\n"+baos);
-
+        if (Debug.isSet("BES")) System.out.println("BES returned:\n" + baos);
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -307,20 +294,21 @@ public class BesAPI {
     }
 
     public static OPeNDAPClient startClient()
-            throws BadConfigurationException,PPTException {
+            throws BadConfigurationException, PPTException {
 
 
         OPeNDAPClient oc = new OPeNDAPClient();
 
-        if(Debug.isSet("BES")) System.out.println("Starting OPeNDAPClient. BES - Host: "+_besHost+"  Port:"+_besPort);
+        if (Debug.isSet("BES"))
+            System.out.println("Starting OPeNDAPClient. BES - Host: " + _besHost + "  Port:" + _besPort);
 
         oc.startClient(getHost(), getPort());
 
-        if(Debug.isSet("BES"))
-            oc.setOutput(System.out,true);
+        if (Debug.isSet("BES"))
+            oc.setOutput(System.out, true);
         else {
             DevNull devNull = new DevNull();
-            oc.setOutput(devNull,true);
+            oc.setOutput(devNull, true);
         }
 
 
@@ -336,45 +324,44 @@ public class BesAPI {
         //String ce = rs.getConstraintExpression();
 
         //String cmd = "set container in catalog values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
-        String cmd = "set container in catalog values "+dataset + ", " + dataset + ";\n";
-        if(Debug.isSet("BES")) System.out.print("Sending BES command: " + cmd);
+        String cmd = "set container in catalog values " + dataset + ", " + dataset + ";\n";
+        if (Debug.isSet("BES")) System.out.print("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
 
 
-        if(Debug.isSet("BES")) System.out.println("ConstraintExpression: "+constraintExpression);
+        if (Debug.isSet("BES")) System.out.println("ConstraintExpression: " + constraintExpression);
 
 
-        if(constraintExpression== null || constraintExpression.equalsIgnoreCase("") ){
-            cmd = "define d1 as "+dataset + ";\n";
+        if (constraintExpression == null || constraintExpression.equalsIgnoreCase("")) {
+            cmd = "define d1 as " + dataset + ";\n";
+        } else {
+            cmd = "define d1 as " + dataset + " with " + dataset + ".constraint=\"" + constraintExpression + "\"  ;\n";
+
         }
-        else {
-            cmd = "define d1 as "+dataset + " with "+dataset+".constraint=\"" + constraintExpression + "\"  ;\n";
 
-        }
-
-        if(Debug.isSet("BES")) System.out.print("Sending BES command: " +cmd);
+        if (Debug.isSet("BES")) System.out.print("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
 
     }
 
-    public static String getGetCmd(String product){
-        return "get "+product+" for d1;\n";
+    public static String getGetCmd(String product) {
+        return "get " + product + " for d1;\n";
 
     }
 
-    public static String getAPINameForDDS(){
+    public static String getAPINameForDDS() {
         return "dds";
     }
 
-    public static String getAPINameForDAS(){
+    public static String getAPINameForDAS() {
         return "das";
     }
 
-    public static String getAPINameForDODS(){
+    public static String getAPINameForDODS() {
         return "dods";
     }
 
-    public static String getAPINameForDDX(){
+    public static String getAPINameForDDX() {
         return "ddx";
     }
 
@@ -384,20 +371,20 @@ public class BesAPI {
                                       OutputStream os) throws PPTException {
 
         String cmd = getGetCmd(product);
-        if(Debug.isSet("BES")) System.err.print("Sending command: " +cmd);
+        if (Debug.isSet("BES")) System.err.print("Sending command: " + cmd);
 
-        oc.setOutput(os,false);
+        oc.setOutput(os, false);
         oc.executeCommand(cmd);
 
     }
 
     public static void shutdownClient(OPeNDAPClient oc) throws PPTException {
-        if(Debug.isSet("BES")) System.out.print("Shutting down client...");
+        if (Debug.isSet("BES")) System.out.print("Shutting down client...");
 
-        oc.setOutput(null,false);
+        oc.setOutput(null, false);
 
         oc.shutdownClient();
-        if(Debug.isSet("BES")) System.out.println("Done.");
+        if (Debug.isSet("BES")) System.out.println("Done.");
 
 
     }
@@ -405,21 +392,20 @@ public class BesAPI {
     private static void besGetTransaction(String product,
                                           String dataset, String constraintExpression,
                                           OutputStream os)
-            throws BadConfigurationException,PPTException {
+            throws BadConfigurationException, PPTException {
 
-        if(Debug.isSet("BES")) System.out.println("Entered besGetTransaction().");
+        if (Debug.isSet("BES")) System.out.println("Entered besGetTransaction().");
 
 
         OPeNDAPClient oc = startClient();
 
-        configureTransaction(oc, dataset,  constraintExpression);
+        configureTransaction(oc, dataset, constraintExpression);
 
-        getDataProduct(oc,product,os);
+        getDataProduct(oc, product, os);
 
         shutdownClient(oc);
 
     }
-
 
 
     public static void besShowTransaction(String product, OutputStream os)
@@ -432,31 +418,24 @@ public class BesAPI {
 
         oc.startClient(getHost(), getPort());
 
-        if(Debug.isSet("BES"))
-            oc.setOutput(System.out,true);
+        if (Debug.isSet("BES"))
+            oc.setOutput(System.out, true);
         else {
             DevNull devNull = new DevNull();
-            oc.setOutput(devNull,true);
+            oc.setOutput(devNull, true);
         }
 
-        String cmd = "show "+product+";\n";
-        if(Debug.isSet("BES")) System.err.print("Sending command: "+cmd);
-        oc.setOutput(os,false);
+        String cmd = "show " + product + ";\n";
+        if (Debug.isSet("BES")) System.err.print("Sending command: " + cmd);
+        oc.setOutput(os, false);
         oc.executeCommand(cmd);
 
-        if(Debug.isSet("BES")) System.out.print("Shutting down client...");
-        oc.setOutput(null,false);
+        if (Debug.isSet("BES")) System.out.print("Shutting down client...");
+        oc.setOutput(null, false);
         oc.shutdownClient();
-        if(Debug.isSet("BES")) System.out.println("Done.");
+        if (Debug.isSet("BES")) System.out.println("Done.");
 
     }
-
-
-
-
-
-
-
 
 
 }
