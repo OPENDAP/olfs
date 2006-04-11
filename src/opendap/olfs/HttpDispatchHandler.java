@@ -27,9 +27,9 @@ package opendap.olfs;
 import opendap.dap.DODSException;
 import opendap.dap.DAS;
 import opendap.dap.DefaultFactory;
+import opendap.dap.DDS;
 import opendap.dap.Server.ServerDDS;
 import opendap.ppt.PPTException;
-import opendap.ppt.OPeNDAPClient;
 import opendap.util.Debug;
 import opendap.coreServlet.*;
 
@@ -47,6 +47,7 @@ import org.jdom.JDOMException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
@@ -274,7 +275,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+            DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
+            ddx.getDAS().print(Out);
+            //BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -292,7 +295,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     /**
      * ************************************************************************
-     * Default handler for the client's DDS request. Requires the getDDS() method
+     * Default handler for the client's DDS request. Requires the writeDDS() method
      * implemented by each server localization effort.
      * <p/>
      * <p>Once the DDS has been parsed and constrained it is sent to the
@@ -326,7 +329,18 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+            // We get a DDX from the BES and then parse it. We use the parsed
+            // one to send a DDS representation. Since the BES applies the
+            // constraint expression, we don't need to get a ServerDDS (full
+            // of Server BaseTypes) with whic we could apply the conststraint
+            //expression - it's already done.
+            DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
+            ddx.print(Out);
+
+            // Earlier method - asks BES directly for a DDS and then writes it
+            // out to the response stream.
+            //BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -347,7 +361,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     /**
      * ************************************************************************
-     * Default handler for the client's DDS request. Requires the getDDS() method
+     * Default handler for the client's DDS request. Requires the writeDDS() method
      * implemented by each server localization effort.
      * <p/>
      * <p>Once the DDS has been parsed and constrained it is sent to the
@@ -381,7 +395,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
+            BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -402,7 +416,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     /**
      * ************************************************************************
-     * Default handler for the client's data request. Requires the getDDS()
+     * Default handler for the client's data request. Requires the writeDDS()
      * method implemented by each server localization effort.
      * <p/>
      * <p>Once the DDS has been parsed, the data is read (using the class in the
@@ -448,7 +462,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
         try {
-            BesAPI.getDODS(rs.getDataset(), rs.getConstraintExpression(), bOut);
+            BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), bOut);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -499,8 +513,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         if (vdoc == null) {
             throw new DODSException("Internal Error: Version Document not initialized.");
         }
-        //XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        XMLOutputter xout = new XMLOutputter();
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        //XMLOutputter xout = new XMLOutputter();
         xout.output(rs.getVersionDocument(), ps);
         ps.flush();
 
@@ -580,11 +594,11 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                    "",                                  // CollectionID, which for us needs to be empty.
+                    "",                                   // CollectionID, which for us needs to be empty.
                     BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
-                    "OPeNDAP-Server4",                   // Service Name
-                    "OPeNDAP",                           // Service Type Name
-                    request.getRequestURI().substring(0, request.getRequestURI().indexOf(request.getPathInfo()) + 1)); // Base URL for this service
+                    "OPeNDAP-Server4",                    // Service Name
+                    "OPeNDAP",                            // Service Type Name
+                    request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf(request.getPathInfo()) + 1)); // Base URL for this service
 
             if (Debug.isSet("showResponse")) {
                 System.out.println("doGetCatalog() - Generating catalog");
@@ -650,43 +664,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
                 "    CE: '" + request.getQueryString() + "'");
 
-
-        OPeNDAPClient oc = BesAPI.startClient();
-        BesAPI.configureTransaction(oc, rs.getDataset(), null);
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDDS(), os);
-
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        ServerDDS dds = new ServerDDS(new DefaultFactory());
-        dds.parse(is);
-
-        os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDAS(), os);
-
-        BesAPI.shutdownClient(oc);
-
-        is = new ByteArrayInputStream(os.toByteArray());
-        DAS das = new DAS();
-        das.parse(is);
-
-/*
-        // Turn this on later if we discover we're supposed to accept
-        // constraint expressions as input to the Data Request Web Form
-        String ce;
-        if(request.getQueryString() == null){
-            ce = "";
-            }
-        else {
-            ce = "?" + request.getQueryString();
-            }
-*/
-
-
+        ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
+        DAS das = ddx.getDAS();
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
-        DefaultResponse.sendHtmlResponse(pw, rs, dds, das);
+        DefaultResponse.sendHtmlResponse(pw, rs, ddx, das);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -715,31 +698,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             System.out.println("doGetINFO For: " + rs.getDataset());
 
 
-        ServerDDS myDDS;
-        DAS myDAS;
+        ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
 
-
-        OPeNDAPClient oc = BesAPI.startClient();
-        BesAPI.configureTransaction(oc, rs.getDataset(), rs.getConstraintExpression());
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDDS(), os);
-
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        myDDS = new ServerDDS(new DefaultFactory());
-        myDDS.parse(is);
-
-        os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc, BesAPI.getAPINameForDAS(), os);
-        BesAPI.shutdownClient(oc);
-
-        is = new ByteArrayInputStream(os.toByteArray());
-        myDAS = new DAS();
-        myDAS.parse(is);
+        DAS das = ddx.getDAS();
 
         PrintStream pw = new PrintStream(response.getOutputStream());
 
-        DefaultResponse.sendInfoResponse(pw, rs, myDDS, myDAS);
+        DefaultResponse.sendInfoResponse(pw, rs, ddx, das);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -782,7 +747,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDODS(rs.getDataset(), rs.getConstraintExpression(), os);
+        BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), os);
         ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());

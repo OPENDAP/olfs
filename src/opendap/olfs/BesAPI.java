@@ -28,6 +28,10 @@ package opendap.olfs;
 import opendap.util.Debug;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
+import opendap.dap.Server.ServerDDS;
+import opendap.dap.DefaultFactory;
+import opendap.dap.DODSException;
+import opendap.dap.BaseTypeFactory;
 
 import java.io.OutputStream;
 import java.io.IOException;
@@ -109,17 +113,57 @@ public class BesAPI {
     }
 
 
-    public static void getDDX(String dataset,
-                              String constraintExpression,
-                              OutputStream os)
+    public static void writeDDX(String dataset,
+                                String constraintExpression,
+                                OutputStream os)
             throws BadConfigurationException, PPTException {
 
         besGetTransaction(getAPINameForDDX(), dataset, constraintExpression, os);
     }
 
-    public static void getDDS(String dataset,
-                              String constraintExpression,
-                              OutputStream os)
+
+    public static Document getDDXDocument(String dataset,
+                                          String constraintExpression)
+            throws PPTException, BadConfigurationException, IOException, JDOMException {
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.writeDDX(dataset, constraintExpression, os);
+        SAXBuilder sb = new SAXBuilder();
+
+        return sb.build(new ByteArrayInputStream(os.toByteArray()));
+    }
+
+
+
+    public static ServerDDS getDDX(String dataset, String constraintExpression)
+            throws PPTException, DODSException {
+  
+        return getDDX(dataset,constraintExpression, new DefaultFactory());
+
+    }
+
+
+    public static ServerDDS getDDX(String dataset,
+                                   String constraintExpression,
+                                   BaseTypeFactory btf)
+            throws PPTException, DODSException {
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        BesAPI.writeDDX(dataset, constraintExpression, os);
+
+        //System.out.println("\n\nBES sent: \n\n"+os.toString());
+
+        ServerDDS dds = new ServerDDS(btf);
+        dds.parseXML( new ByteArrayInputStream(os.toByteArray()),true);
+
+        return dds;
+
+    }
+
+
+    public static void writeDDS(String dataset,
+                                String constraintExpression,
+                                OutputStream os)
             throws BadConfigurationException, PPTException {
 
         besGetTransaction(getAPINameForDDS(), dataset, constraintExpression, os);
@@ -127,15 +171,15 @@ public class BesAPI {
 
 /*
 
-    public static ServerDDS getDDS(String dataset,
+    public static ServerDDS writeDDS(String dataset,
                               String constraintExpression)
             throws BadConfigurationException, PPTException, DDSException, ParseException {
 
-        return getDDS(dataset,constraintExpression,new DefaultFactory());
+        return writeDDS(dataset,constraintExpression,new DefaultFactory());
 
     }
 
-   public static ServerDDS getDDS(String dataset,
+   public static ServerDDS writeDDS(String dataset,
                                   String constraintExpression, BaseTypeFactory btf)
                 throws BadConfigurationException, PPTException, DDSException, ParseException {
         OPeNDAPClient oc = BesAPI.startClient();
@@ -153,17 +197,17 @@ public class BesAPI {
     }
 */
 
-    public static void getDAS(String dataset,
-                              String constraintExpression,
-                              OutputStream os)
+    public static void writeDAS(String dataset,
+                                String constraintExpression,
+                                OutputStream os)
             throws BadConfigurationException, PPTException {
 
         besGetTransaction(getAPINameForDAS(), dataset, constraintExpression, os);
     }
 
-    public static void getDODS(String dataset,
-                               String constraintExpression,
-                               OutputStream os)
+    public static void writeDapData(String dataset,
+                                    String constraintExpression,
+                                    OutputStream os)
             throws BadConfigurationException, PPTException {
 
         besGetTransaction(getAPINameForDODS(), dataset, constraintExpression, os);
@@ -255,6 +299,11 @@ public class BesAPI {
 
 
             }
+
+
+
+
+
             throw new BESException(msg);
         }
 

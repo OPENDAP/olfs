@@ -74,7 +74,7 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
     public BESCrawlableDataset(String path, Object o) throws IOException, PPTException, BadConfigurationException, JDOMException, BESException {
 
-        Debug.set("CrawlableDataset", true);
+        //Debug.set("CrawlableDataset", true);
         init();
 
         _config = (Element) o;

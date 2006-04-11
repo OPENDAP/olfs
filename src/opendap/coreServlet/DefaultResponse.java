@@ -28,7 +28,6 @@ import opendap.dap.DODSException;
 import opendap.dap.DAS;
 import opendap.dap.Server.ServerDDS;
 import opendap.dap.parser.ParseException;
-import opendap.ppt.PPTException;
 
 import java.io.PrintWriter;
 import java.io.InputStream;
@@ -73,5 +72,10 @@ public class DefaultResponse {
         InfoResponse.sendINFO(pw, rs, dds, das);
 
     }
+
+
+
+
+    //@todo Write a default sendDirectoryResponse()
 
 }

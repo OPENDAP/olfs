@@ -110,7 +110,7 @@ public class DispatchServlet extends HttpServlet {
      * <p/>
      * In this (default) implementation of the getServerName() method we just get
      * the name of the servlet and pass it back. If something different is
-     * required, override this method when implementing the getDDS() and
+     * required, override this method when implementing the writeDDS() and
      * getXDODSServerVersion() methods.
      * <p/>
      * This is typically used by the getINFO() method to figure out if there is
@@ -445,6 +445,25 @@ public class DispatchServlet extends HttpServlet {
 
     }
     /***************************************************************************/
+
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doPost(HttpServletRequest request,
+                      HttpServletResponse response)
+            throws IOException, ServletException {
+
+        SOAPRequestDispatcher.doPost(request,response,odh);
+    }
+
+
+
 
 
 }

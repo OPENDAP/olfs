@@ -75,7 +75,7 @@ class HtmlResponse {
 
         // Get the DDS and the DAS (if one exists) for the dataSet.
         // DDS myDDS = getWebFormDDS(rs.getDataset(), wwwDDS);
-        // DAS myDAS = dServ.getDAS(dataSet); // change jc
+        // DAS myDAS = dServ.writeDAS(dataSet); // change jc
 
 
         pw.println(

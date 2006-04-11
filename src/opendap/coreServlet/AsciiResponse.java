@@ -50,16 +50,16 @@ import opendap.servers.ascii.asciiFactory;
 class AsciiResponse {
 
 
-    /**
-     * ************************************************************************
+    /**--------------------------------------------------------------------------------
+     *
      * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
      * comma delimited ascii columns for ingestion into some not so
-     * OPeNDAP enabled application such as MS-Excel. Accepts constraint expressions
-     * in exactly the same way as the regular OPeNDAP dataserver.
+     * OPeNDAP enabled application such as MS-Excel. 
      */
     static void sendASCII(PrintWriter pw,
                           ReqState rs,
-                          InputStream is) throws DODSException, ParseException, IOException {
+                          InputStream is)
+            throws DODSException, ParseException, IOException {
 
 
         if (Debug.isSet("showResponse"))
@@ -105,7 +105,7 @@ class AsciiResponse {
 
 
     }
-    /***************************************************************************/
+    /**--------------------------------------------------------------------------------*/
 
 }
 

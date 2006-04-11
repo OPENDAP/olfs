@@ -119,6 +119,12 @@ public interface OpendapHttpDispatchHandler {
                          ReqState rs) throws Exception;
 
 
+    /**--------------------------------------------------------------------------------
+     *
+     * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
+     * comma delimited ascii columns for ingestion into some not so
+     * OPeNDAP enabled application such as MS-Excel. 
+     */
     public void sendASCII(HttpServletRequest request,
                           HttpServletResponse response,
                           ReqState rs) throws Exception;
