@@ -130,6 +130,10 @@ public class BesAPI {
         BesAPI.writeDDX(dataset, constraintExpression, os);
         SAXBuilder sb = new SAXBuilder();
 
+
+        System.out.println("getDDXDocument got this array:\n"+os.toString());
+
+
         return sb.build(new ByteArrayInputStream(os.toByteArray()));
     }
 
@@ -137,7 +141,7 @@ public class BesAPI {
 
     public static ServerDDS getDDX(String dataset, String constraintExpression)
             throws PPTException, DODSException {
-  
+
         return getDDX(dataset,constraintExpression, new DefaultFactory());
 
     }
