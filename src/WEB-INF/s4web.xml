@@ -7,27 +7,6 @@
 <web-app>
 
 
-    <servlet>
-        <servlet-name>test</servlet-name>
-        <servlet-class>opendap.olfs.OLFS</servlet-class>
-
-        <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value>showRequest probeRequest showResponse CE </param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>BackEndServerHost</param-name>
-            <param-value>127.0.0.1</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>BackEndServerPort</param-name>
-            <param-value>10002</param-value>
-        </init-param>
-
-    </servlet>
-
 
 
 
@@ -39,9 +18,15 @@
         <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
 
         <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value>showRequest probeRequest showResponse CE </param-value>
+            <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
+            <param-value>opendap.olfs.HttpDispatchHandler</param-value>
         </init-param>
+
+        <init-param>
+            <param-name>DebugOn</param-name>
+            <param-value>showRequest probeRequest showResponse CE BES</param-value>
+        </init-param>
+
 
         <init-param>
             <param-name>BackEndServerHost</param-name>
@@ -58,16 +43,6 @@
 
 
     </servlet>
-
-    <servlet-mapping>
-       <servlet-name>test</servlet-name>
-       <url-pattern>/test/*</url-pattern>
-     </servlet-mapping>
-
-    <servlet-mapping>
-       <servlet-name>test</servlet-name>
-       <url-pattern>/test</url-pattern>
-     </servlet-mapping>
 
 
 

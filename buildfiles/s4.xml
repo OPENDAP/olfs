@@ -17,7 +17,7 @@
     &globaltargets;
 
     <!-- Library (class)paths -->
-    <path id="compile.classpath">
+    <path id="s4.compile.classpath">
         <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
             <include name="${servlet.lib}"/>
@@ -30,10 +30,12 @@
     </path>
 
 
-    <target name="all" depends="clean,client,server" description="Compiles the DRDS software."/>
+
+    <target name="all" depends="clean,clients,server" description="Builds stuff"/>
     <target name="compile" depends="s4" description="Compiles the DRDS software."/>
 
 
+    <target name="clients" depends="BESclient" description="Compiles the clients."/>
 
 
     <target
@@ -50,9 +52,11 @@
             debuglevel="${compile.debuglevel}"
             deprecation="${compile.deprecation}">
 
-            <classpath refid="compile.classpath"/>
+            <classpath refid="s4.compile.classpath"/>
 
             <src path="${src.dir}"/>
+            <exclude name="opendap/soap/TestClient.java"/>
+            <exclude name="opendap/soap/SoapUtils.java"/>
             <include name="opendap/**/*.java"/>
             <include name="hao/**/*.java"/>
         </javac>
@@ -83,7 +87,7 @@
             use="true"
             Verbose="false">
 
-            <classpath refid="compile.classpath"/>
+            <classpath refid="s4.compile.classpath"/>
 
             <fileset dir="${src.dir}/opendap/"/>
         </javadoc>
@@ -133,7 +137,7 @@
 
 
     <target
-        name="client"
+        name="BESclient"
         depends="s4-lib"
         description="Build and package the back end client."
         >
@@ -196,7 +200,6 @@
                 <include name="${getopt.lib}"/>
                 <include name="${regexp.lib}"/>
                 <include name="${jdom.lib}"/>
-                <include name="${soap.lib}"/>
                 <include name="${opendap.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
@@ -208,58 +211,6 @@
 
 
         </war>
-
-
-
-        <war destfile="${build.dist}/tt.war"
-            webxml="${src.dir}/WEB-INF/combined-web.xml"
-            >
-
-            <lib dir="${lib.dir}">
-                <include name="${regexp.lib}"/>
-                <include name="${getopt.lib}"/>
-                <include name="${jdom.lib}"/>
-                <include name="${opendap.lib}"/>
-                <include name="${thredds.lib}"/>
-                <include name="${threddsResources.lib}"/>
-                <include name="${nlog4j.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
-            </lib>
-            <classes dir="${build.classes}"/>
-
-
-            <fileset dir="${doc.dir}">
-                <exclude name="src.distribution.readme"/>
-                <exclude name="index.html"/>
-            </fileset>
-
-            <fileset file="${build.dist}/index.html"/>
-
-            <zipfileset dir="${schema.dir}" prefix="schema" />
-
-            <zipfileset dir="${build.doc}/server4" prefix="javadocs/server4"/>
-
-            <zipfileset dir="${build.lib}" prefix="s4-libraries"/>
-
-            <zipfileset dir="${lib.dir}" prefix="s4-libraries">
-                <include name="${getopt.lib}"/>
-                <include name="${regexp.lib}"/>
-                <include name="${jdom.lib}"/>
-                <include name="${soap.lib}"/>
-                <include name="${opendap.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
-           </zipfileset>
-
-            <webinf dir="${src.dir}/WEB-INF">
-                <include name="log4j.xml"/>
-            </webinf>
-
-
-        </war>
-
-
 
 
 
