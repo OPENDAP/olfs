@@ -97,13 +97,14 @@ public class SoapUtils {
         System.out.println("    SOAPPart:       " + sp.getClass().getName());
         System.out.println("");
 
-        System.out.println("SOAP Envelope: ");
+        System.out.println("-----------------  SOAP Envelope (START) ---------------- ");
         System.out.println(m.getSOAPEnvelope());
+        System.out.println("------------------- SOAP Envelope (END) ----------------- ");
 
 
         int acount = m.countAttachments();
         int cnt=0;
-        System.out.println("\n\nAttachments: "+acount+"\n\n");
+        System.out.println("\n\n--------------------- Attachments ("+acount+") ----------------------");
         if(acount>0){
 
             Iterator i = m.getAttachments();
@@ -111,7 +112,7 @@ public class SoapUtils {
             while(i.hasNext()){
 
                 ap = (AttachmentPart) i.next();
-                System.out.println("Attachment["+cnt+"]:");
+                System.out.println("--- Attachment["+cnt+"]:\n");
                 Iterator j = ap.getAllMimeHeaders();
                 while(j.hasNext()){
                     MimeHeader mhdr = (MimeHeader)j.next();
@@ -121,18 +122,24 @@ public class SoapUtils {
 
                 InputStream is = (InputStream) ap.getContent();
 
-                System.out.println("\nAttachment Content ["+is.available()+" bytes]: \n");
 
                 byte[] buf = new byte[is.available()];
 
                 int ret = is.read(buf);
 
-               System.out.println("Read "+ret+" bytes. Content: \n"+new String(buf));
+
+                System.out.println("\nAttachment Content ["+is.available()+" bytes]:");
+                System.out.println("buf[0]: "+buf[0]+"   b[1]: "+buf[1]+"   b[2]: "+buf[2]+"   buf["+(buf.length-1)+"]: "+buf[buf.length-1]);
+                System.out.print("-->");
+                System.out.println(new String(buf));
+                System.out.println("<--");
 
                 cnt++;
 
+
             }
 
+            System.out.println("\n--------------------- Attachments (END) ----------------------");
 
         }
 
@@ -195,14 +202,37 @@ public class SoapUtils {
     public static void addDDXRequest(SOAPBody b, String datasetName, String constraintExpression) throws SOAPException, SOAPException {
 
 
-        PrefixedQName bodyName = new PrefixedQName(SoapNamespaces.OpendapSoapNamespaceString,"Request", "ons");
+        PrefixedQName bodyName = new PrefixedQName(XMLNamespaces.OpendapSoapNamespaceString,"Request", "ons");
         SOAPBodyElement bodyElement = (SOAPBodyElement) b.addBodyElement(bodyName);
 
         UID reqID = new UID();
 
-        bodyElement.addAttribute(new PrefixedQName(SoapNamespaces.OpendapSoapNamespaceString,"reqID", "ons"),reqID.toString());
+        bodyElement.addAttribute(new PrefixedQName(XMLNamespaces.OpendapSoapNamespaceString,"reqID", "ons"),reqID.toString());
 
         MessageElement cmd =  (MessageElement) bodyElement.addChildElement("GetDDX");
+        MessageElement dataset =  (MessageElement) cmd.addChildElement("DataSet");
+        MessageElement name  = (MessageElement) dataset.addChildElement("name");
+        name.addTextNode(datasetName);
+
+        MessageElement ce  = (MessageElement) dataset.addChildElement("ConstraintExpression");
+        ce.addTextNode(constraintExpression);
+
+
+    }
+
+
+
+    public static void addDATARequest(SOAPBody b, String datasetName, String constraintExpression) throws SOAPException, SOAPException {
+
+
+        PrefixedQName bodyName = new PrefixedQName(XMLNamespaces.OpendapSoapNamespaceString,"Request", "ons");
+        SOAPBodyElement bodyElement = (SOAPBodyElement) b.addBodyElement(bodyName);
+
+        UID reqID = new UID();
+
+        bodyElement.addAttribute(new PrefixedQName(XMLNamespaces.OpendapSoapNamespaceString,"reqID", "ons"),reqID.toString());
+
+        MessageElement cmd =  (MessageElement) bodyElement.addChildElement("GetDATA");
         MessageElement dataset =  (MessageElement) cmd.addChildElement("DataSet");
         MessageElement name  = (MessageElement) dataset.addChildElement("name");
         name.addTextNode(datasetName);
@@ -220,12 +250,12 @@ public class SoapUtils {
     public static void addTHREDDSCatalogRequest(SOAPBody b, String path) throws SOAPException, SOAPException {
 
 
-        PrefixedQName bodyName = new PrefixedQName(SoapNamespaces.OpendapSoapNamespaceString,"Request", "ons");
+        PrefixedQName bodyName = new PrefixedQName(XMLNamespaces.OpendapSoapNamespaceString,"Request", "ons");
         SOAPBodyElement bodyElement = (SOAPBodyElement) b.addBodyElement(bodyName);
 
         UID reqID = new UID();
 
-        bodyElement.addAttribute(new PrefixedQName(SoapNamespaces.OpendapSoapNamespaceString,"reqID", "ons"),reqID.toString());
+        bodyElement.addAttribute(new PrefixedQName(XMLNamespaces.OpendapSoapNamespaceString,"reqID", "ons"),reqID.toString());
 
         MessageElement cmd =  (MessageElement) bodyElement.addChildElement("GetTHREDDSCatalog");
         MessageElement dpath  = (MessageElement) cmd.addChildElement("path");
@@ -243,17 +273,43 @@ public class SoapUtils {
 
 
     public static  Element getDDXRequestElement(String datasetName, String constraintExpression){
-        Element req = new Element("Request",SoapNamespaces.getOpendapSoapNamespace());
+        Element req = new Element("Request",XMLNamespaces.getOpendapSoapNamespace());
 
         UID reqID = new UID();
 
-        req.setAttribute("reqID",reqID.toString(),SoapNamespaces.getOpendapSoapNamespace());
+        req.setAttribute("reqID",reqID.toString(),XMLNamespaces.getOpendapSoapNamespace());
 
-        Element cmd = new Element("GetDDX",SoapNamespaces.getOpendapSoapNamespace());
+        Element cmd = new Element("GetDDX",XMLNamespaces.getOpendapSoapNamespace());
 
-        Element dataset = new Element("DataSet",SoapNamespaces.getOpendapSoapNamespace());
-        Element dname = new Element("name",SoapNamespaces.getOpendapSoapNamespace());
-        Element ce = new Element("ConstraintExpression",SoapNamespaces.getOpendapSoapNamespace());
+        Element dataset = new Element("DataSet",XMLNamespaces.getOpendapSoapNamespace());
+        Element dname = new Element("name",XMLNamespaces.getOpendapSoapNamespace());
+        Element ce = new Element("ConstraintExpression",XMLNamespaces.getOpendapSoapNamespace());
+
+        dname.addContent(new Text(datasetName));
+        ce.addContent(new Text(constraintExpression));
+
+        dataset.addContent(dname);
+        cmd.addContent(dataset);
+        dataset.addContent(ce);
+
+        req.addContent(cmd);
+
+        return req;
+
+    }
+
+    public static  Element getDATARequestElement(String datasetName, String constraintExpression){
+        Element req = new Element("Request",XMLNamespaces.getOpendapSoapNamespace());
+
+        UID reqID = new UID();
+
+        req.setAttribute("reqID",reqID.toString(),XMLNamespaces.getOpendapSoapNamespace());
+
+        Element cmd = new Element("GetDATA",XMLNamespaces.getOpendapSoapNamespace());
+
+        Element dataset = new Element("DataSet",XMLNamespaces.getOpendapSoapNamespace());
+        Element dname = new Element("name",XMLNamespaces.getOpendapSoapNamespace());
+        Element ce = new Element("ConstraintExpression",XMLNamespaces.getOpendapSoapNamespace());
 
         dname.addContent(new Text(datasetName));
         ce.addContent(new Text(constraintExpression));
@@ -269,15 +325,15 @@ public class SoapUtils {
     }
 
     public static  Element getCatalogRequestElement(String path){
-        Element req = new Element("Request");
+        Element req = new Element("Request",XMLNamespaces.getOpendapSoapNamespace());
 
         UID reqID = new UID();
 
-        req.setAttribute("reqID",reqID.toString());
+        req.setAttribute("reqID",reqID.toString(),XMLNamespaces.getOpendapSoapNamespace());
 
         Element cmd = new Element("GetTHREDDSCatalog");
 
-        Element dpath = new Element("path");
+        Element dpath = new Element("path",XMLNamespaces.getOpendapSoapNamespace());
 
         dpath.addContent(new Text(path));
 

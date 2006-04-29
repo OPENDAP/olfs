@@ -35,6 +35,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Iterator;
 import java.rmi.server.UID;
@@ -42,7 +43,7 @@ import java.rmi.server.UID;
 import opendap.olfs.BesAPI;
 import opendap.olfs.BESCrawlableDataset;
 import opendap.util.Debug;
-import opendap.soap.SoapNamespaces;
+import opendap.soap.XMLNamespaces;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
@@ -61,7 +62,8 @@ public class SOAPRequestDispatcher {
                               HttpServletResponse response,
                               OpendapHttpDispatchHandler odh){
 
-        doPostMulti(request,response,odh);
+        doPost03(request,response,odh);
+        //doPost03(request,response,odh);
     }
 
 
@@ -108,30 +110,28 @@ public class SOAPRequestDispatcher {
                 System.out.println("Sending Response...");
 
                 Element soapBody = doc.getRootElement().
-                        getChild("Body",SoapNamespaces.getDefaultSoapEnvNamespace());
+                        getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
 
                 List soapContents = soapBody.getChildren();
 
                 Element[] msgs = new Element[soapContents.size()];
 
-                for(int i=0; i<soapContents.size() ;i++){
+                for (Object soapContent : soapContents) {
 
-                    Object o = soapContents.get(i);
 
-                    if(o instanceof Element){
-                        Element clientReq = (Element) o;
-                        msgs[i] = soapRequestDispatcher(request,clientReq);
+                    if (soapContent instanceof Element) {
+                        Element clientReq = (Element) soapContent;
+                        //                     msgs[i] = soapRequestDispatcher(request,clientReq);
                         //xmlo.output(msgElement,System.out);
-                    }
-                    else if (o instanceof Text){
-                        Text t = (Text) o;
-                        System.out.println("Got a Text object: \""+t.getText()+"\"");
+                    } else if (soapContent instanceof Text) {
+                        Text t = (Text) soapContent;
+                        System.out.println("Got a Text object: \"" + t.getText() + "\"");
                     }
                 }
 
-                for(int i=0; i<msgs.length ;i++){
-                    if(msgs[i] != null)
-                    soapBody.addContent(msgs[i]);
+                for (Element msg : msgs) {
+                    if (msg != null)
+                        soapBody.addContent(msg);
                 }
 
 
@@ -159,10 +159,10 @@ public class SOAPRequestDispatcher {
     private static int count = 0;
     private static String getNewMimeBoundary(){
         //Date date = new Date();
-        return "----=_Part_"+count++ +"_"+getSuid();
+        return "----=_Part_"+count++ +"_"+getUidString();
     }
 
-    private static String getSuid(){
+    private static String getUidString(){
         UID uid = new UID();
 
         byte[] val = uid.toString().getBytes();
@@ -178,6 +178,21 @@ public class SOAPRequestDispatcher {
         return suid;
     }
 
+
+    private static void writeAttachment(String boundary,ServletOutputStream os) throws IOException {
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        for(int i=0; i<5 ;i++)
+            ps.println("This is my attachment bullshit.");
+
+        Attachment a = new Attachment("text; charset=UTF-8",MultipartResponse.getUidString(),new ByteArrayInputStream(baos.toByteArray()));
+
+        a.write(boundary,os);
+
+
+    }
 
 
     /**
@@ -213,10 +228,11 @@ public class SOAPRequestDispatcher {
                 ServletOutputStream os = response.getOutputStream();
 
 
-                String mimeBoundary = getNewMimeBoundary();
+                String mimeBoundary = MultipartResponse.getNewMimeBoundary();
                 System.out.println("MIME Boundary: "+mimeBoundary);
 
-                String startID = "<OPeNDAP_SOAP_MSG_RESPONSE_START>";
+                //String startID = "<OPeNDAP_SOAP_MSG_RESPONSE_START>";
+                String startID = MultipartResponse.getUidString();
 
 
                 response.setContentType("Multipart/related;  "+
@@ -238,7 +254,8 @@ public class SOAPRequestDispatcher {
 
 
                 Element soapBody = doc.getRootElement().
-                        getChild("Body",SoapNamespaces.getDefaultSoapEnvNamespace());
+                        getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
+
 
                 List soapContents = soapBody.getContent();
 
@@ -252,7 +269,7 @@ public class SOAPRequestDispatcher {
 
                     if(o instanceof Element){
                         Element clientReq = (Element) o;
-                        msgs[i] = soapRequestDispatcher(request,clientReq);
+                        msgs[i] = soapRequestDispatcher(request,clientReq,null);
                         //xmlo.output(msgElement,System.out);
                     }
                     else if (o instanceof Text){
@@ -261,40 +278,115 @@ public class SOAPRequestDispatcher {
                     }
                 }
 
-                for(int i=0; i<msgs.length ;i++){
-                    if(msgs[i] != null)
-                    soapBody.addContent(msgs[i]);
+                for (Element msg : msgs) {
+                    if (msg != null)
+                        soapBody.addContent(msg);
                 }
 
                 xmlo.output(doc,os);
 
 
-                os.println("--"+mimeBoundary);
-                os.println("Content-Type: text; charset=UTF-8");
-                os.println("Content-Transfer-Encoding: binary");
-                os.println("Content-Id: <"+getSuid()+">");
-                os.println();
-
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-                os.println("This is my attachment bullshit.");
-
+                writeAttachment(mimeBoundary,os);
+                writeAttachment(mimeBoundary,os);
 
 
                 os.println("--"+mimeBoundary+"--");
+
+
+                System.out.println("done.");
+
+            }
+            else {
+                System.out.print("Reflecting Document to client...");
+
+                xmlo.output(doc,response.getOutputStream());
+
+                System.out.println("done.");
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        System.out.println("SOAPRequestDispatcher.doPost(): End of POST Handler.\n\n\n");
+    }
+
+
+
+
+    /**
+     *
+     *
+     * @param request
+     * @param response
+     */
+    public static void doPost03(HttpServletRequest request,
+                              HttpServletResponse response,
+                              OpendapHttpDispatchHandler odh){
+
+
+        System.out.println("\n\n\nSOAPHandler.doPost(): Start of POST Handler.");
+
+        try {
+
+            SAXBuilder saxBldr = new SAXBuilder();
+            Document doc = saxBldr.build(request.getReader());
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+            System.out.println("");
+            System.out.println("POST Method got this XML Document:");
+
+            xmlo.output(doc,System.out);
+            System.out.println("");
+
+
+
+            if(qcSOAPDocument(doc)){
+
+
+                System.out.println("Sending Response...");
+
+                MultipartResponse mpr = new MultipartResponse(request,response,odh);
+
+                Element soapEnvelope = doc.getRootElement();
+
+                mpr.setSoapEnvelope(soapEnvelope);
+
+                List soapContents = soapEnvelope.getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace()).getContent();
+
+                System.out.println("Got "+soapContents.size()+" SOAP Body Elements.");
+
+                for (Object soapContent : soapContents) {
+
+
+                    if (soapContent instanceof Element) {
+                        Element clientReq = (Element) soapContent;
+                        soapRequestDispatcher(request, clientReq, mpr);
+                    } else if (soapContent instanceof Text) {
+                        Text t = (Text) soapContent;
+                        System.out.println("Got a Text object: \"" + t.getText() + "\"");
+                    }
+                }
+/*
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintStream ps = new PrintStream(baos);
+                for(int i=0; i<16 ;i++)
+                    ps.println("This is my attachment bullshit.");
+
+                byte[] b = new byte[512];
+                Random rnd = new Random();
+                rnd.nextBytes(b);
+
+                mpr.addAttachment("text; charset=UTF-8",MultipartResponse.getUidString(),new ByteArrayInputStream(baos.toByteArray()));
+                mpr.addAttachment("text; charset=UTF-8",MultipartResponse.getUidString(),new ByteArrayInputStream(baos.toByteArray()));
+                mpr.addAttachment("text; charset=UTF-8",MultipartResponse.getUidString(),new ByteArrayInputStream(baos.toByteArray()));
+                mpr.addAttachment("application/octet-stream",MultipartResponse.getUidString(),new ByteArrayInputStream(b));
+
+                System.out.println("b[0]: "+b[0]+"   b[1]: "+b[1]+"   b[2]: "+b[2]+"   b["+(b.length-1)+"]: "+b[b.length-1]);
+*/
+                mpr.send();
 
 
                 System.out.println("done.");
@@ -322,7 +414,7 @@ public class SOAPRequestDispatcher {
         boolean result;
 
 
-        Namespace soapEnvNameSpace = SoapNamespaces.getDefaultSoapEnvNamespace();
+        Namespace soapEnvNameSpace = XMLNamespaces.getDefaultSoapEnvNamespace();
 
         result = false;
 
@@ -345,9 +437,9 @@ public class SOAPRequestDispatcher {
                     List reqs = sb.getChildren();
                     result = true;
 
-                    for(int j=0; j< reqs.size() ;j++){
-                        Element req = (Element) reqs.get(j);
-                        if(!req.getName().equals("Request"))
+                    for (Object req1 : reqs) {
+                        Element req = (Element) req1;
+                        if (!req.getName().equals("Request"))
                             result = false;
                     }
                 }
@@ -365,7 +457,7 @@ public class SOAPRequestDispatcher {
 
 
 
-    private static Element soapRequestDispatcher(HttpServletRequest srvReq, Element reqElement){
+    private static Element soapRequestDispatcher(HttpServletRequest srvReq, Element reqElement, MultipartResponse mpr){
 
 
         Element respElement = null;
@@ -379,10 +471,41 @@ public class SOAPRequestDispatcher {
             if(cmds.size() == 1){
 
                 Element cmd = (Element) cmds.get(0);
+                Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
-                if (cmd.getName().equals("GetMultiPartTest")) {
+                if (cmd.getName().equals("GetDATA")) {
 
-                    System.out.println("Received GetMultiPartTest reqElement.");
+                    System.out.println("Received GetDATA reqElement.");
+                    Element dataSet = cmd.getChild("DataSet", osnms);
+
+                    System.out.println("Dataset:\n"+dataSet.toString());
+
+
+                    String datasetname = dataSet.getChild("name",osnms).getTextTrim();
+                    String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
+
+                    System.out.println("Processing DataSet - path: "+datasetname+"   ce: "+ce);
+
+                    respElement = new Element("Response",osnms);
+                    String reqID = reqElement.getAttributeValue("reqID",osnms);
+                    respElement.setAttribute("reqID",reqID,osnms);
+
+                    Element ddx = BesAPI.getDDXDocument(datasetname, ce).detachRootElement();
+
+                    //@todo Fix The BES use of dodsBLOB!
+                    
+                    Element blob = ddx.getChild("dodsBLOB",XMLNamespaces.getOpendapDAP2Namespace());
+
+                    String contentId = MultipartResponse.getUidString();
+                    blob.setAttribute("href","cid:"+contentId);
+
+
+                    respElement.addContent(ddx);
+
+
+                    mpr.addAttachment("application/octet-stream",
+                            contentId,
+                            BesAPI.getDap2DataStream(datasetname,ce));
 
 
                 }
@@ -390,7 +513,6 @@ public class SOAPRequestDispatcher {
 
                     System.out.println("Received GetDDX reqElement.");
 
-                    Namespace osnms = SoapNamespaces.getOpendapSoapNamespace();
 
                     Element dataSet = cmd.getChild("DataSet", osnms);
 
@@ -404,7 +526,7 @@ public class SOAPRequestDispatcher {
 
                     respElement = new Element("Response",osnms);
                     String reqID = reqElement.getAttributeValue("reqID",osnms);
-                    respElement.setAttribute("reqID",reqID);
+                    respElement.setAttribute("reqID",reqID,osnms);
 
                     respElement.addContent(BesAPI.getDDXDocument(datasetname, ce).detachRootElement());
 
@@ -413,7 +535,7 @@ public class SOAPRequestDispatcher {
 
                     System.out.println("Received GetTHREDDSCatalog reqElement.");
 
-                    String path = cmd.getChild("path").getTextTrim();
+                    String path = cmd.getChild("path",osnms).getTextTrim();
 
                     path = BESCrawlableDataset.besPath2ThreddsPath(path);
 
@@ -445,8 +567,8 @@ public class SOAPRequestDispatcher {
                             );
                         }
                         else {
-                            respElement = new Element("Response");
-                            respElement.setAttribute("reqID",reqElement.getAttributeValue("reqID"));
+                            respElement = new Element("Response",osnms);
+                            respElement.setAttribute("reqID",reqElement.getAttributeValue("reqID",osnms),osnms);
                             respElement.addContent(catalog.detachRootElement());
                         }
 
@@ -463,11 +585,6 @@ public class SOAPRequestDispatcher {
                         );
 
                     }
-
-
-
-
-
 
                 }
             }
@@ -501,7 +618,9 @@ public class SOAPRequestDispatcher {
 
         }
 
-        return respElement;
+        if(mpr!=null) mpr.addSoapBodyPart(respElement);
+
+        return(respElement);
 
     }
 
@@ -511,13 +630,14 @@ public class SOAPRequestDispatcher {
 
     public static Element makeExceptionElement(String type, String msg, String location){
 
+        Namespace ns = XMLNamespaces.getOpendapSoapNamespace();
 
-        Element exception = new Element("OPeNDAPException");
+        Element exception = new Element("OPeNDAPException",ns);
 
 
-        exception.addContent( new Element("Type").setText(type));
-        exception.addContent( new Element("Message").setText(msg));
-        exception.addContent( new Element("Location").setText(location));
+        exception.addContent( new Element("Type",ns).setText(type));
+        exception.addContent( new Element("Message",ns).setText(msg));
+        exception.addContent( new Element("Location",ns).setText(location));
 
         return exception;
 

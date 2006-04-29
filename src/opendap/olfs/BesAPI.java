@@ -32,11 +32,9 @@ import opendap.dap.Server.ServerDDS;
 import opendap.dap.DefaultFactory;
 import opendap.dap.DODSException;
 import opendap.dap.BaseTypeFactory;
+import opendap.dap.HeaderInputStream;
 
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
+import java.io.*;
 import java.util.Iterator;
 
 import org.jdom.Document;
@@ -173,33 +171,10 @@ public class BesAPI {
         besGetTransaction(getAPINameForDDS(), dataset, constraintExpression, os);
     }
 
-/*
 
-    public static ServerDDS writeDDS(String dataset,
-                              String constraintExpression)
-            throws BadConfigurationException, PPTException, DDSException, ParseException {
 
-        return writeDDS(dataset,constraintExpression,new DefaultFactory());
 
-    }
 
-   public static ServerDDS writeDDS(String dataset,
-                                  String constraintExpression, BaseTypeFactory btf)
-                throws BadConfigurationException, PPTException, DDSException, ParseException {
-        OPeNDAPClient oc = BesAPI.startClient();
-
-        BesAPI.configureTransaction(oc,dataset, constraintExpression);
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.getDataProduct(oc,BesAPI.getAPINameForDDS(),os);
-
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-        ServerDDS myDDS = new ServerDDS(btf);
-        myDDS.parse(is);
-
-        return myDDS;
-    }
-*/
 
     public static void writeDAS(String dataset,
                                 String constraintExpression,
@@ -216,6 +191,35 @@ public class BesAPI {
 
         besGetTransaction(getAPINameForDODS(), dataset, constraintExpression, os);
     }
+
+
+    public static InputStream getDap2DataStream(String dataset,
+                                    String constraintExpression)
+            throws BadConfigurationException, PPTException, IOException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        writeDapData(dataset, constraintExpression, baos);
+
+        InputStream is = new ByteArrayInputStream(baos.toByteArray());
+
+        HeaderInputStream his  = new HeaderInputStream(is);
+
+        boolean done = false;
+        int val;
+        while(!done){
+            val = his.read();
+            if(val==-1)
+                done = true;
+
+        }
+
+        return is;
+
+    }
+
+
+
 
 
     public static Document showVersion()
