@@ -43,7 +43,7 @@
         depends="init"
         description="Compiles Server 4."
         >
-        <echo level="info" message="AntFile: ${ant.file} Compiling DRDS"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling Server4"/>
         <echo level="info" message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
         <javac compiler="${build.compiler}"

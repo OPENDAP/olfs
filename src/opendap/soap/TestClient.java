@@ -53,7 +53,7 @@ import opendap.servers.ascii.toASCII;
 public class TestClient {
 
 
-    private static String defaultURL = "http://localhost:3001/opendap/s4/";
+    private static String defaultURL = "http://localhost:8080/opendap/s4/";
 
     public static void testMsg01(String[] args) throws Exception {
 
