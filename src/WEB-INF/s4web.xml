@@ -23,6 +23,11 @@
         </init-param>
 
         <init-param>
+            <param-name>OpendapSoapDispatchHandlerImplementation</param-name>
+            <param-value>opendap.olfs.SoapDispatchHandler</param-value>
+        </init-param>
+
+        <init-param>
             <param-name>DebugOn</param-name>
             <param-value>showRequest probeRequest showResponse CE BES</param-value>
         </init-param>

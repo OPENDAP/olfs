@@ -26,19 +26,18 @@ package opendap.olfs;
 
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
+import opendap.coreServlet.DispatchServlet;
 import opendap.soap.XMLNamespaces;
 import opendap.soap.ExceptionElementUtil;
-import opendap.ppt.PPTException;
 import opendap.util.Debug;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletException;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.JDOMException;
 import org.jdom.Document;
 
-import java.io.IOException;
 
 import thredds.cataloggen.SimpleCatalogBuilder;
 
@@ -51,9 +50,23 @@ import thredds.cataloggen.SimpleCatalogBuilder;
  */
 public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
+    /**
+     *
+     * @param ds
+     * @throws ServletException
+     */
+    public void init(DispatchServlet ds) throws ServletException{
+
+    }
 
 
-
+    /**
+     *
+     * @param reqID
+     * @param cmd
+     * @param mpr
+     * @throws Exception
+     */
     public void getDATA( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
@@ -89,12 +102,17 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                 contentId,
                 BesAPI.getDap2DataStream(datasetname, ce));
 
-
-
-
         mpr.addSoapBodyPart(respElement);
     }
 
+
+    /**
+     *
+     * @param reqID
+     * @param cmd
+     * @param mpr
+     * @throws Exception
+     */
     public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
         System.out.println("Received GetDDX reqElement.");
@@ -119,6 +137,15 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
     }
 
+
+    /**
+     *
+     * @param srvReq
+     * @param reqID
+     * @param cmd
+     * @param mpr
+     * @throws Exception
+     */
     public void getTHREDDSCatalog(HttpServletRequest srvReq, String reqID, Element cmd, MultipartResponse mpr) throws Exception {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();

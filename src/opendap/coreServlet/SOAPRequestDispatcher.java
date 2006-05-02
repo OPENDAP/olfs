@@ -57,27 +57,14 @@ public class SOAPRequestDispatcher {
     }
 
 
-    public static Document getSOAPDoc(HttpServletRequest req) throws IOException, JDOMException {
-
-        SAXBuilder saxBldr = new SAXBuilder();
-        Document doc = saxBldr.build(req.getReader());
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        System.out.println("");
-        System.out.println("POST Method got this XML Document:");
-
-        xmlo.output(doc, System.out);
-        System.out.println("");
-
-        return doc;
-    }
-
-
 
 
     /**
+     *
      * @param request
      * @param response
+     * @param odh
+     * @param sdh
      */
     public static void doPost03(HttpServletRequest request,
                                 HttpServletResponse response,
@@ -143,10 +130,13 @@ public class SOAPRequestDispatcher {
     }
 
 
-
-
-
-
+    /**
+     *
+     * @param srvReq
+     * @param reqElement
+     * @param mpr
+     * @param sdh
+     */
     private static void requestDispatcher(HttpServletRequest srvReq,
                                              Element reqElement,
                                              MultipartResponse mpr,
@@ -213,10 +203,33 @@ public class SOAPRequestDispatcher {
     }
 
 
+    /**
+     *
+     * @param req
+     * @return
+     * @throws IOException
+     * @throws JDOMException
+     */
+    private static Document getSOAPDoc(HttpServletRequest req) throws IOException, JDOMException {
 
+        SAXBuilder saxBldr = new SAXBuilder();
+        Document doc = saxBldr.build(req.getReader());
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
+        System.out.println("");
+        System.out.println("POST Method got this XML Document:");
 
+        xmlo.output(doc, System.out);
+        System.out.println("");
 
+        return doc;
+    }
+
+    /**
+     *
+     * @param doc
+     * @return  Returns true if the SOAP document looks good, false if not.
+     */
     private static boolean qcSOAPDocument(Document doc) {
         boolean result;
 

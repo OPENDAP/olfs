@@ -27,7 +27,6 @@ package opendap.coreServlet;
 import opendap.util.Debug;
 import opendap.util.Log;
 import opendap.dap.DODSException;
-import opendap.olfs.SoapDispatchHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +66,7 @@ public class DispatchServlet extends HttpServlet {
 
 
     private OpendapHttpDispatchHandler odh = null;
+    private OpendapSoapDispatchHandler sdh = null;
 
 
     /**
@@ -75,9 +75,9 @@ public class DispatchServlet extends HttpServlet {
      * the object opendap.util.Debug from the debuggery flags in the
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
+     *
+     * @throws ServletException
      */
-
-
     public void init() throws ServletException {
 
         super.init();
@@ -100,6 +100,30 @@ public class DispatchServlet extends HttpServlet {
 
 
         odh.init(this);
+
+
+
+
+
+
+        className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
+
+        System.out.println("\n\nOpendapSoapDispatchHandlerImplementation: " + className);
+
+        try {
+            Class classDefinition = Class.forName(className);
+            sdh = (OpendapSoapDispatchHandler) classDefinition.newInstance();
+        } catch (InstantiationException e) {
+            throw new ServletException("Cannot instantiate class: " + className,e);
+        } catch (IllegalAccessException e) {
+            throw new ServletException("Cannot access class: " + className,e);
+        } catch (ClassNotFoundException e) {
+            throw new ServletException("Cannot find class: " + className, e);
+        }
+
+
+        sdh.init(this);
+
 
 
     }
@@ -460,7 +484,6 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        SoapDispatchHandler sdh = new SoapDispatchHandler();
 
         SOAPRequestDispatcher.doPost(request,response, odh, sdh);
     }
