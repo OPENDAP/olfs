@@ -26,6 +26,7 @@ package opendap.soap;
 
 import org.jdom.Element;
 import org.jdom.Text;
+import org.jdom.Namespace;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -42,6 +43,8 @@ import javax.xml.soap.AttachmentPart;
 import java.rmi.server.UID;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Iterator;
 
 /**
@@ -343,6 +346,34 @@ public class SoapUtils {
 
         return req;
 
+
+    }
+
+
+
+    public static Element makeExceptionElement(String type, String msg, String location){
+
+        Namespace ns = XMLNamespaces.getOpendapSoapNamespace();
+
+        Element exception = new Element("OPeNDAPException",ns);
+
+
+        exception.addContent( new Element("Type",ns).setText(type));
+        exception.addContent( new Element("Message",ns).setText(msg));
+        exception.addContent( new Element("Location",ns).setText(location));
+
+        return exception;
+
+
+    }
+
+
+    public static Element anyExceptionElementBuilder(Exception e){
+        ByteArrayOutputStream baos =new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream( baos);
+        e.printStackTrace(ps);
+
+        return makeExceptionElement(e.getClass().getName(),e.getMessage(),baos.toString());
 
     }
 

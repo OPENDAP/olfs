@@ -27,6 +27,7 @@ package opendap.coreServlet;
 import opendap.util.Debug;
 import opendap.util.Log;
 import opendap.dap.DODSException;
+import opendap.olfs.SoapDispatchHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -459,7 +460,9 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        SOAPRequestDispatcher.doPost(request,response,odh);
+        SoapDispatchHandler sdh = new SoapDispatchHandler();
+
+        SOAPRequestDispatcher.doPost(request,response, odh, sdh);
     }
 
 

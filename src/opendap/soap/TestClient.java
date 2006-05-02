@@ -137,7 +137,7 @@ public class TestClient {
         SOAPEnvelope se = new SOAPEnvelope();
         //SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
         SoapUtils.addTHREDDSCatalogRequest((SOAPBody)se.getBody(),"/nc/");
-        SoapUtils.addDATARequest((SOAPBody)se.getBody(),"nc/fnoc1.nc","time");
+        SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"nc/fnoc1.nc","time");
         SoapUtils.addDATARequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u");
         SoapUtils.addDATARequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","v");
 
@@ -185,7 +185,7 @@ public class TestClient {
         Iterator i = respDoc.getDescendants(exceptionFilter);
 
         if(i.hasNext())
-            handleErrors(respDoc);
+            handleErrors(i);
         else {
 
             Element soapBody = respDoc.getRootElement().getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
@@ -358,8 +358,23 @@ public class TestClient {
 
 
 
-    private static void handleErrors(Document response) {
-        //To change body of created methods use File | Settings | File Templates.
+    private static void handleErrors(Iterator i) throws IOException {
+
+        System.out.println("\n\n\n\nOUCH! Errors!");
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        int cnt = 0;
+        while(i.hasNext()){
+            Element err = (Element) i.next();
+
+            System.out.println("\n--------------- ERROR "+ cnt++ +": ");
+            xmlo.output(err,System.out);
+            System.out.println("\n---------------");
+        }
+
+
     }
 
 
