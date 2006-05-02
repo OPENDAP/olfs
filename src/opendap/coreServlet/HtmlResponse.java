@@ -46,7 +46,7 @@ import opendap.servers.www.jscriptCore;
 class HtmlResponse {
 
     //private static final boolean _Debug = false;
-    private static String helpLocation = "http://unidata.ucar.edu/packages/dods/help_files/";
+    private static String helpLocation = "http://www.opendap.org/online_help_files/opendap_form_help.html";
 
 
     /**
