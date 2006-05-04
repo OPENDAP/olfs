@@ -28,10 +28,8 @@ import org.apache.commons.cli.*;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.Namespace;
-import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.DOMBuilder;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.DOMOutputter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -47,8 +45,6 @@ import opendap.dap.*;
 import opendap.servers.ascii.asciiFactory;
 import opendap.servers.ascii.toASCII;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.rpc.ServiceException;
 
 /**
  * Simple test driver for our message service.
@@ -66,6 +62,7 @@ public class TestClient {
     private int requestType;
 
     private boolean verbose;
+    private boolean runTests;
 
     private static final int GET_DDX             = 0;
     private static final int GET_DATA            = 1;
@@ -108,6 +105,7 @@ public class TestClient {
             String val;
 
             verbose = line.hasOption("v");
+            runTests = line.hasOption("tests");
 
 
             if(line.hasOption("t")){
@@ -127,11 +125,11 @@ public class TestClient {
             }
 
 
+
             if(line.hasOption("n"))
                 name = line.getOptionValue( "n" );
-            else {
-                throw new ParseException("You must provide the name of a data product to request.");
-            }
+            else
+                name = null;
 
             if(line.hasOption("h"))
                 hostUrl = line.getOptionValue( "h" );
@@ -149,6 +147,12 @@ public class TestClient {
             else
                 fileName = null;
 
+            if(fileName==null  && name==null) {
+                throw new ParseException("You must provide the either the name of a data product to request, " +
+                        "or the name of a file containing a batch request.");
+            }
+
+
         }
         catch( ParseException exp ) {
             // oops, something went wrong
@@ -164,16 +168,16 @@ public class TestClient {
         Options opts = new Options();
 
         opts.addOption("v", false,"Turn on verbose output.");
+        opts.addOption("tests", false,"Run canned tests.");
 
 
        OptionBuilder.withArgName( " x | d | c " );
        OptionBuilder.hasArg();
-       OptionBuilder.isRequired();
        OptionBuilder.withDescription("The type of the request, must be one of the following:\n" +
                "  x - To request a DDX.\n" +
                "  d - To request data.\n" +
                "  c - To request a THREDDS catalog.\n" +
-               "(THIS IS A REQUIRED ARGUMENT.)");
+               "(IF A BATCH REQUEST FILE IS NOT SPECIFIED, THEN THIS IS A REQUIRED ARGUMENT.)");
        opts.addOption(OptionBuilder.create( "t" ));
 
 
@@ -188,11 +192,11 @@ public class TestClient {
 
         OptionBuilder.withArgName( "name" );
         OptionBuilder.hasArg();
-        OptionBuilder.isRequired();
         OptionBuilder.withDescription("The name of the data product to get from the server." +
                 "If the request is for a DDX or data, then the name should be the name of a dataset. " +
                 "If the request is for a THREDDS catalog then the name should be the name (or path " +
-                "if you will) of a collection of datasets.(THIS IS A REQUIRED ARGUMENT.)" );
+                "if you will) of a collection of datasets.(IF A BATCH REQUEST FILE IS NOT SPECIFIED, " +
+                "THEN THIS IS A REQUIRED ARGUMENT.)" );
         opts.addOption(OptionBuilder.create( "n" ));
 
 
@@ -270,33 +274,54 @@ public class TestClient {
 
         TestClient tc = new TestClient(args);
 
+        if(tc.runTests){
+            tc.testMsg01();
+            tc.testMsg02();
 
-        if(tc.fileName != null)
-            tc.sendRequestFromFile();
-        else
-            tc.sendCmdLineRequest();
+        }
+        else {
+            if(tc.fileName != null)
+                tc.sendRequestFromFile();
+            else
+                tc.sendCmdLineRequest();
+        }
 
 
 
-
-        //TestClient.testMsg01(args);
-        //TestClient.testMsg02(args);
     }
 
 
 
-    public void sendRequestFromFile() throws IOException, JDOMException {
+    public void sendRequestFromFile() throws Exception {
 
         FileInputStream  fis = new FileInputStream(new File(fileName));
 
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(fis);
 
-        
+        SOAPEnvelope se = new SOAPEnvelope(fis);
+
+        Service service = new Service();
+
+        Call call = (Call) service.createCall();
+
+        call.setTargetEndpointAddress( new URL(hostUrl) );
+
+        Message msg = new Message(se);
 
 
+        if(verbose){
+            System.out.println("- - - - - - - - - - - - - - - ");
+            System.out.println("Sending this SOAP message:");
+            msg.writeTo(System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("- - - - - - - - - - - - - - - ");
+        }
+        call.invoke(msg);
 
+        //SoapUtils.probeMessage(call.getResponseMessage());
+
+
+        handleResponse(call.getResponseMessage());
 
     }
 
@@ -364,7 +389,7 @@ public class TestClient {
 
 
 
-    public  void testMsg01(String[] args) throws Exception {
+    public  void testMsg01() throws Exception {
 
         System.out.println();
         System.out.println("*************************************************************************************");
@@ -372,7 +397,6 @@ public class TestClient {
         System.out.println(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .");
 
 
-        String url = args.length>0?args[0]:defaultURL;
 
 
         DOMOutputter domO = new DOMOutputter();
@@ -404,7 +428,7 @@ public class TestClient {
         System.out.println("Call class is a: "+call.getClass().getName());
 
 
-        call.setTargetEndpointAddress( new URL(url) );
+        call.setTargetEndpointAddress( new URL(hostUrl) );
         //Vector          elems = (Vector) call.invoke( input );
         call.invoke( input );
 
@@ -423,28 +447,21 @@ public class TestClient {
 
 
 
-    public  void testMsg02(String[] args) throws Exception {
+    public  void testMsg02() throws Exception {
         System.out.println();
         System.out.println("*************************************************************************************");
         System.out.println("                                   testMsg02()");
         System.out.println(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .");
 
 
-        String url = args.length>0?args[0]:defaultURL;
 
 
 
         //Create the data for the attached file.
 
-        Service service = new Service();
-
-        Call call = (Call) service.createCall();
-
-        call.setTargetEndpointAddress( new URL(url) );
-
 
         SOAPEnvelope se = new SOAPEnvelope();
-        //SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
+        SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
         SoapUtils.addTHREDDSCatalogRequest((SOAPBody)se.getBody(),"/nc/");
         SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","time");
         SoapUtils.addDATARequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u");
@@ -461,6 +478,10 @@ public class TestClient {
         System.out.println();
         System.out.println("- - - - - - - - - - - - - - - ");
 
+
+        Service service = new Service();
+        Call call = (Call) service.createCall();
+        call.setTargetEndpointAddress( new URL(hostUrl) );
         call.invoke(msg);
 
         //SoapUtils.probeMessage(call.getResponseMessage());
