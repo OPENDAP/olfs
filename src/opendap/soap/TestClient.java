@@ -23,12 +23,15 @@ import org.apache.axis.message.SOAPBody;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.Message;
 import org.apache.axis.attachments.AttachmentPart;
+import org.apache.commons.cli.*;
 
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.Namespace;
+import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.DOMOutputter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -37,15 +40,15 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Enumeration;
-import java.io.DataInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.IOException;
+import java.io.*;
 
 import opendap.dap.XMLparser.DDSXMLParser;
 import opendap.dap.*;
 import opendap.servers.ascii.asciiFactory;
 import opendap.servers.ascii.toASCII;
+
+import javax.xml.soap.SOAPException;
+import javax.xml.rpc.ServiceException;
 
 /**
  * Simple test driver for our message service.
@@ -55,7 +58,313 @@ public class TestClient {
 
     private static String defaultURL = "http://localhost:8080/opendap/s4/";
 
-    public static void testMsg01(String[] args) throws Exception {
+
+    private String hostUrl;
+    private String name;
+    private String constraint;
+    private String fileName;
+    private int requestType;
+
+    private boolean verbose;
+
+    private static final int GET_DDX             = 0;
+    private static final int GET_DATA            = 1;
+    private static final int GET_THREDDS_CATALOG = 2;
+
+
+
+
+
+
+
+
+    public TestClient(String[] args){
+
+
+
+        Options opts = buildCommandLineOptions();
+        processCmdLine(args,opts);
+
+        System.out.println(status());
+
+
+
+
+
+
+
+
+
+    }
+
+
+    private void processCmdLine(String[] args, Options opts){
+        CommandLineParser parser = new GnuParser();
+        CommandLine line;
+        try {
+            // parse the command line arguments
+            line = parser.parse( opts, args );
+
+            String val;
+
+            verbose = line.hasOption("v");
+
+
+            if(line.hasOption("t")){
+                val = line.getOptionValue( "t" );
+                if(val.equals("x")){
+                    requestType = GET_DDX;
+                }
+                else if(val.equals("d")){
+                    requestType = GET_DATA;
+                }
+                else if(val.equals("c")){
+                    requestType = GET_THREDDS_CATALOG;
+                }
+                else {
+                    throw new ParseException("-t must have an argument of \"x\", \"d\", or \"c\".");
+                }
+            }
+
+
+            if(line.hasOption("n"))
+                name = line.getOptionValue( "n" );
+            else {
+                throw new ParseException("You must provide the name of a data product to request.");
+            }
+
+            if(line.hasOption("h"))
+                hostUrl = line.getOptionValue( "h" );
+            else
+                hostUrl = defaultURL;
+
+            if(line.hasOption("ce"))
+                constraint = line.getOptionValue( "ce" );
+            else
+                constraint = "";
+
+
+            if(line.hasOption("f"))
+                fileName = line.getOptionValue( "f" );
+            else
+                fileName = null;
+
+        }
+        catch( ParseException exp ) {
+            // oops, something went wrong
+            System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
+            usage(opts);
+            System.exit(1);
+        }
+
+
+    }
+
+    private static Options buildCommandLineOptions(){
+        Options opts = new Options();
+
+        opts.addOption("v", false,"Turn on verbose output.");
+
+
+       OptionBuilder.withArgName( " x | d | c " );
+       OptionBuilder.hasArg();
+       OptionBuilder.isRequired();
+       OptionBuilder.withDescription("The type of the request, must be one of the following:\n" +
+               "  x - To request a DDX.\n" +
+               "  d - To request data.\n" +
+               "  c - To request a THREDDS catalog.\n" +
+               "(THIS IS A REQUIRED ARGUMENT.)");
+       opts.addOption(OptionBuilder.create( "t" ));
+
+
+        OptionBuilder.withArgName( "targethost" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("The URL of (http://host:port/servlet/name) of a SOAP enabled OPeNDAP Server. " +
+                "If not specified will default to http://localhost:8080/opendap/s4/" );
+        opts.addOption(OptionBuilder.create( "h" ));
+
+
+
+
+        OptionBuilder.withArgName( "name" );
+        OptionBuilder.hasArg();
+        OptionBuilder.isRequired();
+        OptionBuilder.withDescription("The name of the data product to get from the server." +
+                "If the request is for a DDX or data, then the name should be the name of a dataset. " +
+                "If the request is for a THREDDS catalog then the name should be the name (or path " +
+                "if you will) of a collection of datasets.(THIS IS A REQUIRED ARGUMENT.)" );
+        opts.addOption(OptionBuilder.create( "n" ));
+
+
+
+        OptionBuilder.withArgName( "constraint" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("The constraint expression to use when with a DDX or DATA request " +
+                "will be ignored if the request is for a THREDDS catalog.");
+         opts.addOption(OptionBuilder.create( "ce" ));
+
+
+
+
+
+        OptionBuilder.withArgName( "filename" );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription("The name of a file containing one or more XML Request elements to send" +
+                "to the server.");
+        opts.addOption(OptionBuilder.create( "f" ));
+
+        return opts;
+
+    }
+
+    public String status(){
+        String d = "";
+        String s = "";
+
+        s += d+"TestClient STATUS: \n";
+        s += d+"    Target Host:           " + hostUrl + "\n";
+
+        if(fileName == null){
+            switch(requestType){
+                case GET_DDX:
+                    s += d+"    Request Type:          GetDDX\n";
+                    s += d+"    Dataset Name:          "+name+"\n";
+                    s += d+"    Constraint Expression: "+constraint+"\n";
+
+                    break;
+                case GET_DATA:
+                    s += d+"    Request Type:          GetDATA\n";
+                    s += d+"    Dataset Name:          "+name+"\n";
+                    s += d+"    Constraint Expression: "+constraint+"\n";
+                    break;
+                case GET_THREDDS_CATALOG:
+                    s += d+"    Request Type:          GetTHREDDSCatalog\n";
+                    s += d+"    Collection Name:       "+name+"\n";
+                    break;
+                default:
+                    s = "";
+                    break;
+            }
+        }
+        else {
+
+            s += d+"    Request File:         " + fileName + "\n";
+
+        }
+        return s;
+
+    }
+
+
+
+
+    private static void usage(Options opts){
+        // automatically generate the help statement
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("TestClient", opts );
+
+    }
+
+
+    public static void main(String[] args) throws Exception {
+
+        TestClient tc = new TestClient(args);
+
+
+        if(tc.fileName != null)
+            tc.sendRequestFromFile();
+        else
+            tc.sendCmdLineRequest();
+
+
+
+
+        //TestClient.testMsg01(args);
+        //TestClient.testMsg02(args);
+    }
+
+
+
+    public void sendRequestFromFile() throws IOException, JDOMException {
+
+        FileInputStream  fis = new FileInputStream(new File(fileName));
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(fis);
+
+        
+
+
+
+
+    }
+
+    public void sendCmdLineRequest() throws Exception {
+
+
+
+
+        //Create the data for the attached file.
+
+        Service service = new Service();
+
+        Call call = (Call) service.createCall();
+
+        call.setTargetEndpointAddress( new URL(hostUrl) );
+
+
+        SOAPEnvelope se = new SOAPEnvelope();
+        //SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
+
+
+        switch(requestType){
+            case GET_DDX:
+                SoapUtils.addDDXRequest((SOAPBody)se.getBody(),name,constraint);
+                break;
+
+            case GET_DATA:
+                SoapUtils.addDATARequest((SOAPBody)se.getBody(),name,constraint);
+                break;
+
+            case GET_THREDDS_CATALOG:
+                SoapUtils.addTHREDDSCatalogRequest((SOAPBody)se.getBody(),name);
+                break;
+
+            default:
+                break;
+        }
+
+
+        Message msg = new Message(se);
+
+
+        if(verbose){
+            System.out.println("- - - - - - - - - - - - - - - ");
+            System.out.println("Sending this SOAP message:");
+            msg.writeTo(System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("- - - - - - - - - - - - - - - ");
+        }
+        call.invoke(msg);
+
+        //SoapUtils.probeMessage(call.getResponseMessage());
+
+
+        handleResponse(call.getResponseMessage());
+
+    }
+
+
+
+
+
+
+
+
+
+    public  void testMsg01(String[] args) throws Exception {
 
         System.out.println();
         System.out.println("*************************************************************************************");
@@ -114,7 +423,7 @@ public class TestClient {
 
 
 
-    public static void testMsg02(String[] args) throws Exception {
+    public  void testMsg02(String[] args) throws Exception {
         System.out.println();
         System.out.println("*************************************************************************************");
         System.out.println("                                   testMsg02()");
@@ -137,7 +446,7 @@ public class TestClient {
         SOAPEnvelope se = new SOAPEnvelope();
         //SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
         SoapUtils.addTHREDDSCatalogRequest((SOAPBody)se.getBody(),"/nc/");
-        SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"nc/fnoc1.nc","time");
+        SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","time");
         SoapUtils.addDATARequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u");
         SoapUtils.addDATARequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","v");
 
@@ -169,8 +478,7 @@ public class TestClient {
 
 
 
-    public static void handleResponse(Message responseMsg) throws Exception {
-
+    public void handleResponse(Message responseMsg) throws Exception {
 
 
         DOMBuilder db = new DOMBuilder();
@@ -198,7 +506,7 @@ public class TestClient {
 
                 Element request = (Element) r;
                 String reqID = request.getAttributeValue("reqID",osnms);
-                System.out.println("\nRequest reqID: "+reqID);
+                if(verbose) System.out.println("\nRequest reqID: "+reqID);
 
                 Element response = null;
 
@@ -206,7 +514,7 @@ public class TestClient {
                     Element rsp = (Element) rp;
                     String respReqID = rsp.getAttributeValue("reqID",osnms);
                     if(reqID.equals(respReqID)){
-                        System.out.println("Found Matching Response: "+respReqID);
+                        if(verbose) System.out.println("Found Matching Response: "+respReqID);
                         response = rsp;
                         break;
                     }
@@ -239,15 +547,16 @@ public class TestClient {
     }
 
 
-    public static void handleDATAResponse(Element request, Element response, Message msg) throws Exception {
+    public  void handleDATAResponse(Element request, Element response, Message msg) throws Exception {
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        System.out.println("Received DATA response!");
-        System.out.println("Request command:");
-        xmlo.output(request,System.out);
-
+        if(verbose) {
+            System.out.println("Received DATA response!");
+            System.out.println("Request command:");
+            xmlo.output(request,System.out);
+        }
 
         String[] s = msg.getMimeHeaders().getHeader("XDODS-Server");
         String serverVersion = s[0];
@@ -260,7 +569,7 @@ public class TestClient {
         String cid = blob.getAttributeValue("href");
         cid = cid.substring(4,cid.length());
 
-        System.out.println("Searching for Attachment with cid: "+cid);
+        if(verbose) System.out.println("Searching for Attachment with cid: "+cid);
 
         AttachmentPart data = null;
         Iterator i = msg.getAttachments();
@@ -271,11 +580,12 @@ public class TestClient {
             String[] attachmentCid = ap.getMimeHeader("Content-ID");
 
             if(cid.equals(attachmentCid[0])){
-                System.out.println("Found it.");
+                 if(verbose) System.out.println("Found it.");
                 data = ap;
+                break;
             }
         }
-        System.out.println();
+         if(verbose) System.out.println();
 
 
         if(data==null)
@@ -315,18 +625,20 @@ public class TestClient {
     }
 
 
-    public static void handleDDXResponse(Element request, Element response) throws IOException {
+    public  void handleDDXResponse(Element request, Element response) throws IOException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Element ddx = response.getChild("Dataset",  XMLNamespaces.getOpendapDAP2Namespace());
 
-        System.out.println("Received DDX response!");
-        System.out.println("Request command:");
-        xmlo.output(request,System.out);
-        System.out.println();
-        System.out.println();
-        System.out.println("DDX Returned:");
+        if(verbose) {
+            System.out.println("Received DDX response!");
+            System.out.println("Request command:");
+            xmlo.output(request,System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("DDX Returned:");
+        }
         xmlo.output(ddx,System.out);
         System.out.println();
         System.out.println();
@@ -335,18 +647,21 @@ public class TestClient {
     }
 
 
-    public static void handleTHREDDSCatalogResponse(Element request, Element response) throws IOException {
+    public  void handleTHREDDSCatalogResponse(Element request, Element response) throws IOException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Element catalog = response.getChild("catalog",XMLNamespaces.getThreddsCatalogNamespace());
 
-        System.out.println("Received THREDDS catalog response!");
-        System.out.println("Request command:");
-        xmlo.output(request,System.out);
-        System.out.println();
-        System.out.println();
-        System.out.println("THREDDS Catalog Returned:");
+        if(verbose){
+            System.out.println("Received THREDDS catalog response!");
+            System.out.println("Request command:");
+            xmlo.output(request,System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("THREDDS Catalog Returned:");
+        }
+
         xmlo.output(catalog,System.out);
         System.out.println();
         System.out.println();
@@ -378,8 +693,4 @@ public class TestClient {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        //TestClient.testMsg01(args);
-        TestClient.testMsg02(args);
-    }
 }

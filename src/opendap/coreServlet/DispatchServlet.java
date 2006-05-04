@@ -103,9 +103,6 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-
-
-
         className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
 
         System.out.println("\n\nOpendapSoapDispatchHandlerImplementation: " + className);

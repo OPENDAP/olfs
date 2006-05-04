@@ -96,14 +96,8 @@ public class SOAPRequestDispatcher {
 
                 for (Object soapContent : soapContents) {
 
-
-                    if (soapContent instanceof Element) {
-                        Element clientReq = (Element) soapContent;
-                        requestDispatcher(request, clientReq, mpr, sdh);
-                    } else if (soapContent instanceof Text) {
-                        Text t = (Text) soapContent;
-                        System.out.println("Got a Text object: \"" + t.getText() + "\"");
-                    }
+                    Element clientReq = (Element) soapContent;
+                    requestDispatcher(request, clientReq, mpr, sdh);
                 }
 
                 mpr.send();
