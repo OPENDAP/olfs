@@ -70,27 +70,12 @@ public class TestClient {
 
 
 
-
-
-
-
-
     public TestClient(String[] args){
-
-
 
         Options opts = buildCommandLineOptions();
         processCmdLine(args,opts);
 
         System.out.println(status());
-
-
-
-
-
-
-
-
 
     }
 
