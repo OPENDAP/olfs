@@ -56,6 +56,7 @@
     <!-- Libraries -->
     <property name="jdom.lib"                     value="jdom-1.0.jar"/>
     <property name="opendap.lib"                  value="opendap-0.0.2.jar"/>
+    <property name="cli.lib"                      value="apache-commons-cli-1.0.jar"/>
 
     <property name="axis.lib"                     value="axis-1.3.0.jar"/>
     <property name="apache-commons-discovery.lib" value="commons-discovery-0.2.jar"/>
@@ -75,6 +76,7 @@
         <fileset dir="${lib.dir}">
             <include name="${opendap.lib}"/>
             <include name="${jdom.lib}"/>
+            <include name="${cli.lib}"/>
         </fileset>
         <fileset dir="${axislib.dir}">
             <include name="${axis.lib}"/>
@@ -132,6 +134,7 @@
             <fileset dir="${lib.dir}">
                 <include name="${opendap.lib}"/>
                 <include name="${jdom.lib}"/>
+                <include name="${cli.lib}"/>
             </fileset>
             <fileset dir="${axislib.dir}">
                 <include name="${axis.lib}"/>

@@ -92,7 +92,10 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         Element blob = ddx.getChild("dodsBLOB", XMLNamespaces.getOpendapDAP2Namespace());
 
         String contentId = MultipartResponse.getUidString();
+
+        //@todo Add the namespace to the href - first we must add it to the schema!
         blob.setAttribute("href", "cid:" + contentId);
+        
 
 
         respElement.addContent(ddx);

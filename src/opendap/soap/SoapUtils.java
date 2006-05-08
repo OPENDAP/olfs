@@ -27,13 +27,17 @@ package opendap.soap;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.Namespace;
+import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+import org.jdom.filter.ElementFilter;
+import org.jdom.input.DOMBuilder;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
-import org.apache.axis.message.SOAPBody;
-import org.apache.axis.message.PrefixedQName;
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.message.MessageElement;
+import org.apache.axis.client.Service;
+import org.apache.axis.client.Call;
+import org.apache.axis.message.*;
 
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.MimeHeader;
@@ -41,11 +45,17 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.soap.AttachmentPart;
 
 import java.rmi.server.UID;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Iterator;
+import java.util.List;
+import java.net.URL;
+
+import opendap.dap.XMLparser.DDSXMLParser;
+import opendap.dap.ServerVersion;
+import opendap.dap.DDS;
+import opendap.dap.BaseTypeFactory;
+import opendap.dap.DefaultFactory;
+import opendap.servers.ascii.asciiFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -377,6 +387,486 @@ public class SoapUtils {
 
     }
 
+
+
+    public static DDS getDDX(String host,
+                              String datasetName,
+                              String constraintExpression,
+                              boolean verbose)
+            throws Exception {
+
+
+        Service service = new Service();
+
+        Call call = (Call) service.createCall();
+
+        call.setTargetEndpointAddress( new URL(host) );
+
+
+        SOAPEnvelope se = new SOAPEnvelope();
+        //SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
+
+
+        SoapUtils.addDDXRequest((SOAPBody)se.getBody(),datasetName,constraintExpression);
+
+
+        Message msg = new Message(se);
+
+
+        if(verbose){
+            System.out.println("- - - - - - - - - - - - - - - ");
+            System.out.println("Sending this SOAP message:");
+            msg.writeTo(System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("- - - - - - - - - - - - - - - ");
+        }
+        call.invoke(msg);
+
+        return handleSingleDDXResponse(call.getResponseMessage(),verbose);
+
+    }
+
+
+
+
+    public static DDS handleSingleDDXResponse(Message responseMsg, boolean verbose) throws Exception {
+        return handleSingleDDXResponse(responseMsg,new DefaultFactory(),verbose);
+    }
+
+
+
+
+
+
+    public static DDS handleSingleDDXResponse(Message responseMsg, BaseTypeFactory btf, boolean verbose) throws Exception {
+
+
+        DOMBuilder db = new DOMBuilder();
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+        Namespace osd2nms = XMLNamespaces.getOpendapDAP2Namespace();
+
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+        Element d = db.build(responseMsg.getSOAPEnvelope().getAsDOM());
+        d.detach();
+
+        Document respDoc = new Document(d);
+
+        //xmlo.output(respDoc,System.out);
+
+        ElementFilter exceptionFilter = new ElementFilter("OPeNDAPException");
+        Iterator i = respDoc.getDescendants(exceptionFilter);
+
+        if(i.hasNext())
+            throw new Exception(getServerErrorMsgs(i));
+
+
+
+        Element soapBody = respDoc.getRootElement().getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
+
+
+        //xmlo.output(soapBody,System.out);
+
+
+
+        List resps = soapBody.getChildren("Response",XMLNamespaces.getOpendapSoapNamespace());
+        List reqs = soapBody.getChildren("Request",XMLNamespaces.getOpendapSoapNamespace());
+
+        if(verbose) System.out.println("Requests: "+reqs.size() +"   Responses: "+resps.size());
+
+        if(reqs.size()>1 ){
+            throw new Exception("More than one Request Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(reqs.size()<1 ){
+            throw new Exception("No Request Elements found in SOAP envelope. ");
+        }
+
+
+        if(resps.size()>1){
+            throw new Exception("More than one Response Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(resps.size()<1){
+            throw new Exception("No Response Element found in SOAP envelope. ");
+        }
+
+
+        Element request = (Element) reqs.get(0);
+        Element response = (Element) resps.get(0);
+
+        String reqID = request.getAttributeValue("reqID",osnms);
+        String respReqID = response.getAttributeValue("reqID",osnms);
+
+        if(verbose) System.out.println("\nRequest reqID: "+reqID+"  Response reqID: "+reqID);
+
+
+        if(reqID.equals(respReqID)){
+        }
+        else{
+            throw new Exception("BAD THINGS HAPPENED! " +
+                    "The Server returned a Response <"+respReqID+"> that is not related to Request <"+reqID+">");
+        }
+
+
+        Element ds = response.getChild("Dataset",osd2nms);
+        ds.detach();
+
+        Document ddxDoc = new Document(ds);
+
+        DDSXMLParser parser = new DDSXMLParser(XMLNamespaces.OpendapDAP2NamespaceString);
+
+        DDS dds = new DDS();
+
+        parser.parse(ddxDoc,dds,btf,false);
+
+        return dds;
+    }
+
+
+    public static DDS getDATA(String host,
+                              String datasetName,
+                              String constraintExpression,
+                              boolean verbose)
+            throws Exception {
+
+
+        Service service = new Service();
+
+        Call call = (Call) service.createCall();
+
+        call.setTargetEndpointAddress( new URL(host) );
+
+
+        SOAPEnvelope se = new SOAPEnvelope();
+
+        SoapUtils.addDATARequest((SOAPBody)se.getBody(),datasetName,constraintExpression);
+
+
+        Message msg = new Message(se);
+
+
+        if(verbose){
+            System.out.println("- - - - - - - - - - - - - - - ");
+            System.out.println("Sending this SOAP message:");
+            msg.writeTo(System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("- - - - - - - - - - - - - - - ");
+        }
+        call.invoke(msg);
+
+        return handleSingleDATAResponse(call.getResponseMessage(),verbose);
+
+    }
+
+
+
+    public static DDS handleSingleDATAResponse(Message responseMsg, boolean verbose) throws Exception {
+        return handleSingleDATAResponse(responseMsg,new DefaultFactory(),verbose);
+    }
+
+
+
+    public static DDS handleSingleDATAResponse(Message responseMsg, BaseTypeFactory btf, boolean verbose) throws Exception {
+
+
+        DOMBuilder db = new DOMBuilder();
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+        Namespace osd2nms = XMLNamespaces.getOpendapDAP2Namespace();
+
+        Element d = db.build(responseMsg.getSOAPEnvelope().getAsDOM());
+        d.detach();
+
+
+        Document respDoc = new Document(d);
+
+        ElementFilter exceptionFilter = new ElementFilter("OPeNDAPException");
+        Iterator i = respDoc.getDescendants(exceptionFilter);
+
+        if(i.hasNext())
+            throw new Exception(getServerErrorMsgs(i));
+
+
+
+        Element soapBody = respDoc.getRootElement().getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
+
+        List reqs = soapBody.getChildren("Request",XMLNamespaces.getOpendapSoapNamespace());
+        List resps = soapBody.getChildren("Response",XMLNamespaces.getOpendapSoapNamespace());
+
+
+        if(reqs.size()>1 ){
+            throw new Exception("More than one Request Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(reqs.size()<1 ){
+            throw new Exception("No Request Elements found in SOAP envelope. ");
+        }
+
+
+        if(resps.size()>1){
+            throw new Exception("More than one Response Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(resps.size()<1){
+            throw new Exception("No Response Element found in SOAP envelope. ");
+        }
+
+        Element request = (Element) reqs.get(0);
+        Element response = (Element) resps.get(0);
+
+        String reqID = request.getAttributeValue("reqID",osnms);
+        String respReqID = response.getAttributeValue("reqID",osnms);
+
+        if(verbose) System.out.println("\nRequest reqID: "+reqID+"  Response reqID: "+reqID);
+
+
+        if(reqID.equals(respReqID)){
+        }
+        else{
+            throw new Exception("BAD THINGS HAPPENED! " +
+                    "The Server returned a Response <"+respReqID+"> that is not related to Request <"+reqID+">");
+        }
+
+
+        Element ds = response.getChild("Dataset",osd2nms);
+        ds.detach();
+
+        //new XMLOutputter(Format.getPrettyFormat()).output(ds,System.out);
+
+
+        Element blob = ds.getChild("dodsBLOB",osd2nms);
+
+
+        //@todo When the schema is updated we must add the namespace to the this getAttribute call
+        String cid = blob.getAttributeValue("href");
+
+        if(cid==null)
+            throw new Exception("\n\nThe returned DDX has an incorrectly structured blob reference.\n" +
+                    "It is missing an href attribute that points to the Content-ID of the binary data attachment.\n" +
+                    "Did you mistakenly ask for a DDX when you meant to ask for DATA?\n");
+
+
+        cid = cid.substring(4,cid.length());
+
+
+        AttachmentPart data = getAttachment(responseMsg,cid,verbose);
+
+
+
+
+
+
+        Document ddxDoc = new Document(ds);
+
+        DDSXMLParser parser = new DDSXMLParser(XMLNamespaces.OpendapDAP2NamespaceString);
+
+        DDS dds = new DDS();
+
+        parser.parse(ddxDoc,dds,btf,false);
+
+
+
+
+
+        String[] s = responseMsg.getMimeHeaders().getHeader("XDODS-Server");
+        String serverVersion = s[0];
+        ServerVersion sv = new ServerVersion(serverVersion);
+
+
+        dds.deserialize(new DataInputStream((InputStream)data.getContent()), sv, null);
+
+
+
+        return dds;
+    }
+
+
+
+    public static AttachmentPart getAttachment(Message msg, String contentID, boolean verbose) throws Exception {
+
+        if(verbose) System.out.println("Searching for Attachment with cid: "+contentID);
+
+        AttachmentPart data = null;
+        Iterator i = msg.getAttachments();
+
+        while(i.hasNext()){
+            org.apache.axis.attachments.AttachmentPart ap = (org.apache.axis.attachments.AttachmentPart) i.next();
+
+            String[] attachmentCid = ap.getMimeHeader("Content-ID");
+
+            if(contentID.equals(attachmentCid[0])){
+                 if(verbose) System.out.println("Found it.");
+                data = ap;
+                break;
+            }
+        }
+         if(verbose) System.out.println();
+
+
+        if(data==null)
+            throw new Exception("Error! Message does not contain an attachment " +
+                    "with a ContentID of "+contentID);
+
+
+        return data;
+    }
+
+
+    public static Document getTHREDDSCatalog(String host,
+                              String path,
+                              boolean verbose)
+            throws Exception {
+
+
+        Service service = new Service();
+
+        Call call = (Call) service.createCall();
+
+        call.setTargetEndpointAddress( new URL(host) );
+
+
+        SOAPEnvelope se = new SOAPEnvelope();
+        //SoapUtils.addDDXRequest((SOAPBody)se.getBody(),"/nc/fnoc1.nc","u,v");
+
+
+        SoapUtils.addTHREDDSCatalogRequest((SOAPBody)se.getBody() ,path);
+
+
+        Message msg = new Message(se);
+
+
+        if(verbose){
+            System.out.println("- - - - - - - - - - - - - - - ");
+            System.out.println("Sending this SOAP message:");
+            msg.writeTo(System.out);
+            System.out.println();
+            System.out.println();
+            System.out.println("- - - - - - - - - - - - - - - ");
+        }
+        call.invoke(msg);
+
+        return handleSingleTHREDDSCatalogResponse(call.getResponseMessage(),verbose);
+
+    }
+
+    private static Document handleSingleTHREDDSCatalogResponse(Message responseMsg, boolean verbose) throws Exception{
+
+        DOMBuilder db = new DOMBuilder();
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+
+        Element d = db.build(responseMsg.getSOAPEnvelope().getAsDOM());
+        d.detach();
+
+        Document respDoc = new Document(d);
+
+        ElementFilter exceptionFilter = new ElementFilter("OPeNDAPException");
+        Iterator i = respDoc.getDescendants(exceptionFilter);
+
+        if(i.hasNext())
+            throw new Exception(getServerErrorMsgs(i));
+
+
+
+        Element soapBody = respDoc.getRootElement().getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
+
+        List reqs = soapBody.getChildren("Request",XMLNamespaces.getOpendapSoapNamespace());
+        List resps = soapBody.getChildren("Response",XMLNamespaces.getOpendapSoapNamespace());
+
+
+        if(reqs.size()>1 ){
+            throw new Exception("More than one Request Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(reqs.size()<1 ){
+            throw new Exception("No Request Elements found in SOAP envelope. ");
+        }
+
+
+        if(resps.size()>1){
+            throw new Exception("More than one Response Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(resps.size()<1){
+            throw new Exception("No Response Element found in SOAP envelope. ");
+        }
+
+
+        Element request = (Element) reqs.get(0);
+        Element response = (Element) resps.get(0);
+
+        String reqID = request.getAttributeValue("reqID",osnms);
+        String respReqID = response.getAttributeValue("reqID",osnms);
+
+        if(verbose) System.out.println("\nRequest reqID: "+reqID+"  Response reqID: "+reqID);
+
+
+        if(reqID.equals(respReqID)){
+        }
+        else{
+            throw new Exception("BAD THINGS HAPPENED! " +
+                    "The Server returned a Response <"+respReqID+"> that is not related to Request <"+reqID+">");
+        }
+
+
+        List c = response.getChildren();
+
+        if(c.size() != 1){
+            throw new Exception("Badly formed response! Response Element MUST contain " +
+                    "one and opnly one child Element.");
+        }
+
+
+        Element catalog = (Element) c.get(0);
+
+        catalog.detach();
+
+        return new Document(catalog);
+
+
+
+
+    }
+
+
+    private static String getServerErrorMsgs(Iterator i) {
+
+       String eMsg = "\"The Server Returned One Or More Errors.  Messages: \n";
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        int cnt = 0;
+        while(i.hasNext()){
+            Element err = (Element) i.next();
+
+            eMsg +="\n--------------- ERROR "+ cnt++ +": ";
+            eMsg += xmlo.outputString(err);
+            eMsg +="\n---------------";
+        }
+
+        return eMsg;
+    }
 
 
 }

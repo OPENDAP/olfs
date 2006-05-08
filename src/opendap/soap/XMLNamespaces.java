@@ -36,7 +36,7 @@ public class XMLNamespaces {
 
     public static final String OpendapSoapNamespaceString = "http://xml.opendap.org/ns/soap1";
     public static org.jdom.Namespace getOpendapSoapNamespace(){
-        return org.jdom.Namespace.getNamespace("osnms",OpendapSoapNamespaceString);
+        return org.jdom.Namespace.getNamespace("ons",OpendapSoapNamespaceString);
     }
 
 

@@ -277,6 +277,7 @@ public class TestClient {
         if(tc.runTests){
             tc.testMsg01();
             tc.testMsg02();
+            tc.testMsg03();
 
         }
         else {
@@ -488,6 +489,60 @@ public class TestClient {
 
 
         handleResponse(call.getResponseMessage());
+
+
+
+
+
+        System.out.println("*************************************************************************************");
+        System.out.println();
+    }
+
+
+
+
+    public  void testMsg03() throws Exception {
+        System.out.println();
+        System.out.println("*************************************************************************************");
+        System.out.println("                                   testMsg03()");
+        System.out.println(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .");
+
+
+        DDS dds;
+
+
+        System.out.println("\n\n\n-----------------------\nUsing the getDDX() method:\n");
+        dds = SoapUtils.getDDX(hostUrl,"/nc/fnoc1.nc","",verbose);
+
+        System.out.println("From the returned DDX I get this DDS:\n");
+        dds.print(System.out);
+        System.out.println("\n\nFrom the returned DDX I get this DDX:\n");
+        dds.printXML(System.out);
+
+
+
+        System.out.println("\n\n\n-----------------------\nUsing the getDATA() method:\n");
+
+        dds = SoapUtils.getDATA(hostUrl,"/nc/fnoc1.nc","u,v",verbose);
+        System.out.println("From the returned DDX I get this DDS:\n");
+        dds.print(System.out);
+        System.out.println("\n\nFrom the returned DDX I get this DDX:\n");
+        dds.printXML(System.out);
+        System.out.println("\n\nFrom the returned DDX I get these values:\n");
+        dds.printVal(System.out,"");
+
+
+        System.out.println("\n\n\n-----------------------\nUsing the getTHREDDSCatalog() method:\n");
+
+        Document catalog = SoapUtils.getTHREDDSCatalog(hostUrl,"/nc",verbose);
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        System.out.println("I got this catalog:\n");
+        xmlo.output(catalog,System.out);
+
+
+
 
 
 
