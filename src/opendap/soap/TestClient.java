@@ -121,8 +121,8 @@ public class TestClient {
             else
                 hostUrl = defaultURL;
 
-            if(line.hasOption("ce"))
-                constraint = line.getOptionValue( "ce" );
+            if(line.hasOption("c"))
+                constraint = line.getOptionValue( "c" );
             else
                 constraint = "";
 
@@ -132,7 +132,7 @@ public class TestClient {
             else
                 fileName = null;
 
-            if(fileName==null  && name==null) {
+            if(fileName==null  && name==null && runTests==false) {
                 throw new ParseException("You must provide the either the name of a data product to request, " +
                         "or the name of a file containing a batch request.");
             }
@@ -190,7 +190,7 @@ public class TestClient {
         OptionBuilder.hasArg();
         OptionBuilder.withDescription("The constraint expression to use when with a DDX or DATA request " +
                 "will be ignored if the request is for a THREDDS catalog.");
-         opts.addOption(OptionBuilder.create( "ce" ));
+         opts.addOption(OptionBuilder.create( "c" ));
 
 
 
