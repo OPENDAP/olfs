@@ -97,7 +97,7 @@
 
 
     <target name="compile"
-        depends="init"
+        depends="init,show"
         description="Compiles Server4 Test Client Application."
         >
         <echo level="info" message="AntFile: ${ant.file} Compiling Test Client"/>
