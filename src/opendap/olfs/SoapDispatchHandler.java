@@ -95,7 +95,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         //@todo Add the namespace to the href - first we must add it to the schema!
         blob.setAttribute("href", "cid:" + contentId);
-        
+
 
 
         respElement.addContent(ddx);
@@ -164,6 +164,20 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         BESCrawlableDataset s4cd = new BESCrawlableDataset(path, null);
 
+        String baseURL = srvReq.getRequestURI().substring(0, srvReq.getRequestURI().lastIndexOf(srvReq.getPathInfo()) + 1);
+
+        if(baseURL==null){
+            respElement =  ExceptionElementUtil.makeExceptionElement(
+                    "CatalogGenError",
+                    "BaseURL = null.\n" +
+                            "getREquestURI(): "+srvReq.getRequestURI()+"\n" +
+                            "getPathInfo(): "+srvReq.getPathInfo()+"\n",
+                    "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+            );
+            mpr.addSoapBodyPart(respElement);
+
+        }
+
 
         if (s4cd.isCollection()) {
 
@@ -172,7 +186,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                     BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
                     "OPeNDAP-Server4",                    // Service Name
                     "OPeNDAP",                            // Service Type Name
-                    srvReq.getRequestURI().substring(0, srvReq.getRequestURI().lastIndexOf(srvReq.getPathInfo()) + 1)); // Base URL for this service
+                    baseURL ); // Base URL for this service
 
             if (Debug.isSet("showResponse")) {
                 System.out.println("SOAPRequestDispatcher:GetTHREDDSCatalog - Generating catalog");
