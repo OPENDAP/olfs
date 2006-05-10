@@ -168,17 +168,21 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         String pathInfo = srvReq.getPathInfo();
 
 
-            respElement =  ExceptionElementUtil.makeExceptionElement(
-                    "CatalogGenError",
+        respElement =  ExceptionElementUtil.makeExceptionElement(
+                "CatalogGenError",
 
-                            "getREquestURI(): "+srvReq.getRequestURI()+"\n" +
-                            "getPathInfo(): "+srvReq.getPathInfo()+"\n",
-                    "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
-            );
-            mpr.addSoapBodyPart(respElement);
+                        "getRequestURI(): "+srvReq.getRequestURI()+"     " +
+                        "getPathInfo(): "+srvReq.getPathInfo()+"\n",
+                "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+        );
+        mpr.addSoapBodyPart(respElement);
 
+        String baseURL;
+        if(pathInfo != null)
+            baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
+        else
+            baseURL = reqURI;
 
-        String baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
 
         if (s4cd.isCollection()) {
 
