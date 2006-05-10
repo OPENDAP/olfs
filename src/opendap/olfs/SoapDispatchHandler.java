@@ -164,20 +164,21 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         BESCrawlableDataset s4cd = new BESCrawlableDataset(path, null);
 
-        String baseURL = srvReq.getRequestURI().substring(0, srvReq.getRequestURI().lastIndexOf(srvReq.getPathInfo()) + 1);
+        String reqURI   = srvReq.getRequestURI();
+        String pathInfo = srvReq.getPathInfo();
 
-        if(baseURL==null){
+
             respElement =  ExceptionElementUtil.makeExceptionElement(
                     "CatalogGenError",
-                    "BaseURL = null.\n" +
+
                             "getREquestURI(): "+srvReq.getRequestURI()+"\n" +
                             "getPathInfo(): "+srvReq.getPathInfo()+"\n",
                     "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
             );
             mpr.addSoapBodyPart(respElement);
 
-        }
 
+        String baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
 
         if (s4cd.isCollection()) {
 
