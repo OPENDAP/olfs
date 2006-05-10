@@ -145,7 +145,7 @@
         <copy file="${lib.dir}/${cli.lib}" tofile="${build.dist}/${cli.lib}"/>
 
         <jar destfile="${build.dist}/beclient.jar"
-            manifest="jar/MANIFEST.MF">
+            manifest="jar/BESclient.MANIFEST.MF">
             <fileset dir="${build.classes}">
                 <include name="opendap/ppt/**/*.class"/>
                 <include name="hao/**/*.class"/>
