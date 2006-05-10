@@ -167,7 +167,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         String reqURI   = srvReq.getRequestURI();
         String pathInfo = srvReq.getPathInfo();
 
-
+/*
         respElement =  ExceptionElementUtil.makeExceptionElement(
                 "CatalogGenError",
 
@@ -176,7 +176,9 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                 "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
         );
         mpr.addSoapBodyPart(respElement);
+*/
 
+        
         String baseURL;
         if(pathInfo != null)
             baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
