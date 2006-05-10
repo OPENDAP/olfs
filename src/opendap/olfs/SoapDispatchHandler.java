@@ -178,12 +178,12 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         mpr.addSoapBodyPart(respElement);
 */
 
-        
+
         String baseURL;
         if(pathInfo != null)
             baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
         else
-            baseURL = reqURI;
+            baseURL = reqURI+"/";
 
 
         if (s4cd.isCollection()) {
