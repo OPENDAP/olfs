@@ -178,7 +178,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         mpr.addSoapBodyPart(respElement);
 */
 
-
+//@todo Why did I have to do this? doPost() and doGet() have different behaviours relative to reqURI and pathINFO
         String baseURL;
         if(pathInfo != null)
             baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);

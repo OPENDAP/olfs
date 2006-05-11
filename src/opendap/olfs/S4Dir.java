@@ -81,6 +81,11 @@ public class S4Dir {
 
         String requestURL = rs.getRequestURL();
 
+
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - requestURL: "+requestURL);
+
+
+
         // clean up the url
         if (requestURL.endsWith("/"))
             requestURL = requestURL.substring(0, requestURL.length() - 1);
@@ -124,6 +129,9 @@ public class S4Dir {
 
         if (baseName.lastIndexOf("/") > 0)
             baseName = baseName.substring(baseName.lastIndexOf("/"), baseName.length());
+
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - baseName: "+baseName);
+
 
         // Strip off the basename to make the link
         link = requestURL.substring(0, requestURL.lastIndexOf(baseName));

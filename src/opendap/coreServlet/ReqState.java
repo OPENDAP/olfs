@@ -34,6 +34,8 @@ import java.util.Iterator;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
+import opendap.util.Debug;
+
 
 /**
  * User requests get cached here so that downstream code can access
@@ -392,12 +394,13 @@ public class ReqState {
         // Figure out the data set name.
         dataSetName = myHttpRequest.getPathInfo();
 
-        System.out.println("myHttpRequest.getPathInfo() = " + dataSetName);
+        if(Debug.isSet("ReqState")) System.out.println("ReqState - myHttpRequest.getPathInfo() = " + dataSetName);
         requestSuffix = null;
 
         //Are they looking for a directory?
         if (dataSetName == null || dataSetName.endsWith("/")) {
             requestURL = myHttpRequest.getRequestURL().toString();
+            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a dir)");
             //return;
         } else {
             // Break the path up and find the last (terminal)
@@ -436,7 +439,8 @@ public class ReqState {
                 // No longer shall we strip the leadin slash! ndp 2/3/06
                 //this.dataSetName = this.dataSetName.substring(1, this.dataSetName.length());
             }
-            requestURL = myHttpRequest.getRequestURL().substring(0, suffixIndex);
+            requestURL = myHttpRequest.getRequestURL().substring(0, suffixIndex-1);
+            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a file)");
         }
 
 
