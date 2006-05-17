@@ -563,7 +563,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 //        System.out.println("myPath:      "+"/"+rs.getDataset());
 
 /*
-        if(catHandler.processReqForCatalog(this,request,response, contentPath)){
+        if(catHandler.processReqForCatalog(this,request,response, request.getPathInfo())){
             System.out.println("Processed Catalog Request");
         }
         else {

@@ -219,6 +219,20 @@ public class BesAPI {
     }
 
 
+    public static InputStream getDDXStream(String dataset,
+                                    String constraintExpression)
+            throws BadConfigurationException, PPTException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        besGetTransaction(getAPINameForDDX(), dataset, constraintExpression, baos);
+
+       return new ByteArrayInputStream(baos.toByteArray());
+
+
+    }
+
+
 
 
 

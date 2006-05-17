@@ -37,9 +37,14 @@ import javax.servlet.ServletException;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 
 
 import thredds.cataloggen.SimpleCatalogBuilder;
+
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -103,6 +108,71 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         mpr.addAttachment("application/octet-stream",
                 contentId,
+                BesAPI.getDap2DataStream(datasetname, ce));
+
+        mpr.addSoapBodyPart(respElement);
+    }
+
+
+
+    /**
+     *
+     * @param reqID
+     * @param cmd
+     * @param mpr
+     * @throws Exception
+     */
+    public void getDATA_NEW( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
+
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+
+        System.out.println("Received GetDATA reqElement.");
+        Element dataSet = cmd.getChild("DataSet", osnms);
+
+        System.out.println("Dataset:\n"+dataSet.toString());
+
+
+        String datasetname = dataSet.getChild("name",osnms).getTextTrim();
+        String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
+
+        System.out.println("Processing DataSet - path: "+datasetname+"   ce: "+ce);
+
+        Element respElement = new Element("Response",osnms);
+        respElement.setAttribute("reqID",reqID,osnms);
+        String contentId = MultipartResponse.getUidString();
+        respElement.setAttribute("href","cid:"+contentId,osnms);
+
+
+        Document ddxDoc =  BesAPI.getDDXDocument(datasetname, ce);
+        Element ddx = ddxDoc.getRootElement();
+        //@todo Fix The BES use of dodsBLOB!
+
+        Element blob = ddx.getChild("dodsBLOB", XMLNamespaces.getOpendapDAP2Namespace());
+
+        String blobID = MultipartResponse.getUidString();
+
+        //@todo Add the namespace to the href - first we must add it to the schema!
+        blob.setAttribute("href", "cid:" + blobID);
+
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        xmlo.output(ddxDoc,baos);
+
+
+
+
+
+
+        mpr.addAttachment("text/xml",
+                contentId,
+                new ByteArrayInputStream(baos.toByteArray()));
+
+
+        mpr.addAttachment("application/octet-stream",
+                blobID,
                 BesAPI.getDap2DataStream(datasetname, ce));
 
         mpr.addSoapBodyPart(respElement);
