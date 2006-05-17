@@ -218,7 +218,17 @@ public class DispatchServlet extends HttpServlet {
                 String dataSet = rs.getDataset();
                 String requestSuffix = rs.getRequestSuffix();
 
-                if ( // Directory response?
+
+
+                if ( // Version Response?
+                        dataSet.equalsIgnoreCase("/version") ||
+                                dataSet.equalsIgnoreCase("/version/") ||
+                                requestSuffix.equalsIgnoreCase("ver") ||
+                                requestSuffix.equalsIgnoreCase("version")
+                        ) {
+                    odh.sendVersion(request, response, rs);
+
+                } else if ( // Directory response?
                         dataSet == null ||
                                 dataSet.equals("/") ||
                                 dataSet.equals("") ||
@@ -228,15 +238,7 @@ public class DispatchServlet extends HttpServlet {
                     odh.sendDir(request, response, rs);
 
 
-                } else if ( // Version Response?
-                        dataSet.equalsIgnoreCase("/version") ||
-                                dataSet.equalsIgnoreCase("/version/") ||
-                                requestSuffix.equalsIgnoreCase("ver") ||
-                                requestSuffix.equalsIgnoreCase("version")
-                        ) {
-                    odh.sendVersion(request, response, rs);
-
-                } else if ( // Help Response?
+                }else if ( // Help Response?
                         dataSet.equalsIgnoreCase("/help") ||
                                 dataSet.equalsIgnoreCase("/help/") ||
                                 dataSet.equalsIgnoreCase("/" + requestSuffix) ||
