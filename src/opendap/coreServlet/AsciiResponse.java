@@ -50,11 +50,18 @@ import opendap.servers.ascii.asciiFactory;
 class AsciiResponse {
 
 
-    /**--------------------------------------------------------------------------------
-     *
+
+    /**
      * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
      * comma delimited ascii columns for ingestion into some not so
-     * OPeNDAP enabled application such as MS-Excel. 
+     * OPeNDAP enabled application such as MS-Excel.
+     * @param pw Where to print the ASCII response.
+     * @param rs The ReqState object associated with this client request
+     * @param is An input stream containing the .dods data response (i.e. a serialized DataDDS)
+     * for the dataset requested by the client.
+     * @throws DODSException
+     * @throws ParseException
+     * @throws IOException
      */
     static void sendASCII(PrintWriter pw,
                           ReqState rs,
