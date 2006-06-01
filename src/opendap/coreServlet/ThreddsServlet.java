@@ -310,15 +310,13 @@ public class ThreddsServlet extends HttpServlet {
             synchronized (syncLock) {
                 long reqno = HitCounter++;
 
-                if (!isDebug) {
-                    if (Debug.isSet("showRequest")) {
-                        System.out.println("-------------------------------------------");
-                        System.out.println("Server: " + getServerName() + "   Request #" + reqno);
-                        System.out.println("Client: " + request.getRemoteHost());
-                        System.out.println(rs.toString());
-                        Log.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
-                                "' CE: '" + rs.getConstraintExpression() + "'");
-                    }
+                if (Debug.isSet("showRequest")) {
+                    System.out.println("-------------------------------------------");
+                    System.out.println("Server: " + getServerName() + "   Request #" + reqno);
+                    System.out.println("Client: " + request.getRemoteHost());
+                    System.out.println(rs.toString());
+                    Log.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
+                            "' CE: '" + rs.getConstraintExpression() + "'");
                 }
 
             } // synch
@@ -346,7 +344,7 @@ public class ThreddsServlet extends HttpServlet {
 
                     log.info("Sent Catalog");
 
-                }else if ( // Help Response?
+                } else if ( // Help Response?
                         dataSet.equalsIgnoreCase("/help") ||
                                 dataSet.equalsIgnoreCase("/help/") ||
                                 dataSet.equalsIgnoreCase("/" + requestSuffix) ||

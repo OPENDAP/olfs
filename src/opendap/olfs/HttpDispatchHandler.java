@@ -80,7 +80,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      */
-    public void init(DispatchServlet ds) throws ServletException {
+    public void init(HttpServlet ds) throws ServletException {
 
         // debuggering
         String debugOn = ds.getInitParameter("DebugOn");

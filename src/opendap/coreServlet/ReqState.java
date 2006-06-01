@@ -415,7 +415,7 @@ public class ReqState {
             // character "."
             int index = endOPath.lastIndexOf('.');
 
-            //System.out.println("last index of . in \""+ds+"\": "+index);
+            if(Debug.isSet("ReqState")) System.out.println("last index of . in \""+dataSetName+"\": "+index);
 
             // If a dot is found take the stuff after it as the OPeNDAP suffix
             if (index >= 0) {
@@ -432,16 +432,20 @@ public class ReqState {
                 //Changed to not remove the leading slash! ndp 2/3/06
                 dataSetName = dataSetName.substring(0, dataSetName.lastIndexOf('.'));
 
+                requestURL = myHttpRequest.getRequestURL().substring(0, suffixIndex-1);
+                
             } else { // strip the leading slash (/) from the dataset name and set the suffix to an empty string
                 requestSuffix = "";
-                suffixIndex = myHttpRequest.getRequestURL().length();
+                //suffixIndex = myHttpRequest.getRequestURL().length();
 
                 // No longer shall we strip the leadin slash! ndp 2/3/06
                 //this.dataSetName = this.dataSetName.substring(1, this.dataSetName.length());
+                requestURL = myHttpRequest.getRequestURL().toString();
             }
-            requestURL = myHttpRequest.getRequestURL().substring(0, suffixIndex-1);
             if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a file)");
         }
+        if(requestSuffix==null)
+            requestSuffix = "";
 
 
     }

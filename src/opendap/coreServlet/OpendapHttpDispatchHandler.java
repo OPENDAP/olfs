@@ -27,6 +27,7 @@ package opendap.coreServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 
 /**
@@ -38,7 +39,7 @@ import javax.servlet.ServletException;
  */
 public interface OpendapHttpDispatchHandler {
 
-    public void init(DispatchServlet ds) throws ServletException;
+    public void init(HttpServlet ds) throws ServletException;
 
 
     /**
@@ -123,7 +124,7 @@ public interface OpendapHttpDispatchHandler {
      *
      * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
      * comma delimited ascii columns for ingestion into some not so
-     * OPeNDAP enabled application such as MS-Excel. 
+     * OPeNDAP enabled application such as MS-Excel.
      */
     public void sendASCII(HttpServletRequest request,
                           HttpServletResponse response,

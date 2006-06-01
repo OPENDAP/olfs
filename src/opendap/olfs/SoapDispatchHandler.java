@@ -32,6 +32,7 @@ import opendap.soap.ExceptionElementUtil;
 import opendap.util.Debug;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 
 import org.jdom.Element;
@@ -60,7 +61,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * @param ds
      * @throws ServletException
      */
-    public void init(DispatchServlet ds) throws ServletException{
+    public void init(HttpServlet ds) throws ServletException{
 
     }
 

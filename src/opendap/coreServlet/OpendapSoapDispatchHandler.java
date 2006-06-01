@@ -27,6 +27,7 @@ package opendap.coreServlet;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 
 /**
@@ -38,7 +39,7 @@ import javax.servlet.ServletException;
  */
 public interface OpendapSoapDispatchHandler {
 
-    public void init(DispatchServlet ds) throws ServletException;
+    public void init(HttpServlet ds) throws ServletException;
     public  void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
     public  void getDDX(String reqID, Element reqElement, MultipartResponse mpr) throws Exception;
     public  void getTHREDDSCatalog(HttpServletRequest srvReq,  String reqID, Element reqElement, MultipartResponse mpr) throws Exception;
