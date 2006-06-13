@@ -6,14 +6,24 @@
 
 <web-app>
 
+    <display-name>OPeNDAP Server4</display-name>
+    <description>OPeNDAP Server4</description>
+
+    <context-param>
+      <param-name>ContextPath</param-name>
+      <param-value>opendap</param-value>
+    </context-param>
+
 
 
     <!-- default servlet -->
 
-    <servlet>
-        <servlet-name>s4</servlet-name>
 
-        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
+
+    <servlet>
+        <servlet-name>ts</servlet-name>
+
+        <servlet-class>opendap.coreServlet.ThreddsServlet</servlet-class>
 
         <init-param>
             <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
@@ -27,7 +37,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest probeRequest showResponse CE BES S4Dir ReqState</param-value>
+            <param-value>showRequest probeRequest showResponse CE BES</param-value>
         </init-param>
 
 
@@ -50,15 +60,15 @@
 
 
 
-    <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4/*</url-pattern>
-    </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>ts</servlet-name>
+        <url-pattern>/ts</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ts</servlet-name>
+        <url-pattern>/ts/*</url-pattern>
+    </servlet-mapping>
 
 
 
