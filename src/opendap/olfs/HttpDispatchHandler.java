@@ -51,7 +51,8 @@ import org.jdom.output.Format;
 import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
- * Created by IntelliJ IDEA.
+ * Handler fo HTTP GET requests.
+ * 
  * User: ndp
  * Date: Feb 28, 2006
  * Time: 12:42:23 PM
@@ -665,11 +666,10 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 "    CE: '" + request.getQueryString() + "'");
 
         ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
-        DAS das = ddx.getDAS();
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
-        DefaultResponse.sendHtmlResponse(pw, rs, ddx, das);
+        DefaultResponse.sendHtmlResponse(pw, rs, ddx);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -700,11 +700,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
 
-        DAS das = ddx.getDAS();
-
         PrintStream pw = new PrintStream(response.getOutputStream());
 
-        DefaultResponse.sendInfoResponse(pw, rs, ddx, das);
+        DefaultResponse.sendInfoResponse(pw, rs, ddx);
 
         response.setStatus(HttpServletResponse.SC_OK);
 

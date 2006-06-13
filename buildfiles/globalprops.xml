@@ -112,7 +112,7 @@ http://ant.apache.org/manual/sysclasspath.html
 
 
 
-<property name="thredds.lib" value="threddsCatalog-3.7.jar"/>
+<property name="thredds.lib" value="threddsCatalog-3.9.jar"/>
 <property name="threddsResources.lib" value="threddsResources-3.7.jar"/>
 <property name="nlog4j.lib" value="nlog4j-1.2.21.jar"/>
 

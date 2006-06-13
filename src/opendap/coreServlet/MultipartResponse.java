@@ -39,7 +39,11 @@ import java.util.Vector;
 import opendap.soap.XMLNamespaces;
 
 /**
- * Created by IntelliJ IDEA.
+ * This is used to hold the various parts of a MutlipartMIME response used by the OPeNDAP
+ * servlet when replying to a SOAP request. The first part will contain the SOAP envelope
+ * and the other parts (if oresent) may hold serialized binary data and/or other documents
+ * requested by the client.
+ *
  * User: ndp
  * Date: Apr 27, 2006
  * Time: 9:19:54 PM
@@ -57,6 +61,13 @@ public class MultipartResponse {
     private String startID;
 
 
+    /**
+     *
+     *
+     * @param request The HttpServletRequest to which we are replying
+     * @param response The HttpServletResponse that we are going to send back.
+     * @param o The servlet's instance of the <code>OpendapHttpDispatchHandler</code>
+     */
     MultipartResponse(HttpServletRequest request, HttpServletResponse response, OpendapHttpDispatchHandler o){
         servResponse = response;
         servRequest = request;
@@ -67,20 +78,59 @@ public class MultipartResponse {
         soapEnvelope = null;
     }
 
+    /**
+     * Adds the passed <cod>Element</code> to the SOAP body.
+     * @param e The Element to add to the SOAP body.
+     */
     public void addSoapBodyPart(Element e){
         soapEnvelope.getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace()).addContent(e);
     }
 
-    public void setSoapEnvelope(Element se){
-        soapEnvelope = (Element) se.clone();
+    /**
+     * Sets the SOAP Envelope to the passed Element. No Effort is made to ensure that the passed Element
+     * actually represents a valid SOAP Envelope (which should at minimum contain a SOAP Body Element and
+     * be in the correct namespace). The SOAP Envelope passed WILL BE CLONED and the clone kept by the instance
+     * of <code>MultipartResponse</code>, thus subsequent modifications to the passed SOAP Envelope Element will NOT
+     * be reflected in the SOAP Enveope help by this class instance.
+     *
+     * <P><b>This method may be called only once for a particular instance of <code>MultipartResponse</code>.
+     * Subsequent calls will cause an exception to be thrown.</b></p>
+     *
+     *
+     * @param se The SOAP element to clone for use by this instance.
+     * @throws BadUsageException Thrown is this method is called more than once on an instance of this class.
+     */
+    public void setSoapEnvelope(Element se) throws BadUsageException {
+        if(soapEnvelope == null)
+            soapEnvelope = (Element) se.clone();
+        else
+            throw new BadUsageException("This method may only be called once for each instance of MultipartResponse.");
     }
 
 
+    /**
+     *
+     * @return The MIME Boundary that will be used by this MultipartResponse.
+     */
+    public String getMimeBoundary(){
+        //Date date = new Date();
+        return mimeBoundary;
+    }
+
+    /**
+     * This is a utility function that returns a new MIME boundary string suitable for use in a Multipart MIME respone.
+     * <p><b>Do not confuse this method with <code>getMimeBoundary</code> </b></p>
+     * @return Returns a NEW MIME Boundary string.
+     */
     public static String getNewMimeBoundary(){
         //Date date = new Date();
         return "----=_Part_0_"+getUidString();
     }
 
+    /**
+     *
+     * @return Returns a new UID String
+     */
     public static String getUidString(){
         UID uid = new UID();
 
@@ -98,8 +148,10 @@ public class MultipartResponse {
     }
 
 
-
-
+    /**
+     * Send the Multipart MIME docuemtn response to the client.
+     * @throws IOException
+     */
     public void send() throws IOException {
         System.out.println("Sending Response...");
 

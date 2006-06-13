@@ -25,11 +25,13 @@
 package opendap.olfs;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 2, 2006
- * Time: 2:48:52 PM
- * To change this template use File | Settings | File Templates.
+ * Thrown when something BAD happens in the BES - primairly used to wrap BES
+ * errors in a way that the servlet can manage.
+ *
+ *
+ *
+ *
+ *
  */
 public class BESException extends Exception {
     BESException(String msg) {
@@ -38,5 +40,13 @@ public class BESException extends Exception {
 
     BESException(String msg, Exception e) {
         super(msg, e);
+    }
+
+    public BESException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public BESException(Throwable cause) {
+        super(cause);
     }
 }

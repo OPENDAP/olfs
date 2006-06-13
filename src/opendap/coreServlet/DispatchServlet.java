@@ -38,7 +38,24 @@ import java.io.OutputStreamWriter;
 import java.io.BufferedOutputStream;
 
 /**
- * Created by IntelliJ IDEA.
+ * This servlet provides the dispatching for all OPeNDAP requests.
+ *
+ * <p>This server will respond to both HTTP GET and POST requests. The GET dispatching is
+ * done in this class, and the POST dispatching (which is in fact the SOAP inrterface)
+ * is done in <code>SOAPRequestDispatcher</code></p>
+ *
+ *
+ * <p>This server is built designed so that the actual handling of the dispatchs is done
+ * through code that is identified at run time through the web.xml configuration of the
+ * servlet. In particular the HTTP GET request are handled by a class the implements the
+ * OpendapHttpDispatchHandler interface. The SOAP requests (via HTTP POST) are handled by a
+ * class the implements the OpendapSOAPDispatchHandler interface.<p>
+ *
+ * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
+ * an implmentation clas for both these interfaces.</p>
+ *
+ *
+ *
  * User: ndp
  * Date: Mar 17, 2006
  * Time: 2:23:37 PM
@@ -71,10 +88,7 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * ************************************************************************
-     * Intitializes the servlet. Init (at this time) basically sets up
-     * the object opendap.util.Debug from the debuggery flags in the
-     * servlet InitParameters. The Debug object can be referenced (with
-     * impunity) from any of the dods code...
+     * Intitializes the servlet.
      *
      * @throws ServletException
      */
@@ -83,7 +97,13 @@ public class DispatchServlet extends HttpServlet {
         super.init();
 
 
+        // Identify and make the HTTP GET request handler
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
+
+        if(className == null)
+            throw new ServletException("Missing servlet parameter \"OpendapHttpDispatchHandlerImplementation\"." +
+                    "A class that implements the opendap.coreServlet.OpendapHttpDispatchHandler interface must" +
+                    "be identified in this (missing) servlet parameter.");
 
         System.out.println("\n\nOpendapHttpDispatchHandlerImplementation: " + className);
 
@@ -102,9 +122,15 @@ public class DispatchServlet extends HttpServlet {
         odh.init(this);
 
 
+        // Identify and make the SOAP (via HTTP POST) request handler
 
         className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
 
+        if(className == null)
+            throw new ServletException("Missing servlet parameter \"OpendapSoapDispatchHandlerImplementation\"." +
+                    "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
+                    "be identified in this (missing) servlet parameter.");
+        
         System.out.println("\n\nOpendapSoapDispatchHandlerImplementation: " + className);
 
         try {
@@ -178,6 +204,7 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @see opendap.servlet.ReqState
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
             throws IOException, ServletException {

@@ -40,7 +40,37 @@ import javax.servlet.ServletException;
 public interface OpendapSoapDispatchHandler {
 
     public void init(HttpServlet ds) throws ServletException;
-    public  void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
-    public  void getDDX(String reqID, Element reqElement, MultipartResponse mpr) throws Exception;
-    public  void getTHREDDSCatalog(HttpServletRequest srvReq,  String reqID, Element reqElement, MultipartResponse mpr) throws Exception;
+
+
+
+    /**
+     * Handles a SOAP request for a OPeNDAP Data.
+     *
+     * @param reqID The request ID from the Request Element in the SOAP body
+     * @param cmd The GetDATA commad Element from the the Request.
+     * @param mpr The multipart response into which the DATA response should be added.
+     * @throws Exception
+     */
+    public void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
+
+    /**
+     * Handles a SOAP request for an OPeNDAP DDX.
+     *
+     * @param reqID The request ID from the Request Element in the SOAP body
+     * @param cmd The GetDDX commad Element from the the Request.
+     * @param mpr The multipart response into which the DDX should be added.
+     * @throws Exception
+     */
+    public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
+
+    /**
+     * Handles a SOAP request for a THREDDS catalog.
+     *
+     * @param srvReq The HttpServletRequest object associated with this SOAP request
+     * @param reqID The request ID from the Request Element in the SOAP body
+     * @param cmd The GetTHREDDSCatalog commad Element from the the Request.
+     * @param mpr The multipart response into which the THREDDS catalog should be added.
+     * @throws Exception
+     */
+    public void getTHREDDSCatalog(HttpServletRequest srvReq,  String reqID, Element cmd, MultipartResponse mpr) throws Exception;
 }

@@ -39,7 +39,24 @@ import thredds.servlet.DatasetHandler;
 import thredds.servlet.HtmlWriter2;
 
 /**
- * Created by IntelliJ IDEA.
+ * This servlet provides the dispatching for all OPeNDAP requests.
+ *
+ * <p>This server will respond to both HTTP GET and POST requests. The GET dispatching is
+ * done in this class, and the POST dispatching (which is in fact the SOAP inrterface)
+ * is done in <code>SOAPRequestDispatcher</code></p>
+ *
+ *
+ * <p>This server is built designed so that the actual handling of the dispatchs is done
+ * through code that is identified at run time through the web.xml configuration of the
+ * servlet. In particular the HTTP GET request are handled by a class the implements the
+ * OpendapHttpDispatchHandler interface. The SOAP requests (via HTTP POST) are handled by a
+ * class the implements the OpendapSOAPDispatchHandler interface.<p>
+ *
+ * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
+ * an implmentation clas for both these interfaces.</p>
+ *
+ *
+ *
  * User: ndp
  * Date: Mar 17, 2006
  * Time: 2:23:37 PM
@@ -182,6 +199,11 @@ public class ThreddsServlet extends HttpServlet {
 
 
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
+        if(className == null)
+            throw new ServletException("Missing servlet parameter \"OpendapHttpDispatchHandlerImplementation\"." +
+                    "A class that implements the opendap.coreServlet.OpendapHttpDispatchHandler interface must" +
+                    "be identified in this (missing) servlet parameter.");
+
 
         System.out.println("\n\nOpendapHttpDispatchHandlerImplementation: " + className);
 
@@ -202,6 +224,10 @@ public class ThreddsServlet extends HttpServlet {
 
 
         className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
+        if(className == null)
+            throw new ServletException("Missing servlet parameter \"OpendapSoapDispatchHandlerImplementation\"." +
+                    "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
+                    "be identified in this (missing) servlet parameter.");
 
         System.out.println("\n\nOpendapSoapDispatchHandlerImplementation: " + className);
 

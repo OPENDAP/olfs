@@ -35,10 +35,9 @@ import opendap.servers.www.wwwFactory;
 import opendap.servers.www.jscriptCore;
 
 /**
- * Default handler for OPeNDAP .html requests. This class is used
- * by OLFS. This code exists as a seperate class in order to alleviate
- * code bloat in the OLFS class. As such, it contains virtually no
- * state, just behaviors.
+ * Default handler for OPeNDAP .html requests. This class is may be used by any implmentor
+ * of the OPeNDAPHttpDispatchHandler intefrface to provide a consistent version of the
+ * HTML request form.
  *
  * @author Nathan David Potter
  */
@@ -50,7 +49,6 @@ class HtmlResponse {
 
 
     /**
-     * ************************************************************************
      * Default handler for OPeNDAP .html requests. Returns an html form
      * and javascript code that allows the user to use their browser
      * to select variables and build constraints for a data request.
@@ -58,11 +56,15 @@ class HtmlResponse {
      * types in opendap.servers.www are integral to the form generation.
      *
      * @see opendap.servers.www
+     * @param pw Where to print the ASCII response.
+     * @param rs The ReqState object associated with this client request
+     * @param dds The DDS (with attributes) for which to build the request form.
+     * @throws DODSException
+     * @throws ParseException
      */
     static void sendDataRequestForm(PrintWriter pw,
                                     ReqState rs,
-                                    ServerDDS dds,
-                                    DAS das)
+                                    ServerDDS dds)
             throws DODSException, ParseException {
 
 
@@ -109,10 +111,10 @@ class HtmlResponse {
         wOut.writeDisposition(rs.getRequestURL());
         pw.println("<tr><td><td><hr>\n");
 
-        wOut.writeGlobalAttributes(das, wwwDDS);
+        wOut.writeGlobalAttributes(dds.getDAS(), wwwDDS);
         pw.println("<tr><td><td><hr>\n");
 
-        wOut.writeVariableEntries(das, wwwDDS);
+        wOut.writeVariableEntries(dds.getDAS(), wwwDDS);
         pw.println("</table></form>\n");
         pw.println("<hr>\n");
 

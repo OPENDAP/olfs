@@ -31,16 +31,25 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 /**
- * Created by IntelliJ IDEA.
+ *
+ * Provides XML representaions of Java exceptions.
+ *
+ *
  * User: ndp
  * Date: May 2, 2006
  * Time: 11:07:16 AM
- * To change this template use File | Settings | File Templates.
  */
 public class ExceptionElementUtil  {
 
 
-
+    /**
+     * Builds a JDOM ELement called OPeNDAPException that holds information about an exception
+     * thrown, well, somewhere...
+     * @param type The type of exception
+     * @param msg The message associated with the exception.
+     * @param location The location (in the code) of the exeption.
+     * @return A JDOM Element containing the all the Exception information.
+     */
     public static Element makeExceptionElement(String type, String msg, String location){
 
         Namespace ns = XMLNamespaces.getOpendapSoapNamespace();
@@ -58,6 +67,12 @@ public class ExceptionElementUtil  {
     }
 
 
+    /**
+     * Builds a JDOM ELement called OPeNDAPException that holds the pertinent information
+     * about the passed Exeption
+     * @param e The Exception to wrapin an XML Element.
+     * @return A JDOM Element containing the all the Exception information.
+     */
     public static Element anyExceptionElementBuilder(Exception e){
         ByteArrayOutputStream baos =new ByteArrayOutputStream();
         PrintStream ps = new PrintStream( baos);

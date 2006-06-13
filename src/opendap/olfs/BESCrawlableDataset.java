@@ -39,7 +39,9 @@ import opendap.ppt.PPTException;
 import opendap.util.Debug;
 
 /**
- * Created by IntelliJ IDEA.
+ * This implmentation of the THREDDS CrawlableDataset interface provides the connection
+ * between the core THREDDS functionalities and the BES.
+ *  
  * User: ndp
  * Date: Dec 4, 2005
  * Time: 8:08:25 AM
@@ -97,6 +99,8 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
         getInfo();
 
+        //System.out.println(this);
+
     }
 
     private void init() {
@@ -121,6 +125,7 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
         processPath(path);
         //getInfo();
+        //System.out.println(this);
 
     }
 

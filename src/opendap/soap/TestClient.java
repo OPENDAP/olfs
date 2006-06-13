@@ -30,6 +30,7 @@ import org.jdom.Document;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.DOMOutputter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -44,6 +45,9 @@ import opendap.dap.XMLparser.DDSXMLParser;
 import opendap.dap.*;
 import opendap.servers.ascii.asciiFactory;
 import opendap.servers.ascii.toASCII;
+
+import javax.activation.DataHandler;
+import javax.activation.CommandInfo;
 
 
 /**
@@ -608,7 +612,7 @@ public class TestClient {
     }
 
 
-    public  void handleDATAResponse(Element request, Element response, Message msg) throws Exception {
+    public  void handleDATAResponse_OLD(Element request, Element response, Message msg) throws Exception {
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -617,6 +621,7 @@ public class TestClient {
             System.out.println("Received DATA response!");
             System.out.println("Request command:");
             xmlo.output(request,System.out);
+            System.out.println();
         }
 
         String[] s = msg.getMimeHeaders().getHeader("XDODS-Server");
@@ -663,7 +668,7 @@ public class TestClient {
 
         parser.parse(ddxDoc,dds,new asciiFactory(),false);
 
-        dds.deserialize(new DataInputStream((InputStream)data.getContent()), sv, null);
+        dds.deserialize(new DataInputStream(data.getDataHandler().getInputStream()), sv, null);
 
 
         System.out.println("DDS:\n"+dds.getDDSText());
@@ -684,6 +689,167 @@ public class TestClient {
         System.out.println();
 
     }
+
+    public  void handleDATAResponse(Element request, Element response, Message msg) throws Exception {
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        if(verbose) {
+            System.out.println("Received DATA response!");
+            System.out.println("Request command:");
+            xmlo.output(request,System.out);
+            System.out.println("\n");
+        }
+
+        String[] s = msg.getMimeHeaders().getHeader("XDODS-Server");
+        String serverVersion = s[0];
+
+        Namespace osd2nms = XMLNamespaces.getOpendapDAP2Namespace();
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+
+
+
+        // Find the href that contains the contentID for the attachment containing the DDX
+        String cid = response.getAttributeValue("href",osnms);
+        cid = cid.substring(4,cid.length());
+
+        if(verbose) System.out.println("Searching for DDX Attachment (cid: "+cid+")");
+
+        AttachmentPart data = null;
+        Iterator i = msg.getAttachments();
+
+        while(i.hasNext()){
+            AttachmentPart ap = (AttachmentPart) i.next();
+
+            String[] attachmentCid = ap.getMimeHeader("Content-ID");
+
+            if(cid.equals(attachmentCid[0])){
+                data = ap;
+                break;
+            }
+        }
+        if(verbose) System.out.println();
+
+        if(data==null)
+            throw new Exception("Error! Server did not return a DDX Attachment in conjunction with GetDATA Response.");
+
+
+        if(verbose){
+            System.out.println("Found DDX attachment. ContentType: " +
+                    data.getContentType() + "\n" +
+                    "AttachmentPart.getDataHandler() returns a class of type: " +
+                    data.getDataHandler().getClass().getName());
+        }
+
+        DataHandler dh = data.getDataHandler();
+
+
+        if(verbose){
+            CommandInfo[] cia = dh.getAllCommands();
+            System.out.print("\nDataHandler Command Info: ");
+            if(cia.length ==0)
+                System.out.println("None Found.");
+            else
+                System.out.println();
+
+            for (CommandInfo ci : cia) {
+                System.out.println("    name: "+ci.getCommandName()+"    class: "+ci.getCommandClass());
+            }
+            System.out.println();
+
+        }
+
+        SAXBuilder sb = new SAXBuilder();
+
+        Document ddxDoc = sb.build(dh.getInputStream());
+
+        DDSXMLParser parser = new DDSXMLParser(XMLNamespaces.OpendapDAP2NamespaceString);
+
+        ServerVersion sv = new ServerVersion(serverVersion);
+        DDS dds = new DDS();
+
+        parser.parse(ddxDoc,dds,new asciiFactory(),false);
+
+
+
+        Element ds = ddxDoc.getRootElement();
+
+        Element blob = ds.getChild("dodsBLOB",osd2nms);
+
+        // Find the href that contains the contentID for the attachment containing the DATA        
+        cid = blob.getAttributeValue("href");
+        cid = cid.substring(4,cid.length());
+
+        if(verbose) System.out.println("Searching for DATA Attachment with cid: "+cid);
+
+        data = null;
+        i = msg.getAttachments();
+
+        while(i.hasNext()){
+            AttachmentPart ap = (AttachmentPart) i.next();
+
+            String[] attachmentCid = ap.getMimeHeader("Content-ID");
+
+            if(cid.equals(attachmentCid[0])){
+                data = ap;
+                break;
+            }
+        }
+        if(verbose) System.out.println();
+
+
+        if(data==null)
+            throw new Exception("Error! Server did not return data in conjunction with GetDATA Response.");
+
+        if(verbose){
+            System.out.println("Found DATA attachment. ContentType: " +
+                data.getContentType() + "\n" +
+                "AttachmentPart.getDataHandler() returns a class of type: " +
+                data.getDataHandler().getClass().getName() + "\n" +
+                "AttachmentPart.getContent() returns a class of type: " +
+                data.getContent().getClass().getName());
+        }
+
+        dh = data.getDataHandler();
+
+        if(verbose){
+            CommandInfo[] cia = dh.getAllCommands();
+            System.out.print("\nDataHandler Command Info: ");
+            if(cia.length ==0)
+                System.out.println("None Found.");
+            else
+                System.out.println();
+
+            for (CommandInfo ci : cia) {
+                System.out.println("    name: "+ci.getCommandName()+"    class: "+ci.getCommandClass());
+            }
+            System.out.println();
+
+        }
+
+        dds.deserialize(new DataInputStream(dh.getInputStream()), sv, null);
+
+
+        System.out.println("DDS:\n"+dds.getDDSText());
+        System.out.println("DATA:");
+        Enumeration e = dds.getVariables();
+        PrintWriter pw = new PrintWriter(System.out);
+
+        while(e.hasMoreElements()){
+            BaseType bt = (BaseType)e.nextElement();
+            ((toASCII)bt).toASCII(pw,true,null,true);
+        }
+        pw.flush();
+
+        //System.out.println();
+
+        //dds.printVal(System.out);
+
+        System.out.println();
+
+    }
+
 
 
     public  void handleDDXResponse(Element request, Element response) throws IOException {

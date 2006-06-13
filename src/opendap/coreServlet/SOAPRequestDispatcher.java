@@ -117,6 +117,8 @@ public class SOAPRequestDispatcher {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (JDOMException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (BadUsageException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
 

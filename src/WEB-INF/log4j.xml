@@ -101,9 +101,9 @@
     <appender-ref ref="dqcServletRedirect"/>
   </logger>
 
-  <root>
+  <!--root>
     <level value="ALL"/>
     <appender-ref ref="ThreddsStdout"/>
-  </root>
+  </root -->
 
 </log4j:configuration>

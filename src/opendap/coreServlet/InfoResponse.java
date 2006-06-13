@@ -36,10 +36,10 @@ import opendap.ppt.PPTException;
 
 
 /**
- * Default handler for DODS info requests. This class is used
- * by DODSServlet. This code exists as a seperate class in order to alleviate
- * code bloat in the DODSServlet class. As such, it contains virtually no
- * state, just behaviors.
+ * Default handler for OPeNDAP .info requests. This class is may be used by any implmentor
+ * of the OPeNDAPHttpDispatchHandler interface to provide a consistent version of the
+ * HTML request form.
+ *
  *
  * @author Nathan David Potter
  */
@@ -47,7 +47,6 @@ import opendap.ppt.PPTException;
 class InfoResponse {
 
     /**
-     * *****************************************************************************
      * Default implmentation of the OPeNDAP .info reponse. Writes an html document
      * describing the contents of the servers datasets to passed PrintStream.
      * <p/>
@@ -86,12 +85,11 @@ class InfoResponse {
      * @param rs  The ReqState object for this client request. Used to determine the
      *            location of the INFO directory adn anclillary .info documents.
      * @param dds The DDS to build the response from.
-     * @param das The DAS to build the response from.
      * @throws DODSException
      * @see ReqState
      */
     static void sendINFO(PrintStream pw,
-                         ReqState rs, ServerDDS dds, DAS das)
+                         ReqState rs, ServerDDS dds)
             throws DODSException {
 
 
@@ -114,9 +112,9 @@ class InfoResponse {
 
             String user_html = get_user_supplied_docs(infoDir, rs.getServerClassName(), rs.getDataset());
 
-            String global_attrs = buildGlobalAttributes(das, dds);
+            String global_attrs = buildGlobalAttributes(dds.getDAS(), dds);
 
-            String variable_sum = buildVariableSummaries(das, dds);
+            String variable_sum = buildVariableSummaries(dds.getDAS(), dds);
 
             // Send the document back to the client.
             pw.println("<html><head><title>Dataset Information</title>");

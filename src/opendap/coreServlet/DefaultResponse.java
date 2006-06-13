@@ -35,7 +35,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 /**
- * Created by IntelliJ IDEA.
+ * Provides default implmentations of OPeNDAP responses. Methods in this class typically
+ * rely on (wrap calls to) other classaes where the implmentations reside.
  * User: ndp
  * Date: Mar 31, 2006
  * Time: 3:02:40 PM
@@ -44,6 +45,19 @@ import java.io.PrintStream;
 public class DefaultResponse {
 
 
+    /**
+     * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
+     * comma delimited ascii columns for ingestion into some not so
+     * OPeNDAP enabled application such as MS-Excel.
+     * @param pw Where to print the ASCII response.
+     * @param rs The ReqState object associated with this client request
+     * @param is An input stream containing the .dods data response (i.e. a serialized DataDDS)
+     * for the dataset requested by the client.
+     * @throws DODSException
+     * @throws ParseException
+     * @throws IOException
+     * @see AsciiResponse
+     */
     public static void sendAsciiResponse(PrintWriter pw,
                                          ReqState rs,
                                          InputStream is)
@@ -53,29 +67,54 @@ public class DefaultResponse {
 
     }
 
+
+    /**
+     * Default handler for OPeNDAP .html requests. Returns an html form
+     * and javascript code that allows the user to use their browser
+     * to select variables and build constraints for a data request.
+     * The DDS and DAS for the data set are used to build the form. The
+     * types in opendap.servers.www are integral to the form generation.
+     *
+     * @param pw Where to print the ASCII response.
+     * @param rs The ReqState object associated with this client request
+     * @param dds The DDS (with attributes) for which to build the request form.
+     * @throws DODSException
+     * @throws ParseException
+     * @see HtmlResponse
+     */
     public static void sendHtmlResponse(PrintWriter pw,
                                         ReqState rs,
-                                        ServerDDS dds,
-                                        DAS das)
+                                        ServerDDS dds)
             throws DODSException, ParseException {
 
 
-        HtmlResponse.sendDataRequestForm(pw, rs, dds, das);
+        HtmlResponse.sendDataRequestForm(pw, rs, dds);
 
 
     }
 
+    /**
+     * Default implmentation of the OPeNDAP .info reponse. Writes an html document
+     * describing the contents of the servers datasets to passed PrintStream.
+     *
+     * @param pw  Writes the .info document to this PrintStream.
+     * @param rs  The ReqState object for this client request. Used to determine the
+     *            location of the INFO directory adn anclillary .info documents.
+     * @param dds The DDS to build the response from.
+     * @throws DODSException
+     * @see InfoResponse
+     */
     public static void sendInfoResponse(PrintStream pw,
-                                        ReqState rs, ServerDDS dds, DAS das)
+                                        ReqState rs, ServerDDS dds)
             throws DODSException {
 
-        InfoResponse.sendINFO(pw, rs, dds, das);
+        InfoResponse.sendINFO(pw, rs, dds);
 
     }
 
 
 
 
-    //@todo Write a default sendDirectoryResponse()
+    //@todo Write a default sendDirectoryResponse() - may be unneccessary based on THREDDS work
 
 }

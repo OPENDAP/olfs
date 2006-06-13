@@ -40,10 +40,8 @@ import org.jdom.JDOMException;
 import org.jdom.Element;
 
 /**
- * Default handler for OPeNDAP directory requests. This class is used
- * by OLFS. This code exists as a seperate class in order to alleviate
- * code bloat in the OLFS class. As such, it contains virtually no
- * state, just behaviors.
+ * Handler for OPeNDAP directory requests. This class is used
+ * by OLFS.
  *
  * @author Nathan David Potter
  */
@@ -52,9 +50,10 @@ public class S4Dir {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP directory requests. Returns an html document
+     * Handler for OPeNDAP directory requests. Returns an html document
      * with a list of all datasets on this server with links to their
-     * DDS, DAS, Information, and HTML responses.
+     * DDS, DAS, Information, and HTML responses. Talks to the BES to get the
+     * information.
      *
      * @param request  The <code>HttpServletRequest</code> from the client.
      * @param response The <code>HttpServletResponse</code> for the client.

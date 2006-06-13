@@ -25,33 +25,67 @@
 package opendap.soap;
 
 /**
- * Created by IntelliJ IDEA.
+ * Class wrapper for various Namespace names.
+ *
  * User: ndp
  * Date: Apr 26, 2006
  * Time: 2:45:19 PM
- * To change this template use File | Settings | File Templates.
  */
 public class XMLNamespaces {
 
 
+    /**
+     * OPeNDAP SOAP Interface Namespace
+     */
     public static final String OpendapSoapNamespaceString = "http://xml.opendap.org/ns/soap1";
+
+    /**
+     *
+     * @return OPeNDAP SOAP Interface Namespace
+     */
     public static org.jdom.Namespace getOpendapSoapNamespace(){
         return org.jdom.Namespace.getNamespace("ons",OpendapSoapNamespaceString);
     }
 
 
+    /**
+     * Default SOAP Namespace
+     */
     private static final String DefaultSoapEnvNamespace = "http://schemas.xmlsoap.org/soap/envelope/";
+
+
+    /**
+     *
+     * @return Default SOAP Namespace
+     */
     public static org.jdom.Namespace getDefaultSoapEnvNamespace(){
         return org.jdom.Namespace.getNamespace("soapenv",DefaultSoapEnvNamespace);
     }
 
 
+    /**
+     * OPeNDAP Schema Namespace
+     */
     public static final String OpendapDAP2NamespaceString = "http://xml.opendap.org/ns/DAP2";
+
+    /**
+     *
+     * @return OPeNDAP Schema Namespace
+     */
     public static org.jdom.Namespace getOpendapDAP2Namespace(){
         return org.jdom.Namespace.getNamespace("od2nms",OpendapDAP2NamespaceString);
     }
 
+    /**
+     *  THREDDS Catalog Namespace
+     */
     public static final String ThreddsCatalogNamespaceString ="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
+
+
+    /**
+     *
+     * @return THREDDS Catalog Namespace
+     */
     public static org.jdom.Namespace getThreddsCatalogNamespace(){
         return org.jdom.Namespace.getNamespace("tcnms",ThreddsCatalogNamespaceString);
     }

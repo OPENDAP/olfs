@@ -26,7 +26,6 @@ package opendap.olfs;
 
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
-import opendap.coreServlet.DispatchServlet;
 import opendap.soap.XMLNamespaces;
 import opendap.soap.ExceptionElementUtil;
 import opendap.util.Debug;
@@ -67,13 +66,15 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
 
     /**
+     * Handles a SOAP request for OPeNDAP data. This version puts the DDX in the Soap Envelope and adds the data as
+     * an attachment to the Multipart MIME message.
      *
      * @param reqID
      * @param cmd
      * @param mpr
      * @throws Exception
      */
-    public void getDATA( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
+    public void getDATA_OLD( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
@@ -117,13 +118,17 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
 
     /**
+     * Handles a SOAP request for OPeNDAP data. This version places an href attribute in the Response element in the
+     * SOAP envelope that references an attachment containing the DDX, which gets added as an attachment. The DDX
+     * references (via an href attribute in the dodsBlob element) the data which is added as another attachment to
+     * the Multipart MIME message.
      *
      * @param reqID
      * @param cmd
      * @param mpr
      * @throws Exception
      */
-    public void getDATA_NEW( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
+    public void getDATA( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
@@ -163,10 +168,6 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         xmlo.output(ddxDoc,baos);
 
 
-
-
-
-
         mpr.addAttachment("text/xml",
                 contentId,
                 new ByteArrayInputStream(baos.toByteArray()));
@@ -181,6 +182,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
 
     /**
+     * Handles a SOAP request for an OPeNDAP DDX.
      *
      * @param reqID
      * @param cmd
@@ -213,6 +215,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
 
     /**
+     * Handles a SOAP request for a THREDDS catalog.
      *
      * @param srvReq
      * @param reqID

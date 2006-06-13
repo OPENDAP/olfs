@@ -32,6 +32,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -43,6 +44,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.MimeHeader;
 import javax.xml.soap.SOAPPart;
 import javax.xml.soap.AttachmentPart;
+import javax.activation.DataHandler;
 
 import java.rmi.server.UID;
 import java.io.*;
@@ -635,9 +637,165 @@ public class SoapUtils {
         if(verbose) System.out.println("\nRequest reqID: "+reqID+"  Response reqID: "+reqID);
 
 
-        if(reqID.equals(respReqID)){
+        if(!reqID.equals(respReqID)){
+            throw new Exception("BAD THINGS HAPPENED! " +
+                    "The Server returned a Response <"+respReqID+"> that is not related to Request <"+reqID+">");
         }
-        else{
+
+
+        // Find the href that content a contentID for the attachment containing the DDX
+        String cid = response.getAttributeValue("href",osnms);
+        cid = cid.substring(4,cid.length());
+
+        if(verbose) System.out.println("Searching for DDX Attachment (cid: "+cid+")");
+
+        org.apache.axis.attachments.AttachmentPart data = null;
+        i = responseMsg.getAttachments();
+
+        while(i.hasNext()){
+            org.apache.axis.attachments.AttachmentPart ap = (org.apache.axis.attachments.AttachmentPart) i.next();
+
+            String[] attachmentCid = ap.getMimeHeader("Content-ID");
+
+            if(cid.equals(attachmentCid[0])){
+                 if(verbose) System.out.println("Found it.");
+                data = ap;
+                break;
+            }
+        }
+        if(verbose) System.out.println();
+
+        if(data==null)
+            throw new Exception("Error! Server did not return a DDX Attachment in conjunction with GetDATA Response.");
+
+
+        System.out.println("Found DDX attachment. ContentType: "+data.getContentType());
+        System.out.println("AttachmentPart.getDataHandler() returns a class of type: "+data.getDataHandler().getClass().getName());
+        System.out.println("AttachmentPart.getContent() returns a class of type: "+data.getContent().getClass().getName());
+
+
+        DataHandler dh = data.getDataHandler();
+
+
+
+        SAXBuilder sb = new SAXBuilder();
+
+        Document ddxDoc = sb.build(dh.getInputStream());
+
+
+        DDSXMLParser parser = new DDSXMLParser(XMLNamespaces.OpendapDAP2NamespaceString);
+
+        DDS dds = new DDS();
+
+        parser.parse(ddxDoc,dds,new asciiFactory(),false);
+
+
+
+        Element ds = ddxDoc.getRootElement();
+
+        Element blob = ds.getChild("dodsBLOB",osd2nms);
+
+        cid = blob.getAttributeValue("href");
+        cid = cid.substring(4,cid.length());
+
+        if(verbose) System.out.println("Searching for Attachment with cid: "+cid);
+
+        data = null;
+        i = responseMsg.getAttachments();
+
+        while(i.hasNext()){
+            org.apache.axis.attachments.AttachmentPart ap = (org.apache.axis.attachments.AttachmentPart) i.next();
+
+            String[] attachmentCid = ap.getMimeHeader("Content-ID");
+
+            if(cid.equals(attachmentCid[0])){
+                 if(verbose) System.out.println("Found it.");
+                data = ap;
+                break;
+            }
+        }
+        if(verbose) System.out.println();
+
+
+        if(data==null)
+            throw new Exception("Error! Server did not return data in conjunction with GetDATA Response.");
+
+        System.out.println("Found DATA attachment. ContentType: "+data.getContentType());
+
+        System.out.println("AttachmentPart.getContent() returns a class of type: "+data.getContent().getClass().getName());
+
+        dh = data.getDataHandler();
+
+        String[] s = responseMsg.getMimeHeaders().getHeader("XDODS-Server");
+        String serverVersion = s[0];
+        ServerVersion sv = new ServerVersion(serverVersion);
+
+        dds.deserialize(new DataInputStream(dh.getInputStream()), sv, null);
+
+
+        return dds;
+    }
+
+    public static DDS handleSingleDATAResponse_OLD(Message responseMsg, BaseTypeFactory btf, boolean verbose) throws Exception {
+
+
+        DOMBuilder db = new DOMBuilder();
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+        Namespace osd2nms = XMLNamespaces.getOpendapDAP2Namespace();
+
+        Element d = db.build(responseMsg.getSOAPEnvelope().getAsDOM());
+        d.detach();
+
+
+        Document respDoc = new Document(d);
+
+        ElementFilter exceptionFilter = new ElementFilter("OPeNDAPException");
+        Iterator i = respDoc.getDescendants(exceptionFilter);
+
+        if(i.hasNext())
+            throw new Exception(getServerErrorMsgs(i));
+
+
+
+        Element soapBody = respDoc.getRootElement().getChild("Body",XMLNamespaces.getDefaultSoapEnvNamespace());
+
+        List reqs = soapBody.getChildren("Request",XMLNamespaces.getOpendapSoapNamespace());
+        List resps = soapBody.getChildren("Response",XMLNamespaces.getOpendapSoapNamespace());
+
+
+        if(reqs.size()>1 ){
+            throw new Exception("More than one Request Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(reqs.size()<1 ){
+            throw new Exception("No Request Elements found in SOAP envelope. ");
+        }
+
+
+        if(resps.size()>1){
+            throw new Exception("More than one Response Element found in SOAP envelope. " +
+                    "The method \"SoapUtils.handleSingleDDXResponse()\" is not an appropriate way to handle " +
+                    "this SOAP transaction.");
+        }
+
+
+        if(resps.size()<1){
+            throw new Exception("No Response Element found in SOAP envelope. ");
+        }
+
+        Element request = (Element) reqs.get(0);
+        Element response = (Element) resps.get(0);
+
+        String reqID = request.getAttributeValue("reqID",osnms);
+        String respReqID = response.getAttributeValue("reqID",osnms);
+
+        if(verbose) System.out.println("\nRequest reqID: "+reqID+"  Response reqID: "+reqID);
+
+
+        if(!reqID.equals(respReqID)){
             throw new Exception("BAD THINGS HAPPENED! " +
                     "The Server returned a Response <"+respReqID+"> that is not related to Request <"+reqID+">");
         }
@@ -667,10 +825,6 @@ public class SoapUtils {
         AttachmentPart data = getAttachment(responseMsg,cid,verbose);
 
 
-
-
-
-
         Document ddxDoc = new Document(ds);
 
         DDSXMLParser parser = new DDSXMLParser(XMLNamespaces.OpendapDAP2NamespaceString);
@@ -678,10 +832,6 @@ public class SoapUtils {
         DDS dds = new DDS();
 
         parser.parse(ddxDoc,dds,btf,false);
-
-
-
-
 
         String[] s = responseMsg.getMimeHeaders().getHeader("XDODS-Server");
         String serverVersion = s[0];
@@ -694,6 +844,7 @@ public class SoapUtils {
 
         return dds;
     }
+
 
 
 

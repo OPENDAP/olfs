@@ -2,7 +2,8 @@
 <html>
 <head>
 <title>Servlet Configuration</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
 
 <body>
 <h1 align="center"><a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" width="206" height="93" border="0"></a><br>
@@ -104,7 +105,7 @@ OLFS </h1>
 &lt;/init-param&gt;
 </pre>
       <br>
-    <em>Default</em>: This parameter <strong>must be set </strong> OLFS to function. Server4 is a 2 component system and a connection to a running BES is required. <br>
+    <em>Default</em>: This parameter <strong>must be set </strong> for the OLFS to function. Server4 is a two component system and a connection to a running BES is required. <br>
     <br>
   </li>
   <li><strong>BackEndServerPort</strong> - This parameter specifies the port number on the Back End Server host to which the OLFS is going to communicate with to get OPeNDAP data and ancillary information.<br>
@@ -116,40 +117,82 @@ OLFS </h1>
 &lt;/init-param&gt;
 
 </pre>
-      <em>Default</em>: This parameter <strong>must be set </strong> OLFS to function. Server4 is a 2 component system and a connection to a running BES is required. <br>
+      <em>Default</em>: This parameter <strong>must be set </strong> for the OLFS to function. Server4 is a two component system and a connection to a running BES is required. <br>
     <br>
   </li>
+  <li><strong>OpendapHttpDispatchHandlerImplementation</strong>- This parameter specifies the handler implementation that provides the responses for the HTTP GET commands to the servlet framework. <strong><em>Don't be messin' with this! It's what makes Server4, well, Server4. </em></strong><br>
+    <em>Example:</em>
+      <pre>
+&lt;init-param&gt;
+    &lt;param-name&gt;OpendapHttpDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.HttpDispatchHandler&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+</pre>
+      <em>Default</em>: This parameter <strong>must be set </strong> to the value <strong><em>opendap.olfs.HttpDispatchHandler</em></strong> for the server to actually be an OLFS. <br>
+    <br>
+  </li>
+  <li><strong>OpendapSoapDispatchHandlerImplementation</strong>- This parameter specifies the handler implementation that provides the responses for the HTTP POST commands (via a SOAP interface) to the servlet framework. <strong><em>Don't be messin' with this! It's what makes Server4, well, Server4. </em></strong><br>
+    <br>
+    <em>Example:</em>
+      <pre>
+&lt;init-param&gt;
+    &lt;param-name&gt;OpendapSoapDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.SoapDispatchHandler&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+</pre>
+      <em>Default</em>: This parameter <strong>must be set </strong> to the value <strong><em>opendap.olfs.SoapDispatchHandler</em></strong> for the server to actually be an OLFS. <br>
+      <br>
+</li>
 </ul>
 <p><strong>Example of web.xml content:</strong></p>
-<pre>&lt;servlet&gt;
-	&lt;servlet-name&gt;
-		argos
-	&lt;/servlet-name&gt;
-	&lt;servlet-class&gt;
-		opendap.olfs.OLFS
-	&lt;/servlet-class&gt;
+<pre>
+&lt;servlet&gt;
+
+  &lt;servlet-name&gt;s4&lt;/servlet-name&gt;
+  
+  &lt;servlet-class&gt;opendap.coreServlet.DispatchServlet&lt;/servlet-class&gt;
+  
   &lt;init-param&gt;
-		&lt;param-name&gt;BackEndServerHost&lt;/param-name&gt;
-	    &lt;param-value&gt;127.0.0.1&lt;/param-value&gt;
-	&lt;/init-param&gt;
-	&lt;init-param&gt;
-		&lt;param-name&gt;BackEndServerPort&lt;/param-name&gt;
-		&lt;param-value&gt;10002&lt;/param-value&gt;
-	&lt;/init-param&gt;
-	&lt;init-param&gt;
-		&lt;param-name&gt;DebugOn&lt;/param-name&gt;
-		&lt;param-value&gt;showRequest showResponse BES&lt;/param-value&gt;
-	&lt;/init-param&gt;
+    &lt;param-name&gt;OpendapHttpDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.HttpDispatchHandler&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  
+  &lt;init-param&gt;
+    &lt;param-name&gt;OpendapSoapDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.SoapDispatchHandler&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  
+  &lt;init-param&gt;
+    &lt;param-name&gt;DebugOn&lt;/param-name&gt;
+    &lt;param-value&gt;showRequest probeRequest showResponse CE BES S4Dir ReqState&lt;/param-value&gt;
+  &lt;/init-param&gt;
+
+  &lt;init-param&gt;
+    &lt;param-name&gt;BackEndServerHost&lt;/param-name&gt;
+    &lt;param-value&gt;127.0.0.1&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  
+  &lt;init-param&gt;
+    &lt;param-name&gt;BackEndServerPort&lt;/param-name&gt;
+    &lt;param-value&gt;10002&lt;/param-value&gt;
+  &lt;/init-param&gt;
+
+&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
 &lt;/servlet&gt;
 
 &lt;servlet-mapping&gt;
-	&lt;servlet-name&gt;argos&lt;/servlet-name&gt;
-	&lt;url-pattern&gt;/argos&lt;/url-pattern&gt;
+&lt;servlet-name&gt;s4&lt;/servlet-name&gt;
+&lt;url-pattern&gt;/s4&lt;/url-pattern&gt;
 &lt;/servlet-mapping&gt;
+
 &lt;servlet-mapping&gt;
-	&lt;servlet-name&gt;argos&lt;/servlet-name&gt;
-	&lt;url-pattern&gt;/argos/*&lt;/url-pattern&gt;
-&lt;/servlet-mapping&gt;</pre>
+&lt;servlet-name&gt;s4&lt;/servlet-name&gt;
+&lt;url-pattern&gt;/s4/*&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+
+</pre>
 <hr>
 <br>
 <br>

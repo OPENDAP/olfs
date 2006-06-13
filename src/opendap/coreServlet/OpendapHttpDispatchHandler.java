@@ -64,6 +64,17 @@ public interface OpendapHttpDispatchHandler {
     public String getXDODSServerVersion();
 
 
+    /**
+     * Handles the client's DDX request.
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request
+     *                 object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @param rs       The ReqState of this client request. Contains all kinds of
+     *                 important stuff.
+     * @see ReqState
+     */
     public void sendDDX(HttpServletRequest request,
                         HttpServletResponse response,
                         ReqState rs) throws Exception;
