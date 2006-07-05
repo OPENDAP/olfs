@@ -25,8 +25,6 @@
 package opendap.olfs;
 
 import opendap.dap.DODSException;
-import opendap.dap.DAS;
-import opendap.dap.DefaultFactory;
 import opendap.dap.DDS;
 import opendap.dap.Server.ServerDDS;
 import opendap.ppt.PPTException;
@@ -52,7 +50,7 @@ import thredds.cataloggen.SimpleCatalogBuilder;
 
 /**
  * Handler fo HTTP GET requests.
- * 
+ *
  * User: ndp
  * Date: Feb 28, 2006
  * Time: 12:42:23 PM
@@ -282,9 +280,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
-        } catch (PPTException e) {
-            DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.opendapExceptionHandler(de, response);
+        } catch (Exception e) {
+            Util.anyExceptionHandler(e, response);
         } finally {
             Out.flush();
         }
@@ -314,7 +311,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                         ReqState rs)
             throws IOException, ServletException {
 
-        System.out.println("Flow in doGetDDS()");
+        System.out.println("Flow in sendDDS()");
 
 
         if (Debug.isSet("showResponse"))
@@ -345,14 +342,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
-        } catch (PPTException e) {
-            DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.opendapExceptionHandler(de, response);
+        } catch (Exception e) {
+
+            Util.anyExceptionHandler(e, response);
         } finally {
             Out.flush();
         }
 
-        System.out.println("Flow returned to doGetDDS()");
+        System.out.println("Flow returned to sendDDS()");
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -401,13 +398,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
         } catch (PPTException e) {
-            DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.opendapExceptionHandler(de, response);
+            Util.anyExceptionHandler(e, response);
         } finally {
             Out.flush();
         }
 
-        System.out.println("Flow returned to doGetDDX()");
+        System.out.println("Flow returned to sendDDX()");
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -468,8 +464,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
         } catch (PPTException e) {
-            DODSException de = new DODSException(e.getMessage() + e.getStackTrace());
-            Util.opendapExceptionHandler(de, response);
+            Util.anyExceptionHandler(e, response);
         } finally {
             bOut.flush();
         }
@@ -662,7 +657,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_form");
 
-        System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
+        if(Debug.isSet("showResponse"))
+                System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
                 "    CE: '" + request.getQueryString() + "'");
 
         ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());

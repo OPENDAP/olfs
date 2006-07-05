@@ -35,8 +35,8 @@ import javax.servlet.ServletException;
 import java.io.*;
 
 import thredds.servlet.DataRootHandler2;
-import thredds.servlet.DatasetHandler;
 import thredds.servlet.HtmlWriter2;
+import thredds.catalog.InvDatasetScan;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -102,7 +102,7 @@ public class ThreddsServlet extends HttpServlet {
 
     protected String getVersion()
     {
-      return "Server4 Version 0.0";
+      return "Server4 (beta_0.0.2)";
     }
 
 
@@ -144,6 +144,10 @@ public class ThreddsServlet extends HttpServlet {
         }
         //-------------
 
+        InvDatasetScan.setContext( thredds.servlet.ServletUtil.getContextPath( this ) ); // This gets your context path from web.xml above.
+        InvDatasetScan.setCatalogServletName("/ts");    // This allows you to specify which servlet handles catalog requests.
+                                                        // We set it to "/catalog". Is "/ts" the servlet path for you? If so, set this to "/ts".
+                                                        // If you use the default servlet for everything (path mapping of "/*" in web.xml). set it to the empty string.
 
 
 
@@ -153,7 +157,7 @@ public class ThreddsServlet extends HttpServlet {
         try
         {
           dataRootHandler.initCatalog( "catalog.xml" );
-          dataRootHandler.initCatalog( "extraCatalog.xml" );
+          //dataRootHandler.initCatalog( "extraCatalog.xml" );
         }
         catch ( Throwable e )
         {
@@ -166,7 +170,12 @@ public class ThreddsServlet extends HttpServlet {
 
         HtmlWriter2.init( thredds.servlet.ServletUtil.getContextPath( this ),
                           this.getServletContext().getServletContextName(),
-                          this.getVersion(), this.getDocsPath() );
+                          this.getVersion(),
+                          this.getDocsPath(),
+                          "", // userCssPath
+                          "images/cog.gif", // contextLogoPath
+                          "images/opendap_logo_masthead.gif"  // instituteLogoPath
+                );
 
         log.info( "--- initialized " + getClass().getName() );
 

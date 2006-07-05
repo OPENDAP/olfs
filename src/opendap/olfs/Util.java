@@ -35,10 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Date;
 import java.util.Properties;
@@ -71,40 +68,64 @@ public class Util {
 
 
     /**
-     * ************************************************************************
-     * Sends a DODS error to the client.
-     *
-     * @param de       The DODS exception that caused the problem.
-     * @param response The <code>HttpServletResponse</code> for the client.
-     */
-    public static void opendapExceptionHandler(DODSException de, HttpServletResponse response) {
-
+      * ************************************************************************
+      * Sends a DODS error to the client.
+      *
+      * @param de       The DODS exception that caused the problem.
+      * @param response The <code>HttpServletResponse</code> for the client.
+      */
+     public static void opendapExceptionHandler(DODSException de, HttpServletResponse response) {
         if (Debug.isSet("showException")) {
             de.print(System.out);
             de.printStackTrace();
             Log.printDODSException(de);
         }
 
-        try {
-            BufferedOutputStream eOut = new BufferedOutputStream(response.getOutputStream());
 
-            response.setHeader("Content-Description", "dods_error");
+         try {
 
-            // This should probably be set to "plain" but this works, the
-            // C++ slients don't barf as they would if I sent "plain" AND
-            // the C++ don't expect compressed data if I do this...
-            response.setHeader("Content-Encoding", "");
+             response.setHeader("Content-Description", "dods_error");
 
-            de.print(eOut);
+             // This should probably be set to "plain" but this works, the
+             // C++ slients don't barf as they would if I sent "plain" AND
+             // the C++ don't expect compressed data if I do this...
+             response.setHeader("Content-Encoding", "");
 
-        } catch (IOException ioe) {
-            System.out.println("Cannot respond to client! IO Error: " + ioe.getMessage());
-            Log.println("Cannot respond to client! IO Error: " + ioe.getMessage());
-        }
+             PrintStream ps = new PrintStream(response.getOutputStream());
+             de.print(ps);
+             if (Debug.isSet("showException")) 
+                 de.printStackTrace(ps);
+             ps.flush();
 
 
-    }
-    /***************************************************************************/
+         } catch (IOException ioe) {
+             System.out.println("Cannot respond to client! IO Error: " + ioe.getMessage());
+             Log.println("Cannot respond to client! IO Error: " + ioe.getMessage());
+         }
+
+
+     }
+     /***************************************************************************/
+
+    /**
+      * ************************************************************************
+      * Sends a DODS error to the client.
+      *
+      * @param e       The Exception that caused the problem.
+      * @param response The <code>HttpServletResponse</code> for the client.
+      */
+     public static void anyExceptionHandler(Exception e, HttpServletResponse response) {
+
+
+        DODSException de = new DODSException(DODSException.UNKNOWN_ERROR,e.getMessage());
+
+        de.setStackTrace(e.getStackTrace());
+
+        opendapExceptionHandler(de,response);
+
+
+     }
+     /***************************************************************************/
 
 
 }

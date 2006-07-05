@@ -122,23 +122,28 @@ public class BesAPI {
 
     public static Document getDDXDocument(String dataset,
                                           String constraintExpression)
-            throws PPTException, BadConfigurationException, IOException, JDOMException {
+            throws PPTException, BadConfigurationException, IOException, JDOMException, BESException {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         BesAPI.writeDDX(dataset, constraintExpression, os);
         SAXBuilder sb = new SAXBuilder();
 
 
-        System.out.println("getDDXDocument got this array:\n"+os.toString());
+        if(Debug.isSet("BES")) System.out.println("getDDXDocument got this array:\n"+os.toString());
+
+        Document ddx = sb.build(new ByteArrayInputStream(os.toByteArray()));
+
+        // Check for an exception:
+        besExceptionHandler(ddx);
 
 
-        return sb.build(new ByteArrayInputStream(os.toByteArray()));
+        return ddx ;
     }
 
 
 
     public static ServerDDS getDDX(String dataset, String constraintExpression)
-            throws PPTException, DODSException {
+            throws PPTException, DODSException, IOException, JDOMException, BESException {
 
         return getDDX(dataset,constraintExpression, new DefaultFactory());
 
@@ -148,15 +153,14 @@ public class BesAPI {
     public static ServerDDS getDDX(String dataset,
                                    String constraintExpression,
                                    BaseTypeFactory btf)
-            throws PPTException, DODSException {
+            throws PPTException, DODSException, IOException, JDOMException, BESException {
 
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.writeDDX(dataset, constraintExpression, os);
 
-        //System.out.println("\n\nBES sent: \n\n"+os.toString());
+        Document ddxDoc = getDDXDocument(dataset, constraintExpression);
 
         ServerDDS dds = new ServerDDS(btf);
-        dds.parseXML( new ByteArrayInputStream(os.toByteArray()),true);
+
+        dds.parseXML(ddxDoc,true);
 
         return dds;
 
@@ -301,34 +305,46 @@ public class BesAPI {
 
     }
 
+    public static String BES_EXCEPTION  = "BESException";
 
     private static void besExceptionHandler(Document doc) throws BESException {
+
+
+        Element exception;
+        String msg = "";
 
         ElementFilter exceptionFilter = new ElementFilter("BESException");
         Iterator i = doc.getDescendants(exceptionFilter);
         if (i.hasNext()) {
-
-            String msg = "";
             int j = 0;
             while (i.hasNext()) {
                 if (j > 0)
                     msg += "\n";
-                Element exception = (Element) i.next();
-                msg += "[BESException: " + j++ + "]" +
-                        "[Type: " + exception.getChild("Type").getTextTrim() + "]" +
-                        "[Message: " + exception.getChild("Message").getTextTrim() + "]" +
-                        "[Location: " + exception.getChild("Location").getTextTrim() + "]";
-
-
+                exception = (Element) i.next();
+                msg += makeBesExceptionMsg(exception, j++);
             }
-
-
-
-
 
             throw new BESException(msg);
         }
 
+    }
+
+    private static String makeBesExceptionMsg(Element exception, int number){
+        String msg  = "";
+
+        msg += "[";
+        msg += "[BESException: " + number + "]";
+        msg += "[Type: " + exception.getChild("Type").getTextTrim() + "]";
+        msg += "[Message: " + exception.getChild("Message").getTextTrim() + "]";
+        msg += "[Location: ";
+        msg += exception.getChild("Location").getChild("File").getTextTrim() + " line ";
+        msg += exception.getChild("Location").getChild("Line").getTextTrim() + "]";
+        msg += "]";
+
+
+        System.out.println("BES Exception Message: "+msg);
+
+        return msg;
     }
 
 

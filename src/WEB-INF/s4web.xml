@@ -7,6 +7,16 @@
 <web-app>
 
 
+    <display-name>Server4</display-name>
+    <description>Server4</description>
+
+    <context-param>
+      <param-name>ContextPath</param-name>
+      <param-value>opendap</param-value>
+    </context-param>
+
+
+
 
     <!-- default servlet -->
 
@@ -27,7 +37,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest probeRequest showResponse CE BES S4Dir ReqState</param-value>
+            <param-value>showRequest probeRequest showResponse CE BES S4Dir ReqState </param-value>
         </init-param>
 
 
@@ -45,7 +55,14 @@
         <load-on-startup>1</load-on-startup>
 
 
-    </servlet>
+    </servlet >
+
+
+
+
+
+
+
 
 
 
