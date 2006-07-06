@@ -57,8 +57,6 @@ public class ReqState {
      */
     private String defaultINFOcache;
 
-    private Document serverVersionDoc = null;
-
     private final String defaultSchemaName = "opendap-0.0.0.xsd";
     private String defaultSchemaLocation;
 
@@ -75,9 +73,10 @@ public class ReqState {
     private HttpServletRequest myHttpRequest;
 
 
+
     public ReqState(HttpServletRequest myRequest,
                     ServletConfig sc,
-                    String serverClassName, Document svd)
+                    String serverClassName)
             throws BadURLException {
 
         this.myServletConfig = sc;
@@ -113,9 +112,6 @@ public class ReqState {
         //System.out.println("Schema Location: "+getSchemaLocation());
 
 
-        serverVersionDoc = svd;
-
-
     }
 
     public String getRequestURL() {
@@ -148,100 +144,6 @@ public class ReqState {
         defaultINFOcache = cachedir;
     }
 
-
-    /**
-     * @return A string containing the value of the XDODS-Server MIME header as ascertained
-     *         by querying the BES.
-     */
-    public String getXDODSServer() {
-
-        if (getVersionDocument() != null) {
-            Iterator i = getVersionDocument().getRootElement().getChild("BES").getChildren("lib").iterator();
-
-            while (i.hasNext()) {
-                Element e = (Element) i.next();
-                if (e.getChildTextTrim("name").equalsIgnoreCase("libdap")) {
-                    return ("dods/" + e.getChildTextTrim("version"));
-                }
-            }
-        }
-
-        return ("Server-Version-Unknown");
-    }
-
-    /**
-     * @return A String containing the value of the XOPeNDAP-Server MIME header ascertained by querying
-     *         the BES and conforming to the DAP4 specification.
-     */
-    public String getXOPeNDAPServer() {
-        if (getVersionDocument() != null) {
-
-            String opsrv = "";
-
-            Iterator i = getVersionDocument().getRootElement().getChildren().iterator();
-
-            while (i.hasNext()) {
-                Element pkg = (Element) i.next();
-                Iterator j = pkg.getChildren("lib").iterator();
-                while (j.hasNext()) {
-                    Element lib = (Element) j.next();
-                    opsrv += " " + lib.getChildTextTrim("name") + "/" + lib.getChildTextTrim("version");
-                }
-            }
-            return (opsrv);
-        }
-        return ("Server-Version-Unknown");
-    }
-
-    /**
-     * @return A String containing the XDAP MIME header value that describes the DAP specifcation that
-     *         the server response conforms to.
-     */
-    public String getXDAP(HttpServletRequest request) {
-
-        double hval = 0.0;
-        String hver = "";
-
-        String clientDapVer = null;
-
-        if (request != null)
-            clientDapVer = request.getHeader("XDAP");
-
-        if (getVersionDocument() != null) {
-
-            String responseDAP = null;
-
-            Iterator i = getVersionDocument().getRootElement().getChild("DAP").getChildren("version").iterator();
-
-            while (i.hasNext()) {
-                Element v = (Element) i.next();
-                String ver = v.getTextTrim();
-                double vval = Double.parseDouble(ver);
-                if (hval < vval) {
-                    hval = vval;
-                    hver = ver;
-                }
-
-                if (clientDapVer != null && clientDapVer.equals(ver))
-                    responseDAP = ver;
-            }
-            if (responseDAP == null)
-                return (hver);
-            return (responseDAP);
-        }
-
-        return ("DAP-Version-Unknown");
-
-    }
-
-    /**
-     * @return The OLFS version Document object created and cached shortly after entering the doGet()
-     *         method of this object. This method will return <coe>null</code> if it is called prior to the
-     *         call of the private method of the same name.
-     */
-    public Document getVersionDocument() {
-        return (serverVersionDoc);
-    }
 
 
     public String getDataset() {
@@ -433,7 +335,7 @@ public class ReqState {
                 dataSetName = dataSetName.substring(0, dataSetName.lastIndexOf('.'));
 
                 requestURL = myHttpRequest.getRequestURL().substring(0, suffixIndex-1);
-                
+
             } else { // strip the leading slash (/) from the dataset name and set the suffix to an empty string
                 requestSuffix = "";
                 //suffixIndex = myHttpRequest.getRequestURL().length();

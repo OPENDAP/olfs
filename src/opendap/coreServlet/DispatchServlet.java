@@ -130,7 +130,7 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException("Missing servlet parameter \"OpendapSoapDispatchHandlerImplementation\"." +
                     "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
                     "be identified in this (missing) servlet parameter.");
-        
+
         System.out.println("\n\nOpendapSoapDispatchHandlerImplementation: " + className);
 
         try {
@@ -253,7 +253,7 @@ public class DispatchServlet extends HttpServlet {
                                 requestSuffix.equalsIgnoreCase("ver") ||
                                 requestSuffix.equalsIgnoreCase("version")
                         ) {
-                    odh.sendVersion(request, response, rs);
+                    odh.sendVersion(request, response);
 
                 } else if ( // Directory response?
                         dataSet == null ||
@@ -327,15 +327,15 @@ public class DispatchServlet extends HttpServlet {
                 } else if (  // Status Response?
                         dataSet.equalsIgnoreCase("status")
                         ) {
-                    doGetStatus(request, response, rs);
+                    doGetStatus(request, response);
 
                 } else if ( // System Properties Response?
                         dataSet.equalsIgnoreCase("systemproperties")
                         ) {
-                    ServletUtil.sendSystemProperties(request, response, rs);
+                    ServletUtil.sendSystemProperties(request, response, odh);
 
                 } else if (isDebug) {
-                    DebugHandler.doDebug(this, request, response, rs);
+                    DebugHandler.doDebug(this, request, response, odh, rs);
 
 
                 } else if (requestSuffix.equals("")) {
@@ -358,7 +358,7 @@ public class DispatchServlet extends HttpServlet {
         ReqState rs;
 
         try {
-            rs = new ReqState(request, getServletConfig(), getServerName(), null);
+            rs = new ReqState(request, getServletConfig(), getServerName());
         } catch (BadURLException bue) {
             rs = null;
         }
@@ -379,14 +379,13 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      */
     public void doGetStatus(HttpServletRequest request,
-                            HttpServletResponse response,
-                            ReqState rs)
+                            HttpServletResponse response)
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 
@@ -428,9 +427,9 @@ public class DispatchServlet extends HttpServlet {
             System.out.println("Sending Bad URL Page.");
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");

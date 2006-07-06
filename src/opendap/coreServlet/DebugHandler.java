@@ -55,13 +55,14 @@ public class DebugHandler {
      */
     public static void doDebug(HttpServlet servlet, HttpServletRequest request,
                                HttpServletResponse response,
+                               OpendapHttpDispatchHandler odh,
                                ReqState rs) throws IOException {
 
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_debug");
 
         PrintStream pw = new PrintStream(response.getOutputStream());

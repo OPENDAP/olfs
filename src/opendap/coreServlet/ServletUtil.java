@@ -58,13 +58,13 @@ public class ServletUtil {
      */
     public static void sendSystemProperties(HttpServletRequest request,
                                             HttpServletResponse response,
-                                            ReqState rs)
+                                            OpendapHttpDispatchHandler odh)
             throws IOException {
 
 
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 

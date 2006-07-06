@@ -98,7 +98,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         Element blob = ddx.getChild("dodsBLOB", XMLNamespaces.getOpendapDAP2Namespace());
 
-        String contentId = MultipartResponse.getUidString();
+        String contentId = MultipartResponse.newUidString();
 
         //@todo Add the namespace to the href - first we must add it to the schema!
         blob.setAttribute("href", "cid:" + contentId);
@@ -145,7 +145,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         Element respElement = new Element("Response",osnms);
         respElement.setAttribute("reqID",reqID,osnms);
-        String contentId = MultipartResponse.getUidString();
+        String contentId = MultipartResponse.newUidString();
         respElement.setAttribute("href","cid:"+contentId,osnms);
 
 
@@ -155,7 +155,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         Element blob = ddx.getChild("dodsBLOB", XMLNamespaces.getOpendapDAP2Namespace());
 
-        String blobID = MultipartResponse.getUidString();
+        String blobID = MultipartResponse.newUidString();
 
         //@todo Add the namespace to the href - first we must add it to the schema!
         blob.setAttribute("href", "cid:" + blobID);

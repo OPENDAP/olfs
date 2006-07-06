@@ -41,7 +41,7 @@ import opendap.util.Debug;
 /**
  * This implmentation of the THREDDS CrawlableDataset interface provides the connection
  * between the core THREDDS functionalities and the BES.
- *  
+ *
  * User: ndp
  * Date: Dec 4, 2005
  * Time: 8:08:25 AM
@@ -402,10 +402,9 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
         int j = 0;
         Vector childDatasets = new Vector();
-        Iterator i = _childDatasetElements.iterator();
-        while (i.hasNext()) {
+        for (Object _childDatasetElement : _childDatasetElements) {
 
-            e = (Element) i.next();
+            e = (Element) _childDatasetElement;
 
 
             String newPath = this.getThreddsPath() + (this.getThreddsPath().endsWith("/") ? "" : "/") + e.getChild("name").getTextTrim();
@@ -454,8 +453,8 @@ public class BESCrawlableDataset implements CrawlableDataset {
         if (Debug.isSet("CrawlableDataset")) System.out.println("Filtering CrawlableDataset list.");
 
         List retList = new ArrayList();
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            CrawlableDataset curDs = (CrawlableDataset) it.next();
+        for (Object aList : list) {
+            CrawlableDataset curDs = (CrawlableDataset) aList;
             if (cdf.accept(curDs)) {
                 if (Debug.isSet("CrawlableDataset")) System.out.println("    Filter found matching dataset: " + curDs);
                 retList.add(curDs);

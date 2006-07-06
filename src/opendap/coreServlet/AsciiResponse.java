@@ -56,7 +56,7 @@ class AsciiResponse {
      * comma delimited ascii columns for ingestion into some not so
      * OPeNDAP enabled application such as MS-Excel.
      * @param pw Where to print the ASCII response.
-     * @param rs The ReqState object associated with this client request
+     * @param odh The ReqState object associated with this client request
      * @param is An input stream containing the .dods data response (i.e. a serialized DataDDS)
      * for the dataset requested by the client.
      * @throws DODSException
@@ -64,7 +64,7 @@ class AsciiResponse {
      * @throws IOException
      */
     static void sendASCII(PrintWriter pw,
-                          ReqState rs,
+                          OpendapHttpDispatchHandler odh,
                           InputStream is)
             throws DODSException, ParseException, IOException {
 
@@ -72,7 +72,8 @@ class AsciiResponse {
         if (Debug.isSet("showResponse"))
             System.out.println(" Flow in sendASCII()");
 
-        ServerVersion sv = new ServerVersion(rs.getXDODSServer());
+        String svString = odh.getXDODSServerVersion();
+        ServerVersion sv = new ServerVersion(svString);
 
         if (Debug.isSet("asciiResponse")) {
             System.out.println("    Major Server Version: " + sv.getMajor());

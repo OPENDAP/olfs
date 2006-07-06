@@ -50,7 +50,7 @@ public class DefaultResponse {
      * comma delimited ascii columns for ingestion into some not so
      * OPeNDAP enabled application such as MS-Excel.
      * @param pw Where to print the ASCII response.
-     * @param rs The ReqState object associated with this client request
+     * @param odh
      * @param is An input stream containing the .dods data response (i.e. a serialized DataDDS)
      * for the dataset requested by the client.
      * @throws DODSException
@@ -59,11 +59,11 @@ public class DefaultResponse {
      * @see AsciiResponse
      */
     public static void sendAsciiResponse(PrintWriter pw,
-                                         ReqState rs,
+                                         OpendapHttpDispatchHandler odh,
                                          InputStream is)
             throws DODSException, ParseException, IOException {
 
-        AsciiResponse.sendASCII(pw, rs, is);
+        AsciiResponse.sendASCII(pw, odh, is);
 
     }
 

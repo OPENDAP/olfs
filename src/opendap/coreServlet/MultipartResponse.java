@@ -74,7 +74,7 @@ public class MultipartResponse {
         odh = o;
         attachments  = new Vector<Attachment>();
         mimeBoundary = getNewMimeBoundary();
-        startID = getUidString();
+        startID = newUidString();
         soapEnvelope = null;
     }
 
@@ -124,14 +124,14 @@ public class MultipartResponse {
      */
     public static String getNewMimeBoundary(){
         //Date date = new Date();
-        return "----=_Part_0_"+getUidString();
+        return "----=_Part_0_"+newUidString();
     }
 
     /**
      *
      * @return Returns a new UID String
      */
-    public static String getUidString(){
+    public static String newUidString(){
         UID uid = new UID();
 
         byte[] val = uid.toString().getBytes();

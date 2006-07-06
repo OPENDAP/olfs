@@ -368,7 +368,7 @@ public class ThreddsServlet extends HttpServlet {
                                 requestSuffix.equalsIgnoreCase("ver") ||
                                 requestSuffix.equalsIgnoreCase("version")
                         ) {
-                    odh.sendVersion(request, response, rs);
+                    odh.sendVersion(request, response);
 
                 } else  */
 
@@ -438,10 +438,10 @@ public class ThreddsServlet extends HttpServlet {
                 } else if ( // System Properties Response?
                         dataSet.equalsIgnoreCase("systemproperties")
                         ) {
-                    ServletUtil.sendSystemProperties(request, response, rs);
+                    ServletUtil.sendSystemProperties(request, response, odh);
 
                 } else if (isDebug) {
-                    DebugHandler.doDebug(this, request, response, rs);
+                    DebugHandler.doDebug(this, request, response, odh, rs);
 
 
                 } else if (requestSuffix.equals("")) {
@@ -464,7 +464,7 @@ public class ThreddsServlet extends HttpServlet {
         ReqState rs;
 
         try {
-            rs = new ReqState(request, getServletConfig(), getServerName(), null);
+            rs = new ReqState(request, getServletConfig(), getServerName());
         } catch (BadURLException bue) {
             rs = null;
         }
@@ -490,9 +490,9 @@ public class ThreddsServlet extends HttpServlet {
             throws IOException, ServletException {
 
 
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 
@@ -534,9 +534,9 @@ public class ThreddsServlet extends HttpServlet {
             System.out.println("Sending Bad URL Page.");
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", rs.getXDODSServer());
-        response.setHeader("XOPeNDAP-Server", rs.getXOPeNDAPServer());
-        response.setHeader("XDAP", rs.getXDAP(request));
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");

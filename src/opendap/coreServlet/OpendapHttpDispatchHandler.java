@@ -202,8 +202,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      */
     public void sendVersion(HttpServletRequest request,
-                            HttpServletResponse response,
-                            ReqState rs) throws Exception;
+                            HttpServletResponse response) throws Exception;
 
     public void sendHelpPage(HttpServletRequest request,
                              HttpServletResponse response,

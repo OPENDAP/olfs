@@ -331,14 +331,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             // We get a DDX from the BES and then parse it. We use the parsed
             // one to send a DDS representation. Since the BES applies the
             // constraint expression, we don't need to get a ServerDDS (full
-            // of Server BaseTypes) with whic we could apply the conststraint
-            //expression - it's already done.
+            // of Server BaseTypes) with which we could apply the conststraint
+            // expression - it's already done.
             DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
             ddx.print(Out);
 
             // Earlier method - asks BES directly for a DDS and then writes it
             // out to the response stream.
-            //BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+            // BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -488,8 +488,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      */
     public void sendVersion(HttpServletRequest request,
-                            HttpServletResponse response,
-                            ReqState rs)
+                            HttpServletResponse response)
             throws IOException, ServletException, DODSException {
 
         if (Debug.isSet("showResponse"))
@@ -505,22 +504,22 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         PrintStream ps = new PrintStream(response.getOutputStream());
 
-        Document vdoc = rs.getVersionDocument();
+        Document vdoc = getVersionDocument();
         if (vdoc == null) {
             throw new DODSException("Internal Error: Version Document not initialized.");
         }
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         //XMLOutputter xout = new XMLOutputter();
-        xout.output(rs.getVersionDocument(), ps);
+        xout.output(getVersionDocument(), ps);
         ps.flush();
 
         if (Debug.isSet("showResponse")) {
-            xout.output(rs.getVersionDocument(), System.out);
+            xout.output(getVersionDocument(), System.out);
             System.out.println("Document Sent.");
             System.out.println("\nMIME Headers:");
-            System.out.println("    XDODS-Server: " + rs.getXDODSServer());
-            System.out.println("    XOPeNDAP-Server: " + rs.getXOPeNDAPServer());
-            System.out.println("    XDAP: " + rs.getXDAP(request));
+            System.out.println("    XDODS-Server: " + getXDODSServerVersion());
+            System.out.println("    XOPeNDAP-Server: " + getXOPeNDAPServerVersion());
+            System.out.println("    XDAP: " + getXDAPVersion(request));
             System.out.println("\nEnd Response.");
         }
 
@@ -747,7 +746,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
 
-        DefaultResponse.sendAsciiResponse(pw, rs, is);
+        DefaultResponse.sendAsciiResponse(pw, this, is);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
