@@ -37,7 +37,7 @@ import org.jdom.Text;
 public class Version {
 
 
-    private static String version = "0.0.0";
+    private static String version = "0.1.2";
 
     public static String getVersionString() {
         return (version);
