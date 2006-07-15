@@ -31,8 +31,8 @@
 
 
 
-    <target name="all" depends="clean,clients,server" description="Builds stuff"/>
-    <target name="compile" depends="s4" description="Compiles the DRDS software."/>
+    <target name="all" depends="clean,clients,server" description="Builds lots of stuff."/>
+    <target name="compile" depends="s4" description="Compiles the Server4 software."/>
 
 
     <target name="clients" depends="BESclient" description="Compiles the clients."/>
@@ -81,7 +81,7 @@
         unless="JavaDocIsUpToDate"
         >
 
-        <javadoc destdir="${build.doc}/server4"
+        <javadoc destdir="${build.doc}/javadoc"
             author="true"
             version="true"
             use="true"
@@ -89,9 +89,17 @@
 
             <classpath refid="s4.compile.classpath"/>
 
-            <fileset dir="${src.dir}/opendap/"/>
+            <fileset dir="${src.dir}/opendap/" >
+                <!-- exclude name="${src.dir}/opendap/soap/TestClient.java"/ --> <!-- Exclude the TestClient -->
+            </fileset>
         </javadoc>
 
+        <copy todir="${build.doc}" >
+            <fileset dir="${doc.dir}">
+                <exclude name="javadoc/**"/> <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+            </fileset>
+        </copy>
     </target>
 
 
@@ -111,13 +119,46 @@
 
     <target
         name="doc-dist"
-        depends="doc"
+        depends="clean,doc"
         description="Builds documentation distribution"
         >
 
-        <jar destfile="${build.dist}/drds-${VERSION}-doc.jar">
-            <zipfileset dir="${build.doc}" prefix="drds-${VERSION}-doc"/>
+        <jar destfile="${build.dist}/Server4-${VERSION}-doc.jar">
+            <zipfileset dir="${build.doc}" prefix="Server4-${VERSION}-doc"/>
         </jar>
+
+    </target>
+
+
+    <target
+        name="src-dist"
+        depends="clean,init"
+        description="Builds source distribution"
+        >
+
+        <jar destfile="${build.dist}/Server4-${VERSION}-src.jar"
+                >
+
+            <fileset dir=".">
+                <exclude name="build/**"/>
+                <exclude name="doc/javadoc/**"/> <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="doc/_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="**/*.iml"/>
+                <exclude name="**/*.ipr"/>
+                <exclude name="**/*.iws"/>
+            </fileset>
+
+        </jar>
+
+    </target>
+
+
+
+    <target
+        name="DISTRO"
+        depends="clean,src-dist,doc-dist,server"
+        description="Builds complete distribution"
+        >
 
     </target>
 
@@ -192,7 +233,7 @@
 
             <zipfileset dir="${schema.dir}" prefix="schema" />
 
-            <zipfileset dir="${build.doc}/server4" prefix="javadocs/server4"/>
+            <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/server4"/>
 
             <zipfileset dir="${build.lib}" prefix="s4-libraries"/>
 
