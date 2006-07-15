@@ -197,6 +197,15 @@ public class BesAPI {
     }
 
 
+    public static void writeASCII(String dataset,
+                                    String constraintExpression,
+                                    OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+        besGetTransaction(getAPINameForASCII(), dataset, constraintExpression, os);
+    }
+
+
     public static InputStream getDap2DataStream(String dataset,
                                     String constraintExpression)
             throws BadConfigurationException, PPTException, IOException {
@@ -450,6 +459,11 @@ public class BesAPI {
 
     public static String getAPINameForDDX() {
         return "ddx";
+    }
+
+
+    public static String getAPINameForASCII() {
+        return "ascii";
     }
 
 

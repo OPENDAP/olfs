@@ -25,12 +25,9 @@
 
 package opendap.coreServlet;
 
-import org.jdom.Element;
-import org.jdom.Document;
 
 import java.util.Enumeration;
 import java.util.StringTokenizer;
-import java.util.Iterator;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
@@ -58,7 +55,7 @@ public class ReqState {
     private String defaultINFOcache;
 
     private final String defaultSchemaName = "opendap-0.0.0.xsd";
-    private String defaultSchemaLocation;
+    private String       defaultSchemaLocation;
 
     //protected String rootPath, contentPath;
 
@@ -69,7 +66,7 @@ public class ReqState {
     private String serverClassName;
     private String requestURL;
 
-    private ServletConfig myServletConfig;
+    private ServletConfig      myServletConfig;
     private HttpServletRequest myHttpRequest;
 
 
@@ -85,12 +82,15 @@ public class ReqState {
 
         // Get the constraint expression from the request object and
         // convert all those special characters denoted by a % sign
-        this.CE = prepCE(myHttpRequest.getQueryString());
+        //this.CE = prepCE(myHttpRequest.getQueryString());
+
+        this.CE = myHttpRequest.getQueryString();
 
         // If there was simply no constraint then prepCE() should have returned
         // a CE equal "", the empty string. A null return indicates an error.
         if (this.CE == null) {
-            throw new BadURLException();
+            this.CE = "";
+            //throw new BadURLException();
         }
 
 

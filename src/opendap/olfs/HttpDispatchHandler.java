@@ -704,6 +704,59 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
+    public void sendASCII_FromBES(HttpServletRequest request,
+                          HttpServletResponse response,
+                          ReqState rs)
+            throws Exception {
+
+
+        response.setContentType("text/plain");
+        response.setHeader("XDODS-Server", getXDODSServerVersion());
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion());
+        response.setHeader("XDAP", getXDAPVersion(request));
+        response.setHeader("Content-Description", "dods_ascii");
+
+        if (Debug.isSet("showResponse"))
+            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
+                    "    CE: '" + request.getQueryString() + "'");
+
+
+        String requestURL, ce;
+
+        if (request.getQueryString() == null) {
+            ce = "";
+        } else {
+            ce = "?" + request.getQueryString();
+        }
+
+
+        requestURL = rs.getRequestURL();
+
+        if (Debug.isSet("showResponse")) {
+            System.out.println("New Request URL Resource: '" + requestURL + "'");
+            System.out.println("New Request Constraint Expression: '" + ce + "'");
+        }
+
+
+        OutputStream Out = new BufferedOutputStream(response.getOutputStream());
+        try {
+            BesAPI.writeASCII(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+        } catch (DODSException de) {
+            Util.opendapExceptionHandler(de, response);
+        } catch (PPTException e) {
+            Util.anyExceptionHandler(e, response);
+        } finally {
+            Out.flush();
+        }
+
+        System.out.println("Flow returned to sendASCII()");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+    }
+
+
 
     public void sendASCII(HttpServletRequest request,
                           HttpServletResponse response,
