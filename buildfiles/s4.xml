@@ -139,14 +139,14 @@
         <jar destfile="${build.dist}/Server4-${VERSION}-src.jar"
                 >
 
-            <fileset dir=".">
+            <zipfileset dir="." prefix="Server4-${VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/> <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="doc/_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
                 <exclude name="**/*.iml"/>
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
-            </fileset>
+            </zipfileset>
 
         </jar>
 

@@ -55,7 +55,7 @@
 
     <!-- Libraries -->
     <property name="jdom.lib"                     value="jdom-1.0.jar"/>
-    <property name="opendap.lib"                  value="opendap-0.0.2.jar"/>
+    <property name="opendap.lib"                  value="opendap-0.0.4.jar"/>
     <property name="cli.lib"                      value="apache-commons-cli-1.0.jar"/>
 
     <property name="axis.lib"                     value="axis-1.3.0.jar"/>
