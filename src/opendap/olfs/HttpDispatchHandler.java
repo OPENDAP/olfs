@@ -25,7 +25,6 @@
 package opendap.olfs;
 
 import opendap.dap.DODSException;
-import opendap.dap.DDS;
 import opendap.dap.Server.ServerDDS;
 import opendap.ppt.PPTException;
 import opendap.util.Debug;
@@ -274,9 +273,21 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
-            ddx.getDAS().print(Out);
-            //BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+
+            // We get a DDX from the BES and then parse it. We use the parsed
+            // one to send a DDS representation. Since the BES applies the
+            // constraint expression, we don't need to get a ServerDDS (full
+            // of Server BaseTypes) with which we could apply the conststraint
+            // expression - it's already done.
+            //DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
+            //ddx.getDAS().print(Out);
+
+
+
+            // Earlier method - asks BES directly for a DDS and then writes it
+            // out to the response stream.
+            BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -333,12 +344,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             // constraint expression, we don't need to get a ServerDDS (full
             // of Server BaseTypes) with which we could apply the conststraint
             // expression - it's already done.
-            DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
-            ddx.print(Out);
+            //DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
+            //ddx.print(Out);
 
             // Earlier method - asks BES directly for a DDS and then writes it
             // out to the response stream.
-            // BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+            BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);

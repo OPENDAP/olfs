@@ -255,7 +255,7 @@ class PPTClient {
         }
         catch (IOException e) {
             closeConnection();
-            throw new PPTException("Cannot transmit response to designated stream.", e);
+            throw new PPTException("Cannot read response to designated stream.", e);
         }
     }
 
@@ -267,6 +267,11 @@ class PPTClient {
             if (Debug.isSet("PPTClient")) System.out.print("PPTClient reading bytes ...");
             bytesRead = _in.read(inBuff);
             if (Debug.isSet("PPTClient")) System.out.println(" got " + bytesRead + " bytes.");
+
+            if(bytesRead == -1)
+                throw new PPTException("Failed to read response from server. End Of Stream reached prematurely.\n"); 
+
+
             if (Debug.isSet("PPTClient")) System.out.println("Read: " + new String(inBuff));
         }
         catch (IOException e) {

@@ -207,6 +207,8 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         Element respElement = new Element("Response",osnms);
         respElement.setAttribute("reqID",reqID,osnms);
 
+        // Note that this call does not parse the DDX document into an opendap.dap.DDS, just
+        // into a jdom.Document that gets it's root element stuffed into the SOAP envelope.
         respElement.addContent(BesAPI.getDDXDocument(datasetname, ce).detachRootElement());
 
         mpr.addSoapBodyPart(respElement);
