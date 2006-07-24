@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog name="Server4 Test Catalog"
+        xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <!-- ************************************************************************************* -->
+
+    <service name="OPeNDAP-Server4" serviceType="OPeNDAP" base="/opendap/ts/"/>
+
+    <datasetScan location="/root/nc" path="nc" name="NC" serviceName="OPeNDAP-Server4">
+        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset">
+            <config>
+                <besHost>127.0.0.1</besHost>
+                <besPort>10002</besPort>
+            </config>
+        </crawlableDatasetImpl>
+          <filter>
+            <exclude wildcard=".*" atomic="true" collection="true"/>
+            <include wildcard="*.nc"/>
+          </filter>
+          <addDatasetSize />
+
+        <metadata inherited="true">
+            <serviceName>OPeNDAP-Server4</serviceName>
+            <authority>opendap.org</authority>
+            <dataType>Random</dataType>
+        </metadata>
+
+    </datasetScan>
+
+
+
+    <!-- ************************************************************************************* -->
+
+
+
+</catalog>

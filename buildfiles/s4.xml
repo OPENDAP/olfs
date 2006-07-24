@@ -152,11 +152,31 @@
 
     </target>
 
+    <target
+        name="server-dist"
+        depends="server"
+        description="Packages the war file into tar file with a release related name.">
+
+        <copy file="${distributionResources.dir}/WarFileReadme" tofile="${build.dist}/README" />
+
+        <jar destfile="${build.dist}/Server4-${VERSION}-olfs.jar" >
+            <zipfileset dir="${build.dist}" prefix="Server4-${VERSION}-olfs">
+                <include name="opendap.war" />
+                <include name="README" />
+            </zipfileset>
+
+        </jar>
+
+        <delete file="${build.dist}/README" />
+        <delete file="${build.dist}/opendap.war" />
+
+    </target>
+
 
 
     <target
         name="DISTRO"
-        depends="clean,src-dist,doc-dist,server"
+        depends="clean,src-dist,doc-dist,server-dist"
         description="Builds complete distribution"
         >
 
@@ -207,7 +227,7 @@
 
 
         <war destfile="${build.dist}/opendap.war"
-            webxml="${src.dir}/WEB-INF/s4web.xml"
+            webxml="${WebInfResources.dir}/s4web.xml"
             >
 
             <lib dir="${lib.dir}">
@@ -246,26 +266,16 @@
                 <include name="${xercesXmlApis.lib}"/>
            </zipfileset>
 
-            <webinf dir="${src.dir}/WEB-INF">
+            <webinf dir="${WebInfResources.dir}">
                 <include name="log4j.xml"/>
             </webinf>
 
 
         </war>
 
-
-
-
         <delete file="${build.dist}/index.html"/>
 
-
-
-
-
-
-
     </target>
-
 
 
 </project>

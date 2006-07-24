@@ -37,7 +37,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest </param-value>
+            <param-value>showRequest showResponse BES </param-value>
         </init-param>
 
 

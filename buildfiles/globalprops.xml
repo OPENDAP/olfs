@@ -74,10 +74,14 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="doc.dir" location="doc"/>
 <property name="lib.dir" location="lib"/>
 <property name="bin.dir" location="bin"/>
-<property name="dist.dir" location="dist"/>
+<property name="resources.dir" location="resources"/>
 <property name="datasets.dir" location="datasets"/>
 <property name="schema.dir" location="schema"/>
 <property name="buildfiles.dir" location="buildfiles"/>
+<property name="initialContent.dir" location="${resources.dir}/intiialContent"/>
+<property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
+<property name="distributionResources.dir" location="${resources.dir}/distribution"/>
+
 
 <property name="build.dir" location="build"/>
 <property name="build.classes" location="${build.dir}/classes"/>

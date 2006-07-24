@@ -27,6 +27,7 @@ package opendap.coreServlet;
 import opendap.util.Debug;
 import opendap.util.Log;
 import opendap.dap.DODSException;
+import opendap.olfs.InitialContentHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -210,6 +211,10 @@ public class DispatchServlet extends HttpServlet {
             throws IOException, ServletException {
 
         // response.setHeader("Last-Modified", (new Date()).toString() );
+
+
+        InitialContentHandler.garf(this);
+
 
         boolean isDebug = false;
         ReqState rs = null;
