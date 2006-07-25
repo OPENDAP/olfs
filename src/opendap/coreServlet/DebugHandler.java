@@ -103,7 +103,7 @@ public class DebugHandler {
             } else if (cmd.equals("showInitParameters")) {
                 pw.println(rs.toString());
             } else if (cmd.equals("showRequest")) {
-                ServletUtil.probeRequest(pw, request, servlet.getServletContext(), servlet.getServletConfig());
+                ServletUtil.probeRequest(pw, servlet, request, servlet.getServletContext(), servlet.getServletConfig());
             } else if (!doDebugCmd(cmd, tz, pw)) { // for subclasses
                 pw.println("  unrecognized command");
             }

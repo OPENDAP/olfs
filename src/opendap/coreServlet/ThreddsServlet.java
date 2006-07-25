@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 import java.io.*;
+import java.util.StringTokenizer;
 
 import thredds.servlet.DataRootHandler2;
 import thredds.servlet.HtmlWriter2;
@@ -88,9 +89,9 @@ public class ThreddsServlet extends HttpServlet {
 
 
     protected org.slf4j.Logger log;
-    protected String rootPath;    // Path to location war file was unpacked.
-    protected String contentPath; // Path to ${tomcat_home}/content/<context>
-    // @todo Is this allowed in all servlet engines?
+    //protected String _contentPath; // Path to ${tomcat_home}/content/<context>
+    //protected String _contextPath; // Path to ${tomcat_home}/webapps/<context>
+
 
     protected DataRootHandler2 dataRootHandler;
 
@@ -102,87 +103,8 @@ public class ThreddsServlet extends HttpServlet {
 
     protected String getVersion()
     {
-      return "Server4 (beta_0.0.2)";
+      return "Server4 (alpha-0.1.3) ";
     }
-
-
-    private void initTHREDDS(){
-
-        thredds.servlet.ServletUtil.initDebugging( this ); // read debug flags
-        rootPath = thredds.servlet.ServletUtil.getRootPath( this );
-        contentPath = thredds.servlet.ServletUtil.getContentPath( this );
-
-        // init logging
-        thredds.servlet.ServletUtil.initLogging( this );
-        thredds.servlet.ServletUtil.logServerSetup( this.getClass().getName() + ".init()" );
-        log = org.slf4j.LoggerFactory.getLogger( getClass() );
-
-        log.info( "servlet context name= " + this.getServletContext().getServletContextName() );
-        log.info( "ServletUtil.getContextPath() = " + thredds.servlet.ServletUtil.getContextPath( this ) );
-        log.info( "rootPath= " + rootPath );
-        log.info( "contentPath= " + contentPath );
-
-        // -------------
-        // first time, create content directory
-        //@todo Make our own first time content distribution mechanism. - Stop Using the THREDDS utility to do this
-        //@todo - and move this activity into init proper.
-        String initialContentPath = thredds.servlet.ServletUtil.getInitialContentPath( this );
-        File initialContentFile = new File( initialContentPath );
-        if ( initialContentFile.exists() )
-        {
-          try
-          {
-            if ( thredds.servlet.ServletUtil.copyDir( initialContentPath, contentPath ) )
-            {
-              log.info( "copyDir " + initialContentPath + " to " + contentPath );
-            }
-          }
-          catch ( IOException ioe )
-          {
-            log.error( "failed to copyDir " + initialContentPath + " to " + contentPath, ioe );
-          }
-        }
-        //-------------
-
-        InvDatasetScan.setContext( thredds.servlet.ServletUtil.getContextPath( this ) ); // This gets your context path from web.xml above.
-        InvDatasetScan.setCatalogServletName("/ts");    // This allows you to specify which servlet handles catalog requests.
-                                                        // We set it to "/catalog". Is "/ts" the servlet path for you? If so, set this to "/ts".
-                                                        // If you use the default servlet for everything (path mapping of "/*" in web.xml). set it to the empty string.
-
-
-
-        // handles all catalogs, including ones with DatasetScan elements, ie dynamic
-        DataRootHandler2.init( contentPath, thredds.servlet.ServletUtil.getContextPath( this ) );
-        dataRootHandler = DataRootHandler2.getInstance();
-        try
-        {
-          dataRootHandler.initCatalog( "catalog.xml" );
-          //dataRootHandler.initCatalog( "extraCatalog.xml" );
-        }
-        catch ( Throwable e )
-        {
-          log.error( "Error initializing catalog: " + e.getMessage(), e );
-        }
-
-        //this.makeDebugActions();
-        //dataRootHandler.makeDebugActions();
-        //DatasetHandler.makeDebugActions();
-
-        HtmlWriter2.init( thredds.servlet.ServletUtil.getContextPath( this ),
-                          this.getServletContext().getServletContextName(),
-                          this.getVersion(),
-                          this.getDocsPath(),
-                          "", // userCssPath
-                          "images/cog.gif", // contextLogoPath
-                          "images/opendap_logo_masthead.gif"  // instituteLogoPath
-                );
-
-        log.info( "--- initialized " + getClass().getName() );
-
-    }
-
-
-
 
 
 
@@ -202,9 +124,11 @@ public class ThreddsServlet extends HttpServlet {
     public void init() throws ServletException {
 
         super.init();
+        initDebug();
 
+        InitialContentHandler_OLD.installInitialContent(this);
 
-        initTHREDDS();
+        initTHREDDS(InitialContentHandler_OLD.getContextPath(this), InitialContentHandler_OLD.getContentPath(this));
 
 
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
@@ -254,20 +178,90 @@ public class ThreddsServlet extends HttpServlet {
 
         sdh.init(this);
 
-
-
-
-
-
     }
     /***************************************************************************/
 
 
 
 
+    /**
+     * ************************************************************************
+     *
+     * Process the DebugOn initParameter and turn on the requested debugging
+     * states in the Debug object.
+     *
+     */
+    private void initDebug(){
+        // Turn on debugging.
+        String debugOn = getInitParameter("DebugOn");
+        if (debugOn != null) {
+            System.out.println("** DebugOn **");
+            StringTokenizer toker = new StringTokenizer(debugOn);
+            while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
+        }
+
+    }
+    /***************************************************************************/
+
+
+    /**
+     * ************************************************************************
+     *
+     * Initialize the THREDDS environment so that THREDDS works correctly.
+     *
+     * @param contextPath The context path for this servlet.
+     * @param contentPath The path to the peristemnt configuration content for this servlet.
+     */
+    private void initTHREDDS(String contextPath, String contentPath){
+
+        thredds.servlet.ServletUtil.initDebugging( this ); // read debug flags
+
+        // init logging
+        thredds.servlet.ServletUtil.initLogging( this );
+        thredds.servlet.ServletUtil.logServerSetup( this.getClass().getName() + ".init()" );
+        log = org.slf4j.LoggerFactory.getLogger( getClass() );
+
+
+        InvDatasetScan.setContext( contextPath ); // This gets your context path from web.xml above.
+
+
+        // This allows you to specify which servlet handles catalog requests.
+        // We set it to "/catalog". Is "/ts" the servlet path for you? If so, set this to "/ts".
+        // If you use the default servlet for everything (path mapping of "/*" in web.xml). set it to the empty string.
+        InvDatasetScan.setCatalogServletName("/"+getServletName());
 
 
 
+        // handles all catalogs, including ones with DatasetScan elements, ie dynamic
+        DataRootHandler2.init( contentPath, contextPath );
+        dataRootHandler = DataRootHandler2.getInstance();
+        try
+        {
+          dataRootHandler.initCatalog( "catalog.xml" );
+          //dataRootHandler.initCatalog( "extraCatalog.xml" );
+        }
+        catch ( Throwable e )
+        {
+          log.error( "Error initializing catalog: " + e.getMessage(), e );
+        }
+
+        //this.makeDebugActions();
+        //dataRootHandler.makeDebugActions();
+        //DatasetHandler.makeDebugActions();
+
+        HtmlWriter2.init( contextPath,
+                          this.getServletContext().getServletContextName(),
+                          this.getVersion(),
+                          this.getDocsPath(),
+                          "", // userCssPath
+                          "images/cog.gif", // contextLogoPath
+                          "images/opendap_logo_masthead.gif"  // instituteLogoPath
+                );
+
+        log.info( "--- initialized " + getClass().getName() );
+
+    }
+    /***************************************************************************/
 
 
 
@@ -333,7 +327,7 @@ public class ThreddsServlet extends HttpServlet {
 
         try {
             if (Debug.isSet("probeRequest"))
-                ServletUtil.probeRequest(System.out, request, getServletContext(), getServletConfig());
+                ServletUtil.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
             rs = getRequestState(request);
             if (rs != null) {
@@ -386,71 +380,87 @@ public class ThreddsServlet extends HttpServlet {
                                 requestSuffix.equalsIgnoreCase("help")
                         ) {
                     odh.sendHelpPage(request, response, rs);
+                    log.info("Sent Help Page");
 
                 } else if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")
                         ) {
                     odh.sendDDS(request, response, rs);
+                    log.info("Sent DDS");
 
                 } else if ( // DAS Response?
                         requestSuffix.equalsIgnoreCase("das")
                         ) {
                     odh.sendDAS(request, response, rs);
+                    log.info("Sent DAS");
 
                 } else if (  // DDX Response?
                         requestSuffix.equalsIgnoreCase("ddx")
                         ) {
                     odh.sendDDX(request, response, rs);
+                    log.info("Sent DDX");
 
                 } else if ( // Blob Response?
                         requestSuffix.equalsIgnoreCase("blob")
                         ) {
                     //doGetBLOB(request, response, rs);
                     badURL(request, response, rs);
+                    log.info("Sent BAD URL Response because the asked for a Blob. Bad User!");
 
                 } else if ( // DataDDS (aka .dods) Response?
                         requestSuffix.equalsIgnoreCase("dods")
                         ) {
                     odh.sendDODS(request, response, rs);
+                    log.info("Sent DAP2 Data");
 
                 } else if (  // ASCII Data Response.
                         requestSuffix.equalsIgnoreCase("asc") ||
                                 requestSuffix.equalsIgnoreCase("ascii")
                         ) {
                     odh.sendASCII(request, response, rs);
+                    log.info("Sent ASCII");
 
                 } else if (  // Info Response?
                         requestSuffix.equalsIgnoreCase("info")
                         ) {
                     odh.sendInfo(request, response, rs);
+                    log.info("Sent Info");
 
                 } else if (  //HTML Request Form (aka The Interface From Hell) Response?
                         requestSuffix.equalsIgnoreCase("html") ||
                                 requestSuffix.equalsIgnoreCase("htm")
                         ) {
                     odh.sendHTMLRequestForm(request, response, rs);
+                    log.info("Sent HTML Request Form");
 
                 } else if (  // Status Response?
                         dataSet.equalsIgnoreCase("status")
                         ) {
                     doGetStatus(request, response, rs);
+                    log.info("Sent Status");
 
                 } else if ( // System Properties Response?
                         dataSet.equalsIgnoreCase("systemproperties")
                         ) {
                     ServletUtil.sendSystemProperties(request, response, odh);
+                    log.info("Sent System Properties");
 
                 } else if (isDebug) {
                     DebugHandler.doDebug(this, request, response, odh, rs);
+                    log.info("Sent Debug Response");
 
 
                 } else if (requestSuffix.equals("")) {
                     badURL(request, response, rs);
+                    log.info("Sent BAD URL (missing Suffix)");
+
                 } else {
                     badURL(request, response, rs);
+                    log.info("Sent BAD URL - nothing left to check.");
                 }
             } else {
                 badURL(request, response, rs);
+                log.info("Sent BAD URL - ReqState Object was null.");
             }
 
         } catch (Throwable e) {

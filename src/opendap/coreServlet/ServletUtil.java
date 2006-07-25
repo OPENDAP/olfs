@@ -27,6 +27,7 @@ package opendap.coreServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import java.io.IOException;
@@ -114,13 +115,23 @@ public class ServletUtil {
      * @param request The <code>HttpServletRequest</code> object to probe.
      */
 
-    public static void probeRequest(PrintStream ps, HttpServletRequest request, ServletContext scntxt, ServletConfig scnfg) {
+    public static void probeRequest(PrintStream ps, HttpServlet servlet, HttpServletRequest request, ServletContext scntxt, ServletConfig scnfg) {
 
         Enumeration e;
         int i;
 
 
         ps.println("####################### PROBE ##################################");
+        ps.println("");
+        ps.println("HttpServlet:");
+        ps.println("    getServletName(): "+servlet.getServletName());
+        ps.println("    getServletInfo(): "+servlet.getServletInfo());
+        ps.println("");
+        ps.println("");
+        ps.println("");
+        ps.println("");
+        ps.println("");
+        ps.println("");
         ps.println("The HttpServletRequest object is actually an instance of:");
         ps.println("    " + request.getClass().getName());
         ps.println("");

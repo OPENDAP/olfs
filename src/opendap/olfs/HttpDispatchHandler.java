@@ -37,7 +37,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.zip.DeflaterOutputStream;
-import java.util.StringTokenizer;
 import java.util.Iterator;
 
 import org.jdom.JDOMException;
@@ -73,20 +72,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     /**
      * ************************************************************************
-     * Intitializes the servlet. Init (at this time) basically sets up
-     * the object opendap.util.Debug from the debuggery flags in the
-     * servlet InitParameters. The Debug object can be referenced (with
-     * impunity) from any of the dods code...
+     * Intitializes any state needed for the handler.
      */
     public void init(HttpServlet ds) throws ServletException {
-
-        // debuggering
-        String debugOn = ds.getInitParameter("DebugOn");
-        if (debugOn != null) {
-            System.out.println("** DebugOn **");
-            StringTokenizer toker = new StringTokenizer(debugOn);
-            while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
-        }
 
         configBES(ds);
 
@@ -99,6 +87,11 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
+    /**
+     *
+     * @param ds
+     * @throws ServletException
+     */
     private void configBES(HttpServlet ds) throws ServletException {
         String besHost = ds.getInitParameter("BackEndServerHost");
         if (besHost == null)
@@ -107,7 +100,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         String besPort = ds.getInitParameter("BackEndServerPort");
         if (besPort == null)
             throw new ServletException("Servlet configuration must included BackEndServerPort\n");
-
 
         System.out.print("Configuring BES ... ");
 
@@ -322,7 +314,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                         ReqState rs)
             throws IOException, ServletException {
 
-        System.out.println("Flow in sendDDS()");
 
 
         if (Debug.isSet("showResponse"))
@@ -360,7 +351,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             Out.flush();
         }
 
-        System.out.println("Flow returned to sendDDS()");
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -388,7 +378,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                         ReqState rs)
             throws IOException, ServletException {
 
-        System.out.println("Flow in doGetDDX()");
 
 
         if (Debug.isSet("showResponse"))
@@ -414,7 +403,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             Out.flush();
         }
 
-        System.out.println("Flow returned to sendDDX()");
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -457,7 +445,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         ServletOutputStream sOut = response.getOutputStream();
         OutputStream bOut;
 
-        System.out.println("Flow in doGetOPeNDAP()");
 
 
         if (rs.getAcceptsCompressed()) {
@@ -761,7 +748,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             Out.flush();
         }
 
-        System.out.println("Flow returned to sendASCII()");
 
         response.setStatus(HttpServletResponse.SC_OK);
 

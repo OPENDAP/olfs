@@ -27,7 +27,6 @@ package opendap.coreServlet;
 import opendap.util.Debug;
 import opendap.util.Log;
 import opendap.dap.DODSException;
-import opendap.olfs.InitialContentHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.BufferedOutputStream;
+import java.util.StringTokenizer;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -97,6 +97,7 @@ public class DispatchServlet extends HttpServlet {
 
         super.init();
 
+        initDebug();
 
         // Identify and make the HTTP GET request handler
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
@@ -149,6 +150,26 @@ public class DispatchServlet extends HttpServlet {
         sdh.init(this);
 
 
+
+    }
+    /***************************************************************************/
+
+
+    /**
+     * ************************************************************************
+     *
+     * Process the DebugOn initParameter and turn on the requested debugging
+     * states in the Debug object.
+     *
+     */
+    private void initDebug(){
+        // Turn on debugging.
+        String debugOn = getInitParameter("DebugOn");
+        if (debugOn != null) {
+            System.out.println("** DebugOn **");
+            StringTokenizer toker = new StringTokenizer(debugOn);
+            while (toker.hasMoreTokens()) Debug.set(toker.nextToken(), true);
+        }
 
     }
     /***************************************************************************/
@@ -213,15 +234,13 @@ public class DispatchServlet extends HttpServlet {
         // response.setHeader("Last-Modified", (new Date()).toString() );
 
 
-        InitialContentHandler.garf(this);
-
 
         boolean isDebug = false;
         ReqState rs = null;
 
         try {
             if (Debug.isSet("probeRequest"))
-                ServletUtil.probeRequest(System.out, request, getServletContext(), getServletConfig());
+                ServletUtil.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
             rs = getRequestState(request);
             if (rs != null) {
@@ -511,7 +530,7 @@ public class DispatchServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest request,
-                      HttpServletResponse response)
+                       HttpServletResponse response)
             throws IOException, ServletException {
 
 
