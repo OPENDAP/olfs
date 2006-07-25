@@ -44,7 +44,7 @@ import java.util.Enumeration;
  * Time: 6:32:39 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ServletUtil {
+public class Util {
 
 
     /**

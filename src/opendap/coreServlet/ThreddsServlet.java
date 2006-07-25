@@ -37,6 +37,7 @@ import java.util.StringTokenizer;
 
 import thredds.servlet.DataRootHandler2;
 import thredds.servlet.HtmlWriter2;
+import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
 
 /**
@@ -126,9 +127,10 @@ public class ThreddsServlet extends HttpServlet {
         super.init();
         initDebug();
 
-        InitialContentHandler_OLD.installInitialContent(this);
+        //InitialContentHandler_OLD.installInitialContent(this);
+        PersistentContentHandler.installInitialContent(this);
 
-        initTHREDDS(InitialContentHandler_OLD.getContextPath(this), InitialContentHandler_OLD.getContentPath(this));
+        initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
 
 
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
@@ -327,7 +329,7 @@ public class ThreddsServlet extends HttpServlet {
 
         try {
             if (Debug.isSet("probeRequest"))
-                ServletUtil.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
+                Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
             rs = getRequestState(request);
             if (rs != null) {
@@ -442,7 +444,7 @@ public class ThreddsServlet extends HttpServlet {
                 } else if ( // System Properties Response?
                         dataSet.equalsIgnoreCase("systemproperties")
                         ) {
-                    ServletUtil.sendSystemProperties(request, response, odh);
+                    Util.sendSystemProperties(request, response, odh);
                     log.info("Sent System Properties");
 
                 } else if (isDebug) {

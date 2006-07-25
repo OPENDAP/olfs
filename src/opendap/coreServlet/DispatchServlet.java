@@ -240,7 +240,7 @@ public class DispatchServlet extends HttpServlet {
 
         try {
             if (Debug.isSet("probeRequest"))
-                ServletUtil.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
+                Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
             rs = getRequestState(request);
             if (rs != null) {
@@ -356,7 +356,7 @@ public class DispatchServlet extends HttpServlet {
                 } else if ( // System Properties Response?
                         dataSet.equalsIgnoreCase("systemproperties")
                         ) {
-                    ServletUtil.sendSystemProperties(request, response, odh);
+                    Util.sendSystemProperties(request, response, odh);
 
                 } else if (isDebug) {
                     DebugHandler.doDebug(this, request, response, odh, rs);
