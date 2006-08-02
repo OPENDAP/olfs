@@ -189,6 +189,11 @@ public interface OpendapHttpDispatchHandler {
                         HttpServletResponse response,
                         ReqState rs) throws Exception;
 
+
+    public boolean useOpendapDirectoryView();
+
+
+
     /**
      * ************************************************************************
      * Default handler for the client's version request.

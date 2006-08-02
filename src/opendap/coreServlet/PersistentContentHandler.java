@@ -53,7 +53,7 @@ public class PersistentContentHandler {
 
         // -------------
         // first time, create content directory
-        String initialContentPath = ServletUtil.getInitialContentPath(servlet);
+        String initialContentPath = getInitialContentPath(servlet);
         File initialContentFile = new File(initialContentPath);
 
         if (initialContentFile.exists()) {
@@ -72,6 +72,10 @@ public class PersistentContentHandler {
         }
         //-------------
 
+    }
+
+    public static String getInitialContentPath(HttpServlet servlet) {
+      return ServletUtil.getRootPath(servlet) + "initialContent/";
     }
 
 

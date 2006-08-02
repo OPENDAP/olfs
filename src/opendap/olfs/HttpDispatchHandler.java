@@ -45,6 +45,7 @@ import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import thredds.cataloggen.SimpleCatalogBuilder;
+import thredds.servlet.ServletUtil;
 
 /**
  * Handler fo HTTP GET requests.
@@ -65,6 +66,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      */
     private Document _serverVersionDocument = null;
 
+    /**
+     * ************************************************************************
+     * Configuration, Cached by init()
+     *
+     * @serial
+     */
+    private OLFSConfig _olfsConfig = null;
+
 
     public HttpDispatchHandler() {
         super();
@@ -76,7 +85,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      */
     public void init(HttpServlet ds) throws ServletException {
 
-        configBES(ds);
+        System.out.println("HttpDispatchHandler.init()");
+
+        configure(ds);
 
         try {
             cacheServerVersionDocument();
@@ -92,21 +103,36 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param ds
      * @throws ServletException
      */
-    private void configBES(HttpServlet ds) throws ServletException {
-        String besHost = ds.getInitParameter("BackEndServerHost");
-        if (besHost == null)
-            throw new ServletException("Servlet configuration must included BackEndServer\n");
+    private void configure(HttpServlet ds) throws ServletException {
 
-        String besPort = ds.getInitParameter("BackEndServerPort");
-        if (besPort == null)
-            throw new ServletException("Servlet configuration must included BackEndServerPort\n");
 
-        System.out.print("Configuring BES ... ");
 
-        if (BesAPI.configure(besHost, Integer.parseInt(besPort)))
-            System.out.println("");
-        else
-            System.out.println("That's odd, it was already done...");
+
+        String filename = ds.getInitParameter("OLFSConfigFileName");
+        if (filename == null){
+            String msg = "Servlet configuration must include a file name for the OLFS configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
+
+
+        System.out.print("Configuring OLFS ... ");
+
+
+        try {
+            _olfsConfig = new OLFSConfig( ServletUtil.getContentPath(ds) + filename);
+
+            if (BesAPI.configure(_olfsConfig))
+                System.out.println("");
+            else
+                System.out.println("That's odd, it was already done...");
+
+        }
+        catch (Exception e){
+            throw new ServletException(e);
+        }
+
+
 
     }
 
@@ -528,6 +554,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     /***************************************************************************/
 
 
+
+
+
     /**
      * ************************************************************************
      * Default handler for OPeNDAP catalog.xml requests.
@@ -618,6 +647,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      */
 
 
+    public boolean useOpendapDirectoryView(){
+        return !_olfsConfig.getTHREDDSDirectoryView();
+    }
+
+
+
     public void sendDir(HttpServletRequest request,
                         HttpServletResponse response,
                         ReqState rs)
@@ -703,8 +738,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     }
 
     public void sendASCII_FromBES(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs)
+                                  HttpServletResponse response,
+                                  ReqState rs)
             throws Exception {
 
 

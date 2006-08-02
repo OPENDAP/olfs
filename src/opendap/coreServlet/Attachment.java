@@ -66,6 +66,7 @@ public class Attachment {
                 sos.write(val);
             }
         }
+        //MIME Attachments need to end with a newline!
         sos.println();
 
 

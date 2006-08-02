@@ -127,7 +127,6 @@ public class ThreddsServlet extends HttpServlet {
         super.init();
         initDebug();
 
-        //InitialContentHandler_OLD.installInitialContent(this);
         PersistentContentHandler.installInitialContent(this);
 
         initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
@@ -368,8 +367,23 @@ public class ThreddsServlet extends HttpServlet {
 
                 } else  */
 
+                if ( // OPeNDAP directory response?
 
-                if ( // Directory or catalog response?
+                        odh.useOpendapDirectoryView() && (
+                                dataSet == null ||
+                                dataSet.equals("/") ||
+                                dataSet.equals("") ||
+                                dataSet.endsWith("/") ||
+                                requestSuffix.equals("")
+                                )
+
+                         ){
+                    odh.sendDir(request, response, rs);
+
+                    log.info("Sent Directory");
+
+
+                }else if ( //  THREDDS Catalog or Directory response?
 
                     dataRootHandler.processReqForCatalog(request,response)){
 

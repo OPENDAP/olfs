@@ -76,6 +76,24 @@ public class BesAPI {
 
     }
 
+    public static boolean configure(OLFSConfig bc) {
+
+        synchronized (syncLock) {
+
+            if (isConfigured())
+                return false;
+
+            _besHost = bc.getBESHost();
+            _besPort = bc.getBESPort();
+            _configured = true;
+
+            System.out.println("BES is configured - Host: " + _besHost + "   Port: " + _besPort);
+        }
+
+        return true;
+
+    }
+
     public static boolean isConfigured() {
         return _configured;
     }

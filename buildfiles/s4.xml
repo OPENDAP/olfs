@@ -266,6 +266,10 @@
                 <include name="${xercesXmlApis.lib}"/>
            </zipfileset>
 
+            <zipfileset dir="${initialContent.dir}" prefix="initialContent">
+                <include name="**/*"/>
+           </zipfileset>
+
             <webinf dir="${WebInfResources.dir}">
                 <include name="log4j.xml"/>
             </webinf>

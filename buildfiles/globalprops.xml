@@ -78,7 +78,7 @@ http://ant.apache.org/manual/sysclasspath.html
 <property name="datasets.dir" location="datasets"/>
 <property name="schema.dir" location="schema"/>
 <property name="buildfiles.dir" location="buildfiles"/>
-<property name="initialContent.dir" location="${resources.dir}/intiialContent"/>
+<property name="initialContent.dir" location="${resources.dir}/initialContent"/>
 <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
 <property name="distributionResources.dir" location="${resources.dir}/distribution"/>
 
