@@ -292,20 +292,32 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
 
-
-            // We get a DDX from the BES and then parse it. We use the parsed
-            // one to send a DDS representation. Since the BES applies the
-            // constraint expression, we don't need to get a ServerDDS (full
-            // of Server BaseTypes) with which we could apply the conststraint
-            // expression - it's already done.
-            //DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
-            //ddx.getDAS().print(Out);
+            String path = rs.getDataset();
+            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
 
 
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
 
-            // Earlier method - asks BES directly for a DDS and then writes it
-            // out to the response stream.
-            BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+            if(cgh.isValidConditionalGet()){
+                if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
+
+                if(cgh.conditionIsMet()){
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete DAS response.");
+                    BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+                }
+                else{
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                    response.setStatus(cgh.getReturnStatus());
+                }
+            }
+            else {
+                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete DAS response.");
+                BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+            }
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
@@ -356,22 +368,36 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
 
-            // We get a DDX from the BES and then parse it. We use the parsed
-            // one to send a DDS representation. Since the BES applies the
-            // constraint expression, we don't need to get a ServerDDS (full
-            // of Server BaseTypes) with which we could apply the conststraint
-            // expression - it's already done.
-            //DDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
-            //ddx.print(Out);
 
-            // Earlier method - asks BES directly for a DDS and then writes it
-            // out to the response stream.
-            BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+            String path = rs.getDataset();
+            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+
+
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+
+            if(cgh.isValidConditionalGet()){
+                if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
+
+                if(cgh.conditionIsMet()){
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete DDS response.");
+                    BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+                }
+                else{
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                    response.setStatus(cgh.getReturnStatus());
+                }
+            }
+            else {
+                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete DDS response.");
+                BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+            }
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
         } catch (Exception e) {
-
             Util.anyExceptionHandler(e, response);
         } finally {
             Out.flush();
@@ -419,11 +445,37 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
         try {
-            BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
+            String path = rs.getDataset();
+            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+
+
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+
+            if(cgh.isValidConditionalGet()){
+                if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
+
+                if(cgh.conditionIsMet()){
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete DDX response.");
+                    BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
+
+                }
+                else{
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                    response.setStatus(cgh.getReturnStatus());
+                }
+            }
+            else {
+                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete DDX response.");
+                BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
+            }
+
+
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
-        } catch (PPTException e) {
+        } catch (Exception e) {
             Util.anyExceptionHandler(e, response);
         } finally {
             Out.flush();
@@ -472,7 +524,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         OutputStream bOut;
 
 
-
         if (rs.getAcceptsCompressed()) {
             response.setHeader("Content-Encoding", "deflate");
             bOut = new DeflaterOutputStream(sOut);
@@ -482,12 +533,37 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             bOut = new BufferedOutputStream(sOut);
         }
 
+
         try {
-            BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), bOut);
+            String path = rs.getDataset();
+            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+
+
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+
+            if(cgh.isValidConditionalGet()){
+                if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
+
+                if(cgh.conditionIsMet()){
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete Data response.");
+                    BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), bOut);
+
+                }
+                else{
+                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                    response.setStatus(cgh.getReturnStatus());
+                }
+            }
+            else {
+                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete Data response.");
+                BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), bOut);
+            }
 
         } catch (DODSException de) {
             Util.opendapExceptionHandler(de, response);
-        } catch (PPTException e) {
+        } catch (Exception e) {
             Util.anyExceptionHandler(e, response);
         } finally {
             bOut.flush();
@@ -906,6 +982,15 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
     //**************************************************************************
+
+
+
+
+
+
+
+
+
 
 
 }

@@ -25,6 +25,7 @@
             <include name="${jdom.lib}"/>
             <include name="${cli.lib}"/>
             <include name="${thredds.lib}"/>
+            <include name="${netcdf.lib}"/>
             <include name="${nlog4j.lib}"/>
         </fileset>
     </path>
@@ -236,7 +237,7 @@
                 <include name="${jdom.lib}"/>
                 <include name="${opendap.lib}"/>
                 <include name="${thredds.lib}"/>
-                <include name="${threddsResources.lib}"/>
+                <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>

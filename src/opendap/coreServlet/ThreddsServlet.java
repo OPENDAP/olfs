@@ -35,8 +35,8 @@ import javax.servlet.ServletException;
 import java.io.*;
 import java.util.StringTokenizer;
 
-import thredds.servlet.DataRootHandler2;
-import thredds.servlet.HtmlWriter2;
+import thredds.servlet.DataRootHandler;
+import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
 
@@ -94,7 +94,7 @@ public class ThreddsServlet extends HttpServlet {
     //protected String _contextPath; // Path to ${tomcat_home}/webapps/<context>
 
 
-    protected DataRootHandler2 dataRootHandler;
+    protected DataRootHandler dataRootHandler;
 
 
     protected String getDocsPath()
@@ -234,8 +234,8 @@ public class ThreddsServlet extends HttpServlet {
 
 
         // handles all catalogs, including ones with DatasetScan elements, ie dynamic
-        DataRootHandler2.init( contentPath, contextPath );
-        dataRootHandler = DataRootHandler2.getInstance();
+        DataRootHandler.init( contentPath, contextPath );
+        dataRootHandler = DataRootHandler.getInstance();
         try
         {
           dataRootHandler.initCatalog( "catalog.xml" );
@@ -250,7 +250,7 @@ public class ThreddsServlet extends HttpServlet {
         //dataRootHandler.makeDebugActions();
         //DatasetHandler.makeDebugActions();
 
-        HtmlWriter2.init( contextPath,
+        HtmlWriter.init( contextPath,
                           this.getServletContext().getServletContextName(),
                           this.getVersion(),
                           this.getDocsPath(),

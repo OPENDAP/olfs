@@ -77,7 +77,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest PersistentContentHandler BES</param-value>
+            <param-value>showRequest showResponse PersistentContentHandler BES</param-value>
         </init-param >
 
 

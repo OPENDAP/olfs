@@ -312,8 +312,9 @@ public class BESCrawlableDataset implements CrawlableDataset {
         // process date and time
         String date = dataset.getChild("lastmodified").getChild("date").getTextTrim();
         String time = dataset.getChild("lastmodified").getChild("time").getTextTrim();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        s4c._lastModified = sdf.parse(date + " " + time, new ParsePosition(0));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        
+        s4c._lastModified = sdf.parse(date + " " + time+" UTC", new ParsePosition(0));
 
         // Process collection (if it is one)
         String isCollection = dataset.getAttributeValue("thredds_collection");

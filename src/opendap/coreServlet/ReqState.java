@@ -93,7 +93,6 @@ public class ReqState {
             //throw new BadURLException();
         }
 
-
         processOpendapURL();
 
 
@@ -113,6 +112,8 @@ public class ReqState {
 
 
     }
+
+
 
     public String getRequestURL() {
         return requestURL;
