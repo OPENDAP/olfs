@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OLFSConfig>
+
+    <!-- The hostname (or IP address) and port location for the BES -->
     <BES>
         <host>localhost</host>
         <port>10002</port>
     </BES>
+
+    <!-- Used to indicate which type of directory view clients see. This DOES NOT
+         affect the THREDDS catalogs! ONly the HTML views of them. -->
     <DirectoryView>THREDDS</DirectoryView>
+
 </OLFSConfig>
 
