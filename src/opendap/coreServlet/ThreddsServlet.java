@@ -385,7 +385,7 @@ public class ThreddsServlet extends HttpServlet {
 
                 }else if ( //  THREDDS Catalog or Directory response?
 
-                    dataRootHandler.processReqForCatalog(request,response)){
+                     getThreddsCatalog(request,response)){
 
                     log.info("Sent Catalog");
 
@@ -498,6 +498,30 @@ public class ThreddsServlet extends HttpServlet {
         return rs;
     }
     //**************************************************************************
+
+
+    /**
+     * This helper function makes sure that an empty request path dosn't bone the THREDDS code
+     * for no good reason. IN other wors the top level catalog gets returned even when the URL doesn't
+     * end in a "/"
+     *
+     * @param req Client Request
+     * @param res Server Response
+     * @return True if a THREDDS catalog.xml or catalog.html was returned to the client
+     * @throws IOException
+     * @throws ServletException
+     */
+    private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+
+        if ( (req.getPathInfo() == null)) {
+          String newPath = req.getRequestURL() +"/";
+          res.sendRedirect( newPath);
+          return true;
+        }
+
+        return dataRootHandler.processReqForCatalog(req,res);
+
+    }
 
 
     /**
