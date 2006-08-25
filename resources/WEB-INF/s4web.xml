@@ -18,9 +18,8 @@
 
 
 
-    <!-- default servlet -->
 
-    <!-- servlet>
+    <servlet>
         <servlet-name>s4</servlet-name>
 
         <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
@@ -37,47 +36,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse BES </param-value>
-        </init-param>
-
-
-        <init-param>
-            <param-name>BackEndServerHost</param-name>
-            <param-value>127.0.0.1</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>BackEndServerPort</param-name>
-            <param-value>10002</param-value>
-        </init-param>
-
-
-        <load-on-startup>1</load-on-startup>
-
-
-    </servlet -->
-
-
-
-
-    <servlet>
-        <servlet-name>ts</servlet-name>
-
-        <servlet-class>opendap.coreServlet.ThreddsServlet</servlet-class>
-
-        <init-param>
-            <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
-            <param-value>opendap.olfs.HttpDispatchHandler</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>OpendapSoapDispatchHandlerImplementation</param-name>
-            <param-value>opendap.olfs.SoapDispatchHandler</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse PersistentContentHandler BES</param-value>
+            <param-value>showRequest showResponse probeRequest PersistentContentHandler BES</param-value>
         </init-param >
 
 
@@ -94,12 +53,13 @@
 
 
 
+
     <servlet-mapping>
-        <servlet-name>ts</servlet-name>
+        <servlet-name>s4</servlet-name>
         <url-pattern>/ts</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ts</servlet-name>
+        <servlet-name>s4</servlet-name>
         <url-pattern>/ts/*</url-pattern>
     </servlet-mapping>
     <!-- servlet-mapping>
@@ -108,16 +68,6 @@
     </servlet-mapping -->
 
 
-
-
-    <!-- servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4/*</url-pattern>
-    </servlet-mapping -->
 
 
 

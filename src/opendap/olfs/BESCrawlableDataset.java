@@ -172,9 +172,9 @@ public class BESCrawlableDataset implements CrawlableDataset {
                 threddsPath = "/root/" + path;
         }
         // Is path empty? Then make it "/"
-        //_path = path.equals("") ? "/root" : path;     // Does THREDDS want the top to be "/" or empty??
-
+        //_path = path.equals("") ? "/root" : path; // Does THREDDS want the top to be "/" or empty??
         //_path = _path.equals("/") ? "" : _path;   // Does THREDDS want the top to be "/" or empty??
+
         return threddsPath;
     }
 
@@ -313,7 +313,7 @@ public class BESCrawlableDataset implements CrawlableDataset {
         String date = dataset.getChild("lastmodified").getChild("date").getTextTrim();
         String time = dataset.getChild("lastmodified").getChild("time").getTextTrim();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        
+
         s4c._lastModified = sdf.parse(date + " " + time+" UTC", new ParsePosition(0));
 
         // Process collection (if it is one)

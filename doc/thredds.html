@@ -2,24 +2,71 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>Untitled Document</title>
-</head>
+<title>Untitled Document</title></head>
 
 <body>
 <h1 align="center"><a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" alt="OPeNDAP Banner" width="206" height="93" border="0" /></a><br />
   Server4
-    <br />
+    beta-1.3<br />
   &amp; <br />
   THREDDS </h1>
 <hr />
 <p align="center">&nbsp;</p>
-<p>This release adds simple THREDDS catalogs to the server. No special configuration is required, simply add /catalog.xml to the end of a URL that references a &quot;collection&quot; of data sets and a THREDDS catalog will be returned.</p>
-<p>For more information on THREDDS:</p>
+<p>This release of Server4 supports the complete THREDDS catalog service stack. THREDDS catalogs are controlled by a <em>catalog.xml</em> file located in the (persistent) content directory for the OLFS (More on that here). Rather than provide an exhaustive explanation of the THREDDS catalog functionality and configuration I will appeal to the existing documents provided by our fine colleagues at <a href="http://www.unidata.ucar.edu/projects/THREDDS/">UNIDATA</a>: </p>
 <ul>
   <li><a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/index.html#catalog">Catalog Basics</a></li>
   <li><a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/InvCatalogSpec.html">Catalog Specification </a></li>
   <li><a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/Primer.html">Catalog Primer</a></li>
 </ul>
+<p>The additional important piece of configuration information is regarding the implmentation of CrawlableDataset to be used with Server4, <em>opendap.olfs.BESCrawlableDataset</em>. This class must be specified in any<em> datsetScan</em> element used with server 4. </p>
+<p>Here is an example <em>catalog.xml</em> file:</p>
 <p>&nbsp;</p>
+<pre>
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; 
+&lt;catalog name=&quot;Server4 Test Catalog&quot;
+         xmlns=&quot;http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0&quot;
+         xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
+		 
+     &lt;!-- ************************************************************************************* --&gt;
+	 
+     &lt;service name=&quot;OPeNDAP-Server4&quot; serviceType=&quot;OPeNDAP&quot; base=&quot;/opendap/ts/&quot;/&gt;
+
+     &lt;datasetScan location=&quot;/root/nc&quot; path=&quot;nc&quot; name=&quot;NC&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
+	 
+	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+		   
+           &lt;filter&gt;
+               &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
+               &lt;include wildcard=&quot;*.nc&quot; /&gt;
+           &lt;/filter&gt;
+           &lt;addDatasetSize /&gt;
+
+           &lt;metadata inherited=&quot;true&quot;&gt;
+               &lt;serviceName&gt;OPeNDAP-Server4&lt;/serviceName&gt;
+               &lt;authority&gt;opendap.org&lt;/authority&gt;
+               &lt;dataType&gt;Random&lt;/dataType&gt;
+           &lt;/metadata&gt;     
+     &lt;/datasetScan&gt;
+	 
+     &lt;!-- ************************************************************************************* --&gt;
+&lt;/catalog&gt;
+</pre>
+<p>&nbsp;</p>
+<p>In particular note the following:</p>
+<ul>
+  <li>The line in which the CrawlableDataset implmentation is defined:
+    <pre>&lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt; <pre/>
+    <br />
+    Identifies the correct CrawlableDataset class for Server4 - the one that works with the <em>BES</em> to automatically generate catalogs. <br />
+    <br />
+    <br />
+  </li>
+  <li>In the <em>&lt;datasetScan&gt;</em> element the <em>location</em> attribute's value MUST begin with <em>/root</em>. So, if the top level collection in the BES contains 4 sub collections they must each be identified using a seperate  <em>&lt;datasetScan&gt;</em> element like so:<br />
+    <br />
+      &lt;datasetScan location=&quot;/root&quot; path=&quot;nc&quot; name=&quot;NC&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;<br />
+    <br />
+    <br />
+</li>
+</ul>
 </body>
 </html>

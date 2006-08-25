@@ -64,7 +64,7 @@ import thredds.catalog.InvDatasetScan;
  * Time: 2:23:37 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ThreddsServlet extends HttpServlet {
+public class DispatchServlet extends HttpServlet {
 
 
     /**

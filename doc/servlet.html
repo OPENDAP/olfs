@@ -2,15 +2,14 @@
 <html>
 <head>
 <title>Servlet Configuration</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-</head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
 
 <body>
 <h1 align="center"><a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" width="206" height="93" border="0"></a><br>
 OLFS </h1>
 <h2 align="center">Servlet Configuration And General Information</h2>
 <hr>
-<h3>Servlet Configuration </h3>
+<h3>Synopsis</h3>
 <p>This document should help you get started configuring the OLFS component of Server4.
   This servlet was developed, compiled, and tested using
   the javac 1.5.0 compiler, the 1.5.0 Java Virtual Machine, and Jakarta Tomcat
@@ -18,25 +17,75 @@ OLFS </h1>
 <p><strong><em>Note</em></strong>: All Examples of web.xml configurations in
   this document were check against Jakarta Tomcat 5.5.0 </p>
 <hr>
-<h3><a name="CONFIG"></a>Servlet Configuration
-</h3>
-<p>The OPeNDAP servlets get their configuration from the servlet's web.xml file.
-  The default location of the web.xml file is  (at least in Tomcat 4.1)
-  in  <em>$TOMCATHOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
-  gets renamed then things change accordingly.)</p>
-<p> Each instance of a servlet running
-    in the opendap servlet area needs an entry in the web.xml file. Multiple
+<h2><a name="CONFIG"></a>Servlet Configuration</h2>
+<p>The OPeNDAP Server4 servlet gets its configuration from 3 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, and <strong>web.xml</strong>. Configuration files are located in two places: peristent configurations (<strong>catalog.xml, olfs.xml</strong>) are located in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em>, </p>
+<h3><strong>File Locations:</strong></h3>
+<ul>
+  <li><strong>olfs.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+    <br>
+  </li>
+  <li><strong>catalog.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+    <br>
+  </li>
+  <li><strong>web.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
+    in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
+    gets renamed then things change accordingly.)<br>
+    <br>
+  </li>
+</ul>
+<h3><strong>Configuration Roles:</strong></h3>
+<ul>
+  <li><strong>olfs.xml</strong> - Contains the OLFS localization configuration - location of the BES, directory view instructions, etc. <br>
+    <br>
+  </li>
+  <li>    <strong>catalog.xml</strong> - THREDDS catalogs onfiguration. <br>
+    <br>
+  </li>
+  <li><strong>web.xml</strong> - Core servlet configuration. </li>
+</ul>
+<h3><strong>Configuration Details: </strong></h3>
+<p><strong>olfs.xml</strong> </p>
+<p>Currently the OLFS has 2 normally configurable items: The BES location and the directory view. The <strong>olfs.xml</strong> file looks like this:</p>
+<pre>
+
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+  &lt;OLFSConfig&gt;
+
+      &lt;!-- The hostname (or IP address) and port location for the BES --&gt;
+      &lt;BES&gt;
+          &lt;host&gt;localhost&lt;/host&gt;
+          &lt;port&gt;10002&lt;/port&gt;
+      &lt;/BES&gt;
+	
+      &lt;!-- Used to indicate which type of directory view clients see. This DOES NOT
+           affect the THREDDS catalogs! Only the HTML views of them. A value 
+           of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
+           of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.--&gt;
+
+      &lt;DirectoryView&gt;THREDDS&lt;/DirectoryView&gt;
+	   
+  &lt;/OLFSConfig&gt;</pre>
+<p>&nbsp;</p>
+<p><strong>catalog.xml</strong></p>
+<p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  about it here</a>. </p>
+<p>&nbsp;</p>
+<p><strong>web.xml</strong></p>
+<p><em>In general I would say that you should <strong>NOT</strong> mess with the web.xml file. At least for now. Future versions of Server and the OLFS may have &quot;user configurable&quot; stuff in the web.xml file, but this version (1.3) does not. <strong>SO JUST DON'T DO IT. OK?</strong></em></p>
+<p>&nbsp;</p>
+<hr>
+<p>Having said that here are the details regarding the web.xml file. </p>
+<p>The Serve4  running
+    in the opendap servlet area needs an entry in the <strong>web.xml</strong> file. Multiple
   instances of a servlet and/or several different servlets can be configured
   in the one
-    web.xml file. For instance you can have a DTS and 2 instances of the DRDS
-  configured through one web.xml file.</p>
-<p>Each instance of a servlet needs a unique name which is specified inside a
+    web.xml file. For instance you could have a DTS and a Server4 running in from the same web.xml and thus undr the same servlet context. Running multiple instances of the Server4 in a single web.xml file (aka context) will <strong>NOT</strong> work. </p>
+<p>Each a servlet needs a unique name which is specified inside a
   <em>&lt;servlet&gt;</em> element in the web.xml file using the <em>&lt;servlet-name&gt;</em> tag.
   This is a name of convenience, for example if you where serving data from an
   ARGOS satellite you might call that servlet <em>argos</em>.</p>
 <p>Additionally each instance of a <em>&lt;servlet&gt;</em> must specify which
   Java class contains the actual servlet to run. This is done in the <em>&lt;servlet-class&gt;</em> element.
-  For example the DRDS's class name is <em>opendap.servers.sql.drds</em></p>
+  For example the Server4 class name is <em>opendap.coreServlet.DispatchServlet</em></p>
 <p>Here is a syntax example combining the two previous example values:</p>
 <pre>
 &lt;servlet&gt;
@@ -94,30 +143,7 @@ OLFS </h1>
       <em>Default</em>: If this parameter is
 	  not set, or the value field is empty then debugging instrumentation is not
 	  turned on.<br>
-  </li>
-	<br>
-  <li>    <strong>BackEndServerHost</strong> - This parameter specifies the IP address or host name of the Back End Server to which the OLFS is going to communicate with to get OPeNDAP data and ancillary information.<br>
-    <br>
-    <em>Example:</em>
-      <pre>&lt;init-param&gt;
-	&lt;param-name&gt;BackEndServerHost&lt;/param-name&gt;
-	&lt;param-value&gt;127.0.0.1&lt;/param-value&gt;
-&lt;/init-param&gt;
-</pre>
-      <br>
-    <em>Default</em>: This parameter <strong>must be set </strong> for the OLFS to function. Server4 is a two component system and a connection to a running BES is required. <br>
-    <br>
-  </li>
-  <li><strong>BackEndServerPort</strong> - This parameter specifies the port number on the Back End Server host to which the OLFS is going to communicate with to get OPeNDAP data and ancillary information.<br>
-    <br>
-    <em>Example:</em>
-      <pre>&lt;init-param&gt;
-	&lt;param-name&gt;BackEndServerPort&lt;/param-name&gt;
-	&lt;param-value&gt;10002&lt;/param-value&gt;
-&lt;/init-param&gt;
-
-</pre>
-      <em>Default</em>: This parameter <strong>must be set </strong> for the OLFS to function. Server4 is a two component system and a connection to a running BES is required. <br>
+	  <br>
     <br>
   </li>
   <li><strong>OpendapHttpDispatchHandlerImplementation</strong>- This parameter specifies the handler implementation that provides the responses for the HTTP GET commands to the servlet framework. <strong><em>Don't be messin' with this! It's what makes Server4, well, Server4. </em></strong><br>
@@ -169,17 +195,8 @@ OLFS </h1>
     &lt;param-value&gt;showRequest probeRequest showResponse CE BES S4Dir ReqState&lt;/param-value&gt;
   &lt;/init-param&gt;
 
-  &lt;init-param&gt;
-    &lt;param-name&gt;BackEndServerHost&lt;/param-name&gt;
-    &lt;param-value&gt;127.0.0.1&lt;/param-value&gt;
-  &lt;/init-param&gt;
-  
-  &lt;init-param&gt;
-    &lt;param-name&gt;BackEndServerPort&lt;/param-name&gt;
-    &lt;param-value&gt;10002&lt;/param-value&gt;
-  &lt;/init-param&gt;
+  &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
 
-&lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
 &lt;/servlet&gt;
 
 &lt;servlet-mapping&gt;
