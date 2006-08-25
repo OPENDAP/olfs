@@ -16,6 +16,15 @@
 <p>Represents   the first prototype release of Server4. It  implements the <a href="http://rsg.opendap.org:8090/server-4/templates/feature-set.html">feature set</a> for releases 1.0 and 1.1, along with  a smattering of features due in coming releases. In particular prototype implementations exist for <a href="http://rsg.opendap.org:8090/server-4/templates/features.html#F-23">F-23</a> and <a href="http://rsg.opendap.org:8090/server-4/templates/features.html#F-24">F-24</a> from <a href="http://scm.opendap.org:8090/trac/milestone/Server%204%2C%20release%201.2">release 1.2</a>. At the time of this writing the intended feature set is still growing. </p>
 <p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.2">Release 1.2 - February 24, 2006</a></p>
 <p>This release adds simple THREDDS catalogs to the server. No special configuration is required, simply add /catalog.xml to the end of a URL that references a &quot;collection&quot; of data sets and a THREDDS catalog will be returned.</p>
-<p>&nbsp; </p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3">Release 1.3 - February 24, 2006</a></p>
+<p>This release adds support for:</p>
+<ul>
+  <li>HTTP/1.1 caching - Support for conditional GET using <em>If-Modified-Since</em> and <em>If-Unmodified-Since</em> headers. </li>
+  <li>Peristent Configurations - Now local configurations will not be destroyed when installing new versions of the software. <br>
+  Configurations are stored in the <em>$TOMCAT_HOME/content/opendap</em> directory. </li>
+  <li>Advanced THREDDS catalogs - These require thoughtful modification of the catalog.xml file located in the persisent content/configuration directory. </li>
+</ul>
+<p>&nbsp;</p>
+<p></p>
 </body>
 </html>

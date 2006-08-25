@@ -56,14 +56,14 @@
 
     <servlet-mapping>
         <servlet-name>s4</servlet-name>
-        <url-pattern>/ts</url-pattern>
+        <url-pattern>/s4</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>s4</servlet-name>
-        <url-pattern>/ts/*</url-pattern>
+        <url-pattern>/s4/*</url-pattern>
     </servlet-mapping>
     <!-- servlet-mapping>
-        <servlet-name>ts</servlet-name>
+        <servlet-name>s4</servlet-name>
         <url-pattern>*</url-pattern>
     </servlet-mapping -->
 

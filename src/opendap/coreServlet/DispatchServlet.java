@@ -513,11 +513,13 @@ public class DispatchServlet extends HttpServlet {
      */
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 
+
         if ( (req.getPathInfo() == null)) {
           String newPath = req.getRequestURL() +"/";
           res.sendRedirect( newPath);
           return true;
         }
+        
 
         return dataRootHandler.processReqForCatalog(req,res);
 

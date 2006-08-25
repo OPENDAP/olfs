@@ -7,18 +7,16 @@
 
     <service name="OPeNDAP-Server4" serviceType="OPeNDAP" base="/opendap/ts/"/>
 
-    <datasetScan location="/root/nc" path="nc" name="NC" serviceName="OPeNDAP-Server4">
-        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset">
-            <config>
-                <besHost>127.0.0.1</besHost>
-                <besPort>10002</besPort>
-            </config>
-        </crawlableDatasetImpl>
-          <filter>
+    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
+
+    <datasetScan location="/root/nc" path="nc" name="NetCDF Archive" serviceName="OPeNDAP-Server4">
+
+        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
+        <filter>
             <exclude wildcard=".*" atomic="true" collection="true"/>
-            <include wildcard="*.nc"/>
-          </filter>
-          <addDatasetSize />
+            <include wildcard="*"/>
+        </filter>
+        <addDatasetSize />
 
         <metadata inherited="true">
             <serviceName>OPeNDAP-Server4</serviceName>
@@ -28,6 +26,27 @@
 
     </datasetScan>
 
+    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
+
+    <datasetScan location="/root/ff" path="ff" name="FreeForm Data Archive" serviceName="OPeNDAP-Server4">
+
+        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
+
+        <filter>
+            <exclude wildcard=".*" atomic="true" collection="true"/>
+            <include wildcard="*"/>
+        </filter>
+        <addDatasetSize />
+
+        <metadata inherited="true">
+            <serviceName>OPeNDAP-Server4</serviceName>
+            <authority>opendap.org</authority>
+            <dataType>Random</dataType>
+        </metadata>
+
+    </datasetScan>
+
+    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
 
     <!-- ************************************************************************************* -->
