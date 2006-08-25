@@ -693,7 +693,7 @@ public class SoapUtils {
 
         Element ds = ddxDoc.getRootElement();
 
-        Element blob = ds.getChild("dodsBLOB",osd2nms);
+        Element blob = ds.getChild("dataBLOB",osd2nms);
 
         cid = blob.getAttributeValue("href");
         cid = cid.substring(4,cid.length());
@@ -807,7 +807,7 @@ public class SoapUtils {
         //new XMLOutputter(Format.getPrettyFormat()).output(ds,System.out);
 
 
-        Element blob = ds.getChild("dodsBLOB",osd2nms);
+        Element blob = ds.getChild("dataBLOB",osd2nms);
 
 
         //@todo When the schema is updated we must add the namespace to the this getAttribute call

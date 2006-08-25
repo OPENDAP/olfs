@@ -153,7 +153,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         Element ddx = ddxDoc.getRootElement();
         //@todo Fix The BES use of dodsBLOB!
 
-        Element blob = ddx.getChild("dodsBLOB", XMLNamespaces.getOpendapDAP2Namespace());
+        Element blob = ddx.getChild("dataBLOB", XMLNamespaces.getOpendapDAP2Namespace());
 
         String blobID = MultipartResponse.newUidString();
 

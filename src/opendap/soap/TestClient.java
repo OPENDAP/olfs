@@ -630,7 +630,7 @@ public class TestClient {
         Namespace osd2nms = XMLNamespaces.getOpendapDAP2Namespace();
 
         Element ds = response.getChild("Dataset",osd2nms);
-        Element blob = ds.getChild("dodsBLOB",osd2nms);
+        Element blob = ds.getChild("dataBLOB",osd2nms);
 
         String cid = blob.getAttributeValue("href");
         cid = cid.substring(4,cid.length());
@@ -775,9 +775,9 @@ public class TestClient {
 
         Element ds = ddxDoc.getRootElement();
 
-        Element blob = ds.getChild("dodsBLOB",osd2nms);
+        Element blob = ds.getChild("dataBLOB",osd2nms);
 
-        // Find the href that contains the contentID for the attachment containing the DATA        
+        // Find the href that contains the contentID for the attachment containing the DATA
         cid = blob.getAttributeValue("href");
         cid = cid.substring(4,cid.length());
 
