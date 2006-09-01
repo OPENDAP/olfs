@@ -29,8 +29,8 @@ package opendap.niotest;
  * Date: Sep 1, 2006
  * Time: 9:29:21 AM
  */
-public class BadArgumentException extends Exception {
-    public BadArgumentException(String msg){
+public class BadArgException extends Exception {
+    public BadArgException(String msg){
         super(msg);
     }
 
