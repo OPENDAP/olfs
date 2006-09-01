@@ -47,7 +47,7 @@ import opendap.util.Debug;
  * Time: 8:08:25 AM
  * To change this template use File | Settings | File Templates.
  */
-public class BESCrawlableDataset implements CrawlableDataset {
+public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     private String _threddsPath;
     private String _besPath;
@@ -402,13 +402,15 @@ public class BESCrawlableDataset implements CrawlableDataset {
         }
 
         int j = 0;
-        Vector childDatasets = new Vector();
+        Vector <BESCrawlableDataset> childDatasets  = new Vector <BESCrawlableDataset>() ;
         for (Object _childDatasetElement : _childDatasetElements) {
 
             e = (Element) _childDatasetElement;
 
 
-            String newPath = this.getThreddsPath() + (this.getThreddsPath().endsWith("/") ? "" : "/") + e.getChild("name").getTextTrim();
+            String newPath = this.getThreddsPath() +
+                            (this.getThreddsPath().endsWith("/") ? "" : "/") +
+                             e.getChild("name").getTextTrim();
 
             if (Debug.isSet("CrawlableDataset"))
                 System.out.println("\n\n\nMaking new dataset \"" + newPath + "\" in listDatasets().");
@@ -430,17 +432,23 @@ public class BESCrawlableDataset implements CrawlableDataset {
             dataset._config = this._config;
             if (Debug.isSet("CrawlableDataset")) System.out.println("Made: " + dataset);
 
-            childDatasets.add(dataset);
 
+            childDatasets.add(dataset);
 
             j++;
 
         }
 
+        // Sort them by name
+        Collections.sort(childDatasets);
+
+
         if (Debug.isSet("CrawlableDataset")) System.out.println("List Datasets found " + j + " member(s).");
 
         return childDatasets;
     }
+
+
 
     public List listDatasets(CrawlableDatasetFilter cdf) {
 
@@ -453,7 +461,7 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
         if (Debug.isSet("CrawlableDataset")) System.out.println("Filtering CrawlableDataset list.");
 
-        List retList = new ArrayList();
+        List <CrawlableDataset> retList = new ArrayList<CrawlableDataset>();
         for (Object aList : list) {
             CrawlableDataset curDs = (CrawlableDataset) aList;
             if (cdf.accept(curDs)) {
@@ -464,6 +472,7 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
             }
         }
+
         return (retList);
     }
 
@@ -494,4 +503,15 @@ public class BESCrawlableDataset implements CrawlableDataset {
 
     }
 
+    /**
+     * Compares this BESCrawlableDataset to the passed one based on on a lexicographically assement of
+     * their names.
+     * @param o
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+     * or greater than the specified object.
+     */
+    public int compareTo(Object o) {
+
+        return _name.compareTo(((BESCrawlableDataset)o).getName());
+    }
 }
