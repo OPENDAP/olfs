@@ -813,7 +813,15 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
-    public void sendASCII_FromBES(HttpServletRequest request,
+    public void sendASCII(HttpServletRequest request,
+                          HttpServletResponse response,
+                          ReqState rs)
+            throws Exception {
+
+        sendASCII_BES( request, response, rs);
+    }
+
+    public void sendASCII_BES(HttpServletRequest request,
                                   HttpServletResponse response,
                                   ReqState rs)
             throws Exception {
@@ -866,7 +874,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-    public void sendASCII(HttpServletRequest request,
+    public void sendASCII_OLD(HttpServletRequest request,
                           HttpServletResponse response,
                           ReqState rs)
             throws Exception {

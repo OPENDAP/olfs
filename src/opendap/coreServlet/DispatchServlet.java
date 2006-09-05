@@ -519,7 +519,7 @@ public class DispatchServlet extends HttpServlet {
           res.sendRedirect( newPath);
           return true;
         }
-        
+
 
         return dataRootHandler.processReqForCatalog(req,res);
 
