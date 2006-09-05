@@ -38,8 +38,6 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
 
     private String targetIP;
     private int    targetPort;
-    private int    outputMode;
-    private byte[] endOfRecordBlock;
     private String fileName;
     private UID    uid;
 
@@ -49,10 +47,8 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
     public IPLConfig(){
         uid = new UID();
         setTargetIP(null);
-        setTargetPort(IPLogger.NOTSET);
-        outputMode = IPLogger.NOTSET; // Using direct access to avoid a BadArgException.
-        setEndOfRecordBlock( null );
         setLogFileName(null);
+        setTargetPort(-1);
     }
 
 
@@ -64,13 +60,6 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
         uid = new UID();
         setTargetIP(iplcr.getTargetIP());
         setTargetPort(iplcr.getTargetPort());
-        try {
-            setOutputMode(iplcr.getOutputMode());
-        } catch (BadArgException e) {
-            e.printStackTrace();
-        }
-        if(getOutputMode()==IPLogger.INTERPRETED)
-            setEndOfRecordBlock(iplcr.getEndOfRecordBlock());
         setLogFileName(iplcr.getLogFileName());
     }
 
@@ -99,8 +88,6 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
             copy.targetIP    = this.getTargetIP();
             copy.targetPort  = this.getTargetPort();
             copy.fileName    = this.getLogFileName();
-            copy.outputMode  = this.getOutputMode();
-            copy.setEndOfRecordBlock(this.getEndOfRecordBlock()); // Copies the array content and not the reference.
         }
         catch (CloneNotSupportedException cnse){
             System.err.println("We should never get here because we support clones!");
@@ -111,30 +98,12 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
     }
 
 
-    /**
-     * @return A string representation of the current logging mode.
-     */
-    public String getModeString(){
-        String mode;
-        switch(outputMode){
-            case IPLogger.RAW:
-                mode = "RAW";
-                break;
-            case IPLogger.INTERPRETED:
-                mode = "INTERPRETED";
-                break;
-            default:
-                mode = "NOT SET";
-                break;
-        }
-        return mode;
-    }
 
     /**
      * @return An ID string for the logger.
      */
     public String getLoggerID(){
-        return "[ IPLogger ("+uid+") ("+targetIP+":"+targetPort+"-->"+fileName+") mode="+getModeString() +" ] ";
+        return "[ IPLogger ("+uid+") ("+targetIP+":"+targetPort+"-->"+fileName+") ] ";
     }
 
 
@@ -157,29 +126,7 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
         fileName = name;
     }
 
-    /**
-     * Returns the output mode that this instance of IPLogger will use.
-     *
-     * @return The output mode, -1 if the mode has not been set.
-     * @see IPLogger.RAW
-     * @see IPLogger.INTERPRETED
-     */
-    public int getOutputMode(){
-        return outputMode;
-    }
 
-    /**
-     * Sets the output mode. The only acceptable values are: RAW or INTERPRETED
-     * @param mode The output mode.
-     * @throws BadArgException If mode has already been set, or if it is set to value other than 0 or 1.
-     * @see IPLogger.RAW
-     * @see IPLogger.INTERPRETED
-     */
-    public void setOutputMode(int mode) throws BadArgException {
-
-        if(mode==IPLogger.RAW || mode==IPLogger.INTERPRETED) outputMode = mode;
-        else throw new BadArgException("Output Mode May Only Be Set to 0 (zero) or 1 (one)! RTFM!");
-    }
 
     /**
      * Returns the IP (or hostname) address of the system to which IPLogger will connect to log data.
@@ -214,26 +161,6 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
     }
 
 
-    /**
-     * DANGER! Do not alter the contents of the returned array. It is not a copy.
-     * @return A reference to the current End Of Record block.
-     */
-    public byte[] getEndOfRecordBlock(){
-        return endOfRecordBlock;
-    }
-
-    /**
-     * Copies the values of the passed array into a new End Of Record block.
-     * @param block The values for the new End Of Record block.
-     */
-    public void setEndOfRecordBlock(byte block[]){
-        if( block!= null) {
-            endOfRecordBlock = new byte[block.length];
-            System.arraycopy(block,0,endOfRecordBlock,0,endOfRecordBlock.length);
-        }
-        else
-            endOfRecordBlock = null;
-    }
 
 /*
     public byte getEndOfRecordBlock(int index){
@@ -483,88 +410,16 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
             System.out.print("[" + iplc.getTargetPort() + "]: ");
             k = kybrd.readLine();
             if (!k.equals("")){
-                iplc.setTargetPort(Integer.valueOf(k).intValue());
+                iplc.setTargetPort(Integer.valueOf(k));
                 done = true;
             }
-            else if(iplc.getTargetPort()==IPLogger.NOTSET)
+            else if(iplc.getTargetPort()==-1)
                 System.out.println("You must enter a port number.\n\n");
             else
                 done = true;
         }
 
-        done = false;
-        while(!done){
-            System.out.print("\nEnter the output mode for this logger, R for RAW or I for INTERPRETED.   ");
-            System.out.print("[" + iplc.getModeString() + "]: ");
-            k = kybrd.readLine();
-            if (!k.equals("")){
-                if(k.equalsIgnoreCase("RAW") || k.equalsIgnoreCase("R")){
-                    try {
-                        iplc.setOutputMode(IPLogger.RAW);
-                    } catch (BadArgException e) {
-                        e.printStackTrace();
-                    }
-                    done = true;
-                }
-                else if(k.equalsIgnoreCase("INTERPRETED") || k.equalsIgnoreCase("I")){
-                    try {
-                        iplc.setOutputMode(IPLogger.INTERPRETED);
-                    } catch (BadArgException e) {
-                        e.printStackTrace();
-                    }
-                    done = true;
-                }
-            }
-            else if(iplc.getOutputMode() == IPLogger.NOTSET){
-                    System.out.println("Your choice of \""+k+"\"  is invalid.\n" +
-                                       "Please respond with either an \"R\" or an \"I\"");
-            }
-            else
-                done = true;
 
-        }
-
-        if(iplc.getOutputMode() == IPLogger.INTERPRETED){
-            System.out.println("\nThis IPLogger will be using "+iplc.getModeString()+" mode.\n" +
-                               "You need to specify the length and content of the End Of Record Block (EORB).");
-
-            int bsize = 0;
-            done = false;
-            while(!done){
-                if(iplc.getEndOfRecordBlock()!=null)
-                    bsize = iplc.getEndOfRecordBlock().length;
-                System.out.print("Enter the number of bytes in the EORB. ");
-                System.out.print("["+bsize+"]: ");
-                k = kybrd.readLine();
-                if (!k.equals("")){
-                    bsize = Integer.valueOf(k).intValue();
-                    done = true;
-                }
-                else if(bsize <= 0)
-                    System.out.println("You must enter a size (larger than zero) for the EORB!");
-                else
-                    done = true;
-
-            }
-            byte newBlock[] = new byte[bsize];
-
-            byte oldBlock[] = iplc.getEndOfRecordBlock();
-            byte oldByte;
-
-            for(int i=0; i<newBlock.length ;i++){
-                oldByte = 0;
-                if(oldBlock!=null && i<oldBlock.length)
-                    oldByte = oldBlock[i];
-
-                System.out.print("Byte "+i+" ["+oldByte+"]: ");
-                k = kybrd.readLine();
-                if (!k.equals(""))
-                    newBlock[i] = Byte.valueOf(k).byteValue();
-                else
-                    newBlock[i] = oldByte;
-            }
-            iplc.setEndOfRecordBlock(newBlock);
-        }
 
         done = false;
         while(!done){
@@ -606,22 +461,6 @@ public class IPLConfig implements IPLConfigReader, Serializable, Cloneable {
         s += "     Target Host Name:    " + getTargetIP() + "\n";
         s += "     Target Host Port:    " + getTargetPort() + "\n";
         s += "\n";
-        s += "     Logger Output Mode:  " + getModeString() + "\n";
-        s += "     End Of Record Block: ";
-
-        if(getOutputMode() == IPLogger.INTERPRETED){
-            s+= "{ ";
-            byte block[] = getEndOfRecordBlock();
-            for(int i=0; i<block.length ;i++){
-                if(i>0)
-                    s+= ", ";
-                s+= block[i];
-            }
-            s+= " }\n";
-        }
-        else
-            s+= "Not Used In RAW mode.\n";
-
         s += "\n";
         s += "     Log File Name:       " + getLogFileName()+"\n";
         s += "\n";

@@ -24,13 +24,43 @@
 
 package opendap.niotest;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.nio.channels.SocketChannel;
+import java.net.InetSocketAddress;
+
 /**
  * User: ndp
- * Date: Sep 1, 2006
- * Time: 9:24:04 AM
+ * Date: Sep 5, 2006
+ * Time: 3:47:22 PM
  */
-public interface IPLConfigReader {
-    public String getLogFileName();
-    public String getTargetIP();
-    public int    getTargetPort();
+public class NioServlet extends HttpServlet {
+
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+
+
+        response.setContentType("image/jpeg");
+        response.setHeader("Content-Description", "My Big Picture");
+
+        SocketChannel sc = SocketChannel.open(new InetSocketAddress("localhost",10007));
+
+        response.setBufferSize(4096);
+
+        sc.configureBlocking(true);
+
+
+
+
+
+
+
+
+
+    }
 }
