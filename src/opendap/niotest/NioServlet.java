@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
+import java.util.Date;
 
 /**
  * User: ndp
@@ -49,20 +50,22 @@ public class NioServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        byte[] crlfArray    = {0x0d,0x0a};
-        ByteBuffer crlf     = ByteBuffer.wrap(crlfArray);
+
+
+        Date startTime = new Date();
 
         byte[] chunkArray   = new byte[4];
         ByteBuffer chunk    = ByteBuffer.wrap(chunkArray);
 
-        byte[] eolArray     = new byte[2];
-        ByteBuffer eol      = ByteBuffer.wrap(eolArray);
+        byte[] crlfArray     = new byte[2];
+        ByteBuffer crlf      = ByteBuffer.wrap(crlfArray);
 
-        byte[] promptArray  = new byte[2];
-        ByteBuffer prompt   = ByteBuffer.wrap(promptArray);
 
         byte[] dataArray    = new byte[4096];
         ByteBuffer data     = ByteBuffer.wrap(dataArray);
+
+        ByteBuffer send = ByteBuffer.wrap(("send\r\n").getBytes());
+
 
 
         response.setBufferSize(4096);
@@ -81,23 +84,22 @@ public class NioServlet extends HttpServlet {
         //sc.read(prompt);
 
 
-        ByteBuffer send = ByteBuffer.wrap(("send\r\n").getBytes());
 
 
 
 
-        System.out.println("sc.write(send) wrote: "+sc.write(send)+" bytes.");
-        //System.out.println("sc.write(crlf) wrote: "+sc.write(crlf)+" bytes.");
+        //System.out.println("sc.write(send) wrote: "+sc.write(send)+" bytes.");
+        sc.write(send);
 
 
 
         boolean moreData = true;
         while(moreData){
             chunk.clear();
-            eol.clear();
+            crlf.clear();
 
             sc.read(chunk);
-            sc.read(eol);
+            sc.read(crlf);
 
             int chunkSize = Integer.valueOf(new String(chunkArray),16);
 
@@ -121,24 +123,28 @@ public class NioServlet extends HttpServlet {
                     //System.out.println("count: "+count);
                 }
 
-                data.flip();
                 os.write(data.array(),0,chunkSize);
 
-                eol.clear();
-
-                sc.read(eol);
-
-
+                crlf.clear();
+                sc.read(crlf);
 
 
             }
 
         }
 
-        System.out.println("Closing connections, flushing buffers, etc...");
+        //System.out.println("Closing connections, flushing buffers, etc...");
         os.flush();
         sc.close();
         response.setStatus(200);
+
+        Date endTime = new Date();
+
+        double elapsed = (endTime.getTime() - startTime.getTime())/1000.0;
+
+        System.out.println("Elapsed Time: "+elapsed+" seconds.");
+
+
 
 
 
