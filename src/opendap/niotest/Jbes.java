@@ -26,12 +26,14 @@ package opendap.niotest;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.util.Vector;
+import java.util.Date;
 
 /**
  * User: ndp
@@ -41,6 +43,8 @@ import java.util.Vector;
 public class Jbes {
 
 
+
+
     public static void main(String[] args) throws Exception{
 
 
@@ -48,36 +52,35 @@ public class Jbes {
             System.out.println("Usage: Jbes imageFileName");
             System.exit(-1);
         }
-        int count = 0;
+        int count;
 
         FileInputStream fis = new FileInputStream(args[0]);
 
         FileChannel fc = fis.getChannel();
 
 
-        ByteBuffer imageData = ByteBuffer.allocate((int)fc.size());
+        byte[] data = new byte[(int)fc.size()];
+        ByteBuffer imageData = ByteBuffer.wrap(data);
+        count = fc.read(imageData);
+        imageData.flip();
+        fc.close();
 
-        byte prmpt[] = {(byte)'%',(byte)' '};
-        ByteBuffer prompt = ByteBuffer.wrap(prmpt);
+        double sizeinMB = count/(1024.0*1024.0);
+        System.out.println("Read image data. ("+sizeinMB+" MB)");
+
+
+        Date startTime;
+        long elapsed;
+
+        ServerSocketChannel ssc =  ServerSocketChannel.open();
+        ssc.socket().bind(new InetSocketAddress(10007));
+        ssc.configureBlocking(true);
+
 
         byte cmd[] = new byte[10];
         ByteBuffer command = ByteBuffer.wrap(cmd);
 
-        count = fc.read(imageData);
-        fc.close();
-
-        System.out.println("Read image data. ("+count+" bytes)");
-
-        imageData.flip();
-
-        ServerSocketChannel ssc =  ServerSocketChannel.open();
-
-        ssc.socket().bind(new InetSocketAddress(10007));
-        ssc.configureBlocking(true);
-
         boolean done = false;
-
-
         while(!done){
 
             System.out.print("Waiting for connection ... ");
@@ -88,13 +91,11 @@ public class Jbes {
 
 
 
+
             boolean closed = false;
 
             while(!closed){
 
-
-                //sc.write(prompt);
-                //prompt.rewind();
 
                 count  = sc.read(command);
 
@@ -108,17 +109,25 @@ public class Jbes {
                     if(cmdString.equalsIgnoreCase("send")){
 
                         //sc.write(imageData);
-                        //imageData.rewind();
+                        imageData.rewind();
 
-                        Jbes.sendChunkedData(sc,imageData,4096);
+                        startTime = new Date();
+
+                        //Jbes.sendChunkedDataBlockWrite(sc,imageData.array(),4096);
+                        Jbes.sendChunkedDataNIO(sc,imageData,8192);
+
+                        elapsed  = (new Date()).getTime() - startTime.getTime();
+                        System.out.println("Sent "+sizeinMB+" MB in "+elapsed+" ms ("+(sizeinMB/(elapsed/1000.0))+" MB/sec)");
                     }
                     else if(cmdString.equalsIgnoreCase("close")){
                         System.out.println("Client requested closed connection...");
+                        sc.close();
                         closed = true;
 
                     }
                     else if(cmdString.equalsIgnoreCase("exit")){
                         System.out.println("Client requested termination, exiting...");
+                        sc.close();
                         closed = true;
                         done = true;
 
@@ -126,6 +135,7 @@ public class Jbes {
                 }
                 else if(count <0){
                     System.out.println("Client closed connection...");
+                    sc.close();
                     closed = true;
                 }
                 else if(count ==0){
@@ -142,7 +152,102 @@ public class Jbes {
 
     }
 
-    public static void sendChunkedData(SocketChannel sc, ByteBuffer data, int blockSize) throws IOException {
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     * @param sc
+     * @param data
+     * @param blockSize
+     * @throws IOException
+     */
+    public static void sendChunkedDataNIO(SocketChannel sc, ByteBuffer data, int blockSize) throws IOException {
+
+
+        System.out.println("Sending data using NIO.");
+
+
+        byte[] crlfArray = {0x0d,0x0a};
+        ByteBuffer  crlf = ByteBuffer.wrap(crlfArray);
+
+        ByteBuffer chunkSize = ByteBuffer.wrap((StringUtil.toHexString(blockSize,4)).getBytes());
+
+
+        int remaining = data.remaining();
+        int start = 0;
+        int end = 0;
+
+        while(remaining>0){
+
+
+            if(remaining>=blockSize){
+
+
+                end += blockSize;
+                //System.out.println("start: "+start+" end: "+end+"  remaining: "+remaining+"  blockSize: "+blockSize);
+
+                data.position(start);
+                data.limit(end);
+
+                start += blockSize;
+                remaining -= blockSize;
+            }
+            else {
+                end += remaining;
+                System.out.println("Last Chunk  -  start: "+start+" end: "+end+"  remaining: "+remaining+"  blockSize: "+blockSize);
+
+                data.position(start);
+                data.limit(end);
+
+                chunkSize = ByteBuffer.wrap((StringUtil.toHexString(remaining,4)).getBytes());
+
+
+                remaining =0;
+
+            }
+
+            sc.write(chunkSize); chunkSize.rewind();
+            sc.write(crlf); crlf.rewind();
+            sc.write(data);
+            sc.write(crlf); crlf.rewind();
+
+
+            //data.clear();
+
+        }
+        chunkSize = ByteBuffer.wrap((StringUtil.toHexString(0,4)).getBytes());
+        sc.write(chunkSize); chunkSize.rewind();
+        sc.write(crlf); crlf.rewind();
+
+
+    }
+
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     * @param sc
+     * @param data
+     * @param blockSize
+     * @throws IOException
+     */
+    public static void sendChunkedDataNIO_OLD(SocketChannel sc, ByteBuffer data, int blockSize) throws IOException {
+
+        System.out.println("Sending data using NIO Gathering que.");
 
         byte[] crlfArray = {0x0d,0x0a};
         ByteBuffer  crlf = ByteBuffer.wrap(crlfArray);
@@ -222,6 +327,68 @@ public class Jbes {
 
     }
 
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     * @param sc
+     * @param data
+     * @param blockSize
+     * @throws IOException
+     */
+    public static void sendChunkedDataBlockWrite(SocketChannel sc, byte[] data, int blockSize) throws IOException {
+
+
+        System.out.println("Sending data using traditional block writes.");
+
+        byte[] crlf = {0x0d,0x0a};
+
+
+
+        int remaining = data.length;
+        int start = 0;
+        int length = blockSize;
+        byte[] chunkSize = (StringUtil.toHexString(length,4)).getBytes();
+
+
+        OutputStream os = sc.socket().getOutputStream();
+
+        while(remaining>0){
+
+            if(remaining < blockSize){
+                length = remaining;
+                chunkSize = (StringUtil.toHexString(length,4)).getBytes();
+                System.out.println("Last Chunk  -  start: "+start+" length: "+length+"  remaining: "+remaining+"  blockSize: "+blockSize);
+
+            }
+
+            os.write(chunkSize);
+            os.write(crlf);
+            os.write(data,start,length);
+            os.write(crlf);
+
+            start += length;
+            remaining -= length;
+
+
+        }
+        chunkSize = (StringUtil.toHexString(0,4)).getBytes();
+        os.write(chunkSize);
+        os.write(crlf);
+
+
+
+    }
 
 
 

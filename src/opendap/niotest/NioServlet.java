@@ -24,15 +24,19 @@
 
 package opendap.niotest;
 
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.InputStream;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Date;
 
 /**
@@ -42,17 +46,87 @@ import java.util.Date;
  */
 public class NioServlet extends HttpServlet {
 
+
+    private int maxChunkSize = 8192;
+
+
     public void init() throws ServletException {
         System.out.println("NioServlet loaded.");
 
 
+
     }
+
+
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
 
+        String path = request.getPathInfo();
+
+
+
+        String msg = "NOOP";
+
 
         Date startTime = new Date();
+        Date endTime   = startTime;
+
+
+        if(path == null){
+
+        }else if(path.equals("/nio") || path.equals("/nio/")){
+
+            msg = ("NIOREAD");
+            startTime = new Date();
+            doNIO(request,response);
+            endTime = new Date();
+        }
+        else if(path.equals("/block") || path.equals("/block/")){
+
+            msg = ("BLOCKREAD");
+            startTime = new Date();
+            doBLOCK(request,response);
+            endTime = new Date();
+        }
+
+        else if(path.equals("/byte") || path.equals("/byte/")){
+
+            msg = ("BYTEREAD");
+            startTime = new Date();
+            doBYTE(request,response);
+            endTime = new Date();
+        }
+
+
+
+        long elapsed = endTime.getTime() - startTime.getTime();
+
+        System.out.println(msg + "_Elapsed_Time: "+elapsed+" ms");
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    public void doNIO(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+
+
 
         byte[] chunkArray   = new byte[4];
         ByteBuffer chunk    = ByteBuffer.wrap(chunkArray);
@@ -61,14 +135,13 @@ public class NioServlet extends HttpServlet {
         ByteBuffer crlf      = ByteBuffer.wrap(crlfArray);
 
 
-        byte[] dataArray    = new byte[4096];
+        byte[] dataArray    = new byte[maxChunkSize];
         ByteBuffer data     = ByteBuffer.wrap(dataArray);
 
         ByteBuffer send = ByteBuffer.wrap(("send\r\n").getBytes());
 
 
 
-        response.setBufferSize(4096);
 
         ServletOutputStream os = response.getOutputStream();
 
@@ -81,17 +154,7 @@ public class NioServlet extends HttpServlet {
 
         sc.configureBlocking(true);
 
-        //sc.read(prompt);
-
-
-
-
-
-
-        //System.out.println("sc.write(send) wrote: "+sc.write(send)+" bytes.");
         sc.write(send);
-
-
 
         boolean moreData = true;
         while(moreData){
@@ -124,9 +187,71 @@ public class NioServlet extends HttpServlet {
                 }
 
                 os.write(data.array(),0,chunkSize);
-
                 crlf.clear();
                 sc.read(crlf);
+            }
+        }
+        //System.out.println("Closing connections, flushing buffers, etc...");
+        os.flush();
+        sc.close();
+        response.setStatus(200);
+    }
+
+
+
+
+    public void doBLOCK(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+
+
+
+        byte[] chunk  = new byte[   4];
+        byte[] crlf   = new byte[   2];
+        byte[] data   = new byte[maxChunkSize];
+
+        byte[] send = ("send\r\n").getBytes();
+
+
+        ServletOutputStream os = response.getOutputStream();
+
+        response.setContentType("image/jpeg");
+        //response.setContentType("text/ascii");
+        response.setHeader("Content-Description", "My Big Picture");
+
+        Socket sc = new Socket();
+        sc.connect(new InetSocketAddress("localhost",10007));
+
+        OutputStream sourceOS = sc.getOutputStream();
+        InputStream  sourceIS = sc.getInputStream();
+
+
+
+
+        //System.out.println("sc.write(send) wrote: "+sc.write(send)+" bytes.");
+        sourceOS.write(send);
+
+
+        boolean moreData = true;
+        while(moreData){
+            completeRead(sourceIS,chunk);
+            completeRead(sourceIS,crlf);
+
+            int chunkSize = Integer.valueOf(new String(chunk),16);
+
+            //System.out.println("chunkSize: "+chunkSize);
+
+            if(chunkSize == 0) {
+                moreData = false;
+            }
+            else {
+
+
+                completeRead(sourceIS,data,0,chunkSize);
+
+                os.write(data,0,chunkSize);
+
+                completeRead(sourceIS,crlf);
 
 
             }
@@ -138,13 +263,74 @@ public class NioServlet extends HttpServlet {
         sc.close();
         response.setStatus(200);
 
-        Date endTime = new Date();
-
-        double elapsed = (endTime.getTime() - startTime.getTime())/1000.0;
-
-        System.out.println("Elapsed Time: "+elapsed+" seconds.");
 
 
+
+    }
+    public void doBYTE(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+
+
+
+        byte[] chunk  = new byte[   4];
+        byte[] crlf   = new byte[   2];
+
+        byte[] send = ("send\r\n").getBytes();
+
+
+        ServletOutputStream os = response.getOutputStream();
+
+        response.setContentType("image/jpeg");
+        //response.setContentType("text/ascii");
+        response.setHeader("Content-Description", "My Big Picture");
+
+        Socket sc = new Socket();
+        sc.connect(new InetSocketAddress("localhost",10007));
+
+        OutputStream sourceOS = sc.getOutputStream();
+        InputStream  sourceIS = sc.getInputStream();
+
+
+
+
+        //System.out.println("sc.write(send) wrote: "+sc.write(send)+" bytes.");
+        sourceOS.write(send);
+
+
+        int i;
+        boolean moreData = true;
+        while(moreData){
+            byteRead(sourceIS,chunk);
+            byteRead(sourceIS,crlf);
+
+            int chunkSize = Integer.valueOf(new String(chunk),16);
+
+            //System.out.println("chunkSize: "+chunkSize);
+
+            if(chunkSize == 0) {
+                moreData = false;
+            }
+            else {
+
+
+                for(i=0; i<chunkSize; i++){
+
+                    os.write(sourceIS.read());
+
+                }
+
+                byteRead(sourceIS,crlf);
+
+
+            }
+
+        }
+
+        //System.out.println("Closing connections, flushing buffers, etc...");
+        os.flush();
+        sc.close();
+        response.setStatus(200);
 
 
 
@@ -153,9 +339,37 @@ public class NioServlet extends HttpServlet {
 
 
 
+    public void byteRead(InputStream is, byte[] data) throws IOException {
+
+        for(int i=0; i<data.length; i++){
+            data[i] = (byte) is.read();
+        }
 
 
 
+    }
+
+    public void completeRead(InputStream is, byte[] data) throws IOException {
+
+        completeRead(is,data,0,data.length);
+
+
+
+    }
+
+
+    public void completeRead(InputStream is, byte[] data, int offset, int length) throws IOException {
+
+        int readCount=0;
+
+
+        while(readCount < length){
+            readCount += is.read(data,offset+readCount,length-readCount);
+        }
+
+
+
+    }
 
 
 
