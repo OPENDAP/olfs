@@ -56,7 +56,7 @@ public class IPLogger implements Runnable, IPLConfigReader {
     private PrintWriter     targetControl;
 
     //private int recordCount = 0;
-    DecimalFormat dformat = null;
+    //DecimalFormat dformat = null;
 
     private boolean runnning;
 
@@ -75,8 +75,8 @@ public class IPLogger implements Runnable, IPLConfigReader {
 
         iplc = new IPLConfig();
 
-        dformat = new DecimalFormat();
-        dformat.applyPattern("#00000");
+        //dformat = new DecimalFormat();
+        //dformat.applyPattern("#00000");
 
         runnning = false;
     }

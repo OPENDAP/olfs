@@ -24,13 +24,14 @@
 
 package opendap.niotest;
 
-import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
+import java.util.Vector;
 
 /**
  * User: ndp
@@ -92,8 +93,8 @@ public class Jbes {
             while(!closed){
 
 
-                sc.write(prompt);
-                prompt.rewind();
+                //sc.write(prompt);
+                //prompt.rewind();
 
                 count  = sc.read(command);
 
@@ -106,8 +107,10 @@ public class Jbes {
 
                     if(cmdString.equalsIgnoreCase("send")){
 
-                        sc.write(imageData);
-                        imageData.rewind();
+                        //sc.write(imageData);
+                        //imageData.rewind();
+
+                        Jbes.sendChunkedData(sc,imageData,4096);
                     }
                     else if(cmdString.equalsIgnoreCase("close")){
                         System.out.println("Client requested closed connection...");
@@ -138,6 +141,89 @@ public class Jbes {
 
 
     }
+
+    public static void sendChunkedData(SocketChannel sc, ByteBuffer data, int blockSize) throws IOException {
+
+        byte[] crlfArray = {0x0d,0x0a};
+        ByteBuffer  crlf = ByteBuffer.wrap(crlfArray);
+
+        ByteBuffer chunkSize = ByteBuffer.wrap((StringUtil.toHexString(blockSize,4)).getBytes());
+
+        Vector<ByteBuffer> que = new Vector<ByteBuffer>();
+
+        int remaining = data.remaining();
+        int start = 0;
+        int end = 0;
+
+        while(remaining>0){
+
+
+            if(remaining>=blockSize){
+
+
+                end += blockSize;
+                //System.out.println("start: "+start+" end: "+end+"  remaining: "+remaining+"  blockSize: "+blockSize);
+
+                data.position(start);
+                data.limit(end);
+
+                start += blockSize;
+                remaining -= blockSize;
+            }
+            else {
+                end += remaining;
+                System.out.println("Last Chunk  -  start: "+start+" end: "+end+"  remaining: "+remaining+"  blockSize: "+blockSize);
+
+                data.position(start);
+                data.limit(end);
+
+                chunkSize = ByteBuffer.wrap((StringUtil.toHexString(remaining,4)).getBytes());
+
+                remaining =0;
+
+            }
+
+            que.add(chunkSize.asReadOnlyBuffer());
+            que.add(crlf.asReadOnlyBuffer());
+            que.add(data.asReadOnlyBuffer());
+            que.add(crlf.asReadOnlyBuffer());
+
+            data.clear();
+
+        }
+        chunkSize = ByteBuffer.wrap((StringUtil.toHexString(0,4)).getBytes());
+        que.add(chunkSize);
+        que.add(crlf);
+
+
+
+        ByteBuffer[] bb = new ByteBuffer[que.size()];
+
+        bb = que.toArray(bb);
+
+        //System.out.println("Que Length: "+que.size());
+        //System.out.println("bb Length:  "+bb.length);
+
+
+        int count = 0;
+        boolean done = false;
+        while(!done){
+
+            if(sc.write(bb) == 0)
+                done = true;
+            else
+                count++;
+        }
+
+
+        System.out.println("It took "+count+" passes to send the que.");
+
+
+
+    }
+
+
+
 
 
 }
