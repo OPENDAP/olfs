@@ -100,7 +100,7 @@
             <classpath refid="s4.compile.classpath"/>
 
             <fileset dir="${src.dir}/opendap/" >
-                <!-- exclude name="${src.dir}/opendap/soap/TestClient.java"/ --> <!-- Exclude the TestClient -->
+
             </fileset>
         </javadoc>
 
@@ -245,8 +245,6 @@
                 <include name="${thredds.lib}"/>
                 <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
-                <!-- include name="${xercesImpl.lib}"/ -->
-                <!-- include name="${xercesXmlApis.lib}"/ -->
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -266,8 +264,6 @@
 
             <zipfileset dir="${lib.dir}" prefix="s4-libraries">
                 <include name="${jdom.lib}"/>
-                <!-- include name="${xercesImpl.lib}"/ -->
-                <!-- include name="${xercesXmlApis.lib}"/ -->
            </zipfileset>
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">
