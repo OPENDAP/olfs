@@ -24,8 +24,6 @@
 
 package opendap.coreServlet;
 
-import opendap.util.Log;
-import opendap.util.Debug;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,13 +77,13 @@ public class DebugHandler {
                 pw.println(" on|off=(flagName)");
                 doDebugCmd(cmd, tz, pw); // for subclasses
             } else if (cmd.equals("log")) {
-                Log.reset();
+                DebugLog.reset();
                 pw.println(" logging started");
             } else if (cmd.equals("logEnd")) {
-                Log.close();
+                DebugLog.close();
                 pw.println(" logging ended");
             } else if (cmd.equals("logShow")) {
-                pw.println(Log.getContents());
+                pw.println(DebugLog.getContents());
                 pw.println("-----done logShow");
             } else if (cmd.equals("on"))
                 Debug.set(tz.nextToken(), true);
@@ -94,9 +92,8 @@ public class DebugHandler {
                 Debug.set(tz.nextToken(), false);
 
             else if (cmd.equals("showFlags")) {
-                Iterator iter = Debug.keySet().iterator();
-                while (iter.hasNext()) {
-                    String key = (String) iter.next();
+                for (Object o : Debug.keySet()) {
+                    String key = (String) o;
                     pw.println("  " + key + " " + Debug.isSet(key));
                 }
             } else if (cmd.equals("showInitParameters")) {
@@ -109,7 +106,7 @@ public class DebugHandler {
         }
 
         pw.println("--------------------------------------");
-        pw.println("Logging is " + (Log.isOn() ? "on" : "off"));
+        pw.println("Logging is " + (DebugLog.isOn() ? "on" : "off"));
         Iterator iter = Debug.keySet().iterator();
         while (iter.hasNext()) {
             String key = (String) iter.next();

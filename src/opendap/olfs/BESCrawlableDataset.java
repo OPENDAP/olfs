@@ -36,7 +36,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import opendap.ppt.PPTException;
-import opendap.util.Debug;
+import opendap.coreServlet.Debug;
 
 /**
  * This implmentation of the THREDDS CrawlableDataset interface provides the connection

@@ -24,7 +24,6 @@
 
 package opendap.coreServlet;
 
-import opendap.util.Debug;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;

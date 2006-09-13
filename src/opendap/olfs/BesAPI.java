@@ -25,14 +25,10 @@
 
 package opendap.olfs;
 
-import opendap.util.Debug;
+import opendap.coreServlet.Debug;
+
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
-import opendap.dap.Server.ServerDDS;
-import opendap.dap.DefaultFactory;
-import opendap.dap.DODSException;
-import opendap.dap.BaseTypeFactory;
-import opendap.dap.HeaderInputStream;
 
 import java.io.*;
 import java.util.Iterator;
@@ -160,30 +156,6 @@ public class BesAPI {
 
 
 
-    public static ServerDDS getDDX(String dataset, String constraintExpression)
-            throws PPTException, DODSException, IOException, JDOMException, BESException {
-
-        return getDDX(dataset,constraintExpression, new DefaultFactory());
-
-    }
-
-
-    public static ServerDDS getDDX(String dataset,
-                                   String constraintExpression,
-                                   BaseTypeFactory btf)
-            throws PPTException, DODSException, IOException, JDOMException, BESException {
-
-
-        Document ddxDoc = getDDXDocument(dataset, constraintExpression);
-
-        ServerDDS dds = new ServerDDS(btf);
-
-        dds.parseXML(ddxDoc,true);
-
-        return dds;
-
-    }
-
 
     public static void writeDDS(String dataset,
                                 String constraintExpression,
@@ -194,10 +166,6 @@ public class BesAPI {
     }
 
 
-
-
-
-
     public static void writeDAS(String dataset,
                                 String constraintExpression,
                                 OutputStream os)
@@ -206,9 +174,9 @@ public class BesAPI {
         besGetTransaction(getAPINameForDAS(), dataset, constraintExpression, os);
     }
 
-    public static void writeDapData(String dataset,
-                                    String constraintExpression,
-                                    OutputStream os)
+    public static void writeDap2Data(String dataset,
+                                     String constraintExpression,
+                                     OutputStream os)
             throws BadConfigurationException, PPTException {
 
         besGetTransaction(getAPINameForDODS(), dataset, constraintExpression, os);
@@ -224,13 +192,46 @@ public class BesAPI {
     }
 
 
+    public static void writeHTMLForm(String dataset, String url, OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+
+        OPeNDAPClient oc = startClient();
+
+        configureTransaction(oc, dataset, null);
+
+        String cmd = "get html_form for d1 using "+url+";\n";
+
+        if (Debug.isSet("BES")) System.err.print("Sending command: " + cmd);
+
+        oc.setOutput(os, false);
+        oc.executeCommand(cmd);
+
+
+        shutdownClient(oc);
+
+    }
+
+
+
+
+    public static void writeINFOPage(String dataset,
+                                    OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+        besGetTransaction(getAPINameForINFOPage(), dataset, null, os);
+    }
+
+
+
+
     public static InputStream getDap2DataStream(String dataset,
                                     String constraintExpression)
             throws BadConfigurationException, PPTException, IOException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        writeDapData(dataset, constraintExpression, baos);
+        writeDap2Data(dataset, constraintExpression, baos);
 
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
@@ -459,6 +460,7 @@ public class BesAPI {
     }
 
     public static String getGetCmd(String product) {
+
         return "get " + product + " for d1;\n";
 
     }
@@ -484,6 +486,15 @@ public class BesAPI {
         return "ascii";
     }
 
+    public static String getAPINameForHTMLForm() {
+        return "html_form";
+    }
+
+    public static String getAPINameForINFOPage() {
+        return "info_page";
+    }
+
+
 
     public static void getDataProduct(OPeNDAPClient oc,
                                       String product,
@@ -496,6 +507,11 @@ public class BesAPI {
         oc.executeCommand(cmd);
 
     }
+
+
+
+
+
 
     public static void shutdownClient(OPeNDAPClient oc) throws PPTException {
         if (Debug.isSet("BES")) System.out.print("Shutting down client...");

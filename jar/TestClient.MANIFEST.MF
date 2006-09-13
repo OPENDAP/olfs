@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: opendap.soap.TestClient
-Created-By: 1.4.2_07 (Apple Computer, Inc.)
-Class-Path: apache-commons-cli-1.0.jar axis-1.3.0.jar commons-discovery-0.2.jar commons-logging-1.0.4.jar jaf-1.0.2.jar java-mail-1.3.3_01.jar jaxrpc.jar saaj.jar jdom-1.0.jar opendap-0.0.5.jar 

@@ -25,18 +25,14 @@
 
 package opendap.olfs;
 
-import opendap.dap.DODSException;
-import opendap.ppt.PPTException;
-import opendap.util.Debug;
+import opendap.coreServlet.Debug;
 import opendap.coreServlet.ReqState;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import org.jdom.JDOMException;
 import org.jdom.Element;
 
 /**
@@ -63,7 +59,7 @@ public class S4Dir {
     public static void sendDIR(HttpServletRequest request,
                                HttpServletResponse response,
                                ReqState rs)
-            throws DODSException, PPTException, JDOMException, BESException, IOException {
+            throws Exception {
 
         if (Debug.isSet("showResponse"))
             System.out.println("sendDIR request = " + request);

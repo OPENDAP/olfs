@@ -37,7 +37,7 @@ import org.jdom.Text;
 public class Version {
 
 
-    private static String version = "0.1.2";
+    private static String version = "0.1.3";
 
     public static String getVersionString() {
         return (version);
@@ -59,7 +59,6 @@ public class Version {
 
 
         olfs.addContent(lib);
-        olfs.addContent(opendap.Version.getVersionElement());
 
         return (olfs);
 

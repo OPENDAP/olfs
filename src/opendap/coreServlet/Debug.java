@@ -22,24 +22,41 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
+package opendap.coreServlet;
 
-package opendap.olfs;
-
-import opendap.dap.DODSException;
+import java.util.TreeMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Aug 25, 2003
- * Time: 11:13:10 AM
- * To change this template use Options | File Templates.
+ * A minimal implementation of a globally-accessible set of Debug flags.
  */
-public class BadURLException extends DODSException {
-    public BadURLException(String msg) {
-        super(msg);
+
+public class Debug {
+    static private TreeMap <String, Boolean> map = new TreeMap<String, Boolean>();
+    static private boolean debug = false;
+
+    static public boolean isSet(String flagName) {
+        Boolean val;
+        val = map.get(flagName);
+        if ( val == null){
+            if (debug) System.out.println("Debug.isSet new " + flagName);
+            map.put(flagName, false);
+            return false;
+        }
+
+        return  val;
     }
 
-    public BadURLException() {
-        super("");
+    static public void set(String flagName, boolean value) {
+
+        map.put(flagName, value);
+        if (debug) System.out.println("  Debug.set " + flagName + " " + value);
+    }
+
+    static public void clear() {
+        map = new TreeMap<String, Boolean>();
+    }
+
+    static public java.util.Set keySet() {
+        return map.keySet();
     }
 }

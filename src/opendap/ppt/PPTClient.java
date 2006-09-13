@@ -24,7 +24,7 @@
 
 package opendap.ppt ;
 
-import opendap.util.Debug;
+import opendap.coreServlet.Debug;
 
 import java.io.*;
 import java.net.*;
@@ -52,7 +52,7 @@ class PPTClient {
             _mySock = new Socket(addr, portVal);
         }
         catch (IOException e) {
-            String msg = "Could not connect to host " + hostStr + " on port " + portVal + "\n";
+            String msg = "Could not connect to host " + hostStr + " on port " + portVal + ".  ";
             msg += e.getMessage();
             closeConnection();
             throw new PPTException(msg, e);
@@ -63,7 +63,7 @@ class PPTClient {
             _in = new BufferedInputStream(_mySock.getInputStream());
         }
         catch (IOException e) {
-            String msg = "Couldn't get I/O for the connection to: " + hostStr + "\n";
+            String msg = "Couldn't get I/O for the connection to: " + hostStr + ".  ";
             msg += e.getMessage();
             closeConnection();
             throw new PPTException(msg, e);
@@ -76,7 +76,7 @@ class PPTClient {
             this.writeBuffer(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION);
         }
         catch (PPTException e) {
-            String msg = "Failed to initialize connection to server\n";
+            String msg = "Failed to initialize connection to server. ";
             msg += e.getMessage();
             closeConnection();
             throw new PPTException(msg, e);
@@ -94,7 +94,7 @@ class PPTClient {
             }
         }
         catch (PPTException e) {
-            String msg = "Failed to receive initialization response from server\n";
+            String msg = "Failed to receive initialization response from server.  ";
             msg += e.getMessage();
             closeConnection();
             throw new PPTException(msg, e);
@@ -109,7 +109,7 @@ class PPTClient {
                 this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
-            System.err.println("Failed to inform server that client is exiting, continuing");
+            System.err.println("Failed to inform server that client is exiting, continuing.");
             System.err.println(e.getMessage());
         }
 
@@ -210,7 +210,7 @@ class PPTClient {
 
         try {
             if (strm == null)
-                throw new PPTException("Cannot write response to \"null\" OutputStream.");
+                throw new PPTException("Cannot write response to \"null\" OutputStream. ");
 
             int bytesRead, markBufBytes, i;
 
@@ -255,7 +255,7 @@ class PPTClient {
         }
         catch (IOException e) {
             closeConnection();
-            throw new PPTException("Cannot read response to designated stream.", e);
+            throw new PPTException("Cannot read response to designated stream. ", e);
         }
     }
 
@@ -269,13 +269,13 @@ class PPTClient {
             if (Debug.isSet("PPTClient")) System.out.println(" got " + bytesRead + " bytes.");
 
             if(bytesRead == -1)
-                throw new PPTException("Failed to read response from server. End Of Stream reached prematurely.\n"); 
+                throw new PPTException("Failed to read response from server. End Of Stream reached prematurely.  ");
 
 
             if (Debug.isSet("PPTClient")) System.out.println("Read: " + new String(inBuff));
         }
         catch (IOException e) {
-            String msg = "Failed to read response from server\n";
+            String msg = "Failed to read response from server.  ";
             msg += e.getMessage();
             closeConnection();
 

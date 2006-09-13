@@ -24,6 +24,8 @@
 
 package opendap.olfs;
 
+import opendap.coreServlet.OPeNDAPException;
+
 /**
  * Thrown when something BAD happens in the BES - primairly used to wrap BES
  * errors in a way that the servlet can manage.
@@ -33,7 +35,7 @@ package opendap.olfs;
  *
  *
  */
-public class BESException extends Exception {
+public class BESException extends OPeNDAPException {
     BESException(String msg) {
         super(msg);
     }

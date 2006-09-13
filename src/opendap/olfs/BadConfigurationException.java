@@ -25,7 +25,7 @@
 
 package opendap.olfs;
 
-import opendap.dap.DODSException;
+import opendap.coreServlet.OPeNDAPException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +34,7 @@ import opendap.dap.DODSException;
  * Time: 9:01:46 AM
  * To change this template use File | Settings | File Templates.
  */
-public class BadConfigurationException extends DODSException {
+public class BadConfigurationException extends OPeNDAPException {
 
     public BadConfigurationException(String msg) {
         super(msg);

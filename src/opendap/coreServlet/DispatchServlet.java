@@ -24,10 +24,6 @@
 
 package opendap.coreServlet;
 
-import opendap.util.Debug;
-import opendap.util.Log;
-import opendap.dap.DODSException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
@@ -42,23 +38,23 @@ import thredds.catalog.InvDatasetScan;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
- *
+ * <p/>
  * <p>This server will respond to both HTTP GET and POST requests. The GET dispatching is
  * done in this class, and the POST dispatching (which is in fact the SOAP inrterface)
  * is done in <code>SOAPRequestDispatcher</code></p>
- *
- *
+ * <p/>
+ * <p/>
  * <p>This server is built designed so that the actual handling of the dispatchs is done
  * through code that is identified at run time through the web.xml configuration of the
  * servlet. In particular the HTTP GET request are handled by a class the implements the
  * OpendapHttpDispatchHandler interface. The SOAP requests (via HTTP POST) are handled by a
  * class the implements the OpendapSOAPDispatchHandler interface.<p>
- *
+ * <p/>
  * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
  * an implmentation clas for both these interfaces.</p>
- *
- *
- *
+ * <p/>
+ * <p/>
+ * <p/>
  * User: ndp
  * Date: Mar 17, 2006
  * Time: 2:23:37 PM
@@ -97,20 +93,13 @@ public class DispatchServlet extends HttpServlet {
     protected DataRootHandler dataRootHandler;
 
 
-    protected String getDocsPath()
-    {
-      return "docs/";
+    protected String getDocsPath() {
+        return "docs/";
     }
 
-    protected String getVersion()
-    {
-      return "Server4 (alpha-0.1.3) ";
+    protected String getVersion() {
+        return "Server4 (alpha-0.1.3) ";
     }
-
-
-
-
-
 
 
     /**
@@ -133,7 +122,7 @@ public class DispatchServlet extends HttpServlet {
 
 
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
-        if(className == null)
+        if (className == null)
             throw new ServletException("Missing servlet parameter \"OpendapHttpDispatchHandlerImplementation\"." +
                     "A class that implements the opendap.coreServlet.OpendapHttpDispatchHandler interface must" +
                     "be identified in this (missing) servlet parameter.");
@@ -145,9 +134,9 @@ public class DispatchServlet extends HttpServlet {
             Class classDefinition = Class.forName(className);
             odh = (OpendapHttpDispatchHandler) classDefinition.newInstance();
         } catch (InstantiationException e) {
-            throw new ServletException("Cannot instantiate class: " + className,e);
+            throw new ServletException("Cannot instantiate class: " + className, e);
         } catch (IllegalAccessException e) {
-            throw new ServletException("Cannot access class: " + className,e);
+            throw new ServletException("Cannot access class: " + className, e);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Cannot find class: " + className, e);
         }
@@ -156,9 +145,8 @@ public class DispatchServlet extends HttpServlet {
         odh.init(this);
 
 
-
         className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
-        if(className == null)
+        if (className == null)
             throw new ServletException("Missing servlet parameter \"OpendapSoapDispatchHandlerImplementation\"." +
                     "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
                     "be identified in this (missing) servlet parameter.");
@@ -169,9 +157,9 @@ public class DispatchServlet extends HttpServlet {
             Class classDefinition = Class.forName(className);
             sdh = (OpendapSoapDispatchHandler) classDefinition.newInstance();
         } catch (InstantiationException e) {
-            throw new ServletException("Cannot instantiate class: " + className,e);
+            throw new ServletException("Cannot instantiate class: " + className, e);
         } catch (IllegalAccessException e) {
-            throw new ServletException("Cannot access class: " + className,e);
+            throw new ServletException("Cannot access class: " + className, e);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Cannot find class: " + className, e);
         }
@@ -183,16 +171,13 @@ public class DispatchServlet extends HttpServlet {
     /***************************************************************************/
 
 
-
-
     /**
      * ************************************************************************
-     *
+     * <p/>
      * Process the DebugOn initParameter and turn on the requested debugging
      * states in the Debug object.
-     *
      */
-    private void initDebug(){
+    private void initDebug() {
         // Turn on debugging.
         String debugOn = getInitParameter("DebugOn");
         if (debugOn != null) {
@@ -207,63 +192,57 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * ************************************************************************
-     *
+     * <p/>
      * Initialize the THREDDS environment so that THREDDS works correctly.
      *
      * @param contextPath The context path for this servlet.
      * @param contentPath The path to the peristemnt configuration content for this servlet.
      */
-    private void initTHREDDS(String contextPath, String contentPath){
+    private void initTHREDDS(String contextPath, String contentPath) {
 
-        thredds.servlet.ServletUtil.initDebugging( this ); // read debug flags
+        thredds.servlet.ServletUtil.initDebugging(this); // read debug flags
 
         // init logging
-        thredds.servlet.ServletUtil.initLogging( this );
-        thredds.servlet.ServletUtil.logServerSetup( this.getClass().getName() + ".init()" );
-        log = org.slf4j.LoggerFactory.getLogger( getClass() );
+        thredds.servlet.ServletUtil.initLogging(this);
+        thredds.servlet.ServletUtil.logServerSetup(this.getClass().getName() + ".init()");
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        InvDatasetScan.setContext( contextPath ); // This gets your context path from web.xml above.
-
+        InvDatasetScan.setContext(contextPath); // This gets your context path from web.xml above.
 
         // This allows you to specify which servlet handles catalog requests.
         // We set it to "/catalog". Is "/ts" the servlet path for you? If so, set this to "/ts".
         // If you use the default servlet for everything (path mapping of "/*" in web.xml). set it to the empty string.
-        InvDatasetScan.setCatalogServletName("/"+getServletName());
-
-
+        InvDatasetScan.setCatalogServletName("/" + getServletName());
 
         // handles all catalogs, including ones with DatasetScan elements, ie dynamic
-        DataRootHandler.init( contentPath, contextPath );
+        DataRootHandler.init(contentPath, contextPath);
         dataRootHandler = DataRootHandler.getInstance();
-        try
-        {
-          dataRootHandler.initCatalog( "catalog.xml" );
-          //dataRootHandler.initCatalog( "extraCatalog.xml" );
+        try {
+            dataRootHandler.initCatalog("catalog.xml");
+            //dataRootHandler.initCatalog( "extraCatalog.xml" );
         }
-        catch ( Throwable e )
-        {
-          log.error( "Error initializing catalog: " + e.getMessage(), e );
+        catch (Throwable e) {
+            log.error("Error initializing catalog: " + e.getMessage(), e);
         }
 
         //this.makeDebugActions();
         //dataRootHandler.makeDebugActions();
         //DatasetHandler.makeDebugActions();
 
-        HtmlWriter.init( contextPath,
-                          this.getServletContext().getServletContextName(),
-                          this.getVersion(),
-                          this.getDocsPath(),
-                          "", // userCssPath
-                          "images/cog.gif", // contextLogoPath
-                          "images/opendap_logo_masthead.gif"  // instituteLogoPath
-                );
+        HtmlWriter.init(contextPath,
+                this.getServletContext().getServletContextName(),
+                this.getVersion(),
+                this.getDocsPath(),
+                "", // userCssPath
+                "images/cog.gif", // contextLogoPath
+                "images/opendap_logo_masthead.gif"  // instituteLogoPath
+        );
 
-        log.info( "--- initialized " + getClass().getName() );
+        log.info("--- initialized " + getClass().getName());
 
     }
     /***************************************************************************/
-
 
 
     /**
@@ -324,7 +303,7 @@ public class DispatchServlet extends HttpServlet {
         // response.setHeader("Last-Modified", (new Date()).toString() );
 
         boolean isDebug = false;
-        ReqState rs = null;
+        ReqState rs;
 
         try {
             if (Debug.isSet("probeRequest"))
@@ -334,7 +313,7 @@ public class DispatchServlet extends HttpServlet {
             if (rs != null) {
                 String ds = rs.getDataset();
                 String suff = rs.getRequestSuffix();
-                isDebug = ((ds != null) && ds.equals("debug") && (suff != null) && suff.equals(""));
+                isDebug = ((ds != null) && ds.equals("/debug") && (suff != null) && suff.equals(""));
             }
 
             synchronized (syncLock) {
@@ -345,7 +324,7 @@ public class DispatchServlet extends HttpServlet {
                     System.out.println("Server: " + getServerName() + "   Request #" + reqno);
                     System.out.println("Client: " + request.getRemoteHost());
                     System.out.println(rs.toString());
-                    Log.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
+                    DebugLog.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
                             "' CE: '" + rs.getConstraintExpression() + "'");
                 }
 
@@ -357,46 +336,67 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-                /* if ( // Version Response?
-                        dataSet.equalsIgnoreCase("/version") ||
-                                dataSet.equalsIgnoreCase("/version/") ||
-                                requestSuffix.equalsIgnoreCase("ver") ||
-                                requestSuffix.equalsIgnoreCase("version")
+
+
+                if (        // Version Response?
+                        dataSet.equalsIgnoreCase("/version")
                         ) {
                     odh.sendVersion(request, response);
 
-                } else  */
+                } else if ( // Help Response?
+                        dataSet.equalsIgnoreCase("/help") ||
+                                dataSet.equalsIgnoreCase("/help/") ||
+                                requestSuffix.equalsIgnoreCase("help")
+                        ) {
+                    odh.sendHelpPage(request, response, rs);
+                    log.info("Sent Help Page");
 
-                if ( // OPeNDAP directory response?
+                } else if ( // System Properties Response?
+                        //Debug.isSet("SystemProperties") &&
+                        dataSet.equalsIgnoreCase("/systemproperties")
+                        ) {
+                    Util.sendSystemProperties(request, response, odh);
+                    log.info("Sent System Properties");
+
+                } else if (    // Debug response?
+                        isDebug &&
+                        Debug.isSet("DebugInterface")) {
+                    
+                    DebugHandler.doDebug(this, request, response, odh, rs);
+                    log.info("Sent Debug Response");
+
+                } else if (  // Status Response?
+                        dataSet.equalsIgnoreCase("/status")
+                        ) {
+                    doGetStatus(request, response, rs);
+                    log.info("Sent Status");
+
+
+
+
+
+                } else if ( // OPeNDAP directory response?
 
                         odh.useOpendapDirectoryView() && (
-                                dataSet == null ||
-                                dataSet.equals("/") ||
-                                dataSet.equals("") ||
-                                dataSet.endsWith("/") ||
-                                requestSuffix.equals("")
-                                )
+                                        dataSet == null       ||
+                                        dataSet.equals("/")   ||
+                                        dataSet.equals("")    ||
+                                        dataSet.endsWith("/") ||
+                                        requestSuffix.equals("")
+                                        )
 
-                         ){
+                        ) {
                     odh.sendDir(request, response, rs);
 
                     log.info("Sent Directory");
 
 
-                }else if ( //  THREDDS Catalog or Directory response?
+                } else if ( //  THREDDS Catalog or Directory response?
 
-                     getThreddsCatalog(request,response)){
+                        getThreddsCatalog(request, response)) {
 
                     log.info("Sent Catalog");
 
-                } else if ( // Help Response?
-                        dataSet.equalsIgnoreCase("/help") ||
-                                dataSet.equalsIgnoreCase("/help/") ||
-                                dataSet.equalsIgnoreCase("/" + requestSuffix) ||
-                                requestSuffix.equalsIgnoreCase("help")
-                        ) {
-                    odh.sendHelpPage(request, response, rs);
-                    log.info("Sent Help Page");
 
                 } else if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")
@@ -449,21 +449,6 @@ public class DispatchServlet extends HttpServlet {
                     odh.sendHTMLRequestForm(request, response, rs);
                     log.info("Sent HTML Request Form");
 
-                } else if (  // Status Response?
-                        dataSet.equalsIgnoreCase("status")
-                        ) {
-                    doGetStatus(request, response, rs);
-                    log.info("Sent Status");
-
-                } else if ( // System Properties Response?
-                        dataSet.equalsIgnoreCase("systemproperties")
-                        ) {
-                    Util.sendSystemProperties(request, response, odh);
-                    log.info("Sent System Properties");
-
-                } else if (isDebug) {
-                    DebugHandler.doDebug(this, request, response, odh, rs);
-                    log.info("Sent Debug Response");
 
 
                 } else if (requestSuffix.equals("")) {
@@ -480,24 +465,22 @@ public class DispatchServlet extends HttpServlet {
             }
 
         } catch (Throwable e) {
-            anyExceptionHandler(e, response, rs);
+            OPeNDAPException.anyExceptionHandler(e, response);
         }
 
-    }
 
-    private ReqState getRequestState(HttpServletRequest request) {
-
-        ReqState rs;
-
-        try {
-            rs = new ReqState(request, getServletConfig(), getServerName());
-        } catch (BadURLException bue) {
-            rs = null;
-        }
-
-        return rs;
     }
     //**************************************************************************
+
+
+    /**
+     * @param request
+     * @return The ReqState object for the passed HttpServlerRequest
+     */
+    private ReqState getRequestState(HttpServletRequest request) {
+
+        return new ReqState(request, getServletConfig(), getServerName());
+    }
 
 
     /**
@@ -514,20 +497,19 @@ public class DispatchServlet extends HttpServlet {
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 
 
-        if ( (req.getPathInfo() == null)) {
-          String newPath = req.getRequestURL() +"/";
-          res.sendRedirect( newPath);
-          return true;
+        if ((req.getPathInfo() == null)) {
+            String newPath = req.getRequestURL() + "/";
+            res.sendRedirect(newPath);
+            return true;
         }
 
 
-        return dataRootHandler.processReqForCatalog(req,res);
+        return dataRootHandler.processReqForCatalog(req, res);
 
     }
 
 
     /**
-     * ************************************************************************
      * Default handler for OPeNDAP status requests; not publically available,
      * used only for debugging
      *
@@ -564,11 +546,8 @@ public class DispatchServlet extends HttpServlet {
         os.println("<h2>Number of Requests Received = " + HitCounter + "</h2>");
     }
 
-    /***************************************************************************/
-
 
     /**
-     * ************************************************************************
      * Sends an html document to the client explaining that they have used a
      * poorly formed URL and then the help page...
      *
@@ -614,50 +593,6 @@ public class DispatchServlet extends HttpServlet {
 
 
     /**
-     * ************************************************************************
-     * Sends an error to the client.
-     *
-     * @param e        The exception that caused the problem.
-     * @param response The <code>HttpServletResponse</code> for the client.
-     */
-    public static void anyExceptionHandler(Throwable e, HttpServletResponse response, ReqState rs) {
-
-        try {
-            System.out.println("DODServlet ERROR (anyExceptionHandler): " + e);
-            System.out.println(rs);
-
-            e.printStackTrace();
-            Log.printThrowable(e);
-
-            BufferedOutputStream eOut = new BufferedOutputStream(response.getOutputStream());
-            response.setHeader("Content-Description", "dods_error");
-
-            // This should probably be set to "plain" but this works, the
-            // C++ slients don't barf as they would if I sent "plain" AND
-            // the C++ don't expect compressed data if I do this...
-            response.setHeader("Content-Encoding", "");
-
-            // Strip any double quotes out of the parser error message.
-            // These get stuck in auto-magically by the javacc generated parser
-            // code and they break our error parser (bummer!)
-            String msg = e.getMessage();
-            if (msg != null)
-                msg = msg.replace('\"', '\'');
-
-            DODSException de2 = new DODSException(DODSException.UNDEFINED_ERROR, msg);
-            de2.print(eOut);
-
-        } catch (IOException ioe) {
-            System.out.println("Cannot respond to client! IO Error: " + ioe.getMessage());
-        }
-
-
-    }
-    /***************************************************************************/
-
-
-    /**
-     *
      * @param request
      * @param response
      * @throws IOException
@@ -669,11 +604,8 @@ public class DispatchServlet extends HttpServlet {
             throws IOException, ServletException {
 
 
-        SOAPRequestDispatcher.doPost(request,response, odh, sdh);
+        SOAPRequestDispatcher.doPost(request, response, odh, sdh);
     }
-
-
-
 
 
 }

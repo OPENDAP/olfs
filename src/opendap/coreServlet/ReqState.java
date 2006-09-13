@@ -31,7 +31,6 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
-import opendap.util.Debug;
 
 
 /**
@@ -52,7 +51,6 @@ public class ReqState {
      *
      * @serial
      */
-    private String defaultINFOcache;
 
     private final String defaultSchemaName = "opendap-0.0.0.xsd";
     private String       defaultSchemaLocation;
@@ -62,7 +60,6 @@ public class ReqState {
     private String dataSetName;
     private String requestSuffix;
     private String CE;
-    private Object obj = null;
     private String serverClassName;
     private String requestURL;
 
@@ -73,8 +70,7 @@ public class ReqState {
 
     public ReqState(HttpServletRequest myRequest,
                     ServletConfig sc,
-                    String serverClassName)
-            throws BadURLException {
+                    String serverClassName) {
 
         this.myServletConfig = sc;
         this.myHttpRequest = myRequest;
@@ -90,14 +86,11 @@ public class ReqState {
         // a CE equal "", the empty string. A null return indicates an error.
         if (this.CE == null) {
             this.CE = "";
-            //throw new BadURLException();
         }
 
         processOpendapURL();
 
 
-        defaultINFOcache = this.myServletConfig.getServletContext().getRealPath("datasets" +
-                myHttpRequest.getServletPath() + "/info") + "/";
 
 
         int index = myHttpRequest.getRequestURL().lastIndexOf(
@@ -118,33 +111,6 @@ public class ReqState {
     public String getRequestURL() {
         return requestURL;
     }
-
-    /**
-     * This method will attempt to get the INFO cache directory
-     * name from the servlet's InitParameters. Failing this it
-     * will return the default INFO cache directory name.
-     *
-     * @return The name of the INFO cache directory.
-     */
-    public String getINFOCache() {
-        String cacheDir = getInitParameter("INFOcache");
-        if (cacheDir == null)
-            cacheDir = defaultINFOcache;
-        return (cacheDir);
-    }
-
-    /**
-     * Sets the default INFO Cache directory name to
-     * the string <i>cachedir</i>. Note that if the servlet configuration
-     * conatins an Init Parameter <i>INFOcache</i> the default
-     * value will be ingnored.
-     *
-     * @param cachedir
-     */
-    public void setDefaultINFOCache(String cachedir) {
-        defaultINFOcache = cachedir;
-    }
-
 
 
     public String getDataset() {
@@ -390,14 +356,6 @@ public class ReqState {
     }
 
 
-    // for debugging, extra state, etc
-    public Object getUserObject() {
-        return obj;
-    }
-
-    public void setUserObject(Object userObj) {
-        this.obj = userObj;
-    }
 
     public String toString() {
         String ts;

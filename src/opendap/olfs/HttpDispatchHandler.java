@@ -24,10 +24,8 @@
 
 package opendap.olfs;
 
-import opendap.dap.DODSException;
-import opendap.dap.Server.ServerDDS;
 import opendap.ppt.PPTException;
-import opendap.util.Debug;
+
 import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +35,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.zip.DeflaterOutputStream;
-import java.util.Iterator;
 
 import org.jdom.JDOMException;
 import org.jdom.Document;
@@ -49,7 +46,7 @@ import thredds.servlet.ServletUtil;
 
 /**
  * Handler fo HTTP GET requests.
- *
+ * <p/>
  * User: ndp
  * Date: Feb 28, 2006
  * Time: 12:42:23 PM
@@ -98,18 +95,18 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
+
+
+
     /**
-     *
      * @param ds
      * @throws ServletException
      */
     private void configure(HttpServlet ds) throws ServletException {
 
 
-
-
         String filename = ds.getInitParameter("OLFSConfigFileName");
-        if (filename == null){
+        if (filename == null) {
             String msg = "Servlet configuration must include a file name for the OLFS configuration!\n";
             System.err.println(msg);
             throw new ServletException(msg);
@@ -120,7 +117,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         try {
-            _olfsConfig = new OLFSConfig( ServletUtil.getContentPath(ds) + filename);
+            _olfsConfig = new OLFSConfig(ServletUtil.getContentPath(ds) + filename);
 
             if (BesAPI.configure(_olfsConfig))
                 System.out.println("");
@@ -128,10 +125,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 System.out.println("That's odd, it was already done...");
 
         }
-        catch (Exception e){
+        catch (Exception e) {
             throw new ServletException(e);
         }
-
 
 
     }
@@ -175,10 +171,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     public String getXDODSServerVersion() {
 
         if (getVersionDocument() != null) {
-            Iterator i = getVersionDocument().getRootElement().getChild("BES").getChildren("lib").iterator();
 
-            while (i.hasNext()) {
-                Element e = (Element) i.next();
+            for (Object o : getVersionDocument().getRootElement().getChild("BES").getChildren("lib")) {
+                Element e = (Element) o;
                 if (e.getChildTextTrim("name").equalsIgnoreCase("libdap")) {
                     return ("dods/" + e.getChildTextTrim("version"));
                 }
@@ -198,13 +193,10 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             String opsrv = "";
 
-            Iterator i = getVersionDocument().getRootElement().getChildren().iterator();
-
-            while (i.hasNext()) {
-                Element pkg = (Element) i.next();
-                Iterator j = pkg.getChildren("lib").iterator();
-                while (j.hasNext()) {
-                    Element lib = (Element) j.next();
+            for (Object o : getVersionDocument().getRootElement().getChildren()) {
+                Element pkg = (Element) o;
+                for (Object o1 : pkg.getChildren("lib")) {
+                    Element lib = (Element) o1;
                     opsrv += " " + lib.getChildTextTrim("name") + "/" + lib.getChildTextTrim("version");
                 }
             }
@@ -232,10 +224,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             String responseDAP = null;
 
-            Iterator i = getVersionDocument().getRootElement().getChild("DAP").getChildren("version").iterator();
-
-            while (i.hasNext()) {
-                Element v = (Element) i.next();
+            for (Object o : getVersionDocument().getRootElement().getChild("DAP").getChildren("version")) {
+                Element v = (Element) o;
                 String ver = v.getTextTrim();
                 double vval = Double.parseDouble(ver);
                 if (hval < vval) {
@@ -276,7 +266,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     public void sendDAS(HttpServletRequest request,
                         HttpServletResponse response,
                         ReqState rs)
-            throws IOException, ServletException {
+            throws Exception {
 
         if (Debug.isSet("showResponse"))
             System.out.println("doGetDAS for dataset: " + rs.getDataset());
@@ -290,42 +280,36 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         //response.setHeader("Content-Encoding", "plain");
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
-        try {
 
             String path = rs.getDataset();
             path = BESCrawlableDataset.besPath2ThreddsPath(path);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
-            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
 
-            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request, cd.lastModified());
 
-            if(cgh.isValidConditionalGet()){
+            if (cgh.isValidConditionalGet()) {
                 if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
 
-                if(cgh.conditionIsMet()){
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete DAS response.");
+                if (cgh.conditionIsMet()) {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was met. Sending complete DAS response.");
                     BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
-                }
-                else{
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                } else {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was not met. Sending status: " + cgh.getReturnStatus());
                     response.setStatus(cgh.getReturnStatus());
                 }
-            }
-            else {
-                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete DAS response.");
+            } else {
+                if (Debug.isSet("showResponse"))
+                    System.out.println("Client Did not send a conditional GET. Sending complete DAS response.");
                 BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
             }
 
-        } catch (DODSException de) {
-            Util.opendapExceptionHandler(de, response);
-        } catch (Exception e) {
-            Util.anyExceptionHandler(e, response);
-        } finally {
             Out.flush();
-        }
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
@@ -350,8 +334,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     public void sendDDS(HttpServletRequest request,
                         HttpServletResponse response,
                         ReqState rs)
-            throws IOException, ServletException {
-
+            throws Exception {
 
 
         if (Debug.isSet("showResponse"))
@@ -366,42 +349,36 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         //response.setHeader("Content-Encoding", "plain");
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
-        try {
-
 
             String path = rs.getDataset();
             path = BESCrawlableDataset.besPath2ThreddsPath(path);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
-            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
 
-            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request, cd.lastModified());
 
-            if(cgh.isValidConditionalGet()){
+            if (cgh.isValidConditionalGet()) {
                 if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
 
-                if(cgh.conditionIsMet()){
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete DDS response.");
+                if (cgh.conditionIsMet()) {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was met. Sending complete DDS response.");
                     BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
 
-                }
-                else{
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                } else {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was not met. Sending status: " + cgh.getReturnStatus());
                     response.setStatus(cgh.getReturnStatus());
                 }
-            }
-            else {
-                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete DDS response.");
+            } else {
+                if (Debug.isSet("showResponse"))
+                    System.out.println("Client Did not send a conditional GET. Sending complete DDS response.");
                 BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
             }
 
-        } catch (DODSException de) {
-            Util.opendapExceptionHandler(de, response);
-        } catch (Exception e) {
-            Util.anyExceptionHandler(e, response);
-        } finally {
             Out.flush();
-        }
+
 
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -428,8 +405,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     public void sendDDX(HttpServletRequest request,
                         HttpServletResponse response,
                         ReqState rs)
-            throws IOException, ServletException {
-
+            throws Exception {
 
 
         if (Debug.isSet("showResponse"))
@@ -444,44 +420,36 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         //response.setHeader("Content-Encoding", "plain");
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
-        try {
+
             String path = rs.getDataset();
             path = BESCrawlableDataset.besPath2ThreddsPath(path);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
-            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
 
-            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request, cd.lastModified());
 
-            if(cgh.isValidConditionalGet()){
+            if (cgh.isValidConditionalGet()) {
                 if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
 
-                if(cgh.conditionIsMet()){
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete DDX response.");
+                if (cgh.conditionIsMet()) {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was met. Sending complete DDX response.");
                     BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
 
-                }
-                else{
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                } else {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was not met. Sending status: " + cgh.getReturnStatus());
                     response.setStatus(cgh.getReturnStatus());
                 }
-            }
-            else {
-                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete DDX response.");
+            } else {
+                if (Debug.isSet("showResponse"))
+                    System.out.println("Client Did not send a conditional GET. Sending complete DDX response.");
                 BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
             }
 
 
-
-        } catch (DODSException de) {
-            Util.opendapExceptionHandler(de, response);
-        } catch (Exception e) {
-            Util.anyExceptionHandler(e, response);
-        } finally {
             Out.flush();
-        }
-
-
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
@@ -508,7 +476,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     public void sendDODS(HttpServletRequest request,
                          HttpServletResponse response,
                          ReqState rs)
-            throws IOException, ServletException {
+            throws Exception {
 
 
         if (Debug.isSet("showResponse"))
@@ -534,40 +502,34 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
 
-        try {
             String path = rs.getDataset();
             path = BESCrawlableDataset.besPath2ThreddsPath(path);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
-            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(),HttpDate.RFC_1123));
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
 
-            ConditionalGetHandler cgh = new ConditionalGetHandler(request,cd.lastModified());
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request, cd.lastModified());
 
-            if(cgh.isValidConditionalGet()){
+            if (cgh.isValidConditionalGet()) {
                 if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
 
-                if(cgh.conditionIsMet()){
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was met. Sending complete Data response.");
-                    BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), bOut);
+                if (cgh.conditionIsMet()) {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was met. Sending complete Data response.");
+                    BesAPI.writeDap2Data(rs.getDataset(), rs.getConstraintExpression(), bOut);
 
-                }
-                else{
-                    if (Debug.isSet("showResponse")) System.out.println(" condition was not met. Sending status: "+cgh.getReturnStatus());
+                } else {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was not met. Sending status: " + cgh.getReturnStatus());
                     response.setStatus(cgh.getReturnStatus());
                 }
-            }
-            else {
-                if (Debug.isSet("showResponse")) System.out.println("Client Did not send a conditional GET. Sending complete Data response.");
-                BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), bOut);
+            } else {
+                if (Debug.isSet("showResponse"))
+                    System.out.println("Client Did not send a conditional GET. Sending complete Data response.");
+                BesAPI.writeDap2Data(rs.getDataset(), rs.getConstraintExpression(), bOut);
             }
 
-        } catch (DODSException de) {
-            Util.opendapExceptionHandler(de, response);
-        } catch (Exception e) {
-            Util.anyExceptionHandler(e, response);
-        } finally {
             bOut.flush();
-        }
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
@@ -589,7 +551,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      */
     public void sendVersion(HttpServletRequest request,
                             HttpServletResponse response)
-            throws IOException, ServletException, DODSException {
+            throws Exception {
 
         if (Debug.isSet("showResponse"))
             System.out.println("Sending Version Document:");
@@ -606,7 +568,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         Document vdoc = getVersionDocument();
         if (vdoc == null) {
-            throw new DODSException("Internal Error: Version Document not initialized.");
+            throw new ServletException("Internal Error: Version Document not initialized.");
         }
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         //XMLOutputter xout = new XMLOutputter();
@@ -630,9 +592,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     /***************************************************************************/
 
 
-
-
-
     /**
      * ************************************************************************
      * Default handler for OPeNDAP catalog.xml requests.
@@ -645,7 +604,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     public void sendCatalog(HttpServletRequest request,
                             HttpServletResponse response,
                             ReqState rs)
-            throws IOException, ServletException, DODSException, PPTException, JDOMException, BESException {
+            throws Exception {
 
 
         response.setContentType("text/xml");
@@ -709,7 +668,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         } else {
             response.setContentType("text/html");
             String msg = "ERROR: THREDDS catalogs may only be requested for collections, not for individual data sets.";
-            throw new DODSException(msg);
+            throw new OPeNDAPException(msg);
         }
 
         //printCatalog(request, pw);
@@ -723,10 +682,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      */
 
 
-    public boolean useOpendapDirectoryView(){
+    public boolean useOpendapDirectoryView() {
         return !_olfsConfig.getTHREDDSDirectoryView();
     }
-
 
 
     public void sendDir(HttpServletRequest request,
@@ -751,13 +709,11 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param request
      * @param response
      * @param rs
-     * @throws Exception
      */
     public void sendHTMLRequestForm(HttpServletRequest request,
                                     HttpServletResponse response,
                                     ReqState rs)
-            throws Exception {
-
+            throws Exception  {
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -765,17 +721,30 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_form");
 
-        if(Debug.isSet("showResponse"))
-                System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
-                "    CE: '" + request.getQueryString() + "'");
+        if (Debug.isSet("showResponse"))
+            System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
+                    "    CE: '" + request.getQueryString() + "'");
 
-        ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
 
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
+            OutputStream os = new BufferedOutputStream(response.getOutputStream());
 
-        DefaultResponse.sendHtmlResponse(pw, rs, ddx);
+            String url = request.getRequestURL().toString();
+
+            int suffix_start = url.lastIndexOf("." + rs.getRequestSuffix());
+
+            url = url.substring(0, suffix_start);
+
+
+            if (Debug.isSet("showResponse"))
+                System.out.println("HTML Form URL: " + url);
+
+            BesAPI.writeHTMLForm(rs.getDataset(), url, os);
+
+                    os.flush();
+
 
         response.setStatus(HttpServletResponse.SC_OK);
+
 
     }
 
@@ -784,12 +753,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param request
      * @param response
      * @param rs
-     * @throws Exception
      */
     public void sendInfo(HttpServletRequest request,
                          HttpServletResponse response,
                          ReqState rs)
-            throws Exception {
+            throws Exception  {
+
 
 
         response.setContentType("text/html");
@@ -801,30 +770,22 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         if (Debug.isSet("showResponse"))
             System.out.println("doGetINFO For: " + rs.getDataset());
 
+        OutputStream os = new BufferedOutputStream(response.getOutputStream());
 
-        ServerDDS ddx = BesAPI.getDDX(rs.getDataset(), rs.getConstraintExpression());
+            BesAPI.writeINFOPage(rs.getDataset(), os);
 
-        PrintStream pw = new PrintStream(response.getOutputStream());
+                    os.flush();
 
-        DefaultResponse.sendInfoResponse(pw, rs, ddx);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-
     }
+
 
     public void sendASCII(HttpServletRequest request,
                           HttpServletResponse response,
                           ReqState rs)
-            throws Exception {
-
-        sendASCII_BES( request, response, rs);
-    }
-
-    public void sendASCII_BES(HttpServletRequest request,
-                                  HttpServletResponse response,
-                                  ReqState rs)
-            throws Exception {
+            throws Exception  {
 
 
         response.setContentType("text/plain");
@@ -837,92 +798,62 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
                     "    CE: '" + request.getQueryString() + "'");
 
-
-        String requestURL, ce;
-
-        if (request.getQueryString() == null) {
-            ce = "";
-        } else {
-            ce = "?" + request.getQueryString();
-        }
-
-
-        requestURL = rs.getRequestURL();
-
-        if (Debug.isSet("showResponse")) {
-            System.out.println("New Request URL Resource: '" + requestURL + "'");
-            System.out.println("New Request Constraint Expression: '" + ce + "'");
-        }
-
-
-        OutputStream Out = new BufferedOutputStream(response.getOutputStream());
-        try {
-            BesAPI.writeASCII(rs.getDataset(), rs.getConstraintExpression(), Out);
-
-        } catch (DODSException de) {
-            Util.opendapExceptionHandler(de, response);
-        } catch (PPTException e) {
-            Util.anyExceptionHandler(e, response);
-        } finally {
-            Out.flush();
-        }
-
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-    }
+        OutputStream bOut ;
 
 
 
-    public void sendASCII_OLD(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs)
-            throws Exception {
+            ServletOutputStream sOut = response.getOutputStream();
+
+            if (rs.getAcceptsCompressed()) {
+                response.setHeader("Content-Encoding", "deflate");
+                bOut = new DeflaterOutputStream(sOut);
+            } else {
+                // Commented out because of a bug in the OPeNDAP C++ stuff...
+                //response.setHeader("Content-Encoding", "plain");
+                bOut = new BufferedOutputStream(sOut);
+            }
 
 
-        response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion());
-        response.setHeader("XDAP", getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_ascii");
-
-        if (Debug.isSet("showResponse"))
-            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
-                    "    CE: '" + request.getQueryString() + "'");
+            String path = rs.getDataset();
+            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
+            response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
 
-        String requestURL, ce;
+            ConditionalGetHandler cgh = new ConditionalGetHandler(request, cd.lastModified());
 
-        if (request.getQueryString() == null) {
-            ce = "";
-        } else {
-            ce = "?" + request.getQueryString();
-        }
+            if (cgh.isValidConditionalGet()) {
+                if (Debug.isSet("showResponse")) System.out.print("Client sent a valid conditional GET request...");
 
+                if (cgh.conditionIsMet()) {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was met. Sending complete Data response.");
+                    BesAPI.writeASCII(rs.getDataset(), rs.getConstraintExpression(), bOut);
 
-        requestURL = rs.getRequestURL();
+                } else {
+                    if (Debug.isSet("showResponse"))
+                        System.out.println(" condition was not met. Sending status: " + cgh.getReturnStatus());
+                    response.setStatus(cgh.getReturnStatus());
+                }
+            } else {
+                if (Debug.isSet("showResponse"))
+                    System.out.println("Client Did not send a conditional GET. Sending complete Data response.");
+                BesAPI.writeASCII(rs.getDataset(), rs.getConstraintExpression(), bOut);
+            }
 
-        if (Debug.isSet("showResponse")) {
-            System.out.println("New Request URL Resource: '" + requestURL + "'");
-            System.out.println("New Request Constraint Expression: '" + ce + "'");
-        }
-
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        BesAPI.writeDapData(rs.getDataset(), rs.getConstraintExpression(), os);
-        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
-
-
-        DefaultResponse.sendAsciiResponse(pw, this, is);
+                    bOut.flush();
 
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
 
 
-    public void sendHelpPage(HttpServletRequest request, HttpServletResponse response, ReqState rs) throws Exception {
+    public void sendHelpPage(HttpServletRequest request,
+                             HttpServletResponse response,
+                             ReqState rs)
+            throws Exception  {
+
+
         if (Debug.isSet("showResponse"))
             System.out.println("Sending Help Page.");
 
@@ -934,11 +865,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
+
+        PrintWriter pw  = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
+
+            printHelpPage(pw);
+            pw.flush();
 
 
-        printHelpPage(pw);
-        pw.flush();
+                    pw.flush();
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -990,15 +924,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
     //**************************************************************************
-
-
-
-
-
-
-
-
-
 
 
 }

@@ -31,17 +31,10 @@ package opendap.coreServlet;
  * Time: 9:39:11 AM
  * To change this template use File | Settings | File Templates.
  */
-public class BadUsageException extends Exception{
+public class BadUsageException extends OPeNDAPException{
     public BadUsageException(String msg) {
         super(msg);
     }
 
-    public BadUsageException(String msg, Throwable cause) {
-        super(msg, cause);
-    }
-
-    public BadUsageException(Throwable cause) {
-        super(cause);
-    }
 
 }

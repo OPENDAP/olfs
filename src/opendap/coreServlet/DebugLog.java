@@ -22,24 +22,59 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-
 package opendap.coreServlet;
 
-import opendap.dap.DODSException;
+import java.io.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Aug 25, 2003
- * Time: 11:13:10 AM
- * To change this template use Options | File Templates.
+ * A minimal implementation of a logging facility.
  */
-public class BadURLException extends DODSException {
-    public BadURLException(String msg) {
-        super(msg);
+
+public class DebugLog {
+
+    static private PrintStream logger = null;
+    static private ByteArrayOutputStream buff = null;
+
+    public static  void println(String s) {
+        if (logger != null)
+            logger.println(s);
     }
 
-    public BadURLException() {
-        super("");
+    public static void printDODSException(OPeNDAPException de) {
+        if (logger != null) {
+            de.print(logger);
+            de.printStackTrace(logger);
+        }
     }
+
+    public static void printThrowable(Throwable t) {
+        if (logger != null) {
+            logger.println(t.getMessage());
+            t.printStackTrace(logger);
+        }
+    }
+
+    public static void reset() {
+        buff = new ByteArrayOutputStream();
+        logger = new PrintStream(buff);
+    }
+
+    public static boolean isOn() {
+        return (logger != null);
+    }
+
+    public static void close() {
+        logger = null;
+        buff = null;
+    }
+
+    public static String getContents() {
+        if (buff == null)
+            return "null";
+        else {
+            logger.flush();
+            return buff.toString();
+        }
+    }
+
 }

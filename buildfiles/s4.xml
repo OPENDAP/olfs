@@ -18,21 +18,20 @@
 
     <!-- Library (class)paths -->
     <path id="s4.compile.classpath">
-        <pathelement path="${build.classes}"/>
+        <pathelement path="${build.classes}" />
         <fileset dir="${lib.dir}">
-            <include name="${servlet.lib}"/>
-            <include name="${opendap.lib}"/>
-            <include name="${jdom.lib}"/>
-            <include name="${cli.lib}"/>
-            <include name="${thredds.lib}"/>
-            <include name="${netcdf.lib}"/>
-            <include name="${nlog4j.lib}"/>
+            <include name="${servlet.lib}" />
+            <include name="${jdom.lib}" />
+            <include name="${cli.lib}" />
+            <include name="${thredds.lib}" />
+            <include name="${netcdf.lib}" />
+            <include name="${nlog4j.lib}" />
         </fileset>
     </path>
 
 
 
-    <target name="all" depends="clean,clients,server" description="Builds lots of stuff."/>
+    <target name="all" depends="clean,clients,server,soap-lib" description="Builds lots of stuff."/>
     <target name="compile" depends="s4" description="Compiles the Server4 software."/>
 
 
@@ -69,6 +68,16 @@
         <jar destfile="${build.lib}/s4-${VERSION}.jar">
             <fileset dir="${build.classes}">
                 <exclude name="hao/**/*.class"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+
+    <target name="soap-lib" depends="clean,compile">
+        <jar destfile="${build.lib}/opendap-soap-${VERSION}.jar">
+            <fileset dir="${build.classes}">
+                <include name="opendap/soap/**/*.class"/>
             </fileset>
         </jar>
 
@@ -232,15 +241,12 @@
             >
 
             <lib dir="${lib.dir}">
-                <include name="${regexp.lib}"/>
-                <include name="${getopt.lib}"/>
                 <include name="${jdom.lib}"/>
-                <include name="${opendap.lib}"/>
                 <include name="${thredds.lib}"/>
                 <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
+                <!-- include name="${xercesImpl.lib}"/ -->
+                <!-- include name="${xercesXmlApis.lib}"/ -->
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -259,12 +265,9 @@
             <zipfileset dir="${build.lib}" prefix="s4-libraries"/>
 
             <zipfileset dir="${lib.dir}" prefix="s4-libraries">
-                <include name="${getopt.lib}"/>
-                <include name="${regexp.lib}"/>
                 <include name="${jdom.lib}"/>
-                <include name="${opendap.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
+                <!-- include name="${xercesImpl.lib}"/ -->
+                <!-- include name="${xercesXmlApis.lib}"/ -->
            </zipfileset>
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">

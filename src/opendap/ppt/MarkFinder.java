@@ -24,7 +24,7 @@
 
 package opendap.ppt;
 
-import opendap.util.Debug;
+import opendap.coreServlet.Debug;
 
 /**
  * Created by IntelliJ IDEA.

@@ -31,6 +31,7 @@ import java.text.ParsePosition;
 import java.text.FieldPosition;
 
 /**
+ * This class provides methods for dealing with HTTP/1.1 dates.
  * User: ndp
  * Date: Aug 22, 2006
  * Time: 5:52:32 PM
@@ -224,7 +225,10 @@ public class HttpDate {
         return date.toString();
     }
 
-
+    /**
+     * Provides a simple test of this classes date handling methods.
+     * @param args
+     */
     public static void main(String args[]){
 
         String rfc1123Date = "Sun, 06 Nov 1994 08:49:37 GMT";

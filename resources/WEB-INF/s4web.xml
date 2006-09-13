@@ -52,6 +52,17 @@
     </servlet >
 
 
+    <servlet>
+        <servlet-name>nio</servlet-name>
+
+        <servlet-class>opendap.niotest.NioServlet</servlet-class>
+
+        <load-on-startup>1</load-on-startup>
+
+
+    </servlet >
+
+
 
 
     <servlet-mapping>
@@ -67,6 +78,14 @@
         <url-pattern>*</url-pattern>
     </servlet-mapping -->
 
+    <servlet-mapping>
+        <servlet-name>nio</servlet-name>
+        <url-pattern>/nio</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>nio</servlet-name>
+        <url-pattern>/nio/*</url-pattern>
+    </servlet-mapping>
 
 
 

@@ -68,6 +68,30 @@ public class ExceptionElementUtil  {
 
 
     /**
+     * Builds a JDOM ELement called OPeNDAPException that holds information about an exception
+     * thrown, well, somewhere...
+     * @param t The bad thing that happened.
+     * @return A JDOM Element containing the all the Exception information.
+     */
+    public static Element makeExceptionElement(Throwable t){
+
+        Namespace ns = XMLNamespaces.getOpendapSoapNamespace();
+
+        Element exception = new Element("OPeNDAPException",ns);
+
+
+        exception.addContent( new Element("Type",ns).setText(t.getClass().getName()));
+        exception.addContent( new Element("Message",ns).setText(t.getMessage()));
+        exception.addContent( new Element("Location",ns).setText(t.getStackTrace()[0].getFileName() +
+                " - line " + t.getStackTrace()[0].getLineNumber()));
+
+        return exception;
+
+
+    }
+
+
+    /**
      * Builds a JDOM ELement called OPeNDAPException that holds the pertinent information
      * about the passed Exeption
      * @param e The Exception to wrapin an XML Element.
