@@ -95,13 +95,16 @@
             author="true"
             version="true"
             use="true"
-            Verbose="false">
+            Verbose="true"
+            failonerror="true"
+            >
 
             <classpath refid="s4.compile.classpath"/>
 
             <fileset dir="${src.dir}/opendap/" >
 
             </fileset>
+
         </javadoc>
 
         <copy todir="${build.doc}" >
