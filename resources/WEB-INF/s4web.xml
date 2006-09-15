@@ -36,7 +36,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse probeRequest PersistentContentHandler BES</param-value>
+            <param-value></param-value>
         </init-param >
 
 
@@ -45,17 +45,6 @@
             <param-value>olfs.xml</param-value>
         </init-param>
 
-
-        <load-on-startup>1</load-on-startup>
-
-
-    </servlet >
-
-
-    <servlet>
-        <servlet-name>nio</servlet-name>
-
-        <servlet-class>opendap.niotest.NioServlet</servlet-class>
 
         <load-on-startup>1</load-on-startup>
 
@@ -77,16 +66,6 @@
         <servlet-name>s4</servlet-name>
         <url-pattern>*</url-pattern>
     </servlet-mapping -->
-
-    <servlet-mapping>
-        <servlet-name>nio</servlet-name>
-        <url-pattern>/nio</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>nio</servlet-name>
-        <url-pattern>/nio/*</url-pattern>
-    </servlet-mapping>
-
 
 
 
