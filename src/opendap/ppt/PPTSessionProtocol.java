@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2005 OPeNDAP, Inc.
+// Copyright (c) 2006 OPeNDAP, Inc.
 // Author:  Patrick West <pwest@hao.ucar.edu>
 //
 // This library is free software; you can redistribute it and/or
@@ -33,6 +33,6 @@ class PPTSessionProtocol {
     public static final String PPTSERVER_CONNECTION_OK = "PPTSERVER_CONNECTION_OK";
 
     public static final String PPT_COMPLETE_DATA_TRANSMITION = "PPT_COMPLETE_DATA_TRANSMITION";
-    
+
     public static final String PPT_EXIT_NOW = "PPT_EXIT_NOW";
 }

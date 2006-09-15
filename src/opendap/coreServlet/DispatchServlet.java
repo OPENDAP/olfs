@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2005 OPeNDAP, Inc.
+// Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -294,7 +294,7 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see opendap.servlet.ReqState
+     * @see ReqState
      */
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
@@ -361,7 +361,7 @@ public class DispatchServlet extends HttpServlet {
                 } else if (    // Debug response?
                         isDebug &&
                         Debug.isSet("DebugInterface")) {
-                    
+
                     DebugHandler.doDebug(this, request, response, odh, rs);
                     log.info("Sent Debug Response");
 

@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2005 OPeNDAP, Inc.
+// Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -28,6 +28,8 @@ import java.io.*;
 
 /**
  * A minimal implementation of a logging facility.
+ *
+ * @author John Caron
  */
 
 public class DebugLog {
