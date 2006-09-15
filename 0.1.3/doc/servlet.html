@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Servlet Configuration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+
+<body>
+<h1 align="center"><a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" width="206" height="93" border="0"></a><br>
+OLFS </h1>
+<h3 align="center">version: beta-1.3 </h3>
+<h1 align="center">Servlet Configuration And General Information</h1>
+<hr>
+<h3>Synopsis</h3>
+<p>This document should help you get started configuring the OLFS component of Server4.
+  This servlet was developed, compiled, and tested using
+  the javac 1.5.0 compiler, the 1.5.0 Java Virtual Machine, and Jakarta Tomcat
+  5.5 (which also provided the javax.servlet packages).</p>
+<p><strong><em>Note</em></strong>: All Examples of web.xml configurations in
+  this document were check against Jakarta Tomcat 5.5.0 </p>
+<hr>
+<h2><a name="CONFIG"></a>Servlet Configuration</h2>
+<p>The OPeNDAP Server4 servlet gets its configuration from 3 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, and <strong>web.xml</strong>. Configuration files are located in two places: peristent configurations (<strong>catalog.xml, olfs.xml</strong>) are located in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em>, </p>
+<h3><strong>File Locations:</strong></h3>
+<ul>
+  <li><strong>olfs.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+    <br>
+  </li>
+  <li><strong>catalog.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+    <br>
+  </li>
+  <li><strong>web.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
+    in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
+    gets renamed then things change accordingly.)<br>
+    <br>
+  </li>
+</ul>
+<h3><strong>Configuration Roles:</strong></h3>
+<ul>
+  <li><strong>olfs.xml</strong> - Contains the OLFS localization configuration - location of the BES, directory view instructions, etc. <br>
+    <br>
+  </li>
+  <li>    <strong>catalog.xml</strong> - THREDDS catalogs onfiguration. <br>
+    <br>
+  </li>
+  <li><strong>web.xml</strong> - Core servlet configuration. </li>
+</ul>
+<h3><strong>Configuration Details: </strong></h3>
+<p><strong>olfs.xml</strong> </p>
+<p>Currently the OLFS has 2 normally configurable items: The BES location and the directory view. The <strong>olfs.xml</strong> file looks like this:</p>
+<pre>
+
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+  &lt;OLFSConfig&gt;
+
+      &lt;!-- The hostname (or IP address) and port location for the BES --&gt;
+      &lt;BES&gt;
+          &lt;host&gt;localhost&lt;/host&gt;
+          &lt;port&gt;10002&lt;/port&gt;
+      &lt;/BES&gt;
+	
+      &lt;!-- Used to indicate which type of directory view clients see. This DOES NOT
+           affect the THREDDS catalogs! Only the HTML views of them. A value 
+           of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
+           of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.--&gt;
+
+      &lt;DirectoryView&gt;THREDDS&lt;/DirectoryView&gt;
+	   
+  &lt;/OLFSConfig&gt;</pre>
+<p>&nbsp;</p>
+<p><strong>catalog.xml</strong></p>
+<p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  about it here</a>. </p>
+<p>&nbsp;</p>
+<p><strong>web.xml</strong></p>
+<p><em>In general I would say that you should <strong>NOT</strong> mess with the web.xml file. At least for now. Future versions of Server and the OLFS may have &quot;user configurable&quot; stuff in the web.xml file, but this version (1.3) does not. <strong>SO JUST DON'T DO IT. OK?</strong></em></p>
+<p>&nbsp;</p>
+<hr>
+<p>Having said that here are the details regarding the web.xml file. </p>
+<p>The Serve4  running
+    in the opendap servlet area needs an entry in the <strong>web.xml</strong> file. Multiple
+  instances of a servlet and/or several different servlets can be configured
+  in the one
+    web.xml file. For instance you could have a DTS and a Server4 running in from the same web.xml and thus undr the same servlet context. Running multiple instances of the Server4 in a single web.xml file (aka context) will <strong>NOT</strong> work. </p>
+<p>Each a servlet needs a unique name which is specified inside a
+  <em>&lt;servlet&gt;</em> element in the web.xml file using the <em>&lt;servlet-name&gt;</em> tag.
+  This is a name of convenience, for example if you where serving data from an
+  ARGOS satellite you might call that servlet <em>argos</em>.</p>
+<p>Additionally each instance of a <em>&lt;servlet&gt;</em> must specify which
+  Java class contains the actual servlet to run. This is done in the <em>&lt;servlet-class&gt;</em> element.
+  For example the Server4 class name is <em>opendap.coreServlet.DispatchServlet</em></p>
+<p>Here is a syntax example combining the two previous example values:</p>
+<pre>
+&lt;servlet&gt;
+	&lt;servlet-name&gt;argos&lt;/servlet-name&gt;
+	&lt;servlet-class&gt;opendap.coreServlet.DispatchServlet&lt;/servlet-name&gt;
+	.
+	.
+	.
+&lt;/servlet&gt;</pre>
+<p>This servlet could then be accessed as:</p>
+<blockquote>
+  <p> <em>http://hostname/opendap/servlet/argos</em></p>
+</blockquote>
+<p>You may also add to the end of the <em>web.xml</em> file a set of &lt;servlet-mapping&gt;
+  elements. These allow you to abbreviate the URL or the servlet. By placing
+   the servlet mappings:</p>
+<blockquote>
+  <pre> 
+&lt;servlet-mapping&gt;
+	&lt;servlet-name&gt;argos&lt;/servlet-name&gt;
+	&lt;url-pattern&gt;/argos&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+&lt;servlet-mapping&gt;
+	&lt;servlet-name&gt;argos&lt;/servlet-name&gt;
+	&lt;url-pattern&gt;/argos/*&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</pre>
+</blockquote>
+<p>At the end of the <em>web.xml</em> file our previous example changes it's URL to:</p>
+<blockquote>
+  <p><em>http://hostname/opendap/argos</em></p>
+</blockquote>
+<p>Eliminating the need for the word <em>servlet</em> in the URL. For more on
+  the <em>&lt;servlet-mapping&gt;</em> element see the Jakarta-Tomcat documentation.</p>
+<h3>&lt;init-param&gt; Elements</h3>
+<p>  The  OLFS uses <em>&lt;init-param&gt; </em>elements inside of
+  each <em>&lt;servlet&gt;</em> element to get specific configuration information. </p>
+<p> <em>&lt;init-param&gt;'s </em> common
+  to all OPeNDAP servlets are: </p>
+<ul>
+<li><strong>DebugOn</strong> - This controls output to the terminal from which
+    the servlet engine was launched. The value is a list of flags that turn on
+    debugging instrumentation
+  in different parts of the code. <br>
+  <br>
+  Common values are : <em>showRequest, showResponse</em>,
+  <em>showException, BES</em>, and<em> probeRequest</em>.<br>
+  <br>
+    <em>Example:</em>
+    <pre>&lt;init-param&gt;
+	&lt;param-name&gt;DebugOn&lt;/param-name&gt;
+	&lt;param-value&gt;showRequest showResponse&lt;/param-value&gt;
+&lt;/init-param&gt;
+      </pre>
+      <em>Default</em>: If this parameter is
+	  not set, or the value field is empty then debugging instrumentation is not
+	  turned on.<br>
+	  <br>
+    <br>
+  </li>
+  <li><strong>OpendapHttpDispatchHandlerImplementation</strong>- This parameter specifies the handler implementation that provides the responses for the HTTP GET commands to the servlet framework. <strong><em>Don't be messin' with this! It's what makes Server4, well, Server4. </em></strong><br>
+    <em>Example:</em>
+      <pre>
+&lt;init-param&gt;
+    &lt;param-name&gt;OpendapHttpDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.HttpDispatchHandler&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+</pre>
+      <em>Default</em>: This parameter <strong>must be set </strong> to the value <strong><em>opendap.olfs.HttpDispatchHandler</em></strong> for the server to actually be an OLFS. <br>
+    <br>
+  </li>
+  <li><strong>OpendapSoapDispatchHandlerImplementation</strong>- This parameter specifies the handler implementation that provides the responses for the HTTP POST commands (via a SOAP interface) to the servlet framework. <strong><em>Don't be messin' with this! It's what makes Server4, well, Server4. </em></strong><br>
+    <br>
+    <em>Example:</em>
+      <pre>
+&lt;init-param&gt;
+    &lt;param-name&gt;OpendapSoapDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.SoapDispatchHandler&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+</pre>
+      <em>Default</em>: This parameter <strong>must be set </strong> to the value <strong><em>opendap.olfs.SoapDispatchHandler</em></strong> for the server to actually be an OLFS. <br>
+      <br>
+</li>
+</ul>
+<p><strong>Example of web.xml content:</strong></p>
+<pre>
+&lt;servlet&gt;
+
+  &lt;servlet-name&gt;s4&lt;/servlet-name&gt;
+  
+  &lt;servlet-class&gt;opendap.coreServlet.DispatchServlet&lt;/servlet-class&gt;
+  
+  &lt;init-param&gt;
+    &lt;param-name&gt;OpendapHttpDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.HttpDispatchHandler&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  
+  &lt;init-param&gt;
+    &lt;param-name&gt;OpendapSoapDispatchHandlerImplementation&lt;/param-name&gt;
+    &lt;param-value&gt;opendap.olfs.SoapDispatchHandler&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  
+  &lt;init-param&gt;
+    &lt;param-name&gt;DebugOn&lt;/param-name&gt;
+    &lt;param-value&gt;showRequest probeRequest showResponse CE BES S4Dir ReqState&lt;/param-value&gt;
+  &lt;/init-param&gt;
+
+  &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+
+&lt;/servlet&gt;
+
+&lt;servlet-mapping&gt;
+&lt;servlet-name&gt;s4&lt;/servlet-name&gt;
+&lt;url-pattern&gt;/s4&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+
+&lt;servlet-mapping&gt;
+&lt;servlet-name&gt;s4&lt;/servlet-name&gt;
+&lt;url-pattern&gt;/s4/*&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+
+</pre>
+<hr>
+<br>
+<br>
+</body>
+</html>

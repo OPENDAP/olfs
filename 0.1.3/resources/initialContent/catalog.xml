@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog name="Server4 Test Catalog"
+        xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <!-- ************************************************************************************* -->
+
+    <service name="OPeNDAP-Server4" serviceType="OPeNDAP" base="/opendap/ts/"/>
+
+    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
+
+    <datasetScan location="/root/nc" path="nc" name="NetCDF Archive" serviceName="OPeNDAP-Server4">
+
+        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
+        <filter>
+            <exclude wildcard=".*" atomic="true" collection="true"/>
+            <include wildcard="*"/>
+        </filter>
+        <addDatasetSize />
+
+        <metadata inherited="true">
+            <serviceName>OPeNDAP-Server4</serviceName>
+            <authority>opendap.org</authority>
+            <dataType>Random</dataType>
+        </metadata>
+
+    </datasetScan>
+
+    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
+
+    <datasetScan location="/root/ff" path="ff" name="FreeForm Data Archive" serviceName="OPeNDAP-Server4">
+
+        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
+
+        <filter>
+            <exclude wildcard=".*" atomic="true" collection="true"/>
+            <include wildcard="*"/>
+        </filter>
+        <addDatasetSize />
+
+        <metadata inherited="true">
+            <serviceName>OPeNDAP-Server4</serviceName>
+            <authority>opendap.org</authority>
+            <dataType>Random</dataType>
+        </metadata>
+
+    </datasetScan>
+
+    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
+
+
+    <!-- ************************************************************************************* -->
+
+
+
+</catalog>
