@@ -36,7 +36,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value></param-value>
+            <param-value>showRequest showResponse probeRequest PersistentContentHandler BES</param-value>
         </init-param >
 
 
@@ -51,6 +51,16 @@
 
     </servlet >
 
+
+    <servlet>
+        <servlet-name>exp</servlet-name>
+
+        <servlet-class>opendap.experiments.ExperimentSandboxServlet</servlet-class>
+
+        <load-on-startup>1</load-on-startup>
+
+
+    </servlet >
 
 
 
@@ -67,6 +77,18 @@
         <servlet-name>s4</servlet-name>
         <url-pattern>*</url-pattern>
     </servlet-mapping -->
+
+    <servlet-mapping>
+        <servlet-name>nio</servlet-name>
+        <url-pattern>/nio</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>nio</servlet-name>
+        <url-pattern>/nio/*</url-pattern>
+    </servlet-mapping>
+
+
+
 
 
 

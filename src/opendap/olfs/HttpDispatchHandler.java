@@ -904,7 +904,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         pw.println("<dt> help </dt> <dd> help information (this text)</dd>");
         pw.println("</dl>");
         pw.println("For example, to request the DAS object from the FNOC1 dataset at URI/GSO (a");
-        pw.println("test dataset) you would appand `.das' to the URL:");
+        pw.println("experiments dataset) you would appand `.das' to the URL:");
         pw.println("http://opendap.gso.uri.edu/cgi-bin/nph-nc/data/fnoc1.nc.das.");
 
         pw.println("<p><b>Note</b>: Many OPeNDAP clients supply these extensions for you so you don't");

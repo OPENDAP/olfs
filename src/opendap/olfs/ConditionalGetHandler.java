@@ -231,7 +231,7 @@ public class ConditionalGetHandler {
     }
 
     /**
-     * Provides a rudimentary unit test of this class.
+     * Provides a rudimentary unit experiments of this class.
      * @param args Is ignored.
      */
     public static void main(String args[]){

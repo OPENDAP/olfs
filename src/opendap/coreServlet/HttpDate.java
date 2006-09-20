@@ -226,7 +226,7 @@ public class HttpDate {
     }
 
     /**
-     * Provides a simple test of this classes date handling methods.
+     * Provides a simple experiments of this classes date handling methods.
      * @param args
      */
     public static void main(String args[]){

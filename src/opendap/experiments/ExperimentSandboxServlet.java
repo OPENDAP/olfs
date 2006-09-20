@@ -22,7 +22,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.niotest;
+package opendap.experiments;
 
 
 import javax.servlet.http.HttpServlet;
@@ -38,20 +38,32 @@ import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * User: ndp
  * Date: Sep 5, 2006
  * Time: 3:47:22 PM
  */
-public class NioServlet extends HttpServlet {
+public class ExperimentSandboxServlet extends HttpServlet {
 
 
     private int maxChunkSize = 8192;
 
+    private int hitCounter;
+    private int unitHitCounter;
+
+    private Random rand;
 
     public void init() throws ServletException {
-        System.out.println("NioServlet loaded.");
+
+
+        hitCounter=0;
+        unitHitCounter = 0;
+
+        rand = new Random();
+
+        System.out.println("ExperimentSandboxServlet loaded.");
 
 
 
@@ -63,6 +75,12 @@ public class NioServlet extends HttpServlet {
 
 
         String path = request.getPathInfo();
+
+
+        synchronized(this){
+            hitCounter++;
+        }
+
 
 
 
@@ -99,6 +117,27 @@ public class NioServlet extends HttpServlet {
         }
 
 
+        else if(path.equals("/hitcount") || path.equals("/hitcount/")){
+
+            msg = ("HitCounter");
+            startTime = new Date();
+
+            synchronized(this){
+                unitHitCounter++;
+            }
+
+            try {
+                Thread.sleep(rand.nextInt(200));
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            doHitCount(request,response);
+            endTime = new Date();
+        }
+
+
+
 
         long elapsed = endTime.getTime() - startTime.getTime();
 
@@ -111,7 +150,22 @@ public class NioServlet extends HttpServlet {
 
     }
 
+    public void doHitCount(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
 
+        response.setContentType("text/ascii");
+        response.setHeader("Content-Description", "My Hit Counter");
+
+
+
+        ServletOutputStream os = response.getOutputStream();
+
+
+        os.println("Total Hits:       "+hitCounter);
+        os.println("Hit Counter Hits: "+unitHitCounter);
+        os.println("\n\n");
+
+    }
 
 
 

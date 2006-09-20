@@ -208,7 +208,7 @@ public class S4Dir {
         pw.println("        <pre>");
 
         // original line with images
-        //pw.println("<img src=\"/icons/blank.gif\" alt=\"Icon \" /> <A HREF=\"?C=N;O=D\">Name</a>                      <A HREF=\"?C=M;O=A\">Last modified</a>      <A HREF=\"?C=S;O=A\">Size</a>  <A HREF=\"?C=D;O=A\">Description</a><hr /><img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://test.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
+        //pw.println("<img src=\"/icons/blank.gif\" alt=\"Icon \" /> <A HREF=\"?C=N;O=D\">Name</a>                      <A HREF=\"?C=M;O=A\">Last modified</a>      <A HREF=\"?C=S;O=A\">Size</a>  <A HREF=\"?C=D;O=A\">Description</a><hr /><img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://experiments.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
         // Original line, sans images
         //pw.println("<A HREF=\"?C=N;O=D\">Name</a>"+getWhiteSpacePadding("Name",headerSpace)+"<A HREF=\"?C=M;O=A\">Last modified</a>            <A HREF=\"?C=S;O=A\">Size</a>        <A HREF=\"?C=D;O=A\">Description</a>");
@@ -216,7 +216,7 @@ public class S4Dir {
         //No Images, No sorting links.
         pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified            Size        Response Links");
         pw.println("<hr />");
-        //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://test.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
+        //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://experiments.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
         if (!collectionName.equals("/"))
             pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>" + getWhiteSpacePadding("Parent Directory", headerSpace + 26) + "-");
@@ -227,11 +227,11 @@ public class S4Dir {
     private static void printHTMLFooter(PrintWriter pw) {
         /*
         <hr /></pre>
-        <address>Apache/2.0.46 (Red Hat) Server at test.opendap.org Port 80</address>
+        <address>Apache/2.0.46 (Red Hat) Server at experiments.opendap.org Port 80</address>
         </body></html>
         */
         pw.println("<hr /></pre>");
-        //pw.println("<address>Apache/2.0.46 (Red Hat) Server at test.opendap.org Port 80</address>");
+        //pw.println("<address>Apache/2.0.46 (Red Hat) Server at experiments.opendap.org Port 80</address>");
         pw.println("</body></html>");
 
     }
