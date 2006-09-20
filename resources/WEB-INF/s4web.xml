@@ -79,12 +79,12 @@
     </servlet-mapping -->
 
     <servlet-mapping>
-        <servlet-name>nio</servlet-name>
-        <url-pattern>/nio</url-pattern>
+        <servlet-name>exp</servlet-name>
+        <url-pattern>/exp</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>nio</servlet-name>
-        <url-pattern>/nio/*</url-pattern>
+        <servlet-name>exp</servlet-name>
+        <url-pattern>/exp/*</url-pattern>
     </servlet-mapping>
 
 
