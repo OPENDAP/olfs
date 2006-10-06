@@ -95,6 +95,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
+    public String getVersionStringForTHREDDSCatalog(){
+        return "Server4 ("+ Version.getVersionString()+")" +
+                "<font size='-5' color='#5A647E'>" +
+                "ServerUUID="+Version.getServerUUID()+"-catalog" +
+                "</font><br />";
+
+    }
 
 
 
@@ -131,6 +138,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     }
+
+
+    public boolean useOpendapDirectoryView() {
+        return !_olfsConfig.getTHREDDSDirectoryView();
+    }
+
+
+
 
 
     /**
@@ -682,9 +697,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      */
 
 
-    public boolean useOpendapDirectoryView() {
-        return !_olfsConfig.getTHREDDSDirectoryView();
-    }
 
 
     public void sendDir(HttpServletRequest request,

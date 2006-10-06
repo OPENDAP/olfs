@@ -65,6 +65,12 @@ public interface OpendapHttpDispatchHandler {
 
 
     /**
+     *
+     * @return The version String for the THREDDS catalog.html page.
+     */
+    public String getVersionStringForTHREDDSCatalog();
+
+    /**
      * Handles the client's DDX request.
      *
      * @param request  The client's <code> HttpServletRequest</code> request

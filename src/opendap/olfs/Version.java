@@ -64,5 +64,9 @@ public class Version {
 
     }
 
+    public static String getServerUUID(){
+        return "e93c3d09-a5d9-49a0-a912-a0ca16430b91";
+    }
+
 
 }

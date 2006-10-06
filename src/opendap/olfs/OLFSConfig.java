@@ -43,6 +43,7 @@ public class OLFSConfig {
     private  String    _BESHost;
     private  int       _BESPort;
     private  boolean   _showTHREDDSDirectoryView;
+    //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
 
 
@@ -99,12 +100,21 @@ public class OLFSConfig {
             }
             else {
                 throw new Exception("In the OLFS Config, The Element <DirectoryView> may only contain content " +
-                                    "equal to \"THREDDS\" or \"OLFS\". The value \n" + val + "\" is illegal.");
+                                    "equal to \"THREDDS\" or \"OPeNDAP\". The value \n" + val + "\" is illegal.");
             }
         }
         else {
             setTHREDDSDirectoryView(false);
         }
+
+        /*
+        if(olfsConfigurationDoc.getRootElement().getChild("UsePersistentContentDocs") != null)
+            setUsePersistentContentDocs(true);
+        else
+            setUsePersistentContentDocs(false);
+        */
+
+
 
 
     }
@@ -139,13 +149,6 @@ public class OLFSConfig {
 
 
     }
-
-
-
-
-
-
-
 
 
 
@@ -209,14 +212,24 @@ public class OLFSConfig {
         s += "        host: " + getBESHost() + "\n";
         s += "        port: " + getBESPort() + "\n";
 
+        s += "    Directory View: "+(getTHREDDSDirectoryView()?"THREDDS":"OPeNDAP") + "\n";
+//        s += "    Use Persistent Content Documentation Directory ('docs'): "+usePersistentContentDocs() + "\n";
+
+
         return s;
     }
+
+
+
+
 
 
     public void    setTHREDDSDirectoryView(boolean val){ _showTHREDDSDirectoryView = val; }
     public boolean getTHREDDSDirectoryView(){ return _showTHREDDSDirectoryView; }
 
 
+    //public void    setUsePersistentContentDocs(boolean val){ _usePersistentContentDocs = val; }
+    //public boolean usePersistentContentDocs(){ return _usePersistentContentDocs; }
 
 
 
@@ -352,6 +365,45 @@ public class OLFSConfig {
             else
                 done = true;
         }
+
+
+        done = false;
+        while(!done){
+            System.out.print("\nDo you want to use the THREDDS catalog as the default directory view?");
+            System.out.print("[" + bc.getTHREDDSDirectoryView() + "]: ");
+            k = kybrd.readLine();
+            if (k.equalsIgnoreCase("y") || k.equalsIgnoreCase("yes")){
+                bc.setTHREDDSDirectoryView(true);
+                done = true;
+            }
+            else if(k.equalsIgnoreCase("n") || k.equalsIgnoreCase("no")){
+                bc.setTHREDDSDirectoryView(false);
+                done = true;
+            }
+            else
+                System.out.println("You must enter say 'yes' or 'no'.\n\n");
+        }
+
+
+
+        /*
+        done = false;
+        while(!done){
+            System.out.print("\nDo you want to use the 'docs' dir in the persistent content area as the documentation source?");
+            System.out.print("[" + bc.usePersistentContentDocs() + "]: ");
+            k = kybrd.readLine();
+            if (k.equalsIgnoreCase("y") || k.equalsIgnoreCase("yes")){
+                bc.setUsePersistentContentDocs(true);
+                done = true;
+            }
+            else if(k.equalsIgnoreCase("n") || k.equalsIgnoreCase("no")){
+                bc.setUsePersistentContentDocs(false);
+                done = true;
+            }
+            else
+                System.out.println("You must enter say 'yes' or 'no'.\n\n");
+        }
+        */
 
 
     }

@@ -274,6 +274,8 @@
                 <include name="${thredds.lib}"/>
                 <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -293,6 +295,11 @@
 
             <zipfileset dir="${lib.dir}" prefix="s4-libraries">
                 <include name="${jdom.lib}"/>
+                <include name="${thredds.lib}"/>
+                <include name="${netcdf.lib}"/>
+                <include name="${nlog4j.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
            </zipfileset>
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">

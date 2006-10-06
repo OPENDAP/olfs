@@ -74,24 +74,41 @@ public class S4Dir {
         Iterator it;
         Element childDataset;
 
-        String requestURL = rs.getRequestURL();
+        String targetURL = rs.getRequestURL();
 
 
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - requestURL: "+requestURL);
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - rs.getDataset():       "+rs.getDataset());
 
 
 
         // clean up the url
-        if (requestURL.endsWith("/"))
-            requestURL = requestURL.substring(0, requestURL.length() - 1);
+        if (targetURL.endsWith("/"))
+            targetURL = targetURL.substring(0, targetURL.length() - 1);
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
         // Make shure the dataset name is not null
         if (rs.getDataset() == null)
             name = "/";
-        else
+        else {
             name = rs.getDataset();
+            if(name.endsWith("contents") && rs.getRequestSuffix().equalsIgnoreCase("html")){
+                if(Debug.isSet("S4Dir")) System.out.println("S4Dir - **** Client specifically requested 'contents.html' ****");
+
+                name = name.substring(0,name.lastIndexOf("contents"));
+                targetURL = targetURL.substring(0,targetURL.lastIndexOf("/contents"));
+            }
+        }
+
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - name:                  "+name);
+
+
+        boolean isTopLevel = name.equals("/");
+
+
+
 
         // Get the catalog for this collection
         Element dataset = BesAPI.showCatalog(name).getRootElement();
@@ -129,7 +146,7 @@ public class S4Dir {
 
 
         // Strip off the basename to make the link
-        link = requestURL.substring(0, requestURL.lastIndexOf(baseName));
+        link = targetURL.substring(0, targetURL.lastIndexOf(baseName))+"/contents.html";
 
         // Set up the page.
         printHTMLHeader(collectionName, headerSpace, link, pw);
@@ -149,7 +166,7 @@ public class S4Dir {
             if (childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")) {
 
 
-                link = requestURL + "/" + name + "/";
+                link = targetURL + "/" + name + "/contents.html";
 
                 responseLinks = "        " +
                         " -  " +
@@ -162,16 +179,16 @@ public class S4Dir {
                 name += "/";
                 size = " -";
             } else { /// It must be a dataset
-                link = requestURL + "/" + name + ".html";
+                link = targetURL + "/" + name + ".html";
 
                 // Build response links
 
                 responseLinks = "      " +
-                        "<a href=\"" + requestURL + "/" + name + ".ddx" + "\">ddx</a> " +
-                        "<a href=\"" + requestURL + "/" + name + ".dds" + "\">dds</a> " +
-                        "<a href=\"" + requestURL + "/" + name + ".das" + "\">das</a> " +
-                        "<a href=\"" + requestURL + "/" + name + ".info" + "\">info</a> " +
-                        "<a href=\"" + requestURL + "/" + name + ".html" + "\">html</a> ";
+                        "<a href=\"" + targetURL + "/" + name + ".ddx" + "\">ddx</a> " +
+                        "<a href=\"" + targetURL + "/" + name + ".dds" + "\">dds</a> " +
+                        "<a href=\"" + targetURL + "/" + name + ".das" + "\">das</a> " +
+                        "<a href=\"" + targetURL + "/" + name + ".info" + "\">info</a> " +
+                        "<a href=\"" + targetURL + "/" + name + ".html" + "\">html</a> ";
 
 
                 size = computeSizeString(size);
@@ -189,7 +206,7 @@ public class S4Dir {
 
         }
 
-        printHTMLFooter(pw);
+        printHTMLFooter(pw,isTopLevel);
         pw.flush();
 
 
@@ -198,13 +215,41 @@ public class S4Dir {
     private static void printHTMLHeader(String collectionName, int headerSpace, String parentLink, PrintWriter pw) {
 
 
-        pw.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">");
-        pw.println("<html>");
+        pw.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
+                   "<html xmlns=\"http://www.w3.org/1999/xhtml\">" );
         pw.println("    <head>");
-        pw.println("        <title>OPeNDAP Server4:  Index of " + collectionName + "</title>");
+        pw.println("        <title>OPeNDAP Server4:  Contents of " + collectionName + "</title>");
+        pw.println("<STYLE>\n" +
+                    "<!--\n" +
+                    "H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:22px;}\n" +
+                    "H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:16px;}\n" +
+                    "H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:14px;}\n" +
+                    "BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;}\n" +
+                    "B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;}\n" +
+                    "P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}\n" +
+                    "A {color : black;}" +
+                    "A.name {color : black;}" +
+                    "HR {color : #525D76;}" +
+                    "-->" +
+                    "</STYLE>\n" +
+                    "<style type=\"text/css\">" +
+                    "<!--\n" +
+                    ".uuid {font-size: 9px;color:#4A74B9}\n" +
+                    "-->\n" +
+                    "</style>" +
+                    "<style type=\"text/css\">" +
+                    "<!--\n" +
+                    ".small {font-size: 10px;}\n" +
+                    "-->\n" +
+                    "</style>"
+
+
+        );
+
         pw.println("    </head>");
         pw.println("    <body>");
-        pw.println("        <h1>OPeNDAP Server4:  Index of " + collectionName + "</h1>");
+        pw.println("        <h1>Contents of " + collectionName + "</h1>");
+        pw.println("        <hr size=\"1\" noshade=\"noshade\">");
         pw.println("        <pre>");
 
         // original line with images
@@ -215,7 +260,7 @@ public class S4Dir {
 
         //No Images, No sorting links.
         pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified            Size        Response Links");
-        pw.println("<hr />");
+        pw.println("<hr size=\"1\" noshade=\"noshade\">");
         //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://experiments.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
         if (!collectionName.equals("/"))
@@ -224,13 +269,28 @@ public class S4Dir {
 
     }
 
-    private static void printHTMLFooter(PrintWriter pw) {
+    private static void printHTMLFooter(PrintWriter pw, boolean isTopLevel) {
         /*
         <hr /></pre>
         <address>Apache/2.0.46 (Red Hat) Server at experiments.opendap.org Port 80</address>
         </body></html>
         */
-        pw.println("<hr /></pre>");
+        pw.println("        </pre> ");
+        pw.println("        <hr size=\"1\" noshade=\"noshade\">");
+        //pw.println("        <h3>Server4 (alpha-0.1.3)  <a href='/opendap/docs/'> Documentation</a></h3>");
+        pw.println("        <h3>" +
+                   "            OPeNDAP Server4 ("+Version.getVersionString()+")");
+
+        if(isTopLevel)
+            pw.println("            <span class=\"uuid\">ServerUUID="+Version.getServerUUID()+"-contents</span>\n");
+
+
+        pw.println("            <br />\n" +
+                   "            <span class=\"small\"><a href='/opendap/index.html'> Documentation</a></span>\n");
+
+
+        pw.println("        </h3>\n");
+
         //pw.println("<address>Apache/2.0.46 (Red Hat) Server at experiments.opendap.org Port 80</address>");
         pw.println("</body></html>");
 

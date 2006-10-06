@@ -35,6 +35,7 @@ import thredds.servlet.DataRootHandler;
 import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
+import opendap.olfs.Version;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -97,9 +98,6 @@ public class DispatchServlet extends HttpServlet {
         return "docs/";
     }
 
-    protected String getVersion() {
-        return "Server4 (alpha-0.1.3) ";
-    }
 
 
     /**
@@ -118,7 +116,6 @@ public class DispatchServlet extends HttpServlet {
 
         PersistentContentHandler.installInitialContent(this);
 
-        initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
 
 
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
@@ -166,6 +163,14 @@ public class DispatchServlet extends HttpServlet {
 
 
         sdh.init(this);
+
+
+
+
+        initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
+
+
+
 
     }
     /***************************************************************************/
@@ -232,7 +237,7 @@ public class DispatchServlet extends HttpServlet {
 
         HtmlWriter.init(contextPath,
                 this.getServletContext().getServletContextName(),
-                this.getVersion(),
+                odh.getVersionStringForTHREDDSCatalog(),
                 this.getDocsPath(),
                 "", // userCssPath
                 "images/cog.gif", // contextLogoPath
@@ -331,64 +336,112 @@ public class DispatchServlet extends HttpServlet {
             } // synch
 
             if (rs != null) {
+
                 String dataSet = rs.getDataset();
                 String requestSuffix = rs.getRequestSuffix();
 
 
+                boolean specialRequest = false;
+
+                if(dataSet!=null) {
+
+                    if (        // Version Response?
+                            dataSet.equalsIgnoreCase("/version")
+                            ) {
+                        odh.sendVersion(request, response);
+                        log.info("Sent Version Response");
+                        specialRequest = true;
+
+                    } else if ( // Help Response?
+                            dataSet.equalsIgnoreCase("/help")             ||
+                                    dataSet.equalsIgnoreCase("/help/")    ||
+                                    requestSuffix.equalsIgnoreCase("help")
+                            ) {
+                        odh.sendHelpPage(request, response, rs);
+                        log.info("Sent Help Page");
+                        specialRequest = true;
+
+                    } else if ( // System Properties Response?
+                            //Debug.isSet("SystemProperties") &&
+                            //dataSet!=null                                 &&
+
+                            dataSet.equalsIgnoreCase("/systemproperties")
+                            ) {
+                        Util.sendSystemProperties(request, response, odh);
+                        log.info("Sent System Properties");
+                        specialRequest = true;
+
+                    } else if (    // Debug response?
+                            isDebug &&
+                            Debug.isSet("DebugInterface")) {
+
+                        DebugHandler.doDebug(this, request, response, odh, rs);
+                        log.info("Sent Debug Response");
+                        specialRequest = true;
+
+                    } else if (  // Status Response?
+                           // dataSet!=null                                 &&
+
+                            dataSet.equalsIgnoreCase("/status")
+                            ) {
+                        doGetStatus(request, response, rs);
+                        log.info("Sent Status");
+                        specialRequest = true;
+
+                    }
+
+                }
 
 
 
-                if (        // Version Response?
-                        dataSet.equalsIgnoreCase("/version")
-                        ) {
-                    odh.sendVersion(request, response);
 
-                } else if ( // Help Response?
-                        dataSet.equalsIgnoreCase("/help") ||
-                                dataSet.equalsIgnoreCase("/help/") ||
-                                requestSuffix.equalsIgnoreCase("help")
-                        ) {
-                    odh.sendHelpPage(request, response, rs);
-                    log.info("Sent Help Page");
-
-                } else if ( // System Properties Response?
-                        //Debug.isSet("SystemProperties") &&
-                        dataSet.equalsIgnoreCase("/systemproperties")
-                        ) {
-                    Util.sendSystemProperties(request, response, odh);
-                    log.info("Sent System Properties");
-
-                } else if (    // Debug response?
-                        isDebug &&
-                        Debug.isSet("DebugInterface")) {
-
-                    DebugHandler.doDebug(this, request, response, odh, rs);
-                    log.info("Sent Debug Response");
-
-                } else if (  // Status Response?
-                        dataSet.equalsIgnoreCase("/status")
-                        ) {
-                    doGetStatus(request, response, rs);
-                    log.info("Sent Status");
+                if(!specialRequest){
 
 
+                if ( // Implied Directory request?
+
+                            dataSet == null       ||
+                            dataSet.equals("/")   ||
+                            dataSet.equals("")    ||
+                            dataSet.endsWith("/") ||
+                            requestSuffix.equals("")
+
+                    ) {
+
+
+                    String redirect = request.getRequestURI();
+
+                    //System.out.println("redirect: "+redirect);
+
+                    if(!redirect.endsWith("/"))
+                        redirect = redirect +"/";
+
+                    //System.out.println("redirect: "+redirect);
+
+
+                    if(odh.useOpendapDirectoryView())
+                        redirect += "contents.html";
+                    else
+                        redirect += "catalog.html";
+
+
+                    //System.out.println("redirect: "+redirect);
 
 
 
-                } else if ( // OPeNDAP directory response?
+                    response.sendRedirect(redirect);
 
-                        odh.useOpendapDirectoryView() && (
-                                        dataSet == null       ||
-                                        dataSet.equals("/")   ||
-                                        dataSet.equals("")    ||
-                                        dataSet.endsWith("/") ||
-                                        requestSuffix.equals("")
-                                        )
+                    log.info("Sent Redirect To: "+redirect);
 
-                        ) {
+
+                } else if ( //  THREDDS Catalog or Directory response?
+                    dataSet.endsWith("contents") && requestSuffix.equalsIgnoreCase("html")){
+
+
                     odh.sendDir(request, response, rs);
 
-                    log.info("Sent Directory");
+                    log.info("Sent Contents (aka OPeNDAP directory).");
+
 
 
                 } else if ( //  THREDDS Catalog or Directory response?
@@ -459,10 +512,14 @@ public class DispatchServlet extends HttpServlet {
                     badURL(request, response, rs);
                     log.info("Sent BAD URL - nothing left to check.");
                 }
+
             } else {
                 badURL(request, response, rs);
                 log.info("Sent BAD URL - ReqState Object was null.");
             }
+
+            }
+
 
         } catch (Throwable e) {
             OPeNDAPException.anyExceptionHandler(e, response);

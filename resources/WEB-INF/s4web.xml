@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
-    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+        "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"
+
+        [<!ENTITY securityConfig      SYSTEM "file:../content/opendap/TomcatSecurity.xml" >]
+
+>
 
 <web-app>
+
+
+    <!--
+         Loads a persistent security configuration from the content directory.
+         This configuation may be empty, in which case no security constraints will be
+         applied by Tomcat.
+     -->
+    &securityConfig;
+
 
 
     <display-name>Server4</display-name>
     <description>Server4</description>
 
     <context-param>
-      <param-name>ContextPath</param-name>
-      <param-value>opendap</param-value>
+        <param-name>ContextPath</param-name>
+        <param-value>opendap</param-value>
     </context-param>
 
 
 
-
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <servlet>
         <servlet-name>s4</servlet-name>
@@ -36,8 +49,8 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showRequest showResponse probeRequest PersistentContentHandler BES</param-value>
-        </init-param >
+            <param-value>S4Dir showRequest probeRequest</param-value>
+        </init-param>
 
 
         <init-param>
@@ -49,20 +62,22 @@
         <load-on-startup>1</load-on-startup>
 
 
-    </servlet >
+    </servlet>
+
+
+
+
 
 
     <servlet>
-        <servlet-name>exp</servlet-name>
+        <servlet-name>ddd</servlet-name>
 
-        <servlet-class>opendap.experiments.ExperimentSandboxServlet</servlet-class>
+        <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
 
         <load-on-startup>1</load-on-startup>
 
-
-    </servlet >
-
-
+        <!-- Define a security constraint on this application -->
+    </servlet>
 
 
     <servlet-mapping>
@@ -79,17 +94,13 @@
     </servlet-mapping -->
 
     <servlet-mapping>
-        <servlet-name>exp</servlet-name>
-        <url-pattern>/exp</url-pattern>
+        <servlet-name>ddd</servlet-name>
+        <url-pattern>/ddd</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>exp</servlet-name>
-        <url-pattern>/exp/*</url-pattern>
+        <servlet-name>ddd</servlet-name>
+        <url-pattern>/ddd/*</url-pattern>
     </servlet-mapping>
-
-
-
-
 
 
 </web-app>

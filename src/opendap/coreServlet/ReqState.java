@@ -93,8 +93,7 @@ public class ReqState {
 
 
 
-        int index = myHttpRequest.getRequestURL().lastIndexOf(
-                myHttpRequest.getServletPath());
+        int index = myHttpRequest.getRequestURL().lastIndexOf(myHttpRequest.getServletPath());
 
         defaultSchemaLocation = myHttpRequest.getRequestURL().substring(0, index) +
                 "/schema/" +
