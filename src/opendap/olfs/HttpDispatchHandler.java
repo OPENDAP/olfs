@@ -96,7 +96,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     }
 
     public String getVersionStringForTHREDDSCatalog(){
-        return "Server4 ("+ Version.getVersionString()+")" +
+        return "OPeNDAP Server4 ("+ Version.getVersionString()+")" +
                 "<font size='-5' color='#5A647E'>" +
                 "ServerUUID="+Version.getServerUUID()+"-catalog" +
                 "</font><br />";

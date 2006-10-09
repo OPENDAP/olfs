@@ -4,20 +4,10 @@
         PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
         "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"
 
-        [<!ENTITY securityConfig      SYSTEM "file:../content/opendap/TomcatSecurity.xml" >]
 
 >
 
 <web-app>
-
-
-    <!--
-         Loads a persistent security configuration from the content directory.
-         This configuation may be empty, in which case no security constraints will be
-         applied by Tomcat.
-     -->
-    &securityConfig;
-
 
 
     <display-name>Server4</display-name>
@@ -30,7 +20,6 @@
 
 
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <servlet>
         <servlet-name>s4</servlet-name>
@@ -70,7 +59,7 @@
 
 
     <servlet>
-        <servlet-name>ddd</servlet-name>
+        <servlet-name>docs</servlet-name>
 
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
 
@@ -88,18 +77,22 @@
         <servlet-name>s4</servlet-name>
         <url-pattern>/s4/*</url-pattern>
     </servlet-mapping>
-    <!-- servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>*</url-pattern>
-    </servlet-mapping -->
+
 
     <servlet-mapping>
-        <servlet-name>ddd</servlet-name>
-        <url-pattern>/ddd</url-pattern>
+        <servlet-name>s4</servlet-name>
+        <url-pattern>*</url-pattern>
+    </servlet-mapping >
+
+
+
+    <servlet-mapping>
+        <servlet-name>docs</servlet-name>
+        <url-pattern>/docs</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ddd</servlet-name>
-        <url-pattern>/ddd/*</url-pattern>
+        <servlet-name>docs</servlet-name>
+        <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
 
 

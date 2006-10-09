@@ -280,18 +280,18 @@
             <classes dir="${build.classes}"/>
 
 
-            <fileset dir="${doc.dir}">
+            <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
                 <exclude name="index.html"/>
-            </fileset>
+            </zipfileset>
 
-            <fileset file="${build.dist}/index.html"/>
+            <zipfileset file="${build.dist}/index.html" prefix="docs" />
 
             <zipfileset dir="${schema.dir}" prefix="schema" />
 
             <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/server4"/>
 
-            <zipfileset dir="${build.lib}" prefix="s4-libraries"/>
+            <!-- zipfileset dir="${build.lib}" prefix="s4-libraries"/ -->
 
             <zipfileset dir="${lib.dir}" prefix="s4-libraries">
                 <include name="${jdom.lib}"/>

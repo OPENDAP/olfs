@@ -104,7 +104,6 @@ public class DocServlet extends HttpServlet {
 
             ServletOutputStream sos = response.getOutputStream();
 
-
             byte buff[] = new byte[8192];
             int rc;
             boolean doneReading = false;
@@ -114,17 +113,14 @@ public class DocServlet extends HttpServlet {
                     doneReading = true;
                 }
                 else if(rc>0){
-                    sos.write(buff);
+                    sos.write(buff,0,rc);
                 }
-
 
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
 
             sos.flush();
-
-
 
         }
         else {

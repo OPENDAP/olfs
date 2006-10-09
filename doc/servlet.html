@@ -1,26 +1,57 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>Servlet Configuration</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<title>Server4: Servlet Configuration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<STYLE>
+<!--
+H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:22px;}
+H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:16px;}
+H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:14px;}
+BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;}
+B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;}
+P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}
+PRE {font-family:"Courier New", Courier, mono;background:white;color:black;font-size:12px;}
+A {color : black;}
+A.name {color : black;}
+HR {color : #525D76;}
+.rightBanner {
+	left: 100px;
+}
+LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}
+.style3 {font-size: 10px}
+.style4 {font-size: 14px}
+.style5 {font-family: "Courier New", Courier, mono}
+.style6 {font-size: 18px}
+-->
+</STYLE>
+</head>
 
 <body>
-<h1 align="center"><a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" width="206" height="93" border="0"></a><br>
-OLFS </h1>
-<h3 align="center">version: beta-1.3 </h3>
-<h1 align="center">Servlet Configuration And General Information</h1>
-<hr>
-<h3>Synopsis</h3>
+<a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" width="206" height="93" border="0"></a>
+<h1 align="left">Servlet Configuration And General Information<br>
+<span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
+<hr size="1" noshade="noshade">
+<h4>Synopsis</h4>
 <p>This document should help you get started configuring the OLFS component of Server4.
   This servlet was developed, compiled, and tested using
-  the javac 1.5.0 compiler, the 1.5.0 Java Virtual Machine, and Jakarta Tomcat
+  the java 1.5.0 compiler, the 1.5.0 Java Virtual Machine, and Jakarta Tomcat
   5.5 (which also provided the javax.servlet packages).</p>
 <p><strong><em>Note</em></strong>: All Examples of web.xml configurations in
-  this document were check against Jakarta Tomcat 5.5.0 </p>
-<hr>
-<h2><a name="CONFIG"></a>Servlet Configuration</h2>
-<p>The OPeNDAP Server4 servlet gets its configuration from 3 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, and <strong>web.xml</strong>. Configuration files are located in two places: peristent configurations (<strong>catalog.xml, olfs.xml</strong>) are located in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em>, </p>
-<h3><strong>File Locations:</strong></h3>
+  this document were check against Jakarta Tomcat 5.5.0</p>
+<p>The Server4 web application is composed of two servlets, the OLFS servlet and the Docs servlet. </p>
+<p>The OLFS servlet does the majority of the work in the Server4 web application. It handles client requests for the various OPeNDAP data products, THREDDS catalogs, and OPeNDAP directories.</p>
+<p>The Docs servlet provides clients access to a tree of static documents.</p>
+<p>Topics:</p>
+<ol>
+  <li><a href="#OLFS">OLFS Servlet</a> </li>
+  <li><a href="#DOCS">Docs Servlet</a> </li>
+  <li><a href="#SECURITY">Security</a></li>
+</ol>
+<p>&nbsp;</p>
+<h1><a name="OLFS"></a>OLFS Servlet Configuration</h1>
+<p>The  Server4 OLFS servlet gets its configuration from 3 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, <strong>security.xml</strong>, and <strong>web.xml</strong>  </p>
+<h4><strong>File Locations</strong></h4>
 <ul>
   <li><strong>olfs.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
     <br>
@@ -28,24 +59,28 @@ OLFS </h1>
   <li><strong>catalog.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
     <br>
   </li>
+  <li><strong>security.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+    <br>
+</li>
   <li><strong>web.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
     in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
     gets renamed then things change accordingly.)<br>
     <br>
   </li>
 </ul>
-<h3><strong>Configuration Roles:</strong></h3>
+<h4>&nbsp;</h4>
+<h4><strong>Configuration Roles</strong></h4>
 <ul>
   <li><strong>olfs.xml</strong> - Contains the OLFS localization configuration - location of the BES, directory view instructions, etc. <br>
     <br>
   </li>
-  <li>    <strong>catalog.xml</strong> - THREDDS catalogs onfiguration. <br>
+  <li>    <strong>catalog.xml</strong> - THREDDS catalogs configuration. <br>
     <br>
   </li>
   <li><strong>web.xml</strong> - Core servlet configuration. </li>
 </ul>
-<h3><strong>Configuration Details: </strong></h3>
-<p><strong>olfs.xml</strong> </p>
+<p>&nbsp;</p>
+<h2><strong>olfs.xml</strong> </h2>
 <p>Currently the OLFS has 2 normally configurable items: The BES location and the directory view. The <strong>olfs.xml</strong> file looks like this:</p>
 <pre>
 
@@ -67,19 +102,19 @@ OLFS </h1>
 	   
   &lt;/OLFSConfig&gt;</pre>
 <p>&nbsp;</p>
-<p><strong>catalog.xml</strong></p>
+<h2><strong>catalog.xml</strong></h2>
 <p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  about it here</a>. </p>
 <p>&nbsp;</p>
-<p><strong>web.xml</strong></p>
+<h2><strong>web.xml</strong></h2>
 <p><em>In general I would say that you should <strong>NOT</strong> mess with the web.xml file. At least for now. Future versions of Server and the OLFS may have &quot;user configurable&quot; stuff in the web.xml file, but this version (1.3) does not. <strong>SO JUST DON'T DO IT. OK?</strong></em></p>
 <p>&nbsp;</p>
-<hr>
+<hr size="1" noshade="noshade">
 <p>Having said that here are the details regarding the web.xml file. </p>
 <p>The Serve4  running
     in the opendap servlet area needs an entry in the <strong>web.xml</strong> file. Multiple
   instances of a servlet and/or several different servlets can be configured
   in the one
-    web.xml file. For instance you could have a DTS and a Server4 running in from the same web.xml and thus undr the same servlet context. Running multiple instances of the Server4 in a single web.xml file (aka context) will <strong>NOT</strong> work. </p>
+    web.xml file. For instance you could have a DTS and a Server4 running in from the same web.xml and thus under the same servlet context. Running multiple instances of the Server4 in a single web.xml file (aka context) will <strong>NOT</strong> work. </p>
 <p>Each a servlet needs a unique name which is specified inside a
   <em>&lt;servlet&gt;</em> element in the web.xml file using the <em>&lt;servlet-name&gt;</em> tag.
   This is a name of convenience, for example if you where serving data from an
@@ -121,7 +156,7 @@ OLFS </h1>
 </blockquote>
 <p>Eliminating the need for the word <em>servlet</em> in the URL. For more on
   the <em>&lt;servlet-mapping&gt;</em> element see the Jakarta-Tomcat documentation.</p>
-<h3>&lt;init-param&gt; Elements</h3>
+<h4>&lt;init-param&gt; Elements</h4>
 <p>  The  OLFS uses <em>&lt;init-param&gt; </em>elements inside of
   each <em>&lt;servlet&gt;</em> element to get specific configuration information. </p>
 <p> <em>&lt;init-param&gt;'s </em> common
@@ -211,8 +246,110 @@ OLFS </h1>
 &lt;/servlet-mapping&gt;
 
 </pre>
-<hr>
-<br>
-<br>
-</body>
+<h1><a name="DOCS"></a>Docs Servlet</h1>
+<p>The Docs (or documentation) servlet provides the Server4 web application with the ability to serve a tree of static documentation files. By default it will serve the files in the documentation tree provided with the Server4 distribution. This tree is rooted at <em>$TOMCAT_HOME/webapps/opendap/docs/</em> and contains  documentation pertaining to the software in the Server4 distribution - installation and configuration instruction, release notes, java docs, etc.</p>
+<p>If one wished to supplant this information with their own set of web pages, one could remove/replace the files in the default directory. However, installing a new version of Server4 will cause these files to be overwritten, forcing them to be replaced after the install (and hopefully AFTER the new release documentation had been read and understood by the user).</p>
+<p>The Docs servlet provides an alternative to this. If a  <em>docs</em> directory is created in the <em>persistent content</em> directory for Server4 the Docs servlet will detect it (when Tomcat is launched) and it will serve files from there instead of from the default location. </p>
+<p>This scheme provides 2 beneficial effects:</p>
+<ol>
+  <li>It allows localizations of the web documents associated with Server4 to persist through Server4 upgrades with no user intervention.</li>
+  <li>It preserves important release documents that ship with the Server4 software.</li>
+</ol>
+<p>So - in summary - to provide persistent  web pages as part of a Server4 localization simple create the directory:</p>
+<blockquote>
+  <p><em>$TOMCAT_HOME/content/opendap/<strong>docs</strong> </em></p>
+</blockquote>
+<p>Place your content in there and away you go. If later you wish to view the web based documentation bundled with Server4 simply change the name of the directory from <strong>docs</strong> to something else and restart Tomcat. (or, you could just look in the <em>$TOMCAT_HOME/webapps/opendap/docs</em> directory)</p>
+<p>In the Docs servlet, is a URL ends in a directory name or a &quot;/&quot; then the servlet will attempt to serve the <strong>index.html</strong> in that directory. In other words <strong>index.html</strong> is the default document. </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h1><a name="SECURITY"></a>Security </h1>
+<p><span class="style6"><strong>Request for input</strong>:</span> <em>So far Server4 relies on the Tomcat security implementation. If after reading this section and the Tomcat documentation on security you are left wanting something more, then please get in touch with us at <a href="http://www.opendap.org">OPeNDAP</a>. We would like to talk with you about your security needs for  OPeNDAP Server4 and possibly develop some use cases that describe your needs. In the future we hope to provide a richer security configuration environment than the one currently offered by Tomcat. </em></p>
+<hr size="1" noshade="noshade">
+<p>Server4 currently relies on the security implemented by Tomcat. It is recommended that you read carefully and understand the Tomcat 5.x security documentation.</p>
+<ul>
+  <li><a href="http://tomcat.apache.org/tomcat-5.5-doc/index.html">Tomcat 5.5 Documentation</a>
+    <ul>
+      <li><a href="http://tomcat.apache.org/tomcat-5.5-doc/realm-howto.html">Section 6 - Realms and AAA</a></li>
+      <li><a href="http://tomcat.apache.org/tomcat-5.5-doc/security-manager-howto.html">Section 7 - Security Manager</a>   </li>
+    </ul>
+  </li>
+</ul>
+<p>Tomcat security requires fairly extensive additions to the <strong>web.xml</strong> file. (It is important to keep in mind that altering the <em>&lt;servlet&gt; </em>definitions may render you Server4 inoperable - please see the previous sections that discuss this.) </p>
+<p>&nbsp;</p>
+<h2><strong>Limitations</strong></h2>
+<p> Officially Tomcat security supports <em>context</em> level authentication. What this means is that you can restrict access to the collection of servlets running in a single web application - in other words all of the stuff that is defined in a single <strong>web.xml</strong> file. You can call out different authentication rules for different <em>&lt;url-pattern&gt;'</em>s within the web application, but only clients do not cache ANY security information will be able to easily access the different areas. For example in your<strong> web.xml</strong> file you might have:</p>
+<pre> 
+    &lt;security-constraint&gt;
+        &lt;web-resource-collection&gt;
+            &lt;web-resource-name&gt;fnoc1&lt;/web-resource-name&gt;
+            &lt;url-pattern&gt;/s4/nc/fnoc1.txt&lt;/url-pattern&gt;
+        &lt;/web-resource-collection&gt;
+        &lt;auth-constraint&gt;
+            &lt;role-name&gt;fn1&lt;/role-name&gt;
+        &lt;/auth-constraint&gt;
+    &lt;/security-constraint&gt;
+    
+    &lt;security-constraint&gt;
+        &lt;web-resource-collection&gt;
+             &lt;web-resource-name&gt;fnoc2&lt;/web-resource-name&gt;
+             &lt;url-pattern&gt;/s4/nc/fnoc2.txt&lt;/url-pattern&gt;
+         &lt;/web-resource-collection&gt;
+         &lt;auth-constraint&gt;
+             &lt;role-name&gt;fn2&lt;/role-name&gt;
+          &lt;/auth-constraint&gt;
+    &lt;/security-constraint&gt;
+    
+    &lt;login-config&gt;
+        &lt;auth-method&gt;BASIC&lt;/auth-method&gt;
+        &lt;realm-name&gt;MyApplicationRealm&lt;/realm-name&gt;
+    &lt;/login-config&gt;
+</pre>
+
+<p>Where the the security roles fn1 and fn2 (defined in the <strong>tomcat-users.xml</strong> file) have no common members.<br>
+  <br>
+The complete URI's would be:</p>
+<blockquote>
+  <p> http://localhost:8080/mycontext/s4/nc/fnoc1.txt<br>
+    http://localhost:8080/mycontext/s4/nc/fnoc2.txt<br>
+  </p>
+</blockquote>
+<p>Now - this works, for clients that aren't too smart - i.e. they don't cache anything. However, if you try with a browser, once you authenticate for one URI, then you am locked out of the other one until I successfully &quot;reset&quot; the browser (purge all caches).</p>
+<p>I think the reason is as follows: In the exchange between Tomcat and the client, Tomcat is sending the header:</p>
+<pre>    WWW-Authenticate: Basic realm=&quot;MyApplicationRealm&quot;</pre>
+<p>And the client authenticates. When the second URI is accessed Tomcat sends the the same authentication challenge, with the same <span class="style5">WWW-Authenticate</span> header. The client, having recently authenticated to this <em>realm-name </em>(defined in the <em>&lt;login-config&gt;</em> element in the <strong>web.xml</strong> file - see above) , resends the authentication information, and, since it's not valid for that url pattern, the request is denied.</p>
+<p>&nbsp;</p>
+<h2><strong>Persistence</strong></h2>
+<p> You should be careful back up your modified <strong>web.xml</strong> file to a location outside of the <em>webapps/opendap</em> directory as new versions of Server4 will overwrite it when installed. You could use an XML <em>ENTITY</em> and an <em>entity reference</em> in the <strong>web.xml</strong> to cause a local file containing the security configuration to be included in the <strong>web.xml</strong>. For example adding the <em>ENITIY</em>:</p>
+<pre>    [&lt;!ENTITY securityConfig      SYSTEM &quot;file:/fully/qualified/path/to/your/security/config.xml&quot;&gt;]</pre>
+<p>To the <em>&lt;!DOCTYPE&gt;</em> declaration at the top of the <strong>web.xml</strong> in conjunction with adding an <em>entity reference:</em></p>
+<pre>    &amp;securityConfig;</pre>
+<p>To the content of the <em>&lt;web-app</em>&gt; element would cause your external security configuration to be included in the <strong>web.xml</strong> file. </p>
+<p>Here is an example of an <em>ENTITY</em> configuration: </p>
+<pre>
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;
+    
+    &lt;!DOCTYPE web-app
+        PUBLIC &quot;-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN&quot;
+        &quot;http://java.sun.com/j2ee/dtds/web-app_2_2.dtd&quot;
+        [&lt;!ENTITY securityConfig      SYSTEM &quot;file:/fully/qualified/path/to/your/security/config.xml&quot;&gt;]
+    &gt;
+    &lt;web-app&gt;
+    
+        &lt;!--
+            Loads a persistent security configuration from the content directory.
+            This configuration may be empty, in which case no security constraints will be
+            applied by Tomcat.
+        --&gt;
+        &amp;securityConfig;
+        
+        .
+        .
+        .
+        
+    &lt;/web-app&gt;
+ </pre>
+<p>This does not prevent you from losing your <strong>web.xml</strong> file  when a new version of Server4 is installed, but adding the <em>ENTITY</em> stuff to the new <strong>web.xml</strong> file would be easier than remembering an extensive security configuration. Of course, Y.M.M.V.</p>
+<hr size="1" noshade="noshade">
+<h3><br /></h3></body>
 </html>
