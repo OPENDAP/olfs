@@ -26,9 +26,6 @@
 package opendap.coreServlet;
 
 
-import java.util.Enumeration;
-import java.util.StringTokenizer;
-import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -43,340 +40,163 @@ import javax.servlet.http.HttpServletRequest;
 public class ReqState {
 
 
-    /**
-     * ************************************************************************
-     * Default directory for the cached INFO files. This
-     * presupposes that the server is going to use locally
-     * cached INFO files.
-     *
-     * @serial
-     */
-
-    private final String defaultSchemaName = "opendap-0.0.0.xsd";
-    private String       defaultSchemaLocation;
-
-    //protected String rootPath, contentPath;
-
-    private String dataSetName;
-    private String requestSuffix;
-    private String CE;
-    private String serverClassName;
-    private String requestURL;
-
-    private ServletConfig      myServletConfig;
-    private HttpServletRequest myHttpRequest;
 
 
 
-    public ReqState(HttpServletRequest myRequest,
-                    ServletConfig sc,
-                    String serverClassName) {
-
-        this.myServletConfig = sc;
-        this.myHttpRequest = myRequest;
-        this.serverClassName = serverClassName;
-
-        // Get the constraint expression from the request object and
-        // convert all those special characters denoted by a % sign
-        //this.CE = prepCE(myHttpRequest.getQueryString());
-
-        this.CE = myHttpRequest.getQueryString();
+    public static  String getConstraintExpression(HttpServletRequest req) {
+        String CE = req.getQueryString();
 
         // If there was simply no constraint then prepCE() should have returned
         // a CE equal "", the empty string. A null return indicates an error.
-        if (this.CE == null) {
-            this.CE = "";
+        if (CE == null) {
+            CE = "";
         }
 
-        processOpendapURL();
-
-
-
-
-        int index = myHttpRequest.getRequestURL().lastIndexOf(myHttpRequest.getServletPath());
-
-        defaultSchemaLocation = myHttpRequest.getRequestURL().substring(0, index) +
-                "/schema/" +
-                defaultSchemaName;
-
-        //System.out.println("Default Schema Location: "+defaultSchemaLocation);
-        //System.out.println("Schema Location: "+getSchemaLocation());
-
-
-    }
-
-
-
-    public String getRequestURL() {
-        return requestURL;
-    }
-
-
-    public String getDataset() {
-        return dataSetName;
-    }
-
-    public String getServerClassName() {
-        return serverClassName;
-    }
-
-    public String getRequestSuffix() {
-        return requestSuffix;
-    }
-
-
-    public String getConstraintExpression() {
         return CE;
     }
 
 
-    /**
-     * This method will attempt to get the Schema Location
-     * name from the servlet's InitParameters. Failing this it
-     * will return the default Schema Location.
-     *
-     * @return The Schema Location.
-     */
-    public String getSchemaLocation() {
-        String cacheDir = getInitParameter("SchemaLocation");
-        if (cacheDir == null)
-            cacheDir = defaultSchemaLocation;
-        return (cacheDir);
-    }
-
-    /**
-     * Sets the default Schema Location to
-     * the string <i>location</i>. Note that if the servlet configuration
-     * conatins an Init Parameter <i>SchemaLocation</i> the default
-     * value will be ingnored.
-     *
-     * @param location
-     */
-    public void setDefaultSchemaLocation(String location) {
-        defaultSchemaLocation = location;
-    }
 
 
     /**
-     * *************************************************************************
-     * This method is used to convert special characters into their
-     * actual byte values.
-     * <p/>
-     * For example, in a URL the space character
-     * is represented as "%20" this method will replace that with a
-     * space charater. (a single value of 0x20)
      *
-     * @param ce The constraint expresion string as collected from the request
-     *           object with <code>getQueryString()</code>
-     * @return A string containing the prepared constraint expression. If there
-     *         is a problem with the constraint expression a <code>null</code> is returned.
-     */
-    private String prepCE(String ce) {
-
-        int index;
-
-        //System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-        //System.out.println("Prepping: \""+ce+"\"");
-
-        if (ce == null) {
-            ce = "";
-            //System.out.println("null Constraint expression.");
-        } else if (!ce.equals("")) {
-
-            //System.out.println("Searching for:  %");
-            index = ce.indexOf("%");
-            //System.out.println("index of %: "+index);
-
-            if (index == -1)
-                return (ce);
-
-            if (index > (ce.length() - 3))
-                return (null);
-
-            while (index >= 0) {
-                //System.out.println("Found % at character " + index);
-
-                String specChar = ce.substring(index + 1, index + 3);
-                //System.out.println("specChar: \"" + specChar + "\"");
-
-                // Convert that bad boy!
-                char val = (char) Byte.parseByte(specChar, 16);
-                //System.out.println("                val: '" + val + "'");
-                //System.out.println("String.valueOf(val): \"" + String.valueOf(val) + "\"");
-
-
-                ce = ce.substring(0, index) + String.valueOf(val) + ce.substring(index + 3, ce.length());
-                //System.out.println("ce: \"" + ce + "\"");
-
-                index = ce.indexOf("%");
-                if (index > (ce.length() - 3))
-                    return (null);
-            }
-        }
-
-//      char ca[] = ce.toCharArray();
-//	for(int i=0; i<ca.length ;i++)
-//	    System.out.print("'"+(byte)ca[i]+"' ");
-//	System.out.println("");
-//	System.out.println(ce);
-//	System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
-
-//        System.out.println("Returning CE: \""+ce+"\"");
-        return (ce);
-    }
-    /***************************************************************************/
-
-
-    /**
-     * *************************************************************************
-     * Processes an incoming <code>HttpServletRequest</code>. Uses the content of
-     * the <code>HttpServletRequest</code>to create a <code>ReqState</code>
-     * object in that caches the values for:
-     * <ul>
-     * <li> <b>dataSet</b> The data set name.(Accessible using
-     * <code> setDataSet() </code>
-     * and <code>getDataset()</code>)</li>
-     * <li> <b>CE</b> The constraint expression.(Accessible using
-     * <code> setCE() </code>
-     * and <code>getCE()</code>)</li>
-     * <li> <b>requestSuffix</b> The request suffix, used by OPeNDAP to indicate
-     * the type of response desired by the client.
-     * (Accessible using
-     * <code> setRequestSuffix() </code>
-     * and <code>getRequestSuffix()</code>)</li>
-     * <li> <b>isClientCompressed</b> Does the requesting client
-     * accept a compressed response?</li>
-     * <li> <b>ServletConfig</b> The <code>ServletConfig</code> object
-     * for this servlet.</li>
-     * <li> <b>ServerName</b> The class name of this server.</li>
-     * <li> <b>RequestURL</b> THe URL that that was used to call thye servlet.</li>
-     * </ul>
-     *
-     * @see ReqState
+     * @param req
+     * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
+     * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
      */
 
-    protected void processOpendapURL() {
+    public static String getRequestURL(HttpServletRequest req){
 
-        int suffixIndex;
+        String requestURL;
 
         // Figure out the data set name.
-        dataSetName = myHttpRequest.getPathInfo();
+        String requestPath = req.getPathInfo();
 
-        if(Debug.isSet("ReqState")) System.out.println("ReqState - myHttpRequest.getPathInfo() = " + dataSetName);
-        requestSuffix = null;
+        if(Debug.isSet("ReqState")) System.out.println("ReqState - req.getPathInfo() = " + requestPath);
 
-        //Are they looking for a directory?
-        if (dataSetName == null || dataSetName.endsWith("/")) {
-            requestURL = myHttpRequest.getRequestURL().toString();
-            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a dir)");
-            //return;
+        // Is it a collection?
+        if (requestPath == null || requestPath.endsWith("/")) {
+            requestURL = req.getRequestURL().toString();
+            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a collection)");
         } else {
-            // Break the path up and find the last (terminal)
-            // end.
-            StringTokenizer st = new StringTokenizer(dataSetName, "/");
-            String endOPath = "";
-            while (st.hasMoreTokens()) {
-                endOPath = st.nextToken();
+            // It appears to be a dataset.
+
+            // Does it have a request suffix?
+            if(requestPath.lastIndexOf("/") < requestPath.lastIndexOf(".")){
+
+                requestURL = req.getRequestURL().substring(0, req.getRequestURL().toString().lastIndexOf("."));
+
+            } else {
+                requestURL = req.getRequestURL().toString();
             }
-
-            // Check the last element in the path for the
-            // character "."
-            int index = endOPath.lastIndexOf('.');
-
-            if(Debug.isSet("ReqState")) System.out.println("last index of . in \""+dataSetName+"\": "+index);
-
-            // If a dot is found take the stuff after it as the OPeNDAP suffix
-            if (index >= 0) {
-                // pluck the OPeNDAP suffix off of the end
-                requestSuffix = endOPath.substring(index + 1);
-                suffixIndex = myHttpRequest.getRequestURL().toString().lastIndexOf(requestSuffix);
-
-                // Set the data set name to the entire path minus the
-                // suffix which we know exists in the last element
-                // of the path. Remove the leading slash
-
-                //this.dataSetName = this.dataSetName.substring(1, this.dataSetName.lastIndexOf('.'));
-
-                //Changed to not remove the leading slash! ndp 2/3/06
-                dataSetName = dataSetName.substring(0, dataSetName.lastIndexOf('.'));
-
-                requestURL = myHttpRequest.getRequestURL().substring(0, suffixIndex-1);
-
-            } else { // strip the leading slash (/) from the dataset name and set the suffix to an empty string
-                requestSuffix = "";
-                //suffixIndex = myHttpRequest.getRequestURL().length();
-
-                // No longer shall we strip the leadin slash! ndp 2/3/06
-                //this.dataSetName = this.dataSetName.substring(1, this.dataSetName.length());
-                requestURL = myHttpRequest.getRequestURL().toString();
-            }
-            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a file)");
+            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a dataset)");
         }
-        if(requestSuffix==null)
-            requestSuffix = "";
 
+        return requestURL;
 
     }
+
+
+
+
+
+
+
+    public static String getRequestSuffix(HttpServletRequest req){
+
+        String requestSuffix = null;
+        String requestPath = req.getPathInfo();
+        if(Debug.isSet("ReqState")) System.out.println("ReqState - req.getPathInfo() = " + requestPath);
+
+
+        // Is it a dataset and not a collection?
+        if (requestPath!=null && !requestPath.endsWith("/")) {
+
+            // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
+            // and strip it off the dataSetName
+
+            if(requestPath.lastIndexOf("/") < requestPath.lastIndexOf(".")){
+                requestSuffix = requestPath.substring(requestPath.lastIndexOf('.') + 1);
+            }
+
+        }
+        return requestSuffix;
+
+    }
+
+
+
+
+
+
+
+    public static String getDatasetName(HttpServletRequest req){
+
+        String requestPath = req.getPathInfo();
+        if(Debug.isSet("ReqState")) System.out.println("ReqState - req.getPathInfo() = " + requestPath);
+
+
+        String dataSetName = requestPath;
+
+        // Is it a dataset and not a collection?
+        if (requestPath != null && !requestPath.endsWith("/")) {
+
+            // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
+            // and strip it off the dataSetName
+
+            if(requestPath.lastIndexOf("/") < requestPath.lastIndexOf(".")){
+                   dataSetName = requestPath.substring(0, requestPath.lastIndexOf('.'));
+            }
+        }
+
+        return dataSetName;
+
+    }
+
+
+
+
+
+
 
     /**
-     * *************************************************************************
-     * Evaluates the (private) request object to determine if the client that
-     * sent the request accepts compressed return documents.
-     *
-     * @return True is the client accpets a compressed return document.
-     *         False otherwise.
-     */
+       * *************************************************************************
+       * Evaluates the (private) request object to determine if the client that
+       * sent the request accepts compressed return documents.
+       *
+       * @return True is the client accpets a compressed return document.
+       *         False otherwise.
+       */
 
-    public boolean getAcceptsCompressed() {
+      public static boolean getAcceptsCompressed(HttpServletRequest req) {
 
-        boolean isTiny;
+          boolean isTiny;
 
-        String Encoding = this.myHttpRequest.getHeader("Accept-Encoding");
+          String Encoding = req.getHeader("Accept-Encoding");
 
-        if (Encoding != null)
-            isTiny = Encoding.equalsIgnoreCase("deflate");
-        else
-            isTiny = false;
+          if (Encoding != null)
+              isTiny = Encoding.equalsIgnoreCase("deflate");
+          else
+              isTiny = false;
 
-        return (isTiny);
-    }
+          return (isTiny);
+      }
+
+
+
+
+
+
+
+
+
+
 
     /**
      * ***********************************************************************
      */
 
 
-    public Enumeration getInitParameterNames() {
-        return (myServletConfig.getInitParameterNames());
-    }
-
-    public String getInitParameter(String name) {
-        return (myServletConfig.getInitParameter(name));
-    }
-
-
-
-    public String toString() {
-        String ts;
-
-        ts = "ReqState:\n";
-        ts += "  serverClassName:    '" + serverClassName + "'\n";
-        ts += "  dataSet:            '" + dataSetName + "'\n";
-        ts += "  requestSuffix:      '" + requestSuffix + "'\n";
-        ts += "  CE:                 '" + CE + "'\n";
-        ts += "  compressOK:          " + getAcceptsCompressed() + "\n";
-
-        ts += "  InitParameters:\n";
-        Enumeration e = getInitParameterNames();
-        while (e.hasMoreElements()) {
-            String name = (String) e.nextElement();
-            String value = getInitParameter(name);
-
-            ts += "    " + name + ": '" + value + "'\n";
-        }
-
-        return (ts);
-    }
 
 
 }

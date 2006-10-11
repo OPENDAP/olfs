@@ -262,6 +262,35 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     }
 
 
+
+
+
+
+    public long getLastModified(HttpServletRequest req){
+
+
+        System.out.println("\n\n***********   Tomcat looking for a getlastModified() response!\n");
+
+
+
+
+        return -1;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * ************************************************************************
      * Default handler for the client's DAS request. Operates on the assumption
@@ -274,17 +303,18 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDAS(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs)
+                        HttpServletResponse response)
             throws Exception {
 
+
+        String datasetName = ReqState.getDatasetName(request);
+        String constraintExpression =  ReqState.getConstraintExpression(request);
+
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetDAS for dataset: " + rs.getDataset());
+            System.out.println("doGetDAS for dataset: " + datasetName);
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -296,8 +326,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
 
-            String path = rs.getDataset();
-            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            String path = BESCrawlableDataset.besPath2ThreddsPath(datasetName);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
             response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
@@ -310,7 +339,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 if (cgh.conditionIsMet()) {
                     if (Debug.isSet("showResponse"))
                         System.out.println(" condition was met. Sending complete DAS response.");
-                    BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+                    BesAPI.writeDAS(datasetName, constraintExpression, Out);
+                    response.setStatus(HttpServletResponse.SC_OK);
 
                 } else {
                     if (Debug.isSet("showResponse"))
@@ -320,12 +350,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             } else {
                 if (Debug.isSet("showResponse"))
                     System.out.println("Client Did not send a conditional GET. Sending complete DAS response.");
-                BesAPI.writeDAS(rs.getDataset(), rs.getConstraintExpression(), Out);
+                BesAPI.writeDAS(datasetName, constraintExpression, Out);
+                response.setStatus(HttpServletResponse.SC_OK);
 
             }
 
             Out.flush();
-        response.setStatus(HttpServletResponse.SC_OK);
 
     }
     /***************************************************************************/
@@ -342,18 +372,17 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDDS(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs)
+                        HttpServletResponse response)
             throws Exception {
 
+        String datasetName = ReqState.getDatasetName(request);
+        String constraintExpression =  ReqState.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetDDS for dataset: " + rs.getDataset());
+            System.out.println("doGetDDS for dataset: " + datasetName);
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -365,8 +394,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
 
-            String path = rs.getDataset();
-            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            String path = BESCrawlableDataset.besPath2ThreddsPath(datasetName);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
             response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
@@ -379,7 +407,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 if (cgh.conditionIsMet()) {
                     if (Debug.isSet("showResponse"))
                         System.out.println(" condition was met. Sending complete DDS response.");
-                    BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+                    BesAPI.writeDDS(datasetName, constraintExpression, Out);
+                    response.setStatus(HttpServletResponse.SC_OK);
 
                 } else {
                     if (Debug.isSet("showResponse"))
@@ -389,14 +418,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             } else {
                 if (Debug.isSet("showResponse"))
                     System.out.println("Client Did not send a conditional GET. Sending complete DDS response.");
-                BesAPI.writeDDS(rs.getDataset(), rs.getConstraintExpression(), Out);
+                BesAPI.writeDDS(datasetName, constraintExpression, Out);
+                response.setStatus(HttpServletResponse.SC_OK);
             }
 
             Out.flush();
 
 
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
     }
     /***************************************************************************/
@@ -413,18 +442,17 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDDX(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs)
+                        HttpServletResponse response)
             throws Exception {
 
+        String datasetName = ReqState.getDatasetName(request);
+        String constraintExpression =  ReqState.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetDDX for dataset: " + rs.getDataset());
+            System.out.println("doGetDDX for dataset: " + datasetName);
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -436,8 +464,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         OutputStream Out = new BufferedOutputStream(response.getOutputStream());
 
-            String path = rs.getDataset();
-            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            String path = BESCrawlableDataset.besPath2ThreddsPath(datasetName);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
             response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
@@ -450,8 +477,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 if (cgh.conditionIsMet()) {
                     if (Debug.isSet("showResponse"))
                         System.out.println(" condition was met. Sending complete DDX response.");
-                    BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
-
+                    BesAPI.writeDDX(datasetName, constraintExpression, Out);
+                    response.setStatus(HttpServletResponse.SC_OK);
                 } else {
                     if (Debug.isSet("showResponse"))
                         System.out.println(" condition was not met. Sending status: " + cgh.getReturnStatus());
@@ -460,12 +487,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             } else {
                 if (Debug.isSet("showResponse"))
                     System.out.println("Client Did not send a conditional GET. Sending complete DDX response.");
-                BesAPI.writeDDX(rs.getDataset(), rs.getConstraintExpression(), Out);
+                BesAPI.writeDDX(datasetName, constraintExpression, Out);
+                response.setStatus(HttpServletResponse.SC_OK);
             }
 
 
             Out.flush();
-        response.setStatus(HttpServletResponse.SC_OK);
 
     }
     /***************************************************************************/
@@ -484,18 +511,17 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDODS(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
+                         HttpServletResponse response)
             throws Exception {
 
+        String datasetName = ReqState.getDatasetName(request);
+        String constraintExpression =  ReqState.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetOPeNDAP For: " + rs.getDataset());
+            System.out.println("doGetOPeNDAP For: " + datasetName);
 
         response.setContentType("application/octet-stream");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -507,7 +533,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         OutputStream bOut;
 
 
-        if (rs.getAcceptsCompressed()) {
+        if (ReqState.getAcceptsCompressed(request)) {
             response.setHeader("Content-Encoding", "deflate");
             bOut = new DeflaterOutputStream(sOut);
         } else {
@@ -517,8 +543,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
 
-            String path = rs.getDataset();
-            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            String path = BESCrawlableDataset.besPath2ThreddsPath(datasetName);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
             response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
@@ -531,7 +556,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 if (cgh.conditionIsMet()) {
                     if (Debug.isSet("showResponse"))
                         System.out.println(" condition was met. Sending complete Data response.");
-                    BesAPI.writeDap2Data(rs.getDataset(), rs.getConstraintExpression(), bOut);
+                    BesAPI.writeDap2Data(datasetName, constraintExpression, bOut);
+                    response.setStatus(HttpServletResponse.SC_OK);
 
                 } else {
                     if (Debug.isSet("showResponse"))
@@ -541,11 +567,11 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             } else {
                 if (Debug.isSet("showResponse"))
                     System.out.println("Client Did not send a conditional GET. Sending complete Data response.");
-                BesAPI.writeDap2Data(rs.getDataset(), rs.getConstraintExpression(), bOut);
+                BesAPI.writeDap2Data(datasetName, constraintExpression, bOut);
+                response.setStatus(HttpServletResponse.SC_OK);
             }
 
             bOut.flush();
-        response.setStatus(HttpServletResponse.SC_OK);
 
     }
 
@@ -617,9 +643,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      */
     public void sendCatalog(HttpServletRequest request,
-                            HttpServletResponse response,
-                            ReqState rs)
+                            HttpServletResponse response)
             throws Exception {
+
 
 
         response.setContentType("text/xml");
@@ -630,28 +656,10 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
-//        System.out.println("rootPath:    "+rootPath);
-//        System.out.println("contentPath: "+contentPath);
-//        System.out.println("myPath:      "+"/"+rs.getDataset());
-
-/*
-        if(catHandler.processReqForCatalog(this,request,response, request.getPathInfo())){
-            System.out.println("Processed Catalog Request");
-        }
-        else {
-            System.out.println("Rejected Catalog Request");
-        }
-
-
-        if (Debug.isSet("showResponse")){
-            System.out.println("doGetCatalog() - Instantiating BESCrawlableDataset object (a CrawlableDataset)");
-        }
-
-*/
 
         // Strip off the catalog request
 
-        String path = rs.getDataset();
+        String path = ReqState.getDatasetName(request);
         path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
 
         path = BESCrawlableDataset.besPath2ThreddsPath(path);
@@ -700,8 +708,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     public void sendDir(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs)
+                        HttpServletResponse response)
             throws Exception {
 
 
@@ -711,7 +718,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("XDAP", getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_directory");
 
-        S4Dir.sendDIR(request, response, rs);
+        S4Dir.sendDIR(request, response);
 
         response.setStatus(HttpServletResponse.SC_OK);
     }
@@ -720,12 +727,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     /**
      * @param request
      * @param response
-     * @param rs
      */
     public void sendHTMLRequestForm(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    ReqState rs)
+                                    HttpServletResponse response)
             throws Exception  {
+
+        String datasetName = ReqState.getDatasetName(request);
+        String requestSuffix = ReqState.getRequestSuffix(request);
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -734,7 +742,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Content-Description", "dods_form");
 
         if (Debug.isSet("showResponse"))
-            System.out.println("Sending OPeNDAP Data Request Form For: " + rs.getDataset() +
+            System.out.println("Sending OPeNDAP Data Request Form For: " + datasetName +
                     "    CE: '" + request.getQueryString() + "'");
 
 
@@ -742,7 +750,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             String url = request.getRequestURL().toString();
 
-            int suffix_start = url.lastIndexOf("." + rs.getRequestSuffix());
+            int suffix_start = url.lastIndexOf("." + requestSuffix);
 
             url = url.substring(0, suffix_start);
 
@@ -750,7 +758,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             if (Debug.isSet("showResponse"))
                 System.out.println("HTML Form URL: " + url);
 
-            BesAPI.writeHTMLForm(rs.getDataset(), url, os);
+            BesAPI.writeHTMLForm(datasetName, url, os);
 
                     os.flush();
 
@@ -764,14 +772,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     /**
      * @param request
      * @param response
-     * @param rs
      */
     public void sendInfo(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs)
+                         HttpServletResponse response)
             throws Exception  {
 
 
+        String datasetName = ReqState.getDatasetName(request);
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -780,11 +787,11 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Content-Description", "dods_description");
 
         if (Debug.isSet("showResponse"))
-            System.out.println("doGetINFO For: " + rs.getDataset());
+            System.out.println("doGetINFO For: " + datasetName);
 
         OutputStream os = new BufferedOutputStream(response.getOutputStream());
 
-            BesAPI.writeINFOPage(rs.getDataset(), os);
+            BesAPI.writeINFOPage(datasetName, os);
 
                     os.flush();
 
@@ -795,10 +802,12 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     public void sendASCII(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs)
+                          HttpServletResponse response)
             throws Exception  {
 
+
+        String datasetName = ReqState.getDatasetName(request);
+        String constraintExpression =  ReqState.getConstraintExpression(request);
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -807,7 +816,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Content-Description", "dods_ascii");
 
         if (Debug.isSet("showResponse"))
-            System.out.println("Sending OPeNDAP ASCII Data For: " + rs.getDataset() +
+            System.out.println("Sending OPeNDAP ASCII Data For: " + datasetName +
                     "    CE: '" + request.getQueryString() + "'");
 
         OutputStream bOut ;
@@ -816,7 +825,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             ServletOutputStream sOut = response.getOutputStream();
 
-            if (rs.getAcceptsCompressed()) {
+            if (ReqState.getAcceptsCompressed(request)) {
                 response.setHeader("Content-Encoding", "deflate");
                 bOut = new DeflaterOutputStream(sOut);
             } else {
@@ -826,8 +835,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             }
 
 
-            String path = rs.getDataset();
-            path = BESCrawlableDataset.besPath2ThreddsPath(path);
+            String path = BESCrawlableDataset.besPath2ThreddsPath(datasetName);
             BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
             response.setHeader("Last-Modified", HttpDate.getHttpDateString(cd.lastModified(), HttpDate.RFC_1123));
 
@@ -840,7 +848,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                 if (cgh.conditionIsMet()) {
                     if (Debug.isSet("showResponse"))
                         System.out.println(" condition was met. Sending complete Data response.");
-                    BesAPI.writeASCII(rs.getDataset(), rs.getConstraintExpression(), bOut);
+                    BesAPI.writeASCII(datasetName, constraintExpression, bOut);
 
                 } else {
                     if (Debug.isSet("showResponse"))
@@ -850,7 +858,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             } else {
                 if (Debug.isSet("showResponse"))
                     System.out.println("Client Did not send a conditional GET. Sending complete Data response.");
-                BesAPI.writeASCII(rs.getDataset(), rs.getConstraintExpression(), bOut);
+                BesAPI.writeASCII(datasetName, constraintExpression, bOut);
             }
 
                     bOut.flush();
@@ -861,8 +869,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     public void sendHelpPage(HttpServletRequest request,
-                             HttpServletResponse response,
-                             ReqState rs)
+                             HttpServletResponse response)
             throws Exception  {
 
 
@@ -901,15 +908,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         pw.println("<h3>OPeNDAP Server Help</h3>");
         pw.println("To access most of the features of this OPeNDAP server, append");
-        pw.println("one of the following a eight suffixes to a URL: .das, .dds, .dods, .ddx, .blob, .info,");
+        pw.println("one of the following a eight suffixes to a URL: .das, .dds, .dods, .ddx, .info,");
         pw.println(".ver or .help. Using these suffixes, you can ask this server for:");
         pw.println("<dl>");
         pw.println("<dt> das  </dt> <dd> Dataset Attribute Structure (DAS)</dd>");
         pw.println("<dt> dds  </dt> <dd> Dataset Descriptor Structure (DDS)</dd>");
         pw.println("<dt> dods </dt> <dd> DataDDS object (A constrained DDS populated with data)</dd>");
         pw.println("<dt> ddx  </dt> <dd> XML version of the DDS/DAS</dd>");
-        pw.println("<dt> blob </dt> <dd> Serialized binary data content for requested data set, " +
-                "with the constraint expression applied.</dd>");
         pw.println("<dt> info </dt> <dd> info object (attributes, types and other information)</dd>");
         pw.println("<dt> html </dt> <dd> html form for this dataset</dd>");
         pw.println("<dt> ver  </dt> <dd> return the version number of the server</dd>");

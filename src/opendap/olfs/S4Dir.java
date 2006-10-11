@@ -53,12 +53,10 @@ public class S4Dir {
      *
      * @param request  The <code>HttpServletRequest</code> from the client.
      * @param response The <code>HttpServletResponse</code> for the client.
-     * @param rs       The request state object for this client request.
      * @see opendap.coreServlet.ReqState
      */
     public static void sendDIR(HttpServletRequest request,
-                               HttpServletResponse response,
-                               ReqState rs)
+                               HttpServletResponse response)
             throws Exception {
 
         if (Debug.isSet("showResponse"))
@@ -74,11 +72,13 @@ public class S4Dir {
         Iterator it;
         Element childDataset;
 
-        String targetURL = rs.getRequestURL();
+        String datasetName = ReqState.getDatasetName(request);
+        String requestSuffix = ReqState.getRequestSuffix(request);
+        String targetURL = ReqState.getRequestURL(request);
 
 
         if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - rs.getDataset():       "+rs.getDataset());
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - rs.getDataset():       "+datasetName);
 
 
 
@@ -89,16 +89,16 @@ public class S4Dir {
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
         // Make shure the dataset name is not null
-        if (rs.getDataset() == null)
+        name = datasetName;
+        if (name == null)
             name = "/";
-        else {
-            name = rs.getDataset();
-            if(name.endsWith("contents") && rs.getRequestSuffix().equalsIgnoreCase("html")){
-                if(Debug.isSet("S4Dir")) System.out.println("S4Dir - **** Client specifically requested 'contents.html' ****");
+        else if(name.endsWith("contents") && requestSuffix.equalsIgnoreCase("html")){
 
-                name = name.substring(0,name.lastIndexOf("contents"));
-                targetURL = targetURL.substring(0,targetURL.lastIndexOf("/contents"));
-            }
+            if(Debug.isSet("S4Dir")) System.out.println("S4Dir - **** Client specifically requested 'contents.html' ****");
+
+            name = name.substring(0,name.lastIndexOf("contents"));
+            targetURL = targetURL.substring(0,targetURL.lastIndexOf("/contents"));
+
         }
 
         if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);

@@ -256,17 +256,21 @@ public class OPeNDAPException extends Exception {
         try {
 
 
+            if(!response.isCommitted()){
+                response.reset();
+                response.setHeader("Content-Description", "dods_error");
+
+                // This should probably be set to "plain" but this works, the
+                // C++ slients don't barf as they would if I sent "plain" AND
+                // the C++ don't expect compressed data if I do this...
+                response.setHeader("Content-Encoding", "");
+
+                // Strip any double quotes out of the parser error message.
+                // These get stuck in auto-magically by the javacc generated parser
+                // code and they break our error parser (bummer!)
+            }
+
             BufferedOutputStream eOut = new BufferedOutputStream(response.getOutputStream());
-            response.setHeader("Content-Description", "dods_error");
-
-            // This should probably be set to "plain" but this works, the
-            // C++ slients don't barf as they would if I sent "plain" AND
-            // the C++ don't expect compressed data if I do this...
-            response.setHeader("Content-Encoding", "");
-
-            // Strip any double quotes out of the parser error message.
-            // These get stuck in auto-magically by the javacc generated parser
-            // code and they break our error parser (bummer!)
 
 
             OPeNDAPException oe;
@@ -290,6 +294,7 @@ public class OPeNDAPException extends Exception {
 
             }
             oe.print(eOut);
+            
 
         } catch (IOException ioe) {
             System.out.println("Cannot respond to client! IO Error: " + ioe.getMessage());

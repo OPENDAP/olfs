@@ -35,7 +35,6 @@ import thredds.servlet.DataRootHandler;
 import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
-import opendap.olfs.Version;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -99,7 +98,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-
     /**
      * ************************************************************************
      * Intitializes the servlet. Init (at this time) basically sets up
@@ -115,7 +113,6 @@ public class DispatchServlet extends HttpServlet {
         initDebug();
 
         PersistentContentHandler.installInitialContent(this);
-
 
 
         String className = getInitParameter("OpendapHttpDispatchHandlerImplementation");
@@ -165,11 +162,7 @@ public class DispatchServlet extends HttpServlet {
         sdh.init(this);
 
 
-
-
         initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
-
-
 
 
     }
@@ -273,6 +266,29 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
+    protected long getLastModified(HttpServletRequest req) {
+        return odh.getLastModified(req);
+    }
+
+
+    public void showRequest(HttpServletRequest req, long reqno) {
+        System.out.println("-------------------------------------------");
+        System.out.println("Server: " + getServerName() + "   Request #" + reqno);
+        System.out.println("Client: " + req.getRemoteHost());
+        System.out.println("Request Info:");
+        System.out.println("  dataSet:            '" + ReqState.getDatasetName(req) + "'");
+        System.out.println("  requestSuffix:      '" + ReqState.getRequestSuffix(req) + "'");
+        System.out.println("  CE:                 '" + ReqState.getConstraintExpression(req) + "'");
+        System.out.println("  requestURL:         '" + ReqState.getRequestURL(req) + "'");
+        System.out.println("  compressOK:          " + ReqState.getAcceptsCompressed(req));
+
+        DebugLog.println("Request dataset: '" + ReqState.getDatasetName(req) +
+                "' suffix: '" + ReqState.getRequestSuffix(req) +
+                "' CE: '" + ReqState.getConstraintExpression(req) + "'");
+
+    }
+
+
     /**
      * ***********************************************************************
      * Handles incoming requests from clients. Parses the request and determines
@@ -307,144 +323,125 @@ public class DispatchServlet extends HttpServlet {
 
         // response.setHeader("Last-Modified", (new Date()).toString() );
 
-        boolean isDebug = false;
-        ReqState rs;
 
         try {
             if (Debug.isSet("probeRequest"))
                 Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
-            rs = getRequestState(request);
-            if (rs != null) {
-                String ds = rs.getDataset();
-                String suff = rs.getRequestSuffix();
-                isDebug = ((ds != null) && ds.equals("/debug") && (suff != null) && suff.equals(""));
-            }
 
             synchronized (syncLock) {
                 long reqno = HitCounter++;
 
                 if (Debug.isSet("showRequest")) {
-                    System.out.println("-------------------------------------------");
-                    System.out.println("Server: " + getServerName() + "   Request #" + reqno);
-                    System.out.println("Client: " + request.getRemoteHost());
-                    System.out.println(rs.toString());
-                    DebugLog.println("Request dataset: '" + rs.getDataset() + "' suffix: '" + rs.getRequestSuffix() +
-                            "' CE: '" + rs.getConstraintExpression() + "'");
+                    showRequest(request, reqno);
                 }
 
             } // synch
 
-            if (rs != null) {
 
-                String dataSet = rs.getDataset();
-                String requestSuffix = rs.getRequestSuffix();
+            String dataSet = ReqState.getDatasetName(request);
+            String requestSuffix = ReqState.getRequestSuffix(request);
 
 
-                boolean specialRequest = false;
+            boolean specialRequest = false;
 
-                if(dataSet!=null) {
+            if (dataSet != null) {
 
-                    if (        // Version Response?
-                            dataSet.equalsIgnoreCase("/version")
-                            ) {
-                        odh.sendVersion(request, response);
-                        log.info("Sent Version Response");
-                        specialRequest = true;
+                if (        // Version Response?
+                        dataSet.equalsIgnoreCase("/version")
+                        ) {
+                    odh.sendVersion(request, response);
+                    log.info("Sent Version Response");
+                    specialRequest = true;
 
-                    } else if ( // Help Response?
-                            dataSet.equalsIgnoreCase("/help")             ||
-                                    dataSet.equalsIgnoreCase("/help/")    ||
-                                    requestSuffix.equalsIgnoreCase("help")
-                            ) {
-                        odh.sendHelpPage(request, response, rs);
-                        log.info("Sent Help Page");
-                        specialRequest = true;
+                } else if ( // Help Response?
+                        dataSet.equalsIgnoreCase("/help") ||
+                                dataSet.equalsIgnoreCase("/help/") ||
+                                ((requestSuffix != null) &&
+                                requestSuffix.equalsIgnoreCase("help"))
+                        ) {
+                    odh.sendHelpPage(request, response);
+                    log.info("Sent Help Page");
+                    specialRequest = true;
 
-                    } else if ( // System Properties Response?
-                            //Debug.isSet("SystemProperties") &&
-                            //dataSet!=null                                 &&
+                } else if ( // System Properties Response?
+                    //Debug.isSet("SystemProperties") &&
 
-                            dataSet.equalsIgnoreCase("/systemproperties")
-                            ) {
-                        Util.sendSystemProperties(request, response, odh);
-                        log.info("Sent System Properties");
-                        specialRequest = true;
+                        dataSet.equalsIgnoreCase("/systemproperties")
+                        ) {
+                    Util.sendSystemProperties(request, response, odh);
+                    log.info("Sent System Properties");
+                    specialRequest = true;
 
-                    } else if (    // Debug response?
-                            isDebug &&
-                            Debug.isSet("DebugInterface")) {
+                } else if (    // Debug response?
+                        Debug.isSet("DebugInterface") &&
+                                dataSet.equals("/debug") &&
+                                (requestSuffix != null) &&
+                                requestSuffix.equals("")) {
 
-                        DebugHandler.doDebug(this, request, response, odh, rs);
-                        log.info("Sent Debug Response");
-                        specialRequest = true;
+                    DebugHandler.doDebug(this, request, response, odh, this.getServletConfig());
+                    log.info("Sent Debug Response");
+                    specialRequest = true;
 
-                    } else if (  // Status Response?
-                           // dataSet!=null                                 &&
+                } else if (  // Status Response?
 
-                            dataSet.equalsIgnoreCase("/status")
-                            ) {
-                        doGetStatus(request, response, rs);
-                        log.info("Sent Status");
-                        specialRequest = true;
-
-                    }
+                        dataSet.equalsIgnoreCase("/status")
+                        ) {
+                    doGetStatus(request, response);
+                    log.info("Sent Status");
+                    specialRequest = true;
 
                 }
 
+            }
 
 
-
-                if(!specialRequest){
+            if (!specialRequest) {
 
 
                 if ( // Implied Directory request?
 
-                            dataSet == null       ||
-                            dataSet.equals("/")   ||
-                            dataSet.equals("")    ||
-                            dataSet.endsWith("/") ||
-                            requestSuffix.equals("")
+                        dataSet == null ||
+                                dataSet.equals("/") ||
+                                dataSet.equals("") ||
+                                dataSet.endsWith("/") ||
+                                requestSuffix.equals("")
 
-                    ) {
+                        ) {
 
 
-                    String redirect = request.getRequestURI();
-
-                    //System.out.println("redirect: "+redirect);
-
-                    if(!redirect.endsWith("/"))
-                        redirect = redirect +"/";
+                    String reDirect = request.getRequestURI();
 
                     //System.out.println("redirect: "+redirect);
 
+                    if (!reDirect.endsWith("/"))
+                        reDirect = reDirect + "/";
 
-                    if(odh.useOpendapDirectoryView())
-                        redirect += "contents.html";
+                    //System.out.println("redirect: "+redirect);
+
+
+                    if (odh.useOpendapDirectoryView())
+                        reDirect += "contents.html";
                     else
-                        redirect += "catalog.html";
-
+                        reDirect += "catalog.html";
 
                     //System.out.println("redirect: "+redirect);
 
+                    response.sendRedirect(reDirect);
+
+                    log.info("Sent Redirect To: " + reDirect);
 
 
-                    response.sendRedirect(redirect);
-
-                    log.info("Sent Redirect To: "+redirect);
-
-
-                } else if ( //  THREDDS Catalog or Directory response?
-                    dataSet.endsWith("contents") && requestSuffix.equalsIgnoreCase("html")){
+                } else if ( //  Directory response?
+                        dataSet.endsWith("contents") && requestSuffix.equalsIgnoreCase("html")) {
 
 
-                    odh.sendDir(request, response, rs);
+                    odh.sendDir(request, response);
 
                     log.info("Sent Contents (aka OPeNDAP directory).");
 
 
-
-                } else if ( //  THREDDS Catalog or Directory response?
+                } else if ( //  THREDDS Catalog ?
 
                         getThreddsCatalog(request, response)) {
 
@@ -454,72 +451,65 @@ public class DispatchServlet extends HttpServlet {
                 } else if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")
                         ) {
-                    odh.sendDDS(request, response, rs);
+                    odh.sendDDS(request, response);
                     log.info("Sent DDS");
 
                 } else if ( // DAS Response?
                         requestSuffix.equalsIgnoreCase("das")
                         ) {
-                    odh.sendDAS(request, response, rs);
+                    odh.sendDAS(request, response);
                     log.info("Sent DAS");
 
                 } else if (  // DDX Response?
                         requestSuffix.equalsIgnoreCase("ddx")
                         ) {
-                    odh.sendDDX(request, response, rs);
+                    odh.sendDDX(request, response);
                     log.info("Sent DDX");
 
                 } else if ( // Blob Response?
                         requestSuffix.equalsIgnoreCase("blob")
                         ) {
                     //doGetBLOB(request, response, rs);
-                    badURL(request, response, rs);
-                    log.info("Sent BAD URL Response because the asked for a Blob. Bad User!");
+                    badURL(request, response);
+                    log.info("Sent BAD URL Response because they asked for a Blob. Bad User!");
 
                 } else if ( // DataDDS (aka .dods) Response?
                         requestSuffix.equalsIgnoreCase("dods")
                         ) {
-                    odh.sendDODS(request, response, rs);
+                    odh.sendDODS(request, response);
                     log.info("Sent DAP2 Data");
 
                 } else if (  // ASCII Data Response.
                         requestSuffix.equalsIgnoreCase("asc") ||
                                 requestSuffix.equalsIgnoreCase("ascii")
                         ) {
-                    odh.sendASCII(request, response, rs);
+                    odh.sendASCII(request, response);
                     log.info("Sent ASCII");
 
                 } else if (  // Info Response?
                         requestSuffix.equalsIgnoreCase("info")
                         ) {
-                    odh.sendInfo(request, response, rs);
+                    odh.sendInfo(request, response);
                     log.info("Sent Info");
 
                 } else if (  //HTML Request Form (aka The Interface From Hell) Response?
                         requestSuffix.equalsIgnoreCase("html") ||
                                 requestSuffix.equalsIgnoreCase("htm")
                         ) {
-                    odh.sendHTMLRequestForm(request, response, rs);
+                    odh.sendHTMLRequestForm(request, response);
                     log.info("Sent HTML Request Form");
 
 
-
                 } else if (requestSuffix.equals("")) {
-                    badURL(request, response, rs);
+                    badURL(request, response);
                     log.info("Sent BAD URL (missing Suffix)");
 
                 } else {
-                    badURL(request, response, rs);
+                    badURL(request, response);
                     log.info("Sent BAD URL - nothing left to check.");
                 }
 
-            } else {
-                badURL(request, response, rs);
-                log.info("Sent BAD URL - ReqState Object was null.");
             }
-
-            }
-
 
         } catch (Throwable e) {
             OPeNDAPException.anyExceptionHandler(e, response);
@@ -530,19 +520,10 @@ public class DispatchServlet extends HttpServlet {
     //**************************************************************************
 
 
-    /**
-     * @param request
-     * @return The ReqState object for the passed HttpServlerRequest
-     */
-    private ReqState getRequestState(HttpServletRequest request) {
-
-        return new ReqState(request, getServletConfig(), getServerName());
-    }
-
 
     /**
      * This helper function makes sure that an empty request path dosn't bone the THREDDS code
-     * for no good reason. IN other wors the top level catalog gets returned even when the URL doesn't
+     * for no good reason. IN other words the top level catalog gets returned even when the URL doesn't
      * end in a "/"
      *
      * @param req Client Request
@@ -551,7 +532,8 @@ public class DispatchServlet extends HttpServlet {
      * @throws IOException
      * @throws ServletException
      */
-    private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res)
+            throws IOException, ServletException {
 
 
         if ((req.getPathInfo() == null)) {
@@ -576,8 +558,7 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      */
     public void doGetStatus(HttpServletRequest request,
-                            HttpServletResponse response,
-                            ReqState rs)
+                            HttpServletResponse response)
             throws IOException, ServletException {
 
 
@@ -614,8 +595,7 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      */
     public void badURL(HttpServletRequest request,
-                       HttpServletResponse response,
-                       ReqState rs)
+                       HttpServletResponse response)
             throws IOException, ServletException {
 
         if (Debug.isSet("showResponse"))
@@ -633,12 +613,20 @@ public class DispatchServlet extends HttpServlet {
 
 
         pw.println("<h3>Error in URL</h3>");
-        pw.println("The URL extension did not match any that are known by this");
-        pw.println("server. Below is a list of the five extensions that are be recognized by");
-        pw.println("all OPeNDAP servers. If you think that the server is broken (that the URL you");
+        pw.println("<p>The URL extension did not match any that are known by this");
+        pw.println("server. Here is a list of the five extensions that are be recognized by");
+        pw.println("all OPeNDAP servers:</p>");
+        pw.println("<ui>");
+        pw.println("    <li>dds</li>");
+        pw.println("    <li>das</li>");
+        pw.println("    <li>dods</li>");
+        pw.println("    <li>info</li>");
+        pw.println("    <li>html</li>");
+        pw.println("</ui>");
+        pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a><p>");
+        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
 
         pw.flush();
 

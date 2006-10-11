@@ -70,6 +70,12 @@ public interface OpendapHttpDispatchHandler {
      */
     public String getVersionStringForTHREDDSCatalog();
 
+
+    public long getLastModified(HttpServletRequest req);
+
+
+
+
     /**
      * Handles the client's DDX request.
      *
@@ -77,13 +83,11 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDDX(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs) throws Exception;
+                        HttpServletResponse response)
+            throws Exception;
 
     /**
      * Handles the client's DAS request.
@@ -92,13 +96,11 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDAS(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs) throws Exception;
+                        HttpServletResponse response)
+                        throws Exception;
 
     /**
      * ------------------------------------------------------------------------------
@@ -111,13 +113,11 @@ public interface OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDDS(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs) throws Exception;
+                        HttpServletResponse response)
+                        throws Exception;
 
     /**
      * ------------------------------------------------------------------------------
@@ -128,13 +128,11 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param rs       The ReqState of this client request. Contains all kinds of
-     *                 important stuff.
      * @see ReqState
      */
     public void sendDODS(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs) throws Exception;
+                         HttpServletResponse response)
+                         throws Exception;
 
 
     /**--------------------------------------------------------------------------------
@@ -144,8 +142,8 @@ public interface OpendapHttpDispatchHandler {
      * OPeNDAP enabled application such as MS-Excel.
      */
     public void sendASCII(HttpServletRequest request,
-                          HttpServletResponse response,
-                          ReqState rs) throws Exception;
+                          HttpServletResponse response)
+                          throws Exception;
 
     /**
      * ************************************************************************
@@ -184,16 +182,13 @@ public interface OpendapHttpDispatchHandler {
      * <p/>
      * <h3>Look for the user supplied Server- and dataset-specific HTML* documents.</h3>
      *
-     * @param rs The ReqState object for theis client request.
      * @see ReqState
      */
     public void sendInfo(HttpServletRequest request,
-                         HttpServletResponse response,
-                         ReqState rs) throws Exception;
+                         HttpServletResponse response) throws Exception;
 
     public void sendDir(HttpServletRequest request,
-                        HttpServletResponse response,
-                        ReqState rs) throws Exception;
+                        HttpServletResponse response) throws Exception;
 
 
     public boolean useOpendapDirectoryView();
@@ -216,12 +211,10 @@ public interface OpendapHttpDispatchHandler {
                             HttpServletResponse response) throws Exception;
 
     public void sendHelpPage(HttpServletRequest request,
-                             HttpServletResponse response,
-                             ReqState rs) throws Exception;
+                             HttpServletResponse response) throws Exception;
 
     public void sendHTMLRequestForm(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    ReqState rs) throws Exception;
+                                    HttpServletResponse response) throws Exception;
 
 
     /**
@@ -235,8 +228,7 @@ public interface OpendapHttpDispatchHandler {
      */
 
     public void sendCatalog(HttpServletRequest request,
-                            HttpServletResponse response,
-                            ReqState rs) throws Exception;
+                            HttpServletResponse response) throws Exception;
 
 
 }

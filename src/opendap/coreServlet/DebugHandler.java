@@ -28,10 +28,12 @@ package opendap.coreServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.StringTokenizer;
 import java.util.Iterator;
+import java.util.Enumeration;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,7 +55,7 @@ public class DebugHandler {
     public static void doDebug(HttpServlet servlet, HttpServletRequest request,
                                HttpServletResponse response,
                                OpendapHttpDispatchHandler odh,
-                               ReqState rs) throws IOException {
+                               ServletConfig sc) throws IOException {
 
 
         response.setContentType("text/html");
@@ -66,7 +68,7 @@ public class DebugHandler {
         pw.println("<title>Debugging</title>");
         pw.println("<body><pre>");
 
-        StringTokenizer tz = new StringTokenizer(rs.getConstraintExpression(), "=;");
+        StringTokenizer tz = new StringTokenizer(ReqState.getConstraintExpression(request), "=;");
         while (tz.hasMoreTokens()) {
             String cmd = tz.nextToken();
             pw.println("Cmd= " + cmd);
@@ -97,7 +99,20 @@ public class DebugHandler {
                     pw.println("  " + key + " " + Debug.isSet(key));
                 }
             } else if (cmd.equals("showInitParameters")) {
-                pw.println(rs.toString());
+
+
+                String ts = "  InitParameters:\n";
+                Enumeration e = sc.getInitParameterNames();
+                while (e.hasMoreElements()) {
+                    String name = (String) e.nextElement();
+                    String value = sc.getInitParameter(name);
+
+                    ts += "    " + name + ": '" + value + "'\n";
+                }
+
+                pw.println(ts);
+
+
             } else if (cmd.equals("showRequest")) {
                 Util.probeRequest(pw, servlet, request, servlet.getServletContext(), servlet.getServletConfig());
             } else if (!doDebugCmd(cmd, tz, pw)) { // for subclasses
