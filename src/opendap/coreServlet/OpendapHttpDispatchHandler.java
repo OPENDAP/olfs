@@ -83,7 +83,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDDX(HttpServletRequest request,
                         HttpServletResponse response)
@@ -96,7 +96,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDAS(HttpServletRequest request,
                         HttpServletResponse response)
@@ -113,7 +113,7 @@ public interface OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDDS(HttpServletRequest request,
                         HttpServletResponse response)
@@ -128,7 +128,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDODS(HttpServletRequest request,
                          HttpServletResponse response)
@@ -182,7 +182,7 @@ public interface OpendapHttpDispatchHandler {
      * <p/>
      * <h3>Look for the user supplied Server- and dataset-specific HTML* documents.</h3>
      *
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendInfo(HttpServletRequest request,
                          HttpServletResponse response) throws Exception;

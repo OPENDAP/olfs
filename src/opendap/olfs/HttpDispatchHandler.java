@@ -303,15 +303,15 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDAS(HttpServletRequest request,
                         HttpServletResponse response)
             throws Exception {
 
 
-        String datasetName = ReqState.getDatasetName(request);
-        String constraintExpression =  ReqState.getConstraintExpression(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String constraintExpression =  ReqInfo.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
             System.out.println("doGetDAS for dataset: " + datasetName);
@@ -372,14 +372,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDDS(HttpServletRequest request,
                         HttpServletResponse response)
             throws Exception {
 
-        String datasetName = ReqState.getDatasetName(request);
-        String constraintExpression =  ReqState.getConstraintExpression(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String constraintExpression =  ReqInfo.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
             System.out.println("doGetDDS for dataset: " + datasetName);
@@ -442,14 +442,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDDX(HttpServletRequest request,
                         HttpServletResponse response)
             throws Exception {
 
-        String datasetName = ReqState.getDatasetName(request);
-        String constraintExpression =  ReqState.getConstraintExpression(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String constraintExpression =  ReqInfo.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
             System.out.println("doGetDDX for dataset: " + datasetName);
@@ -511,14 +511,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void sendDODS(HttpServletRequest request,
                          HttpServletResponse response)
             throws Exception {
 
-        String datasetName = ReqState.getDatasetName(request);
-        String constraintExpression =  ReqState.getConstraintExpression(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String constraintExpression =  ReqInfo.getConstraintExpression(request);
 
         if (Debug.isSet("showResponse"))
             System.out.println("doGetOPeNDAP For: " + datasetName);
@@ -533,7 +533,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         OutputStream bOut;
 
 
-        if (ReqState.getAcceptsCompressed(request)) {
+        if (ReqInfo.getAcceptsCompressed(request)) {
             response.setHeader("Content-Encoding", "deflate");
             bOut = new DeflaterOutputStream(sOut);
         } else {
@@ -659,7 +659,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         // Strip off the catalog request
 
-        String path = ReqState.getDatasetName(request);
+        String path = ReqInfo.getDatasetName(request);
         path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
 
         path = BESCrawlableDataset.besPath2ThreddsPath(path);
@@ -732,8 +732,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
                                     HttpServletResponse response)
             throws Exception  {
 
-        String datasetName = ReqState.getDatasetName(request);
-        String requestSuffix = ReqState.getRequestSuffix(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -778,7 +778,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception  {
 
 
-        String datasetName = ReqState.getDatasetName(request);
+        String datasetName = ReqInfo.getDatasetName(request);
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -806,8 +806,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception  {
 
 
-        String datasetName = ReqState.getDatasetName(request);
-        String constraintExpression =  ReqState.getConstraintExpression(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String constraintExpression =  ReqInfo.getConstraintExpression(request);
 
         response.setContentType("text/plain");
         response.setHeader("XDODS-Server", getXDODSServerVersion());
@@ -825,7 +825,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             ServletOutputStream sOut = response.getOutputStream();
 
-            if (ReqState.getAcceptsCompressed(request)) {
+            if (ReqInfo.getAcceptsCompressed(request)) {
                 response.setHeader("Content-Encoding", "deflate");
                 bOut = new DeflaterOutputStream(sOut);
             } else {

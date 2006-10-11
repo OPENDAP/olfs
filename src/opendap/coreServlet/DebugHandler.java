@@ -68,7 +68,7 @@ public class DebugHandler {
         pw.println("<title>Debugging</title>");
         pw.println("<body><pre>");
 
-        StringTokenizer tz = new StringTokenizer(ReqState.getConstraintExpression(request), "=;");
+        StringTokenizer tz = new StringTokenizer(ReqInfo.getConstraintExpression(request), "=;");
         while (tz.hasMoreTokens()) {
             String cmd = tz.nextToken();
             pw.println("Cmd= " + cmd);

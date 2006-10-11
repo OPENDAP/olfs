@@ -276,15 +276,15 @@ public class DispatchServlet extends HttpServlet {
         System.out.println("Server: " + getServerName() + "   Request #" + reqno);
         System.out.println("Client: " + req.getRemoteHost());
         System.out.println("Request Info:");
-        System.out.println("  dataSet:            '" + ReqState.getDatasetName(req) + "'");
-        System.out.println("  requestSuffix:      '" + ReqState.getRequestSuffix(req) + "'");
-        System.out.println("  CE:                 '" + ReqState.getConstraintExpression(req) + "'");
-        System.out.println("  requestURL:         '" + ReqState.getRequestURL(req) + "'");
-        System.out.println("  compressOK:          " + ReqState.getAcceptsCompressed(req));
+        System.out.println("  dataSet:            '" + ReqInfo.getDatasetName(req) + "'");
+        System.out.println("  requestSuffix:      '" + ReqInfo.getRequestSuffix(req) + "'");
+        System.out.println("  CE:                 '" + ReqInfo.getConstraintExpression(req) + "'");
+        System.out.println("  requestURL:         '" + ReqInfo.getRequestURL(req) + "'");
+        System.out.println("  compressOK:          " + ReqInfo.getAcceptsCompressed(req));
 
-        DebugLog.println("Request dataset: '" + ReqState.getDatasetName(req) +
-                "' suffix: '" + ReqState.getRequestSuffix(req) +
-                "' CE: '" + ReqState.getConstraintExpression(req) + "'");
+        DebugLog.println("Request dataset: '" + ReqInfo.getDatasetName(req) +
+                "' suffix: '" + ReqInfo.getRequestSuffix(req) +
+                "' CE: '" + ReqInfo.getConstraintExpression(req) + "'");
 
     }
 
@@ -315,7 +315,7 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @see ReqState
+     * @see ReqInfo
      */
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
@@ -339,8 +339,8 @@ public class DispatchServlet extends HttpServlet {
             } // synch
 
 
-            String dataSet = ReqState.getDatasetName(request);
-            String requestSuffix = ReqState.getRequestSuffix(request);
+            String dataSet = ReqInfo.getDatasetName(request);
+            String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
             boolean specialRequest = false;

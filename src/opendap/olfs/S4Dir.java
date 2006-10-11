@@ -26,7 +26,7 @@
 package opendap.olfs;
 
 import opendap.coreServlet.Debug;
-import opendap.coreServlet.ReqState;
+import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +53,7 @@ public class S4Dir {
      *
      * @param request  The <code>HttpServletRequest</code> from the client.
      * @param response The <code>HttpServletResponse</code> for the client.
-     * @see opendap.coreServlet.ReqState
+     * @see opendap.coreServlet.ReqInfo
      */
     public static void sendDIR(HttpServletRequest request,
                                HttpServletResponse response)
@@ -72,9 +72,9 @@ public class S4Dir {
         Iterator it;
         Element childDataset;
 
-        String datasetName = ReqState.getDatasetName(request);
-        String requestSuffix = ReqState.getRequestSuffix(request);
-        String targetURL = ReqState.getRequestURL(request);
+        String datasetName = ReqInfo.getDatasetName(request);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
+        String targetURL = ReqInfo.getRequestURL(request);
 
 
         if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);

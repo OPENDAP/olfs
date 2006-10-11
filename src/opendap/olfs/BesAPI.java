@@ -95,7 +95,7 @@ public class BesAPI {
     }
 
 /*
-    public static boolean configure(ReqState rs) throws BadConfigurationException {
+    public static boolean configure(ReqInfo rs) throws BadConfigurationException {
 
         String besHost = rs.getInitParameter("BackEndServer");
         if (besHost == null)

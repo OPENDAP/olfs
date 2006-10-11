@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Nathan Potter
  */
 
-public class ReqState {
+public class ReqInfo {
 
 
 
@@ -72,12 +72,12 @@ public class ReqState {
         // Figure out the data set name.
         String requestPath = req.getPathInfo();
 
-        if(Debug.isSet("ReqState")) System.out.println("ReqState - req.getPathInfo() = " + requestPath);
+        if(Debug.isSet("ReqInfo")) System.out.println("ReqInfo - req.getPathInfo() = " + requestPath);
 
         // Is it a collection?
         if (requestPath == null || requestPath.endsWith("/")) {
             requestURL = req.getRequestURL().toString();
-            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a collection)");
+            if(Debug.isSet("ReqInfo")) System.out.println("ReqInfo - requestURL: "+requestURL+" (a collection)");
         } else {
             // It appears to be a dataset.
 
@@ -89,7 +89,7 @@ public class ReqState {
             } else {
                 requestURL = req.getRequestURL().toString();
             }
-            if(Debug.isSet("ReqState")) System.out.println("ReqState - requestURL: "+requestURL+" (a dataset)");
+            if(Debug.isSet("ReqInfo")) System.out.println("ReqInfo - requestURL: "+requestURL+" (a dataset)");
         }
 
         return requestURL;
@@ -106,7 +106,7 @@ public class ReqState {
 
         String requestSuffix = null;
         String requestPath = req.getPathInfo();
-        if(Debug.isSet("ReqState")) System.out.println("ReqState - req.getPathInfo() = " + requestPath);
+        if(Debug.isSet("ReqInfo")) System.out.println("ReqInfo - req.getPathInfo() = " + requestPath);
 
 
         // Is it a dataset and not a collection?
@@ -133,7 +133,7 @@ public class ReqState {
     public static String getDatasetName(HttpServletRequest req){
 
         String requestPath = req.getPathInfo();
-        if(Debug.isSet("ReqState")) System.out.println("ReqState - req.getPathInfo() = " + requestPath);
+        if(Debug.isSet("ReqInfo")) System.out.println("ReqInfo - req.getPathInfo() = " + requestPath);
 
 
         String dataSetName = requestPath;
