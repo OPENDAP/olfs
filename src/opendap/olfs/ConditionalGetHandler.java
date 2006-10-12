@@ -37,6 +37,7 @@ import java.util.*;
  * User: ndp
  * Date: Aug 22, 2006
  * Time: 1:55:29 PM
+ * @deprecated
  */
 public class ConditionalGetHandler {
 

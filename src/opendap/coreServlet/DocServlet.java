@@ -35,6 +35,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
+import java.util.Date;
 
 import thredds.servlet.ServletUtil;
 
@@ -66,9 +67,62 @@ public class DocServlet extends HttpServlet {
 
         }
 
+        if(Debug.isSet("DocServlet")) System.out.println("DocServlet - documentsDirectory: "+documentsDirectory);
 
 
     }
+
+
+
+
+    /*
+
+
+
+    public long getLastModified(HttpServletRequest req){
+
+        long lmt;
+
+
+        String name = getName(req);
+
+        File f = new File(name);
+
+        if(f.exists())
+            lmt =  f.lastModified();
+        else
+            lmt = -1;
+
+
+        if(Debug.isSet("DocServlet"))
+            System.out.println("DocServlet - Tomcat requested lastModified for: "+name+" Returning: "+ new Date(lmt));
+
+        return lmt;
+
+
+    }
+
+*/
+
+
+
+
+    
+    private String getName(HttpServletRequest req){
+        String name = req.getPathInfo();
+
+        if(name==null)
+             name = "/";
+
+        if(name.endsWith("/"))
+            name += "index.html";
+
+        name = documentsDirectory + name;
+        return name;
+    }
+
+
+
 
 
 
@@ -77,27 +131,18 @@ public class DocServlet extends HttpServlet {
             throws IOException, ServletException {
 
 
-        if(Debug.isSet("DocServlet")) System.out.println("DocServlet - documentsDirectory: "+documentsDirectory);
 
 
-        String name = request.getPathInfo();
+        String name = getName(request);
 
 
-
-        if(name==null || name.equals("/"))
-             name = "/index.html";
-
-
-        name = documentsDirectory + name;
-
-
-        if(Debug.isSet("DocServlet")) System.out.println("DocServlet - I think the client requested this: "+name);
+        if(Debug.isSet("DocServlet")) System.out.print("DocServlet - The client requested this: "+name);
 
 
         File f = new File(name);
 
         if(f.exists()){
-            if(Debug.isSet("DocServlet")) System.out.println("Requested item EXISTS!");
+            if(Debug.isSet("DocServlet")) System.out.println("   Requested item EXISTS!");
 
 
             FileInputStream fis = new FileInputStream(f);
@@ -124,7 +169,7 @@ public class DocServlet extends HttpServlet {
 
         }
         else {
-            System.out.println("Requested item Does Not Exist.");
+            System.out.println("   Requested item Does Not Exist.");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         }

@@ -38,7 +38,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>S4Dir  showRequest showResponse</param-value>
+            <param-value>S4Dir  showRequest showResponse </param-value>
         </init-param>
 
 
@@ -65,7 +65,6 @@
 
         <load-on-startup>1</load-on-startup>
 
-        <!-- Define a security constraint on this application -->
     </servlet>
 
 

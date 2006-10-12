@@ -261,7 +261,6 @@
         depends="s4-lib,doc"
         description="Performs a clean build of the core software and assembles the WAR file."
         >
-        <copy file="${doc.dir}/servlet-index.html" tofile="${build.dist}/index.html"/>
 
 
 
@@ -282,10 +281,8 @@
 
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
-                <exclude name="index.html"/>
             </zipfileset>
 
-            <zipfileset file="${build.dist}/index.html" prefix="docs" />
 
             <zipfileset dir="${schema.dir}" prefix="schema" />
 
