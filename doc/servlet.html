@@ -28,7 +28,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </head>
 
 <body>
-<a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" width="206" height="93" border="0"></a>
+<a href="http://www.opendap.org"><img src="images/logo.gif" width="206" height="93" border="0"></a>
 <h1 align="left">Servlet Configuration And General Information<br>
 <span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
 <hr size="1" noshade="noshade">
@@ -92,14 +92,14 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
           &lt;host&gt;localhost&lt;/host&gt;
           &lt;port&gt;10002&lt;/port&gt;
       &lt;/BES&gt;
-	
+
       &lt;!-- Used to indicate which type of directory view clients see. This DOES NOT
-           affect the THREDDS catalogs! Only the HTML views of them. A value 
+           affect the THREDDS catalogs! Only the HTML views of them. A value
            of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
            of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.--&gt;
 
       &lt;DirectoryView&gt;THREDDS&lt;/DirectoryView&gt;
-	   
+
   &lt;/OLFSConfig&gt;</pre>
 <p>&nbsp;</p>
 <h2><strong>catalog.xml</strong></h2>
@@ -139,7 +139,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   elements. These allow you to abbreviate the URL or the servlet. By placing
    the servlet mappings:</p>
 <blockquote>
-  <pre> 
+  <pre>
 &lt;servlet-mapping&gt;
 	&lt;servlet-name&gt;argos&lt;/servlet-name&gt;
 	&lt;url-pattern&gt;/argos&lt;/url-pattern&gt;
@@ -213,19 +213,19 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 &lt;servlet&gt;
 
   &lt;servlet-name&gt;s4&lt;/servlet-name&gt;
-  
+
   &lt;servlet-class&gt;opendap.coreServlet.DispatchServlet&lt;/servlet-class&gt;
-  
+
   &lt;init-param&gt;
     &lt;param-name&gt;OpendapHttpDispatchHandlerImplementation&lt;/param-name&gt;
     &lt;param-value&gt;opendap.olfs.HttpDispatchHandler&lt;/param-value&gt;
   &lt;/init-param&gt;
-  
+
   &lt;init-param&gt;
     &lt;param-name&gt;OpendapSoapDispatchHandlerImplementation&lt;/param-name&gt;
     &lt;param-value&gt;opendap.olfs.SoapDispatchHandler&lt;/param-value&gt;
   &lt;/init-param&gt;
-  
+
   &lt;init-param&gt;
     &lt;param-name&gt;DebugOn&lt;/param-name&gt;
     &lt;param-value&gt;showRequest probeRequest showResponse CE BES S4Dir ReqState&lt;/param-value&gt;
@@ -279,7 +279,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>&nbsp;</p>
 <h2><strong>Limitations</strong></h2>
 <p> Officially Tomcat security supports <em>context</em> level authentication. What this means is that you can restrict access to the collection of servlets running in a single web application - in other words all of the stuff that is defined in a single <strong>web.xml</strong> file. You can call out different authentication rules for different <em>&lt;url-pattern&gt;'</em>s within the web application, but only clients do not cache ANY security information will be able to easily access the different areas. For example in your<strong> web.xml</strong> file you might have:</p>
-<pre> 
+<pre>
     &lt;security-constraint&gt;
         &lt;web-resource-collection&gt;
             &lt;web-resource-name&gt;fnoc1&lt;/web-resource-name&gt;
@@ -289,7 +289,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
             &lt;role-name&gt;fn1&lt;/role-name&gt;
         &lt;/auth-constraint&gt;
     &lt;/security-constraint&gt;
-    
+
     &lt;security-constraint&gt;
         &lt;web-resource-collection&gt;
              &lt;web-resource-name&gt;fnoc2&lt;/web-resource-name&gt;
@@ -299,7 +299,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
              &lt;role-name&gt;fn2&lt;/role-name&gt;
           &lt;/auth-constraint&gt;
     &lt;/security-constraint&gt;
-    
+
     &lt;login-config&gt;
         &lt;auth-method&gt;BASIC&lt;/auth-method&gt;
         &lt;realm-name&gt;MyApplicationRealm&lt;/realm-name&gt;
@@ -328,25 +328,25 @@ The complete URI's would be:</p>
 <p>Here is an example of an <em>ENTITY</em> configuration: </p>
 <pre>
     &lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot;?&gt;
-    
+
     &lt;!DOCTYPE web-app
         PUBLIC &quot;-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN&quot;
         &quot;http://java.sun.com/j2ee/dtds/web-app_2_2.dtd&quot;
         [&lt;!ENTITY securityConfig      SYSTEM &quot;file:/fully/qualified/path/to/your/security/config.xml&quot;&gt;]
     &gt;
     &lt;web-app&gt;
-    
+
         &lt;!--
             Loads a persistent security configuration from the content directory.
             This configuration may be empty, in which case no security constraints will be
             applied by Tomcat.
         --&gt;
         &amp;securityConfig;
-        
+
         .
         .
         .
-        
+
     &lt;/web-app&gt;
  </pre>
 <p>This does not prevent you from losing your <strong>web.xml</strong> file  when a new version of Server4 is installed, but adding the <em>ENTITY</em> stuff to the new <strong>web.xml</strong> file would be easier than remembering an extensive security configuration. Of course, Y.M.M.V.</p>

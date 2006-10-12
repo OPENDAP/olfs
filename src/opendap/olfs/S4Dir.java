@@ -59,59 +59,36 @@ public class S4Dir {
                                HttpServletResponse response)
             throws Exception {
 
+
         if (Debug.isSet("showResponse"))
             System.out.println("sendDIR request = " + request);
 
-        String name, collectionName;
+        String name;
         String size;
         String lastModified;
         String link;
         String responseLinks;
+        PrintWriter pw = new PrintWriter(response.getOutputStream());
 
 
         Iterator it;
         Element childDataset;
 
-        String datasetName = ReqInfo.getDatasetName(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-        String targetURL = ReqInfo.getRequestURL(request);
+        String collectionName  = ReqInfo.getCollectionName(request);
+        String targetURL = request.getContextPath() + request.getServletPath() + collectionName;
 
 
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - rs.getDataset():       "+datasetName);
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:                  "+targetURL);
+        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - collectionName:        "+collectionName);
 
 
-
-        // clean up the url
-        if (targetURL.endsWith("/"))
-            targetURL = targetURL.substring(0, targetURL.length() - 1);
-
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
-
-        // Make shure the dataset name is not null
-        name = datasetName;
-        if (name == null)
-            name = "/";
-        else if(name.endsWith("contents") && requestSuffix.equalsIgnoreCase("html")){
-
-            if(Debug.isSet("S4Dir")) System.out.println("S4Dir - **** Client specifically requested 'contents.html' ****");
-
-            name = name.substring(0,name.lastIndexOf("contents"));
-            targetURL = targetURL.substring(0,targetURL.lastIndexOf("/contents"));
-
-        }
-
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:             "+targetURL);
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - name:                  "+name);
-
-
-        boolean isTopLevel = name.equals("/");
+        boolean isTopLevel = collectionName.equals("/");
 
 
 
 
         // Get the catalog for this collection
-        Element dataset = BesAPI.showCatalog(name).getRootElement();
+        Element dataset = BesAPI.showCatalog(collectionName).getRootElement();
 
         // Compute White Space required for correct formating
         int headerSpace = 0;
@@ -124,32 +101,30 @@ public class S4Dir {
         }
         headerSpace += 10;
 
-        // get the name of the collection
-        name = dataset.getChildTextTrim("name");
 
-        // Figure out what the link to the parent directory looks like.
-//        if (name.endsWith("/"))
-//            collectionName = name.substring(0, name.length() - 1);
-//        else
-        collectionName = name;
+        String baseName; // The last item on the Collection path/name thingy
 
-        String baseName;
+        // Strip off a trailing / from the basename.
         if (collectionName.endsWith("/"))
             baseName = collectionName.substring(0, collectionName.length() - 1);
         else
             baseName = collectionName;
 
+        // Strip off any prefixed path (made of "/"'s)
         if (baseName.lastIndexOf("/") > 0)
             baseName = baseName.substring(baseName.lastIndexOf("/"), baseName.length());
 
         if(Debug.isSet("S4Dir")) System.out.println("S4Dir - baseName: "+baseName);
 
 
-        // Strip off the basename to make the link
+        // Strip basename from the end of the targetURL to make the link to the parent directory
         link = targetURL.substring(0, targetURL.lastIndexOf(baseName))+"/contents.html";
 
         // Set up the page.
         printHTMLHeader(collectionName, headerSpace, link, pw);
+
+
+
 
         // Build a line in the page for each child dataset/collection
         it = dataset.getChildren("dataset").iterator();
@@ -166,7 +141,7 @@ public class S4Dir {
             if (childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")) {
 
 
-                link = targetURL + "/" + name + "/contents.html";
+                link = targetURL +  name + "/contents.html";
 
                 responseLinks = "        " +
                         " -  " +
@@ -179,16 +154,17 @@ public class S4Dir {
                 name += "/";
                 size = " -";
             } else { /// It must be a dataset
-                link = targetURL + "/" + name + ".html";
+
+                link = targetURL + name + ".html";
 
                 // Build response links
 
                 responseLinks = "      " +
-                        "<a href=\"" + targetURL + "/" + name + ".ddx" + "\">ddx</a> " +
-                        "<a href=\"" + targetURL + "/" + name + ".dds" + "\">dds</a> " +
-                        "<a href=\"" + targetURL + "/" + name + ".das" + "\">das</a> " +
-                        "<a href=\"" + targetURL + "/" + name + ".info" + "\">info</a> " +
-                        "<a href=\"" + targetURL + "/" + name + ".html" + "\">html</a> ";
+                        "<a href=\"" + targetURL + name + ".ddx" + "\">ddx</a> " +
+                        "<a href=\"" + targetURL + name + ".dds" + "\">dds</a> " +
+                        "<a href=\"" + targetURL + name + ".das" + "\">das</a> " +
+                        "<a href=\"" + targetURL + name + ".info" + "\">info</a> " +
+                        "<a href=\"" + targetURL + name + ".html" + "\">html</a> ";
 
 
                 size = computeSizeString(size);
@@ -211,6 +187,9 @@ public class S4Dir {
 
 
     }
+
+
+
 
     private static void printHTMLHeader(String collectionName, int headerSpace, String parentLink, PrintWriter pw) {
 
@@ -248,6 +227,8 @@ public class S4Dir {
 
         pw.println("    </head>");
         pw.println("    <body>");
+        pw.println("        <img src='/opendap/docs/images/logo.gif' />");
+
         pw.println("        <h1>Contents of " + collectionName + "</h1>");
         pw.println("        <hr size=\"1\" noshade=\"noshade\">");
         pw.println("        <pre>");
@@ -272,6 +253,9 @@ public class S4Dir {
     private static void printHTMLFooter(PrintWriter pw, boolean isTopLevel) {
         pw.println("        </pre> ");
         pw.println("        <hr size=\"1\" noshade=\"noshade\">");
+        pw.println("        <span class=\"small\">THREDDS Catalog " +
+                "<a href='./catalog.html'>HTML</a> " +
+                "<a href='./catalog.xml'>XML</a></span>\n");
         pw.println("        <h3>" +
                    "            OPeNDAP Server4 ("+Version.getVersionString()+")");
 

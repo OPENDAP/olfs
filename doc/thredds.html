@@ -26,7 +26,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </head>
 
 <body>
-<a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" alt="OPeNDAP Banner" width="206" height="93" border="0" /></a>
+<a href="http://www.opendap.org"><img src="images/logo.gif" alt="OPeNDAP Banner" width="206" height="93" border="0" /></a>
 <h1 align="left">THREDDS Catalogs <br />
 <span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
 <hr size="1" noshade="noshade" />
@@ -41,19 +41,19 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>The additional important piece of configuration information is regarding the implementation of CrawlableDataset to be used with Server4, <em>opendap.olfs.BESCrawlableDataset</em>. This class must be specified in any<em> datsetScan</em> element used with server 4. </p>
 <p>Here is an example <em>catalog.xml</em> file:</p>
 <pre class="style13">
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; 
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;catalog name=&quot;Server4 Test Catalog&quot;
          xmlns=&quot;http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0&quot;
          xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
-		 
+
      &lt;!-- ************************************************************************************* --&gt;
-	 
+
      &lt;service name=&quot;OPeNDAP-Server4&quot; serviceType=&quot;OPeNDAP&quot; base=&quot;/opendap/ts/&quot;/&gt;
 
      &lt;datasetScan location=&quot;/root/nc&quot; path=&quot;nc&quot; name=&quot;NC&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
-	 
+
 	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
-		   
+
            &lt;filter&gt;
                &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
                &lt;include wildcard=&quot;*.nc&quot; /&gt;
@@ -64,9 +64,9 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
                &lt;serviceName&gt;OPeNDAP-Server4&lt;/serviceName&gt;
                &lt;authority&gt;opendap.org&lt;/authority&gt;
                &lt;dataType&gt;Random&lt;/dataType&gt;
-           &lt;/metadata&gt;     
+           &lt;/metadata&gt;
      &lt;/datasetScan&gt;
-	 
+
      &lt;!-- ************************************************************************************* --&gt;
 &lt;/catalog&gt;
 </pre>
@@ -74,7 +74,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>In particular note the following:</p>
 <ul>
   <li>The line in which the CrawlableDataset implementation is defined:
-  
+
     <pre>&lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt; </pre>
     Identifies the correct CrawlableDataset class for Server4 - the one that works with the <em>BES</em> to automatically generate catalogs. <br />
     <br />
@@ -86,7 +86,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 	&lt;datasetScan location=&quot;/root/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot;      serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;
 	&lt;datasetScan location=&quot;/root/jg&quot;  path=&quot;jg&quot;  name=&quot;JGOFFS Archive&quot;   serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;
 	&lt;datasetScan location=&quot;/root/ff&quot;  path=&quot;ff&quot;  name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
-	Where each <em>&lt;datasetScan&gt;</em> element may have it's own filter and inheritance rules. You MUST NOT lump them all into one    <em>&lt;datasetScan&gt;</em>element with one set of filter rules like so: 
+	Where each <em>&lt;datasetScan&gt;</em> element may have it's own filter and inheritance rules. You MUST NOT lump them all into one    <em>&lt;datasetScan&gt;</em>element with one set of filter rules like so:
 	<pre>
 	&lt;datasetScan location=&quot;/root&quot;     path=&quot;DATA&quot;  name=&quot;AllYourDataAreUs&quot;   serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
 	Because it does not work.

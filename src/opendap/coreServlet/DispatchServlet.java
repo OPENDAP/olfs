@@ -233,8 +233,8 @@ public class DispatchServlet extends HttpServlet {
                 odh.getVersionStringForTHREDDSCatalog(),
                 this.getDocsPath(),
                 "", // userCssPath
-                "images/cog.gif", // contextLogoPath
-                "images/opendap_logo_masthead.gif"  // instituteLogoPath
+                "docs/images/cog.gif", // contextLogoPath
+                "docs/images/logo.gif"  // instituteLogoPath
         );
 
         log.info("--- initialized " + getClass().getName());
@@ -276,13 +276,18 @@ public class DispatchServlet extends HttpServlet {
         System.out.println("Server: " + getServerName() + "   Request #" + reqno);
         System.out.println("Client: " + req.getRemoteHost());
         System.out.println("Request Info:");
-        System.out.println("  dataSet:            '" + ReqInfo.getDatasetName(req) + "'");
-        System.out.println("  requestSuffix:      '" + ReqInfo.getRequestSuffix(req) + "'");
-        System.out.println("  CE:                 '" + ReqInfo.getConstraintExpression(req) + "'");
-        System.out.println("  requestURL:         '" + ReqInfo.getRequestURL(req) + "'");
-        System.out.println("  compressOK:          " + ReqInfo.getAcceptsCompressed(req));
+        System.out.println("  dataSource:                   '" + ReqInfo.getDataSource(req) + "'");
+        System.out.println("  dataSetName:                  '" + ReqInfo.getDataSetName(req) + "'");
+        System.out.println("  collectionName:               '" + ReqInfo.getCollectionName(req) + "'");
+        System.out.println("  requestSuffix:                '" + ReqInfo.getRequestSuffix(req) + "'");
+        System.out.println("  CE:                           '" + ReqInfo.getConstraintExpression(req) + "'");
+        System.out.println("  requestURL:                   '" + ReqInfo.getRequestURL(req) + "'");
+        System.out.println("  compressOK:                    " + ReqInfo.getAcceptsCompressed(req));
+        System.out.println("  requestForOpendapContents:     " + ReqInfo.requestForOpendapContents(req));
+        System.out.println("  requestForTHREDDSCatalog:      " + ReqInfo.requestForTHREDDSCatalog(req));
+        System.out.println();
 
-        DebugLog.println("Request dataset: '" + ReqInfo.getDatasetName(req) +
+        DebugLog.println("Request dataSource: '" + ReqInfo.getDataSource(req) +
                 "' suffix: '" + ReqInfo.getRequestSuffix(req) +
                 "' CE: '" + ReqInfo.getConstraintExpression(req) + "'");
 
@@ -339,24 +344,25 @@ public class DispatchServlet extends HttpServlet {
             } // synch
 
 
-            String dataSet = ReqInfo.getDatasetName(request);
+            String dataSource = ReqInfo.getDataSource(request);
+            String dataSetName = ReqInfo.getDataSetName(request);
             String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
             boolean specialRequest = false;
 
-            if (dataSet != null) {
+            if (dataSource != null) {
 
                 if (        // Version Response?
-                        dataSet.equalsIgnoreCase("/version")
+                        dataSource.equalsIgnoreCase("/version")
                         ) {
                     odh.sendVersion(request, response);
                     log.info("Sent Version Response");
                     specialRequest = true;
 
                 } else if ( // Help Response?
-                        dataSet.equalsIgnoreCase("/help") ||
-                                dataSet.equalsIgnoreCase("/help/") ||
+                        dataSource.equalsIgnoreCase("/help") ||
+                                dataSource.equalsIgnoreCase("/help/") ||
                                 ((requestSuffix != null) &&
                                 requestSuffix.equalsIgnoreCase("help"))
                         ) {
@@ -367,7 +373,7 @@ public class DispatchServlet extends HttpServlet {
                 } else if ( // System Properties Response?
                     //Debug.isSet("SystemProperties") &&
 
-                        dataSet.equalsIgnoreCase("/systemproperties")
+                        dataSource.equalsIgnoreCase("/systemproperties")
                         ) {
                     Util.sendSystemProperties(request, response, odh);
                     log.info("Sent System Properties");
@@ -375,7 +381,7 @@ public class DispatchServlet extends HttpServlet {
 
                 } else if (    // Debug response?
                         Debug.isSet("DebugInterface") &&
-                                dataSet.equals("/debug") &&
+                                dataSource.equals("/debug") &&
                                 (requestSuffix != null) &&
                                 requestSuffix.equals("")) {
 
@@ -385,7 +391,7 @@ public class DispatchServlet extends HttpServlet {
 
                 } else if (  // Status Response?
 
-                        dataSet.equalsIgnoreCase("/status")
+                        dataSource.equalsIgnoreCase("/status")
                         ) {
                     doGetStatus(request, response);
                     log.info("Sent Status");
@@ -401,10 +407,10 @@ public class DispatchServlet extends HttpServlet {
 
                 if ( // Implied Directory request?
 
-                        dataSet == null ||
-                                dataSet.equals("/") ||
-                                dataSet.equals("") ||
-                                dataSet.endsWith("/") ||
+                        dataSource == null ||
+                                dataSource.equals("/") ||
+                                dataSource.equals("") ||
+                                dataSource.endsWith("/") ||
                                 requestSuffix.equals("")
 
                         ) {
@@ -420,20 +426,24 @@ public class DispatchServlet extends HttpServlet {
                     //System.out.println("redirect: "+redirect);
 
 
-                    if (odh.useOpendapDirectoryView())
+                    if (odh.useOpendapDirectoryView()) {
                         reDirect += "contents.html";
-                    else
+                        odh.sendDir(request, response);
+                    }
+                    else {
                         reDirect += "catalog.html";
-
+                        getThreddsCatalog(request, response);
+                    }
                     //System.out.println("redirect: "+redirect);
 
-                    response.sendRedirect(reDirect);
+                    //response.sendRedirect(reDirect);
 
-                    log.info("Sent Redirect To: " + reDirect);
+                    //log.info("Sent Redirect To: " + reDirect);
 
 
                 } else if ( //  Directory response?
-                        dataSet.endsWith("contents") && requestSuffix.equalsIgnoreCase("html")) {
+                        dataSetName.equalsIgnoreCase("contents") &&
+                        requestSuffix.equalsIgnoreCase("html")) {
 
 
                     odh.sendDir(request, response);
@@ -539,6 +549,7 @@ public class DispatchServlet extends HttpServlet {
         if ((req.getPathInfo() == null)) {
             String newPath = req.getRequestURL() + "/";
             res.sendRedirect(newPath);
+            log.info("Sent THREDDS redirect to avoid a null valued return to request.getPathInfo().");
             return true;
         }
 

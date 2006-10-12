@@ -34,7 +34,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </head>
 
 <body>
-<a href="http://www.opendap.org"><img src="images/opendap_logo_masthead.gif" alt="OPeNDAP Logo" width="206" height="93" border="0" /></a>
+<a href="http://www.opendap.org"><img src="images/logo.gif" alt="OPeNDAP Logo" width="206" height="93" border="0" /></a>
 <h1 align="left"> Installation<br />
   <span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
  <hr size="1" noshade="noshade">
@@ -71,7 +71,7 @@ release.</em>)</p>
 <blockquote>
   <p class="style1"> cp build/dist/opendap.war /usr/local/apache-tomcat-5.5.15/webapps/</p>
 </blockquote>
-<p>If you're replacing an old copy, make sure that remove the 'opendap' directory 
+<p>If you're replacing an old copy, make sure that remove the 'opendap' directory
 that Tomcat will have created when it was started. </p>
 <p>Configure the Tomcat environment by setting the environment variable CATALINA_HOME to the full
 path for the Tomcat distribution.<br />
@@ -102,7 +102,7 @@ In bash:</p>
 </blockquote>
 <p>To see an HTML directory of the top of your data archive. </p>
 <p>&nbsp;</p>
-<p>You can probably 
+<p>You can probably
   get a THREDDS catalog by appending&quot;catalog.html&quot; to the end of any URL that returns an HTML directory, like so: </p>
 <blockquote>
   <p> <a href="http://localhost:8080/opendap/s4/catalog.xml" class="style1">http://localhost:8080/opendap/s4/catalog.xml</a><br />
@@ -110,7 +110,7 @@ In bash:</p>
     <a href="http://localhost:8080/opendap/s4/data/nc/catalog.xml" class="style1">http://localhost:8080/opendap/s4/data/nc/catalog.xml</a></p>
 </blockquote>
 <p>Et cetera.</p>
-<p>Usage Note:  If you use ctrl-c to stop watching the tail of the servers output, make sure to run bin/shutdown.sh to 
+<p>Usage Note:  If you use ctrl-c to stop watching the tail of the servers output, make sure to run bin/shutdown.sh to
   shutdown Tomcat. If you don't, you may get errors when you next
 try to start the Tomcat server.</p>
 <hr size="1" noshade="noshade" />
