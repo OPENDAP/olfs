@@ -152,10 +152,11 @@ public class S4Dir {
 
 
                 name += "/";
-                size = " -";
+                size = "  -";
             } else { /// It must be a dataset
 
-                link = targetURL + name + ".html";
+                //link = targetURL + name + ".html";
+                link = request.getContextPath()+ "/file" + collectionName + name ;
 
                 // Build response links
 
@@ -182,7 +183,7 @@ public class S4Dir {
 
         }
 
-        printHTMLFooter(pw,isTopLevel);
+        printHTMLFooter(pw,targetURL,isTopLevel);
         pw.flush();
 
 
@@ -240,22 +241,22 @@ public class S4Dir {
         //pw.println("<A HREF=\"?C=N;O=D\">Name</a>"+getWhiteSpacePadding("Name",headerSpace)+"<A HREF=\"?C=M;O=A\">Last modified</a>            <A HREF=\"?C=S;O=A\">Size</a>        <A HREF=\"?C=D;O=A\">Description</a>");
 
         //No Images, No sorting links.
-        pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified            Size        Response Links");
+        pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified             Size        Response Links");
         pw.println("<hr size=\"1\" noshade=\"noshade\">");
         //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://experiments.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
         if (!collectionName.equals("/"))
-            pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>" + getWhiteSpacePadding("Parent Directory", headerSpace + 26) + "-");
+            pw.println("<A HREF=\"" + parentLink + "\">Parent Directory</a>" + getWhiteSpacePadding("Parent Directory", headerSpace + 27) + "-");
 
 
     }
 
-    private static void printHTMLFooter(PrintWriter pw, boolean isTopLevel) {
+    private static void printHTMLFooter(PrintWriter pw, String targetURL, boolean isTopLevel) {
         pw.println("        </pre> ");
         pw.println("        <hr size=\"1\" noshade=\"noshade\">");
         pw.println("        <span class=\"small\">THREDDS Catalog " +
-                "<a href='./catalog.html'>HTML</a> " +
-                "<a href='./catalog.xml'>XML</a></span>\n");
+                "<a href='"+targetURL+"catalog.html'>HTML</a> " +
+                "<a href='"+targetURL+"catalog.xml'>XML</a></span>\n");
         pw.println("        <h3>" +
                    "            OPeNDAP Server4 ("+Version.getVersionString()+")");
 
@@ -325,7 +326,7 @@ public class S4Dir {
                 break;
         }
 
-        result = getWhiteSpacePadding(result, 4) + result;
+        result = getWhiteSpacePadding(result, 5) + result;
         return result;
 
     }
