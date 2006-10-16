@@ -282,7 +282,7 @@ public class ReqInfo {
           String Encoding = req.getHeader("Accept-Encoding");
 
           if (Encoding != null)
-              isTiny = Encoding.equalsIgnoreCase("deflate");
+              isTiny = Encoding.contains("deflate");
           else
               isTiny = false;
 

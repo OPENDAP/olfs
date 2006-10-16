@@ -22,10 +22,11 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.coreServlet;
+package opendap.olfs;
 
 
-import opendap.olfs.BesAPI;
+import opendap.coreServlet.Debug;
+import opendap.coreServlet.OPeNDAPException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.IOException;
+
+
 
 /**
  * User: ndp
@@ -42,47 +45,35 @@ import java.io.IOException;
 public class FileServlet extends HttpServlet {
 
 
-
-
-    public void init(){
-
+    public void init() {
 
 
     }
 
 
-
-
-
-    public long getLastModified(HttpServletRequest req){
-
-        long lmt;
+    public long getLastModified(HttpServletRequest req) {
 
 
         String name = req.getPathInfo();
 
 
+        if (Debug.isSet("showRequest"))
+            System.out.print("FileServlet - getlastModified() for dataSource: " + name + "  ");
 
+        String path = BESCrawlableDataset.besPath2ThreddsPath(name);
 
+        try {
+            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
+            if (Debug.isSet("showRequest")) System.out.println("Returning: " + cd.lastModified());
 
-
-
-
-        
-        if(Debug.isSet("DocServlet"))
-            System.out.println("DocServlet - Tomcat requested lastModified for: "+name+" Returning: "+ new Date(lmt));
-
-        return lmt;
-
+            return cd.lastModified().getTime();
+        }
+        catch (Exception e) {
+            if (Debug.isSet("showRequest")) System.out.println("Returning: -1");
+            return -1;
+        }
 
     }
-
-
-
-
-
-
-
 
 
     public void doGet(HttpServletRequest req,
@@ -90,46 +81,23 @@ public class FileServlet extends HttpServlet {
             throws IOException, ServletException {
 
 
-
-
         String name = req.getPathInfo();
 
 
-        if(Debug.isSet("FileServlet")) System.out.print("FileServlet - The client requested this: "+name);
+        if (Debug.isSet("showRequest")) System.out.println("FileServlet - The client requested this: " + name);
 
 
-
-
-
-        try{
+        try {
             ServletOutputStream sos = response.getOutputStream();
-            BesAPI.writeFile(name,sos);
+            BesAPI.writeFile(name, sos);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
-        catch (Exception e){
-            OPeNDAPException.anyExceptionHandler(e,response);
+        catch (Exception e) {
+            OPeNDAPException.anyExceptionHandler(e, response);
         }
-
-
-
-
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

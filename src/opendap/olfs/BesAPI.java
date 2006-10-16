@@ -32,6 +32,8 @@ import opendap.ppt.PPTException;
 
 import java.io.*;
 import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -54,7 +56,144 @@ public class BesAPI {
     private static boolean _configured = false;
     private static final Object syncLock = new Object();
 
-    public static boolean configure(String host, int port) {
+    private static ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
+    private static Semaphore _checkOutFlag;
+    private static int _maxClients;
+
+    private static boolean useClientPool =  true;
+
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------- CLIENT POOL CODE -----------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+    /**
+     *
+     * @return
+     * @throws PPTException
+     * @throws BadConfigurationException
+     */
+    private static OPeNDAPClient getClient() throws PPTException, BadConfigurationException {
+
+        OPeNDAPClient odc;
+
+        try {
+            _checkOutFlag.acquire();
+
+            if(_clientQueue.size()==0){
+                odc = new OPeNDAPClient();
+                odc.startClient(getHost(), getPort());
+                if (Debug.isSet("BES")) System.out.println("BesAPI - Made new OPeNDAPClient.");
+
+
+            }
+            else {
+
+                odc = _clientQueue.take();
+                if (Debug.isSet("BES")) System.out.println("BesAPI - Retrieved OPeNDAPClient from queue.");
+            }
+
+            if (Debug.isSet("BES"))
+                odc.setOutput(System.out, true);
+            else {
+                DevNull devNull = new DevNull();
+                odc.setOutput(devNull, true);
+            }
+
+            return odc;
+        }
+        catch (InterruptedException e){
+           return null;
+        }
+
+    }
+
+    /**
+     *
+     * @param odc
+     * @throws PPTException
+     */
+    private static void returnClient(OPeNDAPClient odc) throws PPTException {
+
+        try {
+
+
+
+            String cmd = "delete definitions;\n";
+            odc.executeCommand(cmd);
+
+            cmd = "delete containers;\n";
+            odc.executeCommand(cmd);
+
+
+            odc.setOutput(null, false);
+
+            _clientQueue.put(odc);
+            _checkOutFlag.release();
+            if (Debug.isSet("BES")) System.out.println("BesAPI - Returned OPeNDAPClient to queue.");
+        }
+        catch (InterruptedException e){
+            e.printStackTrace(); // Don't do a thing
+        }
+
+    }
+
+
+
+
+
+    /**
+     *
+     */
+    public static void shutdownBES(){
+
+
+        try {
+            _checkOutFlag.acquireUninterruptibly(_maxClients);
+
+            int i = 0;
+            while (_clientQueue.size() > 0) {
+
+
+                OPeNDAPClient odc = _clientQueue.take();
+                if (Debug.isSet("BES")) System.out.println("BesAPI - Retrieved OPeNDAPClient["+ i++ +"] from queue.");
+
+                shutdownClient(odc);
+
+
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace(); // Do nothing
+        } catch (PPTException e) {
+            e.printStackTrace();  // Do nothing..
+        }
+
+
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+    public static boolean configure(String host, int port, int maxClients) {
 
         synchronized (syncLock) {
 
@@ -63,16 +202,23 @@ public class BesAPI {
 
             _besHost = host;
             _besPort = port;
+            _maxClients = maxClients;
+
+            _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(_maxClients);
+            _checkOutFlag = new Semaphore(_maxClients);
+
             _configured = true;
 
+
             System.out.println("BES is configured - Host: " + _besHost + "   Port: " + _besPort);
+
         }
 
         return true;
 
     }
 
-    public static boolean configure(OLFSConfig bc) {
+    public static boolean configure(BESConfig bc) {
 
         synchronized (syncLock) {
 
@@ -81,7 +227,14 @@ public class BesAPI {
 
             _besHost = bc.getBESHost();
             _besPort = bc.getBESPort();
+
+            _maxClients = bc.getBESMaxClients();
+
+            _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(_maxClients);
+            _checkOutFlag = new Semaphore(_maxClients);
+
             _configured = true;
+
 
             System.out.println("BES is configured - Host: " + _besHost + "   Port: " + _besPort);
         }
@@ -166,6 +319,27 @@ public class BesAPI {
     }
 
 
+    public static void writeFile(String dataset,
+                                OutputStream os)
+            throws BadConfigurationException, PPTException {
+
+        OPeNDAPClient oc;
+        if(useClientPool)
+            oc = getClient();
+        else
+            oc = startClient();
+
+        configureTransaction(oc, dataset, null, "stream");
+
+        getDataProduct(oc, getAPINameForStream(), os);
+
+        if(useClientPool)
+            returnClient(oc);
+        else
+            shutdownClient(oc);
+    }
+
+
     public static void writeDAS(String dataset,
                                 String constraintExpression,
                                 OutputStream os)
@@ -196,7 +370,11 @@ public class BesAPI {
             throws BadConfigurationException, PPTException {
 
 
-        OPeNDAPClient oc = startClient();
+        OPeNDAPClient oc;
+        if(useClientPool)
+            oc = getClient();
+        else
+            oc = startClient();
 
         configureTransaction(oc, dataset, null);
 
@@ -208,7 +386,10 @@ public class BesAPI {
         oc.executeCommand(cmd);
 
 
-        shutdownClient(oc);
+        if(useClientPool)
+            returnClient(oc);
+        else
+            shutdownClient(oc);
 
     }
 
@@ -413,11 +594,12 @@ public class BesAPI {
 
 
         OPeNDAPClient oc = new OPeNDAPClient();
+        oc.startClient(getHost(), getPort());
+
 
         if (Debug.isSet("BES"))
-            System.out.println("Starting OPeNDAPClient. BES - Host: " + _besHost + "  Port:" + _besPort);
+            System.out.println("Got OPeNDAPClient. BES - Host: " + _besHost + "  Port:" + _besPort);
 
-        oc.startClient(getHost(), getPort());
 
         if (Debug.isSet("BES"))
             oc.setOutput(System.out, true);
@@ -431,7 +613,15 @@ public class BesAPI {
     }
 
 
+
+
     public static void configureTransaction(OPeNDAPClient oc, String dataset, String constraintExpression)
+            throws PPTException {
+        configureTransaction(oc, dataset, constraintExpression, null);
+    }
+
+
+    public static void configureTransaction(OPeNDAPClient oc, String dataset, String constraintExpression, String type)
             throws PPTException {
         //String datasetPath = rs.getDataset();
         //String datasetType = "nc"; // No longer required as BES will determine data formats
@@ -439,7 +629,7 @@ public class BesAPI {
         //String ce = rs.getConstraintExpression();
 
         //String cmd = "set container in catalog values "+cName + ", " + datasetPath + ", " + datasetType + ";\n";
-        String cmd = "set container in catalog values " + dataset + ", " + dataset + ";\n";
+        String cmd = "set container in catalog values " + dataset + ", " + dataset + (type==null?"":", "+type)+ ";\n";
         if (Debug.isSet("BES")) System.out.print("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
 
@@ -479,6 +669,11 @@ public class BesAPI {
 
     public static String getAPINameForDDX() {
         return "ddx";
+    }
+
+
+    public static String getAPINameForStream() {
+        return "stream";
     }
 
 
@@ -532,13 +727,26 @@ public class BesAPI {
         if (Debug.isSet("BES")) System.out.println("Entered besGetTransaction().");
 
 
-        OPeNDAPClient oc = startClient();
+        OPeNDAPClient oc;
+
+        if(useClientPool)
+            oc = getClient();
+        else
+            oc = startClient();
+
+
 
         configureTransaction(oc, dataset, constraintExpression);
 
         getDataProduct(oc, product, os);
 
-        shutdownClient(oc);
+
+
+        if(useClientPool)
+            returnClient(oc);
+        else
+            shutdownClient(oc);
+
 
     }
 
@@ -547,30 +755,66 @@ public class BesAPI {
             throws PPTException, BadConfigurationException {
 
 
-        OPeNDAPClient oc = new OPeNDAPClient();
-
-        //System.out.println("BES - Host: "+_besHost+"  Port:"+_besPort);
-
-        oc.startClient(getHost(), getPort());
-
-        if (Debug.isSet("BES"))
-            oc.setOutput(System.out, true);
-        else {
-            DevNull devNull = new DevNull();
-            oc.setOutput(devNull, true);
+        OPeNDAPClient oc;
+        if(useClientPool){
+            oc = getClient();
         }
+        else {
+            oc = new OPeNDAPClient();
+
+            //System.out.println("BES - Host: "+_besHost+"  Port:"+_besPort);
+
+            oc.startClient(getHost(), getPort());
+
+            if (Debug.isSet("BES"))
+                oc.setOutput(System.out, true);
+            else {
+                DevNull devNull = new DevNull();
+                oc.setOutput(devNull, true);
+            }
+
+        }
+
+
 
         String cmd = "show " + product + ";\n";
         if (Debug.isSet("BES")) System.err.print("Sending command: " + cmd);
         oc.setOutput(os, false);
         oc.executeCommand(cmd);
 
-        if (Debug.isSet("BES")) System.out.print("Shutting down client...");
-        oc.setOutput(null, false);
-        oc.shutdownClient();
+
+
+        if(useClientPool){
+            returnClient(oc);
+        }
+        else {
+            if (Debug.isSet("BES")) System.out.print("Shutting down client...");
+            oc.setOutput(null, false);
+            oc.shutdownClient();
+        }
+
+
+
         if (Debug.isSet("BES")) System.out.println("Done.");
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

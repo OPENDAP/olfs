@@ -132,6 +132,8 @@ public class S4Dir {
 
             childDataset = (Element) it.next();
 
+            boolean isData = childDataset.getAttributeValue("isData").equalsIgnoreCase("true");
+
             name = childDataset.getChildTextTrim("name");
             size = childDataset.getChildTextTrim("size");
             lastModified = childDataset.getChild("lastmodified").getChildTextTrim("date") + " " +
@@ -155,8 +157,10 @@ public class S4Dir {
                 size = "  -";
             } else { /// It must be a dataset
 
-                //link = targetURL + name + ".html";
-                link = request.getContextPath()+ "/file" + collectionName + name ;
+                if(isData)
+                    link = targetURL + name + ".html";
+                else
+                    link = request.getContextPath()+ "/file" + collectionName + name ;
 
                 // Build response links
 

@@ -219,23 +219,20 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
         if (_config != null) {
 
-            //System.out.println("Configuring BES...");
-            String besHost = _config.getChildTextTrim("besHost", _config.getNamespace());
-            String besPortString = _config.getChildTextTrim("besPort", _config.getNamespace());
-            //System.out.println("besHost: "+besHost+"   besPortString: "+besPortString);
+            try {
+                BesAPI.configure(new BESConfig(_config));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            int besPort = Integer.parseInt(besPortString);
 
-            //System.out.println("besHost: "+besHost+"   besPort: "+besPort+"\n\n");
-
-            BesAPI.configure(besHost, besPort);
         } else {
             if (Debug.isSet("CrawlableDataset"))
                 System.out.println("Looks like we are already configured, checking...");
-            if (!BesAPI.isConfigured())
-                System.out.println("BES IS NOT CONFIGURED!\n\n\n");
         }
 
+        if (!BesAPI.isConfigured())
+            System.out.println("\n\n\n!!!!!!!!! BES IS NOT CONFIGURED !!!!!!!!\n\n\n");
 
     }
 

@@ -75,9 +75,6 @@ public class DocServlet extends HttpServlet {
 
 
 
-    /*
-
-
 
     public long getLastModified(HttpServletRequest req){
 
@@ -94,7 +91,7 @@ public class DocServlet extends HttpServlet {
             lmt = -1;
 
 
-        if(Debug.isSet("DocServlet"))
+        if(Debug.isSet("showRequest"))
             System.out.println("DocServlet - Tomcat requested lastModified for: "+name+" Returning: "+ new Date(lmt));
 
         return lmt;
@@ -102,12 +99,10 @@ public class DocServlet extends HttpServlet {
 
     }
 
-*/
 
 
 
 
-    
     private String getName(HttpServletRequest req){
         String name = req.getPathInfo();
 
@@ -136,13 +131,13 @@ public class DocServlet extends HttpServlet {
         String name = getName(request);
 
 
-        if(Debug.isSet("DocServlet")) System.out.print("DocServlet - The client requested this: "+name);
+        if(Debug.isSet("showRequest")) System.out.print("DocServlet - The client requested this: "+name);
 
 
         File f = new File(name);
 
         if(f.exists()){
-            if(Debug.isSet("DocServlet")) System.out.println("   Requested item EXISTS!");
+            if(Debug.isSet("showRequest")) System.out.println("   Requested item exists, sending.");
 
 
             FileInputStream fis = new FileInputStream(f);
@@ -169,7 +164,7 @@ public class DocServlet extends HttpServlet {
 
         }
         else {
-            System.out.println("   Requested item Does Not Exist.");
+            if(Debug.isSet("showRequest")) System.out.println("   Requested item does not exist. Returning '404 Not Found'");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         }

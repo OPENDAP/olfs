@@ -38,7 +38,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>S4Dir  showRequest showResponse </param-value>
+            <param-value>S4Dir  showException showRequest showResponse </param-value>
         </init-param>
 
 
@@ -62,6 +62,15 @@
         <servlet-name>docs</servlet-name>
 
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
+
+        <load-on-startup>1</load-on-startup>
+
+    </servlet>
+
+    <servlet>
+        <servlet-name>file</servlet-name>
+
+        <servlet-class>opendap.olfs.FileServlet</servlet-class>
 
         <load-on-startup>1</load-on-startup>
 
@@ -92,6 +101,15 @@
     <servlet-mapping>
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>file</servlet-name>
+        <url-pattern>/file</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>file</servlet-name>
+        <url-pattern>/file/*</url-pattern>
     </servlet-mapping>
 
 

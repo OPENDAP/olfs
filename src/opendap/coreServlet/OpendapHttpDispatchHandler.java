@@ -40,6 +40,7 @@ import javax.servlet.ServletException;
 public interface OpendapHttpDispatchHandler {
 
     public void init(HttpServlet ds) throws ServletException;
+    public void destroy();
 
 
     /**

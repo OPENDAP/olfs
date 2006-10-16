@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2005 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -26,49 +26,58 @@ package opendap.olfs;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
-import org.jdom.input.SAXBuilder;
 
 import java.io.*;
 
 /**
  * User: ndp
- * Date: Jul 24, 2006
- * Time: 1:25:01 PM
+ * Date: Oct 13, 2006
+ * Time: 5:00:33 PM
  */
-public class OLFSConfig {
+public class BESConfig {
 
-    private BESConfig  _besConfig;
-
-    private  boolean   _showTHREDDSDirectoryView;
+    private  String    _BESHost;
+    private  int       _BESPort;
+    private  int       _BESMaxClients;
     //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
 
 
-    OLFSConfig() {
-        _besConfig = new BESConfig();
-        _showTHREDDSDirectoryView = false;
+    BESConfig() {
+        _BESHost = "HostNameIsNotSet!";
+        _BESPort = -1;
+        _BESMaxClients = 1;
     }
 
-    OLFSConfig(Document olfsConfiguration) throws Exception{
+    BESConfig(Document besConfiguration) throws Exception{
 
-        configure(olfsConfiguration);
+        this();
+        configure(besConfiguration);
 
     }
 
+    BESConfig(Element besConfiguration) throws Exception{
+        this();
 
-    OLFSConfig(String filename) throws Exception {
+        configure(besConfiguration);
+
+    }
+
+    BESConfig(String filename) throws Exception {
+        this();
 
         File confFile = new File(filename);
 
 
         if(!confFile.exists()){
-            throw new Exception("OLFS configuration file \""+filename+"\" does not exist.");
+            throw new Exception("BES configuration file \""+filename+"\" does not exist.");
         }
 
         if(!confFile.canRead())
-            throw new Exception("OLFS configuration file \""+filename+"\" is not readable.");
+            throw new Exception("BES configuration file \""+filename+"\" is not readable.");
 
 
         // Parse the XML doc into a Document object.
@@ -82,44 +91,72 @@ public class OLFSConfig {
     }
 
 
+
+
+
     private void configure(Document olfsConfigurationDoc) throws Exception {
+        Element besConfig = olfsConfigurationDoc.getRootElement();
 
-        Element besConfig = olfsConfigurationDoc.getRootElement().getChild("BES");
+        configure(besConfig);
 
-        _besConfig = new BESConfig(besConfig);
+    }
 
+    private void configure(Element besConfig) throws Exception {
 
-
-        Element dirView = olfsConfigurationDoc.getRootElement().getChild("DirectoryView");
-        if( dirView!=null ){
-            String val = dirView.getTextTrim();
-
-            if(val.equalsIgnoreCase("THREDDS")){
-                setTHREDDSDirectoryView(true);
-            }
-            else if(val.equalsIgnoreCase("OPeNDAP")){
-                setTHREDDSDirectoryView(false);
-            }
-            else {
-                throw new Exception("In the OLFS Config, The Element <DirectoryView> may only contain content " +
-                                    "equal to \"THREDDS\" or \"OPeNDAP\". The value \n" + val + "\" is illegal.");
-            }
-        }
-        else {
-            setTHREDDSDirectoryView(false);
+        if( besConfig==null || !besConfig.getName().equals("BES")){
+            throw new Exception("BES configuration document does not contain neccessary content. " +
+                    "Missing <BES> element.");
         }
 
-        /*
-        if(olfsConfigurationDoc.getRootElement().getChild("UsePersistentContentDocs") != null)
-            setUsePersistentContentDocs(true);
-        else
-            setUsePersistentContentDocs(false);
-        */
+
+
+        Element host = besConfig.getChild("host");
+        Element port = besConfig.getChild("port");
+
+        if( host==null ){
+            throw new Exception("OLFS configuration document does not contain neccessary content. " +
+                    "<BES> Element is missing <host> element.");
+        }
+
+        if( port==null ){
+            throw new Exception("OLFS configuration document does not contain neccessary content. " +
+                    "<BES> Element is missing <prt> element.");
+
+        }
+
+        setBESHost(host.getTextTrim());
+        setBESPort(port.getTextTrim());
+
+
+
+        Element usePool = besConfig.getChild("ClientPool");
+
+
+        if( usePool!=null ){
+
+            String maxClients = usePool.getAttributeValue("MaxClients");
+
+            if(maxClients == null){
+                throw new Exception("OLFS configuration document does not contain neccessary content. " +
+                        "<ClientPool> element (in the <BES> Element) is missing a MaxClients attribute.");
+            }
+
+            int clients = Integer.parseInt(maxClients);
+
+            if(clients<1){
+                throw new Exception("OLFS configuration document does not contain correct content. " +
+                        "The value of the MaxClients attribute on the <ClientPool> element " +
+                        "(in the <BES> Element)  MUST an integer greater than 0 (zero).");
+            }
+            setBESMaxClients(clients);
+        }
 
 
 
 
     }
+
+
 
 
 
@@ -146,35 +183,54 @@ public class OLFSConfig {
 
 
     public Element getConfigElement(){
-        Element config = new Element("OLFSConfig");
-        Element bes = getBESConfig().getConfigElement();
 
-        Element dv = new Element("DirectoryView");
-        dv.setText((_showTHREDDSDirectoryView?"THREDDS":"OPeNDAP"));
+        Element bes = new Element("BES");
 
-        config.addContent(bes);
-        config.addContent(dv);
+        Element host = new Element("host");
+        host.setText(getBESHost());
 
-        return config;
+        Element port = new Element("port");
+        port.setText(String.valueOf(getBESPort()));
+
+
+        Element clientPool = new Element("ClientPool");
+        clientPool.setAttribute("MaxClients",Integer.toString(_BESMaxClients));
+
+        bes.addContent(host);
+        bes.addContent(port);
+        bes.addContent(clientPool);
+
+        return bes;
     }
 
 
 
 
-    public BESConfig getBESConfig(){
-        return _besConfig;
-    }
 
+    public void   setBESHost(String host){ _BESHost = host; }
+    public String getBESHost(){ return _BESHost; }
+
+
+    public void setBESPort(String port){ _BESPort = Integer.parseInt(port); }
+    public void setBESPort(int port){ _BESPort = port; }
+    public int  getBESPort() { return _BESPort; }
+
+
+
+    public void setBESMaxClients(String i){ _BESMaxClients = Integer.parseInt(i);   }
+    public void setBESMaxClients(int i){ _BESMaxClients = i;   }
+    public int  getBESMaxClients(){ return _BESMaxClients;  }
 
 
 
     public String toString(){
-        String s = "OLFSConfig:\n";
 
-        s += _besConfig;
+        String s = "";
+        s += "    BESConfig:\n";
+        s += "        Host:       " + getBESHost() + "\n";
+        s += "        Port:       " + getBESPort() + "\n";
+        s += "        MaxClients: " + getBESMaxClients() + "\n";
 
-        s += "    Directory View: "+(getTHREDDSDirectoryView()?"THREDDS":"OPeNDAP") + "\n";
-//        s += "    Use Persistent Content Documentation Directory ('docs'): "+usePersistentContentDocs() + "\n";
 
 
         return s;
@@ -183,10 +239,6 @@ public class OLFSConfig {
 
 
 
-
-
-    public void    setTHREDDSDirectoryView(boolean val){ _showTHREDDSDirectoryView = val; }
-    public boolean getTHREDDSDirectoryView(){ return _showTHREDDSDirectoryView; }
 
 
     //public void    setUsePersistentContentDocs(boolean val){ _usePersistentContentDocs = val; }
@@ -198,11 +250,10 @@ public class OLFSConfig {
 
     public static void main(String[] args) throws Exception{
 
-        OLFSConfig bc = new OLFSConfig();
+        BESConfig bc = new BESConfig();
 
 
-            bc.userConfigure();
-
+        bc.userConfigure();
 
     }
 
@@ -240,7 +291,7 @@ public class OLFSConfig {
      * @throws IOException
      */
 
-    public static void userConfigure(OLFSConfig bc) throws IOException {
+    public static void userConfigure(BESConfig bc) throws IOException {
         boolean done = false;
         String k;
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
@@ -248,10 +299,10 @@ public class OLFSConfig {
         while(!done){
 
             System.out.println("\n\n---------------------------------");
-            System.out.println("OLFS Configuration:");
+            System.out.println("BES Configuration:");
             config(bc);
 
-            System.out.println("\n\nYou Configured The OLFS Like This:\n"+bc);
+            System.out.println("\n\nYou Configured The BES Like This:\n"+bc);
             System.out.print("\nIs this acceptable? [Enter Y or N]: ");
             k = kybrd.readLine();
             if (!k.equals("")){
@@ -274,8 +325,8 @@ public class OLFSConfig {
 
                         }
                     }
-                    done = true;
                 }
+                done = true;
             }
             else
                 System.out.println("OK then! Try Again!\n\n");
@@ -283,59 +334,62 @@ public class OLFSConfig {
         }
     }
 
-    public static void config(OLFSConfig olfsConfig) throws IOException {
+    public static void config(BESConfig bc) throws IOException {
 
         String k;
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
         boolean done;
 
-        BESConfig.config(olfsConfig.getBESConfig());
-
-
         done = false;
         while(!done){
-            System.out.print("\nDo you want to use the THREDDS catalog as the default directory view?");
-            System.out.print("[" + olfsConfig.getTHREDDSDirectoryView() + "]: ");
+            System.out.print("\nEnter the name (or IP address) of the BES host. ");
+            System.out.print("[" + bc.getBESHost() + "]: ");
             k = kybrd.readLine();
-            if (k.equalsIgnoreCase("y") || k.equalsIgnoreCase("yes")){
-                olfsConfig.setTHREDDSDirectoryView(true);
+            if (!k.equals("")){
+                bc.setBESHost(k);
                 done = true;
             }
-            else if(k.equalsIgnoreCase("n") || k.equalsIgnoreCase("no")){
-                olfsConfig.setTHREDDSDirectoryView(false);
-                done = true;
-            }
-            else 
-                System.out.println("You must enter say 'yes' or 'no'.\n\n");
-        }
-
-
-
-        /*
-        done = false;
-        while(!done){
-            System.out.print("\nDo you want to use the 'docs' dir in the persistent content area as the documentation source?");
-            System.out.print("[" + olfsConfig.usePersistentContentDocs() + "]: ");
-            k = kybrd.readLine();
-            if (k.equalsIgnoreCase("y") || k.equalsIgnoreCase("yes")){
-                olfsConfig.setUsePersistentContentDocs(true);
-                done = true;
-            }
-            else if(k.equalsIgnoreCase("n") || k.equalsIgnoreCase("no")){
-                olfsConfig.setUsePersistentContentDocs(false);
-                done = true;
-            }
+            else if(bc.getBESHost()==null)
+                System.out.println("You must enter a hostname or IP address.\n\n");
             else
-                System.out.println("You must enter say 'yes' or 'no'.\n\n");
+                done = true;
         }
-        */
+
+        done = false;
+        while(!done){
+            System.out.print("\nEnter the port number for the BES host "+bc.getBESHost()+"   ");
+            System.out.print("[" + bc.getBESPort() + "]: ");
+            k = kybrd.readLine();
+            if (!k.equals("")){
+                bc.setBESPort(k);
+                done = true;
+            }
+            else if(bc.getBESPort()==-1)
+                System.out.println("You must enter a port number.\n\n");
+            else
+                done = true;
+        }
+
+
+
+        done = false;
+        while(!done){
+            System.out.print("\nEnter the maximum allowed number of BES client connections. ");
+            System.out.print("[" + bc.getBESMaxClients() + "]: ");
+            k = kybrd.readLine();
+            if (!k.equals("")){
+                bc.setBESMaxClients(k);
+            }
+
+            if(bc.getBESMaxClients()<1)
+                System.out.println("You must enter an integer greater than 0.\n\n");
+            else
+                done = true;
+        }
+
 
 
     }
-
-
-
-
 
 
 

@@ -35,6 +35,7 @@ import thredds.servlet.DataRootHandler;
 import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
+import opendap.olfs.BesAPI;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -663,5 +664,11 @@ public class DispatchServlet extends HttpServlet {
         SOAPRequestDispatcher.doPost(request, response, odh, sdh);
     }
 
+
+    public void destroy(){
+
+        odh.destroy();
+        super.destroy();
+    }
 
 }

@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.zip.DeflaterOutputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.jdom.JDOMException;
 import org.jdom.Document;
@@ -95,6 +96,14 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
+    public void destroy(){
+        BesAPI.shutdownBES();
+    }
+
+
+
+
+
     public String getVersionStringForTHREDDSCatalog(){
         return "OPeNDAP Server4 ("+ Version.getVersionString()+")" +
                 "<font size='-5' color='#5A647E'>" +
@@ -126,7 +135,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         try {
             _olfsConfig = new OLFSConfig(ServletUtil.getContentPath(ds) + filename);
 
-            if (BesAPI.configure(_olfsConfig))
+            if (BesAPI.configure(_olfsConfig.getBESConfig()))
                 System.out.println("");
             else
                 System.out.println("That's odd, it was already done...");
@@ -210,9 +219,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             for (Object o : getVersionDocument().getRootElement().getChildren()) {
                 Element pkg = (Element) o;
+                boolean first = true;
                 for (Object o1 : pkg.getChildren("lib")) {
                     Element lib = (Element) o1;
+                    if(!first)
+                        opsrv += ",";
                     opsrv += " " + lib.getChildTextTrim("name") + "/" + lib.getChildTextTrim("version");
+                    first = false;
                 }
             }
             return (opsrv);
@@ -483,16 +496,30 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         ServletOutputStream sOut = response.getOutputStream();
         OutputStream bOut;
 
-
+        //boolean compress = false;
+        /*
         if (ReqInfo.getAcceptsCompressed(request)) {
-            response.setHeader("Content-Encoding", "deflate");
-            bOut = new DeflaterOutputStream(sOut);
+            //compress = true;
+            response.setHeader("Content-Encoding", "gzip");
+            //DeflaterOutputStream dos = new DeflaterOutputStream(sOut);
+            DeflaterOutputStream dos = new GZIPOutputStream(sOut);
+            BesAPI.writeDap2Data(dataSource, constraintExpression, dos);
+            //dos.finish();
+            //dos.flush();
+            dos.close();
+            response.setStatus(HttpServletResponse.SC_OK);
+
         } else {
             // Commented out because of a bug in the OPeNDAP C++ stuff...
             //response.setHeader("Content-Encoding", "plain");
             bOut = new BufferedOutputStream(sOut);
+            BesAPI.writeDap2Data(dataSource, constraintExpression, bOut);
+            response.setStatus(HttpServletResponse.SC_OK);
+            bOut.flush();
         }
+*/
 
+        bOut = new BufferedOutputStream(sOut);
 
         BesAPI.writeDap2Data(dataSource, constraintExpression, bOut);
         response.setStatus(HttpServletResponse.SC_OK);
@@ -752,19 +779,34 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         ServletOutputStream sOut = response.getOutputStream();
 
+        /*
+        //boolean compress = false;
         if (ReqInfo.getAcceptsCompressed(request)) {
+            //compress = true;
             response.setHeader("Content-Encoding", "deflate");
-            bOut = new DeflaterOutputStream(sOut);
+            DeflaterOutputStream dos = new DeflaterOutputStream(sOut);
+            //DeflaterOutputStream dos = new GZIPOutputStream(sOut);
+            BesAPI.writeASCII(dataSource, constraintExpression, dos);
+            dos.finish();
+            dos.flush();
+            response.setStatus(HttpServletResponse.SC_OK);
+
         } else {
             // Commented out because of a bug in the OPeNDAP C++ stuff...
             //response.setHeader("Content-Encoding", "plain");
             bOut = new BufferedOutputStream(sOut);
+            BesAPI.writeASCII(dataSource, constraintExpression, bOut);
+            response.setStatus(HttpServletResponse.SC_OK);
+            bOut.flush();
         }
 
+*/
 
+        bOut = new BufferedOutputStream(sOut);
         BesAPI.writeASCII(dataSource, constraintExpression, bOut);
         response.setStatus(HttpServletResponse.SC_OK);
         bOut.flush();
+
 
 
     }
