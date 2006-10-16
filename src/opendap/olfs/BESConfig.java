@@ -129,24 +129,17 @@ public class BESConfig {
 
 
 
-        Element usePool = besConfig.getChild("ClientPool");
+        Element maxClients = besConfig.getChild("MaxClients");
 
 
-        if( usePool!=null ){
+        if( maxClients!=null ){
 
-            String maxClients = usePool.getAttributeValue("MaxClients");
 
-            if(maxClients == null){
-                throw new Exception("OLFS configuration document does not contain neccessary content. " +
-                        "<ClientPool> element (in the <BES> Element) is missing a MaxClients attribute.");
-            }
-
-            int clients = Integer.parseInt(maxClients);
+            int clients = Integer.parseInt(maxClients.getTextTrim());
 
             if(clients<1){
                 throw new Exception("OLFS configuration document does not contain correct content. " +
-                        "The value of the MaxClients attribute on the <ClientPool> element " +
-                        "(in the <BES> Element)  MUST an integer greater than 0 (zero).");
+                        "The <MaxClients> element MUST contain an integer greater than 0 (zero).");
             }
             setBESMaxClients(clients);
         }

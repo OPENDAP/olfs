@@ -160,9 +160,8 @@ class PPTClient {
             if (Debug.isSet("PPTClient")) System.out.println(" done.");
         }
         catch (IOException e) {
-            String msg = "Failed to write to socket\n";
+            String msg = "Failed to write to socket:  ";
             msg += e.getMessage();
-            closeConnection();
             throw new PPTException(msg, e);
         }
         return true;
