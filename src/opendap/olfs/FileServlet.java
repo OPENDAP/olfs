@@ -27,6 +27,8 @@ package opendap.olfs;
 
 import opendap.coreServlet.Debug;
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.MimeTypes;
+import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,9 +48,11 @@ import java.io.IOException;
  */
 public class FileServlet extends HttpServlet {
 
+    private MimeTypes mimeTypes;
+
 
     public void init() {
-
+        mimeTypes = new MimeTypes();
 
     }
 
@@ -86,7 +90,18 @@ public class FileServlet extends HttpServlet {
         String name = req.getPathInfo();
 
 
-        if (Debug.isSet("showRequest")) System.out.println("FileServlet - The client requested this: " + name);
+        if (Debug.isSet("showRequest")) System.out.print("FileServlet - The client requested this: " + name);
+
+        String suffix = ReqInfo.getRequestSuffix();
+
+        if(suffix!=null){
+            String mType = mimeTypes.getMimeType(suffix);
+            if(mType!=null)
+                response.setContentType(mType);
+            if(Debug.isSet("showRequest")) System.out.print("   MIME type: "+mType+"  ");
+        }
+
+        if (Debug.isSet("showRequest")) System.out.println();
 
 
         try {

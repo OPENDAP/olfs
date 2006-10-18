@@ -40,7 +40,7 @@ public class MimeTypes {
     /**
      * MIME Type to file extension mapping taken from: http://www.huw.id.au/code/fileTypeIDs.html
      */
-    MimeTypes(){
+    public MimeTypes(){
 
         // Plain Text
         typeMap.put("txt", "text/plain");
