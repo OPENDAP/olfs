@@ -50,6 +50,7 @@ public class DocServlet extends HttpServlet {
 
     private String documentsDirectory;
 
+    private MimeTypes mimeTypes;
 
 
     public void init(){
@@ -66,6 +67,8 @@ public class DocServlet extends HttpServlet {
 
         }
 
+        mimeTypes = new MimeTypes();
+
         if(Debug.isSet("DocServlet")) System.out.println("DocServlet - documentsDirectory: "+documentsDirectory);
 
 
@@ -78,6 +81,7 @@ public class DocServlet extends HttpServlet {
     public long getLastModified(HttpServletRequest req){
 
         long lmt;
+
 
 
         String name = getName(req);
@@ -136,7 +140,26 @@ public class DocServlet extends HttpServlet {
         File f = new File(name);
 
         if(f.exists()){
-            if(Debug.isSet("showRequest")) System.out.println("   Requested item exists, sending.");
+            if(Debug.isSet("showRequest")) System.out.print("   Requested item exists.");
+
+
+            String suffix = null;
+            if(name.lastIndexOf("/") < name.lastIndexOf(".")){
+                suffix = name.substring(name.lastIndexOf('.') + 1);
+            }
+
+
+            if(suffix!=null){
+                String mType = mimeTypes.getMimeType(suffix);
+                if(mType!=null)
+                    response.setContentType(mType);
+                if(Debug.isSet("showRequest")) System.out.print("   MIME type: "+mType+"  ");
+            }
+
+
+
+
+            if(Debug.isSet("showRequest")) System.out.println("   Sending.");
 
 
             FileInputStream fis = new FileInputStream(f);
