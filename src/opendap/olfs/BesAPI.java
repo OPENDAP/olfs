@@ -531,7 +531,7 @@ public class BesAPI {
     public static InputStream getDDXStream(String dataSource,
                                     String constraintExpression)
             throws BadConfigurationException, PPTException {
-     //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
+        //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
