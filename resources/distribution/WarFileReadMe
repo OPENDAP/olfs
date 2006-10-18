@@ -11,9 +11,9 @@ front end - the OLFS.
 
 To install the OLFS:
 
-1) Build and install the BES and whatever handlers you wish to use.  See: 
+1) Build and install the BES and whatever handlers you wish to use.  See:
 
-        http://www.opendap.org/download/s4_server.html 
+        http://www.opendap.org/download/s4_server.html
 
    for more information on that.
 
@@ -31,7 +31,7 @@ To install the OLFS:
 
 5) Point your favorite web browser at:
 
-        http://the.machine.on.which.you.are.running.tomcat:8080/opendap/ 
+        http://the.machine.on.which.you.are.running.tomcat:8080/opendap/docs/
 
    for configuration information for Server4.
 
