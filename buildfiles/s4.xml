@@ -149,7 +149,7 @@
         >
 
         <copy todir="${doc.dir}/javadoc" >
-            <fileset dir="${build.doc}/server4">
+            <fileset dir="${build.doc}/javadoc">
                 <include name="**/*"/>
             </fileset>
         </copy>
@@ -279,7 +279,7 @@
             <classes dir="${build.classes}"/>
 
 
-            <zipfileset dir="${doc.dir}" prefix="docs">
+            <zipfileset dir="${build.doc}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
                 <exclude name="_notes"/>
             </zipfileset>
