@@ -47,11 +47,6 @@ import thredds.servlet.ServletUtil;
 
 /**
  * Handler fo HTTP GET requests.
- * <p/>
- * User: ndp
- * Date: Feb 28, 2006
- * Time: 12:42:23 PM
- * To change this template use File | Settings | File Templates.
  */
 public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 

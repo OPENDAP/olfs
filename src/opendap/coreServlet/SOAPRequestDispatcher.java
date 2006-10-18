@@ -39,15 +39,19 @@ import opendap.soap.XMLNamespaces;
 import opendap.soap.ExceptionElementUtil;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Apr 4, 2006
- * Time: 12:50:10 PM
- * To change this template use File | Settings | File Templates.
+ * Handles SOAP requests that arrive via HTTP POST.
  */
 public class SOAPRequestDispatcher {
 
 
+    /**
+     * Handles SOAP requests that arrive via HTTP POST. No other POST functions supported.
+     *
+     * @param request
+     * @param response
+     * @param odh
+     * @param sdh
+     */
     public static void doPost(HttpServletRequest request,
                               HttpServletResponse response,
                               OpendapHttpDispatchHandler odh,
@@ -59,14 +63,7 @@ public class SOAPRequestDispatcher {
 
 
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @param odh
-     * @param sdh
-     */
-    public static void doPost03(HttpServletRequest request,
+    private static void doPost03(HttpServletRequest request,
                                 HttpServletResponse response,
                                 OpendapHttpDispatchHandler odh,
                                 OpendapSoapDispatchHandler sdh) {

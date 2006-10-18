@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2005 OPeNDAP, Inc.
+// Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -40,9 +40,8 @@ import java.util.Date;
 import thredds.servlet.ServletUtil;
 
 /**
- * User: ndp
- * Date: Oct 5, 2006
- * Time: 2:54:35 PM
+ * This mini servlet provides access to distributed or, if it exisits, persistent documentation in the
+ * content directory.
  */
 public class DocServlet extends HttpServlet {
 

@@ -28,11 +28,7 @@ package opendap.olfs;
 import java.io.OutputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Aug 18, 2005
- * Time: 10:29:07 AM
- * To change this template use File | Settings | File Templates.
+ * A stream that acts like /dev/null - it just throws it all away!
  */
 public class DevNull extends OutputStream {
     public void write(int i) {

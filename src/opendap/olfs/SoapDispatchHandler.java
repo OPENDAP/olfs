@@ -47,11 +47,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: May 2, 2006
- * Time: 10:42:48 AM
- * To change this template use File | Settings | File Templates.
+ *
+ * Handler for SOAP requests.
+ *
  */
 public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 

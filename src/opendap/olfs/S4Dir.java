@@ -157,22 +157,31 @@ public class S4Dir {
                 size = "  -";
             } else { /// It must be a dataset
 
-                if(isData)
+                if(isData){
                     link = targetURL + name + ".html";
-                else
+                    // Build response links
+
+                    responseLinks = "      " +
+                            "<a href=\"" + targetURL + name + ".ddx" + "\">ddx</a> " +
+                            "<a href=\"" + targetURL + name + ".dds" + "\">dds</a> " +
+                            "<a href=\"" + targetURL + name + ".das" + "\">das</a> " +
+                            "<a href=\"" + targetURL + name + ".info" + "\">info</a> " +
+                            "<a href=\"" + targetURL + name + ".html" + "\">html</a> ";
+
+
+                }
+                else{
                     link = request.getContextPath()+ "/file" + collectionName + name ;
 
-                // Build response links
-
-                responseLinks = "      " +
-                        "<a href=\"" + targetURL + name + ".ddx" + "\">ddx</a> " +
-                        "<a href=\"" + targetURL + name + ".dds" + "\">dds</a> " +
-                        "<a href=\"" + targetURL + name + ".das" + "\">das</a> " +
-                        "<a href=\"" + targetURL + name + ".info" + "\">info</a> " +
-                        "<a href=\"" + targetURL + name + ".html" + "\">html</a> ";
-
-
+                    responseLinks = "      " +
+                            " -  " +
+                            " -  " +
+                            " -  " +
+                            " -   " +
+                            " -   ";
+                }
                 size = computeSizeString(size);
+
             }
 
             pw.print("<A HREF=\"");

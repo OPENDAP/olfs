@@ -23,6 +23,8 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 .style4 {font-size: 14px}
 .style5 {font-family: "Courier New", Courier, mono}
 .style6 {font-size: 18px}
+.style7 {color: #999999}
+.style8 {color: #000000}
 -->
 </STYLE>
 </head>
@@ -47,6 +49,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li><a href="#OLFS">OLFS Servlet</a> </li>
   <li><a href="#DOCS">Docs Servlet</a> </li>
   <li><a href="#SECURITY">Security</a></li>
+  <li><a href="#COMPRESSION">Compressed Responses and Tomcat </a></li>
 </ol>
 <p>&nbsp;</p>
 <h1><a name="OLFS"></a>OLFS Servlet Configuration</h1>
@@ -81,27 +84,62 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </ul>
 <p>&nbsp;</p>
 <h2><strong>olfs.xml</strong> </h2>
-<p>Currently the OLFS has 2 normally configurable items: The BES location and the directory view. The <strong>olfs.xml</strong> file looks like this:</p>
+<p>Currently the OLFS has 2 normally configurable items: The BES location and the directory view.</p>
+<p>The <em>&lt;OLFSConfig&gt;</em> element is the document root and it contains the following configuration inflrmation: </p>
+<ul>
+  <li>The <em>&lt;BES&gt;</em> element contains the BES configuration information.
+    <br>
+    <br>
+    <ul>
+    <li><em>&lt;host&gt; </em>element: The host/ip  location of the BES. <br>
+      <br>
+    </li>
+    <li><em>&lt;port&gt; </em>element: The port  number on which the BES is listening.<br>
+      <br>
+    </li>
+    <li><em>&lt;MaxClients&gt; </em>element: Provides the maximum number of concurrent BES client connections that the OLFS should maintain. These connections are pooled for efficiency and speed, and the limit should be determined empirically. If the <em>&lt;MaxClients&gt;</em> element is missing the pool size defaults to 10. <br>
+      <br>
+    </li>
+    </ul>
+</li>
+  <li>The <em>&lt;DirectoryView&gt;</em> element is <span class="style8">used to indicate which type of directory view clients see. This DOES NOT
+           affect the THREDDS catalogs! Only the HTML views of them. A value
+           of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
+  of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.</span> </li>
+</ul>
+<p>An example <strong>olfs.xml</strong> file:</p>
 <pre>
 
   &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
   &lt;OLFSConfig&gt;
 
-      &lt;!-- The hostname (or IP address) and port location for the BES --&gt;
+      <span class="style7">&lt;!-- The hostname (or IP address) and port location for the BES --&gt;</span>
       &lt;BES&gt;
+	  
+          <span class="style7">&lt;!-- The hostname (or IP address) for the BES --&gt;</span>
           &lt;host&gt;localhost&lt;/host&gt;
+		  
+          <span class="style7">&lt;!-- The port number for the BES --&gt;</span>
           &lt;port&gt;10002&lt;/port&gt;
+		  
+          <span class="style7">&lt;!-- The Maximum number of concurrent BES client connections allowed. --&gt;</span>
+          &lt;MaxClients&gt;10&lt;/MaxClients&gt;
+		  
       &lt;/BES&gt;
 
-      &lt;!-- Used to indicate which type of directory view clients see. This DOES NOT
+      <span class="style7">&lt;!-- Used to indicate which type of directory view clients see. This DOES NOT
            affect the THREDDS catalogs! Only the HTML views of them. A value
            of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
-           of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.--&gt;
+           of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.--&gt;</span>
 
       &lt;DirectoryView&gt;THREDDS&lt;/DirectoryView&gt;
 
-  &lt;/OLFSConfig&gt;</pre>
-<p>&nbsp;</p>
+  &lt;/OLFSConfig&gt;
+
+
+
+
+</pre>
 <h2><strong>catalog.xml</strong></h2>
 <p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  about it here</a>. </p>
 <p>&nbsp;</p>
@@ -350,6 +388,53 @@ The complete URI's would be:</p>
     &lt;/web-app&gt;
  </pre>
 <p>This does not prevent you from losing your <strong>web.xml</strong> file  when a new version of Server4 is installed, but adding the <em>ENTITY</em> stuff to the new <strong>web.xml</strong> file would be easier than remembering an extensive security configuration. Of course, Y.M.M.V.</p>
+<p>&nbsp;</p>
+<h1><a name="COMPRESSION"></a>Compressed Responses  and Tomcat </h1>
+<p>Many OPeNDAP clients accept compressed responses. This can greatly increase the efficiency of the client/server interaction by diminishing the number of bytes actually transmitted over &quot;the wire&quot;. Tomcat provides native compression support for the GZIP compression mechanism, however it is NOT turned on by default. </p>
+<p>The following example is based on Tomcat 5.15. We recommend that you read carefully the Tomcat documentation related to this topic before proceeding:</p>
+<ul>
+  <li><a href="http://tomcat.apache.org">Tomcat Home</a></li>
+  <li><a href="http://tomcat.apache.org/tomcat-5.5-doc/index.html">Tomcat 5.x documentation</a>. (See Reference Section for the <a href="http://tomcat.apache.org/tomcat-5.5-doc/config/index.html">Apache Tomcat Configuration section</a>) </li>
+  <li><a href="http://tomcat.apache.org/tomcat-5.5-doc/config/http.html">Tomcat 5.x documentation section related to compression</a>. </li>
+</ul>
+<h4>Example:</h4>
+<p>To enable compression you will need to edit the <em>$CATALINA_HOME/conf/server.xml</em> file. You will need to locate the <em>&lt;Connector&gt;</em> element associated with your server, typically this will be the only <em>&lt;Connector&gt;</em> element whose <em>port</em> attribute is set equal to 8080. To this you will need to add/change several attributes to enable compression.</p>
+<p>With my Tomcat 5.5 distribution I found this default <em>&lt;Connector&gt;</em> element definition in my <em>server.xml</em> file:</p>
+<pre>    &lt;Connector port=&quot;8080&quot; maxHttpHeaderSize=&quot;8192&quot;
+        maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot; maxSpareThreads=&quot;75&quot;
+        enableLookups=&quot;false&quot; redirectPort=&quot;8443&quot; acceptCount=&quot;100&quot;
+        connectionTimeout=&quot;20000&quot; disableUploadTimeout=&quot;true&quot;
+        compression=&quot;no&quot;
+    /&gt;
+</pre>
+<p>You will need to add to this four attributes:</p>
+<pre>        compression=&quot;force&quot;
+        compressionMinSize=&quot;2048&quot;
+        noCompressionUserAgents=&quot;gozilla, traviata&quot;
+        compressableMimeType=&quot;text/html,text/xml&quot;
+</pre>
+<p>Notice that there is a list of compressible MIME types. Basically:</p>
+<ul>
+  <li> <strong>compression=&quot;no&quot;</strong> means nothing gets compressed.</li>
+  <li><strong>compression=&quot;yes&quot;</strong> means only the compressible MIME types get compressed.</li>
+  <li><strong>compression=&quot;force&quot;</strong> means everything gets compressed (assuming the client<br>
+    accepts gzip and the response is bigger than compressionMinSize)<br>
+  </li>
+</ul>
+<p>You MUST set  <strong>compression=&quot;force&quot;</strong> for compression to work with the OPeNDAP data transport. </p>
+<p>The final result being:  </p>
+<pre>    &lt;Connector port=&quot;8080&quot; maxHttpHeaderSize=&quot;8192&quot;
+        maxThreads=&quot;150&quot; minSpareThreads=&quot;25&quot; maxSpareThreads=&quot;75&quot;
+        enableLookups=&quot;false&quot; redirectPort=&quot;8443&quot; acceptCount=&quot;100&quot;
+        connectionTimeout=&quot;20000&quot; disableUploadTimeout=&quot;true&quot;
+        compression=&quot;force&quot;
+        compressionMinSize=&quot;2048&quot;
+        noCompressionUserAgents=&quot;gozilla, traviata&quot;
+        compressableMimeType=&quot;text/html,text/xml&quot;
+    /&gt;
+</pre>
+<p>Restart Tomcat for these changes to take effect. </p>
+<p>&nbsp;</p>
 <hr size="1" noshade="noshade">
 <h3><br /></h3></body>
 </html>

@@ -42,12 +42,25 @@ public class Attachment {
     String contentId;
     String contentType;
     InputStream istream;
+
+    /**
+     *
+     * @param ctype String containing the value of the HTTP header Content-Type for this attachment.
+     * @param cid String containing the value if the HTTP header Content-Id for this attachment.
+     * @param is A stream containing the content for this attachment.
+     */
     Attachment(String ctype, String cid, InputStream is){
         contentType = ctype;
         contentId = cid;
         istream = is;
     }
 
+    /**
+     * Write the attchment to the indicated stream
+     * @param mimeBoundary MIME Boundary for the attachment.
+     * @param sos Stream to which to write the attachment.
+     * @throws IOException
+     */
     void write(String mimeBoundary, ServletOutputStream sos) throws IOException {
 
 

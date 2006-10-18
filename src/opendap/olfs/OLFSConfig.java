@@ -33,9 +33,8 @@ import org.jdom.input.SAXBuilder;
 import java.io.*;
 
 /**
- * User: ndp
- * Date: Jul 24, 2006
- * Time: 1:25:01 PM
+ * This class holds configuration information for the OLFS. It has a main() method and can be run as an application
+ * to generate an OLFS config file.
  */
 public class OLFSConfig {
 
@@ -305,7 +304,7 @@ public class OLFSConfig {
                 olfsConfig.setTHREDDSDirectoryView(false);
                 done = true;
             }
-            else 
+            else
                 System.out.println("You must enter say 'yes' or 'no'.\n\n");
         }
 

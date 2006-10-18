@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2005 OPeNDAP, Inc.
+// Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -33,6 +33,8 @@ import org.jdom.output.Format;
 import java.io.*;
 
 /**
+ * Holds a configuarrtion for the BES. The persistent representation of this is an XML element, usually incorporated
+ * into a larger document such as the OLFS configuration document.
  * User: ndp
  * Date: Oct 13, 2006
  * Time: 5:00:33 PM
@@ -49,7 +51,7 @@ public class BESConfig {
     BESConfig() {
         _BESHost = "HostNameIsNotSet!";
         _BESPort = -1;
-        _BESMaxClients = 1;
+        _BESMaxClients = 10;
     }
 
     BESConfig(Document besConfiguration) throws Exception{
@@ -66,6 +68,12 @@ public class BESConfig {
 
     }
 
+    /**
+     * Creates a new BESConfig and sets its state according to the values of the persistent representation of the
+     * BESConfig fpund in the (XML) file whose name is passed in.
+     * @param filename
+     * @throws Exception
+     */
     BESConfig(String filename) throws Exception {
         this();
 

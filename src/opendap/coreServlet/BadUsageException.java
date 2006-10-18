@@ -25,11 +25,7 @@
 package opendap.coreServlet;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Jun 8, 2006
- * Time: 9:39:11 AM
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class BadUsageException extends OPeNDAPException{
     public BadUsageException(String msg) {

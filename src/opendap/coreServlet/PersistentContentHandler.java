@@ -33,12 +33,17 @@ import thredds.util.IO;
 import thredds.servlet.ServletUtil;
 
 /**
- * User: ndp
- * Date: Jul 25, 2006
- * Time: 11:54:34 AM
+ * Provides methods for detecting the presence of the peristent content directory and moving an initial
+ * copy of the persistent content to that directory if it does not already exist.
  */
 public class PersistentContentHandler {
 
+
+    /**
+     * Checks to see if the persistent content directory exists, if it doesn't it is created and populated
+     * with initial content from the distribution.
+     * @param servlet
+     */
     public static void installInitialContent(HttpServlet servlet) {
 
         String semaphore = ".INIT";
@@ -73,7 +78,7 @@ public class PersistentContentHandler {
 
     }
 
-    public static String getInitialContentPath(HttpServlet servlet) {
+    private static String getInitialContentPath(HttpServlet servlet) {
       return ServletUtil.getRootPath(servlet) + "initialContent/";
     }
 

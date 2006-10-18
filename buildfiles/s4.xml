@@ -113,7 +113,7 @@
     <target
         name="doc"
         depends="init,IsJavaDocUpToDate"
-        description="Builds JavaDoc for the core OPeNDAP software packages, if missing or out of date."
+        description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
         unless="JavaDocIsUpToDate"
         >
 
@@ -229,7 +229,7 @@
         >
         <uptodate property="JavaDocIsUpToDate" targetfile="${build.doc}/opendap/index.html">
             <srcfiles dir="${src.dir}">
-                <include name="opendap/servers/sql/**/*.java"/>
+                <include name="opendap/**/*.java"/>
             </srcfiles>
         </uptodate>
 
@@ -281,6 +281,7 @@
 
             <zipfileset dir="${doc.dir}" prefix="docs">
                 <exclude name="src.distribution.readme"/>
+                <exclude name="_notes"/>
             </zipfileset>
 
 

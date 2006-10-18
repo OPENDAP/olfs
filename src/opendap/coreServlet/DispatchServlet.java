@@ -35,7 +35,6 @@ import thredds.servlet.DataRootHandler;
 import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
-import opendap.olfs.BesAPI;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -283,7 +282,6 @@ public class DispatchServlet extends HttpServlet {
         System.out.println("  requestSuffix:                '" + ReqInfo.getRequestSuffix(req) + "'");
         System.out.println("  CE:                           '" + ReqInfo.getConstraintExpression(req) + "'");
         System.out.println("  requestURL:                   '" + ReqInfo.getRequestURL(req) + "'");
-        System.out.println("  compressOK:                    " + ReqInfo.getAcceptsCompressed(req));
         System.out.println("  requestForOpendapContents:     " + ReqInfo.requestForOpendapContents(req));
         System.out.println("  requestForTHREDDSCatalog:      " + ReqInfo.requestForTHREDDSCatalog(req));
         System.out.println();

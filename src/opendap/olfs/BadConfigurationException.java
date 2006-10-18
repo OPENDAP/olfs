@@ -28,11 +28,7 @@ package opendap.olfs;
 import opendap.coreServlet.OPeNDAPException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Aug 18, 2005
- * Time: 9:01:46 AM
- * To change this template use File | Settings | File Templates.
+ * 
  */
 public class BadConfigurationException extends OPeNDAPException {
 

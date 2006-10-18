@@ -44,7 +44,7 @@ class PPTClient {
         catch (UnknownHostException e) {
             String msg = "Don't know about host: " + hostStr + "\n";
             msg += e.getMessage();
-            closeConnection();
+            closeConnection(true);
             throw new PPTException(msg, e);
         }
 
@@ -54,7 +54,7 @@ class PPTClient {
         catch (IOException e) {
             String msg = "Could not connect to host " + hostStr + " on port " + portVal + ".  ";
             msg += e.getMessage();
-            closeConnection();
+            closeConnection(true);
             throw new PPTException(msg, e);
         }
 
@@ -65,7 +65,7 @@ class PPTClient {
         catch (IOException e) {
             String msg = "Couldn't get I/O for the connection to: " + hostStr + ".  ";
             msg += e.getMessage();
-            closeConnection();
+            closeConnection(true);
             throw new PPTException(msg, e);
         }
 
@@ -78,7 +78,7 @@ class PPTClient {
         catch (PPTException e) {
             String msg = "Failed to initialize connection to server. ";
             msg += e.getMessage();
-            closeConnection();
+            closeConnection(true);
             throw new PPTException(msg, e);
         }
 
@@ -96,16 +96,21 @@ class PPTClient {
         catch (PPTException e) {
             String msg = "Failed to receive initialization response from server.  ";
             msg += e.getMessage();
-            closeConnection();
+            closeConnection(true);
             throw new PPTException(msg, e);
         }
 
         return true;
     }
 
-    public void closeConnection() {
+    /**
+     * Attempts to gracefully close the connection to the Server.
+     * @param informServer A true value will result in an attempt to inform the Server that the client is disconnecting.
+     * A false value will simple cause the client to close connections with out informing the server.
+     */
+    public void closeConnection(boolean informServer) {
         try {
-            if(_out != null)
+            if(informServer && _out != null)
                 this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
@@ -162,6 +167,7 @@ class PPTClient {
         catch (IOException e) {
             String msg = "Failed to write to socket:  ";
             msg += e.getMessage();
+            closeConnection(false);
             throw new PPTException(msg, e);
         }
         return true;
@@ -253,7 +259,7 @@ class PPTClient {
             bstrm.flush();
         }
         catch (IOException e) {
-            closeConnection();
+            closeConnection(true);
             throw new PPTException("Cannot read response to designated stream. ", e);
         }
     }
@@ -276,7 +282,7 @@ class PPTClient {
         catch (IOException e) {
             String msg = "Failed to read response from server.  ";
             msg += e.getMessage();
-            closeConnection();
+            closeConnection(true);
 
             throw new PPTException(msg, e);
         }

@@ -38,11 +38,7 @@ import java.util.Properties;
 import java.util.Enumeration;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Mar 31, 2006
- * Time: 6:32:39 PM
- * To change this template use File | Settings | File Templates.
+ * Some handy servlet sniffing utility methods.
  */
 public class Util {
 
@@ -57,7 +53,7 @@ public class Util {
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
      */
-    public static void sendSystemProperties(HttpServletRequest request,
+    static void sendSystemProperties(HttpServletRequest request,
                                             HttpServletResponse response,
                                             OpendapHttpDispatchHandler odh)
             throws IOException {

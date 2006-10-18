@@ -28,16 +28,12 @@ import org.jdom.Element;
 import org.jdom.Text;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Oct 31, 2005
- * Time: 3:35:50 PM
- * To change this template use File | Settings | File Templates.
+ * Contains the Version and UUID information fr Server4.
  */
 public class Version {
 
 
-    private static String version = "0.1.3";
+    private static String version = "0.1.4";
 
     public static String getVersionString() {
         return (version);

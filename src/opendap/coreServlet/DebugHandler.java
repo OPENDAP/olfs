@@ -36,11 +36,9 @@ import java.util.Iterator;
 import java.util.Enumeration;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Mar 31, 2006
- * Time: 1:13:40 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * Handles debuging interface for the servlet.
+ * 
  */
 public class DebugHandler {
 

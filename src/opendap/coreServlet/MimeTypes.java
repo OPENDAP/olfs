@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2005 OPeNDAP, Inc.
+// Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -27,6 +27,7 @@ package opendap.coreServlet;
 import java.util.TreeMap;
 
 /**
+ * Maps file extensions (suffixes) to commonly known MIME types.
  * User: ndp
  * Date: Oct 5, 2006
  * Time: 4:28:08 PM
@@ -199,6 +200,11 @@ public class MimeTypes {
 
     }
 
+    /**
+     *
+     * @param fileExtension The file type extension (suffix) to be mapped to a MIME type
+     * @return The MIME type associated with the passed file extension. Null if no mapping can be found.
+     */
     public String getMimeType(String fileExtension){
         return typeMap.get(fileExtension);
     }

@@ -31,23 +31,49 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * User requests get cached here so that downstream code can access
- * the details of the request information.
+ * Provides utility methods that perform "analysis" of the user request and return important componet strings
+ * for the OPeNDAP servlet.
  *
+ * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+ * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
+ * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+ * <p><b>Examples:</b>
+ * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds?lat,lon,time&lat>72.0<br/>
+ * Then the:</li>
+ * <ul>
+ * <li> RequestURL = http://opendap.org:8080/opendap/nc/fnoc1.nc </li>
+ * <li> CollectionName = /opendap/nc/ </li>
+ * <li> DataSetName = fnoc1.nc </li>
+ * <li> DataSourceName = /opendap/nc/fnoc1.nc </li>
+ * <li> RequestSuffix = dds </li>
+ * <li> ConstraintExpression = lat,lon,time&lat>72.0 </li>
+ * </ul>
+ *
+ * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
+ * Then the:</li>
+ * <ul>
+ * <li> RequestURL = http://opendap.org:8080/opendap/nc/ </li>
+ * <li> CollectionName = /opendap/nc/ </li>
+ * <li> DataSetName = null </li>
+ * <li> DataSourceName = /opendap/nc/ </li>
+ * <li> RequestSuffix = "" </li>
+ * <li> ConstraintExpression = "" </li>
+ * </ul>
+ * </ul>
  * @author Nathan Potter
  */
 
 public class ReqInfo {
 
 
-
-
-
+    /**
+     * Returns the OPeNDAP constraint expression.
+     * @param req The client request.
+     * @return The OPeNDAP constraint expression.
+     */
     public static  String getConstraintExpression(HttpServletRequest req) {
         String CE = req.getQueryString();
 
-        // If there was simply no constraint then prepCE() should have returned
-        // a CE equal "", the empty string. A null return indicates an error.
         if (CE == null) {
             CE = "";
         }
@@ -60,7 +86,7 @@ public class ReqInfo {
 
     /**
      *
-     * @param req
+     * @param req The client request.
      * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
      * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
      */
@@ -97,8 +123,13 @@ public class ReqInfo {
     }
 
 
-
-
+    /**
+     * The collection name is the path leading to requestd dataset, if a dataset was requested. If a
+     * collection was requested then that is returned.
+     *
+     * @param req The client request.
+     * @return The name of the collection.
+     */
     public static String getCollectionName(HttpServletRequest req){
 
         String cName, dSrc, dSetName;
@@ -121,7 +152,7 @@ public class ReqInfo {
 
     /**
      *
-     * @param req
+     * @param req The client request.
      * @return The suffix of the request. Basically it looks at the last element in the slash "/" seperated list
      * of stuff in the URL and returns everything after the final "." If there is no final "." then null is returned.
      */
@@ -151,11 +182,15 @@ public class ReqInfo {
     }
 
 
-
-
-
-
-
+    /**
+     * The dataset is an "atom" in the OPeNDAP URL lexicon. Thus, the dataset is the last thing in the URL prior to
+     * the constraint expression (query string) and after the last slash. If the last item in the URL path is a
+     * collection, than the dataset name may be null.
+     *
+     *
+     * @param req The client request.
+     * @return The dataset name, null if the request is for a collection.
+     */
     public static String getDataSetName(HttpServletRequest req){
 
         String requestPath = req.getPathInfo();
@@ -190,10 +225,31 @@ public class ReqInfo {
     }
 
 
-
-
-
-
+    /**
+     * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+     * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
+     * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+     * <p><b>Examples:</b>
+     * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = fnoc1.nc </li>
+     * <li> dataSourceName = /opendap/nc/fnoc1.nc </li>
+     * <li> requestSuffix = dds </li>
+     * </ul>
+     *
+     * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = null </li>
+     * <li> dataSourceName = /opendap/nc/ </li>
+     * <li> requestSuffix = "" </li>
+     * </ul>
+     * </ul>
+     *
+     * @param req The client request.
+     * @return The DataSourceName
+     */
     public static String getDataSource(HttpServletRequest req){
 
         String requestPath = req.getPathInfo();
@@ -229,7 +285,11 @@ public class ReqInfo {
     }
 
 
-
+    /**
+     * Evaluates the request and returns TRUE if it is determined that the request is for an OPeNDAP directory view.
+     * @param req The client request.
+     * @return True if the request is for an OPeNDAP directory view, False otherwise.
+     */
     public static boolean requestForOpendapContents(HttpServletRequest req){
 
         boolean test = false;
@@ -246,6 +306,11 @@ public class ReqInfo {
         return test;
     }
 
+    /**
+     * Evaluates the request and returns TRUE if it is determined that the request is for an THREDDS directory view.
+     * @param req The client request.
+     * @return True if the request is for an THREDDS directory view, False otherwise.
+     */
     public static boolean requestForTHREDDSCatalog(HttpServletRequest req){
         boolean test = false;
         String dsName  = ReqInfo.getDataSetName(req);
@@ -261,42 +326,6 @@ public class ReqInfo {
         return test;
 
     }
-
-
-
-
-
-    /**
-       * *************************************************************************
-       * Evaluates the (private) request object to determine if the client that
-       * sent the request accepts compressed return documents.
-       *
-       * @return True is the client accpets a compressed return document.
-       *         False otherwise.
-       */
-
-      public static boolean getAcceptsCompressed(HttpServletRequest req) {
-
-          boolean isTiny;
-
-          String Encoding = req.getHeader("Accept-Encoding");
-
-          if (Encoding != null)
-              isTiny = Encoding.contains("deflate");
-          else
-              isTiny = false;
-
-          return (isTiny);
-      }
-
-
-
-
-
-
-
-
-
 
 
     /**

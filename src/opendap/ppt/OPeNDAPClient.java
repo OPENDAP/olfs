@@ -98,7 +98,7 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void shutdownClient() throws PPTException {
-        _client.closeConnection();
+        _client.closeConnection(true);
         if (_stream != null) {
             try {
                 _stream.close();
@@ -361,7 +361,7 @@ public class OPeNDAPClient {
             }
         }
         catch (Exception e) {
-            _client.closeConnection();
+            _client.closeConnection(true);
             throw(new PPTException(e.getMessage(),e));
         }
     }

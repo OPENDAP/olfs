@@ -31,11 +31,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: May 2, 2006
- * Time: 10:39:02 AM
- * To change this template use File | Settings | File Templates.
+ * Impelmentations of this interface may plugged into the DispatchServlet (via the web.xml file) to
+ * provide specific Server responses to SOAP requests. The DispatchServlet REQUIRES an implmentation of this interface
+ * to be identified in the web.xml file.
  */
 public interface OpendapSoapDispatchHandler {
 
