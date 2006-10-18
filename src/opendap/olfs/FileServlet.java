@@ -92,7 +92,7 @@ public class FileServlet extends HttpServlet {
 
         if (Debug.isSet("showRequest")) System.out.print("FileServlet - The client requested this: " + name);
 
-        String suffix = ReqInfo.getRequestSuffix();
+        String suffix = ReqInfo.getRequestSuffix(req);
 
         if(suffix!=null){
             String mType = mimeTypes.getMimeType(suffix);
