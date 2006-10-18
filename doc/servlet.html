@@ -50,6 +50,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li><a href="#DOCS">Docs Servlet</a> </li>
   <li><a href="#SECURITY">Security</a></li>
   <li><a href="#COMPRESSION">Compressed Responses and Tomcat </a></li>
+  <li>Gotcha's</li>
 </ol>
 <p>&nbsp;</p>
 <h1><a name="OLFS"></a>OLFS Servlet Configuration</h1>
@@ -144,7 +145,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  about it here</a>. </p>
 <p>&nbsp;</p>
 <h2><strong>web.xml</strong></h2>
-<p><em>In general I would say that you should <strong>NOT</strong> mess with the web.xml file. At least for now. Future versions of Server and the OLFS may have &quot;user configurable&quot; stuff in the web.xml file, but this version (1.3) does not. <strong>SO JUST DON'T DO IT. OK?</strong></em></p>
+<p><em>In general I would say that you should <strong>NOT</strong> mess with the web.xml file. At least for now. Future versions of Server and the OLFS may have &quot;user configurable&quot; stuff in the web.xml file, but this version (0.1.4) does not. <strong>SO JUST DON'T DO IT. OK?</strong></em></p>
 <p>&nbsp;</p>
 <hr size="1" noshade="noshade">
 <p>Having said that here are the details regarding the web.xml file. </p>
@@ -434,7 +435,22 @@ The complete URI's would be:</p>
     /&gt;
 </pre>
 <p>Restart Tomcat for these changes to take effect. </p>
-<p>&nbsp;</p>
+<h1>Gotcha's</h1>
+<ol>
+  <li>Because Server4 supports two differnt &quot;directory&quot; level views (THREDSS catalog.html and OPeNDAP contents.html) it is possible to have the views incompatible.<br>
+    <br>
+    For example:
+    <ul>
+      <li> Your BES configuration allows you to see 3 collections: nc, hdf, and freeform.</li>
+      <li>Your THREDDS catalog configuration only allows you to see nc and freeform.</li>
+    </ul>
+  </li>
+</ol>
+<blockquote>
+  <p>If you are in the opendap view for the hdf collection and you click the link to the THREDDS HTML or XML view you will get garbage.</p>
+  <p><em><strong>The moral - Make Sure That your BES and THREDDS configurations fundamentally agree about what is visible to the user!</strong></em><br>
+  </p>
+</blockquote>
 <hr size="1" noshade="noshade">
 <h3><br /></h3></body>
 </html>
