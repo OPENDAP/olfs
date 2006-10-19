@@ -451,7 +451,7 @@ public class BesAPI {
 
         configureTransaction(oc, dataSource, null);
 
-        String cmd = "get "+ getAPINameForHTMLForm()+ " html_form for d1 using "+url+";\n";
+        String cmd = "get "+ getAPINameForHTMLForm()+ " for d1 using "+url+";\n";
 
         if (Debug.isSet("BES")) System.err.print("Sending command: " + cmd);
 
