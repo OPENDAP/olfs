@@ -38,19 +38,80 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li><a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/Primer.html">Catalog Primer</a></li>
   <li><a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/cataloggen/devel/datasetScanElement.html">DatasetScan Element</a> </li>
 </ul>
-<p>The additional important piece of configuration information is regarding the implementation of CrawlableDataset to be used with Server4, <em>opendap.olfs.BESCrawlableDataset</em>. This class must be specified in any<em> datsetScan</em> element used with server 4. </p>
-<p>Here is an example <em>catalog.xml</em> file:</p>
+<p>Did you read all that? Excellent...</p>
+<h3>READ THIS NEXT BIT OR ABANDON ALL HOPE!  </h3>
+<p> Now, to get THREDDS catalogs working on Server4 <strong>YOU MUST</strong> do at least the following:</p>
+<ol>
+  <li>For each collection that appears in the top level of the OPeNDAP directory response (<a href="http://localhost:8080/opendap/contents.html">http://localhost:8080/opendap/contents.html</a> if Server4 is running out of the box on this machine) you <strong>MUST</strong> create a <em>&lt;datasetScan&gt;</em> in the <strong>catalog.xml</strong> file located in the persistent content directory ($TOMCAT_HOME/content/opendap). <strong><em><br />
+    <br />
+    </em></strong><em>The THREDDS catalog views will NOT include a collection for which this is not done! <br />
+    </em><strong><em><br />
+    </em></strong></li>
+  <li>In each <em>&lt;datasetScan&gt;</em> element that you create you <strong>MUST</strong> use the following element: <span class="style13">&lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt; </span> This is the only CrawlableDataset implementation available!<br />
+    <br />
+  </li>
+  <li>No matter what your BES collection looks like, the <em>location</em> attribute of the <em>&lt;datasetScan&gt;</em> element must begin with &quot;<em>/root</em>&quot;. This is a THREDDS requirement. <br />
+    <br />
+  </li>
+  <li>The <em>service</em> attribute in the <em>&lt;datasetScan&gt;</em> element must be set to <em>&quot;OPeNDAP&quot;</em>. <br />
+      <br />
+  </li>
+  <li>The <em>path</em> attribute in the <em>&lt;datasetScan&gt;</em> element appears in the URL after the servlet name, and MUST be the same as the value of the<em> location</em> attribute with the leading &quot;/root/&quot; removed. In other words it MUST NOT start with a &quot;/&quot; character .<br />
+    <br />
+  </li>
+  <li>You should apply a filter to the data that coincides with the value of the <em>&quot;BES.Catalog.catalog.TypeMatch&quot;</em> for the data types being served. I suggest that you make the filter expose ALL of the data types served by the BES. See the <a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/cataloggen/devel/datasetScanElement.html">THREDDS pages on the DatasetScan Element</a> for filter details. The point of this to remove files from the catalog view that are NOT OPeNDAP data. For example README files.<br />
+    <br />
+  </li>
+  <li>Add metadata as you see fit. If you REALLY did read the THREDDS documentation above you will already have a clue about this. If you haven't <strong>DO SO NOW</strong>. </li>
+</ol>
+<p>&nbsp;</p>
+<h3>Examples</h3>
+<p><strong>Example 1</strong></p>
+<p>Here is an example <em>catalog.xml</em> file for a Server4 installation in which the top level of the BES shows only ONE collection called <em>&quot;data&quot;</em>:</p>
 <pre class="style13">
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;catalog name=&quot;Server4 Test Catalog&quot;
          xmlns=&quot;http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0&quot;
          xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
 
-     &lt;!-- ************************************************************************************* --&gt;
+     &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
 
-     &lt;service name=&quot;OPeNDAP-Server4&quot; serviceType=&quot;OPeNDAP&quot; base=&quot;/opendap/ts/&quot;/&gt;
+     &lt;service name=&quot;OPeNDAP-Server4&quot; serviceType=&quot;OPeNDAP&quot; base=&quot;/opendap/&quot;/&gt;
 
-     &lt;datasetScan location=&quot;/root/nc&quot; path=&quot;nc&quot; name=&quot;NC&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
+     &lt;datasetScan location=&quot;/root/data&quot; path=&quot;data&quot; name=&quot;AllMyData&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
+
+	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+
+           &lt;filter&gt;
+               &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
+               &lt;include wildcard=&quot;*&quot; /&gt;
+           &lt;/filter&gt;
+           &lt;addDatasetSize /&gt;
+
+           &lt;metadata inherited=&quot;true&quot;&gt;
+               &lt;serviceName&gt;OPeNDAP-Server4&lt;/serviceName&gt;
+               &lt;authority&gt;opendap.org&lt;/authority&gt;
+               &lt;dataType&gt;Random&lt;/dataType&gt;
+           &lt;/metadata&gt;
+     &lt;/datasetScan&gt;
+
+     &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
+&lt;/catalog&gt;
+</pre>
+<hr size="1" noshade="noshade" />
+<p><strong>Example 2 </strong></p>
+<p>Here is an example <em>catalog.xml</em> file for a Server4 installation in which the top level of the BES shows contains 4 collection called <em>&quot;nc&quot;</em>, <em>&quot;hdf&quot;</em>, and <em>&quot;ff&quot;</em>:</p>
+<pre class="style13">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;catalog name=&quot;Server4 Test Catalog&quot;
+         xmlns=&quot;http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0&quot;
+         xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot;&gt;
+
+     &lt;service name=&quot;OPeNDAP-Server4&quot; serviceType=&quot;OPeNDAP&quot; base=&quot;/opendap/&quot;/&gt;
+
+     &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
+
+     &lt;datasetScan location=&quot;/root/nc&quot; path=&quot;nc&quot; name=&quot;NetCDF Archive&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
 
 	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
 
@@ -67,11 +128,49 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
            &lt;/metadata&gt;
      &lt;/datasetScan&gt;
 
-     &lt;!-- ************************************************************************************* --&gt;
+     &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
+
+     &lt;datasetScan location=&quot;/root/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
+
+	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+
+           &lt;filter&gt;
+               &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
+               &lt;include wildcard=&quot;*.hdf&quot; /&gt;
+           &lt;/filter&gt;
+           &lt;addDatasetSize /&gt;
+
+           &lt;metadata inherited=&quot;true&quot;&gt;
+               &lt;serviceName&gt;OPeNDAP-Server4&lt;/serviceName&gt;
+               &lt;authority&gt;opendap.org&lt;/authority&gt;
+               &lt;dataType&gt;Random&lt;/dataType&gt;
+           &lt;/metadata&gt;
+    &lt;/datasetScan&gt;
+
+    &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
+
+    &lt;datasetScan location=&quot;/root/ff&quot; path=&quot;ff&quot; name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt;
+
+	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+
+           &lt;filter&gt;
+               &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
+               &lt;include wildcard=&quot;*.dat&quot; /&gt;
+           &lt;/filter&gt;
+           &lt;addDatasetSize /&gt;
+
+           &lt;metadata inherited=&quot;true&quot;&gt;
+               &lt;serviceName&gt;OPeNDAP-Server4&lt;/serviceName&gt;
+               &lt;authority&gt;opendap.org&lt;/authority&gt;
+               &lt;dataType&gt;Random&lt;/dataType&gt;
+           &lt;/metadata&gt;
+     &lt;/datasetScan&gt;
+
+     &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
 &lt;/catalog&gt;
 </pre>
-<p>&nbsp;</p>
-<p>In particular note the following:</p>
+<hr size="1" noshade="noshade" />
+<h4><strong>In particular note the following:</strong></h4>
 <ul>
   <li>The line in which the CrawlableDataset implementation is defined:
 
@@ -86,11 +185,11 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 	&lt;datasetScan location=&quot;/root/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot;      serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;
 	&lt;datasetScan location=&quot;/root/jg&quot;  path=&quot;jg&quot;  name=&quot;JGOFFS Archive&quot;   serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;
 	&lt;datasetScan location=&quot;/root/ff&quot;  path=&quot;ff&quot;  name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
-	Where each <em>&lt;datasetScan&gt;</em> element may have it's own filter and inheritance rules. You MUST NOT lump them all into one    <em>&lt;datasetScan&gt;</em>element with one set of filter rules like so:
+	Where each <em>&lt;datasetScan&gt;</em> element may have it's own filter and inheritance rules. You MUST NOT lump them all into one    <em>&lt;datasetScan&gt; </em>element with one set of filter rules like so:
 	<pre>
 	&lt;datasetScan location=&quot;/root&quot;     path=&quot;DATA&quot;  name=&quot;AllYourDataAreUs&quot;   serviceName=&quot;OPeNDAP-Server4&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
 	Because it does not work.
-    <br />
+    If you want them all to be in one a single collection then configure the BES so that it has one top level collection (see Example 1) <br />
     <br />
   </li>
   <li>The <em>path</em> attribute in the <em>&lt;datasetScan&gt;</em> element appears in the URL after the servlet name, and MUST be the same as the value of the<em> location</em> attribute with the leading &quot;/root/&quot; removed. In other words it MUST NOT start with a &quot;/&quot; character . </li>

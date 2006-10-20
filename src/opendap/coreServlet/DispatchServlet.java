@@ -62,6 +62,7 @@ import thredds.catalog.InvDatasetScan;
  */
 public class DispatchServlet extends HttpServlet {
 
+    private static boolean forceTHREDDSCatalog = false;
 
     /**
      * ************************************************************************
@@ -542,7 +543,7 @@ public class DispatchServlet extends HttpServlet {
      * @throws ServletException
      */
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res)
-            throws IOException, ServletException {
+            throws Exception, ServletException {
 
 
         if ((req.getPathInfo() == null)) {
@@ -553,7 +554,20 @@ public class DispatchServlet extends HttpServlet {
         }
 
 
-        return dataRootHandler.processReqForCatalog(req, res);
+        boolean wasTHREDDS = dataRootHandler.processReqForCatalog(req, res);
+
+        if(forceTHREDDSCatalog && !wasTHREDDS ){
+            if(ReqInfo.getDataSetName(req).equalsIgnoreCase("catalog") &&
+                    ReqInfo.getRequestSuffix(req).equalsIgnoreCase("xml")){
+
+                odh.sendCatalog(req,res);
+                wasTHREDDS = true;
+            }
+        }
+
+
+
+        return wasTHREDDS;
 
     }
 
