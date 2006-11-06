@@ -267,9 +267,34 @@ public class S4Dir {
     private static void printHTMLFooter(PrintWriter pw, String targetURL, boolean isTopLevel) {
         pw.println("        </pre> ");
         pw.println("        <hr size=\"1\" noshade=\"noshade\">");
-        pw.println("        <span class=\"small\">THREDDS Catalog " +
-                "<a href='"+targetURL+"catalog.html'>HTML</a> " +
-                "<a href='"+targetURL+"catalog.xml'>XML</a></span>\n");
+//        pw.println("        <span class=\"small\">THREDDS Catalog " +
+//                "<a href='"+targetURL+"catalog.html'>HTML</a> " +
+//                "<a href='"+targetURL+"catalog.xml'>XML</a></span>\n");
+
+
+
+        pw.println("            <span class=\"small\"> <table width=\"100%\" border=\"0\">\n" +
+                "      <tr>\n" +
+                "        <td>" +
+                "            <div align=\"left\">" +
+                "                THREDDS Catalog" +
+                "                <a href='"+targetURL+"catalog.html'>HTML</a> " +
+                "                <a href='"+targetURL+"catalog.xml'>XML</a> " +
+                "            </div>" +
+                "        </td>\n" +
+                "        <td>" +
+                "            <div align=\"right\">" +
+                "                Sponsored by the <a href='http://www.nsf.gov/'>National Science Foundation</a>\n" +
+                "            </div>" +
+                "        </td>\n" +
+                "      </tr>\n" +
+                "    </table>");
+
+
+
+
+
+
         pw.println("        <h3>" +
                    "            OPeNDAP Server4 ("+Version.getVersionString()+")");
 
@@ -279,9 +304,13 @@ public class S4Dir {
 
         pw.println("            <br />\n" +
                    "            <a href='/opendap/docs/'> Documentation</a>\n");
-
-
         pw.println("        </h3>\n");
+
+//        pw.println("            <span class=\"small\">\n" +
+//                   "            Sponsored by the <a href='http://www.nsf.gov/'>National Science Foundation</a>\n" +
+//                   "            </span>");
+
+
 
         pw.println("</body></html>");
 
