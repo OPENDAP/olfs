@@ -71,29 +71,9 @@ Now, to get THREDDS catalogs working on Server4 YOU MUST do at least the followi
 
     <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
-    <datasetScan location="/root/nc" path="nc" name="NetCDF Archive" serviceName="OPeNDAP-Server4">
+    <datasetScan location="/root/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Server4">
 
         <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
-        <filter>
-            <exclude wildcard=".*" atomic="true" collection="true"/>
-            <include wildcard="*"/>
-        </filter>
-        <addDatasetSize />
-
-        <metadata inherited="true">
-            <serviceName>OPeNDAP-Server4</serviceName>
-            <authority>opendap.org</authority>
-            <dataType>Random</dataType>
-        </metadata>
-
-    </datasetScan>
-
-    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
-
-    <datasetScan location="/root/ff" path="ff" name="FreeForm Data Archive" serviceName="OPeNDAP-Server4">
-
-        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
-
         <filter>
             <exclude wildcard=".*" atomic="true" collection="true"/>
             <include wildcard="*"/>
@@ -159,7 +139,7 @@ In particular note the following:
 
     3) The path attribute in the <datasetScan> element appears in the URL after the servlet name, and
        MUST be the same as the value of the location attribute with the leading "/root/" removed. In
-       other words it MUST NOT start with a "/" character . 
+       other words it MUST NOT start with a "/" character .
 
 
 -->

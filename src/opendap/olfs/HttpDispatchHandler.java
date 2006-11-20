@@ -50,6 +50,12 @@ import thredds.servlet.ServletUtil;
  */
 public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
+    private MimeTypes mimeTypes;
+
+
+
+
+
 
     /**
      * ************************************************************************
@@ -72,11 +78,19 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         super();
     }
 
+
+
+
+
+
+
     /**
      * ************************************************************************
      * Intitializes any state needed for the handler.
      */
     public void init(HttpServlet ds) throws ServletException {
+
+        mimeTypes = new MimeTypes();
 
         System.out.println("HttpDispatchHandler.init()");
 
@@ -95,8 +109,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         BesAPI.shutdownBES();
     }
 
-
-
+    public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
+        return new BESDataSource(dataSourceName);
+    }
 
 
     public String getVersionStringForTHREDDSCatalog(){
@@ -146,6 +161,13 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     public boolean useOpendapDirectoryView() {
         return !_olfsConfig.getTHREDDSDirectoryView();
+    }
+
+
+
+
+    public boolean allowDirectDataSourceAccess() {
+        return _olfsConfig.allowDirectDataSourceAccess();
     }
 
 
@@ -835,6 +857,48 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
     }
+
+
+
+
+
+    public void sendFile(HttpServletRequest req,
+                             HttpServletResponse response)
+            throws Exception  {
+
+
+        String name = req.getPathInfo();
+
+
+        if (Debug.isSet("showResponse")) System.out.print("Sending File: " + name);
+
+        String suffix = ReqInfo.getRequestSuffix(req);
+
+        if(suffix!=null){
+            String mType = mimeTypes.getMimeType(suffix);
+            if(mType!=null)
+                response.setContentType(mType);
+            if(Debug.isSet("showResponse")) System.out.print("   MIME type: "+mType+"  ");
+        }
+
+        if (Debug.isSet("showResponse")) System.out.println();
+
+
+            ServletOutputStream sos = response.getOutputStream();
+            BesAPI.writeFile(name, sos);
+            response.setStatus(HttpServletResponse.SC_OK);
+
+
+
+
+
+    }
+
+
+
+
+
+
 
 
     /**

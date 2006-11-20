@@ -60,8 +60,8 @@ public class S4Dir {
             throws Exception {
 
 
-        if (Debug.isSet("showResponse"))
-            System.out.println("sendDIR request = " + request);
+        //if (Debug.isSet("showResponse"))
+        //    System.out.println("sendDIR request = " + request);
 
         String name;
         String size;
@@ -74,7 +74,20 @@ public class S4Dir {
         Iterator it;
         Element childDataset;
 
-        String collectionName  = ReqInfo.getCollectionName(request);
+//        String collectionName  = ReqInfo.getCollectionName(request);
+
+
+        String collectionName  = ReqInfo.getFullSourceName(request);
+
+        if(collectionName.endsWith("/contents.html")){
+            collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
+        }
+
+        if(!collectionName.endsWith("/"))
+            collectionName += "/";
+
+
+
         String targetURL = request.getContextPath() + request.getServletPath() + collectionName;
 
 
@@ -171,7 +184,7 @@ public class S4Dir {
 
                 }
                 else{
-                    link = request.getContextPath()+ "/file" + collectionName + name ;
+                    link = request.getContextPath()+  collectionName + name ;
 
                     responseLinks = "      " +
                             " -  " +
@@ -284,7 +297,8 @@ public class S4Dir {
                 "        </td>\n" +
                 "        <td>" +
                 "            <div align=\"right\">" +
-                "                Sponsored by the <a href='http://www.nsf.gov/'>National Science Foundation</a>\n" +
+                "                Server4 development sponsored by <a href='http://www.nsf.gov/'>NSF</a>\n" +
+                "                and <a href='http://www.nasa.gov/'>NASA</a>" +
                 "            </div>" +
                 "        </td>\n" +
                 "      </tr>\n" +

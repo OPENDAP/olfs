@@ -41,13 +41,14 @@ public class OLFSConfig {
     private BESConfig  _besConfig;
 
     private  boolean   _showTHREDDSDirectoryView;
-    //private  boolean   _usePersistentContentDocs;
+    private  boolean   _allowDirectDataSourceAccess;
     //private  Document  _OLFSConfigurationDoc;
 
 
     OLFSConfig() {
         _besConfig = new BESConfig();
         _showTHREDDSDirectoryView = false;
+        _allowDirectDataSourceAccess = false;
     }
 
     OLFSConfig(Document olfsConfiguration) throws Exception{
@@ -108,12 +109,13 @@ public class OLFSConfig {
             setTHREDDSDirectoryView(false);
         }
 
-        /*
-        if(olfsConfigurationDoc.getRootElement().getChild("UsePersistentContentDocs") != null)
-            setUsePersistentContentDocs(true);
+
+
+
+        if(olfsConfigurationDoc.getRootElement().getChild("AllowDirectDataSourceAccess") != null)
+            setAllowDirectDataSourceAccess(true);
         else
-            setUsePersistentContentDocs(false);
-        */
+            setAllowDirectDataSourceAccess(false);
 
 
 
@@ -188,8 +190,8 @@ public class OLFSConfig {
     public boolean getTHREDDSDirectoryView(){ return _showTHREDDSDirectoryView; }
 
 
-    //public void    setUsePersistentContentDocs(boolean val){ _usePersistentContentDocs = val; }
-    //public boolean usePersistentContentDocs(){ return _usePersistentContentDocs; }
+    public void    setAllowDirectDataSourceAccess(boolean val){ _allowDirectDataSourceAccess = val; }
+    public boolean allowDirectDataSourceAccess(){ return _allowDirectDataSourceAccess; }
 
 
 

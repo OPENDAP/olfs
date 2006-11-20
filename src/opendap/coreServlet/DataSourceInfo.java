@@ -29,13 +29,13 @@ package opendap.coreServlet;
  * Date: Nov 15, 2006
  * Time: 5:24:06 PM
  */
-public interface SourceInfo {
+public interface DataSourceInfo {
 
-    public  boolean sourceExists(String dataSource);
+    public  boolean sourceExists();
 
-    public  boolean isCollection(String dataSource);
+    public  boolean isCollection();
 
-    public  boolean isDataset(String dataSource);
+    public  boolean isDataset();
 
 
 

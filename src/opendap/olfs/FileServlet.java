@@ -45,6 +45,7 @@ import java.io.IOException;
  * Date: Oct 12, 2006
  * Time: 1:32:37 PM
  * @see S4Dir
+ * @deprecated
  */
 public class FileServlet extends HttpServlet {
 

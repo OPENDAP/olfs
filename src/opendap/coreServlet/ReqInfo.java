@@ -226,6 +226,29 @@ public class ReqInfo {
 
 
     /**
+     * Returns the full source name for this request. This is essentially the same as the value
+     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
+     * is null then the full source name is "/".
+     * @param req The client request.
+     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
+     */
+    public static String getFullSourceName(HttpServletRequest req){
+
+        String name=req.getPathInfo();
+
+        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
+            name = "/";
+
+        }
+        return name;
+
+    }
+
+
+
+
+
+    /**
      * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
      * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
      * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.

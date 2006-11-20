@@ -41,6 +41,11 @@ public interface OpendapHttpDispatchHandler {
     public void destroy();
 
 
+
+    public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception;
+
+
+
     /**
      * @return A String containing the XDAP MIME header value that describes the
      *         DAP specifcation that the server response conforms to. This methof should
@@ -191,6 +196,7 @@ public interface OpendapHttpDispatchHandler {
 
 
     public boolean useOpendapDirectoryView();
+    public boolean allowDirectDataSourceAccess();
 
 
 
@@ -227,6 +233,10 @@ public interface OpendapHttpDispatchHandler {
      */
 
     public void sendCatalog(HttpServletRequest request,
+                            HttpServletResponse response) throws Exception;
+
+
+    public void sendFile(HttpServletRequest request,
                             HttpServletResponse response) throws Exception;
 
 

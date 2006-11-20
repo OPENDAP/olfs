@@ -21,5 +21,18 @@
       -->
     <DirectoryView>OPeNDAP</DirectoryView>
 
+    <!-- AllowDirectDataSourceAccess
+      - If this element is opresent then the server will allow users to request
+      - the data source (file) directly. For example a user could just get the
+      - underlying NetCDF files located on the server without using the OPeNDAP
+      - request interface.
+      -
+      - THINK TWICE before allowing this, as data sources can be quite large
+      - and allowing their transmission with out subsetting can put heavy loads
+      - on the network and the server.
+    -->
+    <!-- <AllowDirectDataSourceAccess /> -->
+
+
 </OLFSConfig>
 

@@ -24,7 +24,7 @@
     <servlet>
         <servlet-name>s4</servlet-name>
 
-        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
+        <servlet-class>opendap.coreServlet.NewDispatch</servlet-class>
 
         <init-param>
             <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
@@ -38,7 +38,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value> </param-value>
+            <param-value>showException probeRequest S4Dir showRequest showResponse </param-value>
         </init-param>
 
 
@@ -67,6 +67,8 @@
 
     </servlet>
 
+
+    <!--
     <servlet>
         <servlet-name>file</servlet-name>
 
@@ -75,6 +77,7 @@
         <load-on-startup>1</load-on-startup>
 
     </servlet>
+    -->
 
 
     <servlet-mapping>
@@ -103,6 +106,7 @@
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
 
+    <!--
     <servlet-mapping>
         <servlet-name>file</servlet-name>
         <url-pattern>/file</url-pattern>
@@ -111,7 +115,7 @@
         <servlet-name>file</servlet-name>
         <url-pattern>/file/*</url-pattern>
     </servlet-mapping>
-
+    -->
 
 </web-app>
 
