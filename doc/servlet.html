@@ -85,29 +85,32 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </ul>
 <p>&nbsp;</p>
 <h2><strong>olfs.xml</strong> </h2>
-<p>Currently the OLFS has 2 normally configurable items: The BES location and the directory view.</p>
+<p>Currently the OLFS has 3 normally configurable items:</p>
 <p>The <em>&lt;OLFSConfig&gt;</em> element is the document root and it contains the following configuration inflrmation: </p>
-<ul>
+<ol>
   <li>The <em>&lt;BES&gt;</em> element contains the BES configuration information.
     <br>
     <br>
     <ul>
-    <li><em>&lt;host&gt; </em>element: The host/ip  location of the BES. <br>
-      <br>
-    </li>
-    <li><em>&lt;port&gt; </em>element: The port  number on which the BES is listening.<br>
-      <br>
-    </li>
-    <li><em>&lt;MaxClients&gt; </em>element: Provides the maximum number of concurrent BES client connections that the OLFS should maintain. These connections are pooled for efficiency and speed, and the limit should be determined empirically. If the <em>&lt;MaxClients&gt;</em> element is missing the pool size defaults to 10. <br>
-      <br>
-    </li>
+      <li><em>&lt;host&gt; </em>element: The host/ip  location of the BES.<br>  
+        <br>
+      </li>
+      <li><em>&lt;port&gt; </em>element: The port  number on which the BES is listening.<br>  
+        <br>
+      </li>
+      <li><em>&lt;MaxClients&gt; </em>element: Provides the maximum number of concurrent BES client connections that the OLFS should maintain. These connections are pooled for efficiency and speed, and the limit should be determined empirically. If the <em>&lt;MaxClients&gt;</em> element is missing the pool size defaults to 10.<br>  
+        <br>
+      </li>
     </ul>
-</li>
+  </li>
   <li>The <em>&lt;DirectoryView&gt;</em> element is <span class="style8">used to indicate which type of directory view clients see. This DOES NOT
-           affect the THREDDS catalogs! Only the HTML views of them. A value
-           of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
-  of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.</span> </li>
-</ul>
+        affect the THREDDS catalogs! Only the HTML views of them. A value
+        of &quot;THREDDS&quot; will provide the THREDDS directory view and a value
+        of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.</span> <br>
+        <br>
+  </li>
+  <li>The &lt;AllowDirectDataSourceAccess /&gt; element controls the users ability to directly access data sources via the web interface. If  this element is present in the OLFS.xml file (and not commented out as in the example below)  a client can get an entire data source (such as an HDF file) by simply requesting it through the HTTP URL interface. This is NOT a good practice and is not recommended. By default Server4 ships with this option turned off and I recommend that you leave it that way unless you really want users to be able to circumvent the OPeNDAP request interface and have direct access to the data products stored on your server. </li>
+</ol>
 <p>An example <strong>olfs.xml</strong> file:</p>
 <pre>
 
@@ -134,6 +137,8 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
            of &quot;OPeNDAP&quot; will produce the OPeNDAP directory view.--&gt;</span>
 
       &lt;DirectoryView&gt;THREDDS&lt;/DirectoryView&gt;
+
+    <span class="style7">&lt;!-- AllowDirectDataSourceAccess<br>      - If this element is opresent then the server will allow users to request<br>      - the data source (file) directly. For example a user could just get the<br>      - underlying NetCDF files located on the server without using the OPeNDAP<br>      - request interface.<br>      -<br>      - THINK TWICE before allowing this, as data sources can be quite large<br>      - and allowing their transmission with out subsetting can put heavy loads<br>      - on the network and the server.<br>    --&gt;</span><br>    &lt;!-- &lt;AllowDirectDataSourceAccess /&gt; --&gt;
 
   &lt;/OLFSConfig&gt;
 
