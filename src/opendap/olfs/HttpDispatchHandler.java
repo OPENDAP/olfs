@@ -269,7 +269,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
             String responseDAP = null;
 
-            for (Object o : getVersionDocument().getRootElement().getChild("DAP").getChildren("version")) {
+            for (Object o : getVersionDocument().getRootElement().getChild("Handlers").getChild("DAP").getChildren("version")) {
                 Element v = (Element) o;
                 String ver = v.getTextTrim();
                 double vval = Double.parseDouble(ver);

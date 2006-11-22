@@ -38,7 +38,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>showException probeRequest S4Dir showRequest showResponse </param-value>
+            <param-value>showException  BES showRequest showResponse </param-value>
         </init-param>
 
 
