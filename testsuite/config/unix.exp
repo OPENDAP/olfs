@@ -1,0 +1,59 @@
+
+# Tcl/Expect code for the OLFS test.
+# 
+# $Id$
+
+# Compare $expected to the global $comp_output. Run `pass' if they match,
+# `fail' otherwise unless `xfailp' is true in which case run `xfail' if they
+# do not match. $msg is the name of the test to print when calling pass, fail
+# or xfail.
+# 
+# NB: $expected may be either a string or a file name. If it is the latter,
+# read the file and compare its contents to $comp_output.
+
+# Read the common code for tests.
+
+if {[file exists testsuite/config/common_tests.exp]} {
+    source testsuite/config/common_tests.exp
+} else {
+    send_user "Could not load common tests!\n"
+    exit
+}
+
+# The four `required' procs are _start, _load, _exit and _version.
+
+
+proc getdap_start { {switches ""} {urls ""} {file ""}} {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    if ![string compare $file ""] {
+	send_user "Trap file not used...\n"
+	if {$verbose >= 1} {
+	    send_user "Testing getdap $switches $urls ...\n"
+	    exp_internal 1
+	}
+	catch "exec getdap $switches {$urls}" comp_output
+    } else {
+	send_user "Trap file: ${file}\n"
+	if {$verbose >= 1} {
+	    send_user "Testing getdap $switches $urls >& $file ...\n"
+	    exp_internal 1
+	}
+	catch "exec getdap {$switches} {$urls} > $file" comp_output
+    }
+}
+
+
+proc getdap_load {} {
+}
+
+proc getdap_exit {} {
+    send -raw ""
+}
+
+
+proc getdap_version {} {
+    send_user "geturl test suite 1.0\n"
+}
