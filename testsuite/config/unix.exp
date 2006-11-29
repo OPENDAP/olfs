@@ -29,16 +29,16 @@ proc getdap_start { {switches ""} {urls ""} {file ""}} {
     global spawn_id
 
     if ![string compare $file ""] {
-	send_user "Trap file not used...\n"
+	#send_user "Trap file not used...\n"
 	if {$verbose >= 1} {
-	    send_user "Testing getdap $switches $urls ...\n"
+	    send_user "Testing OLFS using \"getdap $switches $urls\"\n"
 	    exp_internal 1
 	}
 	catch "exec getdap $switches {$urls}" comp_output
     } else {
-	send_user "Trap file: ${file}\n"
+	#send_user "Trap file: ${file}\n"
 	if {$verbose >= 1} {
-	    send_user "Testing getdap $switches $urls >& $file ...\n"
+	    send_user "Testing OLFS using \"getdap $switches $urls >& $file\"\n"
 	    exp_internal 1
 	}
 	catch "exec getdap {$switches} {$urls} > $file" comp_output
@@ -55,5 +55,109 @@ proc getdap_exit {} {
 
 
 proc getdap_version {} {
-    send_user "geturl test suite 1.0\n"
+    send_user "OLFS test suite 1.0 via getdap\n"
+}
+
+
+
+
+proc getdap_dds { url file {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+send_user "Constraint: $constraint\n"
+getdap_start "-d ${constraint}"  "$url"
+compare_stdout $file "getdap DDS for $url (baseline file: $file)" 1
+}
+
+
+proc getdap_das { url file {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+send_user "Constraint: $constraint\n"
+getdap_start "-a ${constraint}"  "$url"
+compare_stdout $file "getdap DAS for $url (baseline file: $file)" 1
+}
+
+
+proc getdap_ddx { url file {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+send_user "Constraint: $constraint\n"
+getdap_start "-x ${constraint}"  "$url"
+compare_stdout $file "getdap DDX for $url (baseline file: $file)" 1
+}
+
+
+proc getdap_data { url file {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+send_user "Constraint: $constraint\n"
+
+getdap_start "-D ${constraint}"  "$url"
+compare_stdout $file "getdap OPeNDAP data for $url (baseline file: $file)" 1
+}
+
+
+
+proc getdap_all {url fileBase {constraint ""} } {
+
+
+     getdap_dds  ${url} ${fileBase}.dds  ${constraint}
+     getdap_das  ${url} ${fileBase}.das  ${constraint}
+     getdap_ddx  ${url} ${fileBase}.ddx  ${constraint}
+     getdap_data ${url} ${fileBase}.data ${constraint}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+proc curl_start { {switches ""} {urls ""} {file ""}} {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    if ![string compare $file ""] {
+	send_user "Trap file not used...\n"
+	if {$verbose >= 1} {
+	    send_user "Testing OLFS using \"curl $switches $urls\"\n"
+	    exp_internal 1
+	}
+	catch "exec curl $switches {$urls}" comp_output
+    } else {
+	send_user "Trap file: ${file}\n"
+	if {$verbose >= 1} {
+	    send_user "Testing OLFS using \"curl $switches $urls >& $file\"\n"
+	    exp_internal 1
+	}
+	catch "exec curl {$switches} {$urls} > $file" comp_output
+    }
+}
+
+
+proc curl_load {} {
+}
+
+proc curl_exit {} {
+    send -raw ""
+}
+
+
+proc curl_version {} {
+    send_user "OLFS test suite 1.0 via curl\n"
 }
