@@ -23,6 +23,12 @@ if {[file exists testsuite/config/common_tests.exp]} {
 # The four `required' procs are _start, _load, _exit and _version.
 
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#
+# Getdap based testing
+#
+#
+#
 proc getdap_start { {switches ""} {urls ""} {file ""}} {
     global verbose
     global comp_output
@@ -66,7 +72,7 @@ proc getdap_dds { url file {constraint ""} } {
     global comp_output
     global spawn_id
 
-send_user "Constraint: $constraint\n"
+#send_user "Constraint: $constraint\n"
 getdap_start "-d ${constraint}"  "$url"
 compare_stdout $file "getdap DDS for $url (baseline file: $file)" 1
 }
@@ -77,7 +83,7 @@ proc getdap_das { url file {constraint ""} } {
     global comp_output
     global spawn_id
 
-send_user "Constraint: $constraint\n"
+#send_user "Constraint: $constraint\n"
 getdap_start "-a ${constraint}"  "$url"
 compare_stdout $file "getdap DAS for $url (baseline file: $file)" 1
 }
@@ -88,7 +94,7 @@ proc getdap_ddx { url file {constraint ""} } {
     global comp_output
     global spawn_id
 
-send_user "Constraint: $constraint\n"
+#send_user "Constraint: $constraint\n"
 getdap_start "-x ${constraint}"  "$url"
 compare_stdout $file "getdap DDX for $url (baseline file: $file)" 1
 }
@@ -99,7 +105,7 @@ proc getdap_data { url file {constraint ""} } {
     global comp_output
     global spawn_id
 
-send_user "Constraint: $constraint\n"
+#send_user "Constraint: $constraint\n"
 
 getdap_start "-D ${constraint}"  "$url"
 compare_stdout $file "getdap OPeNDAP data for $url (baseline file: $file)" 1
@@ -117,6 +123,7 @@ proc getdap_all {url fileBase {constraint ""} } {
 
 
 }
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 
@@ -125,9 +132,14 @@ proc getdap_all {url fileBase {constraint ""} } {
 
 
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#
+# Curl based testing
+#
+#
+#
 
-
-proc curl_start { {switches ""} {urls ""} {file ""}} {
+proc curl_start { url {file ""}} {
     global verbose
     global comp_output
     global spawn_id
@@ -135,17 +147,20 @@ proc curl_start { {switches ""} {urls ""} {file ""}} {
     if ![string compare $file ""] {
 	send_user "Trap file not used...\n"
 	if {$verbose >= 1} {
-	    send_user "Testing OLFS using \"curl $switches $urls\"\n"
+	    send_user "Testing OLFS using \"curl -s $url\"\n"
 	    exp_internal 1
 	}
-	catch "exec curl $switches {$urls}" comp_output
+	catch "exec curl -gs ${url}" comp_output
+	#send_user "bah!\n"
+	#send_user $comp_output
+	#send_user "\n"
     } else {
 	send_user "Trap file: ${file}\n"
 	if {$verbose >= 1} {
-	    send_user "Testing OLFS using \"curl $switches $urls >& $file\"\n"
+	    send_user "Testing OLFS using \"curl -s $url >& $file\"\n"
 	    exp_internal 1
 	}
-	catch "exec curl {$switches} {$urls} > $file" comp_output
+	catch "exec curl -gs {$url} > $file" comp_output
     }
 }
 
@@ -161,3 +176,76 @@ proc curl_exit {} {
 proc curl_version {} {
     send_user "OLFS test suite 1.0 via curl\n"
 }
+
+
+proc curl_all {url fileBase {constraint ""} } {
+
+    #send_user "${url}" "${fileBase}" "${constraint}"
+
+    curl_dds   "$url" "$fileBase" "$constraint"
+    curl_das   "$url" "$fileBase" "$constraint"
+    curl_ddx   "$url" "$fileBase" "$constraint"
+    curl_dap2  "$url" "$fileBase" "$constraint"
+    curl_ascii "$url" "$fileBase" "$constraint"
+
+
+
+}
+
+proc curl_dds { url fileBase {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    #send_user "${url}" "${fileBase}" "${constraint}"
+
+
+    curl_start "${url}.dds?$constraint"
+    compare_stdout "${fileBase}.dds" "curl for ${url}.dds?$constraint  against baseline file: $fileBase.dds" 1
+}
+
+
+proc curl_das { url fileBase {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    curl_start "${url}.das?$constraint"
+    compare_stdout "${fileBase}.das" "curl for $url.das?$constraint  against baseline file: $fileBase.das" 1
+}
+
+
+proc curl_ddx { url fileBase {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    curl_start "${url}.ddx?$constraint"
+    compare_stdout "${fileBase}.ddx" "curl for $url.ddx?$constraint  against baseline file: $fileBase.ddx" 1
+}
+
+
+proc curl_dap2 { url fileBase {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    curl_start "${url}.dods?$constraint"
+    compare_stdout "${fileBase}.dods" "curl for $url.dods?$constraint  against baseline file: $fileBase.dods" 1
+}
+
+proc curl_ascii { url fileBase {constraint ""} } {
+    global verbose
+    global comp_output
+    global spawn_id
+
+    curl_start "${url}.ascii?$constraint"
+    compare_stdout "${fileBase}.ascii" "curl for $url.ascii?$constraint  against baseline file: $fileBase.ascii" 1
+}
+
+
+
+
+
+
+

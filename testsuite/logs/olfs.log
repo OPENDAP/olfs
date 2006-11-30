@@ -1,0 +1,143 @@
+Test Run By ndp on Wed Nov 29 16:30:40 2006
+Native configuration is powerpc-apple-darwin8.8.0
+
+		=== olfs tests ===
+
+Schedule of variations:
+    unix
+
+Running target unix
+Using /usr/local/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/local/share/dejagnu/config/unix.exp as generic interface file for target.
+Using testsuite/config/unix.exp as tool-and-target-specific interface file.
+Running testsuite/olfs.0/freeform.exp ...
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dds?  against baseline file: testsuite/ff/1998-6-avhrr.dat.dds
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dds?  against baseline file: testsuite/ff/1998-6-avhrr.dat.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.das?  against baseline file: testsuite/ff/1998-6-avhrr.dat.das
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.das?  against baseline file: testsuite/ff/1998-6-avhrr.dat.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.ddx?  against baseline file: testsuite/ff/1998-6-avhrr.dat.ddx
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.ddx?  against baseline file: testsuite/ff/1998-6-avhrr.dat.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dods?  against baseline file: testsuite/ff/1998-6-avhrr.dat.dods
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.dods?  against baseline file: testsuite/ff/1998-6-avhrr.dat.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.ascii?  against baseline file: testsuite/ff/1998-6-avhrr.dat.ascii
+PASS: curl for http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat.ascii?  against baseline file: testsuite/ff/1998-6-avhrr.dat.ascii
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.dds?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.dds
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.dds?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.das?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.das
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.das?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ddx?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ddx
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ddx?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.dods?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.dods
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.dods?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ascii?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ascii
+PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ascii?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ascii
+testcase testsuite/olfs.0/freeform.exp completed in 1 seconds
+Running testsuite/olfs.0/hdf.exp ...
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.dds?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.dds
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.dds?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.das?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.das
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.das?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.ddx?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.ddx
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.ddx?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.dods?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.dods
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.dods?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.ascii?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.ascii
+PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.ascii?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.ascii
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.dds?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].dds
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.dds?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.das?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].das
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.das?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.ddx?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].ddx
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.ddx?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.dods?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].dods
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.dods?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.ascii?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].ascii
+PASS: curl for http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf.ascii?Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]  against baseline file: testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature[0:100:4095][0:100:2047].ascii
+testcase testsuite/olfs.0/hdf.exp completed in 2 seconds
+Running testsuite/olfs.0/netcdf.exp ...
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dds?  against baseline file: testsuite/nc/fnoc1.nc.dds
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dds?  against baseline file: testsuite/nc/fnoc1.nc.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.das?  against baseline file: testsuite/nc/fnoc1.nc.das
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.das?  against baseline file: testsuite/nc/fnoc1.nc.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ddx?  against baseline file: testsuite/nc/fnoc1.nc.ddx
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ddx?  against baseline file: testsuite/nc/fnoc1.nc.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dods?  against baseline file: testsuite/nc/fnoc1.nc.dods
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dods?  against baseline file: testsuite/nc/fnoc1.nc.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ascii?  against baseline file: testsuite/nc/fnoc1.nc.ascii
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ascii?  against baseline file: testsuite/nc/fnoc1.nc.ascii
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dds?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.dds
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dds?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.das?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.das
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.das?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ddx?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.ddx
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ddx?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dods?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.dods
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dods?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ascii?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.ascii
+PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ascii?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.ascii
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dds?  against baseline file: testsuite/nc/bears.nc.dds
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dds?  against baseline file: testsuite/nc/bears.nc.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?  against baseline file: testsuite/nc/bears.nc.das
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?  against baseline file: testsuite/nc/bears.nc.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?  against baseline file: testsuite/nc/bears.nc.ddx
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?  against baseline file: testsuite/nc/bears.nc.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dods?  against baseline file: testsuite/nc/bears.nc.dods
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dods?  against baseline file: testsuite/nc/bears.nc.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ascii?  against baseline file: testsuite/nc/bears.nc.ascii
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ascii?  against baseline file: testsuite/nc/bears.nc.ascii
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dds?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.dds
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dds?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.dds
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.das
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.das
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ddx
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ddx
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dods?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.dods
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dods?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.dods
+Trap file not used...
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ascii?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ascii
+PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ascii?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ascii
+testcase testsuite/olfs.0/netcdf.exp completed in 3 seconds
+
+		=== olfs Summary ===
+
+# of expected passes		40
+runtest completed at Wed Nov 29 16:30:46 2006

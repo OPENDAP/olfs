@@ -1,0 +1,3 @@
+Dataset: avhrr.dat
+URI_Avhrr.year, URI_Avhrr.month, URI_Avhrr.day, URI_Avhrr.hours, URI_Avhrr.minutes, URI_Avhrr.seconds, URI_Avhrr.DODS_URL
+, , , , , , 

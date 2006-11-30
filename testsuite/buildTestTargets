@@ -1,0 +1,23 @@
+#!/bin/csh
+
+
+
+csh ./buildTestTarget nc/fnoc1.nc
+csh ./buildTestTarget nc/fnoc1.nc lat
+
+
+csh ./buildTestTarget nc/bears.nc 
+csh ./buildTestTarget nc/bears.nc "bears,aloan.i"
+
+
+csh ./buildTestTarget hdf/3B42.980909.5.HDF 
+
+csh ./buildTestTarget hdf/1990104h09da-gdm.hdf "Sea%20Surface%20Temperature[0:100:4095][0:100:2047]"
+
+csh ./buildTestTarget ff/1998-6-avhrr.dat 
+csh ./buildTestTarget ff/avhrr.dat "URI_Avhrr.DODS_URL"
+
+
+
+
+#csh ./buildTestTarget ff/1998-6-avhrr.dat  "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"

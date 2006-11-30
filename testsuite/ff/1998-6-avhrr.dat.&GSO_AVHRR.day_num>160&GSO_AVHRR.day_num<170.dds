@@ -1,0 +1,5 @@
+Error {
+    code = -1;
+    message = "opendap.ppt.PPTException: Failed to read response from server. End Of Stream reached prematurely.   [PPTClient.java - line 277]";
+};
+

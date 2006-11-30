@@ -1,0 +1,27 @@
+#!/bin/csh
+
+
+set curlswitches="-gs"
+
+echo dataset: "$1"
+echo constraint: "$2"
+
+if ("$2" != "") then
+    set baselineFileName = $1."$2"
+else
+    set baselineFileName = $1
+endif
+
+echo
+echo baslineFileName: "$baselineFileName"
+echo
+
+echo url: "http://localhost:8080/opendap/data/$1.dds?$2"
+
+curl $curlswitches "http://localhost:8080/opendap/data/$1.dds?$2"    > "$baselineFileName.dds"
+curl $curlswitches "http://localhost:8080/opendap/data/$1.das?$2"    > "$baselineFileName.das"
+curl $curlswitches "http://localhost:8080/opendap/data/$1.ddx?$2"    > "$baselineFileName.ddx"
+curl $curlswitches "http://localhost:8080/opendap/data/$1.dods?$2"   > "$baselineFileName.dods"
+curl $curlswitches "http://localhost:8080/opendap/data/$1.ascii?$2"  > "$baselineFileName.ascii"
+getdap -D  "http://localhost:8080/opendap/data/$1?$2"      > "$baselineFileName.data"
+
