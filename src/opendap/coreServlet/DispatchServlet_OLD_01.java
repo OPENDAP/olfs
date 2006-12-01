@@ -59,8 +59,9 @@ import thredds.catalog.InvDatasetScan;
  * Date: Mar 17, 2006
  * Time: 2:23:37 PM
  * To change this template use File | Settings | File Templates.
+ * @deprecated
  */
-public class DispatchServlet_OLD extends HttpServlet {
+public class DispatchServlet_OLD_01 extends HttpServlet {
 
     private static boolean forceTHREDDSCatalog = false;
 

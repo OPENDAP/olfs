@@ -39,9 +39,24 @@ import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
 /**
- * User: ndp
- * Date: Nov 15, 2006
- * Time: 3:30:36 PM
+ * This servlet provides the dispatching for all OPeNDAP requests.
+ * <p/>
+ * <p>This server will respond to both HTTP GET and POST requests. The GET dispatching is
+ * done in this class, and the POST dispatching (which is in fact the SOAP inrterface)
+ * is done in <code>SOAPRequestDispatcher</code></p>
+ * <p/>
+ * <p/>
+ * <p>This server is built designed so that the actual handling of the dispatch is done
+ * through code that is identified at run time through the web.xml configuration of the
+ * servlet. In particular the HTTP GET request are handled by a class the implements the
+ * OpendapHttpDispatchHandler interface. The SOAP requests (via HTTP POST) are handled by a
+ * class the implements the OpendapSOAPDispatchHandler interface.<p>
+ * <p/>
+ * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
+ * an implmentation clas for both these interfaces.</p>
+ * <p/>
+ * <p/>
+ * <p/>
  */
 public class DispatchServlet extends HttpServlet {
 

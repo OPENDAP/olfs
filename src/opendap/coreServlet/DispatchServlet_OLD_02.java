@@ -42,8 +42,9 @@ import java.io.OutputStreamWriter;
  * User: ndp
  * Date: Nov 15, 2006
  * Time: 3:30:36 PM
+ * @deprecated
  */
-public class NewDispatch extends HttpServlet {
+public class DispatchServlet_OLD_02 extends HttpServlet {
 
     private static boolean forceTHREDDSCatalog = false;
 
