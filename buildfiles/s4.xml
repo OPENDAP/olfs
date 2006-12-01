@@ -142,19 +142,6 @@
     </target>
 
 
-    <target
-        name="UpdateRepositoryJavaDoc"
-        depends="clean,doc"
-        description="Builds JavaDoc for the core OPeNDAP software packages, and puts it into the repository documentation directory."
-        >
-
-        <copy todir="${doc.dir}/javadoc" >
-            <fileset dir="${build.doc}/javadoc">
-                <include name="**/*"/>
-            </fileset>
-        </copy>
-     </target>
-
 
     <target
         name="doc-dist"
