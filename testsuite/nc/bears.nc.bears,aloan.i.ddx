@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dataset name="bears.nc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://xml.opendap.org/ns/DAP2"
+xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/dap2.xsd">
+
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="history" type="String">
+            <value>&quot;This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.&quot;</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <value>&quot;k&quot;</value>
+        </Attribute>
+    </Attribute>
+
+    <Grid name="bears">
+        <Attribute name="act" type="String">
+            <value>&quot;text string\\012\\011123&quot;</value>
+        </Attribute>
+        <Attribute name="acs" type="Int16">
+            <value>-40</value>
+        </Attribute>
+        <Attribute name="acl" type="Int32">
+            <value>17000</value>
+        </Attribute>
+        <Attribute name="acf" type="Float32">
+            <value>-2.</value>
+            <value>1.</value>
+            <value>0.</value>
+        </Attribute>
+        <Attribute name="acd" type="Float64">
+            <value>-1.</value>
+            <value>0.75</value>
+        </Attribute>
+        <Array name="bears">
+            <String/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+            <dimension name="l" size="3"/>
+        </Array>
+        <Map name="i">
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+        <Map name="l">
+            <Int16/>
+            <dimension name="l" size="3"/>
+        </Map>
+    </Grid>
+    <Grid name="aloan">
+        <Map name="i">
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+    </Grid>
+
+    <dataBLOB href=".blob?bears,aloan.i"/>
+</Dataset>
