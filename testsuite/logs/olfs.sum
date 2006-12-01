@@ -1,4 +1,4 @@
-Test Run By ndp on Wed Nov 29 16:30:40 2006
+Test Run By ndp on Fri Dec  1 13:39:36 2006
 Native configuration is powerpc-apple-darwin8.8.0
 
 		=== olfs tests ===
@@ -17,7 +17,7 @@ PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.dds?URI_Avhrr.DOD
 PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.das?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.das
 PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ddx?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ddx
 PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.dods?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.dods
-PASS: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ascii?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ascii
+XFAIL: curl for http://localhost:8080/opendap/data/ff/avhrr.dat.ascii?URI_Avhrr.DODS_URL  against baseline file: testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL.ascii
 Running testsuite/olfs.0/hdf.exp ...
 PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.dds?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.dds
 PASS: curl for http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF.das?  against baseline file: testsuite/hdf/3B42.980909.5.HDF.das
@@ -41,16 +41,17 @@ PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ddx?lat  against b
 PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.dods?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.dods
 PASS: curl for http://localhost:8080/opendap/data/nc/fnoc1.nc.ascii?lat  against baseline file: testsuite/nc/fnoc1.nc.lat.ascii
 PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dds?  against baseline file: testsuite/nc/bears.nc.dds
-PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?  against baseline file: testsuite/nc/bears.nc.das
-PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?  against baseline file: testsuite/nc/bears.nc.ddx
+XFAIL: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?  against baseline file: testsuite/nc/bears.nc.das
+XFAIL: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?  against baseline file: testsuite/nc/bears.nc.ddx
 PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dods?  against baseline file: testsuite/nc/bears.nc.dods
 PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ascii?  against baseline file: testsuite/nc/bears.nc.ascii
 PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dds?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.dds
-PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.das
-PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ddx
+XFAIL: curl for http://localhost:8080/opendap/data/nc/bears.nc.das?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.das
+XFAIL: curl for http://localhost:8080/opendap/data/nc/bears.nc.ddx?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ddx
 PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.dods?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.dods
 PASS: curl for http://localhost:8080/opendap/data/nc/bears.nc.ascii?bears,aloan.i  against baseline file: testsuite/nc/bears.nc.bears,aloan.i.ascii
 
 		=== olfs Summary ===
 
-# of expected passes		40
+# of expected passes		35
+# of expected failures		5

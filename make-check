@@ -1,0 +1,2 @@
+#!/bin/sh
+runtest --outdir testsuite/logs --srcdir testsuite --tool olfs
