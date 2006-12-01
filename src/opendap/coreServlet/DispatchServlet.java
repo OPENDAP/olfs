@@ -265,11 +265,23 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
+    /**
+     * Gets the last modified date of the requested resource. Because the data handler is really
+     * the only entity capable of determining the last modified dat the job is passed  through to it.
+     * @param req
+     * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
+     * since midnight January 1, 1970 GMT
+     */
     protected long getLastModified(HttpServletRequest req) {
         return odh.getLastModified(req);
     }
 
 
+    /**
+     * Writes information about the incomming request to stdout.
+     * @param req
+     * @param reqno
+     */
     public void showRequest(HttpServletRequest req, long reqno) {
         System.out.println("-------------------------------------------");
         System.out.println("Server: " + getServerName() + "   Request #" + reqno);
@@ -293,8 +305,27 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    public boolean specialRequest(HttpServletRequest request,
-                                  HttpServletResponse response) throws Exception {
+    /**
+     * Performs dispatching for "special" server requests. This server supports several diagnositic responses:
+     * <ui>
+     *     <li> version - returns the OPeNDAP version document (XML) </li>
+     *     <li> help - returns the help page for Server4  </li>
+     *     <li> systemproperties - returns an html document describing the state of the "system" </li>
+     *     <li> debug -   </li>
+     *     <li> status -    </li>
+     *     <li> contents.html -  Returns the OPeNDAP directory view of a collection (as an HTML document)</li>
+     *     <li> catalog.html - Returns the THREDDS catalog view of a collection (as an HTML document)</li>
+     *     <li> catalog.xml - Returns the THREDDS catalog of a collection (as an XML document)</li>
+     * </ui>
+     *
+     *
+     * @param request
+     * @param response
+     * @return true if the request was handled as a special request, false otherwise.
+     * @throws Exception
+     */
+    public boolean specialRequestDispatch(HttpServletRequest request,
+                                          HttpServletResponse response) throws Exception {
 
         String dataSource = ReqInfo.getDataSource(request);
         String dataSetName = ReqInfo.getDataSetName(request);
@@ -382,6 +413,26 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
+    /**
+     * Performs dispatching for OPeNDAP data requests. The OPeNDAP response suite consists of:
+     * <ui>
+     *     <li>dds - The OPeNDAP Data Description Service document for the requested dataset. </li>
+     *     <li>das - The OPeNDAP Data Attribute Service document for the requested dataset. </li>
+     *     <li>ddx - The OPeNDAP DDX document, an XML document that combines the DDS and the DAS. </li>
+     *     <li>dods - The OPeNDAP DAP2 data service. Returns data to the user as described in
+     *                the DAP2 specification </li>
+     *     <li>ascii - The requested data as columns of ASCII values. </li>
+     *     <li>info - An HTML document providing a easy to read view of the DDS and DAS information. </li>
+     *     <li>html - The HTML request form from which users can choose wich components of a dataset they wish
+     *                to retrieve. </li>
+     * </ui>
+     *
+     *
+     * @param request
+     * @param response
+     * @return true if the request was handled as an OPeNDAP service request, false otherwise.
+     * @throws Exception
+     */
     public boolean dataSetDispatch(HttpServletRequest request,
                                   HttpServletResponse response) throws Exception {
 
@@ -427,7 +478,7 @@ public class DispatchServlet extends HttpServlet {
                     isDataRequest  = true;
                     log.info("Sent BAD URL Response because they asked for a Blob. Bad User!");
 
-                } else if ( // DataDDS (aka .dods) Response?
+                } else if ( // DAP2 (aka .dods) Response?
                         requestSuffix.equalsIgnoreCase("dods")
                         ) {
                     odh.sendDODS(request, response);
@@ -477,7 +528,15 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-
+    /**
+     * Performs dispatching for file requests. If a request is not for a special service or an OPeNDAP service
+     * then we attempt to resolve the request to a "file" located within the context of the data handler and
+     * return it's contents.
+     * @param request
+     * @param response
+     * @return true if the request was serviced as a file request, false otherwise.
+     * @throws Exception
+     */
     public boolean fileDispatch(HttpServletRequest request,
                                   HttpServletResponse response) throws Exception {
 
@@ -566,7 +625,7 @@ public class DispatchServlet extends HttpServlet {
 
 
 
-            if (!specialRequest(request, response)) {
+            if (!specialRequestDispatch(request, response)) {
                 if (!dataSetDispatch(request, response)){
                     if(!fileDispatch(request,response)){
                         sendResourceNotFound(request, response);
