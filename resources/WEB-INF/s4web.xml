@@ -24,7 +24,7 @@
     <servlet>
         <servlet-name>s4</servlet-name>
 
-        <servlet-class>opendap.coreServlet.NewDispatch</servlet-class>
+        <servlet-class>opendap.coreServlet.NewDispatch2</servlet-class>
 
         <init-param>
             <param-name>OpendapHttpDispatchHandlerImplementation</param-name>

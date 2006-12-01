@@ -132,9 +132,8 @@ public class BesAPI {
      *
      *
      * @param odc The OPeNDAPClient to return to the client pool.
-     * @throws PPTException
      */
-    private static void returnClient(OPeNDAPClient odc) throws PPTException {
+    private static void returnClient(OPeNDAPClient odc) {
 
         try {
 
@@ -155,6 +154,14 @@ public class BesAPI {
         }
         catch (InterruptedException e){
             e.printStackTrace(); // Don't do a thing
+        } catch (PPTException e) {
+            // This is a bad sign, for now we'll assume that the BES died and we should trash the
+            // connection
+
+            // By releasing the flag and not checking the OPeNDAPClient back in we essentially through the client away.
+            // A new one will be made the next time it's needed.
+            _checkOutFlag.release();
+            e.printStackTrace();
         }
 
     }
