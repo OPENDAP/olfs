@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 
 /**
- * Implmentations of this interface may plugged into the DispatchServlet (via the web.xml file) to
- * provide specific Server responses to HTTP GET requests. The DispatchServlet REQUIRES an implmentation of this interface
+ * Implmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to
+ * provide specific Server responses to HTTP GET requests. The DispatchServlet_OLD REQUIRES an implmentation of this interface
  * to be identified in the web.xml file.
  */
 public interface OpendapHttpDispatchHandler {

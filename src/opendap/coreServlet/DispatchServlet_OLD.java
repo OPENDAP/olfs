@@ -24,26 +24,43 @@
 
 package opendap.coreServlet;
 
-import thredds.catalog.InvDatasetScan;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletException;
+import java.io.*;
+import java.util.StringTokenizer;
+
 import thredds.servlet.DataRootHandler;
 import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.util.StringTokenizer;
+import thredds.catalog.InvDatasetScan;
 
 /**
+ * This servlet provides the dispatching for all OPeNDAP requests.
+ * <p/>
+ * <p>This server will respond to both HTTP GET and POST requests. The GET dispatching is
+ * done in this class, and the POST dispatching (which is in fact the SOAP inrterface)
+ * is done in <code>SOAPRequestDispatcher</code></p>
+ * <p/>
+ * <p/>
+ * <p>This server is built designed so that the actual handling of the dispatchs is done
+ * through code that is identified at run time through the web.xml configuration of the
+ * servlet. In particular the HTTP GET request are handled by a class the implements the
+ * OpendapHttpDispatchHandler interface. The SOAP requests (via HTTP POST) are handled by a
+ * class the implements the OpendapSOAPDispatchHandler interface.<p>
+ * <p/>
+ * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
+ * an implmentation clas for both these interfaces.</p>
+ * <p/>
+ * <p/>
+ * <p/>
  * User: ndp
- * Date: Nov 15, 2006
- * Time: 3:30:36 PM
+ * Date: Mar 17, 2006
+ * Time: 2:23:37 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class NewDispatch2 extends HttpServlet {
+public class DispatchServlet_OLD extends HttpServlet {
 
     private static boolean forceTHREDDSCatalog = false;
 
@@ -89,7 +106,7 @@ public class NewDispatch2 extends HttpServlet {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      *
-     * @throws javax.servlet.ServletException
+     * @throws ServletException
      */
     public void init() throws ServletException {
 
@@ -260,7 +277,6 @@ public class NewDispatch2 extends HttpServlet {
         System.out.println("Server: " + getServerName() + "   Request #" + reqno);
         System.out.println("Client: " + req.getRemoteHost());
         System.out.println("Request Info:");
-        System.out.println("  fullSourceName:               '" + ReqInfo.getFullSourceName(req) + "'");
         System.out.println("  dataSource:                   '" + ReqInfo.getDataSource(req) + "'");
         System.out.println("  dataSetName:                  '" + ReqInfo.getDataSetName(req) + "'");
         System.out.println("  collectionName:               '" + ReqInfo.getCollectionName(req) + "'");
@@ -276,230 +292,6 @@ public class NewDispatch2 extends HttpServlet {
                 "' CE: '" + ReqInfo.getConstraintExpression(req) + "'");
 
     }
-
-
-    public boolean specialRequest(HttpServletRequest request,
-                                  HttpServletResponse response) throws Exception {
-
-        String dataSource = ReqInfo.getDataSource(request);
-        String dataSetName = ReqInfo.getDataSetName(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-
-        boolean specialRequest = false;
-
-        if (dataSource != null) {
-
-            if (        // Version Response?
-                    dataSource.equalsIgnoreCase("/version")
-                    ) {
-                odh.sendVersion(request, response);
-                log.info("Sent Version Response");
-                specialRequest = true;
-
-            } else if ( // Help Response?
-                    dataSource.equalsIgnoreCase("/help") ||
-                            dataSource.equalsIgnoreCase("/help/") ||
-                            ((requestSuffix != null) &&
-                                    requestSuffix.equalsIgnoreCase("help"))
-                    ) {
-                odh.sendHelpPage(request, response);
-                log.info("Sent Help Page");
-                specialRequest = true;
-
-            } else if ( // System Properties Response?
-                //Debug.isSet("SystemProperties") &&
-
-                    dataSource.equalsIgnoreCase("/systemproperties")
-                    ) {
-                Util.sendSystemProperties(request, response, odh);
-                log.info("Sent System Properties");
-                specialRequest = true;
-
-            } else if (    // Debug response?
-                    Debug.isSet("DebugInterface") &&
-                            dataSource.equals("/debug") &&
-                            (requestSuffix != null) &&
-                            requestSuffix.equals("")) {
-
-                DebugHandler.doDebug(this, request, response, odh, this.getServletConfig());
-                log.info("Sent Debug Response");
-                specialRequest = true;
-
-            } else if (  // Status Response?
-
-                    dataSource.equalsIgnoreCase("/status")
-                    ) {
-                doGetStatus(request, response);
-                log.info("Sent Status");
-                specialRequest = true;
-
-            } else if (dataSetName != null) {
-
-
-                if (   //  Directory response?
-                        dataSetName.equalsIgnoreCase("contents") &&
-                                requestSuffix != null &&
-                                requestSuffix.equalsIgnoreCase("html")) {
-
-
-                    odh.sendDir(request, response);
-
-                    log.info("Sent Contents (aka OPeNDAP directory).");
-
-                    specialRequest = true;
-
-                } else if ( //  THREDDS Catalog ?
-                        dataSetName.equalsIgnoreCase("catalog") && requestSuffix != null &&
-                                (requestSuffix.equalsIgnoreCase("html") || requestSuffix.equalsIgnoreCase("xml"))
-                        ) {
-
-                    if (getThreddsCatalog(request, response)) {
-                        log.info("Sent Catalog");
-                        specialRequest = true;
-                    }
-                }
-            }
-        }
-
-        return specialRequest;
-
-    }
-
-
-    public boolean dataSetDispatch(HttpServletRequest request,
-                                  HttpServletResponse response) throws Exception {
-
-
-        String dataSource = ReqInfo.getDataSource(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-        DataSourceInfo dsi = odh.getDataSourceInfo(dataSource);
-        System.out.println(dsi);
-
-        boolean isDataRequest = false;
-
-        if (dsi.sourceExists()) {
-
-            if (requestSuffix!=null && dsi.isDataset()) {
-
-                if ( // DDS Response?
-                        requestSuffix.equalsIgnoreCase("dds")
-                        ) {
-                    odh.sendDDS(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent DDS");
-
-                } else if ( // DAS Response?
-                        requestSuffix.equalsIgnoreCase("das")
-                        ) {
-                    odh.sendDAS(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent DAS");
-
-                } else if (  // DDX Response?
-                        requestSuffix.equalsIgnoreCase("ddx")
-                        ) {
-                    odh.sendDDX(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent DDX");
-
-                } else if ( // Blob Response?
-                        requestSuffix.equalsIgnoreCase("blob")
-                        ) {
-                    //doGetBLOB(request, response, rs);
-                    badURL(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent BAD URL Response because they asked for a Blob. Bad User!");
-
-                } else if ( // DataDDS (aka .dods) Response?
-                        requestSuffix.equalsIgnoreCase("dods")
-                        ) {
-                    odh.sendDODS(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent DAP2 Data");
-
-                } else if (  // ASCII Data Response.
-                        requestSuffix.equalsIgnoreCase("asc") ||
-                                requestSuffix.equalsIgnoreCase("ascii")
-                        ) {
-                    odh.sendASCII(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent ASCII");
-
-                } else if (  // Info Response?
-                        requestSuffix.equalsIgnoreCase("info")
-                        ) {
-                    odh.sendInfo(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent Info");
-
-                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
-                        requestSuffix.equalsIgnoreCase("html") ||
-                                requestSuffix.equalsIgnoreCase("htm")
-                        ) {
-                    odh.sendHTMLRequestForm(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent HTML Request Form");
-
-
-                } else if (requestSuffix.equals("")) {
-                    badURL(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent BAD URL (missing Suffix)");
-
-                } else {
-                    badURL(request, response);
-                    isDataRequest  = true;
-                    log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                }
-
-            }
-        }
-
-
-        return isDataRequest;
-    }
-
-
-
-    public boolean fileDispatch(HttpServletRequest request,
-                                  HttpServletResponse response) throws Exception {
-
-
-
-        String fullSourceName = ReqInfo.getFullSourceName(request);
-
-        DataSourceInfo dsi = odh.getDataSourceInfo(fullSourceName);
-
-        System.out.println(dsi);
-
-        boolean isFileResponse = false;
-
-        if (dsi.sourceExists()) {
-            if (dsi.isCollection()) {
-                if (odh.useOpendapDirectoryView()) {
-                    odh.sendDir(request, response);
-                } else {
-                    getThreddsCatalog(request, response);
-                }
-
-            } else {
-
-                if (!dsi.isDataset() || odh.allowDirectDataSourceAccess()) {
-                    odh.sendFile(request, response);
-                } else {
-                    sendDirectAccessDenied(request, response);
-                }
-            }
-            isFileResponse = true;
-
-        }
-
-        return isFileResponse;
-
-    }
-
 
 
     /**
@@ -534,6 +326,8 @@ public class NewDispatch2 extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
+        // response.setHeader("Last-Modified", (new Date()).toString() );
+
 
         try {
             if (Debug.isSet("probeRequest"))
@@ -550,15 +344,181 @@ public class NewDispatch2 extends HttpServlet {
             } // synch
 
 
+            String dataSource = ReqInfo.getDataSource(request);
+            String dataSetName = ReqInfo.getDataSetName(request);
+            String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-            if (!specialRequest(request, response)) {
-                if (!dataSetDispatch(request, response)){
-                    if(!fileDispatch(request,response)){
-                        sendResourceNotFound(request, response);
-                        log.info("Sent Resource Not Found (404) - nothing left to check.");
-                    }
+
+            boolean specialRequest = false;
+
+            if (dataSource != null) {
+
+                if (        // Version Response?
+                        dataSource.equalsIgnoreCase("/version")
+                        ) {
+                    odh.sendVersion(request, response);
+                    log.info("Sent Version Response");
+                    specialRequest = true;
+
+                } else if ( // Help Response?
+                        dataSource.equalsIgnoreCase("/help") ||
+                                dataSource.equalsIgnoreCase("/help/") ||
+                                ((requestSuffix != null) &&
+                                requestSuffix.equalsIgnoreCase("help"))
+                        ) {
+                    odh.sendHelpPage(request, response);
+                    log.info("Sent Help Page");
+                    specialRequest = true;
+
+                } else if ( // System Properties Response?
+                    //Debug.isSet("SystemProperties") &&
+
+                        dataSource.equalsIgnoreCase("/systemproperties")
+                        ) {
+                    Util.sendSystemProperties(request, response, odh);
+                    log.info("Sent System Properties");
+                    specialRequest = true;
+
+                } else if (    // Debug response?
+                        Debug.isSet("DebugInterface") &&
+                                dataSource.equals("/debug") &&
+                                (requestSuffix != null) &&
+                                requestSuffix.equals("")) {
+
+                    DebugHandler.doDebug(this, request, response, odh, this.getServletConfig());
+                    log.info("Sent Debug Response");
+                    specialRequest = true;
+
+                } else if (  // Status Response?
+
+                        dataSource.equalsIgnoreCase("/status")
+                        ) {
+                    doGetStatus(request, response);
+                    log.info("Sent Status");
+                    specialRequest = true;
 
                 }
+
+            }
+
+
+            if (!specialRequest) {
+
+
+                if ( // Implied Directory request?
+
+                        dataSource == null ||
+                                dataSource.equals("/") ||
+                                dataSource.equals("") ||
+                                dataSource.endsWith("/") ||
+                                requestSuffix == null
+
+                        ) {
+
+
+                    //String reDirect = request.getRequestURI();
+
+                    //System.out.println("redirect: "+redirect);
+
+                    //if (!reDirect.endsWith("/"))
+                        //reDirect = reDirect + "/";
+
+                    //System.out.println("redirect: "+redirect);
+
+
+                    if (odh.useOpendapDirectoryView()) {
+                        //reDirect += "contents.html";
+                        odh.sendDir(request, response);
+                    }
+                    else {
+                        //reDirect += "catalog.html";
+                        getThreddsCatalog(request, response);
+                    }
+                    //System.out.println("redirect: "+redirect);
+
+                    //response.sendRedirect(reDirect);
+
+                    //log.info("Sent Redirect To: " + reDirect);
+
+
+                } else if ( //  Directory response?
+                        dataSetName.equalsIgnoreCase("contents") &&
+                        requestSuffix.equalsIgnoreCase("html")) {
+
+
+                    odh.sendDir(request, response);
+
+                    log.info("Sent Contents (aka OPeNDAP directory).");
+
+
+                } else if ( //  THREDDS Catalog ?
+
+                        getThreddsCatalog(request, response)) {
+
+                    log.info("Sent Catalog");
+
+
+                } else if ( // DDS Response?
+                        requestSuffix.equalsIgnoreCase("dds")
+                        ) {
+                    odh.sendDDS(request, response);
+                    log.info("Sent DDS");
+
+                } else if ( // DAS Response?
+                        requestSuffix.equalsIgnoreCase("das")
+                        ) {
+                    odh.sendDAS(request, response);
+                    log.info("Sent DAS");
+
+                } else if (  // DDX Response?
+                        requestSuffix.equalsIgnoreCase("ddx")
+                        ) {
+                    odh.sendDDX(request, response);
+                    log.info("Sent DDX");
+
+                } else if ( // Blob Response?
+                        requestSuffix.equalsIgnoreCase("blob")
+                        ) {
+                    //doGetBLOB(request, response, rs);
+                    badURL(request, response);
+                    log.info("Sent BAD URL Response because they asked for a Blob. Bad User!");
+
+                } else if ( // DataDDS (aka .dods) Response?
+                        requestSuffix.equalsIgnoreCase("dods")
+                        ) {
+                    odh.sendDODS(request, response);
+                    log.info("Sent DAP2 Data");
+
+                } else if (  // ASCII Data Response.
+                        requestSuffix.equalsIgnoreCase("asc") ||
+                                requestSuffix.equalsIgnoreCase("ascii")
+                        ) {
+                    odh.sendASCII(request, response);
+                    log.info("Sent ASCII");
+
+                } else if (  // Info Response?
+                        requestSuffix.equalsIgnoreCase("info")
+                        ) {
+                    odh.sendInfo(request, response);
+                    log.info("Sent Info");
+
+                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
+                        requestSuffix.equalsIgnoreCase("html") ||
+                                requestSuffix.equalsIgnoreCase("htm")
+                        ) {
+                    odh.sendHTMLRequestForm(request, response);
+                    log.info("Sent HTML Request Form");
+
+
+                } else if (requestSuffix.equals("")) {
+                    badURL(request, response);
+                    log.info("Sent BAD URL (missing Suffix)");
+
+                } else {
+                    badURL(request, response);
+                    log.info("Sent BAD URL - nothing left to check.");
+                }
+
             }
 
         } catch (Throwable e) {
@@ -568,6 +528,7 @@ public class NewDispatch2 extends HttpServlet {
 
     }
     //**************************************************************************
+
 
 
     /**
@@ -595,14 +556,15 @@ public class NewDispatch2 extends HttpServlet {
 
         boolean wasTHREDDS = dataRootHandler.processReqForCatalog(req, res);
 
-        if (forceTHREDDSCatalog && !wasTHREDDS) {
-            if (ReqInfo.getDataSetName(req).equalsIgnoreCase("catalog") &&
-                    ReqInfo.getRequestSuffix(req).equalsIgnoreCase("xml")) {
+        if(forceTHREDDSCatalog && !wasTHREDDS ){
+            if(ReqInfo.getDataSetName(req).equalsIgnoreCase("catalog") &&
+                    ReqInfo.getRequestSuffix(req).equalsIgnoreCase("xml")){
 
-                odh.sendCatalog(req, res);
+                odh.sendCatalog(req,res);
                 wasTHREDDS = true;
             }
         }
+
 
 
         return wasTHREDDS;
@@ -679,13 +641,11 @@ public class NewDispatch2 extends HttpServlet {
         pw.println("server. Here is a list of the five extensions that are be recognized by");
         pw.println("all OPeNDAP servers:</p>");
         pw.println("<ui>");
-        pw.println("    <li>ddx</li>");
         pw.println("    <li>dds</li>");
         pw.println("    <li>das</li>");
         pw.println("    <li>dods</li>");
         pw.println("    <li>info</li>");
         pw.println("    <li>html</li>");
-        pw.println("    <li>ascii</li>");
         pw.println("</ui>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
@@ -717,73 +677,10 @@ public class NewDispatch2 extends HttpServlet {
     }
 
 
-    public void destroy() {
+    public void destroy(){
 
         odh.destroy();
         super.destroy();
     }
-
-
-    private void sendResourceNotFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
-        response.setHeader("XDAP", odh.getXDAPVersion(request));
-        response.setHeader("Content-Description", "BadURL");
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-
-        String topLevel = request.getRequestURL().substring(0,request.getRequestURL().lastIndexOf(request.getPathInfo()));
-
-        pw.println("<h2>Resource Not Found</h2>");
-        pw.println("<p>The URL <i>'"+request.getRequestURL()+"'</i> does not describe a resource that can be found on this server.</p>");
-        pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='"+topLevel+"'>"+topLevel+"</a></p>");
-        pw.println("<p>If you think that the server is broken (that the URL you");
-        pw.println("submitted should have worked), then please contact the");
-        pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
-
-        pw.flush();
-
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-
-    }
-
-
-    private void sendDirectAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
-        response.setHeader("XDAP", odh.getXDAPVersion(request));
-        response.setHeader("Content-Description", "BadURL");
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-
-        String topLevel = request.getRequestURL().substring(0,request.getRequestURL().lastIndexOf(request.getPathInfo()));
-
-        pw.println("<h2>ACCESS DENIED</h2>");
-        pw.println("<p>The URL <i>'"+request.getRequestURL()+"'</i> references a data source directly. </p>" +
-                "<p>You must use the OPeNDAP request interface to get data from the data source.</p>");
-
-
-
-        pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='"+topLevel+"'>"+topLevel+"</a></p>");
-        pw.println("<p>If you think that the server is broken (that the URL you");
-        pw.println("submitted should have worked), then please contact the");
-        pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
-
-        pw.flush();
-
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-
-    }
-
 
 }

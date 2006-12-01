@@ -246,7 +246,7 @@ public class OPeNDAPException extends Exception {
     public static void anyExceptionHandler(Throwable t, HttpServletResponse response) {
 
 
-        System.out.println("DispatchServlet ERROR (anyExceptionHandler): " + t);
+        System.out.println("DispatchServlet_OLD ERROR (anyExceptionHandler): " + t);
         if (Debug.isSet("showException")) {
             t.printStackTrace();
             DebugLog.printThrowable(t);
@@ -294,7 +294,7 @@ public class OPeNDAPException extends Exception {
 
             }
             oe.print(eOut);
-            
+
 
         } catch (IOException ioe) {
             System.out.println("Cannot respond to client! IO Error: " + ioe.getMessage());
