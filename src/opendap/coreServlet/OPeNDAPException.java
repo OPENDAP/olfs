@@ -246,8 +246,9 @@ public class OPeNDAPException extends Exception {
     public static void anyExceptionHandler(Throwable t, HttpServletResponse response) {
 
 
-        System.out.println("DispatchServlet_OLD ERROR (anyExceptionHandler): " + t);
+        System.out.println("OPeNDAPException (anyExceptionHandler): \n    " + t);
         if (Debug.isSet("showException")) {
+            System.out.print("\n    ");
             t.printStackTrace();
             DebugLog.printThrowable(t);
         }
