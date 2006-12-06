@@ -14,4 +14,4 @@ curl_all "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat" "testsuite/ff/
 curl_all "http://localhost:8080/opendap/data/ff/avhrr.dat" "testsuite/ff/avhrr.dat.URI_Avhrr.DODS_URL" "URI_Avhrr.DODS_URL"
 
 
-#curl_all "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat" "testsuite/ff/1998-6-avhrr.dat.&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170" "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"
+curl_all "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat" "testsuite/ff/1998-6-avhrr.dat.&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170" "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"

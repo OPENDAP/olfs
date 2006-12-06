@@ -17,7 +17,4 @@ csh ./buildTestTarget hdf/1990104h09da-gdm.hdf "Sea%20Surface%20Temperature[0:10
 csh ./buildTestTarget ff/1998-6-avhrr.dat 
 csh ./buildTestTarget ff/avhrr.dat "URI_Avhrr.DODS_URL"
 
-
-
-
-#csh ./buildTestTarget ff/1998-6-avhrr.dat  "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"
+csh ./buildTestTarget ff/1998-6-avhrr.dat "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"

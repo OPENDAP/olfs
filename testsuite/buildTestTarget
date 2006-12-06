@@ -23,5 +23,5 @@ curl $curlswitches "http://localhost:8080/opendap/data/$1.das?$2"    > "$baselin
 curl $curlswitches "http://localhost:8080/opendap/data/$1.ddx?$2"    > "$baselineFileName.ddx"
 curl $curlswitches "http://localhost:8080/opendap/data/$1.dods?$2"   > "$baselineFileName.dods"
 curl $curlswitches "http://localhost:8080/opendap/data/$1.ascii?$2"  > "$baselineFileName.ascii"
-getdap -D  "http://localhost:8080/opendap/data/$1?$2"      > "$baselineFileName.data"
+getdap -D  "http://localhost:8080/opendap/data/$1?$2"                > "$baselineFileName.data"
 

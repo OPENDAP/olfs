@@ -26,13 +26,13 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <value>17000</value>
         </Attribute>
         <Attribute name="acf" type="Float32">
-            <value>-2.</value>
-            <value>1.</value>
-            <value>0.</value>
+            <value>-2.000000000</value>
+            <value>1.000000000</value>
+            <value>0.000000000</value>
         </Attribute>
         <Attribute name="acd" type="Float64">
-            <value>-1.</value>
-            <value>0.75</value>
+            <value>-1.0000000000000000</value>
+            <value>0.75000000000000000</value>
         </Attribute>
         <Array name="bears">
             <String/>
