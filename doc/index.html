@@ -16,9 +16,7 @@ A.name {color : black;}
 HR {color : #525D76;}
 LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}
 .style1 {font-size: 14px}
-.style5 {font-size: 12px}
-.style6 {color: #FFFFFF}
-.style7 {font-size: 18px}
+.style8 {font-size: 16px}
 -->
 </STYLE>
 </head>
@@ -34,7 +32,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p><br>
   Server4 is a new data server which combines the efforts at UCAR/HAO to build a high performance DAP-compliant data server for the Earth System Grid II
   project with existing software developed by OPeNDAP. The server is intended to be a replacement for the existing 3.x servers which OPeNDAP is distributing.</p>
-<p>The new server uses the Java servlet mechanism to hand off requests from general web daemon to DAP format-specific software. This results in higher performance for small requests. The servlet front end, which we call the <strong>O</strong>PeNDAP <strong>L</strong>ightweight <strong>F</strong>ront end <strong>S</strong>erver (OLFS) looks at each request and formulates a query to a second server (which may or may not on the same machine as the OLFS) called the <strong>B</strong>ack <strong>E</strong>nd <strong>S</strong>erver (BES). The BES is the high-performance server software from HAO. It's handles reading data from data stores and returning DAP-compliant responses. The OLFS may return those with little or no modification or it may use them to build more complex responses. The nature of the Inter Process Communication (IPC) between the OLFS and BES is such that they should both be on the same machine or be able to communicate over a very high bandwidth channel.</p>
+<p>The new server uses the Java servlet mechanism to hand off requests from a general web daemon to DAP format-specific software. This results in higher performance for small requests. The servlet front end, which we call the <strong>O</strong>PeNDAP <strong>L</strong>ightweight <strong>F</strong>ront end <strong>S</strong>erver (OLFS) looks at each request and formulates a query to a second server (which may or may not on the same machine as the OLFS) called the <strong>B</strong>ack <strong>E</strong>nd <strong>S</strong>erver (BES). The BES is the high-performance server software from HAO. It handles reading data from the data stores and returning DAP-compliant responses to the OLFS. In turn, the OLFS may pass these response back to the requestor with little or no modification or it may use them to build more complex responses. The nature of the Inter Process Communication (IPC) between the OLFS and BES is such that they should both be on the same machine or be able to communicate over a very high bandwidth channel.</p>
 <p> Both the OLFS and the BES require installation and configuration before they can be run. </p>
 <p>Here you will find:</p>
 <ul>
@@ -79,11 +77,12 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>Java Core Development: <a href="mailto:ndp@opendap.org">ndp@opendap.org</a></p>
 <br>
 <h1>Sponsorship</h1>
-<p>The OPeNDAP Server4 project is sponsored by:</p>
+<p> OPeNDAP Server4  development is sponsored by:</p>
 <blockquote>
   <blockquote>
-    <p><a href="http://www.nsf.gov/"></a><a href="http://www.nsf.gov"><img src="images/nsf-banner.gif" width="414" height="80" border="0"></a></p>
-    <p><a href="http://www.nasa.gov"><img src="images/nasa.jpg" alt="NASA" width="97" height="80" border="0" longdesc="http://www.nasa.gov"></a></p>
+    <p><a href="http://www.nsf.gov"><img src="images/nsf-logo.png" alt="NSF" width="95" height="95" border="0" align="absmiddle"></a> <span class="style8"><a href="http://www.nsf.gov">National Science Foundation</a></span></p>
+    <p><a href="http://www.nasa.gov"><img src="images/nasa-logo.jpg" alt="NASA" width="97" height="80" border="0" align="absmiddle" longdesc="http://www.nasa.gov"><span class="style8">National Aeronautics and Space Administration</span></a></p>
+    <p><a href="http://www.noaa.gov"><img src="images/noaa-logo.jpg" alt="NOAA" width="90" height="90" border="0" align="absmiddle"></a> <span class="style8"><a href="http://www.noaa.gov">National Oceanic and Atmospheric Administration</a></span></p>
     <p><a href="http://www.nasa.gov"></a><a href="http://www.nasa.gov"></a></p>
   </blockquote>
 </blockquote>
