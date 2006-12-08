@@ -521,12 +521,10 @@ public class BesAPI {
 
         }
         finally {
-
             if (useClientPool)
                 returnClient(oc);
             else
                 shutdownClient(oc);
-
         }
     }
 
