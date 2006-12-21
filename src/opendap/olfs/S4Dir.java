@@ -297,8 +297,9 @@ public class S4Dir {
                 "        </td>\n" +
                 "        <td>" +
                 "            <div align=\"right\">" +
-                "                Server4 development sponsored by <a href='http://www.nsf.gov/'>NSF</a>\n" +
-                "                and <a href='http://www.nasa.gov/'>NASA</a>" +
+                "                Server4 development sponsored by <a href='http://www.nsf.gov/'>NSF</a>,\n" +
+                "                <a href='http://www.nasa.gov/'>NASA</a>\n" +
+                "                and <a href='http://www.noaa.gov/'>NOAA</a>" +
                 "            </div>" +
                 "        </td>\n" +
                 "      </tr>\n" +
