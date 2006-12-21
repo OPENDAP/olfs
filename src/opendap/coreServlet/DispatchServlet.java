@@ -441,7 +441,7 @@ public class DispatchServlet extends HttpServlet {
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         DataSourceInfo dsi = odh.getDataSourceInfo(dataSource);
-        System.out.println(dsi);
+        //System.out.println(dsi);
 
         boolean isDataRequest = false;
 
@@ -546,7 +546,7 @@ public class DispatchServlet extends HttpServlet {
 
         DataSourceInfo dsi = odh.getDataSourceInfo(fullSourceName);
 
-        System.out.println(dsi);
+        //System.out.println(dsi);
 
         boolean isFileResponse = false;
 
@@ -652,11 +652,10 @@ public class DispatchServlet extends HttpServlet {
      * @param req Client Request
      * @param res Server Response
      * @return True if a THREDDS catalog.xml or catalog.html was returned to the client
-     * @throws IOException
-     * @throws ServletException
+     * @throws Exception
      */
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res)
-            throws Exception, ServletException {
+            throws Exception {
 
 
         if ((req.getPathInfo() == null)) {
@@ -692,6 +691,8 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws IOException
+     * @throws ServletException
      */
     public void doGetStatus(HttpServletRequest request,
                             HttpServletResponse response)
