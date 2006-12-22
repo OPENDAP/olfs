@@ -110,12 +110,8 @@ public class SOAPRequestDispatcher {
 
                 System.out.println("done.");
             }
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (BadUsageException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            OPeNDAPException.anyExceptionHandler(e,response);
         }
 
 

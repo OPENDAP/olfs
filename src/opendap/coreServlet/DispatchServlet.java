@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.BufferedReader;
 import java.util.StringTokenizer;
 
 /**
@@ -268,7 +269,7 @@ public class DispatchServlet extends HttpServlet {
     /**
      * Gets the last modified date of the requested resource. Because the data handler is really
      * the only entity capable of determining the last modified dat the job is passed  through to it.
-     * @param req
+     * @param req The current request
      * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
      * since midnight January 1, 1970 GMT
      */
@@ -279,8 +280,8 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * Writes information about the incomming request to stdout.
-     * @param req
-     * @param reqno
+     * @param req The current request
+     * @param reqno The request number.
      */
     public void showRequest(HttpServletRequest req, long reqno) {
         System.out.println("-------------------------------------------");
@@ -319,10 +320,10 @@ public class DispatchServlet extends HttpServlet {
      * </ui>
      *
      *
-     * @param request
-     * @param response
+     * @param request The current request
+     * @param response The response to which we write.
      * @return true if the request was handled as a special request, false otherwise.
-     * @throws Exception
+     * @throws Exception When things go awry.
      */
     public boolean specialRequestDispatch(HttpServletRequest request,
                                           HttpServletResponse response) throws Exception {
@@ -609,6 +610,7 @@ public class DispatchServlet extends HttpServlet {
             throws IOException, ServletException {
 
 
+
         try {
             if (Debug.isSet("probeRequest"))
                 Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
@@ -652,7 +654,7 @@ public class DispatchServlet extends HttpServlet {
      * @param req Client Request
      * @param res Server Response
      * @return True if a THREDDS catalog.xml or catalog.html was returned to the client
-     * @throws Exception
+     * @throws Exception When things go poorly.
      */
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res)
             throws Exception {
@@ -691,12 +693,11 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @throws IOException
-     * @throws ServletException
+     * @throws IOException If unablde to right to the response.
      */
     public void doGetStatus(HttpServletRequest request,
                             HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException {
 
 
         response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
@@ -730,10 +731,11 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws IOException If it can't right the response.
      */
     public void badURL(HttpServletRequest request,
                        HttpServletResponse response)
-            throws IOException, ServletException {
+            throws IOException {
 
         if (Debug.isSet("showResponse"))
             System.out.println("Sending Bad URL Page.");
