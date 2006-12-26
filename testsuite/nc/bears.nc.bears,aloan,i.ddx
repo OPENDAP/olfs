@@ -54,11 +54,24 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Map>
     </Grid>
     <Grid name="aloan">
+        <Array name="aloan">
+            <Float32/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
         <Map name="i">
             <Int32/>
             <dimension name="i" size="2"/>
         </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
     </Grid>
+    <Array name="i">
+        <Int32/>
+        <dimension name="i" size="2"/>
+    </Array>
 
-    <dataBLOB href=".blob?bears,aloan.i"/>
+    <dataBLOB href=".blob?bears,aloan,i"/>
 </Dataset>
