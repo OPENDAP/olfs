@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dataset name="coads_climatology.nc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://xml.opendap.org/ns/DAP2"
+xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/dap2.xsd">
+
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="history" type="String">
+            <value>&quot;FERRET V4.30 (debug/no GUI) 15-Aug-96&quot;</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <value>&quot;TIME&quot;</value>
+        </Attribute>
+    </Attribute>
+
+
+    <dataBLOB href=".blob?geogrid(SST,61,-82,38,-19,"TIME<1500")"/>
+</Dataset>

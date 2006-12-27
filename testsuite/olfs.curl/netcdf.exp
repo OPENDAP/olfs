@@ -17,8 +17,8 @@ global srcdir
 
 
 curl_all "http://localhost:8080/opendap/data/nc/fnoc1.nc" "testsuite/nc/fnoc1.nc"
-#curl_all "http://localhost:8080/opendap/data/nc/fnoc1.nc" "testsuite/nc/fnoc1.nc.lat" "lat"
+curl_all "http://localhost:8080/opendap/data/nc/fnoc1.nc" "testsuite/nc/fnoc1.nc.lat" "lat"
 
-#curl_all "http://localhost:8080/opendap/data/nc/bears.nc" "testsuite/nc/bears.nc"
-#curl_all "http://localhost:8080/opendap/data/nc/bears.nc" "testsuite/nc/bears.nc.bears,aloan.i" "bears,aloan.i"
+curl_all "http://localhost:8080/opendap/data/nc/bears.nc" "testsuite/nc/bears.nc"
+curl_all "http://localhost:8080/opendap/data/nc/bears.nc" "testsuite/nc/bears.nc.bears,aloan,i" "bears,aloan,i"
 

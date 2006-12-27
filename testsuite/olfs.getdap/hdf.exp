@@ -9,8 +9,3 @@ global srcdir
 
 # The `1' in compare_stdout means call xfail if the test fails.
 
-
-curl_all "http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF" "testsuite/hdf/3B42.980909.5.HDF"
-curl_all "http://localhost:8080/opendap/data/hdf/1990104h09da-gdm.hdf" "testsuite/hdf/1990104h09da-gdm.hdf.Sea%20Surface%20Temperature\[0:100:4095\]\[0:100:2047\]" "Sea%20Surface%20Temperature\\\[0:100:4095\\\]\\\[0:100:2047\\\]"
-
-

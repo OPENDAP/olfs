@@ -1,27 +1,32 @@
-#!/bin/csh
+#!/bin/sh
 
 
-set curlswitches="-gs"
-
-echo dataset: "$1"
-echo constraint: "$2"
-
-if ("$2" != "") then
-    set baselineFileName = $1."$2"
-else
-    set baselineFileName = $1
-endif
+curlswitches="-gs"
+dataset="$1"
+ce=`echo "$2" | sed 's/\"/\\\"/g'`
+baselineFileName="$3"
 
 echo
-echo baslineFileName: "$baselineFileName"
-echo
+echo dataset: "$dataset"
+echo constraint: "$ce"
+echo baselineFileName: "$baselineFileName"
 
-echo url: "http://localhost:8080/opendap/data/$1.dds?$2"
+echo url: "http://localhost:8080/opendap/data/$dataset.xxxx?$ce"
 
-curl $curlswitches "http://localhost:8080/opendap/data/$1.dds?$2"    > "$baselineFileName.dds"
-curl $curlswitches "http://localhost:8080/opendap/data/$1.das?$2"    > "$baselineFileName.das"
-curl $curlswitches "http://localhost:8080/opendap/data/$1.ddx?$2"    > "$baselineFileName.ddx"
-curl $curlswitches "http://localhost:8080/opendap/data/$1.dods?$2"   > "$baselineFileName.dods"
-curl $curlswitches "http://localhost:8080/opendap/data/$1.ascii?$2"  > "$baselineFileName.ascii"
-getdap -D  "http://localhost:8080/opendap/data/$1?$2"                > "$baselineFileName.data"
+echo dds
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.dds?$ce"    > "$baselineFileName.dds"
+echo das
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.das?$ce"    > "$baselineFileName.das"
+echo ddx
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.ddx?$ce"    > "$baselineFileName.ddx"
+echo dods
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.dods?$ce"   > "$baselineFileName.dods"
+echo ascii
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.ascii?$ce"  > "$baselineFileName.ascii"
+echo info
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.info"       > "$baselineFileName.info"
+echo html
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.html"       > "$baselineFileName.html"
+
+#getdap -D  "http://localhost:8080/opendap/data/$dataset?$ce"                > "$baselineFileName.data"
 

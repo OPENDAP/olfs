@@ -1,23 +1,59 @@
-#!/bin/csh
+#!/bin/sh
+
+
+#-------------------------------------------------------------------------------
+# netcdf_handler baselines
+
+./buildTestTarget "nc/fnoc1.nc"   ""     "nc/fnoc1.nc"
+./buildTestTarget "nc/fnoc1.nc"   "lat"  "nc/fnoc1.nc.lat"
+
+./buildTestTarget "nc/bears.nc"  ""               "nc/bears.nc"
+./buildTestTarget "nc/bears.nc"  "bears,aloan,i"  "nc/bears.nc.bears,aloan,i"
 
 
 
-csh ./buildTestTarget nc/fnoc1.nc
-csh ./buildTestTarget nc/fnoc1.nc lat
+#-------------------------------------------------------------------------------
+# freeform_handler baselines
 
 
-csh ./buildTestTarget nc/bears.nc 
-csh ./buildTestTarget nc/bears.nc "bears,aloan.i"
+./buildTestTarget "ff/1998-6-avhrr.dat" ""                                                    "ff/1998-6-avhrr.dat"
+./buildTestTarget "ff/1998-6-avhrr.dat" "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<162"        "ff/1998-6-avhrr.dat.RelationalConstraint_01"
+./buildTestTarget "ff/1998-6-avhrr.dat" "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"        "ff/1998-6-avhrr.dat.RelationalConstraint_02"
+
+./buildTestTarget "ff/avhrr.dat"    ""    "ff/avhrr.dat"
+
+./buildTestTarget "ff/gsodock.dat"   ""                                        "ff/gsodock.dat"
+./buildTestTarget "ff/gsodock.dat" "URI_GSO-Dock.Air_Temp,URI_GSO-Dock.Depth"  "ff/gsodock.dat.URI_GSO-Dock.Air_Temp,URI_GSO-Dock.Depth"
 
 
-csh ./buildTestTarget hdf/3B42.980909.5.HDF 
-
-csh ./buildTestTarget hdf/1990104h09da-gdm.hdf "Sea%20Surface%20Temperature[0:100:4095][0:100:2047]"
-
-csh ./buildTestTarget ff/1998-6-avhrr.dat 
-csh ./buildTestTarget ff/avhrr.dat "URI_Avhrr.DODS_URL"
-
-csh ./buildTestTarget ff/1998-6-avhrr.dat "&GSO_AVHRR.day_num>160&GSO_AVHRR.day_num<170"
 
 
-csh ./buildTestTarget ff/1998-6-avhrr.dat "DODS_URL&date_time(\"1998/160:17:45:00\")"
+#-------------------------------------------------------------------------------
+# hdf4_handler baselines
+
+./buildTestTarget "hdf/3B42.980909.5.HDF"   ""     "hdf4/3B42.980909.5.HDF" 
+./buildTestTarget "hdf/1990104h09da-gdm.hdf" "Sea%20Surface%20Temperature[0:100:4095][0:100:2047]" "hdf4/1990104h09da-gdm.hdf.ArraySubset"
+./buildTestTarget "hdf/S2000415.hdf" "" "hdf4/S2000415.hdf"
+
+
+
+#-------------------------------------------------------------------------------
+# Server Side Functions
+
+./buildTestTarget "ff/1998-6-avhrr.dat" "DODS_URL&date_time(\"1998/160:17:45:00\")"                          "ssfunc/1998-6-avhrr.dat.DateTimeConstraint_01"
+./buildTestTarget "ff/1998-6-avhrr.dat" "DODS_URL&date_time(\"1998/160\:17\:45\:00\",\"1998/165:17:45:00\")" "ssfunc/1998-6-avhrr.dat.DateTimeRange_01"
+
+./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST)"                                 "ssfunc/coads_climatology.nc.geoarray().BadArgs"
+./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,135,-45,225,90,0,-90,359)"     "ssfunc/coads_climatology.nc.geoarray().Basic"
+./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,-45,-45,45,90,0,-90,359)"      "ssfunc/coads_climatology.nc.geoarray().MixedNotations_01"
+./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,135,-45,225,90,-180,-90,179)"  "ssfunc/coads_climatology.nc.geoarray().MixedNotations_02"
+./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,-45,-45,45,90,-180,-90,179)"   "ssfunc/coads_climatology.nc.geoarray().NegativeNotations"
+./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,90,0,-90,359,90,0,-90,359)"       "ssfunc/coads_climatology.nc.geoarray().WholeArray"
+
+./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST)"                               "ssfunc/coads_climatology.nc.geogrid().BadArgs"
+./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST,61,-82,38,-19)"                 "ssfunc/coads_climatology.nc.geogrid().Basic"
+./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST,-82,61,-19,38)"                 "ssfunc/coads_climatology.nc.geogrid().SwapCoords"
+./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST,61,-82,38,-19,\"TIME<1500\")"   "ssfunc/coads_climatology.nc.geogrid().TimeSelect"
+./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST,379,-89,0,89)"                  "ssfunc/coads_climatology.nc.geogrid().WholeArray"
+
+

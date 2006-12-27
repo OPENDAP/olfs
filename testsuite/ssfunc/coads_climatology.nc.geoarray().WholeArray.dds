@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<getDDS>
+    <response>
+        <Administrator>ndp@opendap.org</Administrator>
+        <BESException>
+            <Type>TransmitProblem</Type>
+            <Message>libdap exception transmitting DDS: error_code = 1001: Function calls can only be used with data requests. To see the structure
+of the underlying data source, reissue the URL without the function.</Message>
+            <Location>
+                <File>BESDapTransmit.cc</File>
+                <Line>104</Line>
+            </Location>
+        </BESException>
+    </response>
+</getDDS>
