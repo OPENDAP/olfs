@@ -1,3 +1,0 @@
-Dataset {
-    Float32 lat[lat = 17];
-} fnoc1.nc;
