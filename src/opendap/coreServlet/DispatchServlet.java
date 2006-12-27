@@ -609,8 +609,7 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-
-
+        
         try {
             if (Debug.isSet("probeRequest"))
                 Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
