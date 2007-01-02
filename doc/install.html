@@ -53,7 +53,7 @@ release.</em>)</p>
   <li>A web browser</li>
 </ul>
 <h2>Part I: Download, build, configure and test the BES</h2>
-<p>For this version you will need to get <a href="http://www.opendap.org/download/BES.html#3.2.0">BES version 3.2.0</a></p>
+<p>For this version you will need to get the latest <a href="http://www.opendap.org/download/BES.html">BES.</a></p>
 <p>Go to the website, get the stuff, follow the instructions, and come back here when you've got it working. </p>
 <p>&nbsp;</p>
 <h2>Part II: Setting up the OLFS</h2>
@@ -98,16 +98,15 @@ In bash:</p>
 </blockquote>
 <p>and you should see the Tomcat default page. Open the URL:</p>
 <blockquote>
-  <p class="style1"><a href="http://localhost:8080/opendap/s4/data/nc/fnoc1.nc.das">http://localhost:8080/opendap/s4/</a></p>
+  <p class="style1"><a href="http://localhost:8080/opendap/s4/data/nc/fnoc1.nc.das">http://localhost:8080/opendap/</a></p>
 </blockquote>
 <p>To see an HTML directory of the top of your data archive. </p>
 <p>&nbsp;</p>
 <p>You can probably
   get a THREDDS catalog by appending&quot;catalog.html&quot; to the end of any URL that returns an HTML directory, like so: </p>
 <blockquote>
-  <p> <a href="http://localhost:8080/opendap/s4/catalog.xml" class="style1">http://localhost:8080/opendap/s4/catalog.xml</a><br />
-    <a href="http://localhost:8080/opendap/s4/data/catalog.xml" class="style1">http://localhost:8080/opendap/s4/data/catalog.xml</a><br />
-    <a href="http://localhost:8080/opendap/s4/data/nc/catalog.xml" class="style1">http://localhost:8080/opendap/s4/data/nc/catalog.xml</a></p>
+  <p> <a href="http://localhost:8080/opendap/s4/catalog.xml" class="style1">http://localhost:8080/opendap/catalog.xml</a><br />
+  </p>
 </blockquote>
 <p>Et cetera.</p>
 <p>Usage Note:  If you use ctrl-c to stop watching the tail of the servers output, make sure to run bin/shutdown.sh to
