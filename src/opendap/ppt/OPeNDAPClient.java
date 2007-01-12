@@ -55,8 +55,9 @@ import java.io.*;
  */
 
 public class OPeNDAPClient {
-    private PPTClient _client = null;
-    private OutputStream _stream = null;
+    private PPTClient     _client = null;
+    private OutputStream  _stream = null;
+    private boolean       _isRunning;
 
     /**
      * Creates a OpenDAPClient to handle OpenDAP requests.
@@ -66,6 +67,13 @@ public class OPeNDAPClient {
      */
     public OPeNDAPClient() {
         _stream = null;
+        _isRunning = false;
+    }
+
+
+
+    public boolean isRunning()  {
+        return _isRunning;
     }
 
     /**
@@ -86,6 +94,7 @@ public class OPeNDAPClient {
     public void startClient(String hostStr, int portVal) throws PPTException {
         _client = new PPTClient(hostStr, portVal);
         _client.initConnection();
+        _isRunning = true;
     }
 
     /**
@@ -106,7 +115,11 @@ public class OPeNDAPClient {
             catch (IOException e) {
                 throw(new PPTException(e.getMessage()));
             }
+            finally {
+                _isRunning = false;
+            }
         }
+        _isRunning = false;
     }
 
     /**

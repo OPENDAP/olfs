@@ -60,7 +60,7 @@ public class BesAPI {
     private static Semaphore _checkOutFlag;
     private static int _maxClients;
 
-    private static boolean useClientPool = true;
+    private static DevNull devNull = new DevNull();
 
     /**
      * The name of the BES Exception Element.
@@ -87,37 +87,51 @@ public class BesAPI {
     private static OPeNDAPClient getClient()
             throws PPTException, BadConfigurationException {
 
-        OPeNDAPClient odc;
+        OPeNDAPClient odc=null;
 
         try {
             _checkOutFlag.acquire();
 
             if (_clientQueue.size() == 0) {
                 odc = new OPeNDAPClient();
+                if (Debug.isSet("BES")){
+                    System.out.print("BesAPI.getClient() - " +
+                            "Made new OPeNDAPClient. Starting...");
+                }
                 odc.startClient(getHost(), getPort());
                 if (Debug.isSet("BES"))
-                    System.out.println("BesAPI - Made new OPeNDAPClient.");
+                    System.out.println("Done.");
 
 
             } else {
 
                 odc = _clientQueue.take();
                 if (Debug.isSet("BES"))
-                    System.out.println("BesAPI - Retrieved " +
+                    System.out.println("BesAPI.getClient() - Retrieved " +
                             "OPeNDAPClient from queue.");
             }
 
             if (Debug.isSet("BES"))
                 odc.setOutput(System.out, true);
             else {
-                DevNull devNull = new DevNull();
                 odc.setOutput(devNull, true);
             }
 
+
+            //odc.isProperlyConnected();
+            //odc.setOutput(devNull, false);
+            //odc.executeCommand("show status;");
+
+
+
+
             return odc;
         }
-        catch (InterruptedException e) {
-            return null;
+        catch (Exception e) {
+            if (Debug.isSet("BES"))
+                System.out.println("\n\nERROR encountered.\n");
+            discardClient(odc);
+            throw new PPTException(e);
         }
 
     }
@@ -127,6 +141,7 @@ public class BesAPI {
      * to the pool using this method.
      *
      * @param odc The OPeNDAPClient to return to the client pool.
+     * @throws PPTException
      */
     private static void returnClient(OPeNDAPClient odc) throws PPTException {
 
@@ -151,24 +166,38 @@ public class BesAPI {
             e.printStackTrace(); // Don't do a thing
         } catch (PPTException e) {
 
-            // This is a bad sign, for now we'll assume that the BES died
-            // and we should trash the connection
-
-            // By releasing the flag and not checking the OPeNDAPClient back in
-            // we essentially throw the client away. A new one will be made
-            // the next time it's needed.
-            _checkOutFlag.release();
-
 
             String msg = "\n*** BesAPI - WARNING! Problem with " +
-                         "OPeNDAPClient. Discarding.";
+                         "OPeNDAPClient, discarding.";
 
-
+            discardClient(odc);
 
             throw new PPTException(msg, e);
         }
 
     }
+
+
+
+    private static void discardClient(OPeNDAPClient odc){
+        if(odc != null && odc.isRunning()){
+            try {
+                shutdownClient(odc);
+            } catch (PPTException e) {
+                if (Debug.isSet("BES")){
+                    System.out.println("BesAPI: Discarding client " +
+                            "encountered problems shutting down an " +
+                            "OPeNDAPClient connection to the BES\n");
+                }
+            }
+        }
+        // By releasing the flag and not checking the OPeNDAPClient back in
+        // we essentially throw the client away. A new one will be made
+        // the next time it's needed.
+        _checkOutFlag.release();
+
+    }
+
 
 
     /**
@@ -180,12 +209,18 @@ public class BesAPI {
 
 
         try {
+
+            System.out.print("BesAPI.shutdownBES() - " +
+                    "Waiting for BES client check in ... ");
             _checkOutFlag.acquireUninterruptibly(_maxClients);
+            System.out.println("Done.");
+
+            System.out.println("BesAPI.shutdownBES() - " + _clientQueue.size() +
+                    " client(s) to shutdown.");
+
 
             int i = 0;
             while (_clientQueue.size() > 0) {
-
-
                 OPeNDAPClient odc = _clientQueue.take();
                 if (Debug.isSet("BES"))
                     System.out.println("BesAPI - Retrieved OPeNDAPClient["
@@ -399,22 +434,27 @@ public class BesAPI {
                                  OutputStream os)
             throws BadConfigurationException, PPTException {
 
-        OPeNDAPClient oc;
-        if (useClientPool)
-            oc = getClient();
-        else
-            oc = startClient();
+        boolean trouble = false;
+
+        OPeNDAPClient oc = getClient();
 
         try {
             configureTransaction(oc, dataSource, null, "stream");
 
             getDataProduct(oc, getAPINameForStream(), os);
         }
-        finally {
-            if (useClientPool)
+        catch (PPTException e){
+            trouble = true;
+            throw new PPTException("BesAPI.writeFile(): " +
+                    "Problem with OPeNDAPClient.\n");
+        }
+        finally{
+            if (trouble) {
+                discardClient(oc);
+            }
+            else {
                 returnClient(oc);
-            else
-                shutdownClient(oc);
+            }
         }
     }
 
@@ -502,11 +542,9 @@ public class BesAPI {
             throws BadConfigurationException, PPTException {
 
 
-        OPeNDAPClient oc;
-        if (useClientPool)
-            oc = getClient();
-        else
-            oc = startClient();
+        boolean trouble = false;
+
+        OPeNDAPClient oc = getClient();
 
         try {
             configureTransaction(oc, dataSource, null);
@@ -520,11 +558,18 @@ public class BesAPI {
             oc.executeCommand(cmd);
 
         }
-        finally {
-            if (useClientPool)
+        catch (PPTException e){
+            trouble = true;
+            throw new PPTException("BesAPI.writeHTMLForm(): " +
+                    "Problem with OPeNDAPClient.\n");
+        }
+        finally{
+            if (trouble) {
+                discardClient(oc);
+            }
+            else {
                 returnClient(oc);
-            else
-                shutdownClient(oc);
+            }
         }
     }
 
@@ -665,7 +710,7 @@ public class BesAPI {
      * @throws JDOMException
      * @throws BESException
      */
-    public static Document showInfo(String dataSource) throws
+    public static Document getInfoDocument(String dataSource) throws
             PPTException,
             BadConfigurationException,
             IOException,
@@ -832,7 +877,6 @@ public class BesAPI {
         if (Debug.isSet("BES"))
             oc.setOutput(System.out, true);
         else {
-            DevNull devNull = new DevNull();
             oc.setOutput(devNull, true);
         }
 
@@ -959,11 +1003,20 @@ public class BesAPI {
 
     }
 
+
+
+
+
+
     private static void besGetTransaction(String product,
                                           String dataset,
                                           String constraintExpression,
                                           OutputStream os)
             throws BadConfigurationException, PPTException {
+
+        boolean trouble = false;
+
+
 
         if (Debug.isSet("BES"))
             System.out.println("Entered besGetTransaction().");
@@ -971,11 +1024,7 @@ public class BesAPI {
 
         OPeNDAPClient oc;
 
-        if (useClientPool)
-            oc = getClient();
-        else
-            oc = startClient();
-
+        oc = getClient();
 
         try {
 
@@ -984,12 +1033,18 @@ public class BesAPI {
             getDataProduct(oc, product, os);
 
         }
-        finally {
-
-            if (useClientPool)
+        catch (PPTException e){
+            trouble = true;
+            throw new PPTException("BesAPI.besGetTransaction(): " +
+                    "Problem with OPeNDAPClient.\n");
+        }
+        finally{
+            if (trouble) {
+                discardClient(oc);
+            }
+            else {
                 returnClient(oc);
-            else
-                shutdownClient(oc);
+            }
         }
 
     }
@@ -998,29 +1053,11 @@ public class BesAPI {
     private static void besShowTransaction(String product, OutputStream os)
             throws PPTException, BadConfigurationException {
 
+        boolean trouble = false;
 
-        OPeNDAPClient oc;
-        if (useClientPool) {
-            oc = getClient();
-        } else {
-            oc = new OPeNDAPClient();
-
-            //System.out.println("BES - Host: "+_besHost+"  Port:"+_besPort);
-
-            oc.startClient(getHost(), getPort());
-
-            if (Debug.isSet("BES"))
-                oc.setOutput(System.out, true);
-            else {
-                DevNull devNull = new DevNull();
-                oc.setOutput(devNull, true);
-            }
-
-        }
-
+        OPeNDAPClient oc = getClient();
 
         try {
-
 
             String cmd = "show " + product + ";\n";
             if (Debug.isSet("BES")) System.err.print("Sending command: " + cmd);
@@ -1028,22 +1065,31 @@ public class BesAPI {
             oc.executeCommand(cmd);
 
         }
-        finally {
-
-            if (useClientPool) {
-                returnClient(oc);
-            } else {
+        catch (PPTException e){
+            trouble = true;
+            throw new PPTException("BesAPI.besShowTransaction(): " +
+                    "Problem with OPeNDAPClient.\n");
+        }
+        finally{
+            if (trouble) {
                 if (Debug.isSet("BES"))
-                    System.out.print("Shutting down client...");
-                oc.setOutput(null, false);
-                oc.shutdownClient();
+                    System.out.println("Problem encountered," +
+                        " discarding OPeNDAPCLient..");
+                discardClient(oc);
+            }
+            else {
+                returnClient(oc);
             }
         }
-
-
         if (Debug.isSet("BES")) System.out.println("Done.");
 
     }
+
+
+
+
+
+
 
 
 }

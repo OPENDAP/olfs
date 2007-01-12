@@ -66,7 +66,7 @@ public class BESDataSource implements DataSourceInfo {
 
         try {
 
-            Document info = BesAPI.showInfo(dataSourceName);
+            Document info = BesAPI.getInfoDocument(dataSourceName);
 
             exists = true;
 

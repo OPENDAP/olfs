@@ -59,5 +59,9 @@ public class PPTException  extends Exception{
     public PPTException(String msg,Exception e) {
         super(msg,e);
     }
+
+    public PPTException(Exception e) {
+        super(e);
+    }
 }
 

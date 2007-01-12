@@ -71,6 +71,28 @@ class PPTClient {
 
     }
 
+
+    public boolean showconnectionProperties() throws SocketException {
+
+        System.out.println();
+        System.out.println("PPTClient - Socket isBound():          " + _mySock.isBound());
+        System.out.println("PPTClient - Socket isClosed():         " + _mySock.isClosed());
+        System.out.println("PPTClient - Socket isConnected():      " + _mySock.isConnected());
+        System.out.println("PPTClient - Socket isInputShutdown():  " + _mySock.isInputShutdown());
+        System.out.println("PPTClient - Socket isOutputShutdown(): " + _mySock.isOutputShutdown());
+        System.out.println("PPTClient - Socket getKeepAlive():     " + _mySock.getKeepAlive());
+        System.out.println("PPTClient - Socket getOOBInline():     " + _mySock.getOOBInline());
+        System.out.println("PPTClient - Socket getReuseAddress():  " + _mySock.getReuseAddress());
+        System.out.println("PPTClient - Socket getSoLinger():      " + _mySock.getSoLinger());
+        System.out.println("PPTClient - Socket getSoTimeout():     " + _mySock.getSoTimeout());
+        System.out.println();
+
+
+        return true;
+
+    }
+
+
     public boolean initConnection() throws PPTException {
         try {
             this.writeBuffer(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION);
@@ -114,7 +136,7 @@ class PPTClient {
                 this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
-            System.err.println("Failed to inform server that client is exiting, continuing.");
+            System.err.println("PPTClient.closeConnection(): Unable to inform server that client is exiting, continuing.");
             System.err.println(e.getMessage());
         }
 
@@ -124,7 +146,7 @@ class PPTClient {
             _out = null;
         }
         catch (IOException e) {
-            System.err.println("Failed to close output stream, continuing");
+            System.err.println("PPTClient.closeConnection(): Unable to close output stream, continuing");
             System.err.println(e.getMessage());
         }
 
@@ -134,7 +156,7 @@ class PPTClient {
             _in = null;
         }
         catch (IOException e) {
-            System.err.println("Failed to close input stream, continuing");
+            System.err.println("PPTClient.closeConnection(): Unable to close input stream, continuing");
             System.err.println(e.getMessage());
         }
 
@@ -144,7 +166,7 @@ class PPTClient {
             _mySock = null;
         }
         catch (IOException e) {
-            System.err.println("Failed to close socket, continuing");
+            System.err.println("PPTClient.closeConnection(): Unable to close socket, continuing");
             System.err.println(e.getMessage());
         }
     }
