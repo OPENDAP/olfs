@@ -32,7 +32,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <h1 align="left">Server4 integration with Apache 2.x <br>
 <span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
 <hr size="1" noshade="noshade">
-<p><strong>Disclaimer and Request for Solutions</strong>: By no means do I imagine that I have outlined a best solution here. I am a relative n00b w.r.t. Apache. If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then I would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) </p>
+<p><strong>Disclaimer and Request for Solutions</strong>: By no means do I imagine that I have outlined a best solution here. If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then I would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) </p>
 <hr size="1" noshade="noshade">
 <h2>Overview</h2>
 <p>Many people deploying Server4  have been using previous versions of the OPeNDAP servers to serve their data.  These OPeNDAP servers required the Apache web server and utilized  CGI  to deliver their functionality. This is no longer the case, as Server4 is a Java servlet designed to run in conjunction with Tomcat. However many OPeNDAP administrators may wish to keep the URL hierarchies of their existing systems unchanged and simply replace their existing implementation of the OPeNDAP server with Server4. To this end Tomcat needs to be integrated with the Apache installation. The directions here offer methods for integrating Server4 with Apache version 2.x. If you are using earlier versions of Apache (1.x or older) you might wish to consider upgrading Apache to a more current version (version 2.x really is better...), otherwise these instructions may or may not be helpful, ymmv.</p>
@@ -87,7 +87,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <p class="style5">configure --enable-rewrite --enable-proxy </p>
 </blockquote>
 <p>Then you will need to get it and compile it for your system, and then install it in the Apache modules directory. Go to the <a href="http://tomcat.apache.org/connectors-doc/howto/apache.html">MOD_JK page</a> and follow their instructions and advice. </p>
-<p>**Before proceeding make sure you have installed the <em>mod_jk</em> library in your Apache <em>modules</em> directory. </p>
+<p><strong>Before proceeding make sure you have installed the <em>mod_jk</em> library in your Apache <em>modules</em> directory. </strong></p>
 <p>You will need to find an example of a <em>workers.properties</em> file. An example may be distributed with your Tomcat bundle (I didn't get one with 5.5.15, but I found one in an older - 5.5.9 - distribution). I would use the &quot;minimal&quot; example to start. Get it into your<em> $TOMCAT_HOME/conf</em> directory. Look at it most likely it contains the following 4 lines:</p>
 <blockquote>
   <p class="style5">worker.list=ajp13w
