@@ -305,8 +305,18 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         String name;
 
 
-        // Check to see if they are requesting a catalog/contents view of a collection
-        if(    ReqInfo.requestForOpendapContents(req) || ReqInfo.requestForTHREDDSCatalog(req)){
+        if( ReqInfo.requestForTHREDDSCatalog(req)){ // Requesting a THREDDS catalog?
+
+            name = ReqInfo.getCollectionName(req);
+            if(Debug.isSet("showRequest")) System.out.print("\nTomcat requesting getlastModified() for THREDDS catalog: "+name+"  ");
+            // Since the user can modify the THREDDS catalogs without
+            // changing the underlying data source, AND we can't ask the THREDDS
+            // library to tell us about the last modified times of the catalog
+            // we punt and return -1.
+
+            return(-1);
+        }
+        else  if(    ReqInfo.requestForOpendapContents(req )) { // Requesting OPeNDAP contents?
 
             name = ReqInfo.getCollectionName(req);
             if(Debug.isSet("showRequest")) System.out.print("\nTomcat requesting getlastModified() for collection: "+name+"  ");
@@ -332,7 +342,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     }
-
 
 
 
