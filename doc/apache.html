@@ -32,34 +32,44 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <h1 align="left">Server4 integration with Apache 2.x <br>
 <span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
 <hr size="1" noshade="noshade">
-<p><strong>Disclaimer and Request for Solutions</strong>: By no means do I imagine that I have outlined a best solution here. If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then I would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) </p>
+<p><strong>Request for Alternate Solutions</strong>: By no means do I imagine that I have outlined a best solution here. If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then I would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) </p>
 <hr size="1" noshade="noshade">
 <h2>Overview</h2>
 <p>Many people deploying Server4  have been using previous versions of the OPeNDAP servers to serve their data.  These OPeNDAP servers required the Apache web server and utilized  CGI  to deliver their functionality. This is no longer the case, as Server4 is a Java servlet designed to run in conjunction with Tomcat. However many OPeNDAP administrators may wish to keep the URL hierarchies of their existing systems unchanged and simply replace their existing implementation of the OPeNDAP server with Server4. To this end Tomcat needs to be integrated with the Apache installation. The directions here offer methods for integrating Server4 with Apache version 2.x. If you are using earlier versions of Apache (1.x or older) you might wish to consider upgrading Apache to a more current version (version 2.x really is better...), otherwise these instructions may or may not be helpful, ymmv.</p>
 <p>If you are not concerned about the URL's for your data changing when you install Server4 then just run Tomcat as a standalone server. It can even be configured to operate on port 80, just like Apache. If however you want to keep your existing data access URL's intact, read on. </p>
 <p>There are 2 basic methods for integrating Apache and Tomcat. Both methods use the Apache<em> mod_rewrite</em> module. One of the methods requires the <em>mod_jk</em> module. In either case Tomcat must be running and listening on a port (which one depends on how you set things up) for it to interact with Apache. </p>
-<h5>mod_jk</h5>
-<p>Most discussions of integrating Tomcat and Apache start (and often end with) an Apache module called <em>mod_jk</em>. This module allows Tomcat to map directly in to the Apache URI space. However it has limitations:</p>
-<ul>
-  <li>When using <em>mod_jk</em> one must specify a &quot;mount point&quot;, a place in the Apache servers URI space beneath which all requests get sent to Tomcat. As far as I can tell from using <em>mod_jk</em> the name of the mount point must be synonymous with the servlet context (and possibly servlet name, depending on the Tomcat configuration). This works well, and if your goal is to build a web site using Apache and Server4 from the ground up it is probably a reasonable way to proceed. However, it does not address the goal of preserving the existing OPeNDAP data access URL's when migrating to Server4. For this you need to use <em>mod_rewrite</em>.<br>
-    <br>
-  </li>
-  <li>It is not clear to me if using <em>mod_jk</em> is more efficient or in any other way preferable to using a reverse proxy. </li>
-</ul>
 <h5>mod_rewrite + mod_proxy</h5>
 <p>The simplest method I found for integrating Tomcat with Apache while preserving preexisting URL hierarchies is to use a<em> mod_rewrite</em> to implement a &quot;reverse proxy&quot;. According to the Apache documentation this should be a secure arrangement. </p>
-<p>I do not have enough experience to address any questions regarding the relative performance benefits of using  <em>mod_jk</em> or <em>mod_rewrite</em>.. </p>
+<p>&nbsp;</p>
+<h5>mod_jk</h5>
+<p>Most discussions of integrating Tomcat and Apache start (and often end with) an Apache module called <em>mod_jk</em>. This module allows Tomcat to work as part of Apache. From all I can tell it doesn't really give us anything we need that the  <em>mod_rewrite</em> + <em>mod_proxy</em> solutions don't. If you <strong>really</strong> want to read about how to hook this all up using <em>mod_jk</em> then go <a href="mod_jk.html">here</a>. </p>
 <p>&nbsp;</p>
 <h2>Install Server4</h2>
 <p>Install Server4 as described in the <a href="install.html">installation instructions</a>. No matter how you want things to end up you have to do this first. </p>
 <p>&nbsp;</p>
-<h2>Method 1: Integrate Tomcat with Apache 2.x using mod_rewrite + mod_proxy</h2>
-<p><strong>Advice:</strong> <em>Go read about Apache</em> <a href="http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html">mod_rewrite</a> <em>now, before you do anything else. </em></p>
-<p>You will need to rebuild/compile Apache enabling <em>rewrite</em> and <em>proxy.</em> To do this run the Apache configure script with the <em>--enable-rewrite</em> and <em>--enable-proxy</em> switches, recompile and reinstall. Minimally your <em>configure</em> command should look like this:</p>
+<h2>Make sure your Apache has both <em>mod_rewrite</em> and <em>mod_proxy</em> modules </h2>
+<p>Depending on your Apache installation you  may need to rebuild/compile Apache to enable <em>rewrite</em> and <em>proxy.</em> You should first look  at the <em>http.conf</em> configuration file. Find the <em> LoadModule</em> directives and look for the lines that load the proxy and rewrite modules. They should look something like this: </p>
 <blockquote>
-  <p class="style5">./configure --enable-rerwrite --enable-proxy </p>
+  <p class="style5"> LoadModule rewrite_module modules/mod_rewrite.so<br>
+    LoadModule proxy_module modules/mod_proxy.so</p>
 </blockquote>
-<p>Once you have reinstalled Apache with these modules enabled you will need to edit Apache's httpd.conf file. Add the following lines:</p>
+<p>If you see the modules loaded then your set to go, skip to the next section. </p>
+<p>If not then you will probably need to compile Apache from source and enable the <em>rewrite</em> and <em>proxy</em> modules.</p>
+<ol>
+  <li>Make sure you have the <a href="http://httpd.apache.org/">Apache source</a>. </li>
+  <li>Run the Apache configure script with the <em>--enable-rewrite</em> and <em>--enable-proxy</em> switches. Minimally your <em>configure</em> command should look like this:
+    <br>
+    <br>
+    <span class="style5">./configure --enable-rerwrite --enable-proxy </span><br>
+    <br>
+  </li>
+  <li>(Re)compile.</li>
+  <li>(Re)install.</li>
+</ol>
+<p>&nbsp;</p>
+<h2>Integrate Tomcat with Apache 2.x using mod_rewrite + mod_proxy</h2>
+<p><strong>Advice:</strong> <em>If you are not familiar with Apache</em> <a href="http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html">mod_rewrite</a> <em> and </em><a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy.html">mod_proxy</a><em> go read about them now, before you do anything else. </em></p>
+<p>Once you have  Apache with these modules enabled you will need to edit Apache's httpd.conf file. Add the following lines:</p>
 <blockquote>
   <p class="style5"># Enable the rewrite module <br>
   RewriteEngine on<br>
@@ -77,111 +87,9 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/s4/$1  [P]<br>
     RewriteRule   ^/opendap/(.*) http://localhost:8080/opendap/$1  [P]</p>
 </blockquote>
-<p class="style6">Assuming that your old OPeNDAP server was accessed via <span class="style5">http://your.server/cgi-bin/nph-dods/</span> this will map it to the Server4 servlet running Tomcat engine on the same system as your Apache server and listening on port 8080. You will need BOTH of the RewriteRules, trust me. </p>
-<p class="style6">Restart Apache (assuming Tomcat is already running) and you should be on your way. </p>
-<h5>&nbsp;</h5>
-<h2>Method 2: Integrate Tomcat with Apache 2.x using mod_jk , mod_rewrite, and mod_proxy </h2>
-<p>(This section assumes that your Tomcat server is running on the same system as your Apache server. If not you will need to modify the instructions as needed. ) </p>
-<p>You will need to rebuild/compile Apache enabling <em>rewrite</em> and <em>proxy.</em> To do this run the Apache configure script with the <em>--enable-rewrite</em> and <em>--enable-proxy</em> switches, recompile and reinstall. Minimally, your <em>configure</em> command should look like this:</p>
-<blockquote>
-  <p class="style5">configure --enable-rewrite --enable-proxy </p>
-</blockquote>
-<p>Then you will need to get it and compile it for your system, and then install it in the Apache modules directory. Go to the <a href="http://tomcat.apache.org/connectors-doc/howto/apache.html">MOD_JK page</a> and follow their instructions and advice. </p>
-<p><strong>Before proceeding make sure you have installed the <em>mod_jk</em> library in your Apache <em>modules</em> directory. </strong></p>
-<p>You will need to find an example of a <em>workers.properties</em> file. An example may be distributed with your Tomcat bundle (I didn't get one with 5.5.15, but I found one in an older - 5.5.9 - distribution). I would use the &quot;minimal&quot; example to start. Get it into your<em> $TOMCAT_HOME/conf</em> directory. Look at it most likely it contains the following 4 lines:</p>
-<blockquote>
-  <p class="style5">worker.list=ajp13w
-    <br>
-    worker.ajp13w.type=ajp13<br>
-    worker.ajp13w.host=localhost<br>
-    worker.ajp13w.port=8009</p>
-</blockquote>
-<p>Now you need to edit the Tomcat <em>server.xml</em> file to enable the AJP 1.3 connector. Remember - the <em>workers.properties</em> file and the connector definition must agree! Inside of <em>$TOMCAT_HOME/conf/server.xml </em>add (or possibly uncomment) the AJP connector definition inside of the service named <em>Catalina:</em></p>
-<blockquote>
-  <p class="style5"> &lt;Service name=&quot;Catalina&quot;&gt;<br>
-    .<br>
-    .<br>
-    .<br>
-    &lt;!-- Define an AJP 1.3 Connector on port 8009 --&gt;<br>
-  &lt;Connector port=&quot;8009&quot; <br>
-    enableLookups=&quot;false&quot; redirectPort=&quot;8443&quot; protocol=&quot;AJP/1.3&quot; /&gt;<br>
-    .<br>
-    .<br>
-    .<br>
-    &lt;/Service&gt;</p>
-</blockquote>
-<p>Now, follow the <em>mod_jk</em> instructions for using Tomcat auto-configure. This should create the file  <em>$TOMCAT_HOME/conf/<strong>auto</strong>/mod_jk.conf</em>. I suggest you move this file to <em>$TOMCAT_HOME/conf/<strong>jk</strong>/mod_jk.conf</em> so that you may edit it with the fear that it may be overwritten. Assuming you have done that, add the following line to your Apache server's http.conf file:</p>
-<blockquote>
-  <p class="style5">Include /usr/local/apache-tomcat-5.5.15/conf/jk/mod_jk.conf</p>
-</blockquote>
-<p>Now you will need to edit the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file. It should be quite simple to begin with, mine contained this:</p>
-<blockquote>
-  <p class="style5"># load mod_jk<br>
-    &lt;IfModule !mod_jk.c&gt;<br>
-    LoadModule jk_module &quot;/usr/local/apache2/modules/mod_jk.so&quot;<br>
-    &lt;/IfModule&gt;</p>
-</blockquote>
-<p>To this we need to add the stuff to turn on reverse proxies and rewrite. Then we need to configure <em>mod_jk</em> and map the old OPeNDAP data URL's to the new <em>mod_jk</em> service.</p>
-<p>To turn on  reverse proxies and rewrite. Add the following line to the file:</p>
-<blockquote>
-  <p class="style5"># Enable the rewrite module <br>
-    RewriteEngine on<br>
-    # Target it's logging somewhere useful <br>
-    RewriteLog /usr/local/apache2/logs/rewrite.log<br>
-    # Turn on logging (Set to 0 to disable) <br>
-    RewriteLogLevel 2</p>
-  <p class="style5">#Configure mod_proxy to disable everything except reverse proxies.<br>
-    ProxyRequests Off<br>
-  &lt;Proxy *&gt;<br>
-    Order deny,allow<br>
-    Allow from all<br>
-  &lt;/Proxy&gt;</p>
-</blockquote>
-<p>To configure <em>mod_jk</em>, add the following to the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file: </p>
-<blockquote>
-  <p class="style5"># Set mod_jk for our servlet<br>
-    JkWorkersFile /usr/local/apache-tomcat-5.5.15/conf/workers.properties.minimal<br>
-    JkLogFile     /usr/local/apache-tomcat-5.5.15/logs/mod_jk.log<br>
-    JkLogLevel    error<br>
-    JKMount       /opendap/* ajp13 </p>
-</blockquote>
-<p>To map the old OPeNDAP data URL's to the new service (assuming they were located at <em>http://your.server/cgi-bin/nph-dods/...</em>) add this to the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file:</p>
-<blockquote>
-  <p class="style5"># Use a secure reverse proxy to enable mapping the old URL's too tomcat.<br>
-    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/s4/$1  [P]</p>
-</blockquote>
-<p>In the end my <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file: looked like this:</p>
-<blockquote>
-  <p class="style5"> # We need rewrite and proxy to map the old URL's to the new ones.<br>
-    RewriteEngine on<br>
-    RewriteLog /usr/local/apache2/logs/rewrite.log<br>
-    RewriteLogLevel 2</p>
-  <p class="style5">ProxyRequests Off<br>
-    &lt;Proxy *&gt;<br>
-    Order deny,allow<br>
-    Allow from all<br>
-    &lt;/Proxy&gt;</p>
-  <p class="style5"># load mod_jk<br>
-    &lt;IfModule !mod_jk.c&gt;<br>
-    LoadModule jk_module &quot;/usr/local/apache2/modules/mod_jk.so&quot;<br>
-    &lt;/IfModule&gt;</p>
-  <p class="style5"># Set mod_jk for our servlet<br>
-    JkWorkersFile /usr/local/apache-tomcat-5.5.15/conf/workers.properties.minimal<br>
-    JkLogFile     /usr/local/apache-tomcat-5.5.15/logs/mod_jk.log<br>
-    JkLogLevel    error<br>
-    JKMount       /opendap/* ajp13<br>
-  </p>
-  <p class="style5"># Use a secure reverse proxy to enable mapping the old URL's too tomcat.<br>
-    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/s4/$1  [P]</p>
-</blockquote>
-<p>All of this could be added directly to Apache's http.conf file, and is included in it by the line that you added earlier that looked like this:</p>
-<blockquote>
-  <p><span class="style5">Include /usr/local/apache-tomcat-5.5.15/conf/jk/mod_jk.conf</span> </p>
-</blockquote>
-<p>Save your files, restart Tomcat and Apache and, that's it... </p>
-<p>Don't you think just using proxies to do the whole thing is simpler?</p>
-<p>&nbsp;</p>
-<p>&nbsp; </p>
+<p class="style6">Assuming that your old OPeNDAP server was accessed via <span class="style5">http://your.server/cgi-bin/nph-dods/</span> this will map it to the Server4 servlet running Tomcat engine on the same system as your Apache server and listening on port 8080. You will need BOTH of the RewriteRules (at least I did). </p>
+<p class="style6">Restart Apache (assuming Tomcat is already running) and you should be on your way.</p>
+<p class="style6">&nbsp;</p>
 <hr size="1" noshade="noshade">
 <h3><br /></h3></body>
 </html>
