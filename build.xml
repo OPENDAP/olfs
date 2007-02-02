@@ -27,23 +27,64 @@
 
 
 <!DOCTYPE project [
-    <!ENTITY globalprops      SYSTEM "file:./globalprops.xml">
-    <!ENTITY globaltargets    SYSTEM "file:./globaltargets.xml">
+    <!ENTITY globalprops      SYSTEM "file:./buildfiles/globalprops.xml">
 ]>
 
 <!-- Build file for OPeNDAP core software -->
 
 
-<project name="Server4 OPeNDAP Server Prototype" default="all" basedir="..">
+<project name="OPeNDAP Lightweight Front end Server (OLFS), part of the Server4 project" default="all" basedir=".">
 
     <!-- Global Properties -->
     &globalprops;
 
-    <!-- Global Targets -->
-    &globaltargets;
+    <!-- Project directories -->
+    <property name="src.dir"         location="src"/>
+    <property name="doc.dir"         location="doc"/>
+    <property name="lib.dir"         location="lib"/>
+    <property name="bin.dir"         location="bin"/>
+    <property name="resources.dir"   location="resources"/>
+    <property name="datasets.dir"    location="datasets"/>
+    <property name="schema.dir"      location="schema"/>
+    <property name="buildfiles.dir"  location="buildfiles"/>
+    <property name="initialContent.dir"
+                                     location="${resources.dir}/initialContent"/>
+    <property name="WebInfResources.dir"
+                                     location="${resources.dir}/WEB-INF"/>
+    <property name="distributionResources.dir"
+                                     location="${resources.dir}/distribution"/>
+
+
+    <!-- Build Directories -->
+    <property name="build.dir"       location="build"/>
+    <property name="build.classes"   location="${build.dir}/classes"/>
+    <property name="build.doc"       location="${build.dir}/doc"/>
+    <property name="build.dist"      location="${build.dir}/dist"/>
+    <property name="build.lib"       location="${build.dir}/lib"/>
+
+
+
+
+    <!-- Libraries -->
+    <property name="jdom.lib"           value="jdom-1.0.jar"/>
+    <property name="servlet.lib"        value="tomcat-5.5.0-servlet.jar"/>
+    <property name="echo.lib"           value="echosoap.jar"/>
+
+
+    <property name="thredds.lib"        value="tsf-3.13.00.jar"/>
+    <property name="netcdf.lib"         value="netcdf-2.2.17.jar"/>
+    <property name="nlog4j.lib"         value="nlog4j-1.2.21.jar"/>
+
+    <property name="cli.lib"            value="apache-commons-cli-1.0.jar"/>
+
+    <property name="xercesImpl.lib"     value="xercesImpl-2.8.1.jar"/>
+    <property name="xercesXmlApis.lib"  value="xml-apis-2.8.1.jar"/>
+
+
+
 
     <!-- Library (class)paths -->
-    <path id="s4.compile.classpath">
+    <path id="olfs.compile.classpath">
         <pathelement path="${build.classes}" />
         <fileset dir="${lib.dir}">
             <include name="${servlet.lib}" />
@@ -58,18 +99,39 @@
 
 
     <target name="all" depends="clean,clients,server,soap-lib" description="Builds lots of stuff."/>
-    <target name="compile" depends="s4" description="Compiles the Server4 software."/>
+    <target name="compile" depends="olfs" description="Compiles the OLFS software."/>
 
 
     <target name="clients" depends="BESclient" description="Compiles the clients."/>
 
 
+
+    <target name="clean" description="Clean up ALL build products.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+
+
+    <target name="init" description="Prepare all build directories.">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.doc}"/>
+        <mkdir dir="${build.dist}"/>
+        <mkdir dir="${build.lib}"/>
+
+        <tstamp/>
+        <echo level="info" message="time: ${TSTAMP}"/>
+    </target>
+
+
+
     <target
-        name="s4"
+        name="olfs"
         depends="init"
-        description="Compiles Server 4."
+        description="Compiles the OLFS."
         >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Server4"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info" message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
         <javac compiler="${build.compiler}"
@@ -78,11 +140,9 @@
             debuglevel="${compile.debuglevel}"
             deprecation="${compile.deprecation}">
 
-            <classpath refid="s4.compile.classpath"/>
+            <classpath refid="olfs.compile.classpath"/>
 
             <src path="${src.dir}"/>
-            <exclude name="opendap/soap/TestClient.java"/>
-            <exclude name="opendap/soap/SoapUtils.java"/>
             <include name="opendap/**/*.java"/>
             <include name="hao/**/*.java"/>
         </javac>
@@ -90,8 +150,8 @@
     </target>
 
 
-    <target name="s4-lib" depends="clean,compile">
-        <jar destfile="${build.lib}/s4-${VERSION}.jar">
+    <target name="olfs-lib" depends="clean,compile">
+        <jar destfile="${build.lib}/olfs-${VERSION}.jar">
             <fileset dir="${build.classes}">
                 <exclude name="hao/**/*.class"/>
             </fileset>
@@ -125,7 +185,7 @@
             failonerror="true"
             >
 
-            <classpath refid="s4.compile.classpath"/>
+            <classpath refid="olfs.compile.classpath"/>
 
             <fileset dir="${src.dir}/opendap/" >
 
@@ -149,8 +209,8 @@
         description="Builds documentation distribution"
         >
 
-        <jar destfile="${build.dist}/Server4-${VERSION}-doc.jar">
-            <zipfileset dir="${build.doc}" prefix="Server4-${VERSION}-doc"/>
+        <jar destfile="${build.dist}/olfs-${VERSION}-doc.jar">
+            <zipfileset dir="${build.doc}" prefix="olfs-${VERSION}-doc"/>
         </jar>
 
     </target>
@@ -162,10 +222,10 @@
         description="Builds source distribution"
         >
 
-        <jar destfile="${build.dist}/Server4-${VERSION}-src.jar"
+        <jar destfile="${build.dist}/olfs-${VERSION}-src.jar"
                 >
 
-            <zipfileset dir="." prefix="Server4-${VERSION}-src">
+            <zipfileset dir="." prefix="olfs-${VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/> <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="doc/_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
@@ -185,8 +245,8 @@
 
         <copy file="${distributionResources.dir}/WarFileReadme" tofile="${build.dist}/README" />
 
-        <jar destfile="${build.dist}/Server4-${VERSION}-olfs.jar" >
-            <zipfileset dir="${build.dist}" prefix="Server4-${VERSION}-olfs">
+        <jar destfile="${build.dist}/olfs-${VERSION}-olfs.jar" >
+            <zipfileset dir="${build.dist}" prefix="olfs-${VERSION}-olfs">
                 <include name="opendap.war" />
                 <include name="README" />
             </zipfileset>
@@ -225,7 +285,7 @@
 
     <target
         name="BESclient"
-        depends="s4-lib"
+        depends="olfs-lib"
         description="Build and package the back end client."
         >
 
@@ -245,14 +305,14 @@
 
     <target
         name="server"
-        depends="s4-lib,doc"
+        depends="olfs-lib,doc"
         description="Performs a clean build of the core software and assembles the WAR file."
         >
 
 
 
         <war destfile="${build.dist}/opendap.war"
-            webxml="${WebInfResources.dir}/s4web.xml"
+            webxml="${WebInfResources.dir}/web.xml"
             >
 
             <lib dir="${lib.dir}">
@@ -274,11 +334,10 @@
 
             <zipfileset dir="${schema.dir}" prefix="schema" />
 
-            <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/server4"/>
+            <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>
 
-            <!-- zipfileset dir="${build.lib}" prefix="s4-libraries"/ -->
 
-            <zipfileset dir="${lib.dir}" prefix="s4-libraries">
+            <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
                 <include name="${jdom.lib}"/>
                 <include name="${thredds.lib}"/>
                 <include name="${netcdf.lib}"/>

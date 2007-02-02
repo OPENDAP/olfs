@@ -37,28 +37,6 @@
     </target>
 
 
-
-
-    <!-- Core targets for compiling -->
-
-    <target name="init" description="Prepare all build directories.">
-        <mkdir dir="${build.dir}"/>
-        <mkdir dir="${build.classes}"/>
-        <mkdir dir="${build.doc}"/>
-        <mkdir dir="${build.dist}"/>
-        <mkdir dir="${build.lib}"/>
-
-        <tstamp/>
-        <echo level="info" message="time: ${TSTAMP}"/>
-    </target>
-
-
-
-    <target name="clean" description="Clean up ALL build products.">
-        <delete dir="${build.dir}"/>
-    </target>
-
-
     <target name="show" description="Show build settings.">
 
         <echo level="info" message="Project Name:       ${ant.project.name}"/>
@@ -91,39 +69,6 @@
         <echo level="info" message=""/>
 
     </target>
-
-
-
-
-
-
-<!-- Targets to check for and configure Jakarta-Tomcat (aka Catalina) -->
-<target
-    name="checkForCatalina"
-    description="Check to see if a Jakarta-Tomcat (aka Catalina) configuration is available."
-    >
-    <available  property="Catalina.available" file="${Catalina.config}"/>
-    <echo level="info" message="Catalina.config: ${Catalina.config}"/>
-    <echo level="info" message="Catalina.available: ${Catalina.available}"/>
-
-    <fail
-        message="Missing 'catalina-config' file. See 'Java-OPeNDAP/doc/developerInfo.html' for instructions."
-        unless="Catalina.available"
-        />
-</target>
-
-<target
-    name="configCatalina"
-    description="Load Jakarta-Tomcat (aka Catalina) configuration properties"
-    depends="checkForCatalina"
-    if="Catalina.available">
-
-    <loadproperties srcFile="${Catalina.config}"/>
-    <echo level="info" message="Catalina.url:      ${Catalina.url}"/>
-    <echo level="info" message="Catalina.username: ${Catalina.username}"/>
-    <echo level="info" message="Catalina.password: ${Catalina.password}"/>
-
-</target>
 
 
 

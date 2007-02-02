@@ -117,7 +117,7 @@ public class HttpDate {
      *              | "Sep" | "Oct" | "Nov" | "Dec"
      * </pre>
      *
-     * @param dateString
+     * @param dateString A String containing an HTTP date.
      * @return The Date object represented by the passed String, null if the string fails to parse.
      */
     public static Date getHttpDate(String dateString){
@@ -180,14 +180,14 @@ public class HttpDate {
      * Converts a java.util.Date to an HTTP/1.1 date string. The format of the date string
      * may be compliant with RFC-1123, RFC-850, or ANSI C asctime() function output. THis
      * is specified in the passed parameter <code>format</code>.
-     *
-     *
+     * <ul>
+     *    <li> See <a href="http://tools.ietf.org/html/rfc1123>RFC 1123</a></li>
+     *    <li> See <a href="http://tools.ietf.org/html/rfc850>RFC 850</a></li>
+     *    <li> See ANSI C ASCTIME DATE functions</li>
+     * </ul>
      * @param d The Date we want to get an HTTP representation for.
      * @param format The format id for the format to use in representing the date as a String.
      * @return The HTTP/1.1 date string represented by the passed date.
-     * @see RFC_1123
-     * @see RFC_850
-     * @see ANSI_C_ASCTIME_DATE
      */
     public static String getHttpDateString(Date d, int format){
 
@@ -227,7 +227,7 @@ public class HttpDate {
 
     /**
      * Provides a simple experiments of this classes date handling methods.
-     * @param args
+     * @param args Um... arguments!
      */
     public static void main(String args[]){
 

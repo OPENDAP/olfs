@@ -196,6 +196,7 @@ public interface OpendapHttpDispatchHandler {
 
 
     public boolean useOpendapDirectoryView();
+    
     public boolean allowDirectDataSourceAccess();
 
 
@@ -224,7 +225,8 @@ public interface OpendapHttpDispatchHandler {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP catalog.xml requests.
+     * Default handler for THREDDS catalog requests (catalog.xml & 
+     * catalog.html)
      *
      * @param request  The client's <code> HttpServletRequest</code> request
      *                 object.

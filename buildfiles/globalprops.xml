@@ -40,7 +40,6 @@
      tag information from CVS.
 -->
 <property name="VERSION" value="Not.A.Release"/>
-<property name="CVSTag" value="$Name:  $"/>
 
 
 <!-- Compiler Settings -->
@@ -95,65 +94,7 @@ http://ant.apache.org/manual/sysclasspath.html
 
 
 
-<!-- Project directories -->
-<property name="src.dir" location="src"/>
-<property name="doc.dir" location="doc"/>
-<property name="lib.dir" location="lib"/>
-<property name="bin.dir" location="bin"/>
-<property name="resources.dir" location="resources"/>
-<property name="datasets.dir" location="datasets"/>
-<property name="schema.dir" location="schema"/>
-<property name="buildfiles.dir" location="buildfiles"/>
-<property name="initialContent.dir" location="${resources.dir}/initialContent"/>
-<property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
-<property name="distributionResources.dir" location="${resources.dir}/distribution"/>
 
 
-<property name="build.dir" location="build"/>
-<property name="build.classes" location="${build.dir}/classes"/>
-<property name="build.doc" location="${build.dir}/doc"/>
-<property name="build.dist" location="${build.dir}/dist"/>
-<property name="build.lib" location="${build.dir}/lib"/>
-
-
-
-
-<!-- Properties for web deployment -->
-<property name="webapp.name" value="opendap"/>
-<property name="webapp.path" value="/${webapp.name}"/>
-<property name="webapp.war.url" value="file://${build.webapps}/${webapp.name}.war"/>
-
-
-
-<!-- Libraries -->
-<property name="jdom.lib" value="jdom-1.0.jar"/>
-<property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
-<property name="echo.lib" value="echosoap.jar"/>
-
-
-<property name="thredds.lib" value="tsf-3.13.00.jar"/>
-<property name="netcdf.lib" value="netcdf-2.2.17.jar"/>
-<property name="nlog4j.lib" value="nlog4j-1.2.21.jar"/>
-
-<property name="cli.lib" value="apache-commons-cli-1.0.jar"/>
-
-<property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
-<property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
-
-
-
-
-<!-- Catalina.config:
-
-    Jakarta-Tomcat (aka Catalina) properties file. This file must contain
-    the three ANT properties used to access Catalina's manager application.
-    They are: the URL of the interface, username, and password.
-    For example:
-    Catalina.url=http://localhost:8080/manager
-    Catalina.username=admin
-    Catalina.password=somethingsecret
-
--->
-<property name="Catalina.config" location="${buildfiles.dir}/catalina-config"/>
 
 
