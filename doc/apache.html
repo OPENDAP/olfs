@@ -32,21 +32,18 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <h1 align="left">Server4 integration with Apache 2.x <br>
 <span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
 <hr size="1" noshade="noshade">
-<p><strong>Request for Alternate Solutions</strong>: By no means do I imagine that I have outlined a best solution here. If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then I would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) </p>
+<p><strong>Request for Alternate Solutions</strong>: If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then we would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) Or email the OPeNDAP tech support list (opendap-tech at unidata dot ucar dot edu); see <a href="http://www.opendap.org/mailLists/index.html">mail lists</a> for information about the list. </p>
 <hr size="1" noshade="noshade">
 <h2>Overview</h2>
-<p>Many people deploying Server4  have been using previous versions of the OPeNDAP servers to serve their data.  These OPeNDAP servers required the Apache web server and utilized  CGI  to deliver their functionality. This is no longer the case, as Server4 is a Java servlet designed to run in conjunction with Tomcat. However many OPeNDAP administrators may wish to keep the URL hierarchies of their existing systems unchanged and simply replace their existing implementation of the OPeNDAP server with Server4. To this end Tomcat needs to be integrated with the Apache installation. The directions here offer methods for integrating Server4 with Apache version 2.x. If you are using earlier versions of Apache (1.x or older) you might wish to consider upgrading Apache to a more current version (version 2.x really is better...), otherwise these instructions may or may not be helpful, ymmv.</p>
-<p>If you are not concerned about the URL's for your data changing when you install Server4 then just run Tomcat as a standalone server. It can even be configured to operate on port 80, just like Apache. If however you want to keep your existing data access URL's intact, read on. </p>
+<p>If you are not concerned about the URL's for your data changing when you install the OPeNDAP 4 Data Server, then just run Tomcat as a standalone server. It can even be configured to operate on port 80, just like Apache. If however you want to keep your existing data access URL's intact, read on. </p>
+<p>Many people deploying the OPeNDAP 4 Data Server  have been using previous versions of the OPeNDAP servers with their data.  These OPeNDAP servers required the Apache web server and utilized  CGI  to deliver their functionality. This is no longer the case, as the OPeNDAP 4 Data Server is a Java servlet designed to run in conjunction with Tomcat. However many OPeNDAP administrators may wish to keep the URL hierarchies of their existing systems unchanged and simply replace their existing implementation of the OPeNDAP server with the new server. To this end Tomcat needs to be integrated with the Apache installation. The directions here offer methods for integrating the OPeNDAP 4 Data Server with Apache version 2.x. If you are using earlier versions of Apache (1.x or older) you might wish to consider upgrading Apache to a more current version (version 2.x really is better...), otherwise these instructions may or may not be helpful.</p>
 <p>There are 2 basic methods for integrating Apache and Tomcat. Both methods use the Apache<em> mod_rewrite</em> module. One of the methods requires the <em>mod_jk</em> module. In either case Tomcat must be running and listening on a port (which one depends on how you set things up) for it to interact with Apache. </p>
 <h5>mod_rewrite + mod_proxy</h5>
-<p>The simplest method I found for integrating Tomcat with Apache while preserving preexisting URL hierarchies is to use a<em> mod_rewrite</em> to implement a &quot;reverse proxy&quot;. According to the Apache documentation this should be a secure arrangement. </p>
-<p>&nbsp;</p>
+<p>The simplest method for integrating Tomcat with Apache while preserving preexisting URL hierarchies is to use a<em> mod_rewrite</em> to implement a &quot;reverse proxy&quot;. According to the Apache documentation this should be a secure arrangement.</p>
 <h5>mod_jk</h5>
-<p>Most discussions of integrating Tomcat and Apache start (and often end with) an Apache module called <em>mod_jk</em>. This module allows Tomcat to work as part of Apache. From all I can tell it doesn't really give us anything we need that the  <em>mod_rewrite</em> + <em>mod_proxy</em> solutions don't. If you <strong>really</strong> want to read about how to hook this all up using <em>mod_jk</em> then go <a href="mod_jk.html">here</a>. </p>
-<p>&nbsp;</p>
+<p>Most discussions of integrating Tomcat and Apache start (and often end with) an Apache module called <em>mod_jk</em>, which  allows Tomcat to work as part of Apache. However, <em>mod_jk</em> is generally not installed by default with Apache (while the rewrite and proxy modules are) so you will need to build Apache from source, using <em>mod_jk</em> seems both more complex  and  doesn't appear to offer any substantial performance improvements over the &quot;reverse proxy&quot; solution. That said, if you want to read about how to hook this all up using <em>mod_jk</em> then go <a href="mod_jk.html">here</a>. </p>
 <h2>Install Server4</h2>
-<p>Install Server4 as described in the <a href="install.html">installation instructions</a>. No matter how you want things to end up you have to do this first. </p>
-<p>&nbsp;</p>
+<p>Install the OPeNDAP 4 Data Server as described in the <a href="install.html">installation instructions</a>. No matter how you want things to end up you have to do this first. </p>
 <h2>Make sure your Apache has both <em>mod_rewrite</em> and <em>mod_proxy</em> modules </h2>
 <p>Depending on your Apache installation you  may need to rebuild/compile Apache to enable <em>rewrite</em> and <em>proxy.</em> You should first look  at the <em>http.conf</em> configuration file. Find the <em> LoadModule</em> directives and look for the lines that load the proxy and rewrite modules. They should look something like this: </p>
 <blockquote>
@@ -66,14 +63,13 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li>(Re)compile.</li>
   <li>(Re)install.</li>
 </ol>
-<p>&nbsp;</p>
 <h2>Integrate Tomcat with Apache 2.x using mod_rewrite + mod_proxy</h2>
 <p><strong>Advice:</strong> <em>If you are not familiar with Apache</em> <a href="http://httpd.apache.org/docs/2.2/mod/mod_rewrite.html">mod_rewrite</a> <em> and </em><a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy.html">mod_proxy</a><em> go read about them now, before you do anything else. </em></p>
-<p>Once you have  Apache with these modules enabled you will need to edit Apache's httpd.conf file. Add the following lines:</p>
+<p>Once you have  Apache with these modules enabled you will need to edit Apache's <em>httpd.conf</em> file. Add the following lines:</p>
 <blockquote>
   <p class="style5"># Enable the rewrite module <br>
   RewriteEngine on<br>
-  # Target it's logging somehere useful <br>
+  # Target it's logging somewhere useful <br>
     RewriteLog /usr/local/apache2/logs/rewrite.log<br>
     # Turn on logging (Set to 0 to disable) <br>
   RewriteLogLevel 2</p>
@@ -84,12 +80,28 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     Allow from all<br>
 &lt;/Proxy&gt;</p>
   <p class="style5"># Uses a  reverse proxy to enable mapping  old OPeNDAP URL's to Tomcat.<br>
-    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/s4/$1  [P]<br>
-    RewriteRule   ^/opendap/(.*) http://localhost:8080/opendap/$1  [P]</p>
+    RewriteRule   ^/cgi-bin/nph-dods(.*) http://&lt;&lt;your.server&gt;&gt;:8080/opendap/s4/$1  [P]<br>
+    RewriteRule   ^/opendap/(.*) http://&lt;&lt;your.server&gt;&gt;:8080/opendap/$1  [P]</p>
 </blockquote>
-<p class="style6">Assuming that your old OPeNDAP server was accessed via <span class="style5">http://your.server/cgi-bin/nph-dods/</span> this will map it to the Server4 servlet running Tomcat engine on the same system as your Apache server and listening on port 8080. You will need BOTH of the RewriteRules (at least I did). </p>
-<p class="style6">Restart Apache (assuming Tomcat is already running) and you should be on your way.</p>
-<p class="style6">&nbsp;</p>
+<p class="style6">Assuming that your old OPeNDAP server was accessed via <span class="style5">http://your.server/cgi-bin/nph-dods/</span> this will map it to the Server4 servlet running Tomcat engine on the same system as your Apache server and listening on port 8080. You will need both of the <span class="style5">RewriteRule</span> directives, although you will probably tailor the first one to suit you previous server configuration, the second one should be as shown here. If you used <span class="style5">Alias</span> or <span class="style5">AliasMatch</span> with your old server, add more <span class="style5">RewriteRule</span> directives to get that same behavior.</p>
+<p class="style6">Note: If you have <span class="style5">AddEncoding</span> directives in your Apache configuration, those will likely need to be replaced with<span class="style5"> AddType</span>. If present, the <span class="style5">AddEncoding</span> directives will cause Apache 2.x to report that any page, such as the HTML form interface, is compressed, even though it is not. This problem can be very hard to track down. </p>
+<blockquote>
+  <pre>
+# AddEncoding allows you to have certain browsers uncompress
+# information on the fly. Note: Not all browsers support this.
+# Despite the name similarity, the following Add* directives have nothing
+# to do with the FancyIndexing customization directives above
+#
+# AddEncoding x-compress .Z
+# AddEncoding x-gzip .gz .tgz
+*
+# If the AddEncoding directives above are commented-out, then you
+# probably should define those extensions to indicate media types:
+#
+AddType application/x-compress .Z
+AddType application/x-gzip .gz .tgz</pre>
+</blockquote>
+<p>Restart Apache (assuming Tomcat is already running) and you should be on your way.</p>
 <hr size="1" noshade="noshade">
 <h3><br /></h3></body>
 </html>
