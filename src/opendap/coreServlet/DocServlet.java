@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.util.Date;
 
 import thredds.servlet.ServletUtil;
+import org.slf4j.Logger;
 
 /**
  * This mini servlet provides access to distributed or, if it exisits, persistent documentation in the
@@ -51,6 +52,8 @@ public class DocServlet extends HttpServlet {
     private String documentsDirectory;
 
     private MimeTypes mimeTypes;
+
+    private Logger log;
 
 
     public void init(){
@@ -69,7 +72,9 @@ public class DocServlet extends HttpServlet {
 
         mimeTypes = new MimeTypes();
 
-        if(Debug.isSet("DocServlet")) System.out.println("DocServlet - documentsDirectory: "+documentsDirectory);
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+        log.info("documentsDirectory: "+documentsDirectory);
 
 
     }
@@ -94,8 +99,7 @@ public class DocServlet extends HttpServlet {
             lmt = -1;
 
 
-        if(Debug.isSet("showRequest"))
-            System.out.println("DocServlet - Tomcat requested lastModified for: "+name+" Returning: "+ new Date(lmt));
+        log.debug("DocServlet - Tomcat requested lastModified for: "+name+" Returning: "+ new Date(lmt));
 
         return lmt;
 
@@ -133,14 +137,13 @@ public class DocServlet extends HttpServlet {
 
         String name = getName(request);
 
-
-        if(Debug.isSet("showRequest")) System.out.print("DocServlet - The client requested this: "+name);
+        log.debug("DocServlet - The client requested this: "+name);
 
 
         File f = new File(name);
 
         if(f.exists()){
-            if(Debug.isSet("showRequest")) System.out.print("   Requested item exists.");
+            log.debug("   Requested item exists.");
 
 
             String suffix = null;
@@ -153,13 +156,13 @@ public class DocServlet extends HttpServlet {
                 String mType = mimeTypes.getMimeType(suffix);
                 if(mType!=null)
                     response.setContentType(mType);
-                if(Debug.isSet("showRequest")) System.out.print("   MIME type: "+mType+"  ");
+                log.debug("   MIME type: "+mType+"  ");
             }
 
 
 
 
-            if(Debug.isSet("showRequest")) System.out.println("   Sending.");
+            log.debug("   Sending.");
 
 
             FileInputStream fis = new FileInputStream(f);
@@ -186,7 +189,7 @@ public class DocServlet extends HttpServlet {
 
         }
         else {
-            if(Debug.isSet("showRequest")) System.out.println("   Requested item does not exist. Returning '404 Not Found'");
+            log.debug("   Requested item does not exist. Returning '404 Not Found'");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         }

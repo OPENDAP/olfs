@@ -36,8 +36,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.BufferedReader;
+import java.io.File;
 import java.util.StringTokenizer;
+import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -81,16 +83,20 @@ public class DispatchServlet extends HttpServlet {
     private int HitCounter = 0;
 
 
+
+
+    private long threddsInitTime;
+    private ReentrantLock threddsUpdateLock;
+
+
     private OpendapHttpDispatchHandler odh = null;
     private OpendapSoapDispatchHandler sdh = null;
 
 
-    protected org.slf4j.Logger log;
-    //protected String _contentPath; // Path to ${tomcat_home}/content/<context>
-    //protected String _contextPath; // Path to ${tomcat_home}/webapps/<context>
-
-
     protected DataRootHandler dataRootHandler;
+    protected org.slf4j.Logger log;
+
+
 
 
     protected String getDocsPath() {
@@ -111,6 +117,13 @@ public class DispatchServlet extends HttpServlet {
 
         super.init();
         initDebug();
+        initLogging();
+
+        ReqInfo.init();
+        SOAPRequestDispatcher.init();
+
+        // init logging
+        PerfLog.logServerSetup(this.getClass().getName() + "init() start");
 
         PersistentContentHandler.installInitialContent(this);
 
@@ -122,7 +135,7 @@ public class DispatchServlet extends HttpServlet {
                     "be identified in this (missing) servlet parameter.");
 
 
-        System.out.println("\n\nOpendapHttpDispatchHandlerImplementation: " + className);
+        log.info("OpendapHttpDispatchHandlerImplementation is " + className);
 
         try {
             Class classDefinition = Class.forName(className);
@@ -145,7 +158,7 @@ public class DispatchServlet extends HttpServlet {
                     "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
                     "be identified in this (missing) servlet parameter.");
 
-        System.out.println("\n\nOpendapSoapDispatchHandlerImplementation: " + className);
+        log.info("OpendapSoapDispatchHandlerImplementation is " + className);
 
         try {
             Class classDefinition = Class.forName(className);
@@ -163,6 +176,9 @@ public class DispatchServlet extends HttpServlet {
 
 
         initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
+
+
+        log.info("init() complete.  ");
 
 
     }
@@ -188,6 +204,18 @@ public class DispatchServlet extends HttpServlet {
     /***************************************************************************/
 
 
+    private void initLogging(){
+        thredds.servlet.ServletUtil.initLogging(this);
+        PerfLog.initLogging(this);
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+    }
+
+
+
+
+
+
     /**
      * ************************************************************************
      * <p/>
@@ -200,20 +228,20 @@ public class DispatchServlet extends HttpServlet {
 
         thredds.servlet.ServletUtil.initDebugging(this); // read debug flags
 
-        // init logging
-        thredds.servlet.ServletUtil.initLogging(this);
-        thredds.servlet.ServletUtil.logServerSetup(this.getClass().getName() + ".init()");
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        InvDatasetScan.setContext(contextPath); // This gets your context path from web.xml above.
+        InvDatasetScan.setContext(contextPath); // This gets your context path
+                                                // from web.xml above.
 
         // This allows you to specify which servlet handles catalog requests.
-        // We set it to "/catalog". Is "/ts" the servlet path for you? If so, set this to "/ts".
-        // If you use the default servlet for everything (path mapping of "/*" in web.xml). set it to the empty string.
+        // We set it to "/catalog". Is "/ts" the servlet path for you? If so,
+        // set this to "/ts".
+        // If you use the default servlet for everything (path mapping of
+        // "/*" in web.xml). set it to the empty string.
         InvDatasetScan.setCatalogServletName("/" + getServletName());
 
-        // handles all catalogs, including ones with DatasetScan elements, ie dynamic
+        // handles all catalogs, including ones with DatasetScan elements,
+        // ie dynamic
         DataRootHandler.init(contentPath, contextPath);
         dataRootHandler = DataRootHandler.getInstance();
         try {
@@ -237,7 +265,10 @@ public class DispatchServlet extends HttpServlet {
                 "docs/images/logo.gif"  // instituteLogoPath
         );
 
-        log.info("--- initialized " + getClass().getName());
+        threddsUpdateLock = new ReentrantLock(true);
+        threddsInitTime = new Date().getTime();
+
+        log.info("THREDDS initialized ");
 
     }
     /***************************************************************************/
@@ -284,22 +315,27 @@ public class DispatchServlet extends HttpServlet {
      * @param reqno The request number.
      */
     public void showRequest(HttpServletRequest req, long reqno) {
-        System.out.println("-------------------------------------------");
-        System.out.println("Server: " + getServerName() + "   Request #" + reqno);
-        System.out.println("Client: " + req.getRemoteHost());
-        System.out.println("Request Info:");
-        System.out.println("  fullSourceName:               '" + ReqInfo.getFullSourceName(req) + "'");
-        System.out.println("  dataSource:                   '" + ReqInfo.getDataSource(req) + "'");
-        System.out.println("  dataSetName:                  '" + ReqInfo.getDataSetName(req) + "'");
-        System.out.println("  collectionName:               '" + ReqInfo.getCollectionName(req) + "'");
-        System.out.println("  requestSuffix:                '" + ReqInfo.getRequestSuffix(req) + "'");
-        System.out.println("  CE:                           '" + ReqInfo.getConstraintExpression(req) + "'");
-        System.out.println("  requestURL:                   '" + ReqInfo.getRequestURL(req) + "'");
-        System.out.println("  requestForOpendapContents:     " + ReqInfo.requestForOpendapContents(req));
-        System.out.println("  requestForTHREDDSCatalog:      " + ReqInfo.requestForTHREDDSCatalog(req));
-        System.out.println();
 
-        DebugLog.println("Request dataSource: '" + ReqInfo.getDataSource(req) +
+        String msg = "showRequest():\n";
+        msg += "-------------------------------------------\n";
+        msg += "Server: " + getServerName() + "   Request #" + reqno + "\n";
+        msg += "Client: " + req.getRemoteHost() + "\n";
+        msg += "Request Info:\n";
+        msg += "  fullSourceName:               '" + ReqInfo.getFullSourceName(req) + "'\n";
+        msg += "  dataSource:                   '" + ReqInfo.getDataSource(req) + "'\n";
+        msg += "  dataSetName:                  '" + ReqInfo.getDataSetName(req) + "'\n";
+        msg += "  collectionName:               '" + ReqInfo.getCollectionName(req) + "'\n";
+        msg += "  requestSuffix:                '" + ReqInfo.getRequestSuffix(req) + "'\n";
+        msg += "  CE:                           '" + ReqInfo.getConstraintExpression(req) + "'\n";
+        msg += "  requestURL:                   '" + ReqInfo.getRequestURL(req) + "'\n";
+        msg += "  requestForOpendapContents:     " + ReqInfo.requestForOpendapContents(req) + "\n";
+        msg += "  requestForTHREDDSCatalog:      " + ReqInfo.requestForTHREDDSCatalog(req) + "\n";
+        msg += "-------------------------------------------";
+
+
+        log.debug(msg);
+
+        log.info("Request dataSource: '" + ReqInfo.getDataSource(req) +
                 "' suffix: '" + ReqInfo.getRequestSuffix(req) +
                 "' CE: '" + ReqInfo.getConstraintExpression(req) + "'");
 
@@ -341,7 +377,7 @@ public class DispatchServlet extends HttpServlet {
                     dataSource.equalsIgnoreCase("/version")
                     ) {
                 odh.sendVersion(request, response);
-                log.info("Sent Version Response");
+                log.debug("Sent Version Response");
                 specialRequest = true;
 
             } else if ( // Help Response?
@@ -429,10 +465,10 @@ public class DispatchServlet extends HttpServlet {
      * </ui>
      *
      *
-     * @param request
-     * @param response
+     * @param request .
+     * @param response .
      * @return true if the request was handled as an OPeNDAP service request, false otherwise.
-     * @throws Exception
+     * @throws Exception .
      */
     public boolean dataSetDispatch(HttpServletRequest request,
                                   HttpServletResponse response) throws Exception {
@@ -442,7 +478,6 @@ public class DispatchServlet extends HttpServlet {
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         DataSourceInfo dsi = odh.getDataSourceInfo(dataSource);
-        //System.out.println(dsi);
 
         boolean isDataRequest = false;
 
@@ -482,7 +517,7 @@ public class DispatchServlet extends HttpServlet {
                 } else if ( // DAP2 (aka .dods) Response?
                         requestSuffix.equalsIgnoreCase("dods")
                         ) {
-                    odh.sendDODS(request, response);
+                    odh.sendDAP2Data(request, response);
                     isDataRequest  = true;
                     log.info("Sent DAP2 Data");
 
@@ -533,10 +568,10 @@ public class DispatchServlet extends HttpServlet {
      * Performs dispatching for file requests. If a request is not for a special service or an OPeNDAP service
      * then we attempt to resolve the request to a "file" located within the context of the data handler and
      * return it's contents.
-     * @param request
-     * @param response
+     * @param request .
+     * @param response .
      * @return true if the request was serviced as a file request, false otherwise.
-     * @throws Exception
+     * @throws Exception .
      */
     public boolean fileDispatch(HttpServletRequest request,
                                   HttpServletResponse response) throws Exception {
@@ -546,8 +581,6 @@ public class DispatchServlet extends HttpServlet {
         String fullSourceName = ReqInfo.getFullSourceName(request);
 
         DataSourceInfo dsi = odh.getDataSourceInfo(fullSourceName);
-
-        //System.out.println(dsi);
 
         boolean isFileResponse = false;
 
@@ -609,7 +642,9 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        
+        PerfLog.logServerAccessStart( request,"OPeNDAP_Access");
+
+
         try {
             if (Debug.isSet("probeRequest"))
                 Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
@@ -617,11 +652,7 @@ public class DispatchServlet extends HttpServlet {
 
             synchronized (syncLock) {
                 long reqno = HitCounter++;
-
-                if (Debug.isSet("showRequest")) {
-                    showRequest(request, reqno);
-                }
-
+                showRequest(request, reqno);
             } // synch
 
 
@@ -638,6 +669,10 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable e) {
             OPeNDAPException.anyExceptionHandler(e, response);
+        }
+        finally {
+            PerfLog.logServerAccessEnd( 0,-1,"OPeNDAP_Access");
+
         }
 
 
@@ -658,12 +693,28 @@ public class DispatchServlet extends HttpServlet {
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res)
             throws Exception {
 
+        ServletUtil.logServerAccessSetup( req);
 
         if ((req.getPathInfo() == null)) {
             String newPath = req.getRequestURL() + "/";
             res.sendRedirect(newPath);
             log.info("Sent THREDDS redirect to avoid a null valued return to request.getPathInfo().");
             return true;
+        }
+
+
+        threddsUpdateLock.lock();
+        try{
+            String masterCatalog = ServletUtil.getContentPath(this)+"catalog.xml";
+            File f = new File(masterCatalog);
+            if(f.lastModified()> threddsInitTime){
+                threddsInitTime = f.lastModified();
+                dataRootHandler.reinit();
+                log.info(" **********  THREDDS reinitialized.  ");
+            }
+        }
+        finally{
+            threddsUpdateLock.unlock();
         }
 
 
@@ -736,19 +787,19 @@ public class DispatchServlet extends HttpServlet {
                        HttpServletResponse response)
             throws IOException {
 
-        if (Debug.isSet("showResponse"))
-            System.out.println("Sending Bad URL Page.");
+        log.debug("Sending Bad URL Page.");
 
         response.setContentType("text/html");
         response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
         response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-
 
         pw.println("<h3>Error in URL</h3>");
         pw.println("<p>The URL extension did not match any that are known by this");
@@ -770,7 +821,6 @@ public class DispatchServlet extends HttpServlet {
 
         pw.flush();
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
 
     }
@@ -778,8 +828,8 @@ public class DispatchServlet extends HttpServlet {
 
 
     /**
-     * @param request
-     * @param response
+     * @param request .
+     * @param response .
      * @throws IOException
      * @throws ServletException
      */
@@ -807,6 +857,7 @@ public class DispatchServlet extends HttpServlet {
         response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
@@ -823,7 +874,6 @@ public class DispatchServlet extends HttpServlet {
 
         pw.flush();
 
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
 
     }
@@ -836,6 +886,7 @@ public class DispatchServlet extends HttpServlet {
         response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
@@ -856,7 +907,6 @@ public class DispatchServlet extends HttpServlet {
 
         pw.flush();
 
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
 
     }

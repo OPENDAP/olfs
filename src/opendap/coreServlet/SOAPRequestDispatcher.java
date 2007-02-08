@@ -28,6 +28,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.*;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,14 @@ import opendap.soap.ExceptionElementUtil;
 public class SOAPRequestDispatcher {
 
 
+    private static Logger log;
+
+    public static void init(){
+        log = org.slf4j.LoggerFactory.getLogger(SOAPRequestDispatcher.class);
+
+    }
+
+
     /**
      * Handles SOAP requests that arrive via HTTP POST. No other POST functions supported.
      *
@@ -57,19 +66,7 @@ public class SOAPRequestDispatcher {
                               OpendapHttpDispatchHandler odh,
                               OpendapSoapDispatchHandler sdh) {
 
-        doPost03(request, response, odh, sdh);
-    }
-
-
-
-
-    private static void doPost03(HttpServletRequest request,
-                                HttpServletResponse response,
-                                OpendapHttpDispatchHandler odh,
-                                OpendapSoapDispatchHandler sdh) {
-
-
-        System.out.println("\n\n\nSOAPHandler.doPost(): Start of POST Handler.");
+        log.debug("\n\n\nSOAPHandler.doPost(): Start of POST Handler.");
 
 
         try {
@@ -79,7 +76,7 @@ public class SOAPRequestDispatcher {
             if (qcSOAPDocument(doc)) {
 
 
-                System.out.println("Building Multipart Response...");
+                log.debug("Building Multipart Response...");
 
                 MultipartResponse mpr = new MultipartResponse(request, response, odh);
 
@@ -89,7 +86,7 @@ public class SOAPRequestDispatcher {
 
                 List soapContents = soapEnvelope.getChild("Body", XMLNamespaces.getDefaultSoapEnvNamespace()).getChildren();
 
-                System.out.println("Got " + soapContents.size() + " SOAP Body Elements.");
+                log.debug("Got " + soapContents.size() + " SOAP Body Elements.");
 
                 for (Object soapContent : soapContents) {
 
@@ -100,22 +97,22 @@ public class SOAPRequestDispatcher {
                 mpr.send();
 
 
-                System.out.println("done.");
+                log.debug("done.");
 
             } else {
-                System.out.print("Reflecting Document to client...");
+                log.debug("Reflecting Document to client...");
 
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
                 xmlo.output(doc, response.getOutputStream());
 
-                System.out.println("done.");
+                log.debug("done.");
             }
         } catch (Exception e) {
             OPeNDAPException.anyExceptionHandler(e,response);
         }
 
 
-        System.out.println("SOAPRequestDispatcher.doPost(): End of POST Handler.\n\n\n");
+        log.debug("SOAPRequestDispatcher.doPost(): End of POST Handler.\n\n\n");
     }
 
 
@@ -137,7 +134,7 @@ public class SOAPRequestDispatcher {
         String reqID = reqElement.getAttributeValue("reqID", osnms);
 
 
-        System.out.println("Request ELement: \n" + reqElement.toString());
+        log.debug("Request Element: \n" + reqElement.toString());
 
 
         try {
@@ -160,7 +157,7 @@ public class SOAPRequestDispatcher {
 
                 }
                 else {
-                    System.out.println("Received Bad Soap reqElement: " + reqElement.getName());
+                    log.error("Received Bad Soap reqElement: " + reqElement.getName());
 
                     Element err = ExceptionElementUtil.makeExceptionElement(
                             "BadSOAPRequest",
@@ -171,7 +168,7 @@ public class SOAPRequestDispatcher {
 
                 }
             } else {
-                System.out.println("Received Bad SOAP Request. reqID :" + reqID);
+                log.error("Received Bad SOAP Request. reqID :" + reqID);
 
                 Element err = ExceptionElementUtil.makeExceptionElement(
                         "BadSOAPRequest",
@@ -205,11 +202,8 @@ public class SOAPRequestDispatcher {
         Document doc = saxBldr.build(req.getReader());
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        System.out.println("");
-        System.out.println("POST Method got this XML Document:");
-
-        xmlo.output(doc, System.out);
-        System.out.println("");
+        log.debug("POST Method got this XML Document:" +
+                xmlo.outputString(doc) );
 
         return doc;
     }
@@ -229,7 +223,7 @@ public class SOAPRequestDispatcher {
 
         Element se = doc.getRootElement();
 
-        System.out.println("DocRoot: " + se.getName() + "    getOpendapSoapNamespace: " + se.getNamespace().getURI());
+        log.debug("DocRoot: " + se.getName() + "    getOpendapSoapNamespace: " + se.getNamespace().getURI());
 
         if (se.getName().equals("Envelope") && se.getNamespace().equals(soapEnvNameSpace)) {
             Iterator it = se.getChildren().iterator();

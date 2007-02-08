@@ -71,7 +71,7 @@
   </logger>
 
   <logger name="thredds">
-    <level value="ALL"/>
+    <level value="INFO"/>
     <appender-ref ref="ThreddsStdout"/>
   </logger>
 
@@ -85,7 +85,47 @@
       <appender-ref ref="ThreddsStdout"/>
     </logger>
 
+
+
+    <!-- OPeNDAP Server4 Logging -->
+
+    <!-- Default Logging level -->
     <logger name="opendap">
+      <level value="INFO"/>
+      <appender-ref ref="ThreddsStdout"/>
+    </logger>
+
+
+    <!-- CoreServlet Logging -->
+    <logger name="opendap.coreServlet">
+      <level value="INFO"/>
+    </logger>
+
+    <logger name="opendap.coreServlet.ReqInfo">
+      <level value="INFO"/>
+    </logger>
+
+    <logger name="opendap.coreServlet.DocServlet">
+      <level value="INFO"/>
+    </logger>
+
+
+
+    <!-- OLFS Logging. Includes BesAPI -->
+    <logger name="opendap.olfs">
+      <level value="INFO"/>
+    </logger>
+
+    <logger name="opendap.olfs.BESCrawlableDataset">
+      <level value="INFO"/>
+    </logger>
+
+
+
+
+
+
+    <logger name="OPeNDAP_Access">
       <level value="ALL"/>
       <appender-ref ref="ThreddsStdout"/>
     </logger>

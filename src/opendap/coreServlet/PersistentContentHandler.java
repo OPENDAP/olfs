@@ -31,6 +31,7 @@ import java.io.IOException;
 
 import thredds.util.IO;
 import thredds.servlet.ServletUtil;
+import org.slf4j.Logger;
 
 /**
  * Provides methods for detecting the presence of the peristent content directory and moving an initial
@@ -46,14 +47,16 @@ public class PersistentContentHandler {
      */
     public static void installInitialContent(HttpServlet servlet) {
 
+        Logger log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
+
+
         String semaphore = ".INIT";
 
-        if (Debug.isSet("PersistentContentHandler")) {
-            System.out.println("PersistentContentHandler:");
-            System.out.println("    contentPath:        " + ServletUtil.getContentPath(servlet));
-            System.out.println("    initialContentPath: " + ServletUtil.getInitialContentPath(servlet));
-            System.out.println("    semaphore:          " + semaphore);
-        }
+        log.debug("PersistentContentHandler:");
+        log.debug("    contentPath:        " + ServletUtil.getContentPath(servlet));
+        log.debug("    initialContentPath: " + ServletUtil.getInitialContentPath(servlet));
+        log.debug("    semaphore:          " + semaphore);
+
 
         // -------------
         // first time, create content directory
@@ -63,15 +66,11 @@ public class PersistentContentHandler {
         if (initialContentFile.exists()) {
             try {
                 if (copyDirIfSemaphoreNotPresent(initialContentPath, ServletUtil.getContentPath(servlet), semaphore)) {
-                    if (Debug.isSet("PersistentContentHandler"))
-                        System.out.println("Copied inital content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
+                    log.debug("Copied inital content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
                 }
             }
             catch (IOException ioe) {
-                if (Debug.isSet("PersistentContentHandler")) {
-                    System.out.println("Failed to copy initial content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
-                    ioe.printStackTrace(System.out);
-                }
+                    log.debug("Failed to copy initial content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet),ioe);
             }
         }
         //-------------
@@ -83,7 +82,12 @@ public class PersistentContentHandler {
     }
 
 
-    static private boolean copyDirIfSemaphoreNotPresent(String fromDir, String toDir, String semaphore) throws IOException {
+    private static  boolean copyDirIfSemaphoreNotPresent(
+            String fromDir,
+            String toDir,
+            String semaphore)
+            throws IOException {
+
       File contentFile = new File(toDir+semaphore);
       if (!contentFile.exists()) {
         IO.copyDirTree(fromDir, toDir);

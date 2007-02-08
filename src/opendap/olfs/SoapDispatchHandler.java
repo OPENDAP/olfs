@@ -24,7 +24,6 @@
 
 package opendap.olfs;
 
-import opendap.coreServlet.Debug;
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
 import opendap.soap.XMLNamespaces;
@@ -39,6 +38,7 @@ import org.jdom.Namespace;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.slf4j.Logger;
 
 
 import thredds.cataloggen.SimpleCatalogBuilder;
@@ -53,65 +53,19 @@ import java.io.ByteArrayInputStream;
  */
 public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
+    Logger log;
+
     /**
      *
-     * @param ds
+     * @param ds The Servlet that is aclling init().
      * @throws ServletException
      */
     public void init(HttpServlet ds) throws ServletException{
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
 
     }
 
-
-    /**
-     * Handles a SOAP request for OPeNDAP data. This version puts the DDX in the Soap Envelope and adds the data as
-     * an attachment to the Multipart MIME message.
-     *
-     * @param reqID
-     * @param cmd
-     * @param mpr
-     * @throws Exception
-     */
-    public void getDATA_OLD( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
-
-        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
-
-        System.out.println("Received GetDATA reqElement.");
-        Element dataSet = cmd.getChild("DataSet", osnms);
-
-        System.out.println("Dataset:\n"+dataSet.toString());
-
-
-        String datasetname = dataSet.getChild("name",osnms).getTextTrim();
-        String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
-
-        System.out.println("Processing DataSet - path: "+datasetname+"   ce: "+ce);
-
-        Element respElement = new Element("Response",osnms);
-        respElement.setAttribute("reqID",reqID,osnms);
-
-
-        Element ddx = BesAPI.getDDXDocument(datasetname, ce).detachRootElement();
-        //@todo Fix The BES use of dodsBLOB!
-
-        Element blob = ddx.getChild("dodsBLOB", XMLNamespaces.getOpendapDAP2Namespace());
-
-        String contentId = MultipartResponse.newUidString();
-
-        //@todo Add the namespace to the href - first we must add it to the schema!
-        blob.setAttribute("href", "cid:" + contentId);
-
-
-
-        respElement.addContent(ddx);
-
-
-        mpr.addAttachment("application/octet-stream",
-                contentId,
-                BesAPI.getDap2DataStream(datasetname, ce));
-
-        mpr.addSoapBodyPart(respElement);
-    }
 
 
 
@@ -121,7 +75,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * references (via an href attribute in the dodsBlob element) the data which is added as another attachment to
      * the Multipart MIME message.
      *
-     * @param reqID
+     * @param reqID The request ID for this request.
      * @param cmd
      * @param mpr
      * @throws Exception
@@ -130,16 +84,16 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
-        System.out.println("Received GetDATA reqElement.");
+        log.debug("Received GetDATA reqElement.");
         Element dataSet = cmd.getChild("DataSet", osnms);
 
-        System.out.println("Dataset:\n"+dataSet.toString());
+        log.debug("Dataset:\n"+dataSet.toString());
 
 
         String datasetname = dataSet.getChild("name",osnms).getTextTrim();
         String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
 
-        System.out.println("Processing DataSet - path: "+datasetname+"   ce: "+ce);
+        log.debug("Processing DataSet - path: "+datasetname+"   ce: "+ce);
 
         Element respElement = new Element("Response",osnms);
         respElement.setAttribute("reqID",reqID,osnms);
@@ -173,7 +127,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         mpr.addAttachment("application/octet-stream",
                 blobID,
-                BesAPI.getDap2DataStream(datasetname, ce));
+                BesAPI.getDap2DataStream(datasetname, ce,BesAPI.XML_ERRORS));
 
         mpr.addSoapBodyPart(respElement);
     }
@@ -189,18 +143,18 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      */
     public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
-        System.out.println("Received GetDDX reqElement.");
+        log.debug("Received GetDDX reqElement.");
 
 
         Element dataSet = cmd.getChild("DataSet", osnms);
 
-        System.out.println("Dataset:\n"+dataSet.toString());
+        log.debug("Dataset:\n"+dataSet.toString());
 
 
         String datasetname = dataSet.getChild("name",osnms).getTextTrim();
         String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
 
-        System.out.println("Processing DataSet - path: "+datasetname+"   ce: "+ce);
+        log.debug("Processing DataSet - path: "+datasetname+"   ce: "+ce);
 
         Element respElement = new Element("Response",osnms);
         respElement.setAttribute("reqID",reqID,osnms);
@@ -230,7 +184,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
 
 
-        System.out.println("Received GetTHREDDSCatalog reqElement.");
+        log.debug("Received GetTHREDDSCatalog reqElement.");
 
         String path = cmd.getChild("path",osnms).getTextTrim();
 
@@ -269,15 +223,15 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                     "OPeNDAP",                            // Service Type Name
                     baseURL ); // Base URL for this service
 
-            if (Debug.isSet("showResponse")) {
-                System.out.println("SOAPRequestDispatcher:GetTHREDDSCatalog - Generating catalog");
-            }
+            log.debug("SOAPRequestDispatcher:GetTHREDDSCatalog - " +
+                    "Generating catalog using SimpleCatalogBuilder");
+
 
 
             Document catalog = scb.generateCatalogAsDocument(s4cd);
 
             if(catalog == null){
-                System.out.println("SimpleCatalogBuilder.generateCatalogAsDocument("+path+") returned null.");
+                log.debug("SimpleCatalogBuilder.generateCatalogAsDocument("+path+") returned null.");
                 respElement =  ExceptionElementUtil.makeExceptionElement(
                         "BadSOAPRequest",
                         "Requested catalog ("+cmd.getChild("path").getTextTrim()+" is not available.",

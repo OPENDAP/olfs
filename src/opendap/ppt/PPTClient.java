@@ -29,13 +29,20 @@ import opendap.coreServlet.Debug;
 import java.io.*;
 import java.net.*;
 
+import org.slf4j.Logger;
+
 class PPTClient {
 
     private Socket _mySock = null;
     private BufferedOutputStream _out = null;
     private BufferedInputStream _in = null;
 
+    private Logger log;
+
     PPTClient(String hostStr, int portVal) throws PPTException {
+
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
         InetAddress addr;
 
         try {
@@ -72,23 +79,22 @@ class PPTClient {
     }
 
 
-    public boolean showconnectionProperties() throws SocketException {
+    public String showConnectionProperties() throws SocketException {
 
-        System.out.println();
-        System.out.println("PPTClient - Socket isBound():          " + _mySock.isBound());
-        System.out.println("PPTClient - Socket isClosed():         " + _mySock.isClosed());
-        System.out.println("PPTClient - Socket isConnected():      " + _mySock.isConnected());
-        System.out.println("PPTClient - Socket isInputShutdown():  " + _mySock.isInputShutdown());
-        System.out.println("PPTClient - Socket isOutputShutdown(): " + _mySock.isOutputShutdown());
-        System.out.println("PPTClient - Socket getKeepAlive():     " + _mySock.getKeepAlive());
-        System.out.println("PPTClient - Socket getOOBInline():     " + _mySock.getOOBInline());
-        System.out.println("PPTClient - Socket getReuseAddress():  " + _mySock.getReuseAddress());
-        System.out.println("PPTClient - Socket getSoLinger():      " + _mySock.getSoLinger());
-        System.out.println("PPTClient - Socket getSoTimeout():     " + _mySock.getSoTimeout());
-        System.out.println();
+        String msg = "\nshowConnectionProperties():\n";
+        msg += "    Socket isBound():          " + _mySock.isBound();
+        msg += "    Socket isClosed():         " + _mySock.isClosed();
+        msg += "    Socket isConnected():      " + _mySock.isConnected();
+        msg += "    Socket isInputShutdown():  " + _mySock.isInputShutdown();
+        msg += "    Socket isOutputShutdown(): " + _mySock.isOutputShutdown();
+        msg += "    Socket getKeepAlive():     " + _mySock.getKeepAlive();
+        msg += "    Socket getOOBInline():     " + _mySock.getOOBInline();
+        msg += "    Socket getReuseAddress():  " + _mySock.getReuseAddress();
+        msg += "    Socket getSoLinger():      " + _mySock.getSoLinger();
+        msg += "    Socket getSoTimeout():     " + _mySock.getSoTimeout();
 
 
-        return true;
+        return msg;
 
     }
 
@@ -181,10 +187,10 @@ class PPTClient {
     public boolean writeBuffer(String buffer) throws PPTException {
         try {
             byte[] a = buffer.getBytes();
-            if (Debug.isSet("PPTClient")) System.out.print("PPTClient writing " + a.length + "  bytes ...");
+            log.debug("Writing " + a.length + "  bytes ...");
             _out.write(a, 0, a.length);
             _out.flush();
-            if (Debug.isSet("PPTClient")) System.out.println(" done.");
+            log.debug(" done.");
         }
         catch (IOException e) {
             String msg = "Failed to write to socket:  ";
@@ -195,36 +201,6 @@ class PPTClient {
         return true;
     }
 
-    public void getResponseOld(OutputStream strm) throws PPTException {
-        PrintStream pstrm = null;
-        if (strm != null) {
-            pstrm = new PrintStream(strm, true);
-        }
-        boolean done = false;
-        while (!done && pstrm != null) {
-            byte[] inBuff = new byte[4096];
-            int bytesRead = this.readBuffer(inBuff);
-            if (bytesRead != 0) {
-                int termlen = PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length();
-                int writeBytes = bytesRead;
-                if (bytesRead >= termlen) {
-                    String inEnd = "";
-                    for (int j = 0; j < termlen; j++)
-                        inEnd += inBuff[(bytesRead - termlen) + j];
-                    System.out.println("inEnd:        " + inEnd + " (length: " + inEnd.length() + ")");
-                    System.out.println("search value: " + PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION + " (length: " + PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION.length() + ") ");
-                    if (inEnd.equals(PPTSessionProtocol.PPT_COMPLETE_DATA_TRANSMITION)) {
-                        done = true;
-                        writeBytes = bytesRead - termlen;
-                    }
-                }
-                for (int j = 0; j < writeBytes; j++)
-                    pstrm.write(inBuff[j]);
-            } else {
-                done = true;
-            }
-        }
-    }
 
 
     /**
@@ -291,15 +267,15 @@ class PPTClient {
 
         int bytesRead;
         try {
-            if (Debug.isSet("PPTClient")) System.out.print("PPTClient reading bytes ...");
+            log.debug("Reading bytes ...");
             bytesRead = _in.read(inBuff);
-            if (Debug.isSet("PPTClient")) System.out.println(" got " + bytesRead + " bytes.");
+            log.debug("Got " + bytesRead + " bytes.");
 
             if(bytesRead == -1)
                 throw new PPTException("Failed to read response from server. End Of Stream reached prematurely.  ");
 
 
-            if (Debug.isSet("PPTClient")) System.out.println("Read: " + new String(inBuff));
+            log.debug("Read: " + new String(inBuff));
         }
         catch (IOException e) {
             String msg = "Failed to read response from server.  ";

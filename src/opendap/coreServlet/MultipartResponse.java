@@ -28,6 +28,7 @@ import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -59,6 +60,7 @@ public class MultipartResponse {
     private Vector<Attachment> attachments;
     private String mimeBoundary;
     private String startID;
+    private Logger log;
 
 
     /**
@@ -76,6 +78,8 @@ public class MultipartResponse {
         mimeBoundary = getNewMimeBoundary();
         startID = newUidString();
         soapEnvelope = null;
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
     }
 
     /**
@@ -153,9 +157,9 @@ public class MultipartResponse {
      * @throws IOException
      */
     public void send() throws IOException {
-        System.out.println("Sending Response...");
+        log.debug("Sending Response...");
 
-        System.out.println("MIME Boundary: "+mimeBoundary);
+        log.debug("MIME Boundary: "+mimeBoundary);
 
 
 

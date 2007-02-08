@@ -26,6 +26,8 @@ package opendap.coreServlet;
 
 
 
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
@@ -245,11 +247,14 @@ public class OPeNDAPException extends Exception {
      */
     public static void anyExceptionHandler(Throwable t, HttpServletResponse response) {
 
+        Logger log = org.slf4j.LoggerFactory.getLogger(OPeNDAPException.class);
 
-        System.out.println("OPeNDAPException (anyExceptionHandler): \n    " + t);
+
+        log.error("anyExceptionHandler(): " + t);
+        log.debug("Stack Trace",t);
+
+
         if (Debug.isSet("showException")) {
-            System.out.print("\n    ");
-            t.printStackTrace();
             DebugLog.printThrowable(t);
         }
 
@@ -284,7 +289,8 @@ public class OPeNDAPException extends Exception {
                 String msg = t.getClass().getName()+": ";
                 msg += t.getMessage();
 
-                msg += " ["+t.getStackTrace()[0].getFileName()+" - line " +t.getStackTrace()[0].getLineNumber()+"]";
+                msg += " [" + t.getStackTrace()[0].getFileName() +
+                        " - line " + t.getStackTrace()[0].getLineNumber() + "]";
 
 
                 if (msg != null)
@@ -298,7 +304,7 @@ public class OPeNDAPException extends Exception {
 
 
         } catch (IOException ioe) {
-            System.out.println("Cannot respond to client! IO Error: " + ioe.getMessage());
+            log.error("Cannot respond to client! IO Error: " + ioe.getMessage());
             DebugLog.println("Cannot respond to client! IO Error: " + ioe.getMessage());
         }
 

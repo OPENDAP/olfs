@@ -28,11 +28,28 @@ package opendap.olfs;
 import opendap.coreServlet.OPeNDAPException;
 
 /**
- * 
+ *
  */
 public class BadConfigurationException extends OPeNDAPException {
 
     public BadConfigurationException(String msg) {
         super(msg);
     }
+
+    public BadConfigurationException(String msg, Exception e) {
+        super(msg, e);
+    }
+
+    public BadConfigurationException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public BadConfigurationException(Throwable cause) {
+        super(cause);
+    }
+
+
+
+
+
 }

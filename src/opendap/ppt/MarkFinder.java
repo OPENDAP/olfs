@@ -24,7 +24,7 @@
 
 package opendap.ppt;
 
-import opendap.coreServlet.Debug;
+import org.slf4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,17 +39,22 @@ public class MarkFinder {
     private int     _markIndex;
     private byte[]  _mark;
 
+    Logger log;
+
+
 
 
     public MarkFinder(byte[] mark){
-        _mark = (byte[]) mark.clone();
+        _mark = mark.clone();
         _markIndex = 0;
-        if(Debug.isSet("MarkFinder")) System.out.println("New MarkFinder. _mark="+new String(_mark));
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+        log.debug("New MarkFinder. _mark="+new String(_mark));
     }
 
     public byte[] getMark(){
 
-        return (byte[])_mark.clone();
+        return _mark.clone();
     }
 
     public int getMarkIndex(){
@@ -61,14 +66,14 @@ public class MarkFinder {
     public boolean markCheck(byte b) {
 
         if (_mark[_markIndex] == b) {
-            if(Debug.isSet("MarkFinder")) System.out.println("Found mark byte: "+b+" at index: "+_markIndex);
+            log.debug("Found mark byte: "+b+" at index: "+_markIndex);
             _markIndex++;
             if (_markIndex == _mark.length) {
                 _markIndex = 0;
                 return (true);
             }
         } else {
-            if(Debug.isSet("MarkFinder")) System.out.print("*");
+            log.debug("*");
             _markIndex = 0;
         }
 

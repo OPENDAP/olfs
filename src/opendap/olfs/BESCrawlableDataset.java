@@ -35,6 +35,7 @@ import java.text.ParsePosition;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.slf4j.Logger;
 import opendap.ppt.PPTException;
 import opendap.coreServlet.Debug;
 
@@ -69,6 +70,8 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     private Element _config;
 
+    private Logger log;
+
 
     public static BESCrawlableDataset getRootDataset() throws IOException, PPTException, BadConfigurationException, BESException, JDOMException {
         return new BESCrawlableDataset("/root", null);
@@ -81,7 +84,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
         _config = (Element) o;
 
-        if (Debug.isSet("CrawlableDataset")) System.out.println("\n\n\n\n\nS4CrawlableDataset config: " + _config);
+        log.debug("S4CrawlableDataset config: " + _config);
 
         //XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
         //xo.output(_config,System.out);
@@ -116,6 +119,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         _haveInfo = false;
         _config = null;
         _size = -1;
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     }
 
@@ -140,14 +144,11 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         //Got the catalog yet?
         _haveCatalog = false;
 
-        if (Debug.isSet("CrawlableDataset")) {
-            System.out.println("BESCrawlableDataset:");
-            System.out.println("     getPath()        = " + getPath());
-            System.out.println("     getThreddsPath() = " + getThreddsPath());
-            System.out.println("     getBesPath()     = " + getBesPath());
-            System.out.println("     getName()        = " + getName());
-            System.out.println("     getParentPath()  = " + getParentPath());
-        }
+            log.debug("getPath()        = " + getPath());
+            log.debug("getThreddsPath() = " + getThreddsPath());
+            log.debug("getBesPath()     = " + getBesPath());
+            log.debug("getName()        = " + getName());
+            log.debug("getParentPath()  = " + getParentPath());
 
     }
 
@@ -227,12 +228,11 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
 
         } else {
-            if (Debug.isSet("CrawlableDataset"))
-                System.out.println("Looks like we are already configured, checking...");
+            log.debug("Looks like we are already configured, checking...");
         }
 
         if (!BesAPI.isConfigured())
-            System.out.println("\n\n\n!!!!!!!!! BES IS NOT CONFIGURED !!!!!!!!\n\n\n");
+            log.error("\n\n\n!!!!!!!!! BES IS NOT CONFIGURED !!!!!!!!\n\n\n");
 
     }
 
@@ -248,7 +248,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
             return;
 
         String besPath = getBesPath();
-        if (Debug.isSet("CrawlableDataset")) System.out.println("Getting catalog for: \"" + besPath + "\"");
+        log.debug("Getting catalog for: \"" + besPath + "\"");
         Document doc = BesAPI.showCatalog(besPath);
         Element topDataset = doc.getRootElement();
 
@@ -257,7 +257,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 //            throw new IOException("Returned dataset name does not match requested name.\n" +
 //                    "Requested: " + besPath + "  " +
 //                    "Returned: " + topDataset.getChild("name").getTextTrim());
-            System.out.println("Returned dataset name does not match requested name.\n" +
+            log.error("Returned dataset name does not match requested name.\n" +
                     "Requested: " + besPath + "  " +
                     "Returned: " + topDataset.getChild("name").getTextTrim());
         }
@@ -276,7 +276,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
             return;
 
         String besPath = getBesPath();
-        if (Debug.isSet("CrawlableDataset")) System.out.println("Getting info for: \"" + besPath + "\"");
+        log.debug("Getting info for: \"" + besPath + "\"");
         Document doc = BesAPI.getInfoDocument(besPath);
         Element topDataset = doc.getRootElement();
 
@@ -285,7 +285,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 //                    "Requested: " + besPath + "  " +
 //                    "Returned: " + topDataset.getChild("name").getTextTrim());
 
-            System.out.println("Returned dataset name does not match requested name.\n" +
+            log.error("Returned dataset name does not match requested name.\n" +
                     "Requested: " + besPath + "  " +
                     "Returned: " + topDataset.getChild("name").getTextTrim());
 
@@ -409,8 +409,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
                             (this.getThreddsPath().endsWith("/") ? "" : "/") +
                              e.getChild("name").getTextTrim();
 
-            if (Debug.isSet("CrawlableDataset"))
-                System.out.println("\n\n\nMaking new dataset \"" + newPath + "\" in listDatasets().");
+            log.debug("Making new dataset \"" + newPath + "\" in listDatasets().");
 
             // Show me what I've got...
             //XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
@@ -427,7 +426,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
             dataset._parent = this;
             dataset._config = this._config;
-            if (Debug.isSet("CrawlableDataset")) System.out.println("Made: " + dataset);
+            log.debug("Made: " + dataset);
 
 
             childDatasets.add(dataset);
@@ -440,7 +439,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         Collections.sort(childDatasets);
 
 
-        if (Debug.isSet("CrawlableDataset")) System.out.println("List Datasets found " + j + " member(s).");
+        log.debug("List Datasets found " + j + " member(s).");
 
         return childDatasets;
     }
@@ -456,16 +455,16 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
         if (cdf == null) return list;
 
-        if (Debug.isSet("CrawlableDataset")) System.out.println("Filtering CrawlableDataset list.");
+        log.debug("Filtering CrawlableDataset list.");
 
         List <CrawlableDataset> retList = new ArrayList<CrawlableDataset>();
         for (Object aList : list) {
             CrawlableDataset curDs = (CrawlableDataset) aList;
             if (cdf.accept(curDs)) {
-                if (Debug.isSet("CrawlableDataset")) System.out.println("    Filter found matching dataset: " + curDs);
+                log.debug("    Filter found matching dataset: " + curDs);
                 retList.add(curDs);
             } else {
-                if (Debug.isSet("CrawlableDataset")) System.out.println("    Filter discarded dataset: " + curDs);
+                log.debug("    Filter discarded dataset: " + curDs);
 
             }
         }

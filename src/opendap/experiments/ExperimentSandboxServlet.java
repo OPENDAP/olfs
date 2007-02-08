@@ -25,6 +25,8 @@
 package opendap.experiments;
 
 
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,6 +57,8 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
     private Random rand;
 
+    private Logger log;
+
     public void init() throws ServletException {
 
 
@@ -62,6 +66,8 @@ public class ExperimentSandboxServlet extends HttpServlet {
         unitHitCounter = 0;
 
         rand = new Random();
+
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         System.out.println("ExperimentSandboxServlet loaded.");
 
@@ -129,7 +135,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
             try {
                 Thread.sleep(rand.nextInt(200));
             } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                log.error("Hmmmm, my thread got interrupted.",e);
             }
 
             doHitCount(request,response);
@@ -141,7 +147,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
         long elapsed = endTime.getTime() - startTime.getTime();
 
-        System.out.println(msg + "_Elapsed_Time: "+elapsed+" ms");
+        log.debug(msg + "_Elapsed_Time: "+elapsed+" ms");
 
 
 

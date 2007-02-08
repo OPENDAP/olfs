@@ -32,5 +32,17 @@ public class BadUsageException extends OPeNDAPException{
         super(msg);
     }
 
+    public BadUsageException(String msg, Exception e) {
+        super(msg, e);
+    }
+
+    public BadUsageException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public BadUsageException(Throwable cause) {
+        super(cause);
+    }
+
 
 }

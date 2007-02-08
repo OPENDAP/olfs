@@ -26,6 +26,8 @@
 package opendap.coreServlet;
 
 
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -66,6 +68,10 @@ import javax.servlet.http.HttpServletRequest;
 public class ReqInfo {
 
 
+    private static Logger log;
+
+
+
     /**
      * Returns the OPeNDAP constraint expression.
      * @param req The client request.
@@ -81,6 +87,10 @@ public class ReqInfo {
         return CE;
     }
 
+    public static void init(){
+        log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
+
+    }
 
 
 
@@ -98,12 +108,12 @@ public class ReqInfo {
         // Figure out the data set name.
         String requestPath = req.getPathInfo();
 
-        if(Debug.isSet("ReqInfo")) System.out.print("ReqInfo.getRequestURL() - req.getPathInfo(): " + requestPath);
+        log.debug("getRequestURL() - req.getPathInfo(): " + requestPath);
 
         // Is it a collection?
         if (requestPath == null || requestPath.endsWith("/")) {
             requestURL = req.getRequestURL().toString();
-            if(Debug.isSet("ReqInfo")) System.out.println("   requestURL: "+requestURL+" (a collection)");
+            log.debug("   requestURL: "+requestURL+" (a collection)");
         } else {
             // It appears to be a dataset.
 
@@ -115,7 +125,7 @@ public class ReqInfo {
             } else {
                 requestURL = req.getRequestURL().toString();
             }
-            if(Debug.isSet("ReqInfo")) System.out.println("   requestURL: "+requestURL+" (a dataset)");
+            log.debug("   requestURL: "+requestURL+" (a dataset)");
         }
 
         return requestURL;
@@ -142,7 +152,7 @@ public class ReqInfo {
         else
             cName = dSrc.substring(0,dSrc.lastIndexOf(dSetName));
 
-        if(Debug.isSet("ReqInfo")) System.out.println("ReqInfo.getCollectionName(): " + cName);
+        log.debug("getCollectionName(): " + cName);
 
         return cName;
 
@@ -160,7 +170,7 @@ public class ReqInfo {
 
         String requestSuffix = null;
         String requestPath = req.getPathInfo();
-        if(Debug.isSet("ReqInfo")) System.out.print("ReqInfo.getRequestSuffix() - req.getPathInfo(): " + requestPath);
+        log.debug("getRequestSuffix() - req.getPathInfo(): " + requestPath);
 
 
         // Is it a dataset and not a collection?
@@ -175,7 +185,7 @@ public class ReqInfo {
 
         }
 
-        if(Debug.isSet("ReqInfo")) System.out.println("  requestSuffix:  " + requestSuffix);
+        log.debug("  requestSuffix:  " + requestSuffix);
 
         return requestSuffix;
 
@@ -194,7 +204,7 @@ public class ReqInfo {
     public static String getDataSetName(HttpServletRequest req){
 
         String requestPath = req.getPathInfo();
-        if(Debug.isSet("ReqInfo")) System.out.print("ReqInfo.getDataSetName()   - req.getPathInfo(): " + requestPath);
+        log.debug("getDataSetName()   - req.getPathInfo(): " + requestPath);
 
 
         String dataSetName = requestPath;
@@ -217,7 +227,7 @@ public class ReqInfo {
             }
         }
 
-        if(Debug.isSet("ReqInfo")) System.out.println("  dataSetName:    " + dataSetName);
+        log.debug("  dataSetName:    " + dataSetName);
 
 
         return dataSetName;
@@ -276,7 +286,7 @@ public class ReqInfo {
     public static String getDataSource(HttpServletRequest req){
 
         String requestPath = req.getPathInfo();
-        if(Debug.isSet("ReqInfo")) System.out.print("ReqInfo.getDataSource()    - req.getPathInfo(): " + requestPath);
+        log.debug("getDataSource()    - req.getPathInfo(): " + requestPath);
 
 
         String dataSourceName;
@@ -301,7 +311,7 @@ public class ReqInfo {
                 }
             }
         }
-        if(Debug.isSet("ReqInfo")) System.out.println("  dataSourceName: " + dataSourceName);
+        log.debug("  dataSourceName: " + dataSourceName);
 
         return dataSourceName;
 

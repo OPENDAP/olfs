@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 
 import org.jdom.Element;
+import org.slf4j.Logger;
 
 /**
  * Handler for OPeNDAP directory requests. This class is used
@@ -60,8 +61,8 @@ public class S4Dir {
             throws Exception {
 
 
-        //if (Debug.isSet("showResponse"))
-        //    System.out.println("sendDIR request = " + request);
+        Logger log = org.slf4j.LoggerFactory.getLogger("opendap.olfs.S4Dir");
+        log.debug("sendDIR() request = " + request);
 
         String name;
         String size;
@@ -91,8 +92,8 @@ public class S4Dir {
         String targetURL = request.getContextPath() + request.getServletPath() + collectionName;
 
 
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - targetURL:                  "+targetURL);
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - collectionName:        "+collectionName);
+        log.debug("S4Dir - targetURL:       "+targetURL);
+        log.debug("S4Dir - collectionName:  "+collectionName);
 
 
         boolean isTopLevel = collectionName.equals("/");
@@ -127,7 +128,8 @@ public class S4Dir {
         if (baseName.lastIndexOf("/") > 0)
             baseName = baseName.substring(baseName.lastIndexOf("/"), baseName.length());
 
-        if(Debug.isSet("S4Dir")) System.out.println("S4Dir - baseName: "+baseName);
+
+        log.debug("S4Dir - baseName:         "+baseName);
 
 
         // Strip basename from the end of the targetURL to make the link to the parent directory

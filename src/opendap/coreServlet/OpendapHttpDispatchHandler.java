@@ -134,7 +134,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @see ReqInfo
      */
-    public void sendDODS(HttpServletRequest request,
+    public void sendDAP2Data(HttpServletRequest request,
                          HttpServletResponse response)
                          throws Exception;
 
@@ -196,7 +196,7 @@ public interface OpendapHttpDispatchHandler {
 
 
     public boolean useOpendapDirectoryView();
-    
+
     public boolean allowDirectDataSourceAccess();
 
 
@@ -225,7 +225,7 @@ public interface OpendapHttpDispatchHandler {
 
     /**
      * ************************************************************************
-     * Default handler for THREDDS catalog requests (catalog.xml & 
+     * Default handler for THREDDS catalog requests (catalog.xml &
      * catalog.html)
      *
      * @param request  The client's <code> HttpServletRequest</code> request
