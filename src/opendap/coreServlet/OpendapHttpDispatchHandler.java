@@ -232,6 +232,9 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws Exception When things go poorly
+     *
+     * @deprecated
      */
 
     public void sendCatalog(HttpServletRequest request,

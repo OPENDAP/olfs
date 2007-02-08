@@ -47,14 +47,15 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>Topics:</p>
 <ol>
   <li><a href="#OLFS">OLFS Servlet</a> </li>
-  <li><a href="#DOCS">Docs Servlet</a> </li>
+  <li><a href="#DOCS">Docs Servlet</a></li>
+  <li><a href="logging.html">Logging</a></li>
   <li><a href="#SECURITY">Security</a></li>
   <li><a href="#COMPRESSION">Compressed Responses and Tomcat </a></li>
   <li><a href="#GOTCHA">Gotcha's</a></li>
 </ol>
 <p>&nbsp;</p>
 <h1><a name="OLFS"></a>OLFS Servlet Configuration</h1>
-<p>The  Server4 OLFS servlet gets its configuration from 3 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, <strong>security.xml</strong>, and <strong>web.xml</strong>  </p>
+<p>The  Server4 OLFS servlet gets its configuration from 4 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, <strong>security.xml</strong>, and <strong>web.xml</strong>  </p>
 <h4><strong>File Locations</strong></h4>
 <ul>
   <li><strong>olfs.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
@@ -68,7 +69,12 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </li>
   <li><strong>web.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
     in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
-    gets renamed then things change accordingly.)<br>
+  gets renamed then things change accordingly.)<br>
+  <br>
+  </li>
+  <li><strong>log4j.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
+    in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
+  gets renamed then things change accordingly.)<br>
     <br>
   </li>
 </ul>
@@ -81,7 +87,10 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li>    <strong>catalog.xml</strong> - THREDDS catalogs configuration. <br>
     <br>
   </li>
-  <li><strong>web.xml</strong> - Core servlet configuration. </li>
+  <li><strong>web.xml</strong> - Core servlet configuration. <br>
+    <br>
+  </li>
+  <li><strong>log4j.xml</strong> - </li>
 </ul>
 <p>&nbsp;</p>
 <h2><strong>olfs.xml</strong> </h2>
@@ -147,7 +156,12 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
 </pre>
 <h2><strong>catalog.xml</strong></h2>
-<p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  about it here</a>. </p>
+<p>&nbsp;</p>
+<p>The <strong>catalog.xml</strong> file contains the THREDDS catalog configuration for Server4. It's complex. <a href="thredds.html">Read  About It Here</a>. </p>
+<p>&nbsp;</p>
+<h2><strong>log4j.xml</strong></h2>
+<p>&nbsp;</p>
+<p>The <strong>log4j.xml</strong> file contains the logging configuration for Server4. It too is complex. <a href="logging.html">Read About It Here.</a></p>
 <p>&nbsp;</p>
 <h2><strong>web.xml</strong></h2>
 <p><em>In general I would say that you should <strong>NOT</strong> mess with the web.xml file. At least for now. Future versions of Server and the OLFS may have &quot;user configurable&quot; stuff in the web.xml file, but this version (0.1.4) does not. <strong>SO JUST DON'T DO IT. OK?</strong></em></p>
@@ -211,19 +225,21 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     debugging instrumentation
   in different parts of the code. <br>
   <br>
-  Common values are : <em>showRequest, showResponse</em>,
-  <em>showException, BES</em>, and<em> probeRequest</em>.<br>
+  Supported values are: <em>probeRequest</em> and <em>DebugInterface<br>
   <br>
+  probeRequest</em>: Prints a lengthy inspection of the HttpServletRequest object to stdout. <strong>Don't leave this on for long, it will clog your Catalina logs</strong>.<br>
+  <br>
+  <em>DebugInterface:</em> Enables the servers debug interface. This ineractive interface allows a user to look at (and change) the server state via a web browser. <strong>Enable this only for analysis purposes, disable when finshed!</strong> <br>
+    <br>
     <em>Example:</em>
     <pre>&lt;init-param&gt;
 	&lt;param-name&gt;DebugOn&lt;/param-name&gt;
-	&lt;param-value&gt;showRequest showResponse&lt;/param-value&gt;
+	&lt;param-value&gt;probeRequest&lt;/param-value&gt;
 &lt;/init-param&gt;
       </pre>
-      <em>Default</em>: If this parameter is
-	  not set, or the value field is empty then debugging instrumentation is not
-	  turned on.<br>
-	  <br>
+    <em>Default</em>: If this parameter is
+    not set, or the value field is empty then these features will be disabled - <em>which is what you want unless there is a problem to analyze.</em><br>
+    <br>
     <br>
   </li>
   <li><strong>OpendapHttpDispatchHandlerImplementation</strong>- This parameter specifies the handler implementation that provides the responses for the HTTP GET commands to the servlet framework. <strong><em>Don't be messin' with this! It's what makes Server4, well, Server4. </em></strong><br>

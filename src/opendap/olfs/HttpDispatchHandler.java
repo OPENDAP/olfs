@@ -616,6 +616,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     *
+     * @deprecated This is no longer used.
      */
     public void sendCatalog(HttpServletRequest request,
                             HttpServletResponse response)

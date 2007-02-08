@@ -63,7 +63,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DispatchServlet extends HttpServlet {
 
-    private static boolean forceTHREDDSCatalog = false;
 
     /**
      * ************************************************************************
@@ -642,10 +641,11 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        PerfLog.logServerAccessStart( request,"OPeNDAP_Access");
+        PerfLog.logServerAccessStart( request,"Server4Access");
 
 
         try {
+
             if (Debug.isSet("probeRequest"))
                 Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
@@ -671,7 +671,7 @@ public class DispatchServlet extends HttpServlet {
             OPeNDAPException.anyExceptionHandler(e, response);
         }
         finally {
-            PerfLog.logServerAccessEnd( 0,-1,"OPeNDAP_Access");
+            PerfLog.logServerAccessEnd( 0,-1,"Server4Access");
 
         }
 
@@ -718,19 +718,7 @@ public class DispatchServlet extends HttpServlet {
         }
 
 
-        boolean wasTHREDDS = dataRootHandler.processReqForCatalog(req, res);
-
-        if (forceTHREDDSCatalog && !wasTHREDDS) {
-            if (ReqInfo.getDataSetName(req).equalsIgnoreCase("catalog") &&
-                    ReqInfo.getRequestSuffix(req).equalsIgnoreCase("xml")) {
-
-                odh.sendCatalog(req, res);
-                wasTHREDDS = true;
-            }
-        }
-
-
-        return wasTHREDDS;
+        return dataRootHandler.processReqForCatalog(req, res);
 
     }
 

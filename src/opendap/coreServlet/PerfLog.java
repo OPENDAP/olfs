@@ -59,7 +59,7 @@ public class PerfLog {
      * <p/>
      * The log directory is determined by the servlet containers content
      * directory. The configuration of logging is controlled by the log4j.xml
-     * file. 
+     * file.
      *
      * @param servlet - the servlet.
      */
@@ -199,6 +199,7 @@ public class PerfLog {
 
 
         Logger log = org.slf4j.LoggerFactory.getLogger(logName);
+
 
         log.info(   "Request Completed - " +
                     resCode +

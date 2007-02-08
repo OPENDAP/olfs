@@ -251,12 +251,7 @@ public class OPeNDAPException extends Exception {
 
 
         log.error("anyExceptionHandler(): " + t);
-        log.debug("Stack Trace",t);
-
-
-        if (Debug.isSet("showException")) {
-            DebugLog.printThrowable(t);
-        }
+        DebugLog.printThrowable(t);
 
 
         try {
@@ -271,9 +266,7 @@ public class OPeNDAPException extends Exception {
                 // the C++ don't expect compressed data if I do this...
                 response.setHeader("Content-Encoding", "");
 
-                // Strip any double quotes out of the parser error message.
-                // These get stuck in auto-magically by the javacc generated parser
-                // code and they break our error parser (bummer!)
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
             BufferedOutputStream eOut = new BufferedOutputStream(response.getOutputStream());
