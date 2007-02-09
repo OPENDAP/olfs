@@ -129,12 +129,11 @@
     <logger name="HyraxAccess">
         <level value="ALL"/>
         <appender-ref ref="HyraxAccessLog"/>
-        <appender-ref ref="Stdout"/>
     </logger>
 
     <logger name="DocServletAccess">
         <level value="ALL"/>
-        <appender-ref ref="Stdout"/>
+        <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
 
