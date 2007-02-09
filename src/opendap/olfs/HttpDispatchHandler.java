@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
-// jhrg import java.util.zip.DeflaterOutputStream;
-// jhrg import java.util.zip.GZIPOutputStream;
 import org.jdom.JDOMException;
 import org.jdom.Document;
 import org.jdom.Element;
