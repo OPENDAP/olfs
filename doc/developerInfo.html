@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>Server4: Developer Information</title>
+<title>Hyrax: Developer Information</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <STYLE>
 <!--
@@ -37,93 +37,34 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <body>
 <a href="http://www.opendap.org"><img src="images/logo.gif" width="206" height="93" border="0"></a>
 <h1>Developers Information<br>
-   <span class="style4">Server4 <span class="style3">(version: beta-1.5)</span></span></h1>
+   <span class="style4">Hyrax <span class="style3">(version: beta-1.5)</span></span></h1>
  <hr size="1" noshade="noshade">
- <p><br>
-   <span class="style11"><a name="DEPENDS"></a>Dependencies</span> </p>
-<p class="style7"><a href="http://java.sun.com/j2se/">Java 2 Standard Edition (J2SE)</a></p>
-<p><em><strong>Minimum</strong></em><strong>:</strong> Java 1.2<br>
-<em><strong>Recommended</strong></em><strong>:</strong> Java 1.4.1 or newer.</p>
-<p>This software was developed and tested against the 1.4.1 release of the J2SE</p>
+ <p>Here find instructions for developers.... </p>
+ <h2>Dependencies </h2>
+ <p class="style7"><a href="http://java.sun.com/j2se/">Java 5 Standard Edition (J2SE)</a></p>
+<p><em><strong>Minimum</strong></em><strong>:</strong> Java 1.5<br>
+<em><strong>Recommended</strong></em><strong>:</strong> Java 1.5.0 or newer.</p>
+<p>This software was developed and tested against the  1.5.0_06-112 JVM on OS-X. </p>
 <p class="style12"><a href="http://jakarta.apache.org/tomcat/index.html" class="style7">Jakarta Tomcat
       </a></p>
-<p><em><strong>Minimum</strong></em><strong>:</strong> 4.1.31<br>
-<em><strong>Recommended</strong></em><strong>:</strong> 4.1.31</p>
-<p align="left"><strong>Note</strong>: This code has not been tested against version 5 of Tomcat!</p>
-<p>The servlets were developed and tested using Jakarta/Tomcat 4.1.18. In particular,
+<p><em><strong>Minimum</strong></em><strong>:</strong> 5.5 <br>
+<em><strong>Recommended</strong></em><strong>:</strong> 5.5 </p>
+<p align="left">The servlets were developed and tested using Jakarta/Tomcat 5.5.20. In particular,
   the code was linked against the servlet.jar bundled with this particular version
-  of Tomcat.  This is not (to the best
-  of my knowledge) a library that is included with the standard Java distributions.</p>
+of Tomcat.  </p>
 <p class="style7"><strong><a href="http://ant.apache.org/"><font size="+1">ANT</font></a></strong></p>
-<p><em><strong>Minimum</strong></em><strong>: </strong>1.5.2 (<a href="#ANTWARNING">Warning!</a>)<br>
+<p><em><strong>Minimum</strong></em><strong>: </strong>1.6.5<br>
 <em><strong>Recommended</strong></em><strong>:</strong> 1.6 or higher</p>
 <p>This software now builds entirely with ANT. If you haven't already got ANT,
-  then go get it: You need it. There is a master build file in the top level
-  directory, <em>Java-OPeNDAP/build.xml</em> which relies on the numerous build
-  files located in the <em>Java-OPeNDAP/buildfiles</em> directory. The master
-  build file contains only a few simple targets. The serious developer will want
-  to read and understand the collection of build files in the <em>buildfiles</em> directory.</p>
+  then go get it: You need it. There is a  build file in the top level
+  directory, <em>olfs/build.xml</em> which relies on a couple of build
+  files located in the <em>olfs/buildfiles</em> directory. The serious developer will want
+  to read and understand all of the build related files.</p>
 <p><em><strong>Compiling the source:</strong></em> This should be straight forward.
   Just go to the top level directory and type &quot;ant compile&quot;. For more
   detailed instructions you should
   read the
-  master build file, Server4//buildfiles/s4.xml</p>
-<p><em><strong>Using the deployment targets:</strong></em> There is a separate
-  ANT build file called <em>catalina-targets.xml</em> in <em>Java-OPeNDAP/buildfiles</em> which
-  contains a number of targets  (<em>webapp-deploy, webapp-remove, webapp-redeploy</em>)
-  that allow the developer to build the software and deploy it into a running
-  Jakarta-Tomcat
-  (aka Catalina) server, and one target (<em>webapp-list</em>) to check on
-  the running servlets in Tomcat. Also, for the sake of rapid development and
-  conservation of effort, the <em>opendap.xml</em> build file contains two targets
-  (<em>deploy</em>,
-  and <em>quick-deploy</em>) that will compile the project (with and without
-  the java docs respectively) and put it into a running Tomcat server.</p>
-<p>All of these targets require that you
-    modify
-    your
-    local installation of ANT (see below)
-    and that
-  you create an ANT properties file to configure the ANT tasks to talk to and
-  authenticate with Tomcat. </p>
-<p>The properties file must called <em>catalina-config</em> and
-    it must be located in <em>Java-OPeNDAP/buildfiles</em>. The <em>catalina-config</em> file
-      must contain three property definitions: <em>Catalina.url</em>, <em>Catalina.username</em>,
-      and <em>Catalina.password</em>.</p>
-<p>Here is an example of the content of the <em>catalina-config</em> file: </p>
-<pre class="style13">
-    Catalina.url=http://localhost:8080/manager
-    Catalina.username=admin
-    Catalina.password=secretstuff</pre>
-<p>Where the username and password pair will authenticate as a Tomcat manager
-(see below)</p>
-<p>Additionally you will need to configure ANT as described
-    below in this excerpt from the
-    Tomcat
-    4
-    online
-  documentation:</p>
-<pre class="style13">
-    In addition to the ability to execute Manager commands via HTTP requests Tomcat
-    4 includes a convenient set of Task definitions for the Ant (version 1.4
-    or later) build tool. In order to use these commands, you must perform the
-    following setup operations:
-
-     * Download the binary distribution of Ant from http://jakarta.apache.org/ant.
-       You must use version 1.4 or later.
-     * Install the Ant distribution in a convenient
-       directory (called ANT_HOME in the remainder of these instructions).
-     * Copy the file server/lib/catalina-ant.jar from your Tomcat 4 installation into
-       Ant's library directory ($ANT_HOME/lib).
-     * Add the $ANT_HOME/bin directory
-       to your PATH environment variable.
-     * Configure at least one username/password combination in your Tomcat user
-       database that includes the manager role.
-</pre>
-<p> You may wish to read more about the configuration issues for Tomcat. Check
-  out the online documentation in your running version. Assuming that you have
-  tomcat running on port 8080, then at: http://yourhost:8080 You should find
-  the additional information you need.</p>
+  master build file, olfs/build.xml</p>
 <h4 class="style7"><strong>Additional Libraries</strong></h4>
 <p>The core software depends on several third part libraries. All of these are
   included with the distribution, and these (should) be the ones that the code
@@ -132,7 +73,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   various development teams that create these products. Replace them at your
    own risk.</p>
 <ul>
-  <li> The <strong><a href="http://jakarta.apache.org/commons/cli/">Jakarta Commons Command Line Interface</a> </strong> package, version 1.0</li>
+  <li> The <strong><a href="http://jakarta.apache.org/commons/cli/">Apache Commons Command Line Interface</a> </strong> package, version 1.0</li>
   <li>The <strong><a href="http://www.jdom.org">JDOM</a></strong> package, version 1.0</li>
   <li>The <strong><a href="http://www.unidata.ucar.edu/software/netcdf-java/">Java NetCDF</a> </strong> package, version 2.2.17</li>
   <li>The <strong><a href="http://www.slf4j.org/nlog4j/">NLOG4J</a></strong> package, version 1.2.21</li>
@@ -140,24 +81,21 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li> The <strong><a href="http://xerces.apache.org/xerces2-j/index.html">Xerces XML Parser</a> </strong> package, version 2.8.1 (you will need both the <strong><em>xercesimpl.jar</em></strong> and the <strong><em>xml-apis.jar</em></strong>) </li>
 </ul>
 <p>&nbsp;</p>
-<h4>Building the code</h4>
-<p>Building the Java-OPeNDAP software should be very simple.</p>
+<h2>Getting The Source From Subversion and Building the code</h2>
+<p>Building the OLFS software should be very simple.</p>
 <ol>
   <li>Go get and install the current J2SE and ANT (<a href="#DEPENDS">see above</a>)</li>
-  <li>If you haven't got it already, get the source code distribution from <a href="http://www.unidata.ucar.edu/packages/dods/">OPeNDAP</a>.</li>
-  <li>Unpack the source code distribution (jar -xvf DistributionFileName.jar)</li>
-  <li>Enter the top level directory (Server4)</li>
-  <li>Run the command &quot;ant -f buildfiles/s4.xml compile&quot;</li>
+  <li>Check out the software for the OLFS from our Subversion repository located  at <a href="http://scm.opendap.org:8090/svn/trunk/olfs">http://scm.opendap.org:8090/svn/trunk/olfs</a></li>
+  <li>Enter the top level directory (olfs)</li>
+  <li>Run the command &quot;ant  compile&quot;</li>
 </ol>
-<p>This will compile all of the distributed software, but nothing more. Each
-  sub project in Java-OPeNDAP has it's own build file with targets that are unique
-  to it. For more detailed information you should
+<p>This will compile all of the distributed software, but nothing more. For more detailed information you should
   read (and
-  try to understand) the ANT files
-  in <em>Java-OPeNDAP/buildfiles</em>. For
+  try to understand) the ANT build file, <em>build.xml</em> and the related files in the <em>buildfiles</em> directory. </p>
+<p>For
   those of you using an IDE you will have to follow your own &quot;path&quot; to
   get this going.</p>
- <hr size="1" noshade="noshade">
+<hr size="1" noshade="noshade">
  <h3><br /></h3>
 </body>
 </html>

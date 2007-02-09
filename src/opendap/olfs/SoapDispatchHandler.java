@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -190,7 +190,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         path = BESCrawlableDataset.besPath2ThreddsPath(path);
 
-        BESCrawlableDataset s4cd = new BESCrawlableDataset(path, null);
+        BESCrawlableDataset cds = new BESCrawlableDataset(path, null);
 
         String reqURI   = srvReq.getRequestURI();
         String pathInfo = srvReq.getPathInfo();
@@ -214,12 +214,12 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
             baseURL = reqURI+"/";
 
 
-        if (s4cd.isCollection()) {
+        if (cds.isCollection()) {
 
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
                     "",                                   // CollectionID, which for us needs to be empty.
                     BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
-                    "OPeNDAP-Server4",                    // Service Name
+                    "OPeNDAP-Hyrax",                    // Service Name
                     "OPeNDAP",                            // Service Type Name
                     baseURL ); // Base URL for this service
 
@@ -228,7 +228,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
 
 
-            Document catalog = scb.generateCatalogAsDocument(s4cd);
+            Document catalog = scb.generateCatalogAsDocument(cds);
 
             if(catalog == null){
                 log.debug("SimpleCatalogBuilder.generateCatalogAsDocument("+path+") returned null.");

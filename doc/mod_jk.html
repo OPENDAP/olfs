@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>Server4: Servlet Configuration</title>
+<title>Hyrax: Apache Integration with MOD_JK</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <STYLE>
 <!--
@@ -29,8 +29,8 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
 <body>
 <a href="http://www.opendap.org"><img src="images/logo.gif" width="206" height="93" border="0"></a>
-<h1 align="left">Server4 integration with Apache 2.x using MOD_JK <br>
-<span class="style4">Server4 <span class="style3">(version: beta-1.4)</span></span></h1>
+<h1 align="left">Hyrax integration with Apache 2.x using MOD_JK <br>
+<span class="style4">Hyrax <span class="style3">(version: beta-1.4)</span></span></h1>
 <hr size="1" noshade="noshade">
 <p><strong>Request for Alternate Solutions</strong>: By no means do I imagine that I have outlined a best solution here. If these suggestions work for you then we are both happy. If you have a better method for achieving the same or similar goals then I would love to hear about it. If you're stuck and can't figure out how to achieve your goals, get in touch and I will try to help. - ndp (ndp at opendap dot org) </p>
 <hr size="1" noshade="noshade">
@@ -39,15 +39,15 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <h5>mod_jk</h5>
 <p>Most discussions of integrating Tomcat and Apache start (and often end with) an Apache module called <em>mod_jk</em>. This module allows Tomcat to map directly in to the Apache URI space. However it has limitations:</p>
 <ul>
-  <li>When using <em>mod_jk</em> one must specify a &quot;mount point&quot;, a place in the Apache servers URI space beneath which all requests get sent to Tomcat. As far as I can tell from using <em>mod_jk</em> the name of the mount point must be synonymous with the servlet context (and possibly servlet name, depending on the Tomcat configuration). This works well, and if your goal is to build a web site using Apache and Server4 from the ground up it is probably a reasonable way to proceed. However, it does not address the goal of preserving the existing OPeNDAP data access URL's when migrating to Server4. For this you need to use <em>mod_rewrite</em>.<br>
+  <li>When using <em>mod_jk</em> one must specify a &quot;mount point&quot;, a place in the Apache servers URI space beneath which all requests get sent to Tomcat. As far as I can tell from using <em>mod_jk</em> the name of the mount point must be synonymous with the servlet context (and possibly servlet name, depending on the Tomcat configuration). This works well, and if your goal is to build a web site using Apache and Hyrax from the ground up it is probably a reasonable way to proceed. However, it does not address the goal of preserving the existing OPeNDAP data access URL's when migrating to Hyrax. For this you need to use <em>mod_rewrite</em>.<br>
     <br>
   </li>
   <li>It is not clear to me if using <em>mod_jk</em> is more efficient or in any other way preferable to using a reverse proxy. <br>
   </li>
 </ul>
 <p>&nbsp;</p>
-<h2>Install Server4</h2>
-<p>Install Server4 as described in the <a href="install.html">installation instructions</a>. No matter how you want things to end up you have to do this first. </p>
+<h2>Install Hyrax</h2>
+<p>Install Hyrax as described in the <a href="install.html">installation instructions</a>. No matter how you want things to end up you have to do this first. </p>
 <p>&nbsp;</p>
 <h2> Integrate Tomcat with Apache 2.x using mod_jk , mod_rewrite, and mod_proxy </h2>
 <p>(This section assumes that your Tomcat server is running on the same system as your Apache server. If not you will need to modify the instructions as needed. ) </p>
@@ -117,7 +117,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>To map the old OPeNDAP data URL's to the new service (assuming they were located at <em>http://your.server/cgi-bin/nph-dods/...</em>) add this to the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file:</p>
 <blockquote>
   <p class="style5"># Use a secure reverse proxy to enable mapping the old URL's too tomcat.<br>
-    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/s4/$1  [P]</p>
+    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/hyrax/$1  [P]</p>
 </blockquote>
 <p>In the end my <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file: looked like this:</p>
 <blockquote>
@@ -141,7 +141,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     JKMount       /opendap/* ajp13<br>
   </p>
   <p class="style5"># Use a secure reverse proxy to enable mapping the old URL's too tomcat.<br>
-    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/s4/$1  [P]</p>
+    RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/hyrax/$1  [P]</p>
 </blockquote>
 <p>All of this could be added directly to Apache's http.conf file, and is included in it by the line that you added earlier that looked like this:</p>
 <blockquote>

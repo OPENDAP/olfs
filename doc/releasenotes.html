@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>Server4 Release Notes</title>
+<title>Hyrax Release Notes</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <STYLE>
 <!--
@@ -18,15 +18,8 @@ HR {color : #525D76;}
 	left: 100px;
 }
 LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}
-.style3 {font-size: 10px}
-.style4 {font-size: 14px}
 .style7 {
 	font-size: 16px;
-	font-weight: bold;
-}
-.style11 {font-size: 18px; font-weight: bold; }
-.style12 {
-	font-size: 1px;
 	font-weight: bold;
 }
 -->
@@ -35,23 +28,22 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
 <body>
 <a href="http://www.opendap.org"><img src="images/logo.gif" width="206" height="93" border="0"></a>
-<h1 align="left">Server4 Release Notes</h1>
+<h1 align="left">Hyrax Release Notes</h1>
 <hr size="1" noshade="noshade">
-<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.0" class="style7">Release 1.0 - January 15, 2006</a></p>
-<p>This was an internal release. </p>
-<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.1" class="style7">Release 1.1 - February 17, 2006</a></p>
-<p>Represents   the first prototype release of Server4. It  implements the <a href="http://rsg.opendap.org:8090/server-4/templates/feature-set.html">feature set</a> for releases 1.0 and 1.1, along with  a smattering of features due in coming releases. In particular prototype implementations exist for <a href="http://rsg.opendap.org:8090/server-4/templates/features.html#F-23">F-23</a> and <a href="http://rsg.opendap.org:8090/server-4/templates/features.html#F-24">F-24</a> from <a href="http://scm.opendap.org:8090/trac/milestone/Server%204%2C%20release%201.2">release 1.2</a>. At the time of this writing the intended feature set is still growing. </p>
-<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.2" class="style7">Release 1.2 - February 24, 2006</a></p>
-<p>This release adds simple THREDDS catalogs to the server. No special configuration is required, simply add /catalog.xml to the end of a URL that references a &quot;collection&quot; of data sets and a THREDDS catalog will be returned.</p>
-<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3" class="style7">Release 1.3 - September 26, 2006</a></p>
-<p>This release adds support for:</p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3" class="style7">Release beta-1.5 - February 09, 2007 </a></p>
+<p>2nd beta release. As of this release the name is changed from Server4 to <strong>Hyrax</strong>.</p>
+<p>This release features: </p>
 <ul>
-  <li>HTTP/1.1 caching - Support for conditional GET using <em>If-Modified-Since</em> and <em>If-Unmodified-Since</em> headers. </li>
-  <li>Persistent Configurations - Now local configurations will not be destroyed when installing new versions of the software. <br>
-  Configurations are stored in the <em>$TOMCAT_HOME/content/opendap</em> directory. </li>
-  <li>Advanced THREDDS catalogs - These require thoughtful modification of the catalog.xml file located in the persistent content/configuration directory. </li>
+  <li>Bug fix for <a href="http://scm.opendap.org:8090/trac/ticket/767">Ticket 767</a> </li>
+  <li>Bug fix for <a href="http://scm.opendap.org:8090/trac/ticket/784">Ticket 784</a></li>
+  <li>Bug fix for <a href="http://scm.opendap.org:8090/trac/ticket/789">Ticket 789</a> </li>
+  <li>Bug fix for <a href="http://scm.opendap.org:8090/trac/ticket/793">Ticket 793</a> </li>
+  <li>Partial implementation of  <a href="http://scm.opendap.org:8090/trac/ticket/785">Ticket 785</a> </li>
+  <li>Improved documentation regarding shared libraries. (<a href="http://scm.opendap.org:8090/trac/ticket/780">Ticket 780</a>) </li>
+  <li>The BES and and the data handlers come with test data and will work and serve data immediately after an install using the default configuration.  (<a href="http://scm.opendap.org:8090/trac/ticket/764">Ticket 764</a>) </li>
 </ul>
-<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3" class="style7">Release 1.4 - January 02, 2007 </a></p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3" class="style7">Release beta-1.4 - January 02, 2007 </a></p>
+<p>1st beta release. </p>
 <p>This release adds support for: </p>
 <ul>
   <li>HTTP/1.1 persistent connections</li>
@@ -62,6 +54,26 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li>Improved internal efficency  via BES client connection pooling. </li>
 </ul>
 <p>&nbsp;</p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3" class="style7">Release 1.3 - September 26, 2006</a></p>
+<p>This was an internal release. </p>
+<p>This release adds support for:</p>
+<ul>
+  <li>HTTP/1.1 caching - Support for conditional GET using <em>If-Modified-Since</em> and <em>If-Unmodified-Since</em> headers. </li>
+  <li>Persistent Configurations - Now local configurations will not be destroyed when installing new versions of the software. <br>
+    Configurations are stored in the <em>$TOMCAT_HOME/content/opendap</em> directory. </li>
+  <li>Advanced THREDDS catalogs - These require thoughtful modification of the catalog.xml file located in the persistent content/configuration directory. </li>
+</ul>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.3" class="style7"></a></p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.2" class="style7">Release 1.2 - February 24, 2006</a></p>
+<p>This was an internal release. </p>
+<p>This release adds simple THREDDS catalogs to the server. No special configuration is required, simply add /catalog.xml to the end of a URL that references a &quot;collection&quot; of data sets and a THREDDS catalog will be returned.</p>
+<p>&nbsp;</p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.1" class="style7">Release 1.1 - February 17, 2006</a></p>
+<p>This was an internal release. </p>
+<p>Represents   the first prototype release of Hyrax. It  implements the <a href="http://rsg.opendap.org:8090/server-4/templates/feature-set.html">feature set</a> for releases 1.0 and 1.1, along with  a smattering of features due in coming releases. In particular prototype implementations exist for <a href="http://rsg.opendap.org:8090/server-4/templates/features.html#F-23">F-23</a> and <a href="http://rsg.opendap.org:8090/server-4/templates/features.html#F-24">F-24</a> from <a href="http://scm.opendap.org:8090/trac/milestone/Server%204%2C%20release%201.2">release 1.2</a>. At the time of this writing the intended feature set is still growing. </p>
+<p>&nbsp;</p>
+<p><a href="http://scm.opendap.org:8090/trac/milestone/Server 4, release 1.0" class="style7">Release 1.0 - January 15, 2006</a></p>
+<p>This was an internal release. </p>
 <hr size="1" noshade="noshade">
 <h3><br /></h3>
 </body>

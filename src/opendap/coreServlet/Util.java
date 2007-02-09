@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -42,6 +42,34 @@ import java.util.Enumeration;
  */
 public class Util {
 
+    /**
+     * Writes information about the incomming request to a String.
+     * @param req The current request
+     * @param reqno The request number.
+     * @return A string containing infformation about the passed HttpServletRequest req
+     */
+    public static String showRequest(HttpServletRequest req, long reqno) {
+
+        String msg = "-------------------------------------------\n";
+        msg += "showRequest():\n";
+        msg += "  Request #" + reqno + "\n";
+        msg += "  Client:  " + req.getRemoteHost() + "\n";
+        msg += "  Request Info:\n";
+        msg += "    fullSourceName:            '" + ReqInfo.getFullSourceName(req) + "'\n";
+        msg += "    dataSource:                '" + ReqInfo.getDataSource(req) + "'\n";
+        msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
+        msg += "    collectionName:            '" + ReqInfo.getCollectionName(req) + "'\n";
+        msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
+        msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
+        msg += "    requestURL:                '" + ReqInfo.getRequestURL(req) + "'\n";
+        msg += "    requestForOpendapContents:  " + ReqInfo.requestForOpendapContents(req) + "\n";
+        msg += "    requestForTHREDDSCatalog:   " + ReqInfo.requestForTHREDDSCatalog(req) + "\n";
+        msg += "-------------------------------------------";
+
+        return msg;
+
+    }
+
 
     /**
      * ************************************************************************
@@ -52,6 +80,8 @@ public class Util {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @param odh The dispatch handler.
+     * @throws IOException When things go poorly.
      */
     static void sendSystemProperties(HttpServletRequest request,
                                             HttpServletResponse response,
@@ -108,9 +138,12 @@ public class Util {
      * This method calls the <code>get*</code> methods of the request and prints
      * the results to standard out.
      *
+     * @param ps
+     * @param servlet
      * @param request The <code>HttpServletRequest</code> object to probe.
+     * @param scntxt
+     * @param scnfg
      */
-
     public static void probeRequest(PrintStream ps, HttpServlet servlet, HttpServletRequest request, ServletContext scntxt, ServletConfig scnfg) {
 
         Enumeration e;

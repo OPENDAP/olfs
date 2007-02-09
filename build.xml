@@ -33,7 +33,7 @@
 <!-- Build file for OPeNDAP core software -->
 
 
-<project name="OPeNDAP Lightweight Front end Server (OLFS), part of the Server4 project" default="all" basedir=".">
+<project name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project" default="all" basedir=".">
 
     <!-- Global Properties -->
     &globalprops;
@@ -245,8 +245,8 @@
 
         <copy file="${distributionResources.dir}/WarFileReadme" tofile="${build.dist}/README" />
 
-        <jar destfile="${build.dist}/olfs-${VERSION}-olfs.jar" >
-            <zipfileset dir="${build.dist}" prefix="olfs-${VERSION}-olfs">
+        <jar destfile="${build.dist}/olfs-${VERSION}-webapp.jar" >
+            <zipfileset dir="${build.dist}" prefix="olfs-${VERSION}-webapp">
                 <include name="opendap.war" />
                 <include name="README" />
             </zipfileset>

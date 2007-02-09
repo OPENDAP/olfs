@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -47,8 +47,6 @@ import org.slf4j.Logger;
 public class DocServlet extends HttpServlet {
 
 
-
-
     private String documentsDirectory;
 
     private MimeTypes mimeTypes;
@@ -56,13 +54,13 @@ public class DocServlet extends HttpServlet {
     private Logger log;
 
 
-    public void init(){
+    public void init() {
 
         String dir = ServletUtil.getContentPath(this) + "docs";
 
         File f = new File(dir);
 
-        if(f.exists() && f.isDirectory())
+        if (f.exists() && f.isDirectory())
             documentsDirectory = dir;
         else {
 
@@ -74,32 +72,30 @@ public class DocServlet extends HttpServlet {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        log.info("documentsDirectory: "+documentsDirectory);
+        log.info("documentsDirectory: " + documentsDirectory);
 
 
     }
 
 
-
-
-
-    public long getLastModified(HttpServletRequest req){
+    public long getLastModified(HttpServletRequest req) {
 
         long lmt;
 
 
-
         String name = getName(req);
+
+
 
         File f = new File(name);
 
-        if(f.exists())
-            lmt =  f.lastModified();
+        if (f.exists())
+            lmt = f.lastModified();
         else
             lmt = -1;
 
 
-        log.debug("DocServlet - Tomcat requested lastModified for: "+name+" Returning: "+ new Date(lmt));
+        log.debug("DocServlet - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
 
         return lmt;
 
@@ -107,16 +103,25 @@ public class DocServlet extends HttpServlet {
     }
 
 
+    private boolean redirect(HttpServletRequest req, HttpServletResponse res) throws IOException {
+
+        if (req.getPathInfo() == null) {
+            res.sendRedirect(req.getRequestURI()+"/index.html");
+            log.debug("Sent redirect to make the web page work!");
+            return true;
+        }
+        return false;
+    }
 
 
+    private String getName(HttpServletRequest req) {
 
-    private String getName(HttpServletRequest req){
         String name = req.getPathInfo();
 
-        if(name==null)
-             name = "/";
+        if(name == null)
+            name = "/";
 
-        if(name.endsWith("/"))
+        if (name.endsWith("/"))
             name += "index.html";
 
         name = documentsDirectory + name;
@@ -127,73 +132,74 @@ public class DocServlet extends HttpServlet {
 
 
 
-
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
             throws IOException, ServletException {
 
+        PerfLog.logServerAccessStart(request, "DocServletAccess");
+
+        if (!redirect(request, response)) {
+
+            String name = getName(request);
+
+            log.debug("DocServlet - The client requested this: " + name);
 
 
+            File f = new File(name);
 
-        String name = getName(request);
-
-        log.debug("DocServlet - The client requested this: "+name);
-
-
-        File f = new File(name);
-
-        if(f.exists()){
-            log.debug("   Requested item exists.");
+            if (f.exists()) {
+                log.debug("   Requested item exists.");
 
 
-            String suffix = null;
-            if(name.lastIndexOf("/") < name.lastIndexOf(".")){
-                suffix = name.substring(name.lastIndexOf('.') + 1);
-            }
-
-
-            if(suffix!=null){
-                String mType = mimeTypes.getMimeType(suffix);
-                if(mType!=null)
-                    response.setContentType(mType);
-                log.debug("   MIME type: "+mType+"  ");
-            }
-
-
-
-
-            log.debug("   Sending.");
-
-
-            FileInputStream fis = new FileInputStream(f);
-
-            ServletOutputStream sos = response.getOutputStream();
-
-            byte buff[] = new byte[8192];
-            int rc;
-            boolean doneReading = false;
-            while(!doneReading){
-                rc = fis.read(buff);
-                if(rc<0){
-                    doneReading = true;
-                }
-                else if(rc>0){
-                    sos.write(buff,0,rc);
+                String suffix = null;
+                if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
+                    suffix = name.substring(name.lastIndexOf('.') + 1);
                 }
 
+
+                if (suffix != null) {
+                    String mType = mimeTypes.getMimeType(suffix);
+                    if (mType != null)
+                        response.setContentType(mType);
+                    log.debug("   MIME type: " + mType + "  ");
+                }
+
+
+                log.debug("   Sending.");
+
+
+                FileInputStream fis = new FileInputStream(f);
+
+                ServletOutputStream sos = response.getOutputStream();
+
+                byte buff[] = new byte[8192];
+                int rc;
+                boolean doneReading = false;
+                while (!doneReading) {
+                    rc = fis.read(buff);
+                    if (rc < 0) {
+                        doneReading = true;
+                    } else if (rc > 0) {
+                        sos.write(buff, 0, rc);
+                    }
+
+                }
+
+                response.setStatus(HttpServletResponse.SC_OK);
+                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
+
+                sos.flush();
+
+            } else {
+                log.debug("   Requested item does not exist. Returning '404 Not Found'");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
+
             }
 
-            response.setStatus(HttpServletResponse.SC_OK);
-
-            sos.flush();
-
         }
-        else {
-            log.debug("   Requested item does not exist. Returning '404 Not Found'");
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        }
-
+        else
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_PERMANENTLY, -1, "DocServletAccess");
 
 
     }

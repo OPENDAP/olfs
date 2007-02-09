@@ -1,19 +1,19 @@
 #############################################################################
 
-                                 Server4
+                                 Hyrax
 
                      OPeNDAP Lightweight Frontend Server
 .............................................................................
 
 
-Here you (should) have the Web Archive (war) file containing the Server4
+Here you (should) have the Web Archive (war) file containing the Hyrax
 front end - the OLFS.
 
 To install the OLFS:
 
 1) Build and install the BES and whatever handlers you wish to use.  See:
 
-        http://www.opendap.org/download/s4_server.html
+        http://www.opendap.org/download/hyrax.html
 
    for more information on that.
 
@@ -33,7 +33,7 @@ To install the OLFS:
 
         http://the.machine.on.which.you.are.running.tomcat:8080/opendap/docs/
 
-   for configuration information for Server4.
+   for configuration information for Hyrax.
 
 
 .............................................................................

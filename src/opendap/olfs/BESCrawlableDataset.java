@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -37,7 +37,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import opendap.ppt.PPTException;
-import opendap.coreServlet.Debug;
 
 /**
  * This implmentation of the THREDDS CrawlableDataset interface provides the connection
@@ -84,7 +83,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
         _config = (Element) o;
 
-        log.debug("S4CrawlableDataset config: " + _config);
+        log.debug("BESCrawlableDataset config: " + _config);
 
         //XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
         //xo.output(_config,System.out);
@@ -295,32 +294,32 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     }
 
-    private void processDatasetElement(Element dataset, BESCrawlableDataset s4c) {
+    private void processDatasetElement(Element dataset, BESCrawlableDataset cds) {
 
         // Process name
         String path = besPath2ThreddsPath(dataset.getChild("name").getTextTrim());
 
-        s4c._name = getNameFromPath(path);
-        //s4c._name = s4c._name.equals("/") ? "" : s4c._name;
+        cds._name = getNameFromPath(path);
+        //cds._name = cds._name.equals("/") ? "" : cds._name;
 
         // Process size
-        s4c._size = Integer.parseInt(dataset.getChild("size").getTextTrim());
+        cds._size = Integer.parseInt(dataset.getChild("size").getTextTrim());
 
         // process date and time
         String date = dataset.getChild("lastmodified").getChild("date").getTextTrim();
         String time = dataset.getChild("lastmodified").getChild("time").getTextTrim();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
-        s4c._lastModified = sdf.parse(date + " " + time+" UTC", new ParsePosition(0));
+        cds._lastModified = sdf.parse(date + " " + time+" UTC", new ParsePosition(0));
 
         // Process collection (if it is one)
         String isCollection = dataset.getAttributeValue("thredds_collection");
         if (isCollection.equalsIgnoreCase("true")) {
-            s4c._isCollection = true;
-            s4c._childDatasetElements = dataset.getChildren("dataset");
+            cds._isCollection = true;
+            cds._childDatasetElements = dataset.getChildren("dataset");
         }
 
-        s4c._haveInfo = true;
+        cds._haveInfo = true;
 
 
     }
@@ -359,9 +358,9 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
             return null;
 
         try {
-            BESCrawlableDataset s4c = new BESCrawlableDataset(getParentPath(), _config);
-            _parent = s4c;
-            return s4c;
+            BESCrawlableDataset cds = new BESCrawlableDataset(getParentPath(), _config);
+            _parent = cds;
+            return cds;
         } catch (PPTException e) {
             throw new IOException(e.getMessage());
         } catch (JDOMException e) {

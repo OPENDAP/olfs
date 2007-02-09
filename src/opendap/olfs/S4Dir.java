@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -92,8 +92,8 @@ public class S4Dir {
         String targetURL = request.getContextPath() + request.getServletPath() + collectionName;
 
 
-        log.debug("S4Dir - targetURL:       "+targetURL);
-        log.debug("S4Dir - collectionName:  "+collectionName);
+        log.debug("targetURL:       "+targetURL);
+        log.debug("collectionName:  "+collectionName);
 
 
         boolean isTopLevel = collectionName.equals("/");
@@ -129,7 +129,7 @@ public class S4Dir {
             baseName = baseName.substring(baseName.lastIndexOf("/"), baseName.length());
 
 
-        log.debug("S4Dir - baseName:         "+baseName);
+        log.debug("baseName:         "+baseName);
 
 
         // Strip basename from the end of the targetURL to make the link to the parent directory
@@ -226,7 +226,7 @@ public class S4Dir {
         pw.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
                    "<html xmlns=\"http://www.w3.org/1999/xhtml\">" );
         pw.println("    <head>");
-        pw.println("        <title>OPeNDAP Server4:  Contents of " + collectionName + "</title>");
+        pw.println("        <title>OPeNDAP Hyrax:  Contents of " + collectionName + "</title>");
         pw.println("        <STYLE>\n" +
                     "         <!--\n" +
                     "           H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:22px;}\n" +
@@ -300,7 +300,7 @@ public class S4Dir {
                 "        </td>\n" +
                 "        <td>" +
                 "            <div align=\"right\">" +
-                "                Server4 development sponsored by <a href='http://www.nsf.gov/'>NSF</a>,\n" +
+                "                Hyrax development sponsored by <a href='http://www.nsf.gov/'>NSF</a>,\n" +
                 "                <a href='http://www.nasa.gov/'>NASA</a>\n" +
                 "                and <a href='http://www.noaa.gov/'>NOAA</a>" +
                 "            </div>" +
@@ -314,7 +314,7 @@ public class S4Dir {
 
 
         pw.println("        <h3>" +
-                   "            OPeNDAP Server4 ("+Version.getVersionString()+")");
+                   "            OPeNDAP Hyrax ("+Version.getVersionString()+")");
 
         if(isTopLevel)
             pw.println("            <span class=\"uuid\">ServerUUID="+Version.getServerUUID()+"-contents</span>\n");

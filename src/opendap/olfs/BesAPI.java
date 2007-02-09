@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -877,7 +877,7 @@ public class BesAPI {
 
         //if (Debug.isSet("BES"))
         //    oc.setOutput(System.out, true);
-        //else 
+        //else
             oc.setOutput(devNull, true);
 
 

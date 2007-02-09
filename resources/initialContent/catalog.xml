@@ -13,11 +13,11 @@ FIRST: Go Read The THREDDS Documentation:
 
 
 
-Now, to get THREDDS catalogs working on Server4 YOU MUST do at least the following:
+Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following:
 
 
     1) For each collection that appears in the top level of the OPeNDAP directory response
-       (http://localhost:8080/opendap/contents.html if Server4 is running out of the box on
+       (http://localhost:8080/opendap/contents.html if Hyrax is running out of the box on
        this machine) you MUST create a <datasetScan> in the catalog.xml file located in the
        persistent content directory ($TOMCAT_HOME/content/opendap).
 
@@ -56,14 +56,14 @@ Now, to get THREDDS catalogs working on Server4 YOU MUST do at least the followi
 
 
 -->
-<catalog name="Server4 Test Catalog"
+<catalog name="Hyrax Test Catalog"
         xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
         xmlns:xlink="http://www.w3.org/1999/xlink">
 
     <!-- ************************************************************************************* -->
     <!--                     Don't Change The Service Description!                             -->
 
-    <service name="OPeNDAP-Server4" serviceType="OPeNDAP" base="/opendap/"/>
+    <service name="OPeNDAP-Hyrax" serviceType="OPeNDAP" base="/opendap/"/>
 
     <!-- ************************************************************************************* -->
 
@@ -71,7 +71,7 @@ Now, to get THREDDS catalogs working on Server4 YOU MUST do at least the followi
 
     <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
-    <datasetScan location="/root/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Server4">
+    <datasetScan location="/root/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
 
         <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
         <filter>
@@ -81,7 +81,7 @@ Now, to get THREDDS catalogs working on Server4 YOU MUST do at least the followi
         <addDatasetSize />
 
         <metadata inherited="true">
-            <serviceName>OPeNDAP-Server4</serviceName>
+            <serviceName>OPeNDAP-Hyrax</serviceName>
             <authority>opendap.org</authority>
             <dataType>Random</dataType>
         </metadata>
@@ -101,7 +101,7 @@ In particular note the following:
 
        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
 
-       Identifies the correct CrawlableDataset class for Server4 - the one that works with the BES
+       Identifies the correct CrawlableDataset class for Hyrax - the one that works with the BES
        to automatically generate catalogs.
 
 
@@ -109,26 +109,26 @@ In particular note the following:
        top level collection in the BES contains 4 sub collections they may each be identified using
        a separate <datasetScan> element like so:
 
-	       <datasetScan location="/root/nc"  path="nc"  name="NetCDF Archive"   serviceName="OPeNDAP-Server4">
+	       <datasetScan location="/root/nc"  path="nc"  name="NetCDF Archive"   serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
-	       <datasetScan location="/root/hdf" path="hdf" name="HDF Archive"      serviceName="OPeNDAP-Server4">
+	       <datasetScan location="/root/hdf" path="hdf" name="HDF Archive"      serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
-	       <datasetScan location="/root/jg"  path="jg"  name="JGOFFS Archive"   serviceName="OPeNDAP-Server4">
+	       <datasetScan location="/root/jg"  path="jg"  name="JGOFFS Archive"   serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
-	       <datasetScan location="/root/ff"  path="ff"  name="FreeForm Archive" serviceName="OPeNDAP-Server4">
+	       <datasetScan location="/root/ff"  path="ff"  name="FreeForm Archive" serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
        Where each <datasetScan> element may have it's own filter and inheritance rules. You MUST NOT
        lump them all into one <datasetScan> element with one set of filter rules like so:
 
-	       <datasetScan location="/root"     path="DATA"  name="AllYourDataAreUs"   serviceName="OPeNDAP-Server4">
+	       <datasetScan location="/root"     path="DATA"  name="AllYourDataAreUs"   serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 

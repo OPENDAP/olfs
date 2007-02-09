@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -108,7 +108,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     public String getVersionStringForTHREDDSCatalog() {
-        return "OPeNDAP Server4 (" + Version.getVersionString() + ")" +
+        return "OPeNDAP Hyrax (" + Version.getVersionString() + ")" +
                 "<font size='-5' color='#5A647E'>" +
                 "ServerUUID=" + Version.getServerUUID() + "-catalog" +
                 "</font><br />";
@@ -646,9 +646,9 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         path = BESCrawlableDataset.besPath2ThreddsPath(path);
 
-        BESCrawlableDataset s4cd = new BESCrawlableDataset(path, null);
+        BESCrawlableDataset cds = new BESCrawlableDataset(path, null);
 
-        if (s4cd.isCollection()) {
+        if (cds.isCollection()) {
 
             log.debug("sendCatalog():  Instantiating SimpleCatalogBuilder");
 
@@ -657,7 +657,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
                     "",                                   // CollectionID, which for us needs to be empty.
                     BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
-                    "OPeNDAP-Server4",                    // Service Name
+                    "OPeNDAP-Hyrax",                    // Service Name
                     "OPeNDAP",                            // Service Type Name
                     request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf(request.getPathInfo()) + 1)); // Base URL for this service
 
@@ -665,7 +665,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-            pw.print(scb.generateCatalogAsString(s4cd));
+            pw.print(scb.generateCatalogAsString(cds));
 
 
         } else {

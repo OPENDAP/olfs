@@ -1,7 +1,7 @@
 
 #######################################################################
 
-                            OPeNDAP Server4
+                            OPeNDAP Hyrax
 
                       Source Distribution README
 
@@ -9,13 +9,13 @@
 
 
 
-This is the source code distribution for OPeNDAP Server4 Project. It
+This is the source code distribution for OPeNDAP Hyrax Project. It
 relies on the ANT program (http://ant.apache.org) to exercise it's
 production rules.
 
 It contains:
 
-    * The source code files for the OPeNDAP Server4 project. Files
+    * The source code files for the OPeNDAP Hyrax project. Files
       located in "src" directory.
 
     * Documentation located in the "doc" directory.
@@ -35,14 +35,14 @@ To build all of the source code go to the top level directory (below
 which should be the Java-DODS and buildfiles directories) and run the
 command:
 
-    ant -f buildfiles/s4.xml compile
-	
+    ant  compile
+
 To build the server as a .war file run the command:
 
-    ant -f buildfiles/s4.xml server
+    ant  server
 
 
-Read the build file "buildfiles/s4.xml" to see what it all does.
+Read the build file "build.xml" to see what it all does.
 
 Happy Coding.
 

@@ -4,11 +4,11 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>fnoc1</web-resource-name>
-            <url-pattern>/s4/nc/fnoc1.nc.dds</url-pattern>
-            <url-pattern>/s4/nc/fnoc1.nc.das</url-pattern>
-            <url-pattern>/s4/nc/fnoc3.nc.dds</url-pattern>
-            <url-pattern>/s4/nc/fnoc3.nc.das</url-pattern>
-            <url-pattern>/s4/ff/*</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc1.nc.dds</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc1.nc.das</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc3.nc.dds</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc3.nc.das</url-pattern>
+            <url-pattern>/hyrax/ff/*</url-pattern>
         </web-resource-collection>
 
         <auth-constraint>
@@ -20,7 +20,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>fnoc2</web-resource-name>
-            <url-pattern>/s4/nc/fnoc2.nc.dds</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc2.nc.dds</url-pattern>
         </web-resource-collection>
 
         <auth-constraint>
@@ -33,7 +33,7 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>FreeForm</web-resource-name>
-            <url-pattern>/s4/ff/*</url-pattern>
+            <url-pattern>/hyrax/ff/*</url-pattern>
         </web-resource-collection>
 
         <auth-constraint>
@@ -48,7 +48,7 @@
     <!-- Define the login configuration for this application -->
     <login-config>
         <auth-method>BASIC</auth-method>
-        <realm-name>OPeNDAP Server4</realm-name>
+        <realm-name>OPeNDAP Hyrax</realm-name>
     </login-config>
 
 

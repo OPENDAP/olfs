@@ -11,11 +11,12 @@ Check it out:
 
 Build it:
 
-    ant -f buildfiles/s4.xml server
+    ant server
 
 Install it:
 
-    cp build/dist/opendap.war $TOMCAT_HOME/webapps rm -rf $TOMCAT_HOME/webapps/s4
+    rm -rf $TOMCAT_HOME/webapps/opendap
+    cp build/dist/opendap.war $TOMCAT_HOME/webapps 
 
 Launch it:
 

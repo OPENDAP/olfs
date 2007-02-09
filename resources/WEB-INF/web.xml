@@ -10,8 +10,8 @@
 <web-app>
 
 
-    <display-name>Server4</display-name>
-    <description>Server4</description>
+    <display-name>Hyrax</display-name>
+    <description>OPeNDAP Hyrax Server</description>
 
     <context-param>
         <param-name>ContextPath</param-name>
@@ -22,7 +22,7 @@
 
 
     <servlet>
-        <servlet-name>s4</servlet-name>
+        <servlet-name>hyrax</servlet-name>
 
         <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
 
@@ -70,19 +70,19 @@
 
 
     <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4</url-pattern>
+        <servlet-name>hyrax</servlet-name>
+        <url-pattern>/hyrax</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>s4</servlet-name>
-        <url-pattern>/s4/*</url-pattern>
+        <servlet-name>hyrax</servlet-name>
+        <url-pattern>/hyrax/*</url-pattern>
     </servlet-mapping>
 
 
     <servlet-mapping>
-        <servlet-name>s4</servlet-name>
+        <servlet-name>hyrax</servlet-name>
         <url-pattern>*</url-pattern>
-    </servlet-mapping >
+    </servlet-mapping>
 
 
 

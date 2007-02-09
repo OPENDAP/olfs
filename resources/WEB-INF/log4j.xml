@@ -28,8 +28,8 @@
     Generate an access log similar to Apache server access_log.
     139.140.167.4 - - [01/Mar/2005:00:00:00 -0700] "GET /cgi-bin/dods/DODS-3.2.1/nph-dods/dods/model/2005030100_gfs_211.nc.dods?u[22:22][0:28][0:64][0:92] HTTP/1.1" 200 -
   -->
-  <appender name="Server4AccessLog" class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="${logdir}/Server4Access.log"/>
+  <appender name="HyraxAccessLog" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="File" value="${logdir}/HyraxAccess.log"/>
     <param name="DatePattern" value=".yyyy-MM"/>
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] %X{request} %m%n"/>
@@ -87,7 +87,7 @@
 
 
 
-    <!-- OPeNDAP Server4 Logging -->
+    <!-- OPeNDAP Hyrax Logging -->
 
     <!-- Default Logging level -->
     <logger name="opendap">
@@ -98,6 +98,10 @@
 
     <!-- CoreServlet Logging -->
     <logger name="opendap.coreServlet">
+      <level value="INFO"/>
+    </logger>
+
+    <logger name="opendap.coreServlet.DispatchServlet">
       <level value="INFO"/>
     </logger>
 
@@ -121,9 +125,14 @@
     </logger>
 
 
-    <logger name="Server4Access">
+    <logger name="HyraxAccess">
       <level value="ALL"/>
-        <appender-ref ref="Server4AccessLog"/>
+        <appender-ref ref="HyraxAccessLog"/>
+        <appender-ref ref="Stdout"/>
+    </logger>
+
+    <logger name="DocServletAccess">
+      <level value="ALL"/>
         <appender-ref ref="Stdout"/>
     </logger>
 

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Server4" project, a Java implementation of the
-// OPeNDAP Data Access Protocol.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+//
 //
 // Copyright (c) 2006 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -308,44 +308,13 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    /**
-     * Writes information about the incomming request to stdout.
-     * @param req The current request
-     * @param reqno The request number.
-     */
-    public void showRequest(HttpServletRequest req, long reqno) {
-
-        String msg = "showRequest():\n";
-        msg += "-------------------------------------------\n";
-        msg += "Server: " + getServerName() + "   Request #" + reqno + "\n";
-        msg += "Client: " + req.getRemoteHost() + "\n";
-        msg += "Request Info:\n";
-        msg += "  fullSourceName:               '" + ReqInfo.getFullSourceName(req) + "'\n";
-        msg += "  dataSource:                   '" + ReqInfo.getDataSource(req) + "'\n";
-        msg += "  dataSetName:                  '" + ReqInfo.getDataSetName(req) + "'\n";
-        msg += "  collectionName:               '" + ReqInfo.getCollectionName(req) + "'\n";
-        msg += "  requestSuffix:                '" + ReqInfo.getRequestSuffix(req) + "'\n";
-        msg += "  CE:                           '" + ReqInfo.getConstraintExpression(req) + "'\n";
-        msg += "  requestURL:                   '" + ReqInfo.getRequestURL(req) + "'\n";
-        msg += "  requestForOpendapContents:     " + ReqInfo.requestForOpendapContents(req) + "\n";
-        msg += "  requestForTHREDDSCatalog:      " + ReqInfo.requestForTHREDDSCatalog(req) + "\n";
-        msg += "-------------------------------------------";
-
-
-        log.debug(msg);
-
-        log.info("Request dataSource: '" + ReqInfo.getDataSource(req) +
-                "' suffix: '" + ReqInfo.getRequestSuffix(req) +
-                "' CE: '" + ReqInfo.getConstraintExpression(req) + "'");
-
-    }
 
 
     /**
      * Performs dispatching for "special" server requests. This server supports several diagnositic responses:
      * <ui>
      *     <li> version - returns the OPeNDAP version document (XML) </li>
-     *     <li> help - returns the help page for Server4  </li>
+     *     <li> help - returns the help page for Hyrax  </li>
      *     <li> systemproperties - returns an html document describing the state of the "system" </li>
      *     <li> debug -   </li>
      *     <li> status -    </li>
@@ -641,7 +610,7 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        PerfLog.logServerAccessStart( request,"Server4Access");
+        PerfLog.logServerAccessStart( request,"HyraxAccess");
 
 
         try {
@@ -652,7 +621,11 @@ public class DispatchServlet extends HttpServlet {
 
             synchronized (syncLock) {
                 long reqno = HitCounter++;
-                showRequest(request, reqno);
+                log.debug(Util.showRequest(request,reqno));
+
+                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
             } // synch
 
 
@@ -671,7 +644,7 @@ public class DispatchServlet extends HttpServlet {
             OPeNDAPException.anyExceptionHandler(e, response);
         }
         finally {
-            PerfLog.logServerAccessEnd( 0,-1,"Server4Access");
+            PerfLog.logServerAccessEnd( 0,-1,"HyraxAccess");
 
         }
 
