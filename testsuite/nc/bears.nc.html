@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 13206 2006-02-15 20:16:29Z jimg $
+// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -92,19 +92,23 @@ function help_button() {
 // Helper functions for the form.
 
 function describe_index() {
-   defaultStatus = "Enter start, stride and stop for the array dimension.";
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
 }
 
 function describe_selection() {
-   defaultStatus = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
 }
 
 function describe_operator() {
-   defaultStatus = "Choose a relational operator. Use - to enter a function name).";
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
 }
 
 function describe_projection() {
-   defaultStatus = "Add this variable to the projection.";
+   window.status = "Add this variable to the projection.";
+   return true;
 }
 
 ///////////////////////////////////////////////////////////
@@ -331,9 +335,27 @@ DODS_URL.add_dods_var(org_opendap_bears);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_bears"
-onclick="org_opendap_bears.handle_projection_change(get_org_opendap_bears)">
+onclick="org_opendap_bears.handle_projection_change(get_org_opendap_bears) "  onfocus="describe_projection()">
 <font size="+1">bears</font>: Grid</b><br>
 
+i:<input type="text" name="org_opendap_bears_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_bears.add_dim(2);
+// -->
+</script>
+j:<input type="text" name="org_opendap_bears_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_bears.add_dim(3);
+// -->
+</script>
+l:<input type="text" name="org_opendap_bears_2" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_bears.add_dim(3);
+// -->
+</script>
 <br>
 <textarea name="bears_attr" rows="5" cols="70">
 act: "text string\\012\\011123"
@@ -355,9 +377,21 @@ DODS_URL.add_dods_var(org_opendap_order);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_order"
-onclick="org_opendap_order.handle_projection_change(get_org_opendap_order)">
+onclick="org_opendap_order.handle_projection_change(get_org_opendap_order) "  onfocus="describe_projection()">
 <font size="+1">order</font>: Grid</b><br>
 
+i:<input type="text" name="org_opendap_order_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_order.add_dim(2);
+// -->
+</script>
+j:<input type="text" name="org_opendap_order_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_order.add_dim(3);
+// -->
+</script>
 <br>
 <textarea name="order_attr" rows="5" cols="70">
 </textarea>
@@ -374,9 +408,21 @@ DODS_URL.add_dods_var(org_opendap_shot);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_shot"
-onclick="org_opendap_shot.handle_projection_change(get_org_opendap_shot)">
+onclick="org_opendap_shot.handle_projection_change(get_org_opendap_shot) "  onfocus="describe_projection()">
 <font size="+1">shot</font>: Grid</b><br>
 
+i:<input type="text" name="org_opendap_shot_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_shot.add_dim(2);
+// -->
+</script>
+j:<input type="text" name="org_opendap_shot_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_shot.add_dim(3);
+// -->
+</script>
 <br>
 <textarea name="shot_attr" rows="5" cols="70">
 </textarea>
@@ -393,9 +439,21 @@ DODS_URL.add_dods_var(org_opendap_aloan);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_aloan"
-onclick="org_opendap_aloan.handle_projection_change(get_org_opendap_aloan)">
+onclick="org_opendap_aloan.handle_projection_change(get_org_opendap_aloan) "  onfocus="describe_projection()">
 <font size="+1">aloan</font>: Grid</b><br>
 
+i:<input type="text" name="org_opendap_aloan_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_aloan.add_dim(2);
+// -->
+</script>
+j:<input type="text" name="org_opendap_aloan_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_aloan.add_dim(3);
+// -->
+</script>
 <br>
 <textarea name="aloan_attr" rows="5" cols="70">
 </textarea>
@@ -412,9 +470,21 @@ DODS_URL.add_dods_var(org_opendap_cross);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_cross"
-onclick="org_opendap_cross.handle_projection_change(get_org_opendap_cross)">
+onclick="org_opendap_cross.handle_projection_change(get_org_opendap_cross) "  onfocus="describe_projection()">
 <font size="+1">cross</font>: Grid</b><br>
 
+i:<input type="text" name="org_opendap_cross_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_cross.add_dim(2);
+// -->
+</script>
+j:<input type="text" name="org_opendap_cross_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_cross.add_dim(3);
+// -->
+</script>
 <br>
 <textarea name="cross_attr" rows="5" cols="70">
 </textarea>
@@ -431,7 +501,7 @@ DODS_URL.add_dods_var(org_opendap_i);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_i"
-onclick="org_opendap_i.handle_projection_change(get_org_opendap_i)">
+onclick="org_opendap_i.handle_projection_change(get_org_opendap_i) "  onfocus="describe_projection()">
 <font size="+1">i</font>: Array of 32 bit Integers [i = 0..1]</b><br>
 
 i:<input type="text" name="org_opendap_i_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -457,7 +527,7 @@ DODS_URL.add_dods_var(org_opendap_j);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_j"
-onclick="org_opendap_j.handle_projection_change(get_org_opendap_j)">
+onclick="org_opendap_j.handle_projection_change(get_org_opendap_j) "  onfocus="describe_projection()">
 <font size="+1">j</font>: Array of 32 bit Reals [j = 0..2]</b><br>
 
 j:<input type="text" name="org_opendap_j_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -483,7 +553,7 @@ DODS_URL.add_dods_var(org_opendap_l);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_l"
-onclick="org_opendap_l.handle_projection_change(get_org_opendap_l)">
+onclick="org_opendap_l.handle_projection_change(get_org_opendap_l) "  onfocus="describe_projection()">
 <font size="+1">l</font>: Array of 16 bit Integers [l = 0..2]</b><br>
 
 l:<input type="text" name="org_opendap_l_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">

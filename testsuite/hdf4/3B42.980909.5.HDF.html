@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 13206 2006-02-15 20:16:29Z jimg $
+// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -92,19 +92,23 @@ function help_button() {
 // Helper functions for the form.
 
 function describe_index() {
-   defaultStatus = "Enter start, stride and stop for the array dimension.";
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
 }
 
 function describe_selection() {
-   defaultStatus = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
 }
 
 function describe_operator() {
-   defaultStatus = "Choose a relational operator. Use - to enter a function name).";
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
 }
 
 function describe_projection() {
-   defaultStatus = "Add this variable to the projection.";
+   window.status = "Add this variable to the projection.";
+   return true;
 }
 
 ///////////////////////////////////////////////////////////
@@ -333,7 +337,7 @@ DODS_URL.add_dods_var(org_opendap_percipitate);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_percipitate"
-onclick="org_opendap_percipitate.handle_projection_change(get_org_opendap_percipitate)">
+onclick="org_opendap_percipitate.handle_projection_change(get_org_opendap_percipitate) "  onfocus="describe_projection()">
 <font size="+1">percipitate</font>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]</b><br>
 
 scan:<input type="text" name="org_opendap_percipitate_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -364,7 +368,7 @@ DODS_URL.add_dods_var(org_opendap_relError);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_relError"
-onclick="org_opendap_relError.handle_projection_change(get_org_opendap_relError)">
+onclick="org_opendap_relError.handle_projection_change(get_org_opendap_relError) "  onfocus="describe_projection()">
 <font size="+1">relError</font>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]</b><br>
 
 scan:<input type="text" name="org_opendap_relError_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">

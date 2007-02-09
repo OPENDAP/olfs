@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<getAscii>
-    <response>
-        <Administrator>ndp@opendap.org</Administrator>
-        <BESException>
-            <Type>TransmitProblem</Type>
-            <Message>Failed to read data: Wrong number of arguments to geoarray(). The geoarray() function supports
+Error {
+    code = 1001;
+    message = "Failed to read data: Wrong number of arguments to geoarray(). The geoarray() function supports
 three different sets of arguments:
 
 geoarray(var,left,top,right,bottom)
@@ -16,11 +12,5 @@ In the first version 'var' is the target of the selection and 'left', 'top',
 the selection. In the second version the 'var_left', ..., parameters give the
 longitude and latitude extent of the entire array. The projection and dataum are
 assumed to be Plat-Carre and wgs84. In the last version the the projection and
-datum of the image are also provided.(1001)</Message>
-            <Location>
-                <File>BESAsciiTransmit.cc</File>
-                <Line>138</Line>
-            </Location>
-        </BESException>
-    </response>
-</getAscii>
+datum of the image are also provided.(1001)";
+};

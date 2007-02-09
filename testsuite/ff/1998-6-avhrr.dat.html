@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 13206 2006-02-15 20:16:29Z jimg $
+// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -92,19 +92,23 @@ function help_button() {
 // Helper functions for the form.
 
 function describe_index() {
-   defaultStatus = "Enter start, stride and stop for the array dimension.";
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
 }
 
 function describe_selection() {
-   defaultStatus = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
 }
 
 function describe_operator() {
-   defaultStatus = "Choose a relational operator. Use - to enter a function name).";
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
 }
 
 function describe_projection() {
-   defaultStatus = "Add this variable to the projection.";
+   window.status = "Add this variable to the projection.";
+   return true;
 }
 
 ///////////////////////////////////////////////////////////
@@ -339,7 +343,7 @@ DODS_URL.add_dods_var(org_opendap_satellite);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_satellite"
-onclick="org_opendap_satellite.handle_projection_change(get_org_opendap_satellite)">
+onclick="org_opendap_satellite.handle_projection_change(get_org_opendap_satellite) "  onfocus="describe_projection()">
 <font size="+1">satellite</font>: string</b><br>
 
 satellite <select name="org_opendap_satellite_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -365,7 +369,7 @@ DODS_URL.add_dods_var(org_opendap_year);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_year"
-onclick="org_opendap_year.handle_projection_change(get_org_opendap_year)">
+onclick="org_opendap_year.handle_projection_change(get_org_opendap_year) "  onfocus="describe_projection()">
 <font size="+1">year</font>: 32 bit Integer</b><br>
 
 year <select name="org_opendap_year_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -391,7 +395,7 @@ DODS_URL.add_dods_var(org_opendap_day_num);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_day_num"
-onclick="org_opendap_day_num.handle_projection_change(get_org_opendap_day_num)">
+onclick="org_opendap_day_num.handle_projection_change(get_org_opendap_day_num) "  onfocus="describe_projection()">
 <font size="+1">day_num</font>: 32 bit Integer</b><br>
 
 day_num <select name="org_opendap_day_num_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -417,7 +421,7 @@ DODS_URL.add_dods_var(org_opendap_hh);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_hh"
-onclick="org_opendap_hh.handle_projection_change(get_org_opendap_hh)">
+onclick="org_opendap_hh.handle_projection_change(get_org_opendap_hh) "  onfocus="describe_projection()">
 <font size="+1">hh</font>: 32 bit Integer</b><br>
 
 hh <select name="org_opendap_hh_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -443,7 +447,7 @@ DODS_URL.add_dods_var(org_opendap_mm);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_mm"
-onclick="org_opendap_mm.handle_projection_change(get_org_opendap_mm)">
+onclick="org_opendap_mm.handle_projection_change(get_org_opendap_mm) "  onfocus="describe_projection()">
 <font size="+1">mm</font>: 32 bit Integer</b><br>
 
 mm <select name="org_opendap_mm_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -469,7 +473,7 @@ DODS_URL.add_dods_var(org_opendap_ss);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_ss"
-onclick="org_opendap_ss.handle_projection_change(get_org_opendap_ss)">
+onclick="org_opendap_ss.handle_projection_change(get_org_opendap_ss) "  onfocus="describe_projection()">
 <font size="+1">ss</font>: 32 bit Integer</b><br>
 
 ss <select name="org_opendap_ss_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -495,7 +499,7 @@ DODS_URL.add_dods_var(org_opendap_DODS_URL);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_DODS_URL"
-onclick="org_opendap_DODS_URL.handle_projection_change(get_org_opendap_DODS_URL)">
+onclick="org_opendap_DODS_URL.handle_projection_change(get_org_opendap_DODS_URL) "  onfocus="describe_projection()">
 <font size="+1">DODS_URL</font>: string</b><br>
 
 DODS_URL <select name="org_opendap_DODS_URL_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">

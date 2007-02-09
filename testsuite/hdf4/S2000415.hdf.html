@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 13206 2006-02-15 20:16:29Z jimg $
+// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -92,19 +92,23 @@ function help_button() {
 // Helper functions for the form.
 
 function describe_index() {
-   defaultStatus = "Enter start, stride and stop for the array dimension.";
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
 }
 
 function describe_selection() {
-   defaultStatus = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
 }
 
 function describe_operator() {
-   defaultStatus = "Choose a relational operator. Use - to enter a function name).";
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
 }
 
 function describe_projection() {
-   defaultStatus = "Add this variable to the projection.";
+   window.status = "Add this variable to the projection.";
+   return true;
 }
 
 ///////////////////////////////////////////////////////////
@@ -355,7 +359,7 @@ DODS_URL.add_dods_var(org_opendap_WVC_Lat);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_WVC_Lat"
-onclick="org_opendap_WVC_Lat.handle_projection_change(get_org_opendap_WVC_Lat)">
+onclick="org_opendap_WVC_Lat.handle_projection_change(get_org_opendap_WVC_Lat) "  onfocus="describe_projection()">
 <font size="+1">WVC_Lat</font>: Array of 16 bit Integers [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_WVC_Lat_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -391,7 +395,7 @@ DODS_URL.add_dods_var(org_opendap_WVC_Lon);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_WVC_Lon"
-onclick="org_opendap_WVC_Lon.handle_projection_change(get_org_opendap_WVC_Lon)">
+onclick="org_opendap_WVC_Lon.handle_projection_change(get_org_opendap_WVC_Lon) "  onfocus="describe_projection()">
 <font size="+1">WVC_Lon</font>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_WVC_Lon_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -427,7 +431,7 @@ DODS_URL.add_dods_var(org_opendap_Num_Sigma0);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Num_Sigma0"
-onclick="org_opendap_Num_Sigma0.handle_projection_change(get_org_opendap_Num_Sigma0)">
+onclick="org_opendap_Num_Sigma0.handle_projection_change(get_org_opendap_Num_Sigma0) "  onfocus="describe_projection()">
 <font size="+1">Num_Sigma0</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Num_Sigma0_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -463,7 +467,7 @@ DODS_URL.add_dods_var(org_opendap_Num_Beam_12);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Num_Beam_12"
-onclick="org_opendap_Num_Beam_12.handle_projection_change(get_org_opendap_Num_Beam_12)">
+onclick="org_opendap_Num_Beam_12.handle_projection_change(get_org_opendap_Num_Beam_12) "  onfocus="describe_projection()">
 <font size="+1">Num_Beam_12</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Num_Beam_12_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -499,7 +503,7 @@ DODS_URL.add_dods_var(org_opendap_Num_Beam_34);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Num_Beam_34"
-onclick="org_opendap_Num_Beam_34.handle_projection_change(get_org_opendap_Num_Beam_34)">
+onclick="org_opendap_Num_Beam_34.handle_projection_change(get_org_opendap_Num_Beam_34) "  onfocus="describe_projection()">
 <font size="+1">Num_Beam_34</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Num_Beam_34_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -535,7 +539,7 @@ DODS_URL.add_dods_var(org_opendap_Num_Beam_56);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Num_Beam_56"
-onclick="org_opendap_Num_Beam_56.handle_projection_change(get_org_opendap_Num_Beam_56)">
+onclick="org_opendap_Num_Beam_56.handle_projection_change(get_org_opendap_Num_Beam_56) "  onfocus="describe_projection()">
 <font size="+1">Num_Beam_56</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Num_Beam_56_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -571,7 +575,7 @@ DODS_URL.add_dods_var(org_opendap_Num_Beam_78);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Num_Beam_78"
-onclick="org_opendap_Num_Beam_78.handle_projection_change(get_org_opendap_Num_Beam_78)">
+onclick="org_opendap_Num_Beam_78.handle_projection_change(get_org_opendap_Num_Beam_78) "  onfocus="describe_projection()">
 <font size="+1">Num_Beam_78</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Num_Beam_78_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -607,7 +611,7 @@ DODS_URL.add_dods_var(org_opendap_WVC_Quality_Flag);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_WVC_Quality_Flag"
-onclick="org_opendap_WVC_Quality_Flag.handle_projection_change(get_org_opendap_WVC_Quality_Flag)">
+onclick="org_opendap_WVC_Quality_Flag.handle_projection_change(get_org_opendap_WVC_Quality_Flag) "  onfocus="describe_projection()">
 <font size="+1">WVC_Quality_Flag</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_WVC_Quality_Flag_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -642,7 +646,7 @@ DODS_URL.add_dods_var(org_opendap_Mean_Wind);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Mean_Wind"
-onclick="org_opendap_Mean_Wind.handle_projection_change(get_org_opendap_Mean_Wind)">
+onclick="org_opendap_Mean_Wind.handle_projection_change(get_org_opendap_Mean_Wind) "  onfocus="describe_projection()">
 <font size="+1">Mean_Wind</font>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Mean_Wind_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -678,7 +682,7 @@ DODS_URL.add_dods_var(org_opendap_Wind_Speed);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Wind_Speed"
-onclick="org_opendap_Wind_Speed.handle_projection_change(get_org_opendap_Wind_Speed)">
+onclick="org_opendap_Wind_Speed.handle_projection_change(get_org_opendap_Wind_Speed) "  onfocus="describe_projection()">
 <font size="+1">Wind_Speed</font>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]</b><br>
 
 row:<input type="text" name="org_opendap_Wind_Speed_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -720,7 +724,7 @@ DODS_URL.add_dods_var(org_opendap_Wind_Dir);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Wind_Dir"
-onclick="org_opendap_Wind_Dir.handle_projection_change(get_org_opendap_Wind_Dir)">
+onclick="org_opendap_Wind_Dir.handle_projection_change(get_org_opendap_Wind_Dir) "  onfocus="describe_projection()">
 <font size="+1">Wind_Dir</font>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]</b><br>
 
 row:<input type="text" name="org_opendap_Wind_Dir_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -762,7 +766,7 @@ DODS_URL.add_dods_var(org_opendap_Error_Speed);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Error_Speed"
-onclick="org_opendap_Error_Speed.handle_projection_change(get_org_opendap_Error_Speed)">
+onclick="org_opendap_Error_Speed.handle_projection_change(get_org_opendap_Error_Speed) "  onfocus="describe_projection()">
 <font size="+1">Error_Speed</font>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]</b><br>
 
 row:<input type="text" name="org_opendap_Error_Speed_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -804,7 +808,7 @@ DODS_URL.add_dods_var(org_opendap_Error_Dir);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Error_Dir"
-onclick="org_opendap_Error_Dir.handle_projection_change(get_org_opendap_Error_Dir)">
+onclick="org_opendap_Error_Dir.handle_projection_change(get_org_opendap_Error_Dir) "  onfocus="describe_projection()">
 <font size="+1">Error_Dir</font>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]</b><br>
 
 row:<input type="text" name="org_opendap_Error_Dir_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -846,7 +850,7 @@ DODS_URL.add_dods_var(org_opendap_MLE_Likelihood);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_MLE_Likelihood"
-onclick="org_opendap_MLE_Likelihood.handle_projection_change(get_org_opendap_MLE_Likelihood)">
+onclick="org_opendap_MLE_Likelihood.handle_projection_change(get_org_opendap_MLE_Likelihood) "  onfocus="describe_projection()">
 <font size="+1">MLE_Likelihood</font>: Array of 16 bit Integers [row = 0..457][WVC = 0..23][position = 0..3]</b><br>
 
 row:<input type="text" name="org_opendap_MLE_Likelihood_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -887,7 +891,7 @@ DODS_URL.add_dods_var(org_opendap_Num_Ambigs);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Num_Ambigs"
-onclick="org_opendap_Num_Ambigs.handle_projection_change(get_org_opendap_Num_Ambigs)">
+onclick="org_opendap_Num_Ambigs.handle_projection_change(get_org_opendap_Num_Ambigs) "  onfocus="describe_projection()">
 <font size="+1">Num_Ambigs</font>: Array of Bytes [row = 0..457][WVC = 0..23]</b><br>
 
 row:<input type="text" name="org_opendap_Num_Ambigs_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -927,7 +931,7 @@ DODS_URL.add_dods_var(org_opendap_begin__0);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_begin__0"
-onclick="org_opendap_begin__0.handle_projection_change(get_org_opendap_begin__0)">
+onclick="org_opendap_begin__0.handle_projection_change(get_org_opendap_begin__0) "  onfocus="describe_projection()">
 <font size="+1">begin__0</font>: 16 bit Integer</b><br>
 
 begin__0 <select name="org_opendap_begin__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -958,7 +962,7 @@ DODS_URL.add_dods_var(org_opendap_Mean_Time__0);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Mean_Time__0"
-onclick="org_opendap_Mean_Time__0.handle_projection_change(get_org_opendap_Mean_Time__0)">
+onclick="org_opendap_Mean_Time__0.handle_projection_change(get_org_opendap_Mean_Time__0) "  onfocus="describe_projection()">
 <font size="+1">Mean_Time__0</font>: string</b><br>
 
 Mean_Time__0 <select name="org_opendap_Mean_Time__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -985,7 +989,7 @@ DODS_URL.add_dods_var(org_opendap_Low_Wind_Speed_Flag__0);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Low_Wind_Speed_Flag__0"
-onclick="org_opendap_Low_Wind_Speed_Flag__0.handle_projection_change(get_org_opendap_Low_Wind_Speed_Flag__0)">
+onclick="org_opendap_Low_Wind_Speed_Flag__0.handle_projection_change(get_org_opendap_Low_Wind_Speed_Flag__0) "  onfocus="describe_projection()">
 <font size="+1">Low_Wind_Speed_Flag__0</font>: 32 bit Unsigned integer</b><br>
 
 Low_Wind_Speed_Flag__0 <select name="org_opendap_Low_Wind_Speed_Flag__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -1012,7 +1016,7 @@ DODS_URL.add_dods_var(org_opendap_High_Wind_Speed_Flag__0);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_High_Wind_Speed_Flag__0"
-onclick="org_opendap_High_Wind_Speed_Flag__0.handle_projection_change(get_org_opendap_High_Wind_Speed_Flag__0)">
+onclick="org_opendap_High_Wind_Speed_Flag__0.handle_projection_change(get_org_opendap_High_Wind_Speed_Flag__0) "  onfocus="describe_projection()">
 <font size="+1">High_Wind_Speed_Flag__0</font>: 32 bit Unsigned integer</b><br>
 
 High_Wind_Speed_Flag__0 <select name="org_opendap_High_Wind_Speed_Flag__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">

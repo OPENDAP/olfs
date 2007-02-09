@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 13206 2006-02-15 20:16:29Z jimg $
+// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -92,19 +92,23 @@ function help_button() {
 // Helper functions for the form.
 
 function describe_index() {
-   defaultStatus = "Enter start, stride and stop for the array dimension.";
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
 }
 
 function describe_selection() {
-   defaultStatus = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
 }
 
 function describe_operator() {
-   defaultStatus = "Choose a relational operator. Use - to enter a function name).";
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
 }
 
 function describe_projection() {
-   defaultStatus = "Add this variable to the projection.";
+   window.status = "Add this variable to the projection.";
+   return true;
 }
 
 ///////////////////////////////////////////////////////////
@@ -333,7 +337,7 @@ DODS_URL.add_dods_var(org_opendap_Time);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Time"
-onclick="org_opendap_Time.handle_projection_change(get_org_opendap_Time)">
+onclick="org_opendap_Time.handle_projection_change(get_org_opendap_Time) "  onfocus="describe_projection()">
 <font size="+1">Time</font>: 64 bit Real</b><br>
 
 Time <select name="org_opendap_Time_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -359,7 +363,7 @@ DODS_URL.add_dods_var(org_opendap_Depth);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Depth"
-onclick="org_opendap_Depth.handle_projection_change(get_org_opendap_Depth)">
+onclick="org_opendap_Depth.handle_projection_change(get_org_opendap_Depth) "  onfocus="describe_projection()">
 <font size="+1">Depth</font>: 32 bit Real</b><br>
 
 Depth <select name="org_opendap_Depth_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -385,7 +389,7 @@ DODS_URL.add_dods_var(org_opendap_Sea_Temp);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Sea_Temp"
-onclick="org_opendap_Sea_Temp.handle_projection_change(get_org_opendap_Sea_Temp)">
+onclick="org_opendap_Sea_Temp.handle_projection_change(get_org_opendap_Sea_Temp) "  onfocus="describe_projection()">
 <font size="+1">Sea_Temp</font>: 32 bit Real</b><br>
 
 Sea_Temp <select name="org_opendap_Sea_Temp_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -411,7 +415,7 @@ DODS_URL.add_dods_var(org_opendap_Salinity);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Salinity"
-onclick="org_opendap_Salinity.handle_projection_change(get_org_opendap_Salinity)">
+onclick="org_opendap_Salinity.handle_projection_change(get_org_opendap_Salinity) "  onfocus="describe_projection()">
 <font size="+1">Salinity</font>: 32 bit Real</b><br>
 
 Salinity <select name="org_opendap_Salinity_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -437,7 +441,7 @@ DODS_URL.add_dods_var(org_opendap_DO_);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_DO_"
-onclick="org_opendap_DO_.handle_projection_change(get_org_opendap_DO_)">
+onclick="org_opendap_DO_.handle_projection_change(get_org_opendap_DO_) "  onfocus="describe_projection()">
 <font size="+1">DO </font>: 32 bit Real</b><br>
 
 DO  <select name="org_opendap_DO__operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -463,7 +467,7 @@ DODS_URL.add_dods_var(org_opendap_pH);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_pH"
-onclick="org_opendap_pH.handle_projection_change(get_org_opendap_pH)">
+onclick="org_opendap_pH.handle_projection_change(get_org_opendap_pH) "  onfocus="describe_projection()">
 <font size="+1">pH</font>: 32 bit Real</b><br>
 
 pH <select name="org_opendap_pH_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -489,7 +493,7 @@ DODS_URL.add_dods_var(org_opendap_Turbidity);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Turbidity"
-onclick="org_opendap_Turbidity.handle_projection_change(get_org_opendap_Turbidity)">
+onclick="org_opendap_Turbidity.handle_projection_change(get_org_opendap_Turbidity) "  onfocus="describe_projection()">
 <font size="+1">Turbidity</font>: 32 bit Real</b><br>
 
 Turbidity <select name="org_opendap_Turbidity_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -515,7 +519,7 @@ DODS_URL.add_dods_var(org_opendap_Air_Temp);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Air_Temp"
-onclick="org_opendap_Air_Temp.handle_projection_change(get_org_opendap_Air_Temp)">
+onclick="org_opendap_Air_Temp.handle_projection_change(get_org_opendap_Air_Temp) "  onfocus="describe_projection()">
 <font size="+1">Air_Temp</font>: 32 bit Real</b><br>
 
 Air_Temp <select name="org_opendap_Air_Temp_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -541,7 +545,7 @@ DODS_URL.add_dods_var(org_opendap_Wind_Speed);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Wind_Speed"
-onclick="org_opendap_Wind_Speed.handle_projection_change(get_org_opendap_Wind_Speed)">
+onclick="org_opendap_Wind_Speed.handle_projection_change(get_org_opendap_Wind_Speed) "  onfocus="describe_projection()">
 <font size="+1">Wind_Speed</font>: 32 bit Real</b><br>
 
 Wind_Speed <select name="org_opendap_Wind_Speed_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -567,7 +571,7 @@ DODS_URL.add_dods_var(org_opendap_Wind_Direction);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Wind_Direction"
-onclick="org_opendap_Wind_Direction.handle_projection_change(get_org_opendap_Wind_Direction)">
+onclick="org_opendap_Wind_Direction.handle_projection_change(get_org_opendap_Wind_Direction) "  onfocus="describe_projection()">
 <font size="+1">Wind_Direction</font>: 32 bit Real</b><br>
 
 Wind_Direction <select name="org_opendap_Wind_Direction_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -593,7 +597,7 @@ DODS_URL.add_dods_var(org_opendap_Barometric_Pres);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Barometric_Pres"
-onclick="org_opendap_Barometric_Pres.handle_projection_change(get_org_opendap_Barometric_Pres)">
+onclick="org_opendap_Barometric_Pres.handle_projection_change(get_org_opendap_Barometric_Pres) "  onfocus="describe_projection()">
 <font size="+1">Barometric_Pres</font>: 32 bit Real</b><br>
 
 Barometric_Pres <select name="org_opendap_Barometric_Pres_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
@@ -619,7 +623,7 @@ DODS_URL.add_dods_var(org_opendap_Solar_Radiation);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_Solar_Radiation"
-onclick="org_opendap_Solar_Radiation.handle_projection_change(get_org_opendap_Solar_Radiation)">
+onclick="org_opendap_Solar_Radiation.handle_projection_change(get_org_opendap_Solar_Radiation) "  onfocus="describe_projection()">
 <font size="+1">Solar_Radiation</font>: 32 bit Real</b><br>
 
 Solar_Radiation <select name="org_opendap_Solar_Radiation_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">

@@ -1,16 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<getAscii>
-    <response>
-        <Administrator>ndp@opendap.org</Administrator>
-        <BESException>
-            <Type>TransmitProblem</Type>
-            <Message>Failed to read data: Wrong number of arguments to geogrid(), there must be at least five
+Error {
+    code = 1001;
+    message = "Failed to read data: Wrong number of arguments to geogrid(), there must be at least five
 arguments, A Grid followed by the left-top and right-bottom points of a
-longitude-latitude bounding box.(1001)</Message>
-            <Location>
-                <File>BESAsciiTransmit.cc</File>
-                <Line>138</Line>
-            </Location>
-        </BESException>
-    </response>
-</getAscii>
+longitude-latitude bounding box.(1001)";
+};

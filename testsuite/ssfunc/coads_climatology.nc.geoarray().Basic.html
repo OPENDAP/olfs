@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 13206 2006-02-15 20:16:29Z jimg $
+// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -92,19 +92,23 @@ function help_button() {
 // Helper functions for the form.
 
 function describe_index() {
-   defaultStatus = "Enter start, stride and stop for the array dimension.";
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
 }
 
 function describe_selection() {
-   defaultStatus = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
 }
 
 function describe_operator() {
-   defaultStatus = "Choose a relational operator. Use - to enter a function name).";
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
 }
 
 function describe_projection() {
-   defaultStatus = "Add this variable to the projection.";
+   window.status = "Add this variable to the projection.";
+   return true;
 }
 
 ///////////////////////////////////////////////////////////
@@ -331,7 +335,7 @@ DODS_URL.add_dods_var(org_opendap_COADSX);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_COADSX"
-onclick="org_opendap_COADSX.handle_projection_change(get_org_opendap_COADSX)">
+onclick="org_opendap_COADSX.handle_projection_change(get_org_opendap_COADSX) "  onfocus="describe_projection()">
 <font size="+1">COADSX</font>: Array of 64 bit Reals [COADSX = 0..179]</b><br>
 
 COADSX:<input type="text" name="org_opendap_COADSX_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -360,7 +364,7 @@ DODS_URL.add_dods_var(org_opendap_COADSY);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_COADSY"
-onclick="org_opendap_COADSY.handle_projection_change(get_org_opendap_COADSY)">
+onclick="org_opendap_COADSY.handle_projection_change(get_org_opendap_COADSY) "  onfocus="describe_projection()">
 <font size="+1">COADSY</font>: Array of 64 bit Reals [COADSY = 0..89]</b><br>
 
 COADSY:<input type="text" name="org_opendap_COADSY_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -388,7 +392,7 @@ DODS_URL.add_dods_var(org_opendap_TIME);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_TIME"
-onclick="org_opendap_TIME.handle_projection_change(get_org_opendap_TIME)">
+onclick="org_opendap_TIME.handle_projection_change(get_org_opendap_TIME) "  onfocus="describe_projection()">
 <font size="+1">TIME</font>: Array of 64 bit Reals [TIME = 0..11]</b><br>
 
 TIME:<input type="text" name="org_opendap_TIME_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
@@ -417,9 +421,27 @@ DODS_URL.add_dods_var(org_opendap_SST);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_SST"
-onclick="org_opendap_SST.handle_projection_change(get_org_opendap_SST)">
+onclick="org_opendap_SST.handle_projection_change(get_org_opendap_SST) "  onfocus="describe_projection()">
 <font size="+1">SST</font>: Grid</b><br>
 
+TIME:<input type="text" name="org_opendap_SST_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_SST.add_dim(12);
+// -->
+</script>
+COADSY:<input type="text" name="org_opendap_SST_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_SST.add_dim(90);
+// -->
+</script>
+COADSX:<input type="text" name="org_opendap_SST_2" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_SST.add_dim(180);
+// -->
+</script>
 <br>
 <textarea name="SST_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
@@ -441,9 +463,27 @@ DODS_URL.add_dods_var(org_opendap_AIRT);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_AIRT"
-onclick="org_opendap_AIRT.handle_projection_change(get_org_opendap_AIRT)">
+onclick="org_opendap_AIRT.handle_projection_change(get_org_opendap_AIRT) "  onfocus="describe_projection()">
 <font size="+1">AIRT</font>: Grid</b><br>
 
+TIME:<input type="text" name="org_opendap_AIRT_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_AIRT.add_dim(12);
+// -->
+</script>
+COADSY:<input type="text" name="org_opendap_AIRT_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_AIRT.add_dim(90);
+// -->
+</script>
+COADSX:<input type="text" name="org_opendap_AIRT_2" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_AIRT.add_dim(180);
+// -->
+</script>
 <br>
 <textarea name="AIRT_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
@@ -465,9 +505,27 @@ DODS_URL.add_dods_var(org_opendap_UWND);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_UWND"
-onclick="org_opendap_UWND.handle_projection_change(get_org_opendap_UWND)">
+onclick="org_opendap_UWND.handle_projection_change(get_org_opendap_UWND) "  onfocus="describe_projection()">
 <font size="+1">UWND</font>: Grid</b><br>
 
+TIME:<input type="text" name="org_opendap_UWND_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_UWND.add_dim(12);
+// -->
+</script>
+COADSY:<input type="text" name="org_opendap_UWND_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_UWND.add_dim(90);
+// -->
+</script>
+COADSX:<input type="text" name="org_opendap_UWND_2" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_UWND.add_dim(180);
+// -->
+</script>
 <br>
 <textarea name="UWND_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
@@ -489,9 +547,27 @@ DODS_URL.add_dods_var(org_opendap_VWND);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_VWND"
-onclick="org_opendap_VWND.handle_projection_change(get_org_opendap_VWND)">
+onclick="org_opendap_VWND.handle_projection_change(get_org_opendap_VWND) "  onfocus="describe_projection()">
 <font size="+1">VWND</font>: Grid</b><br>
 
+TIME:<input type="text" name="org_opendap_VWND_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_VWND.add_dim(12);
+// -->
+</script>
+COADSY:<input type="text" name="org_opendap_VWND_1" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_VWND.add_dim(90);
+// -->
+</script>
+COADSX:<input type="text" name="org_opendap_VWND_2" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_VWND.add_dim(180);
+// -->
+</script>
 <br>
 <textarea name="VWND_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
