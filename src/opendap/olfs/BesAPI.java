@@ -799,7 +799,7 @@ public class BesAPI {
         msg += "]";
 
 
-        log.error("Exception Message: " + msg);
+        log.warn("Exception Message: " + msg);
 
         return msg;
     }
@@ -1050,6 +1050,8 @@ public class BesAPI {
         }
         finally{
             if (trouble) {
+                log.error("besGetTransaction(): Problem encountered," +
+                        " discarding OPeNDAPCLient. ",trouble);
                 discardClient(oc);
             }
             else {
@@ -1087,8 +1089,8 @@ public class BesAPI {
         }
         finally{
             if (trouble) {
-                log.error("Problem encountered," +
-                        " discarding OPeNDAPCLient..");
+                log.error("besShowTransaction(): Problem encountered," +
+                        " discarding OPeNDAPCLient. ",trouble);
                 discardClient(oc);
             }
             else {

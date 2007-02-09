@@ -256,7 +256,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 //            throw new IOException("Returned dataset name does not match requested name.\n" +
 //                    "Requested: " + besPath + "  " +
 //                    "Returned: " + topDataset.getChild("name").getTextTrim());
-            log.error("Returned dataset name does not match requested name.\n" +
+            log.warn("Returned dataset name does not match requested name.\n" +
                     "Requested: " + besPath + "  " +
                     "Returned: " + topDataset.getChild("name").getTextTrim());
         }
@@ -284,7 +284,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 //                    "Requested: " + besPath + "  " +
 //                    "Returned: " + topDataset.getChild("name").getTextTrim());
 
-            log.error("Returned dataset name does not match requested name.\n" +
+            log.warn("Returned dataset name does not match requested name.\n" +
                     "Requested: " + besPath + "  " +
                     "Returned: " + topDataset.getChild("name").getTextTrim());
 

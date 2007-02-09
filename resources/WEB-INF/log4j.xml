@@ -2,13 +2,17 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <appender name="Stdout" class="org.apache.log4j.ConsoleAppender">
-    <param name="Threshold" value="ALL" />
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
-      <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
-    </layout>
-  </appender>
+    <appender name="Stdout" class="org.apache.log4j.ConsoleAppender">
+      <param name="Threshold" value="ALL" />
+      <layout class="org.apache.log4j.PatternLayout">
+        <param name="ConversionPattern" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
+        <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
+      </layout>
+    </appender>
+
+    <appender name="devNull" class="org.apache.log4j.varia.NullAppender">
+      <param name="Threshold" value="ALL" />
+    </appender>
 
   <!--
     Example:
