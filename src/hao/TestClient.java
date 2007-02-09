@@ -88,7 +88,7 @@ public class TestClient {
             }
 
             if (timeoutStr != null) {
-                timeoutVal = Integer.valueOf(timeoutStr).intValue();
+                // jhrg timeoutVal = Integer.valueOf(timeoutStr).intValue();
             }
         }
         catch (ParseException pe) {
