@@ -41,8 +41,8 @@ public class TestClient {
         String outputStr = null;
         File outputFile = null;
         String timeoutStr;
-        int timeoutVal = 0;
-        boolean debug = false;
+        // jhrg int timeoutVal = 0;
+        // jhrg boolean debug = false;
 
         PosixParser pp = new PosixParser();
 
@@ -52,7 +52,7 @@ public class TestClient {
         Option opt_i = new Option("i", "inputFile", true, "");
         Option opt_f = new Option("f", "outputFile", true, "");
         Option opt_t = new Option("t", "timeout", true, "");
-        Option opt_d = new Option("d", "debug", false, "");
+        // jhrg Option opt_d = new Option("d", "debug", false, "");
 
         Options opts = new Options();
         opts.addOption(opt_h);
@@ -63,7 +63,7 @@ public class TestClient {
         opts.addOption(opt_t);
 
         boolean badUsage = false;
-        String msg = "";
+        // jhrg String msg = "";
 
         try {
             CommandLine cl = pp.parse(opts, args);
@@ -73,7 +73,7 @@ public class TestClient {
             inputStr = cl.getOptionValue("i");
             outputStr = cl.getOptionValue("f");
             timeoutStr = cl.getOptionValue("t");
-            debug = cl.hasOption("d");
+            // jhrg debug = cl.hasOption("d");
 
             if (hostStr == null) {
                 System.out.println("host must be specified");
