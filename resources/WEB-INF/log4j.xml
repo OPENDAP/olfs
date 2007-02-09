@@ -3,165 +3,155 @@
 <log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
     <appender name="Stdout" class="org.apache.log4j.ConsoleAppender">
-      <param name="Threshold" value="ALL" />
-      <layout class="org.apache.log4j.PatternLayout">
-        <param name="ConversionPattern" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
-        <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
-      </layout>
+        <param name="Threshold" value="ALL"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
+            <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
+        </layout>
     </appender>
 
     <appender name="devNull" class="org.apache.log4j.varia.NullAppender">
-      <param name="Threshold" value="ALL" />
+        <param name="Threshold" value="ALL"/>
     </appender>
 
-  <!--
-    Example:
-    2005-04-18T11:33:43 -0600 [    359843 -        395] DEBUG - thredds.servlet.CatGenServlet - doGet():
-  -->
-  <appender name="coreServlet" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="${logdir}/coreServlet.log"/>
-    <param name="MaxFileSize" value="20MB"/>
-    <param name="MaxBackupIndex" value="5"/>
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
-      <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
-    </layout>
-  </appender>
+    <!--
+      Example:
+      2005-04-18T11:33:43 -0600 [    359843 -        395] DEBUG - thredds.servlet.CatGenServlet - doGet():
+    -->
+    <appender name="coreServlet" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${logdir}/coreServlet.log"/>
+        <param name="MaxFileSize" value="20MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
+            <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
+        </layout>
+    </appender>
 
-  <!--
-    Generate an access log similar to Apache server access_log.
-    139.140.167.4 - - [01/Mar/2005:00:00:00 -0700] "GET /cgi-bin/dods/DODS-3.2.1/nph-dods/dods/model/2005030100_gfs_211.nc.dods?u[22:22][0:28][0:64][0:92] HTTP/1.1" 200 -
-  -->
-  <appender name="HyraxAccessLog" class="org.apache.log4j.DailyRollingFileAppender">
-    <param name="File" value="${logdir}/HyraxAccess.log"/>
-    <param name="DatePattern" value=".yyyy-MM"/>
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] %X{request} %m%n"/>
-    </layout>
-  </appender>
+    <!--
+      Generate an access log similar to Apache server access_log.
+      139.140.167.4 - - [01/Mar/2005:00:00:00 -0700] "GET /cgi-bin/dods/DODS-3.2.1/nph-dods/dods/model/2005030100_gfs_211.nc.dods?u[22:22][0:28][0:64][0:92] HTTP/1.1" 200 -
+    -->
+    <appender name="HyraxAccessLog"
+              class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="${logdir}/HyraxAccess.log"/>
+        <param name="DatePattern" value=".yyyy-MM"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] %X{request} %m%n"/>
+        </layout>
+    </appender>
 
-  <!-- keep track of Cache messages in a seperatefile. runs once a day -->
-  <appender name="cacheLog" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="${logdir}/cache.log"/>
-    <param name="MaxFileSize" value="100KB"/>
-    <param name="MaxBackupIndex" value="2"/>
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="[%d{dd/MMM/yyyy:HH:mm:ss}] %m%n"/>
-    </layout>
-  </appender>
+    <!-- keep track of Cache messages in a seperatefile. runs once a day -->
+    <appender name="cacheLog" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${logdir}/cache.log"/>
+        <param name="MaxFileSize" value="100KB"/>
+        <param name="MaxBackupIndex" value="2"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="[%d{dd/MMM/yyyy:HH:mm:ss}] %m%n"/>
+        </layout>
+    </appender>
 
-  <!--
-    Example:
-    2005-04-18T11:33:43 -0600 [    359843 -        395] DEBUG - thredds.servlet.CatGenServlet - doGet():
-  -->
-  <appender name="dqcServletRedirect" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="${logdir}/dqcServletRedirect.log"/>
-    <param name="MaxFileSize" value="1MB"/>
-    <param name="MaxBackupIndex" value="5"/>
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
-      <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
-    </layout>
-  </appender>
+    <!--
+      Example:
+      2005-04-18T11:33:43 -0600 [    359843 -        395] DEBUG - thredds.servlet.CatGenServlet - doGet():
+    -->
+    <appender name="dqcServletRedirect"
+              class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${logdir}/dqcServletRedirect.log"/>
+        <param name="MaxFileSize" value="1MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
+            <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
+        </layout>
+    </appender>
 
-  <logger name="cacheLogger">
-    <level value="ALL"/>
-    <appender-ref ref="cacheLog"/>
-  </logger>
-
-  <logger name="dods.servers.netcdf">
-    <level value="INFO"/>
-    <appender-ref ref="Stdout"/>
-  </logger>
-
-  <logger name="thredds">
-    <level value="INFO"/>
-    <appender-ref ref="Stdout"/>
-  </logger>
-
-  <logger name="threddsAccessLogger">
-    <level value="ALL"/>
-    <appender-ref ref="Stdout"/>
-  </logger>
-
-    <logger name="ucar.nc2">
-      <level value="ALL"/>
-      <appender-ref ref="Stdout"/>
+    <logger name="cacheLogger">
+        <level value="ALL"/>
+        <appender-ref ref="cacheLog"/>
     </logger>
 
+
+    <logger name="thredds">
+        <level value="INFO"/>
+        <appender-ref ref="devNull"/>
+    </logger>
+
+    <logger name="threddsAccessLogger">
+        <level value="ALL"/>
+        <appender-ref ref="Stdout"/>
+    </logger>
 
 
     <!-- OPeNDAP Hyrax Logging -->
 
     <!-- Default Logging level -->
     <logger name="opendap">
-      <level value="INFO"/>
-      <appender-ref ref="Stdout"/>
+        <level value="INFO"/>
+        <appender-ref ref="devNull"/>
     </logger>
 
 
     <!-- CoreServlet Logging -->
     <logger name="opendap.coreServlet">
-      <level value="INFO"/>
+        <level value="INFO"/>
     </logger>
 
     <logger name="opendap.coreServlet.DispatchServlet">
-      <level value="INFO"/>
+        <level value="INFO"/>
     </logger>
 
     <logger name="opendap.coreServlet.ReqInfo">
-      <level value="INFO"/>
+        <level value="INFO"/>
     </logger>
 
     <logger name="opendap.coreServlet.DocServlet">
-      <level value="INFO"/>
+        <level value="INFO"/>
     </logger>
-
 
 
     <!-- OLFS Logging. Includes BesAPI -->
     <logger name="opendap.olfs">
-      <level value="INFO"/>
+        <level value="INFO"/>
     </logger>
 
     <logger name="opendap.olfs.BESCrawlableDataset">
-      <level value="INFO"/>
+        <level value="INFO"/>
     </logger>
 
 
+    <!-- Access/Performance Logging -->
     <logger name="HyraxAccess">
-      <level value="ALL"/>
+        <level value="ALL"/>
         <appender-ref ref="HyraxAccessLog"/>
         <appender-ref ref="Stdout"/>
     </logger>
 
     <logger name="DocServletAccess">
-      <level value="ALL"/>
+        <level value="ALL"/>
         <appender-ref ref="Stdout"/>
     </logger>
 
 
+    <!-- Initialize a few loggers to make the servlet debug web interface more convenient. -->
+    <logger name="thredds.catalog"/>
+    <logger name="thredds.cataloggen"/>
+    <logger name="thredds.dqc"/>
+    <logger name="thredds.servlet"/>
 
+    <logger name="thredds.dqc.server.DqcServletRedirect">
+        <level value="ALL"/>
+        <appender-ref ref="dqcServletRedirect"/>
+    </logger>
 
-
-
-
-
-
-  <!-- Initialize a few loggers to make the servlet debug web interface more convenient. -->
-  <logger name="thredds.catalog"/>
-  <logger name="thredds.cataloggen"/>
-  <logger name="thredds.dqc"/>
-  <logger name="thredds.servlet"/>
-
-  <logger name="thredds.dqc.server.DqcServletRedirect">
-    <level value="ALL"/>
-    <appender-ref ref="dqcServletRedirect"/>
-  </logger>
-
-  <!--root>
-    <level value="ALL"/>
-    <appender-ref ref="Stdout"/>
-  </root -->
+    <!--root>
+     <level value="ALL"/>
+     <appender-ref ref="Stdout"/>
+   </root -->
 
 </log4j:configuration>
