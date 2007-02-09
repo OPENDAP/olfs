@@ -201,12 +201,13 @@ public class PerfLog {
         Logger log = org.slf4j.LoggerFactory.getLogger(logName);
 
 
-        log.info(   "Request Completed - " +
+        log.info(   "Request Completed - [" +
                     resCode +
-                    " - " +
+                    "] [" +
                     resSizeInBytes +
-                    " - " +
-                    duration);
+                    "] [" +
+                    duration +
+                    "]");
     }
 
 }

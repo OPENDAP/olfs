@@ -860,6 +860,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Content-Description", "dods_help");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
+        response.setStatus(HttpServletResponse.SC_OK);
 
 
         PrintWriter pw = new PrintWriter(
@@ -871,7 +872,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         pw.flush();
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
     }
 
@@ -897,11 +897,11 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
             log.debug("   MIME type: " + mType + "  ");
         }
 
+        response.setStatus(HttpServletResponse.SC_OK);
 
 
         ServletOutputStream sos = response.getOutputStream();
         BesAPI.writeFile(name, sos, BesAPI.DAP2_ERRORS);
-        response.setStatus(HttpServletResponse.SC_OK);
 
 
     }

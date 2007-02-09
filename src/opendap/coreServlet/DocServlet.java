@@ -199,7 +199,7 @@ public class DocServlet extends HttpServlet {
 
         }
         else
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_PERMANENTLY, -1, "DocServletAccess");
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
 
 
     }

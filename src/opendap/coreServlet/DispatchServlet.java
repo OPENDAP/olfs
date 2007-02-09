@@ -82,8 +82,6 @@ public class DispatchServlet extends HttpServlet {
     private int HitCounter = 0;
 
 
-
-
     private long threddsInitTime;
     private ReentrantLock threddsUpdateLock;
 
@@ -94,8 +92,6 @@ public class DispatchServlet extends HttpServlet {
 
     protected DataRootHandler dataRootHandler;
     protected org.slf4j.Logger log;
-
-
 
 
     protected String getDocsPath() {
@@ -200,19 +196,18 @@ public class DispatchServlet extends HttpServlet {
         }
 
     }
-    /***************************************************************************/
+
+    /**
+     * ***********************************************************************
+     */
 
 
-    private void initLogging(){
+    private void initLogging() {
         thredds.servlet.ServletUtil.initLogging(this);
         PerfLog.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     }
-
-
-
-
 
 
     /**
@@ -228,9 +223,8 @@ public class DispatchServlet extends HttpServlet {
         thredds.servlet.ServletUtil.initDebugging(this); // read debug flags
 
 
-
         InvDatasetScan.setContext(contextPath); // This gets your context path
-                                                // from web.xml above.
+        // from web.xml above.
 
         // This allows you to specify which servlet handles catalog requests.
         // We set it to "/catalog". Is "/ts" the servlet path for you? If so,
@@ -299,32 +293,30 @@ public class DispatchServlet extends HttpServlet {
     /**
      * Gets the last modified date of the requested resource. Because the data handler is really
      * the only entity capable of determining the last modified dat the job is passed  through to it.
+     *
      * @param req The current request
      * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
-     * since midnight January 1, 1970 GMT
+     *         since midnight January 1, 1970 GMT
      */
     protected long getLastModified(HttpServletRequest req) {
         return odh.getLastModified(req);
     }
 
 
-
-
     /**
      * Performs dispatching for "special" server requests. This server supports several diagnositic responses:
      * <ui>
-     *     <li> version - returns the OPeNDAP version document (XML) </li>
-     *     <li> help - returns the help page for Hyrax  </li>
-     *     <li> systemproperties - returns an html document describing the state of the "system" </li>
-     *     <li> debug -   </li>
-     *     <li> status -    </li>
-     *     <li> contents.html -  Returns the OPeNDAP directory view of a collection (as an HTML document)</li>
-     *     <li> catalog.html - Returns the THREDDS catalog view of a collection (as an HTML document)</li>
-     *     <li> catalog.xml - Returns the THREDDS catalog of a collection (as an XML document)</li>
+     * <li> version - returns the OPeNDAP version document (XML) </li>
+     * <li> help - returns the help page for Hyrax  </li>
+     * <li> systemproperties - returns an html document describing the state of the "system" </li>
+     * <li> debug -   </li>
+     * <li> status -    </li>
+     * <li> contents.html -  Returns the OPeNDAP directory view of a collection (as an HTML document)</li>
+     * <li> catalog.html - Returns the THREDDS catalog view of a collection (as an HTML document)</li>
+     * <li> catalog.xml - Returns the THREDDS catalog of a collection (as an XML document)</li>
      * </ui>
      *
-     *
-     * @param request The current request
+     * @param request  The current request
      * @param response The response to which we write.
      * @return true if the request was handled as a special request, false otherwise.
      * @throws Exception When things go awry.
@@ -337,6 +329,7 @@ public class DispatchServlet extends HttpServlet {
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
+        boolean threddsCatalog = false;
         boolean specialRequest = false;
 
         if (dataSource != null) {
@@ -401,19 +394,21 @@ public class DispatchServlet extends HttpServlet {
                     specialRequest = true;
 
                 } else if ( //  THREDDS Catalog ?
-                        dataSetName.equalsIgnoreCase("catalog") && requestSuffix != null &&
-                                (requestSuffix.equalsIgnoreCase("html") || requestSuffix.equalsIgnoreCase("xml"))
+                        dataSetName.equalsIgnoreCase("catalog") &&
+                        requestSuffix != null &&
+                        (requestSuffix.equalsIgnoreCase("html") || requestSuffix.equalsIgnoreCase("xml"))
                         ) {
 
-                    if (getThreddsCatalog(request, response)) {
-                        log.info("Sent Catalog");
-                        specialRequest = true;
-                    }
+                    threddsCatalog = getThreddsCatalog(request, response);
                 }
             }
         }
 
-        return specialRequest;
+
+        if(specialRequest && !threddsCatalog)
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+
+        return specialRequest || threddsCatalog;
 
     }
 
@@ -421,25 +416,24 @@ public class DispatchServlet extends HttpServlet {
     /**
      * Performs dispatching for OPeNDAP data requests. The OPeNDAP response suite consists of:
      * <ui>
-     *     <li>dds - The OPeNDAP Data Description Service document for the requested dataset. </li>
-     *     <li>das - The OPeNDAP Data Attribute Service document for the requested dataset. </li>
-     *     <li>ddx - The OPeNDAP DDX document, an XML document that combines the DDS and the DAS. </li>
-     *     <li>dods - The OPeNDAP DAP2 data service. Returns data to the user as described in
-     *                the DAP2 specification </li>
-     *     <li>ascii - The requested data as columns of ASCII values. </li>
-     *     <li>info - An HTML document providing a easy to read view of the DDS and DAS information. </li>
-     *     <li>html - The HTML request form from which users can choose wich components of a dataset they wish
-     *                to retrieve. </li>
+     * <li>dds - The OPeNDAP Data Description Service document for the requested dataset. </li>
+     * <li>das - The OPeNDAP Data Attribute Service document for the requested dataset. </li>
+     * <li>ddx - The OPeNDAP DDX document, an XML document that combines the DDS and the DAS. </li>
+     * <li>dods - The OPeNDAP DAP2 data service. Returns data to the user as described in
+     * the DAP2 specification </li>
+     * <li>ascii - The requested data as columns of ASCII values. </li>
+     * <li>info - An HTML document providing a easy to read view of the DDS and DAS information. </li>
+     * <li>html - The HTML request form from which users can choose wich components of a dataset they wish
+     * to retrieve. </li>
      * </ui>
      *
-     *
-     * @param request .
+     * @param request  .
      * @param response .
      * @return true if the request was handled as an OPeNDAP service request, false otherwise.
      * @throws Exception .
      */
     public boolean dataSetDispatch(HttpServletRequest request,
-                                  HttpServletResponse response) throws Exception {
+                                   HttpServletResponse response) throws Exception {
 
 
         String dataSource = ReqInfo.getDataSource(request);
@@ -451,77 +445,88 @@ public class DispatchServlet extends HttpServlet {
 
         if (dsi.sourceExists()) {
 
-            if (requestSuffix!=null && dsi.isDataset()) {
+            if (requestSuffix != null && dsi.isDataset()) {
 
                 if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")
                         ) {
                     odh.sendDDS(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent DDS");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else if ( // DAS Response?
                         requestSuffix.equalsIgnoreCase("das")
                         ) {
                     odh.sendDAS(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent DAS");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else if (  // DDX Response?
                         requestSuffix.equalsIgnoreCase("ddx")
                         ) {
                     odh.sendDDX(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent DDX");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else if ( // Blob Response?
                         requestSuffix.equalsIgnoreCase("blob")
                         ) {
                     //doGetBLOB(request, response, rs);
                     badURL(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent BAD URL Response because they asked for a Blob. Bad User!");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else if ( // DAP2 (aka .dods) Response?
                         requestSuffix.equalsIgnoreCase("dods")
                         ) {
                     odh.sendDAP2Data(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent DAP2 Data");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else if (  // ASCII Data Response.
                         requestSuffix.equalsIgnoreCase("asc") ||
                                 requestSuffix.equalsIgnoreCase("ascii")
                         ) {
                     odh.sendASCII(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent ASCII");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else if (  // Info Response?
                         requestSuffix.equalsIgnoreCase("info")
                         ) {
                     odh.sendInfo(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent Info");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
-                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
+                } else
+                if (  //HTML Request Form (aka The Interface From Hell) Response?
                         requestSuffix.equalsIgnoreCase("html") ||
                                 requestSuffix.equalsIgnoreCase("htm")
                         ) {
                     odh.sendHTMLRequestForm(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent HTML Request Form");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
 
                 } else if (requestSuffix.equals("")) {
                     badURL(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent BAD URL (missing Suffix)");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
 
                 } else {
                     badURL(request, response);
-                    isDataRequest  = true;
+                    isDataRequest = true;
                     log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
                 }
 
             }
@@ -536,14 +541,14 @@ public class DispatchServlet extends HttpServlet {
      * Performs dispatching for file requests. If a request is not for a special service or an OPeNDAP service
      * then we attempt to resolve the request to a "file" located within the context of the data handler and
      * return it's contents.
-     * @param request .
+     *
+     * @param request  .
      * @param response .
      * @return true if the request was serviced as a file request, false otherwise.
      * @throws Exception .
      */
     public boolean fileDispatch(HttpServletRequest request,
-                                  HttpServletResponse response) throws Exception {
-
+                                HttpServletResponse response) throws Exception {
 
 
         String fullSourceName = ReqInfo.getFullSourceName(request);
@@ -556,6 +561,7 @@ public class DispatchServlet extends HttpServlet {
             if (dsi.isCollection()) {
                 if (odh.useOpendapDirectoryView()) {
                     odh.sendDir(request, response);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
                 } else {
                     getThreddsCatalog(request, response);
                 }
@@ -564,8 +570,10 @@ public class DispatchServlet extends HttpServlet {
 
                 if (!dsi.isDataset() || odh.allowDirectDataSourceAccess()) {
                     odh.sendFile(request, response);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
                 } else {
                     sendDirectAccessDenied(request, response);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_FORBIDDEN, -1, "HyraxAccess");
                 }
             }
             isFileResponse = true;
@@ -575,7 +583,6 @@ public class DispatchServlet extends HttpServlet {
         return isFileResponse;
 
     }
-
 
 
     /**
@@ -610,7 +617,7 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        PerfLog.logServerAccessStart( request,"HyraxAccess");
+        PerfLog.logServerAccessStart(request, "HyraxAccess");
 
 
         try {
@@ -621,7 +628,7 @@ public class DispatchServlet extends HttpServlet {
 
             synchronized (syncLock) {
                 long reqno = HitCounter++;
-                log.debug(Util.showRequest(request,reqno));
+                log.debug(Util.showRequest(request, reqno));
 
                 log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
@@ -629,12 +636,12 @@ public class DispatchServlet extends HttpServlet {
             } // synch
 
 
-
             if (!specialRequestDispatch(request, response)) {
-                if (!dataSetDispatch(request, response)){
-                    if(!fileDispatch(request,response)){
+                if (!dataSetDispatch(request, response)) {
+                    if (!fileDispatch(request, response)) {
                         sendResourceNotFound(request, response);
                         log.info("Sent Resource Not Found (404) - nothing left to check.");
+                        PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
                     }
 
                 }
@@ -642,10 +649,6 @@ public class DispatchServlet extends HttpServlet {
 
         } catch (Throwable e) {
             OPeNDAPException.anyExceptionHandler(e, response);
-        }
-        finally {
-            PerfLog.logServerAccessEnd( 0,-1,"HyraxAccess");
-
         }
 
 
@@ -666,32 +669,39 @@ public class DispatchServlet extends HttpServlet {
     private boolean getThreddsCatalog(HttpServletRequest req, HttpServletResponse res)
             throws Exception {
 
-        ServletUtil.logServerAccessSetup( req);
+        ServletUtil.logServerAccessSetup(req);
 
         if ((req.getPathInfo() == null)) {
             String newPath = req.getRequestURL() + "/";
             res.sendRedirect(newPath);
             log.info("Sent THREDDS redirect to avoid a null valued return to request.getPathInfo().");
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY, -1, "HyraxAccess");
             return true;
         }
 
 
         threddsUpdateLock.lock();
-        try{
-            String masterCatalog = ServletUtil.getContentPath(this)+"catalog.xml";
+        try {
+            String masterCatalog = ServletUtil.getContentPath(this) + "catalog.xml";
             File f = new File(masterCatalog);
-            if(f.lastModified()> threddsInitTime){
+            if (f.lastModified() > threddsInitTime) {
                 threddsInitTime = f.lastModified();
                 dataRootHandler.reinit();
                 log.info(" **********  THREDDS reinitialized.  ");
             }
         }
-        finally{
+        finally {
             threddsUpdateLock.unlock();
         }
 
+        boolean isCatalog = dataRootHandler.processReqForCatalog(req, res);
 
-        return dataRootHandler.processReqForCatalog(req, res);
+        if (isCatalog) {
+            log.info("Sent THREDDS catalog (xml/html)");
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+        }
+
+        return isCatalog;
 
     }
 
@@ -716,6 +726,7 @@ public class DispatchServlet extends HttpServlet {
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
+        response.setStatus(HttpServletResponse.SC_OK);
 
         PrintWriter pw = new PrintWriter(response.getOutputStream());
         pw.println("<title>Server Status</title>");
@@ -723,7 +734,6 @@ public class DispatchServlet extends HttpServlet {
         printStatus(pw);
         pw.println("</ul></body>");
         pw.flush();
-        response.setStatus(HttpServletResponse.SC_OK);
 
     }
 
@@ -783,13 +793,12 @@ public class DispatchServlet extends HttpServlet {
         pw.flush();
 
 
-
     }
     /***************************************************************************/
 
 
     /**
-     * @param request .
+     * @param request  .
      * @param response .
      * @throws IOException
      * @throws ServletException
@@ -822,19 +831,18 @@ public class DispatchServlet extends HttpServlet {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String topLevel = request.getRequestURL().substring(0,request.getRequestURL().lastIndexOf(request.getPathInfo()));
+        String topLevel = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf(request.getPathInfo()));
 
         pw.println("<h2>Resource Not Found</h2>");
-        pw.println("<p>The URL <i>'"+request.getRequestURL()+"'</i> does not describe a resource that can be found on this server.</p>");
+        pw.println("<p>The URL <i>'" + request.getRequestURL() + "'</i> does not describe a resource that can be found on this server.</p>");
         pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='"+topLevel+"'>"+topLevel+"</a></p>");
+        pw.println("<p><a href='" + topLevel + "'>" + topLevel + "</a></p>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
         pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
 
         pw.flush();
-
 
 
     }
@@ -847,27 +855,25 @@ public class DispatchServlet extends HttpServlet {
         response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String topLevel = request.getRequestURL().substring(0,request.getRequestURL().lastIndexOf(request.getPathInfo()));
+        String topLevel = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf(request.getPathInfo()));
 
         pw.println("<h2>ACCESS DENIED</h2>");
-        pw.println("<p>The URL <i>'"+request.getRequestURL()+"'</i> references a data source directly. </p>" +
+        pw.println("<p>The URL <i>'" + request.getRequestURL() + "'</i> references a data source directly. </p>" +
                 "<p>You must use the OPeNDAP request interface to get data from the data source.</p>");
 
 
-
         pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='"+topLevel+"'>"+topLevel+"</a></p>");
+        pw.println("<p><a href='" + topLevel + "'>" + topLevel + "</a></p>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
         pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
 
         pw.flush();
-
 
 
     }
