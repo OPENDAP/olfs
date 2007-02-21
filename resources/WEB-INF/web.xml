@@ -28,12 +28,12 @@
 
         <init-param>
             <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
-            <param-value>opendap.olfs.HttpDispatchHandler</param-value>
+            <param-value>opendap.bes.HttpDispatchHandler</param-value>
         </init-param>
 
         <init-param>
             <param-name>OpendapSoapDispatchHandlerImplementation</param-name>
-            <param-value>opendap.olfs.SoapDispatchHandler</param-value>
+            <param-value>opendap.bes.SoapDispatchHandler</param-value>
         </init-param>
 
         <init-param>

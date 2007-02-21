@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-package opendap.olfs;
+package opendap.bes;
 
 import opendap.coreServlet.Debug;
 import opendap.coreServlet.ReqInfo;
@@ -61,7 +61,7 @@ public class S4Dir {
             throws Exception {
 
 
-        Logger log = org.slf4j.LoggerFactory.getLogger("opendap.olfs.S4Dir");
+        Logger log = org.slf4j.LoggerFactory.getLogger("opendap.bes.S4Dir");
         log.debug("sendDIR() request = " + request);
 
         String name;

@@ -66,11 +66,11 @@ public class PersistentContentHandler {
         if (initialContentFile.exists()) {
             try {
                 if (copyDirIfSemaphoreNotPresent(initialContentPath, ServletUtil.getContentPath(servlet), semaphore)) {
-                    log.debug("Copied inital content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
+                    log.info("Copied inital content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet));
                 }
             }
             catch (IOException ioe) {
-                    log.debug("Failed to copy initial content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet),ioe);
+                    log.error("Failed to copy initial content directory " + initialContentPath + " to " + ServletUtil.getContentPath(servlet),ioe);
             }
         }
         //-------------

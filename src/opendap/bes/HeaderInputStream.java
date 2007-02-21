@@ -22,7 +22,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.olfs;
+package opendap.bes;
 
 import java.io.*;
 

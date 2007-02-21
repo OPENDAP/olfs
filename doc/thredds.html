@@ -48,7 +48,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     </em></strong><em>The THREDDS catalog views will NOT include a collection for which this is not done! <br />
     </em><strong><em><br />
     </em></strong></li>
-  <li>In each <em>&lt;datasetScan&gt;</em> element that you create you <strong>MUST</strong> use the following element: <span class="style13">&lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt; </span> This is the only CrawlableDataset implementation available!<br />
+  <li>In each <em>&lt;datasetScan&gt;</em> element that you create you <strong>MUST</strong> use the following element: <span class="style13">&lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt; </span> This is the only CrawlableDataset implementation available!<br />
     <br />
   </li>
   <li>No matter what your BES collection looks like, the <em>location</em> attribute of the <em>&lt;datasetScan&gt;</em> element must begin with &quot;<em>/root</em>&quot;. This is a THREDDS requirement. <br />
@@ -93,7 +93,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
      &lt;datasetScan location=&quot;/root/data&quot; path=&quot;data&quot; name=&quot;AllMyData&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
-	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
            &lt;filter&gt;
                &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
@@ -126,7 +126,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
      &lt;datasetScan location=&quot;/root/nc&quot; path=&quot;nc&quot; name=&quot;NetCDF Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
-	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
            &lt;filter&gt;
                &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
@@ -145,7 +145,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
      &lt;datasetScan location=&quot;/root/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
-	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
            &lt;filter&gt;
                &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
@@ -164,7 +164,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
     &lt;datasetScan location=&quot;/root/ff&quot; path=&quot;ff&quot; name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
-	       &lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt;
+	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
            &lt;filter&gt;
                &lt;exclude wildcard=&quot;.*&quot; atomic=&quot;true&quot; collection=&quot;true&quot; /&gt;
@@ -187,7 +187,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <ul>
   <li>The line in which the CrawlableDataset implementation is defined:
 
-    <pre>&lt;crawlableDatasetImpl className=&quot;opendap.olfs.BESCrawlableDataset&quot; /&gt; </pre>
+    <pre>&lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt; </pre>
     Identifies the correct CrawlableDataset class for Hyrax - the one that works with the <em>BES</em> to automatically generate catalogs. <br />
     <br />
     <br />

@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-package opendap.olfs;
+package opendap.bes;
 
 import opendap.coreServlet.OPeNDAPException;
 
@@ -32,9 +32,9 @@ import opendap.coreServlet.OPeNDAPException;
  */
 public class BadConfigurationException extends OPeNDAPException {
 
-    // jhrg Java complains that this is missing for a thing that is 
+    // jhrg Java complains that this is missing for a thing that is
     // serializable: static final long serialVersionUID;
-    
+
     public BadConfigurationException(String msg) {
         super(msg);
     }

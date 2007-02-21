@@ -25,7 +25,7 @@ Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following
 
 
     2) In each <datasetScan> element that you create you MUST use the following element:
-       <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" /> This is the only
+       <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" /> This is the only
        CrawlableDataset implementation available!
 
 
@@ -73,7 +73,7 @@ Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following
 
     <datasetScan location="/root/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
 
-        <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
+        <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
         <filter>
             <exclude wildcard=".*" atomic="true" collection="true"/>
             <include wildcard="*"/>
@@ -99,7 +99,7 @@ In particular note the following:
 
     1) The line in which the CrawlableDataset implementation is defined:
 
-       <crawlableDatasetImpl className="opendap.olfs.BESCrawlableDataset" />
+       <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
 
        Identifies the correct CrawlableDataset class for Hyrax - the one that works with the BES
        to automatically generate catalogs.

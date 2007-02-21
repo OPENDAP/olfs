@@ -22,47 +22,33 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.olfs;
+package opendap.bes;
 
-import org.jdom.Element;
-import org.jdom.Text;
+import opendap.coreServlet.OPeNDAPException;
 
 /**
- * Contains the Version and UUID information for Hyrax Server.
+ * Thrown when something BAD happens in the BES - primairly used to wrap BES
+ * errors in a way that the servlet can manage.
+ *
+ *
+ *
+ *
+ *
  */
-public class Version {
-
-
-    private static String version = "0.1.5";
-
-    public static String getVersionString() {
-        return (version);
+public class BESException extends OPeNDAPException {
+    BESException(String msg) {
+        super(msg);
     }
 
-    public static Element getVersionElement() {
-
-        Element olfs = new Element("OLFS");
-
-        Element lib = new Element("lib");
-        Element name = new Element("name");
-        Element ver = new Element("version");
-
-        name.addContent(new Text("olfs"));
-        lib.addContent(name);
-
-        ver.addContent(new Text(version));
-        lib.addContent(ver);
-
-
-        olfs.addContent(lib);
-
-        return (olfs);
-
+    BESException(String msg, Exception e) {
+        super(msg, e);
     }
 
-    public static String getServerUUID(){
-        return "e93c3d09-a5d9-49a0-a912-a0ca16430b91";
+    public BESException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
-
+    public BESException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -116,11 +116,11 @@
 
 
     <!-- OLFS Logging. Includes BesAPI -->
-    <logger name="opendap.olfs">
+    <logger name="opendap.bes">
         <level value="INFO"/>
     </logger>
 
-    <logger name="opendap.olfs.BESCrawlableDataset">
+    <logger name="opendap.bes.BESCrawlableDataset">
         <level value="INFO"/>
     </logger>
 

@@ -22,7 +22,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.olfs;
+package opendap.bes;
 
 import opendap.ppt.PPTException;
 
@@ -181,7 +181,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         Document doc = BesAPI.showVersion();
 
         // Add a version element for this, the OLFS server
-        doc.getRootElement().addContent(opendap.olfs.Version.getVersionElement());
+        doc.getRootElement().addContent(opendap.bes.Version.getVersionElement());
 
 
         _serverVersionDocument = doc;
