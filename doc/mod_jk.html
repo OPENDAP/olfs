@@ -57,7 +57,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </blockquote>
 <p>Then you will need to get it and compile it for your system, and then install it in the Apache modules directory. Go to the <a href="http://tomcat.apache.org/connectors-doc/howto/apache.html">MOD_JK page</a> and follow their instructions and advice. </p>
 <p><strong>Before proceeding make sure you have installed the <em>mod_jk</em> library in your Apache <em>modules</em> directory. </strong></p>
-<p>You will need to find an example of a <em>workers.properties</em> file. An example may be distributed with your Tomcat bundle (I didn't get one with 5.5.15, but I found one in an older - 5.5.9 - distribution). I would use the &quot;minimal&quot; example to start. Get it into your<em> $TOMCAT_HOME/conf</em> directory. Look at it most likely it contains the following 4 lines:</p>
+<p>You will need to find an example of a <em>workers.properties</em> file. An example may be distributed with your Tomcat bundle (I didn't get one with 5.5.15, but I found one in an older - 5.5.9 - distribution). I would use the &quot;minimal&quot; example to start. Get it into your<em> $CATALINA_HOME/conf</em> directory. Look at it most likely it contains the following 4 lines:</p>
 <blockquote>
   <p class="style5">worker.list=ajp13w
     <br>
@@ -65,7 +65,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     worker.ajp13w.host=localhost<br>
     worker.ajp13w.port=8009</p>
 </blockquote>
-<p>Now you need to edit the Tomcat <em>server.xml</em> file to enable the AJP 1.3 connector. Remember - the <em>workers.properties</em> file and the connector definition must agree! Inside of <em>$TOMCAT_HOME/conf/server.xml </em>add (or possibly uncomment) the AJP connector definition inside of the service named <em>Catalina:</em></p>
+<p>Now you need to edit the Tomcat <em>server.xml</em> file to enable the AJP 1.3 connector. Remember - the <em>workers.properties</em> file and the connector definition must agree! Inside of <em>$CATALINA_HOME/conf/server.xml </em>add (or possibly uncomment) the AJP connector definition inside of the service named <em>Catalina:</em></p>
 <blockquote>
   <p class="style5"> &lt;Service name=&quot;Catalina&quot;&gt;<br>
     .<br>
@@ -79,11 +79,11 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     .<br>
     &lt;/Service&gt;</p>
 </blockquote>
-<p>Now, follow the <em>mod_jk</em> instructions for using Tomcat auto-configure. This should create the file  <em>$TOMCAT_HOME/conf/<strong>auto</strong>/mod_jk.conf</em>. I suggest you move this file to <em>$TOMCAT_HOME/conf/<strong>jk</strong>/mod_jk.conf</em> so that you may edit it with the fear that it may be overwritten. Assuming you have done that, add the following line to your Apache server's http.conf file:</p>
+<p>Now, follow the <em>mod_jk</em> instructions for using Tomcat auto-configure. This should create the file  <em>$CATALINA_HOME/conf/<strong>auto</strong>/mod_jk.conf</em>. I suggest you move this file to <em>$CATALINA_HOME/conf/<strong>jk</strong>/mod_jk.conf</em> so that you may edit it with the fear that it may be overwritten. Assuming you have done that, add the following line to your Apache server's http.conf file:</p>
 <blockquote>
   <p class="style5">Include /usr/local/apache-tomcat-5.5.15/conf/jk/mod_jk.conf</p>
 </blockquote>
-<p>Now you will need to edit the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file. It should be quite simple to begin with, mine contained this:</p>
+<p>Now you will need to edit the <em>$CATALINA_HOME/conf/jk/mod_jk.conf</em> file. It should be quite simple to begin with, mine contained this:</p>
 <blockquote>
   <p class="style5"># load mod_jk<br>
     &lt;IfModule !mod_jk.c&gt;<br>
@@ -106,7 +106,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     Allow from all<br>
   &lt;/Proxy&gt;</p>
 </blockquote>
-<p>To configure <em>mod_jk</em>, add the following to the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file: </p>
+<p>To configure <em>mod_jk</em>, add the following to the <em>$CATALINA_HOME/conf/jk/mod_jk.conf</em> file: </p>
 <blockquote>
   <p class="style5"># Set mod_jk for our servlet<br>
     JkWorkersFile /usr/local/apache-tomcat-5.5.15/conf/workers.properties.minimal<br>
@@ -114,12 +114,12 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     JkLogLevel    error<br>
     JKMount       /opendap/* ajp13 </p>
 </blockquote>
-<p>To map the old OPeNDAP data URL's to the new service (assuming they were located at <em>http://your.server/cgi-bin/nph-dods/...</em>) add this to the <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file:</p>
+<p>To map the old OPeNDAP data URL's to the new service (assuming they were located at <em>http://your.server/cgi-bin/nph-dods/...</em>) add this to the <em>$CATALINA_HOME/conf/jk/mod_jk.conf</em> file:</p>
 <blockquote>
   <p class="style5"># Use a secure reverse proxy to enable mapping the old URL's too tomcat.<br>
     RewriteRule   ^/cgi-bin/nph-dods(.*) http://localhost:8080/opendap/hyrax/$1  [P]</p>
 </blockquote>
-<p>In the end my <em>$TOMCAT_HOME/conf/jk/mod_jk.conf</em> file: looked like this:</p>
+<p>In the end my <em>$CATALINA_HOME/conf/jk/mod_jk.conf</em> file: looked like this:</p>
 <blockquote>
   <p class="style5"> # We need rewrite and proxy to map the old URL's to the new ones.<br>
     RewriteEngine on<br>

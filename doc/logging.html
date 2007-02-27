@@ -22,9 +22,6 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 .style3 {font-size: 10px}
 .style4 {font-size: 14px}
 .style5 {font-family: "Courier New", Courier, mono}
-.style6 {font-size: 18px}
-.style7 {color: #999999}
-.style8 {color: #000000}
 -->
 </STYLE>
 </head>
@@ -41,12 +38,78 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <h1><a name="OLFS"></a>Access Logging </h1>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+<p>Many people will want to record access logs for their Hyrax server. <strong>We</strong> want you to keep access logs for your Hyrax server.
+ The easiest way to get a simple access log for Hyrax is to utilize the Tomcat/Catalina implementation of the 
+<a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html">org.apache.catalina.valves.AccessLogValve</a> class. </p>
 <h2><strong>AccessLogValve</strong></h2>
+<p>Since Hyrax's public facade is provided by the OLFS running inside of the Tomcat servlet container you may utilize Tomcat's handy access logging which relies on the <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html">org.apache.catalina.valves.AccessLogValve</a> class. By default Tomcat comes with this turned off. </p>
+<p>To turn it on:</p>
+<ol>
+  <li>Locate the file <em>$CATALINA_HOME/conf/servlet.html.</em> </li>
+  <li>Find the commented out section for the access log inside the <span class="style5">&lt;Host&gt;</span> element. The server.xml file contains a good deal of comments, both for instruction and contianing code examples. The part you are looking for is nested inside of the <span class="style5">&lt;Service&gt;</span> and the <span class="style5">&lt;Engine&gt;</span> elements. Typically it will look like:<br>
+  <pre>
+&lt;Service ...&gt;
+    .
+    .
+    .
+    &lt;Engine...&gt;
+        .
+        .
+        .
+        &lt;Host name=&quot;localhost&quot; appBase=&quot;webapps&quot;
+            unpackWARs=&quot;true&quot; autoDeploy=&quot;true&quot;
+            xmlValidation=&quot;false&quot; xmlNamespaceAware=&quot;false&quot;&gt;
+			.
+			.
+			.			
+            &lt;!-- Access log processes all requests for this virtual host.  
+                 By default, log files are created in the &quot;logs&quot; 
+                 directory relative to $CATALINA_HOME.  If you wish, you can 
+                 specify a different directory with the &quot;directory&quot;
+                 attribute.  Specify either a relative (to $CATALINA_HOME) 
+                 or absolute path to the desired directory. --&gt;
+				 
+            &lt;!--
+            &lt;Valve className="org.apache.catalina.valves.AccessLogValve" 
+                   directory="logs"  prefix="localhost_access_log." suffix=".txt"
+                   pattern="common" resolveHosts="false"/&gt;  
+            --/&gt;
+            .
+            .
+            .
+        &lt;/Host&gt;
+        .
+        .
+        .
+    &lt;/Engine&gt;
+    .
+    .
+    .
+&lt;/Service&gt;</pre>
+  You can uncomment the &lt;Valve&gt; element to enable it and you 
+  can change the values of the various attributes to suite your localization:<br>
+    <br>
+    <br>
+    <br>
+	
+	
+	
+<pre>
+            &lt;Valve className=&quot;org.apache.catalina.valves.AccessLogValve&quot; 
+                   directory=&quot;logs&quot;  
+                   prefix=&quot;access_log.&quot; 
+                   suffix=&quot;.log&quot; 
+                   pattern=&quot;%h %l %u %t &amp;quot;%r&amp;quot; %s %b %D&quot;
+                   resolveHosts=&quot;false&quot;/&gt;
+</pre>
+Of note is the <em>pattern</em> attribute which allows you to customize the content of the access log entries. <br>
+It is documented in the <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/index.html">javadocs for Tomcatt/Catalina</a>, as part of the  <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html">org.apache.catalina.valves.AccessLogValve</a> class.<br>
+  </li>
+</ol>
 <p>&nbsp;</p>
+
 <h1><a name="DOCS"></a>Performance, Informational, and Debug Logging </h1>
-<p>T</p>
+<p>&nbsp;</p>
 <p>&nbsp;</p>
 <h2><strong>Log4j</strong></h2>
 <p><br>

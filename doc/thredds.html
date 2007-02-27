@@ -43,7 +43,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <h3>READ THIS NEXT BIT OR ABANDON ALL HOPE!  </h3>
 <p> Now, to get THREDDS catalogs working on Hyrax <strong>YOU MUST</strong> do at least the following:</p>
 <ol>
-  <li>For each collection that appears in the top level of the OPeNDAP directory response (<a href="http://localhost:8080/opendap/contents.html">http://localhost:8080/opendap/contents.html</a> if Hyrax is running out of the box on this machine) you <strong>MUST</strong> create a <em>&lt;datasetScan&gt;</em> in the <strong>catalog.xml</strong> file located in the persistent content directory ($TOMCAT_HOME/content/opendap). <strong><em><br />
+  <li>For each collection that appears in the top level of the OPeNDAP directory response (<a href="http://localhost:8080/opendap/contents.html">http://localhost:8080/opendap/contents.html</a> if Hyrax is running out of the box on this machine) you <strong>MUST</strong> create a <em>&lt;datasetScan&gt;</em> in the <strong>catalog.xml</strong> file located in the persistent content directory ($CATALINA_HOME/content/opendap). <strong><em><br />
     <br />
     </em></strong><em>The THREDDS catalog views will NOT include a collection for which this is not done! <br />
     </em><strong><em><br />
@@ -67,11 +67,11 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </ol>
 <h3>Reinitializing THREDDS </h3>
 <p>The THREDDS catalog is read when Tomcat is started. Hyrax will check the last modifed date of the catalog.xml file prior to responding to a THREDDS catalog request. If the last modifed date has changed since Tomcat started, then Hyrax will reload all of the THREDDS catalog information.</p>
-<p>So if you make changes to ANY of the THREDDS catalog files in the $TOMCAT_HOME/content/opendap directory tree, then there are two ways for you to get Hyrax to update:</p>
+<p>So if you make changes to ANY of the THREDDS catalog files in the $CATALINA_HOME/content/opendap directory tree, then there are two ways for you to get Hyrax to update:</p>
 <ol>
-  <li>Change the last modified date of the file: <em>$TOMCAT_HOME/content/opendap/catalog.xml </em><br />
+  <li>Change the last modified date of the file: <em>$CATALINA_HOME/content/opendap/catalog.xml </em><br />
     <br />
-    This can be accomplished with the unix command &quot;touch&quot; command:<span class="style13"> touch $TOMCAT_HOME/content/opendap/cataog.xml </span>This will cause Hyrax to reload all of the THREDDS catalogs the next time that a THREDDS catalog request is made (You might want to make this request yourself if you have a big THREDDS catalog configuration so that a knuowning user doesn't have to wait for a response while Hyrax is working) <br />
+    This can be accomplished with the unix command &quot;touch&quot; command:<span class="style13"> touch $CATALINA_HOME/content/opendap/cataog.xml </span>This will cause Hyrax to reload all of the THREDDS catalogs the next time that a THREDDS catalog request is made (You might want to make this request yourself if you have a big THREDDS catalog configuration so that a knuowning user doesn't have to wait for a response while Hyrax is working) <br />
     <br />
   OR you could:<br />
   <br />

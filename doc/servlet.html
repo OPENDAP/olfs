@@ -58,22 +58,22 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <p>The   OLFS servlet gets its configuration from 4 files <strong>olfs.xml</strong>, <strong>catalog.xml</strong>, <strong>security.xml</strong>, and <strong>web.xml</strong>  </p>
 <h4><strong>File Locations</strong></h4>
 <ul>
-  <li><strong>olfs.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+  <li><strong>olfs.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$CATALINA_HOME/content/opendap/</em><br>
     <br>
   </li>
-  <li><strong>catalog.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+  <li><strong>catalog.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$CATALINA_HOME/content/opendap/</em><br>
     <br>
   </li>
-  <li><strong>security.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$TOMCAT_HOME/content/opendap/</em><br>
+  <li><strong>security.xml</strong> - Located in in the <em>persistent content</em> directory    which by default is located at <em>$CATALINA_HOME/content/opendap/</em><br>
     <br>
 </li>
-  <li><strong>web.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
-    in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
+  <li><strong>web.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$CATALINA_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
+    in <em>$CATALINA_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
   gets renamed then things change accordingly.)<br>
   <br>
   </li>
-  <li><strong>log4j.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
-    in <em>$TOMCAT_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
+  <li><strong>log4j.xml</strong> - The servlet's web.xml file located in the WEB-INF directory if the web application &quot;opendap&quot;. Typically you will find it in <em>$CATALINA_HOME/webapps/opendap/WEB-INF/web.xml</em> The default location of the web.xml file is  (at least in Tomcat 5.5)
+    in <em>$CATALINA_HOME/webapps/opendap/WEB-INF </em>(Obviously if the <em>opendap</em> directory
   gets renamed then things change accordingly.)<br>
     <br>
   </li>
@@ -310,7 +310,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
 </pre>
 <h1><a name="DOCS"></a>Docs Servlet</h1>
-<p>The Docs (or documentation) servlet provides the OLFS web application with the ability to serve a tree of static documentation files. By default it will serve the files in the documentation tree provided with the OLFS in the Hyrax distribution. This tree is rooted at <em>$TOMCAT_HOME/webapps/opendap/docs/</em> and contains  documentation pertaining to the software in the Hyrax distribution - installation and configuration instruction, release notes, java docs, etc.</p>
+<p>The Docs (or documentation) servlet provides the OLFS web application with the ability to serve a tree of static documentation files. By default it will serve the files in the documentation tree provided with the OLFS in the Hyrax distribution. This tree is rooted at <em>$CATALINA_HOME/webapps/opendap/docs/</em> and contains  documentation pertaining to the software in the Hyrax distribution - installation and configuration instruction, release notes, java docs, etc.</p>
 <p>If one wished to supplant this information with their own set of web pages, one could remove/replace the files in the default directory. However, installing a new version of Hyrax will cause these files to be overwritten, forcing them to be replaced after the install (and hopefully AFTER the new release documentation had been read and understood by the user).</p>
 <p>The Docs servlet provides an alternative to this. If a  <em>docs</em> directory is created in the <em>persistent content</em> directory for Hyrax the Docs servlet will detect it (when Tomcat is launched) and it will serve files from there instead of from the default location. </p>
 <p>This scheme provides 2 beneficial effects:</p>
@@ -320,9 +320,9 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 </ol>
 <p>So - in summary - to provide persistent  web pages as part of a Hyrax localization simple create the directory:</p>
 <blockquote>
-  <p><em>$TOMCAT_HOME/content/opendap/<strong>docs</strong> </em></p>
+  <p><em>$CATALINA_HOME/content/opendap/<strong>docs</strong> </em></p>
 </blockquote>
-<p>Place your content in there and away you go. If later you wish to view the web based documentation bundled with Hyrax simply change the name of the directory from <strong>docs</strong> to something else and restart Tomcat. (or, you could just look in the <em>$TOMCAT_HOME/webapps/opendap/docs</em> directory)</p>
+<p>Place your content in there and away you go. If later you wish to view the web based documentation bundled with Hyrax simply change the name of the directory from <strong>docs</strong> to something else and restart Tomcat. (or, you could just look in the <em>$CATALINA_HOME/webapps/opendap/docs</em> directory)</p>
 <p>In the Docs servlet, is a URL ends in a directory name or a &quot;/&quot; then the servlet will attempt to serve the <strong>index.html</strong> in that directory. In other words <strong>index.html</strong> is the default document. </p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
