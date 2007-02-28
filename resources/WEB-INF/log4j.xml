@@ -2,7 +2,7 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-    <appender name="Stdout" class="org.apache.log4j.ConsoleAppender">
+    <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
         <param name="Threshold" value="ALL"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
@@ -78,13 +78,13 @@
 
 
     <logger name="thredds">
-        <level value="INFO"/>
-        <appender-ref ref="devNull"/>
+        <level value="ALL"/>
+        <appender-ref ref="stdout"/>
     </logger>
 
     <logger name="threddsAccessLogger">
         <level value="ALL"/>
-        <appender-ref ref="Stdout"/>
+        <appender-ref ref="stdout"/>
     </logger>
 
 
@@ -93,7 +93,7 @@
     <!-- Default Logging level -->
     <logger name="opendap">
         <level value="INFO"/>
-        <appender-ref ref="devNull"/>
+        <appender-ref ref="stdout"/>
     </logger>
 
 
@@ -117,11 +117,11 @@
 
     <!-- OLFS Logging. Includes BesAPI -->
     <logger name="opendap.bes">
-        <level value="INFO"/>
+        <level value="ALL"/>
     </logger>
 
     <logger name="opendap.bes.BESCrawlableDataset">
-        <level value="INFO"/>
+        <level value="ALL"/>
     </logger>
 
 

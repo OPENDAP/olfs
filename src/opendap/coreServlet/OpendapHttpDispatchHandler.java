@@ -223,23 +223,7 @@ public interface OpendapHttpDispatchHandler {
                                     HttpServletResponse response) throws Exception;
 
 
-    /**
-     * ************************************************************************
-     * Default handler for THREDDS catalog requests (catalog.xml &
-     * catalog.html)
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @throws Exception When things go poorly
-     *
-     * @deprecated
-     */
-
-    public void sendCatalog(HttpServletRequest request,
-                            HttpServletResponse response) throws Exception;
-
+ 
 
     public void sendFile(HttpServletRequest request,
                             HttpServletResponse response) throws Exception;

@@ -42,6 +42,7 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 import thredds.cataloggen.SimpleCatalogBuilder;
 import thredds.servlet.ServletUtil;
+import thredds.crawlabledataset.CrawlableDataset;
 
 /**
  * Handler fo HTTP GET requests.
@@ -124,7 +125,8 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
         String filename = ds.getInitParameter("OLFSConfigFileName");
         if (filename == null) {
-            String msg = "Servlet configuration must include a file name for the OLFS configuration!\n";
+            String msg = "Servlet configuration must include a file name for " +
+                    "the OLFS configuration!\n";
             System.err.println(msg);
             throw new ServletException(msg);
         }
@@ -143,6 +145,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
         catch (Exception e) {
             throw new ServletException(e);
         }
+
 
 
     }
@@ -606,77 +609,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     /***************************************************************************/
 
-
-    /**
-     * ************************************************************************
-     * Default handler for OPeNDAP catalog.xml requests.
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     *
-     * @deprecated This is no longer used.
-     */
-    public void sendCatalog(HttpServletRequest request,
-                            HttpServletResponse response)
-            throws Exception {
-
-
-        log.debug("sendCatalog()");
-
-        response.setContentType("text/xml");
-        response.setHeader("XDODS-Server", getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion());
-        response.setHeader("XDAP", getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_catalog");
-
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
-
-
-        // Strip off the catalog request
-
-        String path = ReqInfo.getDataSource(request);
-        path = path.endsWith("/catalog") ? path.substring(0, path.length() - 8) : path;
-
-        path = BESCrawlableDataset.besPath2ThreddsPath(path);
-
-        BESCrawlableDataset cds = new BESCrawlableDataset(path, null);
-
-        if (cds.isCollection()) {
-
-            log.debug("sendCatalog():  Instantiating SimpleCatalogBuilder");
-
-
-
-            SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                    "",                                   // CollectionID, which for us needs to be empty.
-                    BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
-                    "OPeNDAP-Hyrax",                    // Service Name
-                    "OPeNDAP",                            // Service Type Name
-                    request.getRequestURI().substring(0, request.getRequestURI().lastIndexOf(request.getPathInfo()) + 1)); // Base URL for this service
-
-            log.debug("sendCatalog(): Generating catalog");
-
-
-
-            pw.print(scb.generateCatalogAsString(cds));
-
-
-        } else {
-            response.setContentType("text/html");
-            String msg = "ERROR: THREDDS catalogs may only be requested for collections, not for individual data sets.";
-            throw new OPeNDAPException(msg);
-        }
-
-        //printCatalog(request, pw);
-        pw.flush();
-
-    }
 
     /**
      * ***********************************************************************

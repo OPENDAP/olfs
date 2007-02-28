@@ -686,8 +686,9 @@ public class DispatchServlet extends HttpServlet {
             File f = new File(masterCatalog);
             if (f.lastModified() > threddsInitTime) {
                 threddsInitTime = f.lastModified();
+                log.info("getThreddsCatalog(): Reinitializing THREDDS catalogs.  ");
                 dataRootHandler.reinit();
-                log.info(" **********  THREDDS reinitialized.  ");
+                log.info("getThreddsCatalog(): THREDDS has been reinitialized.  ");
             }
         }
         finally {

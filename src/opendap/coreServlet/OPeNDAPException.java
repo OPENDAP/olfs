@@ -251,6 +251,7 @@ public class OPeNDAPException extends Exception {
 
 
         log.error("anyExceptionHandler(): " + t);
+        t.printStackTrace();
         DebugLog.printThrowable(t);
 
 
