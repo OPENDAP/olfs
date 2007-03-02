@@ -71,7 +71,7 @@ Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following
 
     <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
-    <datasetScan location="/root/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
+    <datasetScan location="/bes/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
 
         <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
         <filter>
@@ -94,7 +94,7 @@ Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following
 
     <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
-    <datasetScan location="/root/Test" path="Test" name="NotSVN" serviceName="OPeNDAP-Hyrax">
+    <datasetScan location="/bes/Test" path="Test" name="NotSVN" serviceName="OPeNDAP-Hyrax">
 
         <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
         <filter>

@@ -73,7 +73,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
     private Logger log;
 
 
-    private static String _datasetRootPrefix = "/root";
+    private static String _datasetRootPrefix = "/bes";
 
 
     public BESCrawlableDataset(String path, Object o)  {
@@ -204,7 +204,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
      */
     public BESCrawlableDataset getDescendant(String relativePath) {
 
-        if (getPath().endsWith("/"))
+        if (getPath().endsWith("/") || relativePath.indexOf("/")==0)
             return new BESCrawlableDataset(getPath() + relativePath, _config);
         else
             return new BESCrawlableDataset(getPath() + "/" + relativePath, _config);

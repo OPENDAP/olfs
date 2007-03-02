@@ -688,6 +688,7 @@ public class DispatchServlet extends HttpServlet {
                 threddsInitTime = f.lastModified();
                 log.info("getThreddsCatalog(): Reinitializing THREDDS catalogs.  ");
                 dataRootHandler.reinit();
+                dataRootHandler.initCatalog("catalog.xml");
                 log.info("getThreddsCatalog(): THREDDS has been reinitialized.  ");
             }
         }

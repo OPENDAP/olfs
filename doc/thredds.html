@@ -51,13 +51,13 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
   <li>In each <em>&lt;datasetScan&gt;</em> element that you create you <strong>MUST</strong> use the following element: <span class="style13">&lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt; </span> This is the only CrawlableDataset implementation available!<br />
     <br />
   </li>
-  <li>No matter what your BES collection looks like, the <em>location</em> attribute of the <em>&lt;datasetScan&gt;</em> element must begin with &quot;<em>/root</em>&quot;. This is a THREDDS requirement. <br />
+  <li>No matter what your BES collection looks like, the <em>location</em> attribute of the <em>&lt;datasetScan&gt;</em> element must begin with &quot;<em>/bes</em>&quot;. This is a THREDDS requirement. <br />
     <br />
   </li>
   <li>The <em>service</em> attribute in the <em>&lt;datasetScan&gt;</em> element must be set to <em>&quot;OPeNDAP&quot;</em>. <br />
       <br />
   </li>
-  <li>The <em>path</em> attribute in the <em>&lt;datasetScan&gt;</em> element appears in the URL after the servlet name, and MUST be the same as the value of the<em> location</em> attribute with the leading &quot;/root/&quot; removed. In other words it MUST NOT start with a &quot;/&quot; character .<br />
+  <li>The <em>path</em> attribute in the <em>&lt;datasetScan&gt;</em> element appears in the URL after the servlet name, and MUST be the same as the value of the<em> location</em> attribute with the leading &quot;/bes/&quot; removed. In other words it MUST NOT start with a &quot;/&quot; character .<br />
     <br />
   </li>
   <li>You should apply a filter to the data that coincides with the value of the <em>&quot;BES.Catalog.catalog.TypeMatch&quot;</em> for the data types being served. I suggest that you make the filter expose ALL of the data types served by the BES. See the <a href="http://www.unidata.ucar.edu/projects/THREDDS/tech/cataloggen/devel/datasetScanElement.html">THREDDS pages on the DatasetScan Element</a> for filter details. The point of this to remove files from the catalog view that are NOT OPeNDAP data. For example README files.<br />
@@ -91,7 +91,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
      &lt;service name=&quot;OPeNDAP-Hyrax&quot; serviceType=&quot;OPeNDAP&quot; base=&quot;/opendap/&quot;/&gt;
 
-     &lt;datasetScan location=&quot;/root/data&quot; path=&quot;data&quot; name=&quot;AllMyData&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
+     &lt;datasetScan location=&quot;/bes/data&quot; path=&quot;data&quot; name=&quot;AllMyData&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
 	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
@@ -124,7 +124,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
      &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
 
-     &lt;datasetScan location=&quot;/root/nc&quot; path=&quot;nc&quot; name=&quot;NetCDF Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
+     &lt;datasetScan location=&quot;/bes/nc&quot; path=&quot;nc&quot; name=&quot;NetCDF Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
 	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
@@ -143,7 +143,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
      &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
 
-     &lt;datasetScan location=&quot;/root/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
+     &lt;datasetScan location=&quot;/bes/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
 	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
@@ -162,7 +162,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 
     &lt;!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --&gt;
 
-    &lt;datasetScan location=&quot;/root/ff&quot; path=&quot;ff&quot; name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
+    &lt;datasetScan location=&quot;/bes/ff&quot; path=&quot;ff&quot; name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt;
 
 	       &lt;crawlableDatasetImpl className=&quot;opendap.bes.BESCrawlableDataset&quot; /&gt;
 
@@ -192,20 +192,20 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     <br />
     <br />
   </li>
-  <li>In the <em>&lt;datasetScan&gt;</em> element the <em>location</em> attribute's value MUST begin with <em>/root</em>. So, if the top level collection in the BES contains 4 sub collections they may each be identified using a separate  <em>&lt;datasetScan&gt;</em> element like so:
+  <li>In the <em>&lt;datasetScan&gt;</em> element the <em>location</em> attribute's value MUST begin with <em>/bes</em>. So, if the top level collection in the BES contains 4 sub collections they may each be identified using a separate  <em>&lt;datasetScan&gt;</em> element like so:
     <pre>
-	&lt;datasetScan location=&quot;/root/nc&quot;  path=&quot;nc&quot;  name=&quot;NetCDF Archive&quot;   serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;
-	&lt;datasetScan location=&quot;/root/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot;      serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;
-	&lt;datasetScan location=&quot;/root/jg&quot;  path=&quot;jg&quot;  name=&quot;JGOFFS Archive&quot;   serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;
-	&lt;datasetScan location=&quot;/root/ff&quot;  path=&quot;ff&quot;  name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
+	&lt;datasetScan location=&quot;/bes/nc&quot;  path=&quot;nc&quot;  name=&quot;NetCDF Archive&quot;   serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;
+	&lt;datasetScan location=&quot;/bes/hdf&quot; path=&quot;hdf&quot; name=&quot;HDF Archive&quot;      serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;
+	&lt;datasetScan location=&quot;/bes/jg&quot;  path=&quot;jg&quot;  name=&quot;JGOFFS Archive&quot;   serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;
+	&lt;datasetScan location=&quot;/bes/ff&quot;  path=&quot;ff&quot;  name=&quot;FreeForm Archive&quot; serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
 	Where each <em>&lt;datasetScan&gt;</em> element may have it's own filter and inheritance rules. You MUST NOT lump them all into one    <em>&lt;datasetScan&gt; </em>element with one set of filter rules like so:
 	<pre>
-	&lt;datasetScan location=&quot;/root&quot;     path=&quot;DATA&quot;  name=&quot;AllYourDataAreUs&quot;   serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
+	&lt;datasetScan location=&quot;/bes&quot;     path=&quot;DATA&quot;  name=&quot;AllYourDataAreUs&quot;   serviceName=&quot;OPeNDAP-Hyrax&quot;&gt; . . . &lt;/datasetScan&gt;</pre>
 	Because it does not work.
     If you want them all to be in one a single collection then configure the BES so that it has one top level collection (see Example 1) <br />
     <br />
   </li>
-  <li>The <em>path</em> attribute in the <em>&lt;datasetScan&gt;</em> element appears in the URL after the servlet name, and MUST be the same as the value of the<em> location</em> attribute with the leading &quot;/root/&quot; removed. In other words it MUST NOT start with a &quot;/&quot; character . </li>
+  <li>The <em>path</em> attribute in the <em>&lt;datasetScan&gt;</em> element appears in the URL after the servlet name, and MUST be the same as the value of the<em> location</em> attribute with the leading &quot;/bes/&quot; removed. In other words it MUST NOT start with a &quot;/&quot; character . </li>
 </ul>
 <p>&nbsp;</p>
 <hr size="1" noshade="noshade" />
