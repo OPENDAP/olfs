@@ -80,8 +80,6 @@ Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following
         </filter>
         <addDatasetSize />
 
-
-
         <metadata inherited="true">
             <serviceName>OPeNDAP-Hyrax</serviceName>
             <authority>opendap.org</authority>
