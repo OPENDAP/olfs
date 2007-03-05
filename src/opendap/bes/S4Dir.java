@@ -30,9 +30,8 @@ import opendap.coreServlet.ReqInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.util.Iterator;
+import java.util.*;
 
-import org.jdom.Element;
 import org.slf4j.Logger;
 
 /**
@@ -42,6 +41,11 @@ import org.slf4j.Logger;
  * @author Nathan David Potter
  */
 public class S4Dir {
+
+
+
+
+
 
 
     /**
@@ -72,8 +76,9 @@ public class S4Dir {
         PrintWriter pw = new PrintWriter(response.getOutputStream());
 
 
+        List datasets;
         Iterator it;
-        Element childDataset;
+        BESCrawlableDataset childDataset;
 
 //        String collectionName  = ReqInfo.getCollectionName(request);
 
@@ -99,17 +104,17 @@ public class S4Dir {
         boolean isTopLevel = collectionName.equals("/");
 
 
+        BESCrawlableDataset crds = new BESCrawlableDataset("/bes"+collectionName, null);
 
 
-        // Get the catalog for this collection
-        Element dataset = BesAPI.showCatalog(collectionName).getRootElement();
 
         // Compute White Space required for correct formating
         int headerSpace = 0;
-        it = dataset.getChildren("dataset").iterator();
+        datasets = crds.listDatasets();
+        it = datasets.iterator();
         while (it.hasNext()) {
-            childDataset = (Element) it.next();
-            name = childDataset.getChildTextTrim("name");
+            childDataset = (BESCrawlableDataset) it.next();
+            name = childDataset.getName();
             if (headerSpace < name.length())
                 headerSpace = name.length();
         }
@@ -142,20 +147,38 @@ public class S4Dir {
 
 
         // Build a line in the page for each child dataset/collection
-        it = dataset.getChildren("dataset").iterator();
+        it = datasets.iterator();
         while (it.hasNext()) {
 
-            childDataset = (Element) it.next();
+            childDataset = (BESCrawlableDataset) it.next();
 
-            boolean isData = childDataset.getAttributeValue("isData").equalsIgnoreCase("true");
+            boolean isData = childDataset.isData();
 
-            name = childDataset.getChildTextTrim("name");
-            size = childDataset.getChildTextTrim("size");
-            lastModified = childDataset.getChild("lastmodified").getChildTextTrim("date") + " " +
-                    childDataset.getChild("lastmodified").getChildTextTrim("time");
+            name = childDataset.getName();
+            size = childDataset.length()+"";
+
+
+            // Work up the time string.
+            Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+            cal.setTime(childDataset.lastModified());
+
+
+            lastModified =
+                    cal.get(Calendar.YEAR)                     + "-" +
+                    (cal.get(Calendar.MONTH)<9?"0":"")         +
+                        (cal.get(Calendar.MONTH)+1)            + "-" +
+                    (cal.get(Calendar.DAY_OF_MONTH)<10?"0":"") +
+                        cal.get(Calendar.DAY_OF_MONTH)         + " " +
+                    (cal.get(Calendar.HOUR)<10?"0":"")         +
+                         cal.get(Calendar.HOUR)                + ":" +
+                    (cal.get(Calendar.MINUTE)<10?"0":"")       +
+                        cal.get(Calendar.MINUTE)               + ":" +
+                    (cal.get(Calendar.SECOND)<10?"0":"")       +
+                        cal.get(Calendar.SECOND);
+
 
             // Is it a collection?
-            if (childDataset.getAttributeValue("thredds_collection").equalsIgnoreCase("true")) {
+            if (childDataset.isCollection()) {
 
 
                 link = targetURL +  name + "/contents.html";
@@ -216,6 +239,8 @@ public class S4Dir {
 
 
     }
+
+
 
 
 

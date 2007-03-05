@@ -56,6 +56,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
     private Date _lastModified;
 
     private boolean _isCollection;
+    private boolean _isData;
 
     private String _parentPath;
     private BESCrawlableDataset _parent;
@@ -261,7 +262,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
 
         if (!isCollection()){
-            log.error("lisDatasets(): This dataset is not a collection.");
+            log.error("listDatasets(): This dataset is not a collection.");
             return null;
         }
 
@@ -341,7 +342,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
     public List listDatasets(CrawlableDatasetFilter cdf) {
 
         if (!isCollection()){
-            log.error("lisDatasets(): This dataset is not a collection. " +
+            log.error("listDatasets(): This dataset is not a collection. " +
                     "There is no collection to filter.");
             return null;
         }
@@ -393,6 +394,11 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         return _lastModified;
     }
 
+
+    public boolean isData(){
+        getInfo();
+        return _isData;
+    }
 
     public String toString() {
         String s = "";
@@ -458,6 +464,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         _parent = null;
         _childDatasetElements = null;
         _isCollection = false;
+        _isData = false;
         _haveCatalog = false;
         _haveInfo = false;
         _config = null;
@@ -618,6 +625,8 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
             cds._isCollection = true;
             cds._childDatasetElements = dataset.getChildren("dataset");
         }
+
+        cds._isData = dataset.getAttributeValue("isData").equalsIgnoreCase("true");
 
         cds._haveInfo = true;
         cds._exists = true;
