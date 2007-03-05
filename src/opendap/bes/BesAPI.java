@@ -856,7 +856,7 @@ public class BesAPI {
     }
 
     /**
-     * Creates a new OPeNDAPClient connectio to the BES and starts up the
+     * Creates a new OPeNDAPClient connection to the BES and starts up the
      * connection.
      *
      * @return A new OPeNDAP Client.

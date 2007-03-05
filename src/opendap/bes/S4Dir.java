@@ -25,7 +25,6 @@
 
 package opendap.bes;
 
-import opendap.coreServlet.Debug;
 import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +53,7 @@ public class S4Dir {
      *
      * @param request  The <code>HttpServletRequest</code> from the client.
      * @param response The <code>HttpServletResponse</code> for the client.
+     * @throws Exception when things go poorly.
      * @see opendap.coreServlet.ReqInfo
      */
     public static void sendDIR(HttpServletRequest request,
