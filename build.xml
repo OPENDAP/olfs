@@ -71,7 +71,7 @@
     <property name="echo.lib"           value="echosoap.jar"/>
 
 
-    <property name="thredds.lib"        value="tsf-3.13.00.jar"/>
+    <property name="thredds.lib"        value="tsf-3.14.00.jar"/>
     <property name="netcdf.lib"         value="netcdf-2.2.18.jar"/>
     <property name="nlog4j.lib"         value="nlog4j-1.2.21.jar"/>
 

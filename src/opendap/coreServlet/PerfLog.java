@@ -68,7 +68,7 @@ public class PerfLog {
         if (isLogInit)
             return;
 
-        System.out.println("+++PerfLog.initLogging");
+        System.out.println("+++PerfLog.initLogging()");
         ServletContext servletContext = servlet.getServletContext();
 
         // set up the log path
@@ -84,10 +84,16 @@ public class PerfLog {
         System.setProperty("logdir", logPath); // variable substitution
         try {
             String log4Jconfig = servletContext.getInitParameter("log4j-init-file");
-            if (log4Jconfig == null)
-                log4Jconfig = ServletUtil.getRootPath(servlet) + "WEB-INF/log4j.xml";
+            if (log4Jconfig == null){
+                log4Jconfig = ServletUtil.getContentPath(servlet) + "log4j.xml";
+                File f = new File(log4Jconfig);
+                if (!f.exists()) {
+                    log4Jconfig = ServletUtil.getRootPath(servlet) + "WEB-INF/log4j.xml";
+                }
+            }
+            System.out.println("+++PerfLog.initLogging() - Log4j configuration using: "+log4Jconfig);
             DOMConfigurator.configure(log4Jconfig);
-            System.out.println("+++Log4j configured");
+            System.out.println("+++PerfLog.initLogging() - Log4j configured.");
         } catch (FactoryConfigurationError t) {
             t.printStackTrace();
         }

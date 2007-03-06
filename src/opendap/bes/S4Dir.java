@@ -183,7 +183,7 @@ public class S4Dir {
 
                 link = targetURL +  name + "/contents.html";
 
-                responseLinks = "        " +
+                responseLinks = "              " +
                         " -  " +
                         " -  " +
                         " -  " +
@@ -267,7 +267,7 @@ public class S4Dir {
                     "       </STYLE>\n" +
                     "       <style type=\"text/css\">" +
                     "         <!--\n" +
-                    "           .uuid {font-size: 9px;color:#4A74B9}\n" +
+                    "           .uuid {font-size: 9px;color:#2A54B9}\n" +
                     "         -->\n" +
                     "       </style>" +
                     "       <style type=\"text/css\">" +
@@ -295,7 +295,7 @@ public class S4Dir {
         //pw.println("<A HREF=\"?C=N;O=D\">Name</a>"+getWhiteSpacePadding("Name",headerSpace)+"<A HREF=\"?C=M;O=A\">Last modified</a>            <A HREF=\"?C=S;O=A\">Size</a>        <A HREF=\"?C=D;O=A\">Description</a>");
 
         //No Images, No sorting links.
-        pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified             Size        Response Links");
+        pw.println("Name" + getWhiteSpacePadding("Name", headerSpace) + "Last modified                Size           Response Links");
         pw.println("<hr size=\"1\" noshade=\"noshade\">");
         //pw.println("<img src=\"/icons/back.gif\" alt=\"[DIR]\" /> <A HREF=\"http://experiments.opendap.org/opendap-3.5/nph-dods/data/\">Parent Directory</a>                               -   ");
 
@@ -382,7 +382,7 @@ public class S4Dir {
     private static String computeSizeString(String size) {
 
         int sz = Integer.parseInt(size);
-        String result;
+        String result, leftPad;
 
         int mag = 0;
 
@@ -390,28 +390,31 @@ public class S4Dir {
             sz /= 1024;
             mag++;
         }
+
+
         switch (mag) {
             case 0:
-                result = sz + " ";
+                result = sz + "  bytes";
                 break;
             case 1:
-                result = sz + "K";
+                result = sz + " Kbytes";
                 break;
             case 2:
-                result = sz + "M";
+                result = sz + " Mbytes";
                 break;
             case 3:
-                result = sz + "G";
+                result = sz + " Gbytes";
                 break;
             case 4:
-                result = sz + "P";
+                result = sz + " Pbytes";
                 break;
             default:
-                result = "Way to big!";
+                result = " Way too many bytes!";
                 break;
         }
 
-        result = getWhiteSpacePadding(result, 5) + result;
+
+        result = getWhiteSpacePadding(result, 11) + result;
         return result;
 
     }

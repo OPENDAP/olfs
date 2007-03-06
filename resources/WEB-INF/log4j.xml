@@ -19,8 +19,8 @@
       Example:
       2005-04-18T11:33:43 -0600 [    359843 -        395] DEBUG - thredds.servlet.CatGenServlet - doGet():
     -->
-    <appender name="coreServlet" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="${logdir}/coreServlet.log"/>
+    <appender name="ErrorLog" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${logdir}/error.log"/>
         <param name="MaxFileSize" value="20MB"/>
         <param name="MaxBackupIndex" value="5"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -44,85 +44,24 @@
         </layout>
     </appender>
 
-    <!-- keep track of Cache messages in a seperatefile. runs once a day -->
-    <appender name="cacheLog" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="${logdir}/cache.log"/>
-        <param name="MaxFileSize" value="100KB"/>
-        <param name="MaxBackupIndex" value="2"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="[%d{dd/MMM/yyyy:HH:mm:ss}] %m%n"/>
-        </layout>
-    </appender>
 
-    <!--
-      Example:
-      2005-04-18T11:33:43 -0600 [    359843 -        395] DEBUG - thredds.servlet.CatGenServlet - doGet():
-    -->
-    <appender name="dqcServletRedirect"
-              class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="${logdir}/dqcServletRedirect.log"/>
-        <param name="MaxFileSize" value="1MB"/>
-        <param name="MaxBackupIndex" value="5"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%10r][%8X{ID}] %-5p - %c - %m%n"/>
-            <!--param name="ConversionPattern" value="%d{ISO8601} [%10r - %10X{ID}] %-5p - %c - %m%n"/-->
-        </layout>
-    </appender>
 
-    <logger name="cacheLogger">
-        <level value="ALL"/>
-        <appender-ref ref="cacheLog"/>
-    </logger>
-
+    <!-- THREDDS library logging -->
 
     <logger name="thredds">
-        <level value="ALL"/>
-        <appender-ref ref="stdout"/>
+        <level value="Error"/>
+        <appender-ref ref="ErrorLog"/>
     </logger>
 
-    <logger name="threddsAccessLogger">
-        <level value="ALL"/>
-        <appender-ref ref="stdout"/>
-    </logger>
 
 
     <!-- OPeNDAP Hyrax Logging -->
 
-    <!-- Default Logging level -->
     <logger name="opendap">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
+        <level value="Error"/>
+        <appender-ref ref="ErrorLog"/>
     </logger>
 
-
-    <!-- CoreServlet Logging -->
-    <logger name="opendap.coreServlet">
-        <level value="INFO"/>
-    </logger>
-
-    <logger name="opendap.coreServlet.DispatchServlet">
-        <level value="INFO"/>
-    </logger>
-
-    <logger name="opendap.coreServlet.ReqInfo">
-        <level value="INFO"/>
-    </logger>
-
-    <logger name="opendap.coreServlet.DocServlet">
-        <level value="INFO"/>
-    </logger>
-
-
-    <!-- OLFS Logging. Includes BesAPI -->
-    <logger name="opendap.bes">
-        <level value="ALL"/>
-    </logger>
-
-    <logger name="opendap.bes.BESCrawlableDataset">
-        <level value="ALL"/>
-    </logger>
 
 
     <!-- Access/Performance Logging -->
@@ -137,16 +76,6 @@
     </logger>
 
 
-    <!-- Initialize a few loggers to make the servlet debug web interface more convenient. -->
-    <logger name="thredds.catalog"/>
-    <logger name="thredds.cataloggen"/>
-    <logger name="thredds.dqc"/>
-    <logger name="thredds.servlet"/>
-
-    <logger name="thredds.dqc.server.DqcServletRedirect">
-        <level value="ALL"/>
-        <appender-ref ref="dqcServletRedirect"/>
-    </logger>
 
     <!--root>
      <level value="ALL"/>

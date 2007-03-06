@@ -32,12 +32,16 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 <span class="style4">Hyrax <span class="style3">(version: beta-1.5)</span></span></h1>
 <hr size="1" noshade="noshade">
 <h4>Synopsis</h4>
+<p>I see logging activities falling into two catagories: </p>
+<ul>
+  <li><strong><a href="#Access">Access Logging</a></strong> - Is used to monitor server usage, server performance, and to see which resources are receiving the most attention. Tomcat has a very nice, built in Access Logging mechanism,all you have to do is <a href="#Access">turn it on</a>.<br>
+      <br>
+    <br>
+  </li>
+  <li> <strong><a href="#Debug">Informational and debug logging</a></strong> - Most developers (myself included) rely on a collection of imbedded &quot;instrumentation&quot; that allows them to monior their code and see what parts are being excecuted. Typically we like to design this instrumentation so that it can be enabled/disabled at runtime. Hyrax has this type of debugging instrumentation Hyrax ships with it disabled, but you could enable it. If you were to encounter an internal problem with Hyrax I would have you enbale different aspects of the instrumentation at you site so that we could review the output to determine the issue. </li>
+</ul>
 <p>&nbsp;</p>
-<p>Need to write up a bunch of stuff about logging here! </p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<h1><a name="OLFS"></a>Access Logging </h1>
+<h1><a name="Access"></a>Access Logging </h1>
 <p>Many people will want to record access logs for their Hyrax server. <strong>We</strong> want you to keep access logs for your Hyrax server.
  The easiest way to get a simple access log for Hyrax is to utilize the Tomcat/Catalina implementation of the 
 <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html">org.apache.catalina.valves.AccessLogValve</a> class. </p>
@@ -87,7 +91,7 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
     .
 &lt;/Service&gt;</pre>
   You can uncomment the &lt;Valve&gt; element to enable it and you 
-  can change the values of the various attributes to suite your localization:<br>
+  can change the values of the various attributes to suite your localization. For example:<br>
     <br>
     <br>
     <br>
@@ -100,21 +104,119 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
                    prefix=&quot;access_log.&quot; 
                    suffix=&quot;.log&quot; 
                    pattern=&quot;%h %l %u %t &amp;quot;%r&amp;quot; %s %b %D&quot;
-                   resolveHosts=&quot;false&quot;/&gt;
-</pre>
-Of note is the <em>pattern</em> attribute which allows you to customize the content of the access log entries. <br>
-It is documented in the <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/index.html">javadocs for Tomcatt/Catalina</a>, as part of the  <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html">org.apache.catalina.valves.AccessLogValve</a> class.<br>
+                   resolveHosts=&quot;false&quot;/&gt;<br>
+  </pre></li>
+  <li>Save the file.<br>
+    <br>
+  </li>
+  <li>Restart Tomcat.<br>
+    <br>
+  </li>
+  <li>Go read yer log files!  <br>
   </li>
 </ol>
 <p>&nbsp;</p>
-
-<h1><a name="DOCS"></a>Performance, Informational, and Debug Logging </h1>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<h2><strong>Log4j</strong></h2>
-<p><br>
+<p>Of note is the <em>pattern</em> attribute which allows you to customize the content of the access log entries. <br>
+  It is documented in the <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/index.html">javadocs for Tomcatt/Catalina</a>, as part of the <a href="http://tomcat.apache.org/tomcat-5.0-doc/catalina/docs/api/org/apache/catalina/valves/AccessLogValve.html">org.apache.catalina.valves.AccessLogValve</a> class. The pattern shown above will provide log output that looks like this:<br>
 </p>
-<blockquote>&nbsp;</blockquote>
+<pre>
+        69.59.200.52 - - [05/Mar/2007:16:29:14 -0800] &quot;GET /opendap/data/nc/contents.html HTTP/1.1&quot; 200 13014 234
+        69.59.200.52 - - [05/Mar/2007:16:29:14 -0800] &quot;GET /opendap/docs/images/logo.gif HTTP/1.1&quot; 200 8114 2
+        69.59.200.52 - - [05/Mar/2007:16:29:51 -0800] &quot;GET /opendap/data/nc/TestPatDbl.nc.html HTTP/1.1&quot; 200 11565 137
+        69.59.200.52 - - [05/Mar/2007:16:29:56 -0800] &quot;GET /opendap/data/nc/data.nc.ddx HTTP/1.1&quot; 200 2167 121
+</pre>
+<p>Where the last column is the time in millseconds it took to service the request and the next to the last column is the number of bytes returned. <br>
+</p>
+<h1><a name="Debug"></a> Informational and Debug Logging Using Log4j </h1>
+<p>In general you shouldn't have to modify the default logging configuration for Hyrax. It may become necessary, if you encounter problems, but otherwise I suggest you leave it be. </p>
+<p>Having said that: Hyrax uses the Log4j logging package to provide an easily configurable and flexible logging environment. All &quot;console&quot; output is routed through the Log4j package and can be controlled using the Log4j configuration file. </p>
+<p>There are several logging levels available: </p>
+<ul>
+  <li><strong>TRACE</strong></li>
+  <li><strong>DEBUG</strong></li>
+  <li><strong> INFO </strong></li>
+  <li><strong>WARN</strong></li>
+  <li><strong>ERROR</strong></li>
+  <li><strong>FATAL</strong></li>
+</ul>
+<p>Hyrax ships with a default logging level of <strong>ERROR</strong>. </p>
+<p>Additionally Hyrax maintains it's own access log using Log4j .</p>
+<p><span class="style4">I strongly recommend that you take the time to <a href="http://logging.apache.org/log4j/docs/manual.html"><strong>read about Log4j</strong></a> before you attempt to manipulate the Log4j configuration. </span></p>
+<h3>Configuration File Location </h3>
+<p>Log4j gets it's configuration from an XML file. Hyrax locates  this file in the following manner:</p>
+<ol>
+  <li>Checks the &lt;init-paramter&gt; list for the hyrax servlet (in the web.xml) for a an &lt;init-parameter&gt; called &quot;log4j-init-file&quot;. If found, the value of this parameter is assumed to be a fully qualified path name for the file. This can be used to specify alternate Log4j config files. Note that this configuration will not be persistent across new installations of Hyrax.<br>
+    <br>
+  </li>
+  <li>Failing 1, Hyrax then checks in the persistant content directory (<em>$TOMCAT_HOME/content/opendap</em>) for the file &quot;log4j.xml&quot;. If this file is present then it will be used to configure logging, and new installations of Hyrax will detect ad use this logging configuration automatically. <br>
+    <br>
+  </li>
+  <li>Failing 2, Hyrax falls back to the log4j.xml file shipped with the distribution which is located in the <em>$TOMCAT_HOME/webapps/opendap/WEB-INF</em> directory. Changes made to this file will be lost when a new version of Hyrax is installed. </li>
+</ol>
+<p>So - if you want to customize your Hyrax logging and have it be persistent, do it by copying the distributed <em>log4j.xml</em> file (<em>$TOMCAT_HOME/content/opendap/log4j.xml</em>) to the in the peristent content directory and editing that copy.  </p>
+<h3>Configuration</h3>
+<p>Did you <a href="http://logging.apache.org/log4j/docs/manual.html">read about Log4j</a>? Great...</p>
+<p>There are a number of Appenders defined in the Hyrax log4j.xml file:</p>
+<ul>
+  <li><strong>stdout</strong> - Loggers using this Appender will send everything to the console/stdout - which in a Tomcat environment will get shunted into the file <em>$TOMCAT_HOME/logs/catalina.out</em></li>
+  <li><strong>devNull</strong> - Loggers using this Appender will not log. All messages wil be discarded. This is the Log4j equivalent of piping your output into <em>/dev/null</em> in a UNIX environment. </li>
+  <li><strong>ErrorLog</strong> - Loggers using this Appender will have their log output placed in the error log file in the persistent content directory: <em>$TOMCAT_HOME/content/opendap/logs/error.log</em></li>
+  <li><strong>HyraxAccessLog</strong> - Loggers using this Appender will have their log output placed in the access log file n the persistent content directory: <em>$TOMCAT_HOME/content/opendap/logs/HyraxAccess.log</em></li>
+</ul>
+<p>The default configuration pushes <strong>error</strong> level (and higher) messages into the <strong>ErrorLog</strong>, and logs accesses using <strong>HyraxAccessLog</strong>. You can turn on debugging level loggin by changing the log level to <strong>DEBUG</strong> for the software coponents you are interested in. All of the OPeNDAP code is in the &quot;opendap&quot; package and all of the THREDDS code is in the &quot;thredds&quot; package. Thus:</p>
+<pre>
+    &lt;logger name=&quot;thredds&quot;&gt;
+        &lt;level value=&quot;Error&quot;/&gt;
+        &lt;appender-ref ref=&quot;ErrorLog&quot;/&gt;
+    &lt;/logger&gt;
+	
+    &lt;logger name=&quot;opendap&quot;&gt;
+        &lt;level value=&quot;Error&quot;/&gt;
+        &lt;appender-ref ref=&quot;ErrorLog&quot;/&gt;
+    &lt;/logger&gt;
+</pre>
+<p>Will cause all log messages of <strong>ERROR</strong> level or higher to be sent to the error log.</p>
+<p>This configuration:</p>
+<pre>
+    &lt;logger name=&quot;thredds&quot;&gt;
+        &lt;level value=&quot;INFO&quot;/&gt;
+        &lt;appender-ref ref=&quot;stdout&quot;/&gt;
+    &lt;/logger&gt;
+	
+    &lt;logger name=&quot;DocServletAccess&quot;&gt;
+        &lt;level value=&quot;INFO&quot;/&gt;
+        &lt;appender-ref ref=&quot;stdout&quot;/&gt;
+    &lt;/logger&gt;
+</pre>
+<p>Will cause all messages of level <strong>INFO</strong> or higher to be sent to <strong>stdout</strong>, which (in Tomcat) means that they will get stuck in the file <em>$TOMCAT_HOME/logs/catalina.out</em></p>
+<p>This configuration: </p>
+<pre>
+    &lt;logger name=&quot;thredds&quot;&gt;
+        &lt;level value=&quot;ALL&quot;/&gt;
+        &lt;appender-ref ref=&quot;devNull&quot;/&gt;
+    &lt;/logger&gt;
+	
+    &lt;logger name=&quot;opendap&quot;&gt;
+        &lt;level value=&quot;ALL&quot;/&gt;
+        &lt;appender-ref ref=&quot;devNull&quot;/&gt;
+    &lt;/logger&gt;
+</pre>
+
+
+<p>Will cause all logging (except a hyrax access logging) to be discarded. </p>
+<p>Hyrax access logging can be disabled in a similar manner:</p>
+<pre>
+    &lt;logger name=&quot;HyraxAccess&quot;&gt;
+        &lt;level value=&quot;ALL&quot;/&gt;
+        &lt;appender-ref ref=&quot;devNull&quot;/&gt;
+    &lt;/logger&gt;
+	
+    &lt;logger name=&quot;DocServletAccess&quot;&gt;
+        &lt;level value=&quot;ALL&quot;/&gt;
+        &lt;appender-ref ref=&quot;devNull&quot;/&gt;
+    &lt;/logger&gt;
+</pre>
+<p>Be sure to get in touch if you have further questions about the logging configuration. </p>
 <hr size="1" noshade="noshade">
 <h3><br /></h3></body>
 </html>

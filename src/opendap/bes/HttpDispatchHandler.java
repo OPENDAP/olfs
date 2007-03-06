@@ -109,7 +109,7 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
     public String getVersionStringForTHREDDSCatalog() {
         return "OPeNDAP Hyrax (" + Version.getVersionString() + ")" +
-                "<font size='-5' color='#5A647E'>" +
+                "<font size='-5' color='#7A849E'> " +
                 "ServerUUID=" + Version.getServerUUID() + "-catalog" +
                 "</font><br />";
 
