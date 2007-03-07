@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 
+import thredds.servlet.DataRootHandler;
+
 /**
  * Impelmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to
  * provide specific Server responses to SOAP requests. The DispatchServlet_OLD REQUIRES an implmentation of this interface
@@ -37,7 +39,7 @@ import javax.servlet.ServletException;
  */
 public interface OpendapSoapDispatchHandler {
 
-    public void init(HttpServlet ds) throws ServletException;
+    public void init(HttpServlet ds, DataRootHandler drh) throws ServletException;
 
 
 
@@ -47,7 +49,7 @@ public interface OpendapSoapDispatchHandler {
      * @param reqID The request ID from the Request Element in the SOAP body
      * @param cmd The GetDATA commad Element from the the Request.
      * @param mpr The multipart response into which the DATA response should be added.
-     * @throws Exception
+     * @throws Exception When things go awry.
      */
     public void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
 
@@ -57,7 +59,7 @@ public interface OpendapSoapDispatchHandler {
      * @param reqID The request ID from the Request Element in the SOAP body
      * @param cmd The GetDDX commad Element from the the Request.
      * @param mpr The multipart response into which the DDX should be added.
-     * @throws Exception
+     * @throws Exception When things go awry.
      */
     public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
 
@@ -68,7 +70,7 @@ public interface OpendapSoapDispatchHandler {
      * @param reqID The request ID from the Request Element in the SOAP body
      * @param cmd The GetTHREDDSCatalog commad Element from the the Request.
      * @param mpr The multipart response into which the THREDDS catalog should be added.
-     * @throws Exception
+     * @throws Exception When things go awry.
      */
     public void getTHREDDSCatalog(HttpServletRequest srvReq,  String reqID, Element cmd, MultipartResponse mpr) throws Exception;
 }

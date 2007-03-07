@@ -70,6 +70,27 @@ public class ReqInfo {
 
     private static Logger log;
 
+    public static void init(){
+        log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
+
+    }
+
+
+
+    public static String getBaseURI(HttpServletRequest req){
+
+        String buri = req.getRequestURI().substring(req.getContextPath().length(),req.getRequestURI().length());
+
+
+        buri  =  req.getRequestURL().substring(0,req.getRequestURL().lastIndexOf(buri));
+
+        return buri;
+
+    }
+
+
+
+
 
 
     /**
@@ -85,11 +106,6 @@ public class ReqInfo {
         }
 
         return CE;
-    }
-
-    public static void init(){
-        log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
-
     }
 
 

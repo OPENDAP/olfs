@@ -147,6 +147,11 @@ public class DispatchServlet extends HttpServlet {
         odh.init(this);
 
 
+        initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
+
+
+
+
         className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
         if (className == null)
             throw new ServletException("Missing servlet parameter \"OpendapSoapDispatchHandlerImplementation\"." +
@@ -154,7 +159,7 @@ public class DispatchServlet extends HttpServlet {
                     "be identified in this (missing) servlet parameter.");
 
         log.info("OpendapSoapDispatchHandlerImplementation is " + className);
-
+      
         try {
             Class classDefinition = Class.forName(className);
             sdh = (OpendapSoapDispatchHandler) classDefinition.newInstance();
@@ -166,11 +171,8 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException("Cannot find class: " + className, e);
         }
 
+        sdh.init(this,dataRootHandler);
 
-        sdh.init(this);
-
-
-        initTHREDDS(ServletUtil.getContextPath(this), ServletUtil.getContentPath(this));
 
 
         log.info("init() complete.  ");

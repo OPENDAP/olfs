@@ -134,7 +134,6 @@ public class SOAPRequestDispatcher {
         String reqID = reqElement.getAttributeValue("reqID", osnms);
 
 
-        log.debug("Request Element: \n" + reqElement.toString());
 
 
         try {
@@ -144,14 +143,17 @@ public class SOAPRequestDispatcher {
                 Element cmd = (Element) cmds.get(0);
 
                 if (cmd.getName().equals("GetDATA")) {
+                    log.debug("requestDispatcher(): <GetDATA> Element.");
 
                     sdh.getDATA( reqID, cmd, mpr);
 
                 } else if (cmd.getName().equals("GetDDX")) {
+                    log.debug("requestDispatcher(): <GetDDX> Element.");
 
                     sdh.getDDX( reqID, cmd, mpr);
 
                 } else if (cmd.getName().equals("GetTHREDDSCatalog")) {
+                    log.debug("requestDispatcher(): <GetTHREDDSCatalog> Element.");
 
                     sdh.getTHREDDSCatalog(srvReq, reqID, cmd, mpr);
 
@@ -162,7 +164,7 @@ public class SOAPRequestDispatcher {
                     Element err = ExceptionElementUtil.makeExceptionElement(
                             "BadSOAPRequest",
                             "Request (reqID: " + reqID + ") not recognized by this server.",
-                            "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+                            "opendap.coreServlet.SOAPRequestDispatcher.requestDispatcher()"
                     );
                     mpr.addSoapBodyPart(err);
 

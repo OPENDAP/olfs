@@ -50,11 +50,12 @@ public class Util {
      */
     public static String showRequest(HttpServletRequest req, long reqno) {
 
-        String msg = "-------------------------------------------\n";
+        String msg = "\n-------------------------------------------\n";
         msg += "showRequest():\n";
         msg += "  Request #" + reqno + "\n";
         msg += "  Client:  " + req.getRemoteHost() + "\n";
         msg += "  Request Info:\n";
+        msg += "    baseURI:                   '" + ReqInfo.getBaseURI(req) + "'\n";
         msg += "    fullSourceName:            '" + ReqInfo.getFullSourceName(req) + "'\n";
         msg += "    dataSource:                '" + ReqInfo.getDataSource(req) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";

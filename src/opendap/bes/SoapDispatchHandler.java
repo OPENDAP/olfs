@@ -42,31 +42,37 @@ import org.slf4j.Logger;
 
 
 import thredds.cataloggen.SimpleCatalogBuilder;
+import thredds.servlet.DataRootHandler;
+import thredds.catalog.*;
+import thredds.catalog.parser.jdom.InvCatalogFactory10;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 
 /**
- *
  * Handler for SOAP requests.
- *
  */
 public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
     Logger log;
 
+    DataRootHandler _dataRootHandler;
+
     /**
-     *
-     * @param ds The Servlet that is aclling init().
-     * @throws ServletException
+     * @param ds  The Servlet that is calling init().
+     * @param drh The DataRootHandler that will be used to handle THREDDS requests.
+     * @throws ServletException When things go wrong.
      */
-    public void init(HttpServlet ds) throws ServletException{
+    public void init(HttpServlet ds, DataRootHandler drh) throws ServletException {
+
+        _dataRootHandler = drh;
+
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
+        log.info("init() complete.");
 
     }
-
-
 
 
     /**
@@ -80,28 +86,27 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * @param mpr
      * @throws Exception
      */
-    public void getDATA( String reqID,  Element cmd, MultipartResponse mpr) throws Exception {
+    public void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
-        log.debug("Received GetDATA reqElement.");
         Element dataSet = cmd.getChild("DataSet", osnms);
 
-        log.debug("Dataset:\n"+dataSet.toString());
+        log.debug("getDATA() Dataset:\n" + dataSet.toString());
 
 
-        String datasetname = dataSet.getChild("name",osnms).getTextTrim();
-        String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
+        String datasetname = dataSet.getChild("name", osnms).getTextTrim();
+        String ce = dataSet.getChild("ConstraintExpression", osnms).getTextTrim();
 
-        log.debug("Processing DataSet - path: "+datasetname+"   ce: "+ce);
+        log.debug("getDATA() Processing DataSet - path: " + datasetname + "   ce: " + ce);
 
-        Element respElement = new Element("Response",osnms);
-        respElement.setAttribute("reqID",reqID,osnms);
+        Element respElement = new Element("Response", osnms);
+        respElement.setAttribute("reqID", reqID, osnms);
         String contentId = MultipartResponse.newUidString();
-        respElement.setAttribute("href","cid:"+contentId,osnms);
+        respElement.setAttribute("href", "cid:" + contentId, osnms);
 
 
-        Document ddxDoc =  BesAPI.getDDXDocument(datasetname, ce);
+        Document ddxDoc = BesAPI.getDDXDocument(datasetname, ce);
         Element ddx = ddxDoc.getRootElement();
         //@todo Fix The BES use of dodsBLOB!
 
@@ -113,11 +118,10 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         blob.setAttribute("href", "cid:" + blobID);
 
 
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        xmlo.output(ddxDoc,baos);
+        xmlo.output(ddxDoc, baos);
 
 
         mpr.addAttachment("text/xml",
@@ -127,9 +131,10 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         mpr.addAttachment("application/octet-stream",
                 blobID,
-                BesAPI.getDap2DataStream(datasetname, ce,BesAPI.XML_ERRORS));
+                BesAPI.getDap2DataStream(datasetname, ce, BesAPI.XML_ERRORS));
 
         mpr.addSoapBodyPart(respElement);
+        log.debug("getDATA() completed.");
     }
 
 
@@ -143,27 +148,121 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      */
     public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
-        log.debug("Received GetDDX reqElement.");
 
 
         Element dataSet = cmd.getChild("DataSet", osnms);
 
-        log.debug("Dataset:\n"+dataSet.toString());
+        log.debug("getDDX() Dataset:\n" + dataSet.toString());
 
 
-        String datasetname = dataSet.getChild("name",osnms).getTextTrim();
-        String ce = dataSet.getChild("ConstraintExpression",osnms).getTextTrim();
+        String datasetname = dataSet.getChild("name", osnms).getTextTrim();
+        String ce = dataSet.getChild("ConstraintExpression", osnms).getTextTrim();
 
-        log.debug("Processing DataSet - path: "+datasetname+"   ce: "+ce);
+        log.debug("getDDX() Processing DataSet path: " + datasetname + "   ce: " + ce);
 
-        Element respElement = new Element("Response",osnms);
-        respElement.setAttribute("reqID",reqID,osnms);
+        Element respElement = new Element("Response", osnms);
+        respElement.setAttribute("reqID", reqID, osnms);
 
         // Note that this call does not parse the DDX document into an opendap.dap.DDS, just
         // into a jdom.Document that gets it's root element stuffed into the SOAP envelope.
         respElement.addContent(BesAPI.getDDXDocument(datasetname, ce).detachRootElement());
 
         mpr.addSoapBodyPart(respElement);
+
+
+        log.debug("getDDX() completed.");
+
+    }
+
+
+    /**
+     * Handles a SOAP request for a THREDDS catalog.
+     *
+     * @param srvReq
+     * @param reqID
+     * @param cmd
+     * @param mpr
+     * @throws Exception
+     */
+    public void getTHREDDSCatalog_OLD(HttpServletRequest srvReq, String reqID, Element cmd, MultipartResponse mpr) throws Exception {
+
+        Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
+        Element respElement;
+
+
+        log.debug("Received GetTHREDDSCatalog reqElement.");
+
+        String path = cmd.getChild("path", osnms).getTextTrim();
+
+        path = BESCrawlableDataset.besPath2ThreddsPath(path);
+
+        BESCrawlableDataset cds = new BESCrawlableDataset(path, null);
+
+        String reqURI = srvReq.getRequestURI();
+        String pathInfo = srvReq.getPathInfo();
+
+/*
+        respElement =  ExceptionElementUtil.makeExceptionElement(
+                "CatalogGenError",
+
+                        "getRequestURI(): "+srvReq.getRequestURI()+"     " +
+                        "getPathInfo(): "+srvReq.getPathInfo()+"\n",
+                "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+        );
+        mpr.addSoapBodyPart(respElement);
+*/
+
+//@todo Why did I have to do this? doPost() and doGet() have different behaviours relative to reqURI and pathINFO
+        String baseURL;
+        if (pathInfo != null)
+            baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
+        else
+            baseURL = reqURI + "/";
+
+
+        if (cds.isCollection()) {
+
+            SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
+                    "",                                   // CollectionID, which for us needs to be empty.
+                    BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
+                    "OPeNDAP-Hyrax",                    // Service Name
+                    "OPeNDAP",                            // Service Type Name
+                    baseURL); // Base URL for this service
+
+            log.debug("SOAPRequestDispatcher:GetTHREDDSCatalog - " +
+                    "Generating catalog using SimpleCatalogBuilder");
+
+
+            Document catalog = scb.generateCatalogAsDocument(cds);
+
+            if (catalog == null) {
+                log.debug("SimpleCatalogBuilder.generateCatalogAsDocument(" + path + ") returned null.");
+                respElement = ExceptionElementUtil.makeExceptionElement(
+                        "BadSOAPRequest",
+                        "Requested catalog (" + cmd.getChild("path").getTextTrim() + " is not available.",
+                        "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+                );
+            } else {
+                respElement = new Element("Response", osnms);
+                respElement.setAttribute("reqID", reqID, osnms);
+                respElement.addContent(catalog.detachRootElement());
+            }
+
+        } else {
+
+            String msg = "ERROR: THREDDS catalogs may only be requested for collections, " +
+                    "not for individual data sets. The path: \"" + cmd.getChild("path").getTextTrim() +
+                    "\" does not resolve to a collection.";
+
+            respElement = ExceptionElementUtil.makeExceptionElement(
+                    "BadSOAPRequest",
+                    msg,
+                    "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+            );
+
+        }
+        mpr.addSoapBodyPart(respElement);
+
 
     }
 
@@ -183,82 +282,79 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         Element respElement;
 
 
+        String path = cmd.getChild("path", osnms).getTextTrim();
 
-        log.debug("Received GetTHREDDSCatalog reqElement.");
+        log.debug("getTHREDDSCatalog() SOAP message is requesting a THREDDS catalog for path: " + path);
 
-        String path = cmd.getChild("path",osnms).getTextTrim();
+        String catalogName;
 
-        path = BESCrawlableDataset.besPath2ThreddsPath(path);
-
-        BESCrawlableDataset cds = new BESCrawlableDataset(path, null);
-
-        String reqURI   = srvReq.getRequestURI();
-        String pathInfo = srvReq.getPathInfo();
-
-/*
-        respElement =  ExceptionElementUtil.makeExceptionElement(
-                "CatalogGenError",
-
-                        "getRequestURI(): "+srvReq.getRequestURI()+"     " +
-                        "getPathInfo(): "+srvReq.getPathInfo()+"\n",
-                "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
-        );
-        mpr.addSoapBodyPart(respElement);
-*/
-
-//@todo Why did I have to do this? doPost() and doGet() have different behaviours relative to reqURI and pathINFO
-        String baseURL;
-        if(pathInfo != null)
-            baseURL = reqURI.substring(0, reqURI.lastIndexOf(pathInfo) + 1);
+        if(path.endsWith("/"))
+            catalogName = path + "catalog.xml";
         else
-            baseURL = reqURI+"/";
+            catalogName = path + "/catalog.xml";
 
 
-        if (cds.isCollection()) {
+        log.debug("getTHREDDSCatalog() Requesting catalog: " + catalogName);
 
-            SimpleCatalogBuilder scb = new SimpleCatalogBuilder(
-                    "",                                   // CollectionID, which for us needs to be empty.
-                    BESCrawlableDataset.getRootDataset(), // Root dataset of this collection
-                    "OPeNDAP-Hyrax",                    // Service Name
-                    "OPeNDAP",                            // Service Type Name
-                    baseURL ); // Base URL for this service
+        URI baseURI = thredds.servlet.ServletUtil.getRequestURI(srvReq);
 
-            log.debug("SOAPRequestDispatcher:GetTHREDDSCatalog - " +
-                    "Generating catalog using SimpleCatalogBuilder");
+        InvCatalog catalog = _dataRootHandler.getCatalog(catalogName, baseURI);
 
 
+        if (catalog == null) {
+            log.warn("getTHREDDSCatalog() DataRootHandler.getCatalog(" + path + ","+baseURI+") returned null.");
+            respElement = ExceptionElementUtil.makeExceptionElement(
+                    "BadSOAPRequest",
+                    "Requested catalog \"" + path + "\" is not available.",
+                    "opendap.bes.SOAPDispatchHandler.getTHREDDSCatalog()"
+            );
+        } else {
+            StringBuffer sb = new StringBuffer();
 
-            Document catalog = scb.generateCatalogAsDocument(cds);
+            if (catalog.check(sb)) {
 
-            if(catalog == null){
-                log.debug("SimpleCatalogBuilder.generateCatalogAsDocument("+path+") returned null.");
-                respElement =  ExceptionElementUtil.makeExceptionElement(
+
+                InvCatalogFactory fac = InvCatalogFactory.getDefaultFactory(false);
+                InvCatalogConvertIF converter = fac.getCatalogConverter(XMLEntityResolver.CATALOG_NAMESPACE_10);
+                InvCatalogFactory10 fac10 = (InvCatalogFactory10) converter;
+
+                Document catalogDoc = fac10.writeCatalog((InvCatalogImpl) catalog);
+
+
+                if (catalogDoc == null) {
+                    log.warn("getTHREDDSCatalog()  InvCatalogFactory10.writeCatalog(" + path + ") returned null.");
+                    respElement = ExceptionElementUtil.makeExceptionElement(
+                            "BadSOAPRequest",
+                            "Requested catalog (" + path + " is not available.",
+                            "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+                    );
+                } else {
+                    respElement = new Element("Response", osnms);
+                    respElement.setAttribute("reqID", reqID, osnms);
+                    respElement.addContent(catalogDoc.detachRootElement());
+                }
+
+            } else {
+
+                String msg = "ERROR: THREDDS InvCatalog.check() failed! " +
+                        "The path: \"" + path  +
+                        "\" does not appear to resolve to a valid THREDDS catalog. " +
+                        "InvCatalog.check() returned: " + sb;
+                log.warn("getTHREDDSCatalog()   "+msg);
+
+                respElement = ExceptionElementUtil.makeExceptionElement(
                         "BadSOAPRequest",
-                        "Requested catalog ("+cmd.getChild("path").getTextTrim()+" is not available.",
+                        msg,
                         "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
                 );
+
             }
-            else {
-                respElement = new Element("Response",osnms);
-                respElement.setAttribute("reqID",reqID,osnms);
-                respElement.addContent(catalog.detachRootElement());
-            }
-
-        } else {
-
-            String msg = "ERROR: THREDDS catalogs may only be requested for collections, " +
-                    "not for individual data sets. The path: \""+cmd.getChild("path").getTextTrim()+
-                    "\" does not resolve to a collection.";
-
-            respElement =  ExceptionElementUtil.makeExceptionElement(
-                    "BadSOAPRequest",
-                    msg,
-                    "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
-            );
-
         }
         mpr.addSoapBodyPart(respElement);
 
+        log.debug("getTHREDDSCatalog() completed.");
 
     }
+
+
 }
