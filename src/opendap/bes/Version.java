@@ -33,7 +33,7 @@ import org.jdom.Text;
 public class Version {
 
 
-    private static String version = "0.1.5";
+    private static String version = "1.1.0";
 
     public static String getVersionString() {
         return (version);
