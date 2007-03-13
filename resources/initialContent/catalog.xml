@@ -90,20 +90,6 @@ Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following
     <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
 
-    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
-
-    <datasetScan location="/bes/Test" path="Test" name="NotSVN" serviceName="OPeNDAP-Hyrax">
-
-        <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
-        <filter>
-            <exclude wildcard=".*" atomic="true" collection="true"/>
-            <include wildcard="*"/>
-        </filter>
-        <addDatasetSize />
-
-    </datasetScan>
-
-    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
 
 
 

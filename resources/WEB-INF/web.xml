@@ -39,7 +39,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>  probeRequest </param-value>
+            <param-value></param-value>
         </init-param>
 
 

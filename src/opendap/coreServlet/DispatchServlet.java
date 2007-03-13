@@ -64,6 +64,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DispatchServlet extends HttpServlet {
 
 
+
+
     /**
      * ************************************************************************
      * Used for thread syncronization.
@@ -251,19 +253,18 @@ public class DispatchServlet extends HttpServlet {
         //dataRootHandler.makeDebugActions();
         //DatasetHandler.makeDebugActions();
 
-
         HtmlWriter.init(
-                contextPath,  // context path
-                this.getServletContext().getServletContextName(), // Name of Webb Application
-                odh.getVersionStringForTHREDDSCatalog(), // Version
-                this.getDocsPath(), // docs path
-                "", // userCssPath
-                "docs/images/cog.gif", // context Logo
-                "OPeNDAP Inc.",  // Alternate text for context logo
-                "docs/images/logo.gif",  // Institute Logo path
-                "OPeNDAP Inc.",  // Alternate text for Institute logo
-                "docs/images/nsf-logo.png' width=\"20\" height=\"20\"  ",  // Folder Image
-                "last thing on the list"       // Alternate text for folder image
+                contextPath,                              // context path
+                "Hyrax Data Server",                      // Name of Webb Application
+                odh.getVersionStringForTHREDDSCatalog(),  // Version
+                this.getDocsPath(),                       // docs path
+                "docs/css/thredds.css",                   // userCssPath
+                "docs/images/folder.gif",                 // context Logo
+                "Context Logo",                           // Alternate text for context logo
+                "docs/images/logo.gif",                   // Institute Logo path
+                "OPeNDAP Inc.",                           // Alternate text for Institute logo
+                "docs/images/sml-folder.png",             // Folder Image
+                "This is a collection  "                  // Alternate text for folder image
         );
 
         threddsUpdateLock = new ReentrantLock(true);
