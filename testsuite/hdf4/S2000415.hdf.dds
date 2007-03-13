@@ -32,4 +32,4 @@ Dataset {
             } High_Wind_Speed_Flag;
         } NSCAT%20L2;
     } NSCAT%20Rev%2020;
-} S2000415.hdf;
+} S2000415.HDF;
