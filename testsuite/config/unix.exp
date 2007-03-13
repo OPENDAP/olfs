@@ -74,7 +74,7 @@ proc getdap_dds { url file {constraint ""} } {
 
 #send_user "Constraint: $constraint\n"
 getdap_start "-d ${constraint}"  "$url"
-compare_stdout $file "getdap DDS for $url (baseline file: $file)" 1
+compare_stdout $file "getdap DDS for $url (baseline file: $file)" 0
 }
 
 
@@ -85,7 +85,7 @@ proc getdap_das { url file {constraint ""} } {
 
 #send_user "Constraint: $constraint\n"
 getdap_start "-a ${constraint}"  "$url"
-compare_stdout $file "getdap DAS for $url (baseline file: $file)" 1
+compare_stdout $file "getdap DAS for $url (baseline file: $file)" 0
 }
 
 
@@ -96,7 +96,7 @@ proc getdap_ddx { url file {constraint ""} } {
 
 #send_user "Constraint: $constraint\n"
 getdap_start "-x ${constraint}"  "$url"
-compare_stdout $file "getdap DDX for $url (baseline file: $file)" 1
+compare_stdout $file "getdap DDX for $url (baseline file: $file)" 0
 }
 
 
@@ -108,7 +108,7 @@ proc getdap_data { url file {constraint ""} } {
 #send_user "Constraint: $constraint\n"
 
 getdap_start "-D ${constraint}"  "$url"
-compare_stdout $file "getdap OPeNDAP data for $url (baseline file: $file)" 1
+compare_stdout $file "getdap OPeNDAP data for $url (baseline file: $file)" 0
 }
 
 
@@ -203,7 +203,7 @@ proc curl_dds { url fileBase {constraint ""} } {
 
 
     curl_start "${url}.dds?$constraint"
-    compare_stdout "${fileBase}.dds" "curl request for ${url}.dds?$constraint  against baseline file: $fileBase.dds" 1
+    compare_stdout "${fileBase}.dds" "curl request for ${url}.dds?$constraint  against baseline file: $fileBase.dds" 0
 }
 
 
@@ -213,7 +213,7 @@ proc curl_das { url fileBase {constraint ""} } {
     global spawn_id
 
     curl_start "${url}.das?$constraint"
-    compare_stdout "${fileBase}.das" "curl request for $url.das?$constraint  against baseline file: $fileBase.das" 1
+    compare_stdout "${fileBase}.das" "curl request for $url.das?$constraint  against baseline file: $fileBase.das" 0
 }
 
 
@@ -223,7 +223,7 @@ proc curl_ddx { url fileBase {constraint ""} } {
     global spawn_id
 
     curl_start "${url}.ddx?$constraint"
-    compare_stdout "${fileBase}.ddx" "curl request for $url.ddx?$constraint  against baseline file: $fileBase.ddx" 1
+    compare_stdout "${fileBase}.ddx" "curl request for $url.ddx?$constraint  against baseline file: $fileBase.ddx" 0
 }
 
 
@@ -233,7 +233,7 @@ proc curl_dap2 { url fileBase {constraint ""} } {
     global spawn_id
 
     curl_start "${url}.dods?$constraint"
-    compare_stdout "${fileBase}.dods" "curl request for $url.dods?$constraint  against baseline file: $fileBase.dods" 1
+    compare_stdout "${fileBase}.dods" "curl request for $url.dods?$constraint  against baseline file: $fileBase.dods" 0
 }
 
 proc curl_ascii { url fileBase {constraint ""} } {
@@ -242,7 +242,7 @@ proc curl_ascii { url fileBase {constraint ""} } {
     global spawn_id
 
     curl_start "${url}.ascii?$constraint"
-    compare_stdout "${fileBase}.ascii" "curl request for $url.ascii?$constraint  against baseline file: $fileBase.ascii" 1
+    compare_stdout "${fileBase}.ascii" "curl request for $url.ascii?$constraint  against baseline file: $fileBase.ascii" 0
 }
 
 
@@ -252,7 +252,7 @@ proc curl_info { url fileBase } {
     global spawn_id
 
     curl_start "${url}.info"
-    compare_stdout "${fileBase}.info" "curl request for $url.info  against baseline file: $fileBase.info" 1
+    compare_stdout "${fileBase}.info" "curl request for $url.info  against baseline file: $fileBase.info" 0
 }
 
 
@@ -262,7 +262,7 @@ proc curl_html { url fileBase} {
     global spawn_id
 
     curl_start "${url}.html"
-    compare_stdout "${fileBase}.html" "curl request for $url.html  against baseline file: $fileBase.html" 1
+    compare_stdout "${fileBase}.html" "curl request for $url.html  against baseline file: $fileBase.html" 0
 }
 
 

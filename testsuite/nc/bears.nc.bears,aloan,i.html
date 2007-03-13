@@ -319,8 +319,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/nc/bears.nc");
 <td align="right" valign="top"><h3>
 <a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
 <td><textarea name="global_attr" rows="5" cols="70">
-history: "This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example."
-Unlimited_Dimension: "k"
+NC_GLOBAL.history: "This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example."
+DODS_EXTRA.Unlimited_Dimension: "k"
 </textarea><p>
 
 <tr><td><td><hr>
@@ -393,9 +393,6 @@ org_opendap_order.add_dim(3);
 // -->
 </script>
 <br>
-<textarea name="order_attr" rows="5" cols="70">
-</textarea>
-
 
 <p><p>
 
@@ -424,9 +421,6 @@ org_opendap_shot.add_dim(3);
 // -->
 </script>
 <br>
-<textarea name="shot_attr" rows="5" cols="70">
-</textarea>
-
 
 <p><p>
 
@@ -455,9 +449,6 @@ org_opendap_aloan.add_dim(3);
 // -->
 </script>
 <br>
-<textarea name="aloan_attr" rows="5" cols="70">
-</textarea>
-
 
 <p><p>
 
@@ -486,9 +477,6 @@ org_opendap_cross.add_dim(3);
 // -->
 </script>
 <br>
-<textarea name="cross_attr" rows="5" cols="70">
-</textarea>
-
 
 <p><p>
 
@@ -511,9 +499,6 @@ org_opendap_i.add_dim(2);
 // -->
 </script>
 <br>
-
-<textarea name="i_attr" rows="5" cols="70">
-</textarea>
 
 
 <p><p>
@@ -538,9 +523,6 @@ org_opendap_j.add_dim(3);
 </script>
 <br>
 
-<textarea name="j_attr" rows="5" cols="70">
-</textarea>
-
 
 <p><p>
 
@@ -563,9 +545,6 @@ org_opendap_l.add_dim(3);
 // -->
 </script>
 <br>
-
-<textarea name="l_attr" rows="5" cols="70">
-</textarea>
 
 
 <p><p>

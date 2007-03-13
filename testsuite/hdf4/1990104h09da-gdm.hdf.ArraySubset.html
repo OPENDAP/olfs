@@ -319,36 +319,36 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/hdf/1990104h09da-gdm
 <td align="right" valign="top"><h3>
 <a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
 <td><textarea name="global_attr" rows="5" cols="70">
-Title: "AVHRR Oceans Pathfinder Equal Angle\\000"
-Data Center: "NASA/PO.DAAC AVHRR Oceans Pathfinder\\000"
-Station: "NOAA/NESDIS\\000"
-Mission: "AVHRR Oceans Pathfinder\\000"
-Mission Characteristics: "NOAA/NASA AVHRR Oceans Pathfinder\\000"
-Sensor: "NOAA polar orbiter data\\000"
-Sensor Characteristics: "National Oceanic and Atmospheric Administration Polar Orbiter\\000"
-Product name: "Equal Angle Map HDF\\000"
-Quality type: "Best SST\\000"
-Binning period: "DAILY\\000"
-Pass: "Ascending\\000"
-Processing control: "Algorithm: V4.0 pathfinder flagtree 26aug96\\000"
-Data start time: "4/14/1990 00:00:00\\000"
-Data end time: "4/14/1990 23:59:59\\000"
-Data processing time: "Thu Jun 26 18:02:09 1997"
-Start year: 1990
-End year: 1990
-Start day: 104
-End day: 104
-Start millisec: 53143
-End millisec: 53143
-Number of rows: 2048
-Number of columns: 4096
-Map projection: "Equirectangular projection\\000"
-Parameter name: "Sea Surface Temperature\\000"
-Orbit: 8007
-Maximum Latitude: 89.9561
-Minimum Latitude: -89.9561
-Maximum Longitude: 179.956
-Minimum Longitude: -179.956
+HDF_GLOBAL.Title: "AVHRR Oceans Pathfinder Equal Angle\\000"
+HDF_GLOBAL.Data Center: "NASA/PO.DAAC AVHRR Oceans Pathfinder\\000"
+HDF_GLOBAL.Station: "NOAA/NESDIS\\000"
+HDF_GLOBAL.Mission: "AVHRR Oceans Pathfinder\\000"
+HDF_GLOBAL.Mission Characteristics: "NOAA/NASA AVHRR Oceans Pathfinder\\000"
+HDF_GLOBAL.Sensor: "NOAA polar orbiter data\\000"
+HDF_GLOBAL.Sensor Characteristics: "National Oceanic and Atmospheric Administration Polar Orbiter\\000"
+HDF_GLOBAL.Product name: "Equal Angle Map HDF\\000"
+HDF_GLOBAL.Quality type: "Best SST\\000"
+HDF_GLOBAL.Binning period: "DAILY\\000"
+HDF_GLOBAL.Pass: "Ascending\\000"
+HDF_GLOBAL.Processing control: "Algorithm: V4.0 pathfinder flagtree 26aug96\\000"
+HDF_GLOBAL.Data start time: "4/14/1990 00:00:00\\000"
+HDF_GLOBAL.Data end time: "4/14/1990 23:59:59\\000"
+HDF_GLOBAL.Data processing time: "Thu Jun 26 18:02:09 1997"
+HDF_GLOBAL.Start year: 1990
+HDF_GLOBAL.End year: 1990
+HDF_GLOBAL.Start day: 104
+HDF_GLOBAL.End day: 104
+HDF_GLOBAL.Start millisec: 53143
+HDF_GLOBAL.End millisec: 53143
+HDF_GLOBAL.Number of rows: 2048
+HDF_GLOBAL.Number of columns: 4096
+HDF_GLOBAL.Map projection: "Equirectangular projection\\000"
+HDF_GLOBAL.Parameter name: "Sea Surface Temperature\\000"
+HDF_GLOBAL.Orbit: 8007
+HDF_GLOBAL.Maximum Latitude: 89.9561
+HDF_GLOBAL.Minimum Latitude: -89.9561
+HDF_GLOBAL.Maximum Longitude: 179.956
+HDF_GLOBAL.Minimum Longitude: -179.956
 </textarea><p>
 
 <tr><td><td><hr>
@@ -390,6 +390,8 @@ Slope: 0.15
 Intercept: -3
 Unit: "Degree in Celsius\\000"
 Equation: "SST (Celsius) = DN * .15 - 3.0\\000"
+dim_0.name: "Longitude"
+dim_1.name: "Latitude"
 </textarea>
 
 
@@ -423,6 +425,8 @@ org_opendap_Number_of_Observations_per_Bin.add_dim(2048);
 
 <textarea name="Number of Observations per Bin_attr" rows="5" cols="70">
 Band Name: "Number of Observations per Bin\\000"
+dim_0.name: "fakeDim2"
+dim_1.name: "fakeDim3"
 </textarea>
 
 

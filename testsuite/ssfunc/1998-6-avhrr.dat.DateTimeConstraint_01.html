@@ -319,14 +319,14 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat"
 <td align="right" valign="top"><h3>
 <a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
 <td><textarea name="global_attr" rows="5" cols="70">
-Server: "DODS FreeFrom based on FFND release 4.2.3"
-hours_variable: GSO_AVHRR.hh
-minutes_variable: GSO_AVHRR.mm
-seconds_variable: GSO_AVHRR.ss
-gmt_time: true
-year_variable: GSO_AVHRR.year
-year_base: 1900
-year_day_variable: GSO_AVHRR.day_num
+FF_GLOBAL.Server: "DODS FreeFrom based on FFND release 4.2.3"
+DODS_Time.hours_variable: GSO_AVHRR.hh
+DODS_Time.minutes_variable: GSO_AVHRR.mm
+DODS_Time.seconds_variable: GSO_AVHRR.ss
+DODS_Time.gmt_time: true
+DODS_Date.year_variable: GSO_AVHRR.year
+DODS_Date.year_base: 1900
+DODS_Date.year_day_variable: GSO_AVHRR.day_num
 </textarea><p>
 
 <tr><td><td><hr>
@@ -358,9 +358,6 @@ satellite <select name="org_opendap_satellite_operator" onfocus="describe_operat
 <input type="text" name="org_opendap_satellite_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="satellite_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -383,9 +380,6 @@ year <select name="org_opendap_year_operator" onfocus="describe_operator()" onch
 </select>
 <input type="text" name="org_opendap_year_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="year_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -410,9 +404,6 @@ day_num <select name="org_opendap_day_num_operator" onfocus="describe_operator()
 <input type="text" name="org_opendap_day_num_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="day_num_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -435,9 +426,6 @@ hh <select name="org_opendap_hh_operator" onfocus="describe_operator()" onchange
 </select>
 <input type="text" name="org_opendap_hh_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="hh_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -462,9 +450,6 @@ mm <select name="org_opendap_mm_operator" onfocus="describe_operator()" onchange
 <input type="text" name="org_opendap_mm_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="mm_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -488,9 +473,6 @@ ss <select name="org_opendap_ss_operator" onfocus="describe_operator()" onchange
 <input type="text" name="org_opendap_ss_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="ss_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -513,9 +495,6 @@ DODS_URL <select name="org_opendap_DODS_URL_operator" onfocus="describe_operator
 </select>
 <input type="text" name="org_opendap_DODS_URL_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="DODS_URL_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 </dd></dl>

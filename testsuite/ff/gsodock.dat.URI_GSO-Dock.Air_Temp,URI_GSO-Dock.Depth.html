@@ -319,8 +319,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/gsodock.dat");
 <td align="right" valign="top"><h3>
 <a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
 <td><textarea name="global_attr" rows="5" cols="70">
-Server: "DODS FreeFrom based on FFND release 4.2.3"
-text: "Time    Dep     Temp    Sal     DO%     pH      Turb    AirT    WndSpd  WndDir  Baro    Solar"
+FF_GLOBAL.Server: "DODS FreeFrom based on FFND release 4.2.3"
+FF_GLOBAL.text: "Time    Dep     Temp    Sal     DO%     pH      Turb    AirT    WndSpd  WndDir  Baro    Solar"
 </textarea><p>
 
 <tr><td><td><hr>
@@ -352,9 +352,6 @@ Time <select name="org_opendap_Time_operator" onfocus="describe_operator()" onch
 <input type="text" name="org_opendap_Time_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="Time_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -377,9 +374,6 @@ Depth <select name="org_opendap_Depth_operator" onfocus="describe_operator()" on
 </select>
 <input type="text" name="org_opendap_Depth_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="Depth_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -404,9 +398,6 @@ Sea_Temp <select name="org_opendap_Sea_Temp_operator" onfocus="describe_operator
 <input type="text" name="org_opendap_Sea_Temp_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="Sea_Temp_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -429,9 +420,6 @@ Salinity <select name="org_opendap_Salinity_operator" onfocus="describe_operator
 </select>
 <input type="text" name="org_opendap_Salinity_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="Salinity_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -456,9 +444,6 @@ DO  <select name="org_opendap_DO__operator" onfocus="describe_operator()" onchan
 <input type="text" name="org_opendap_DO__selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="DO _attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -481,9 +466,6 @@ pH <select name="org_opendap_pH_operator" onfocus="describe_operator()" onchange
 </select>
 <input type="text" name="org_opendap_pH_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="pH_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -508,9 +490,6 @@ Turbidity <select name="org_opendap_Turbidity_operator" onfocus="describe_operat
 <input type="text" name="org_opendap_Turbidity_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="Turbidity_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -533,9 +512,6 @@ Air_Temp <select name="org_opendap_Air_Temp_operator" onfocus="describe_operator
 </select>
 <input type="text" name="org_opendap_Air_Temp_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="Air_Temp_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -560,9 +536,6 @@ Wind_Speed <select name="org_opendap_Wind_Speed_operator" onfocus="describe_oper
 <input type="text" name="org_opendap_Wind_Speed_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="Wind_Speed_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -585,9 +558,6 @@ Wind_Direction <select name="org_opendap_Wind_Direction_operator" onfocus="descr
 </select>
 <input type="text" name="org_opendap_Wind_Direction_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="Wind_Direction_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -612,9 +582,6 @@ Barometric_Pres <select name="org_opendap_Barometric_Pres_operator" onfocus="des
 <input type="text" name="org_opendap_Barometric_Pres_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="Barometric_Pres_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -637,9 +604,6 @@ Solar_Radiation <select name="org_opendap_Solar_Radiation_operator" onfocus="des
 </select>
 <input type="text" name="org_opendap_Solar_Radiation_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="Solar_Radiation_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 </dd></dl>

@@ -319,30 +319,30 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/ff/avhrr.dat");
 <td align="right" valign="top"><h3>
 <a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
 <td><textarea name="global_attr" rows="5" cols="70">
-Server: "DODS FreeFrom based on FFND release 4.2.3"
-DODS_FileType: "FileServer"
-DODS_Interfaces: "date", "time", "date_time"
-DODS_Title: "Univ. R.I. 5.5KM AVHRR Browse Archive"
-DODS_LatRange: "60.5750", "9.4250"
-DODS_LonRange: "-96.2220", "-33.7780"
-Sel_Vars: "Sea_Temp"
-Dod_Vars: "dsp_band_1"
-DODS_StartDate: "1979/4/11"
-DODS_EndDate: "2002/12/31"
-year_variable: URI_Avhrr.year
-month_variable: URI_Avhrr.month
-day_variable: URI_Avhrr.day
-hours_variable: URI_Avhrr.hours
-minutes_variable: URI_Avhrr.minutes
-seconds_variable: URI_Avhrr.seconds
-gmt_time: true
-year_variable: URI.Avhrr.year
-month_variable: URI_Avhrr.month
-day_variable: URI_Avhrr.day
-hours_variable: URI_Avhrr.hours
-minutes_variable: URI_Avhrr.minutes
-seconds_variable: URI_Avhrr.seconds
-gmt_time: true
+FF_GLOBAL.Server: "DODS FreeFrom based on FFND release 4.2.3"
+DODS_Global.DODS_FileType: "FileServer"
+DODS_Global.DODS_Interfaces: "date", "time", "date_time"
+DODS_Global.DODS_Title: "Univ. R.I. 5.5KM AVHRR Browse Archive"
+DODS_Global.DODS_LatRange: "60.5750", "9.4250"
+DODS_Global.DODS_LonRange: "-96.2220", "-33.7780"
+DODS_Global.Sel_Vars: "Sea_Temp"
+DODS_Global.Dod_Vars: "dsp_band_1"
+DODS_Global.DODS_StartDate: "1979/4/11"
+DODS_Global.DODS_EndDate: "2002/12/31"
+DODS_Date.year_variable: URI_Avhrr.year
+DODS_Date.month_variable: URI_Avhrr.month
+DODS_Date.day_variable: URI_Avhrr.day
+DODS_Time.hours_variable: URI_Avhrr.hours
+DODS_Time.minutes_variable: URI_Avhrr.minutes
+DODS_Time.seconds_variable: URI_Avhrr.seconds
+DODS_Time.gmt_time: true
+DODS_Date_Time.year_variable: URI.Avhrr.year
+DODS_Date_Time.month_variable: URI_Avhrr.month
+DODS_Date_Time.day_variable: URI_Avhrr.day
+DODS_Date_Time.hours_variable: URI_Avhrr.hours
+DODS_Date_Time.minutes_variable: URI_Avhrr.minutes
+DODS_Date_Time.seconds_variable: URI_Avhrr.seconds
+DODS_Date_Time.gmt_time: true
 </textarea><p>
 
 <tr><td><td><hr>
@@ -374,9 +374,6 @@ year <select name="org_opendap_year_operator" onfocus="describe_operator()" onch
 <input type="text" name="org_opendap_year_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="year_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -399,9 +396,6 @@ month <select name="org_opendap_month_operator" onfocus="describe_operator()" on
 </select>
 <input type="text" name="org_opendap_month_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="month_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -426,9 +420,6 @@ day <select name="org_opendap_day_operator" onfocus="describe_operator()" onchan
 <input type="text" name="org_opendap_day_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="day_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -451,9 +442,6 @@ hours <select name="org_opendap_hours_operator" onfocus="describe_operator()" on
 </select>
 <input type="text" name="org_opendap_hours_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="hours_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 <script type="text/javascript">
@@ -478,9 +466,6 @@ minutes <select name="org_opendap_minutes_operator" onfocus="describe_operator()
 <input type="text" name="org_opendap_minutes_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="minutes_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -504,9 +489,6 @@ seconds <select name="org_opendap_seconds_operator" onfocus="describe_operator()
 <input type="text" name="org_opendap_seconds_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
 
-<textarea name="seconds_attr" rows="5" cols="70">
-</textarea>
-
 <p><p>
 <script type="text/javascript">
 <!--
@@ -529,9 +511,6 @@ DODS_URL <select name="org_opendap_DODS_URL_operator" onfocus="describe_operator
 </select>
 <input type="text" name="org_opendap_DODS_URL_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
 <br>
-
-<textarea name="DODS_URL_attr" rows="5" cols="70">
-</textarea>
 
 <p><p>
 </dd></dl>
