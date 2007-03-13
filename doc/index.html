@@ -32,25 +32,27 @@ LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:1
 project with existing software developed by OPeNDAP. The server is intended to be a replacement for the existing 3.x servers which OPeNDAP is distributing.</p>
 <p>The new server uses the Java servlet mechanism to hand off requests from a general web daemon to DAP format-specific software. This results in higher performance for small requests. The servlet front end, which we call the <strong>O</strong>PeNDAP <strong>L</strong>ightweight <strong>F</strong>ront end <strong>S</strong>erver (OLFS) looks at each request and formulates a query to a second server (which may or may not on the same machine as the OLFS) called the <strong>B</strong>ack <strong>E</strong>nd <strong>S</strong>erver (BES). The BES is the high-performance server software from HAO. It handles reading data from the data stores and returning DAP-compliant responses to the OLFS. In turn, the OLFS may pass these response back to the requestor with little or no modification or it may use them to build more complex responses. The nature of the Inter Process Communication (IPC) between the OLFS and BES is such that they should both be on the same machine or be able to communicate over a very high bandwidth channel.</p>
 <p> Both the OLFS and the BES require installation and configuration before they can be run. </p>
-<p>Here you will find:</p>
+<p>&nbsp;</p>
+<p>OPeNDAP user and developer documentation is now located at the <a href="http://docs.opendap.org">OPeNDAP Documentation Site</a> </p>
+<p>There  you will find:</p>
+<h4><a href="http://docs.opendap.org/index.php/Hyrax">Hyrax Documentation </a></h4>
 <ul>
-  <li><a href="install.html">Installation instructions</a></li>
-  <li> <a href="servlet.html">OLFS  configuration information</a></li>
-  <li><a href="logging.html">Logging configuration information</a> </li>
-  <li><a href="apache.html">Apache integration instructions <br>
+  <li><a href="http://docs.opendap.org/index.php/Hyrax:_Installation_Instructions">Installation instructions</a></li>
+  <li> <a href="http://docs.opendap.org/index.php/Hyrax:_Configuration">Configuration information</a></li>
+  <li><a href="http://docs.opendap.org/index.php/Hyrax:_Logging_Configuration">Logging configuration information</a> </li>
+  <li><a href="http://docs.opendap.org/index.php/Hyrax:_Apache_Integration">Apache integration instructions <br>
     <br>
     <br>
   </a></li>
-  <li><a href="releasenotes.html">Release Notes</a><br>
+  <li><a href="http://docs.opendap.org/index.php/Hyrax:_Release_Notes">Release Notes</a><br>
   </li>
-  <li><a href="developerInfo.html">Instructions for developers.</a></li>
-  <li><a href="javadoc/index.html">Java docs for the OLFS Java API </a><br>
+  <li><a href="http://docs.opendap.org/index.php/Hyrax#For_Developers:">Instructions for developers.</a><br>
     <br>
   </li>
 </ul>
 
 <h3>THREDDS Support </h3>
-<h4>Hyrax  supports THREDDS catalogs, look <a href="thredds.html">here for configuration details</a>. </h4>
+<h4>Hyrax  supports THREDDS catalogs, look <a href="http://docs.opendap.org/index.php/Hyrax:_THREDDS_Configuration">here for configuration details</a>. </h4>
 <h3>SOAP Support </h3>
 <h4>Hyrax  supports SOAP requests.</h4>
 <p>A prototype SOAP interface is included with this release of Hyrax. It is discussed in the
