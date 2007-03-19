@@ -54,6 +54,9 @@
     <property name="distributionResources.dir"
                                      location="${resources.dir}/distribution"/>
 
+    <property name="THREDDSResources.dir"
+                                     location="${resources.dir}/THREDDS"/>
+
 
     <!-- Build Directories -->
     <property name="build.dir"       location="build"/>
@@ -71,7 +74,7 @@
     <property name="echo.lib"           value="echosoap.jar"/>
 
 
-    <property name="thredds.lib"        value="tsf-3.14.03.jar"/>
+    <property name="thredds.lib"        value="tsf-3.14.04.jar"/>
     <property name="netcdf.lib"         value="netcdf-2.2.18.jar"/>
     <property name="nlog4j.lib"         value="nlog4j-1.2.21.jar"/>
 
@@ -331,6 +334,7 @@
                 <exclude name="_notes"/>
             </zipfileset>
 
+            <zipfileset dir="${THREDDSResources.dir}/views" prefix="views" />
 
             <zipfileset dir="${schema.dir}" prefix="schema" />
 
