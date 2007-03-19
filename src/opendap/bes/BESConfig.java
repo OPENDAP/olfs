@@ -39,11 +39,12 @@ import java.io.*;
  * Date: Oct 13, 2006
  * Time: 5:00:33 PM
  */
-public class BESConfig {
+public class BESConfig  {
 
     private  String    _BESHost;
     private  int       _BESPort;
     private  int       _BESMaxClients;
+    private  String    _BESPrefix;
     //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
 
@@ -52,6 +53,7 @@ public class BESConfig {
         _BESHost = "HostNameIsNotSet!";
         _BESPort = -1;
         _BESMaxClients = 10;
+        _BESPrefix = "/data";
     }
 
     BESConfig(Document besConfiguration) throws Exception{
@@ -68,11 +70,24 @@ public class BESConfig {
 
     }
 
+    public BESConfig copy() {
+
+
+        BESConfig copy = new BESConfig();
+
+        copy._BESHost        = _BESHost;
+        copy._BESPort        = _BESPort;
+        copy._BESMaxClients  = _BESMaxClients;
+        copy._BESPrefix      = _BESPrefix;
+
+        return copy;
+    }
+
     /**
      * Creates a new BESConfig and sets its state according to the values of the persistent representation of the
      * BESConfig fpund in the (XML) file whose name is passed in.
-     * @param filename
-     * @throws Exception
+     * @param filename The name of the confguration file
+     * @throws Exception When bad things happen.
      */
     BESConfig(String filename) throws Exception {
         this();
@@ -109,6 +124,13 @@ public class BESConfig {
 
     }
 
+
+
+
+
+
+
+
     private void configure(Element besConfig) throws Exception {
 
         if( besConfig==null || !besConfig.getName().equals("BES")){
@@ -119,29 +141,35 @@ public class BESConfig {
 
 
         Element host = besConfig.getChild("host");
-        Element port = besConfig.getChild("port");
-
         if( host==null ){
             throw new Exception("OLFS configuration document does not contain neccessary content. " +
                     "<BES> Element is missing <host> element.");
         }
+        setHost(host.getTextTrim());
 
+
+
+
+        Element port = besConfig.getChild("port");
         if( port==null ){
             throw new Exception("OLFS configuration document does not contain neccessary content. " +
                     "<BES> Element is missing <prt> element.");
 
         }
-
-        setBESHost(host.getTextTrim());
-        setBESPort(port.getTextTrim());
+        setPort(port.getTextTrim());
 
 
 
+        Element prefix = besConfig.getChild("prefix");
+        if( prefix!=null ){
+            setPrefix(prefix.getTextTrim());
+        }
         Element maxClients = besConfig.getChild("MaxClients");
 
 
-        if( maxClients!=null ){
 
+
+        if( maxClients!=null ){
 
             int clients = Integer.parseInt(maxClients.getTextTrim());
 
@@ -149,7 +177,7 @@ public class BESConfig {
                 throw new Exception("OLFS configuration document does not contain correct content. " +
                         "The <MaxClients> element MUST contain an integer greater than 0 (zero).");
             }
-            setBESMaxClients(clients);
+            setMaxClients(clients);
         }
 
 
@@ -188,10 +216,13 @@ public class BESConfig {
         Element bes = new Element("BES");
 
         Element host = new Element("host");
-        host.setText(getBESHost());
+        host.setText(getHost());
 
         Element port = new Element("port");
-        port.setText(String.valueOf(getBESPort()));
+        port.setText(String.valueOf(getPort()));
+
+        Element prefix = new Element("prefix");
+        port.setText(getPrefix());
 
 
         Element clientPool = new Element("ClientPool");
@@ -199,6 +230,7 @@ public class BESConfig {
 
         bes.addContent(host);
         bes.addContent(port);
+        bes.addContent(prefix);
         bes.addContent(clientPool);
 
         return bes;
@@ -208,19 +240,23 @@ public class BESConfig {
 
 
 
-    public void   setBESHost(String host){ _BESHost = host; }
-    public String getBESHost(){ return _BESHost; }
+    public void setHost(String host){ _BESHost = host; }
+    public String getHost(){ return _BESHost; }
 
 
-    public void setBESPort(String port){ _BESPort = Integer.parseInt(port); }
-    public void setBESPort(int port){ _BESPort = port; }
-    public int  getBESPort() { return _BESPort; }
+    public void setPort(String port){ _BESPort = Integer.parseInt(port); }
+    public void setPort(int port){ _BESPort = port; }
+    public int getPort() { return _BESPort; }
+
+
+    public void setPrefix(String prefix){ _BESPrefix = prefix; }
+    public String getPrefix() { return _BESPrefix; }
 
 
 
-    public void setBESMaxClients(String i){ _BESMaxClients = Integer.parseInt(i);   }
-    public void setBESMaxClients(int i){ _BESMaxClients = i;   }
-    public int  getBESMaxClients(){ return _BESMaxClients;  }
+    public void setMaxClients(String i){ _BESMaxClients = Integer.parseInt(i);   }
+    public void setMaxClients(int i){ _BESMaxClients = i;   }
+    public int getMaxClients(){ return _BESMaxClients;  }
 
 
 
@@ -228,9 +264,10 @@ public class BESConfig {
 
         String s = "";
         s += "    BESConfig:\n";
-        s += "        Host:       " + getBESHost() + "\n";
-        s += "        Port:       " + getBESPort() + "\n";
-        s += "        MaxClients: " + getBESMaxClients() + "\n";
+        s += "        Host:       " + getHost() + "\n";
+        s += "        Port:       " + getPort() + "\n";
+        s += "        Prefix:     " + getPrefix() + "\n";
+        s += "        MaxClients: " + getMaxClients() + "\n";
 
 
 
@@ -273,7 +310,7 @@ public class BESConfig {
     /**
      * Provides a console interface to initialize (or configure if you will) an OLFSConfig object, which provides
      * BES configuration information to the OLFS.
-     * @throws IOException
+     * @throws IOException When bad things happen
      */
     public void userConfigure() throws IOException {
         userConfigure(this);
@@ -289,7 +326,7 @@ public class BESConfig {
      * BES configuration information for the OLFS. After the intialization is complete, the user will be prompted to
      * save the configuration into a file (as an XML document).
      * @param bc The OLFSConfig to initialize.
-     * @throws IOException
+     * @throws IOException When bad things happen
      */
 
     public static void userConfigure(BESConfig bc) throws IOException {
@@ -344,13 +381,13 @@ public class BESConfig {
         done = false;
         while(!done){
             System.out.print("\nEnter the name (or IP address) of the BES host. ");
-            System.out.print("[" + bc.getBESHost() + "]: ");
+            System.out.print("[" + bc.getHost() + "]: ");
             k = kybrd.readLine();
             if (!k.equals("")){
-                bc.setBESHost(k);
+                bc.setHost(k);
                 done = true;
             }
-            else if(bc.getBESHost()==null)
+            else if(bc.getHost()==null)
                 System.out.println("You must enter a hostname or IP address.\n\n");
             else
                 done = true;
@@ -358,14 +395,14 @@ public class BESConfig {
 
         done = false;
         while(!done){
-            System.out.print("\nEnter the port number for the BES host "+bc.getBESHost()+"   ");
-            System.out.print("[" + bc.getBESPort() + "]: ");
+            System.out.print("\nEnter the port number for the BES host "+bc.getHost()+"   ");
+            System.out.print("[" + bc.getPort() + "]: ");
             k = kybrd.readLine();
             if (!k.equals("")){
-                bc.setBESPort(k);
+                bc.setPort(k);
                 done = true;
             }
-            else if(bc.getBESPort()==-1)
+            else if(bc.getPort()==-1)
                 System.out.println("You must enter a port number.\n\n");
             else
                 done = true;
@@ -376,13 +413,13 @@ public class BESConfig {
         done = false;
         while(!done){
             System.out.print("\nEnter the maximum allowed number of BES client connections. ");
-            System.out.print("[" + bc.getBESMaxClients() + "]: ");
+            System.out.print("[" + bc.getMaxClients() + "]: ");
             k = kybrd.readLine();
             if (!k.equals("")){
-                bc.setBESMaxClients(k);
+                bc.setMaxClients(k);
             }
 
-            if(bc.getBESMaxClients()<1)
+            if(bc.getMaxClients()<1)
                 System.out.println("You must enter an integer greater than 0.\n\n");
             else
                 done = true;

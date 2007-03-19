@@ -25,8 +25,6 @@
 
 package opendap.bes;
 
-import opendap.coreServlet.Debug;
-
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
@@ -295,7 +293,7 @@ public class BesAPI {
      */
     public static boolean configure(BESConfig bc) {
 
-        return configure(bc.getBESHost(),bc.getBESPort(),bc.getBESMaxClients());
+        return configure(bc.getHost(),bc.getPort(),bc.getMaxClients());
 
     }
 
@@ -999,7 +997,7 @@ public class BesAPI {
     }
 
 
-    private static void shutdownClient(OPeNDAPClient oc) throws PPTException {
+    static void shutdownClient(OPeNDAPClient oc) throws PPTException {
         log.debug("Shutting down client...");
 
         oc.setOutput(null, false);
