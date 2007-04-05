@@ -53,12 +53,12 @@ public class DebugHandler {
     public static void doDebug(HttpServlet servlet, HttpServletRequest request,
                                HttpServletResponse response,
                                OpendapHttpDispatchHandler odh,
-                               ServletConfig sc) throws IOException {
+                               ServletConfig sc) throws Exception {
 
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_debug");
 

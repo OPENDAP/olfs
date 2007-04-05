@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OLFSConfig>
 
-    <BES>
-        <!-- The hostname (or IP address) for the BES -->
-        <host>localhost</host>
+    <BESConfig>
 
-        <!-- The port number for the BES -->
-        <port>10002</port>
+        <BES>
+            <!-- The path prefix for this BES -->
+            <prefix>/</prefix>
 
-        <!-- The Maximum number of concurrent BES client connections allowed. -->
-        <MaxClients>10</MaxClients>
+            <!-- The hostname (or IP address) for this BES -->
+            <host>localhost</host>
 
-    </BES>
+            <!-- The port number for this BES -->
+            <port>10002</port>
 
+            <!-- The ClientPool maximum number of concurrent
+              -  BES client connections allowed.
+              -->
+            <ClientPool maximum="10" />
+
+        </BES>
+
+    </BESConfig>
     <!-- DirectoryView:
       - Used to indicate which type of directory view clients see. This DOES NOT
       - affect the THREDDS catalogs! Only the HTML views of them. A value
@@ -30,7 +38,7 @@
       - THINK TWICE before allowing this, as data sources can be quite large
       - and allowing their transmission with out subsetting can put heavy loads
       - on the network and the server.
-    -->
+      -->
     <!-- <AllowDirectDataSourceAccess /> -->
 
 

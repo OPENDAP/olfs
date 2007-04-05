@@ -45,21 +45,25 @@ public class BESManager {
     private static boolean _isConfigured = false;
 
 
-    public static void configure(Document olfsConfig) throws Exception {
 
+
+    public static void configure(Element besConfiguration) throws Exception {
+
+        BesAPI.init();
 
         if(_isConfigured) return;
 
         _besCollection  = new Vector<BES>();
 
-        List besList = olfsConfig.getRootElement().getChildren("BES");
+        List besList = besConfiguration.getChildren("BES");
 
         if(besList.isEmpty())
             throw new BadConfigurationException("OLFS Configuration must " +
-                    "contain at LEAST one BES configuration element");
+                    "contain at LEAST one BES configuration element. And " +
+                    "if you're smart it's prefix will be \"/\".");
 
-        Iterator i = besList.iterator();
 
+        boolean foundRootBES = false;
         BES bes;
         BESConfig besConfig;
         Element besConfigElement;
@@ -70,7 +74,14 @@ public class BESManager {
 
             _besCollection.add(bes);
 
+            if(bes.getPrefix().equals("/"))
+                foundRootBES = true;
         }
+
+        if(!foundRootBES)
+            throw new BadConfigurationException("OLFS Configuration must " +
+                    "contain at LEAST one BES configuration element. Whose " +
+                    "prefix is \"/\". (Why? Think about it...)");
 
         _isConfigured = true;
 
@@ -78,7 +89,24 @@ public class BESManager {
     }
 
 
+    public static void configure(OLFSConfig olfsConfig) throws Exception {
+
+        configure(olfsConfig.getBESConfig());
+
+    }
+
+
+    public static boolean isConfigured(){
+        return _isConfigured;
+    }
+
+
+
+
     public static BES getBES(String path){
+
+        if(path==null)
+            path = "/";
 
         BES result = null;
         String prefix;
@@ -109,6 +137,50 @@ public class BESManager {
 
     }
 
+
+    public static Document getCombinedVersionDocument() throws Exception {
+
+
+
+        Document doc = new Document();
+        doc.setRootElement(new Element("OPeNDAP-Version"));
+        Element besVer;
+        Document tmp;
+        for (BES bes : _besCollection) {
+            tmp = bes.getVersionDocument();
+            besVer = tmp.getRootElement();
+            besVer.detach();
+            doc.getRootElement().addContent(besVer);
+        }
+
+        // Add a version element for this, the OLFS server
+        doc.getRootElement().addContent(opendap.bes.Version.getOLFSVersionElement());
+
+        // Add a version element for this, the OLFS server
+        doc.getRootElement().addContent(opendap.bes.Version.getHyraxVersionElement());
+
+        return doc;
+    }
+
+
+
+
+    public static Document getVersionDocument(String path) throws Exception {
+
+
+        BES bes = getBES(path);
+
+        // Get the Version info from the BES.
+        Document doc = bes.getVersionDocument();
+
+        // Add a version element for this, the OLFS server
+        doc.getRootElement().addContent(opendap.bes.Version.getOLFSVersionElement());
+
+        // Add a version element for this, the OLFS server
+        doc.getRootElement().addContent(opendap.bes.Version.getHyraxVersionElement());
+
+        return bes.getVersionDocument();
+    }
 
 
 

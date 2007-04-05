@@ -106,30 +106,30 @@ In particular note the following:
        to automatically generate catalogs.
 
 
-    2) In the <datasetScan> element the location attribute's value MUST begin with /root. So, if the
+    2) In the <datasetScan> element the location attribute's value MUST begin with /bes. So, if the
        top level collection in the BES contains 4 sub collections they may each be identified using
        a separate <datasetScan> element like so:
 
-	       <datasetScan location="/root/nc"  path="nc"  name="NetCDF Archive"   serviceName="OPeNDAP-Hyrax">
+	       <datasetScan location="/bes/nc"  path="nc"  name="NetCDF Archive"   serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
-	       <datasetScan location="/root/hdf" path="hdf" name="HDF Archive"      serviceName="OPeNDAP-Hyrax">
+	       <datasetScan location="/bes/hdf" path="hdf" name="HDF Archive"      serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
-	       <datasetScan location="/root/jg"  path="jg"  name="JGOFFS Archive"   serviceName="OPeNDAP-Hyrax">
+	       <datasetScan location="/bes/jg"  path="jg"  name="JGOFFS Archive"   serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
-	       <datasetScan location="/root/ff"  path="ff"  name="FreeForm Archive" serviceName="OPeNDAP-Hyrax">
+	       <datasetScan location="/bes/ff"  path="ff"  name="FreeForm Archive" serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 
        Where each <datasetScan> element may have it's own filter and inheritance rules. You MUST NOT
        lump them all into one <datasetScan> element with one set of filter rules like so:
 
-	       <datasetScan location="/root"     path="DATA"  name="AllYourDataAreUs"   serviceName="OPeNDAP-Hyrax">
+	       <datasetScan location="/bes"     path="DATA"  name="AllYourDataAreUs"   serviceName="OPeNDAP-Hyrax">
 	       . . .
 	       </datasetScan>
 

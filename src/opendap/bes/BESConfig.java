@@ -26,6 +26,7 @@ package opendap.bes;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Attribute;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -53,7 +54,7 @@ public class BESConfig  {
         _BESHost = "HostNameIsNotSet!";
         _BESPort = -1;
         _BESMaxClients = 10;
-        _BESPrefix = "/data";
+        _BESPrefix = "/";
     }
 
     BESConfig(Document besConfiguration) throws Exception{
@@ -164,18 +165,21 @@ public class BESConfig  {
         if( prefix!=null ){
             setPrefix(prefix.getTextTrim());
         }
-        Element maxClients = besConfig.getChild("MaxClients");
+
+        Element clientPool = besConfig.getChild("ClientPool");
 
 
+        if( clientPool!=null ){
 
+            Attribute maxClients = clientPool.getAttribute("maximum");
 
-        if( maxClients!=null ){
-
-            int clients = Integer.parseInt(maxClients.getTextTrim());
+            int clients = maxClients.getIntValue();
 
             if(clients<1){
-                throw new Exception("OLFS configuration document does not contain correct content. " +
-                        "The <MaxClients> element MUST contain an integer greater than 0 (zero).");
+                throw new Exception("OLFS configuration document does not " +
+                        "contain correct content. The <ClientPool> element " +
+                        "MUST contain an Attribute called \"maximum\" whose " +
+                        "value is an integer greater than 0 (zero).");
             }
             setMaxClients(clients);
         }
@@ -215,22 +219,23 @@ public class BESConfig  {
 
         Element bes = new Element("BES");
 
+        Element prefix = new Element("prefix");
+        prefix.setText(getPrefix());
+
+
         Element host = new Element("host");
         host.setText(getHost());
 
         Element port = new Element("port");
         port.setText(String.valueOf(getPort()));
 
-        Element prefix = new Element("prefix");
-        port.setText(getPrefix());
-
 
         Element clientPool = new Element("ClientPool");
-        clientPool.setAttribute("MaxClients",Integer.toString(_BESMaxClients));
+        clientPool.setAttribute("maximum",Integer.toString(_BESMaxClients));
 
+        bes.addContent(prefix);
         bes.addContent(host);
         bes.addContent(port);
-        bes.addContent(prefix);
         bes.addContent(clientPool);
 
         return bes;
@@ -264,9 +269,9 @@ public class BESConfig  {
 
         String s = "";
         s += "    BESConfig:\n";
+        s += "        Prefix:     " + getPrefix() + "\n";
         s += "        Host:       " + getHost() + "\n";
         s += "        Port:       " + getPort() + "\n";
-        s += "        Prefix:     " + getPrefix() + "\n";
         s += "        MaxClients: " + getMaxClients() + "\n";
 
 
@@ -378,8 +383,25 @@ public class BESConfig  {
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
         boolean done;
 
+
         done = false;
         while(!done){
+            System.out.print("\nEnter the path prefix that the OLFS will use for the BES "+bc.getHost()+":"+bc.getPort()+"   ");
+            System.out.print("[" + bc.getPrefix() + "]: ");
+            k = kybrd.readLine();
+            if (!k.equals("")){
+                bc.setPrefix(k);
+                done = true;
+            }
+            else
+                done = true;
+        }
+
+
+
+        done = false;
+        while(!done){
+
             System.out.print("\nEnter the name (or IP address) of the BES host. ");
             System.out.print("[" + bc.getHost() + "]: ");
             k = kybrd.readLine();
@@ -410,9 +432,11 @@ public class BESConfig  {
 
 
 
+
+
         done = false;
         while(!done){
-            System.out.print("\nEnter the maximum allowed number of BES client connections. ");
+            System.out.print("\nEnter the maximum size of the BES client connection pool. ");
             System.out.print("[" + bc.getMaxClients() + "]: ");
             k = kybrd.readLine();
             if (!k.equals("")){

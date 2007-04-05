@@ -47,25 +47,31 @@ public interface OpendapHttpDispatchHandler {
 
 
     /**
+     * @param request The client request for which to return the verison.
      * @return A String containing the XDAP MIME header value that describes the
      *         DAP specifcation that the server response conforms to. This methof should
      *         determine which DAP secification that the client supports and then return
      *         the lowest matching version for the server being queried.
+     * @throws Exception When things go poorly.
      */
-    public String getXDAPVersion(HttpServletRequest request);
+    public String getXDAPVersion(HttpServletRequest request)throws Exception;
 
 
     /**
+     * @param request The client request for which to return the verison.
      * @return A String containing the value of the XOPeNDAP-Server MIME header
      *         and conforming to the DAP4 specification.
+     * @throws Exception When things go poorly.
      */
-    public String getXOPeNDAPServerVersion();
+    public String getXOPeNDAPServerVersion(HttpServletRequest request)throws Exception;
 
 
     /**
+     * @param request The client request for which to return the verison.
      * @return A string containing the value of the XDODS-Server MIME header.
+     * @throws Exception When things go poorly.
      */
-    public String getXDODSServerVersion();
+    public String getXDODSServerVersion(HttpServletRequest request)throws Exception;
 
 
     /**
@@ -87,6 +93,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws Exception When things go poorly.
      * @see ReqInfo
      */
     public void sendDDX(HttpServletRequest request,
@@ -100,6 +107,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws Exception When things go poorly.
      * @see ReqInfo
      */
     public void sendDAS(HttpServletRequest request,
@@ -117,6 +125,7 @@ public interface OpendapHttpDispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws Exception When things go poorly.
      * @see ReqInfo
      */
     public void sendDDS(HttpServletRequest request,
@@ -132,6 +141,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws Exception When things go poorly.
      * @see ReqInfo
      */
     public void sendDAP2Data(HttpServletRequest request,
@@ -144,6 +154,11 @@ public interface OpendapHttpDispatchHandler {
      * Default handler for OPeNDAP ascii requests. Returns OPeNDAP data in
      * comma delimited ascii columns for ingestion into some not so
      * OPeNDAP enabled application such as MS-Excel.
+     * @param request  The client's <code> HttpServletRequest</code> request
+     *                 object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @throws Exception When things go poorly.
      */
     public void sendASCII(HttpServletRequest request,
                           HttpServletResponse response)
@@ -184,8 +199,14 @@ public interface OpendapHttpDispatchHandler {
      * NB: An HTML* file contains HTML without the <html>, <head> or <body> tags
      * (my own notation).
      * <p/>
-     * <h3>Look for the user supplied Server- and dataset-specific HTML* documents.</h3>
+     * <h3>Look for the user supplied Server- and dataset-specific HTML*
+     * documents.</h3>
      *
+     * @param request  The client's <code> HttpServletRequest</code> request
+     *                 object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @throws Exception When things go poorly.
      * @see ReqInfo
      */
     public void sendInfo(HttpServletRequest request,
@@ -212,6 +233,7 @@ public interface OpendapHttpDispatchHandler {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
+     * @throws Exception When things go poorly.
      */
     public void sendVersion(HttpServletRequest request,
                             HttpServletResponse response) throws Exception;
@@ -223,7 +245,7 @@ public interface OpendapHttpDispatchHandler {
                                     HttpServletResponse response) throws Exception;
 
 
- 
+
 
     public void sendFile(HttpServletRequest request,
                             HttpServletResponse response) throws Exception;

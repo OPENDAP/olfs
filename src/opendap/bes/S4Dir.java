@@ -103,9 +103,15 @@ public class S4Dir {
 
         boolean isTopLevel = collectionName.equals("/");
 
+        String path = BESCrawlableDataset.besPath2ThreddsPath(collectionName);
 
-        BESCrawlableDataset crds = new BESCrawlableDataset("/bes"+collectionName, null);
+        BESCrawlableDataset crds = new BESCrawlableDataset(path, null);
 
+        if(!crds.exists())
+                throw new Exception("Unable to get BESCrawlableDataset for " +
+                        "collection \""+collectionName+"\". Collection may " +
+                        "not exist, or a BES may not be available to serve " +
+                        "data from the requested collection.");
 
 
         // Compute White Space required for correct formating
@@ -318,7 +324,7 @@ public class S4Dir {
 
 
         pw.println("        <h3>" +
-                   "            OPeNDAP Hyrax ("+Version.getVersionString()+")");
+                   "            OPeNDAP Hyrax ("+Version.getHyraxVersionString()+")");
 
         if(isTopLevel)
             pw.println("            <span class=\"uuid\">ServerUUID="+Version.getServerUUID()+"-contents</span>\n");

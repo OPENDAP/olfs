@@ -26,11 +26,13 @@ package opendap.bes;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.DataConversionException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.input.SAXBuilder;
 
 import java.io.*;
+import java.util.Iterator;
 
 /**
  * This class holds configuration information for the OLFS. It has a main() method and can be run as an application
@@ -38,7 +40,7 @@ import java.io.*;
  */
 public class OLFSConfig {
 
-    private BESConfig  _besConfig;
+    private Element  _besConfig;
 
     private  boolean   _showTHREDDSDirectoryView;
     private  boolean   _allowDirectDataSourceAccess;
@@ -46,7 +48,7 @@ public class OLFSConfig {
 
 
     OLFSConfig() {
-        _besConfig = new BESConfig();
+        _besConfig = new Element("BESConfig");
         _showTHREDDSDirectoryView = false;
         _allowDirectDataSourceAccess = false;
     }
@@ -84,10 +86,7 @@ public class OLFSConfig {
 
     private void configure(Document olfsConfigurationDoc) throws Exception {
 
-        Element besConfig = olfsConfigurationDoc.getRootElement().getChild("BES");
-
-        _besConfig = new BESConfig(besConfig);
-
+        _besConfig = olfsConfigurationDoc.getRootElement().getChild("BESConfig");
 
 
         Element dirView = olfsConfigurationDoc.getRootElement().getChild("DirectoryView");
@@ -148,7 +147,7 @@ public class OLFSConfig {
 
     public Element getConfigElement(){
         Element config = new Element("OLFSConfig");
-        Element bes = getBESConfig().getConfigElement();
+        Element bes = getBESConfig();
 
         Element dv = new Element("DirectoryView");
         dv.setText((_showTHREDDSDirectoryView?"THREDDS":"OPeNDAP"));
@@ -162,7 +161,7 @@ public class OLFSConfig {
 
 
 
-    public BESConfig getBESConfig(){
+    public Element getBESConfig(){
         return _besConfig;
     }
 
@@ -171,10 +170,33 @@ public class OLFSConfig {
 
     public String toString(){
         String s = "OLFSConfig:\n";
+        s+="\n";
 
-        s += _besConfig;
+        int i = 0;
+        String prefix, host, port;
+        String maxClients;
+        for(Object o : _besConfig.getChildren("BES")){
+            Element e = (Element) o;
+            host = e.getChild("host").getTextTrim();
+            port = e.getChild("port").getTextTrim();
+            prefix = e.getChild("prefix").getTextTrim();
 
-        s += "    Directory View: "+(getTHREDDSDirectoryView()?"THREDDS":"OPeNDAP") + "\n";
+            try {
+                maxClients = "" + e.getChild("ClientPool").getAttribute("maximum").getIntValue();
+            } catch (DataConversionException e1) {
+                maxClients = "BAD VALUE!";
+            }
+            s += "    BES["+ i++ +"]:\n";
+            s += "        prefix:      "+prefix+"\n";
+            s += "        host:        "+host+"\n";
+            s += "        port:        "+port+"\n";
+            s += "        MaxClients:  "+maxClients+"\n";
+            s+="\n";
+
+        }
+
+        s += "    Directory View:  "+(getTHREDDSDirectoryView()?"THREDDS":"OPeNDAP") + "\n";
+        s += "    Direct Data Source Access: "+allowDirectDataSourceAccess()+ "\n";
 //        s += "    Use Persistent Content Documentation Directory ('docs'): "+usePersistentContentDocs() + "\n";
 
 
@@ -237,11 +259,11 @@ public class OLFSConfig {
      * Provides a console interface to initialize (or configure if you will) the passed OLFSConfig object, which provides
      * BES configuration information for the OLFS. After the intialization is complete, the user will be prompted to
      * save the configuration into a file (as an XML document).
-     * @param bc The OLFSConfig to initialize.
+     * @param oc The OLFSConfig to initialize.
      * @throws IOException
      */
 
-    public static void userConfigure(OLFSConfig bc) throws IOException {
+    public static void userConfigure(OLFSConfig oc) throws IOException {
         boolean done = false;
         String k;
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
@@ -250,9 +272,13 @@ public class OLFSConfig {
 
             System.out.println("\n\n---------------------------------");
             System.out.println("OLFS Configuration:");
-            config(bc);
+            config(oc);
 
-            System.out.println("\n\nYou Configured The OLFS Like This:\n"+bc);
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            xmlo.output(oc._besConfig, System.out);
+
+
+            System.out.println("\n\nYou Configured The OLFS Like This:\n"+oc);
             System.out.print("\nIs this acceptable? [Enter Y or N]: ");
             k = kybrd.readLine();
             if (!k.equals("")){
@@ -266,7 +292,7 @@ public class OLFSConfig {
                                 System.out.print("Enter the file name to which to save the configuration: ");
                                 k = kybrd.readLine();
                                 if (!k.equals("")){
-                                    bc.writeConfiguration(k);
+                                    oc.writeConfiguration(k);
                                     d2 = true;
                                 }
                                 else
@@ -290,7 +316,33 @@ public class OLFSConfig {
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
         boolean done;
 
-        BESConfig.config(olfsConfig.getBESConfig());
+        int besCount=1;
+
+        done = false;
+        while(!done){
+            System.out.print("\nHow Many BES's will you be attaching to your OLFS? (x>=1): ");
+            k = kybrd.readLine();
+            try {
+                besCount  = Integer.decode(k);
+                if(besCount>0){
+                    done = true;
+                }
+                else {
+                    System.out.println("\n\nThe value must be greater than zero!");
+                }
+
+            }
+            catch(NumberFormatException e){
+                System.out.println("\n\nHey! I need an integer. A number, get it?");
+            }
+
+
+        }
+        BESConfig bc = new BESConfig();
+        for(int i=0; i<besCount ; i++){
+            BESConfig.config(bc);
+            olfsConfig.getBESConfig().addContent(bc.getConfigElement());
+        }
 
 
         done = false;
@@ -302,12 +354,10 @@ public class OLFSConfig {
                 olfsConfig.setTHREDDSDirectoryView(true);
                 done = true;
             }
-            else if(k.equalsIgnoreCase("n") || k.equalsIgnoreCase("no")){
+            else  {
                 olfsConfig.setTHREDDSDirectoryView(false);
                 done = true;
             }
-            else
-                System.out.println("You must enter say 'yes' or 'no'.\n\n");
         }
 
 

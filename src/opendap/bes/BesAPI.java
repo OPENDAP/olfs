@@ -57,14 +57,8 @@ public class BesAPI {
 
 
     private static Logger log;
-    private static int _besPort = -1;
-    private static String _besHost = "Not Configured!";
-    private static boolean _configured = false;
-    private static final Object syncLock = new Object();
+    private static boolean _initialized = false;
 
-    private static ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
-    private static Semaphore _checkOutFlag;
-    private static int _maxClients;
 
     private static DevNull devNull = new DevNull();
 
@@ -73,261 +67,21 @@ public class BesAPI {
      */
     private static String BES_EXCEPTION = "BESException";
 
-//------------------------------------------------------------------------------
-//-------------------------- CLIENT POOL CODE ----------------------------------
-//------------------------------------------------------------------------------
-
 
     /**
-     * The pool of available OPeNDAPClient connections starts empty. When this
-     * method is called the pool is checked. If no client is available, and the
-     * number of clients has not reached the cap, then a new one is made,
-     * started, and returned. If no client is available and the cap has been
-     * reached then this method will BLOCK until a client becomes available.
-     * If a client is available, it is returned.
+     * Initializes logging for the BesAPI class.
      *
-     * @return The next available OPeNDAPClient.
-     * @throws PPTException .
-     * @throws BadConfigurationException .
-     */
-    private static OPeNDAPClient getClient()
-            throws PPTException, BadConfigurationException {
-
-        OPeNDAPClient odc=null;
-
-        try {
-            _checkOutFlag.acquire();
-
-            if (_clientQueue.size() == 0) {
-                odc = new OPeNDAPClient();
-                log.debug("getClient() - " +
-                            "Made new OPeNDAPClient. Starting...");
-
-                odc.startClient(getHost(), getPort());
-                log.debug("OPeNDAPClient started.");
-
-
-            } else {
-
-                odc = _clientQueue.take();
-                log.debug("getClient() - Retrieved " +
-                            "OPeNDAPClient from queue.");
-            }
-
-            //if (Debug.isSet("BES"))
-            //    odc.setOutput(System.out, true);
-            //else
-                odc.setOutput(devNull, true);
-
-
-
-            //odc.isProperlyConnected();
-            //odc.setOutput(devNull, false);
-            //odc.executeCommand("show status;");
-
-
-
-
-            return odc;
-        }
-        catch (Exception e) {
-            log.error("ERROR encountered.");
-            discardClient(odc);
-            throw new PPTException(e);
-        }
-
-    }
-
-    /**
-     * When a piece of code is done using an OPeNDAPClient, it should return it
-     * to the pool using this method.
-     *
-     * @param odc The OPeNDAPClient to return to the client pool.
-     * @throws PPTException .
-     */
-    private static void returnClient(OPeNDAPClient odc) throws PPTException {
-
-        try {
-
-
-            String cmd = "delete definitions;\n";
-            odc.executeCommand(cmd);
-
-            cmd = "delete containers;\n";
-            odc.executeCommand(cmd);
-
-
-            odc.setOutput(null, false);
-
-            _clientQueue.put(odc);
-            _checkOutFlag.release();
-            log.debug("Returned OPeNDAPClient to queue.");
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace(); // Don't do a thing
-        } catch (PPTException e) {
-
-
-            String msg = "\n*** BesAPI - WARNING! Problem with " +
-                         "OPeNDAPClient, discarding.";
-
-            discardClient(odc);
-
-            throw new PPTException(msg, e);
-        }
-
-    }
-
-
-
-    private static void discardClient(OPeNDAPClient odc){
-        if(odc != null && odc.isRunning()){
-            try {
-                shutdownClient(odc);
-            } catch (PPTException e) {
-                log.debug("BesAPI: Discarding client " +
-                            "encountered problems shutting down an " +
-                            "OPeNDAPClient connection to the BES\n");
-
-            }
-        }
-        // By releasing the flag and not checking the OPeNDAPClient back in
-        // we essentially throw the client away. A new one will be made
-        // the next time it's needed.
-        _checkOutFlag.release();
-
-    }
-
-
-
-    /**
-     * This method is meant to be called at program exit. It waits until all
-     * clients are checked into the pool and then gracefully shuts down each
-     * client's connection to the BES.
-     */
-    public static void shutdownBES() {
-
-
-        try {
-
-            log.debug("shutdownBES() - " +
-                    "Waiting for BES client check in to complete.");
-            _checkOutFlag.acquireUninterruptibly(_maxClients);
-            log.debug(" All clients checked in.");
-
-            log.debug("BesAPI.shutdownBES() - " + _clientQueue.size() +
-                    " client(s) to shutdown.");
-
-
-            int i = 0;
-            while (_clientQueue.size() > 0) {
-                OPeNDAPClient odc = _clientQueue.take();
-                log.debug("Retrieved OPeNDAPClient["
-                            + i++ + "] from queue.");
-
-                shutdownClient(odc);
-
-
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace(); // Do nothing
-        } catch (PPTException e) {
-            e.printStackTrace();  // Do nothing..
-        }
-
-
-    }
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-
-    /**
-     * Configures the BES. The BES may configured ONCE. Subsequent calls to
-     * configure() will be ignored.
-     *
-     * @param host       The host name/ip of the BES
-     * @param port       The port on which the BES is listening
-     * @param maxClients The maximum number of concurrent client connections
-     *                   that will be allowed to the BES.
      * @return False if configure() mas been called previously, True otherwise.
      */
-    public static boolean configure(String host, int port, int maxClients) {
+    public static void init() {
 
-        synchronized (syncLock) {
-
-            if (isConfigured())
-                return false;
-
-            _besHost = host;
-            _besPort = port;
-            _maxClients = maxClients;
-
-            _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(_maxClients);
-            _checkOutFlag = new Semaphore(_maxClients);
-
-            _configured = true;
+        if(_initialized) return;
 
             log = org.slf4j.LoggerFactory.getLogger(BesAPI.class);
 
-            log.debug("BES is configured - Host: " + _besHost
-                    + "   Port: " + _besPort);
+        _initialized = true;
 
 
-        }
-
-        return true;
-
-    }
-
-
-
-    /**
-     * Configures the BES using the passed BESConfig object. The BES may
-     * configured ONCE. Subsequent calls to configure() will be ignored.
-     *
-     * @param bc .
-     * @return False if configure() mas been called previously, True otherwise.
-     */
-    public static boolean configure(BESConfig bc) {
-
-        return configure(bc.getHost(),bc.getPort(),bc.getMaxClients());
-
-    }
-
-    /**
-     * @return True is the BES had been configured. False otherwise.
-     */
-    public static boolean isConfigured() {
-        return _configured;
-    }
-
-
-    /**
-     * @return The host/ip of the BES.
-     * @throws BadConfigurationException If the BES has not been configured
-     *                                   prior to calling this method.
-     */
-    public static String getHost() throws BadConfigurationException {
-        if (!isConfigured())
-            throw new BadConfigurationException("BES must be configured " +
-                    "before use!\n");
-
-        return _besHost;
-    }
-
-    /**
-     * @return The port number of the BES.
-     * @throws BadConfigurationException If the BES has not been configured
-     *                                   prior to calling this method.
-     */
-    public static int getPort() throws BadConfigurationException {
-        if (!isConfigured())
-            throw new BadConfigurationException("BES must be configured " +
-                    "before use!\n");
-        return _besPort;
     }
 
 
@@ -433,10 +187,17 @@ public class BesAPI {
 
         boolean trouble = false;
 
-        OPeNDAPClient oc = getClient();
+        BES bes = BESManager.getBES(dataSource);
+
+        if(bes==null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataSource);
+
+        OPeNDAPClient oc = bes.getClient();
 
         try {
-            configureTransaction(oc, dataSource, null, "stream",errorMsgFormat);
+
+            String besDataSource = bes.trimPrefix(dataSource);
+            configureTransaction(oc, besDataSource, null, "stream",errorMsgFormat);
 
             getDataProduct(oc, getAPINameForStream(), os);
         }
@@ -447,10 +208,10 @@ public class BesAPI {
         }
         finally{
             if (trouble) {
-                discardClient(oc);
+                bes.discardClient(oc);
             }
             else {
-                returnClient(oc);
+                bes.returnClient(oc);
             }
         }
     }
@@ -552,11 +313,18 @@ public class BesAPI {
 
 
         boolean trouble = false;
+        BES bes = BESManager.getBES(dataSource);
 
-        OPeNDAPClient oc = getClient();
+        if(bes==null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataSource);
+
+
+        OPeNDAPClient oc = bes.getClient();
 
         try {
-            configureTransaction(oc, dataSource, null, DAP2_ERRORS);
+
+            String besDataSource = bes.trimPrefix(dataSource);
+            configureTransaction(oc, besDataSource, null, DAP2_ERRORS);
 
             String cmd = "get " + getAPINameForHTMLForm() +
                     " for d1 using " + url + ";\n";
@@ -574,10 +342,10 @@ public class BesAPI {
         }
         finally{
             if (trouble) {
-                discardClient(oc);
+                bes.discardClient(oc);
             }
             else {
-                returnClient(oc);
+                bes.returnClient(oc);
             }
         }
     }
@@ -649,109 +417,8 @@ public class BesAPI {
     }
 
 
-    /**
-     * Returns an the version document for the BES.
-     *
-     * @return The version Document
-     * @throws BadConfigurationException .
-     * @throws PPTException .
-     * @throws IOException .
-     * @throws JDOMException .
-     * @throws BESException .
-     */
-    public static Document showVersion() throws
-            BadConfigurationException,
-            PPTException,
-            IOException,
-            JDOMException,
-            BESException {
-
-        // Get the version response from the BES (an XML doc)
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        besShowTransaction("version", baos);
-
-        log.debug("BES returned this document:\n"+
-                "-----------\n" + baos +"-----------");
 
 
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-        // Check for an exception:
-        besExceptionHandler(doc);
-
-        // Tweak it!
-
-        // First find the response Element
-        Element ver = doc.getRootElement().getChild("response");
-
-        // Disconnect it from it's parent and then rename it.
-        ver.detach();
-        ver.setName("OPeNDAP-Version");
-
-        doc.detachRootElement();
-        doc.setRootElement(ver);
-
-        return doc;
-    }
-
-
-    /**
-     * Returns the BES INFO document for the spcified dataSource.
-     *
-     * @param dataSource .
-     * @return The BES info document, stripped of it's <response> parent.
-     * @throws PPTException .
-     * @throws BadConfigurationException .
-     * @throws IOException .
-     * @throws JDOMException .
-     * @throws BESException .
-     */
-    public static Document getInfoDocument(String dataSource) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException,
-            BESException {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        String product = "info for " + "\"" + dataSource + "\"";
-
-        log.debug("Sending BES cmd: show " +
-                    product);
-
-
-        BesAPI.besShowTransaction(product, baos);
-
-
-        log.debug("BES returned this document:\n" +
-                    "-----------\n" + baos +"-----------");
-
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-        // Check for an exception:
-        besExceptionHandler(doc);
-
-        // Prepare the response:
-
-        // First find the response Element
-
-        Element topDataset =
-                doc.getRootElement().getChild("response").getChild("dataset");
-
-        // Disconnect it from it's parent and then rename it.
-        topDataset.detach();
-        doc.detachRootElement();
-        doc.setRootElement(topDataset);
-
-        return doc;
-
-    }
 
 
     /**
@@ -800,87 +467,6 @@ public class BesAPI {
         log.warn("Exception Message: " + msg);
 
         return msg;
-    }
-
-
-    /**
-     * Returns the BES catalog Document for the specified dataSource, striped
-     * of the <response> parent element.
-     *
-     * @param dataSource .
-     * @return The BES catalog Document.
-     * @throws PPTException .
-     * @throws BadConfigurationException .
-     * @throws IOException .
-     * @throws JDOMException .
-     * @throws BESException .
-     */
-    public static Document showCatalog(String dataSource) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException,
-            BESException {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        String product = "catalog for " + "\"" + dataSource + "\"";
-
-        BesAPI.besShowTransaction(product, baos);
-
-        log.debug("BES returned this document:\n" +
-                "-----------\n" + baos +"-----------");
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-        // Check for an exception:
-        besExceptionHandler(doc);
-        // Tweak it!
-
-        // First find the response Element
-
-        Element topDataset =
-                doc.getRootElement().getChild("response").getChild("dataset");
-
-        // Disconnect it from it's parent and then rename it.
-        topDataset.detach();
-        doc.detachRootElement();
-        doc.setRootElement(topDataset);
-
-        return doc;
-
-    }
-
-    /**
-     * Creates a new OPeNDAPClient connection to the BES and starts up the
-     * connection.
-     *
-     * @return A new OPeNDAP Client.
-     * @throws BadConfigurationException .
-     * @throws PPTException .
-     */
-    public static OPeNDAPClient startClient()
-            throws BadConfigurationException, PPTException {
-
-
-        OPeNDAPClient oc = new OPeNDAPClient();
-        oc.startClient(getHost(), getPort());
-
-
-        log.debug("Got OPeNDAPClient. BES - Host: "
-                    + _besHost + "  Port:" + _besPort);
-
-
-        //if (Debug.isSet("BES"))
-        //    oc.setOutput(System.out, true);
-        //else
-            oc.setOutput(devNull, true);
-
-
-
-        return oc;
     }
 
 
@@ -1026,15 +612,21 @@ public class BesAPI {
 
         log.debug("besGetTransaction started.");
 
+        BES bes = BESManager.getBES(dataset);
 
-        OPeNDAPClient oc;
+        if(bes==null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataset);
 
-        oc = getClient();
+
+
+        OPeNDAPClient oc = bes.getClient();
 
         try {
 
+            String besDataset  = bes.trimPrefix(dataset);
+
             configureTransaction(oc,
-                                 dataset,
+                                 besDataset,
                                  constraintExpression,
                                  errorMsgFormat);
 
@@ -1050,10 +642,10 @@ public class BesAPI {
             if (trouble) {
                 log.error("besGetTransaction(): Problem encountered," +
                         " discarding OPeNDAPCLient. ",trouble);
-                discardClient(oc);
+                bes.discardClient(oc);
             }
             else {
-                returnClient(oc);
+                bes.returnClient(oc);
             }
         }
         log.debug("besGetTransaction complete.");
@@ -1061,18 +653,60 @@ public class BesAPI {
     }
 
 
-    private static void besShowTransaction(String product, OutputStream os)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private static void besShowTransaction(String product, String dataset, OutputStream os)
             throws PPTException, BadConfigurationException {
 
         log.debug("besShowTransaction started.");
 
         boolean trouble = false;
 
-        OPeNDAPClient oc = getClient();
+
+
+        String besDataset;
+
+        BES bes = BESManager.getBES(dataset);
+
+        if(bes==null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataset);
+
+        OPeNDAPClient oc = bes.getClient();
 
         try {
 
-            String cmd = "show " + product + ";\n";
+            String cmd = "show " + product;
+
+            if(product.equals("version")){
+
+                cmd += ";\n";
+            }
+            else {
+
+                besDataset  = bes.trimPrefix(dataset);
+
+
+                cmd += " for \""+besDataset+"\";\n";
+            }
+
+
+
+
             log.debug("Sending command: " + cmd);
             oc.setOutput(os, false);
             log.debug("Setting error context to: \""+XML_ERRORS+"\"");
@@ -1089,18 +723,192 @@ public class BesAPI {
             if (trouble) {
                 log.error("besShowTransaction(): Problem encountered," +
                         " discarding OPeNDAPCLient. ",trouble);
-                discardClient(oc);
+                bes.discardClient(oc);
             }
             else {
-                returnClient(oc);
+                bes.returnClient(oc);
             }
         }
         log.debug("besShowTransaction complete.");
 
     }
 
+    /**
+     * Returns an the version document for the BES.
+     *
+     * @param path The path prefix for the BES whose version is being sought.
+     *
+     * @return The version Document
+     * @throws BadConfigurationException .
+     * @throws PPTException .
+     * @throws IOException .
+     * @throws JDOMException .
+     * @throws BESException .
+     */
+    public static Document showVersion(String path) throws
+            BadConfigurationException,
+            PPTException,
+            IOException,
+            JDOMException,
+            BESException {
+
+        // Get the version response from the BES (an XML doc)
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        besShowTransaction("version", path, baos);
+
+        log.debug("BES returned this document:\n"+
+                "-----------\n" + baos +"-----------");
+
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        // Check for an exception:
+        besExceptionHandler(doc);
+
+        // Tweak it!
+
+        // First find the response Element
+        Element ver = doc.getRootElement().getChild("response");
+
+        // Disconnect it from it's parent and then rename it.
+        ver.detach();
+        ver.setName("BES-Version");
+
+        doc.detachRootElement();
+        doc.setRootElement(ver);
+
+        return doc;
+    }
+
+    /**
+     * Returns the BES catalog Document for the specified dataSource, striped
+     * of the <response> parent element.
+     *
+     * @param dataSource .
+     * @return The BES catalog Document.
+     * @throws PPTException .
+     * @throws BadConfigurationException .
+     * @throws IOException .
+     * @throws JDOMException .
+     * @throws BESException .
+     */
+    public static Document showCatalog(String dataSource) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException,
+            BESException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String product = "catalog";
+
+        BesAPI.besShowTransaction(product, dataSource, baos);
+
+        log.debug("BES returned this document:\n" +
+                "-----------\n" + baos +"-----------");
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        // Check for an exception:
+        besExceptionHandler(doc);
+        // Tweak it!
+
+        // First find the response Element
+
+        Element topDataset =
+                doc.getRootElement().getChild("response").getChild("dataset");
+
+        // Disconnect it from it's parent and then rename it.
+        topDataset.detach();
+        doc.detachRootElement();
+        doc.setRootElement(topDataset);
+
+        return doc;
+
+    }
 
 
 
+
+    /**
+     * Returns the BES INFO document for the spcified dataSource.
+     *
+     * @param dataSource .
+     * @return The BES info document, stripped of it's <response> parent.
+     * @throws PPTException .
+     * @throws BadConfigurationException .
+     * @throws IOException .
+     * @throws JDOMException .
+     * @throws BESException .
+     */
+    public static Document getInfoDocument(String dataSource) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException,
+            BESException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String product = "info";
+
+
+        BesAPI.besShowTransaction(product, dataSource, baos);
+
+
+        log.debug("BES returned this document:\n" +
+                    "-----------\n" + baos +"-----------");
+
+
+        // Parse the XML doc into a Document object.
+        SAXBuilder sb = new SAXBuilder();
+        Document doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        // Check for an exception:
+        besExceptionHandler(doc);
+
+        // Prepare the response:
+
+        // First find the response Element
+
+        Element topDataset =
+                doc.getRootElement().getChild("response").getChild("dataset");
+
+        // Disconnect it from it's parent and then rename it.
+        topDataset.detach();
+        doc.detachRootElement();
+        doc.setRootElement(topDataset);
+
+        return doc;
+
+    }
+
+
+    public static boolean isConfigured(){
+        return BESManager.isConfigured();
+    }
+
+
+    public static Document getVersionDocument(String path) throws Exception{
+        return BESManager.getVersionDocument(path);
+    }
+    public static Document getCombinedVersionDocument() throws Exception{
+        return BESManager.getCombinedVersionDocument();
+    }
+
+    public static void configure(OLFSConfig olfsConfig) throws Exception {
+
+        BESManager.configure(olfsConfig.getBESConfig());
+
+    }
+    public static void shutdown(){
+        BESManager.shutdown();
+    }
 
 }

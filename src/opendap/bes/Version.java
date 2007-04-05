@@ -33,13 +33,22 @@ import org.jdom.Text;
 public class Version {
 
 
-    private static String version = "1.1.0";
+    private static String olfsVersion  = "1.1.1";
+    private static String hyraxVersion = "1.1.0";
 
-    public static String getVersionString() {
-        return (version);
+
+
+
+
+    public static String getOLFSVersionString() {
+        return (olfsVersion);
     }
 
-    public static Element getVersionElement() {
+    public static String getHyraxVersionString() {
+        return (hyraxVersion);
+    }
+
+    public static Element getOLFSVersionElement() {
 
         Element olfs = new Element("OLFS");
 
@@ -50,7 +59,28 @@ public class Version {
         name.addContent(new Text("olfs"));
         lib.addContent(name);
 
-        ver.addContent(new Text(version));
+        ver.addContent(new Text(olfsVersion));
+        lib.addContent(ver);
+
+
+        olfs.addContent(lib);
+
+        return (olfs);
+
+    }
+
+    public static Element getHyraxVersionElement() {
+
+        Element olfs = new Element("Hyrax");
+
+        Element lib = new Element("lib");
+        Element name = new Element("name");
+        Element ver = new Element("version");
+
+        name.addContent(new Text("Hyrax"));
+        lib.addContent(name);
+
+        ver.addContent(new Text(hyraxVersion));
         lib.addContent(ver);
 
 

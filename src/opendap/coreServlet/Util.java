@@ -87,11 +87,11 @@ public class Util {
     static void sendSystemProperties(HttpServletRequest request,
                                             HttpServletResponse response,
                                             OpendapHttpDispatchHandler odh)
-            throws IOException {
+            throws Exception {
 
 
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");

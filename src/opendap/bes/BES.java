@@ -29,8 +29,14 @@ import opendap.ppt.PPTException;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.List;
+import java.io.IOException;
 
 import org.slf4j.Logger;
+import org.jdom.JDOMException;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * User: ndp
@@ -39,16 +45,22 @@ import org.slf4j.Logger;
  */
 public class BES {
 
-    private static Logger log;
+    private Logger log;
 
 
-    private  ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
-    private  Semaphore _checkOutFlag;
-
-
+    private ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
+    private Semaphore _checkOutFlag;
     private BESConfig _config;
 
-    public BES(BESConfig config){
+
+    private Document _serverVersionDocument;
+    private ReentrantLock _versionDocLock;
+
+
+    private DevNull devNull = new DevNull();
+
+
+    public BES(BESConfig config) throws Exception {
         _config = config.copy();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -56,32 +68,102 @@ public class BES {
         _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients());
         _checkOutFlag = new Semaphore(getMaxClients());
 
+        _versionDocLock = new ReentrantLock(true);
 
-        log.debug("BES built with configuration: \n"+_config);
 
+        log.debug("BES built with configuration: \n" + _config);
+        _serverVersionDocument = null;
 
     }
 
 
-    public int getPort(){
+    public int getPort() {
         return _config.getPort();
     }
 
-    public String getHost(){
+    public String getHost() {
         return _config.getHost();
     }
 
-    public String getPrefix(){
+    public String getPrefix() {
         return _config.getPrefix();
     }
 
-    public int getMaxClients(){
+    public int getMaxClients() {
         return _config.getMaxClients();
     }
 
-    private static DevNull devNull = new DevNull();
 
 
+    public Document getVersionDocument() throws Exception {
+
+        // Have we cached it already?
+        if (_serverVersionDocument == null) {
+
+            // Apparently not, so lets lock the resource.
+            _versionDocLock.lock();
+
+            try {
+                // Make sure someone didn't change it when we weren't looking.
+                if (_serverVersionDocument == null) {
+                    // Cache it!
+                    cacheServerVersionDocument();
+                    log.info("BES Version: \n" + _serverVersionDocument);
+                }
+            }
+            finally {
+                // Unlock the resource.
+                _versionDocLock.unlock();
+            }
+        }
+        // Return a copy so nobody can break our stuff!
+        return (Document) _serverVersionDocument.clone();
+    }
+
+
+    private void cacheServerVersionDocument() throws IOException,
+            PPTException,
+            BadConfigurationException,
+            JDOMException, BESException {
+
+        log.debug("Getting Server Version Document.");
+
+        Document doc = BesAPI.showVersion(getPrefix());
+
+        Element bes = doc.getRootElement().getChild("BES");
+
+
+        List guts = bes.removeContent();
+
+
+        Element prefix = new Element("prefix");
+        prefix.addContent(getPrefix());
+        Element host = new Element("host");
+        host.addContent(getHost());
+        Element port = new Element("port");
+        port.addContent(getPort() + "");
+
+
+        bes.addContent(prefix);
+        bes.addContent(host);
+        bes.addContent(port);
+
+        bes.addContent(guts);
+
+        _serverVersionDocument = doc;
+
+
+    }
+
+
+    public String trimPrefix(String dataset) {
+
+        String trim = dataset.substring(getPrefix().length());
+
+        if (trim.indexOf("/") != 0)
+            trim = "/" + trim;
+        return trim;
+    }
 
 
 //------------------------------------------------------------------------------
@@ -98,13 +180,13 @@ public class BES {
      * If a client is available, it is returned.
      *
      * @return The next available OPeNDAPClient.
-     * @throws opendap.ppt.PPTException .
+     * @throws opendap.ppt.PPTException  .
      * @throws BadConfigurationException .
      */
     public OPeNDAPClient getClient()
             throws PPTException, BadConfigurationException {
 
-        OPeNDAPClient odc=null;
+        OPeNDAPClient odc = null;
 
         try {
             _checkOutFlag.acquire();
@@ -112,7 +194,7 @@ public class BES {
             if (_clientQueue.size() == 0) {
                 odc = new OPeNDAPClient();
                 log.debug("getClient() - " +
-                            "Made new OPeNDAPClient. Starting...");
+                        "Made new OPeNDAPClient. Starting...");
 
                 odc.startClient(getHost(), getPort());
                 log.debug("OPeNDAPClient started.");
@@ -122,21 +204,17 @@ public class BES {
 
                 odc = _clientQueue.take();
                 log.debug("getClient() - Retrieved " +
-                            "OPeNDAPClient from queue.");
+                        "OPeNDAPClient from queue.");
             }
 
             //if (Debug.isSet("BES"))
             //    odc.setOutput(System.out, true);
             //else
-                odc.setOutput(devNull, true);
-
-
+            odc.setOutput(devNull, true);
 
             //odc.isProperlyConnected();
             //odc.setOutput(devNull, false);
             //odc.executeCommand("show status;");
-
-
 
 
             return odc;
@@ -180,7 +258,7 @@ public class BES {
 
 
             String msg = "\n*** BES - WARNING! Problem with " +
-                         "OPeNDAPClient, discarding.";
+                    "OPeNDAPClient, discarding.";
 
             discardClient(odc);
 
@@ -190,15 +268,14 @@ public class BES {
     }
 
 
-
-    public void discardClient(OPeNDAPClient odc){
-        if(odc != null && odc.isRunning()){
+    public void discardClient(OPeNDAPClient odc) {
+        if (odc != null && odc.isRunning()) {
             try {
                 BesAPI.shutdownClient(odc);
             } catch (PPTException e) {
                 log.debug("BES: Discarding client " +
-                            "encountered problems shutting down an " +
-                            "OPeNDAPClient connection to the BES\n");
+                        "encountered problems shutting down an " +
+                        "OPeNDAPClient connection to the BES\n");
 
             }
         }
@@ -208,7 +285,6 @@ public class BES {
         _checkOutFlag.release();
 
     }
-
 
 
     /**
@@ -234,7 +310,7 @@ public class BES {
             while (_clientQueue.size() > 0) {
                 OPeNDAPClient odc = _clientQueue.take();
                 log.debug("Retrieved OPeNDAPClient["
-                            + i++ + "] from queue.");
+                        + i++ + "] from queue.");
 
                 BesAPI.shutdownClient(odc);
 
@@ -253,7 +329,6 @@ public class BES {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-
 
 
 }

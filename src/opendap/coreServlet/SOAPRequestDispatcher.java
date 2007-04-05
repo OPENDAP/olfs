@@ -94,7 +94,7 @@ public class SOAPRequestDispatcher {
                     requestDispatcher(request, clientReq, mpr, sdh);
                 }
 
-                mpr.send();
+                mpr.send(request);
 
 
                 log.debug("done.");

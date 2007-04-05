@@ -98,6 +98,11 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     }
 
+    public static String getDatasetRootPrefix()  {
+        return _datasetRootPrefix;
+    }
+
+
 
     /**
      * Returns the path for this dataset.
@@ -438,19 +443,6 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         return threddsPath;
     }
 
-
-    /**
-     * @return .
-     * @throws IOException               .
-     * @throws PPTException              .
-     * @throws BadConfigurationException .
-     * @throws BESException              .
-     * @throws JDOMException             .
-     * @deprecated
-     */
-    public static BESCrawlableDataset getRootDataset() throws IOException, PPTException, BadConfigurationException, BESException, JDOMException {
-        return new BESCrawlableDataset(_datasetRootPrefix, null);
-    }
 
 
     private void init() {

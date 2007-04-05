@@ -729,11 +729,11 @@ public class DispatchServlet extends HttpServlet {
      */
     public void doGetStatus(HttpServletRequest request,
                             HttpServletResponse response)
-            throws IOException {
+            throws Exception {
 
 
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
@@ -767,13 +767,13 @@ public class DispatchServlet extends HttpServlet {
      */
     public void badURL(HttpServletRequest request,
                        HttpServletResponse response)
-            throws IOException {
+            throws Exception {
 
         log.debug("Sending Bad URL Page.");
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -834,8 +834,8 @@ public class DispatchServlet extends HttpServlet {
     private void sendResourceNotFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -862,8 +862,8 @@ public class DispatchServlet extends HttpServlet {
     private void sendDirectAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "BadURL");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

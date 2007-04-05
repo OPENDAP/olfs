@@ -154,9 +154,9 @@ public class MultipartResponse {
 
     /**
      * Send the Multipart MIME docuemtn response to the client.
-     * @throws IOException
+     * @throws IOException When things go wrong
      */
-    public void send() throws IOException {
+    public void send(HttpServletRequest request) throws Exception {
         log.debug("Sending Response...");
 
         log.debug("MIME Boundary: "+mimeBoundary);
@@ -168,8 +168,8 @@ public class MultipartResponse {
                                 "start=\""+startID+"\";  "+
                                 "boundary=\""+mimeBoundary+"\"");
 
-        servResponse.setHeader("XDODS-Server", odh.getXDODSServerVersion());
-        servResponse.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion());
+        servResponse.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        servResponse.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         servResponse.setHeader("XDAP", odh.getXDAPVersion(servRequest));
         servResponse.setHeader("Content-Description", "OPeNDAP WebServices");
 
