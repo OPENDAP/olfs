@@ -178,7 +178,7 @@ public class S4Dir {
                     (cal.get(Calendar.HOUR)<10?"0":"")         +
                          cal.get(Calendar.HOUR)                + ":" +
                     (cal.get(Calendar.MINUTE)<10?"0":"")       +
-                        cal.get(Calendar.MINUTE)               + ":" +
+                        cal.get(Calendar.MINUTE)               + ":" +`
                     (cal.get(Calendar.SECOND)<10?"0":"")       +
                         cal.get(Calendar.SECOND);
 
