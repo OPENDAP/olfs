@@ -92,8 +92,8 @@ public class DispatchServlet extends HttpServlet {
     private OpendapSoapDispatchHandler sdh = null;
 
 
-    protected DataRootHandler dataRootHandler;
-    protected org.slf4j.Logger log;
+    private DataRootHandler dataRootHandler;
+    private org.slf4j.Logger log;
 
 
     protected String getDocsPath() {
@@ -183,6 +183,13 @@ public class DispatchServlet extends HttpServlet {
     }
     /***************************************************************************/
 
+
+
+
+
+
+
+    
 
     /**
      * ************************************************************************
