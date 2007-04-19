@@ -31,27 +31,77 @@ import java.util.Vector;
 import java.util.List;
 import java.util.Iterator;
 
+import opendap.coreServlet.DispatchHandler;
+import opendap.coreServlet.DispatchServlet;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * User: ndp
  * Date: Mar 19, 2007
  * Time: 11:39:07 AM
  */
-public class BESManager {
+public class BESManager implements DispatchHandler {
 
 
     private static Vector<BES> _besCollection;
 
     private static boolean _isConfigured = false;
 
+    private static  org.slf4j.Logger log = null;
+
+    private static boolean initialized;
+
+    public BESManager(){
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        initialized = false;
+
+    }
+
+    public void init(DispatchServlet servlet, Element config) throws Exception{
+
+        if(initialized) return;
+
+        configure(config);
+
+        log.info("Initialized.");
+
+        initialized = true;
+
+    }
+
+    public boolean requestCanBeHandled(HttpServletRequest request)
+            throws Exception{
+        return false;
+
+    }
+
+    public void handleRequest(HttpServletRequest request,
+                              HttpServletResponse response)
+            throws Exception{
+
+    }
+
+    public long getLastModified(HttpServletRequest request){
+        return -1;
+    }
+
+    public void destroy(){
+        shutdown();
+        log.info("Destroy complete.");
+
+    }
 
 
 
     public static void configure(Element besConfiguration) throws Exception {
 
+        if(_isConfigured) return;
+
         BesAPI.init();
 
-        if(_isConfigured) return;
 
         _besCollection  = new Vector<BES>();
 
@@ -132,8 +182,10 @@ public class BESManager {
 
     public static void shutdown(){
         for(BES bes : _besCollection){
+            log.debug("Shutting down BesPool " + bes);
             bes.shutdownBES();
         }
+        log.debug("All BesPools have been shut down.");
 
     }
 

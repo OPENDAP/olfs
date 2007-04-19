@@ -30,8 +30,6 @@ import opendap.ppt.PPTException;
 
 import java.io.*;
 import java.util.Iterator;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Semaphore;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -60,7 +58,6 @@ public class BesAPI {
     private static boolean _initialized = false;
 
 
-    private static DevNull devNull = new DevNull();
 
     /**
      * The name of the BES Exception Element.
@@ -71,7 +68,6 @@ public class BesAPI {
     /**
      * Initializes logging for the BesAPI class.
      *
-     * @return False if configure() mas been called previously, True otherwise.
      */
     public static void init() {
 
@@ -583,16 +579,6 @@ public class BesAPI {
     }
 
 
-    static void shutdownClient(OPeNDAPClient oc) throws PPTException {
-        log.debug("Shutting down client...");
-
-        oc.setOutput(null, false);
-
-        oc.shutdownClient();
-        log.debug("Client shutdown.");
-
-
-    }
 
 
 
@@ -683,9 +669,13 @@ public class BesAPI {
 
         BES bes = BESManager.getBES(dataset);
 
-        if(bes==null)
-            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataset);
+        if(bes==null){
+            String msg = "There is no BES to handle the requested data source: "+dataset;
+            log.error(msg);
+            throw new BadConfigurationException(msg);
+        }
 
+        
         OPeNDAPClient oc = bes.getClient();
 
         try {
@@ -906,9 +896,6 @@ public class BesAPI {
 
         BESManager.configure(olfsConfig.getBESConfig());
 
-    }
-    public static void shutdown(){
-        BESManager.shutdown();
     }
 
 }

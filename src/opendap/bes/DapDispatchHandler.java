@@ -29,95 +29,248 @@ import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
+import java.util.Date;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
-import thredds.servlet.ServletUtil;
 
 /**
  * Handler fo HTTP GET requests.
  */
-public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
+public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     private MimeTypes mimeTypes;
     private Logger log;
+    private boolean initialized;
 
 
-
-    /**
-     * ************************************************************************
-     * Configuration, Cached by init()
-     *
-     * @serial
-     */
-    private OLFSConfig _olfsConfig;
-
-
-    public HttpDispatchHandler() {
+    public DapDispatchHandler() {
 
         super();
 
-        _olfsConfig = null;
         mimeTypes = new MimeTypes();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
+        initialized = false;
     }
+
+
+
 
 
     /**
      * ************************************************************************
      * Intitializes any state needed for the handler.
      */
-    public void init(HttpServlet ds) throws ServletException {
+    public void init(DispatchServlet ds, Element config) throws Exception {
+
+        if(initialized) return;
+
+        log.info("Initialized.");
+        initialized = true;
+
+    }
 
 
-        log.info("init()");
+    public boolean requestCanBeHandled(HttpServletRequest request)
+            throws Exception {
 
-        BesAPI.init();
+       return dataSetDispatch(request,null,false);
 
-        configure(ds);
+    }
+
+    public void handleRequest(HttpServletRequest request,
+                              HttpServletResponse response)
+            throws Exception {
+
+        dataSetDispatch(request,response,true);
 
 
     }
 
-    private void configure(HttpServlet ds) throws ServletException {
+
+    public long getLastModified(HttpServletRequest req) {
 
 
-        String filename = ds.getInitParameter("OLFSConfigFileName");
-        if (filename == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the OLFS configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
-        }
+        String dataSource = ReqInfo.getDataSource(req);
 
 
-        log.debug("Configuring OLFS.");
+
+
+
+        log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + dataSource );
 
 
         try {
+            DataSourceInfo dsi = new BESDataSource(dataSource);
+            log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
-            _olfsConfig = new OLFSConfig(ServletUtil.getContentPath(ds) + filename);
-
-            BesAPI.configure(_olfsConfig);
-
+            return dsi.lastModified();
         }
         catch (Exception e) {
-            throw new ServletException(e);
+            log.debug("getLastModified(): Returning: -1");
+            return -1;
         }
 
 
 
     }
 
+
     public void destroy() {
-        BesAPI.shutdown();
+        log.info("Destroy complete.");
     }
+
+
+
+
+
+
+
+
+    /**
+     * Performs dispatching for OPeNDAP data requests. The OPeNDAP response
+     * suite consists of:
+     * <ui>
+     * <li>dds - The OPeNDAP Data Description Service document for the
+     * requested dataset. </li>
+     * <li>das - The OPeNDAP Data Attribute Service document for the requested
+     * dataset. </li>
+     * <li>ddx - The OPeNDAP DDX document, an XML document that combines the
+     * DDS and the DAS. </li>
+     * <li>dods - The OPeNDAP DAP2 data service. Returns data to the user as
+     * described in
+     * the DAP2 specification </li>
+     * <li>ascii - The requested data as columns of ASCII values. </li>
+     * <li>info - An HTML document providing a easy to read view of the DDS
+     * and DAS information. </li>
+     * <li>html - The HTML request form from which users can choose wich
+     * components of a dataset they wish
+     * to retrieve. </li>
+     * </ui>
+     *
+     * @param request  The client request that we are evaluating.
+     * @param response The respons ethat we are sending back.
+     * @param sendResponse If this is true a response will be sent. If it is
+     * the request will only be evaluated to determine if a response can be
+     * generated.
+     * @return true if the request was handled as an OPeNDAP service request,
+     * false otherwise.
+     * @throws Exception .
+     */
+    private boolean dataSetDispatch(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   boolean sendResponse) throws Exception {
+
+
+        String dataSource = ReqInfo.getDataSource(request);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
+
+        DataSourceInfo dsi = getDataSourceInfo(dataSource);
+
+        boolean isDataRequest = false;
+
+        if (dsi.sourceExists()) {
+
+            if (requestSuffix != null && dsi.isDataset()) {
+
+                if ( // DDS Response?
+                        requestSuffix.equalsIgnoreCase("dds")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendDDS(request, response);
+                        log.info("Sent DDS");
+                    }
+
+                } else if ( // DAS Response?
+                        requestSuffix.equalsIgnoreCase("das")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendDAS(request, response);
+                        log.info("Sent DAS");
+                    }
+
+                } else if (  // DDX Response?
+                        requestSuffix.equalsIgnoreCase("ddx")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendDDX(request, response);
+                        log.info("Sent DDX");
+                    }
+
+                } else if ( // DAP2 (aka .dods) Response?
+                        requestSuffix.equalsIgnoreCase("dods")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendDAP2Data(request, response);
+                        log.info("Sent DAP2 Data");
+                    }
+
+                } else if (  // ASCII Data Response.
+                        requestSuffix.equalsIgnoreCase("asc") ||
+                                requestSuffix.equalsIgnoreCase("ascii")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendASCII(request, response);
+                        log.info("Sent ASCII");
+                    }
+
+                } else if (  // Info Response?
+                        requestSuffix.equalsIgnoreCase("info")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendInfo(request, response);
+                        log.info("Sent Info");
+                    }
+
+                } else
+                if (  //HTML Request Form (aka The Interface From Hell) Response?
+                        requestSuffix.equalsIgnoreCase("html") ||
+                                requestSuffix.equalsIgnoreCase("htm")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendHTMLRequestForm(request, response);
+                        log.info("Sent HTML Request Form");
+                    }
+
+
+                } else if (requestSuffix.equals("")) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        badURL(response);
+                        log.info("Sent BAD URL (missing Suffix)");
+                    }
+                } else {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        badURL(response);
+                        log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+                    }
+                }
+
+            }
+        }
+
+
+        return isDataRequest;
+    }
+
+
+
+
+
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
         return new BESDataSource(dataSourceName);
@@ -125,25 +278,10 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     public String getVersionStringForTHREDDSCatalog() {
-        return "OPeNDAP Hyrax (" + Version.getHyraxVersionString() + ")" +
-                "<font size='-5' color='#7A849E'> " +
-                "ServerUUID=" + Version.getServerUUID() + "-catalog" +
-                "</font><br />";
-
+        return opendap.bes.Version.getVersionStringForTHREDDSCatalog();
     }
 
 
-
-
-
-    public boolean useOpendapDirectoryView() {
-        return !_olfsConfig.getTHREDDSDirectoryView();
-    }
-
-
-    public boolean allowDirectDataSourceAccess() {
-        return _olfsConfig.allowDirectDataSourceAccess();
-    }
 
 
 
@@ -245,46 +383,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     }
 
 
-    public long getLastModified(HttpServletRequest req) {
-
-        String name;
-
-
-        if (ReqInfo.requestForTHREDDSCatalog(req)) { // Requesting a THREDDS catalog?
-
-            name = ReqInfo.getCollectionName(req);
-            log.debug("Tomcat requesting getlastModified() for THREDDS catalog: " + name );
-            // Since the user can modify the THREDDS catalogs without
-            // changing the underlying data source, AND we can't ask the THREDDS
-            // library to tell us about the last modified times of the catalog
-            // we punt and return -1.
-
-            return (-1);
-        } else
-        if (ReqInfo.requestForOpendapContents(req)) { // Requesting OPeNDAP contents?
-
-            name = ReqInfo.getCollectionName(req);
-            log.debug("Tomcat requesting getlastModified() for collection: " + name );
-        } else { // Otherwise they are looking for data...
-            name = ReqInfo.getDataSource(req);
-            log.debug("Tomcat requesting getlastModified() for dataSource: " + name );
-        }
-
-        String path = BESCrawlableDataset.besPath2ThreddsPath(name);
-
-        try {
-            BESCrawlableDataset cd = new BESCrawlableDataset(path, null);
-            log.debug("Returning: " + cd.lastModified());
-
-            return cd.lastModified().getTime();
-        }
-        catch (Exception e) {
-            log.debug("Returning: -1");
-            return -1;
-        }
-
-
-    }
 
 
     /**
@@ -509,68 +607,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     /***************************************************************************/
 
 
-    /**
-     * ************************************************************************
-     * Default handler for the client's version request.
-     * <p/>
-     * <p>Returns a plain text document with server version and OPeNDAP core
-     * version #'s
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     */
-    public void sendVersion(HttpServletRequest request,
-                            HttpServletResponse response)
-            throws Exception {
-
-        log.debug("sendVersion()");
-
-        response.setContentType("text/xml");
-        response.setHeader("XDODS-Server", getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_version");
-
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        PrintStream ps = new PrintStream(response.getOutputStream());
-
-        Document vdoc = BesAPI.getCombinedVersionDocument();
-        
-        if (vdoc == null) {
-            throw new ServletException("Internal Error: Version Document not initialized.");
-        }
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        //XMLOutputter xout = new XMLOutputter();
-        xout.output(vdoc, ps);
-        ps.flush();
-
-
-/*
-        if (Debug.isSet("showResponse")) {
-            xout.output(getVersionDocument(), System.out);
-            System.out.println("Document Sent.");
-            System.out.println("\nMIME Headers:");
-            System.out.println("    XDODS-Server: " + getXDODSServerVersion());
-            System.out.println("    XOPeNDAP-Server: " + getXOPeNDAPServerVersion());
-            System.out.println("    XDAP: " + getXDAPVersion(request));
-            System.out.println("\nEnd Response.");
-        }
-
-*/
-
-
-
-
-    }
-
-    /***************************************************************************/
-
 
     /**
      * ***********************************************************************
@@ -731,36 +767,6 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     }
 
 
-    public void sendHelpPage(HttpServletRequest request,
-                             HttpServletResponse response)
-            throws Exception {
-
-
-        log.debug("sendHelpPage()");
-
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_help");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-        response.setStatus(HttpServletResponse.SC_OK);
-
-
-        PrintWriter pw = new PrintWriter(
-                new OutputStreamWriter(response.getOutputStream()));
-
-        printHelpPage(pw);
-        pw.flush();
-
-
-        pw.flush();
-
-
-    }
-
-
     public void sendFile(HttpServletRequest req,
                          HttpServletResponse response)
             throws Exception {
@@ -792,49 +798,67 @@ public class HttpDispatchHandler implements OpendapHttpDispatchHandler {
     }
 
 
+
     /**
-     * ************************************************************************
-     * Prints the OPeNDAP Server help page to the passed PrintWriter
+     * Sends an html document to the client explaining that they have used a
+     * poorly formed URL and then the help page...
      *
-     * @param pw PrintWriter stream to which to dump the help page.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @throws IOException If it can't right the response.
      */
-    private void printHelpPage(PrintWriter pw) {
+    private void badURL(HttpServletResponse response) throws Exception {
 
-        pw.println("<h3>OPeNDAP Server Help</h3>");
-        pw.println("To access most of the features of this OPeNDAP server, append");
-        pw.println("one of the following a eight suffixes to a URL: .das, .dds, .dods, .ddx, .info,");
-        pw.println(".ver or .help. Using these suffixes, you can ask this server for:");
-        pw.println("<dl>");
-        pw.println("<dt> das  </dt> <dd> Dataset Attribute Structure (DAS)</dd>");
-        pw.println("<dt> dds  </dt> <dd> Dataset Descriptor Structure (DDS)</dd>");
-        pw.println("<dt> dods </dt> <dd> DataDDS object (A constrained DDS populated with data)</dd>");
-        pw.println("<dt> ddx  </dt> <dd> XML version of the DDS/DAS</dd>");
-        pw.println("<dt> info </dt> <dd> info object (attributes, types and other information)</dd>");
-        pw.println("<dt> html </dt> <dd> html form for this dataset</dd>");
-        pw.println("<dt> ver  </dt> <dd> return the version number of the server</dd>");
-        pw.println("<dt> help </dt> <dd> help information (this text)</dd>");
-        pw.println("</dl>");
-        pw.println("For example, to request the DAS object from the FNOC1 dataset at URI/GSO (a");
-        pw.println("experiments dataset) you would appand `.das' to the URL:");
-        pw.println("http://opendap.gso.uri.edu/cgi-bin/nph-nc/data/fnoc1.nc.das.");
+        log.debug("Sending Bad URL Page.");
 
-        pw.println("<p><b>Note</b>: Many OPeNDAP clients supply these extensions for you so you don't");
-        pw.println("need to append them (for example when using interfaces supplied by us or");
-        pw.println("software re-linked with a OPeNDAP client-library). Generally, you only need to");
-        pw.println("add these if you are typing a URL directly into a WWW browser.");
-        pw.println("<p><b>Note</b>: If you would like version information for this server but");
-        pw.println("don't know a specific data file or data set name, use `/version' for the");
-        pw.println("filename. For example: http://opendap.gso.uri.edu/cgi-bin/nph-nc/version will");
-        pw.println("return the version number for the netCDF server used in the first example. ");
+        response.setContentType("text/html");
 
-        pw.println("<p><b>Suggestion</b>: If you're typing this URL into a WWW browser and");
-        pw.println("would like information about the dataset, use the `.info' extension.");
+        // OPeNDAP Headers not needed (James said so!)
+        //response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
+        //response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
+        //response.setHeader("XDAP", odh.getXDAPVersion(request));
 
-        pw.println("<p>If you'd like to see a data values, use the `.html' extension and submit a");
-        pw.println("query using the customized form.");
+        response.setHeader("Content-Description", "BadURL");
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
+
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
+
+        pw.println("<h3>Error in URL</h3>");
+        pw.println("<p>The URL extension did not match any that are known by this");
+        pw.println("server. Here is a list of the five extensions that are be recognized by");
+        pw.println("all OPeNDAP servers:</p>");
+        pw.println("<ui>");
+        pw.println("    <li>ddx</li>");
+        pw.println("    <li>dds</li>");
+        pw.println("    <li>das</li>");
+        pw.println("    <li>dods</li>");
+        pw.println("    <li>info</li>");
+        pw.println("    <li>html</li>");
+        pw.println("    <li>ascii</li>");
+        pw.println("</ui>");
+        pw.println("<p>If you think that the server is broken (that the URL you");
+        pw.println("submitted should have worked), then please contact the");
+        pw.println("OPeNDAP user support coordinator at: ");
+        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
+
+        pw.flush();
+
 
     }
-    //**************************************************************************
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

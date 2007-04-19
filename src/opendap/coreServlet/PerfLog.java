@@ -45,7 +45,7 @@ import thredds.servlet.ServletUtil;
 public class PerfLog {
 
     private static boolean isLogInit = false;
-    private static volatile long logID = 0;
+    //private static volatile long logID = 0;
 
     private static Logger log;
 
@@ -118,16 +118,18 @@ public class PerfLog {
      * <p/>
      * The appearance of the regular log messages are controlled in the
      * log4j.xml configuration file.
+     * @param source The source id of who started the logging. Typically an init()
+     * method.
      *
-     * @param msg - the information log message logged when this method finishes.
      */
-    public static void logServerSetup(String msg) {
+    public static void logServerSetup(String source) {
         // Setup context.
         synchronized (PerfLog.class) {
-            MDC.put("ID", Long.toString(++logID));
+            MDC.put("ID", "Server Startup");
+            MDC.put("SOURCE", source);
         }
         MDC.put("startTime", System.currentTimeMillis());
-        log.info(msg);
+        log.info("Logging started.");
     }
 
 
@@ -144,7 +146,7 @@ public class PerfLog {
      * This method gathers the following information:
      * 1) "ID" - an identifier for the current thread;
      * 2) "host" - the remote host (IP address or host name);
-     * 3) "userid" - the id of the remote user;
+     * 3) "userid" - the reqID of the remote user;
      * 4) "startTime" - the system time in millis when this request is started (i.e., when this method is called); and
      * 5) "request" - The HTTP request, e.g., "GET /index.html HTTP/1.1".
      * <p/>
@@ -158,16 +160,14 @@ public class PerfLog {
      * @param req     the current HttpServletRequest.
      * @param logName Name of Logger to write stuff.
      */
-    public static void logServerAccessStart(HttpServletRequest req, String logName) {
+    public static void logServerAccessStart(HttpServletRequest req, String logName,  String reqSource, String reqID) {
 
         HttpSession session = req.getSession(false);
 
         Logger log = org.slf4j.LoggerFactory.getLogger(logName);
 
-        // Setup context.
-        synchronized (PerfLog.class) {
-            MDC.put("ID", Long.toString(++logID));
-        }
+        MDC.put("ID", reqID);
+        MDC.put("SOURCE", reqSource);
         MDC.put("host", req.getRemoteHost());
         MDC.put("ident", (session == null) ? "-" : session.getId());
         MDC.put("userid", req.getRemoteUser() != null ? req.getRemoteUser() : "-");

@@ -28,7 +28,7 @@
 
         <init-param>
             <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
-            <param-value>opendap.bes.HttpDispatchHandler</param-value>
+            <param-value>opendap.bes.DapDispatchHandler</param-value>
         </init-param>
 
         <init-param>
@@ -106,7 +106,7 @@
       <servlet-name>View</servlet-name>
       <url-pattern>/view/*</url-pattern>
     </servlet-mapping>
-    
+
 
 
 </web-app>

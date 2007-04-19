@@ -94,6 +94,17 @@ public class BES {
     }
 
 
+    public String toString(){
+
+        return "[BES prefix: "+getPrefix() +
+                " host: " + getHost() +
+                " port: " + getPort() +
+                " maxClients: " + getMaxClients() +
+                "]";
+
+
+    }
+
 
     public Document getVersionDocument() throws Exception {
 
@@ -267,11 +278,21 @@ public class BES {
 
     }
 
+    public void shutdownClient(OPeNDAPClient oc) throws PPTException {
+        log.debug("Shutting down client...");
+
+        oc.setOutput(null, false);
+
+        oc.shutdownClient();
+        log.debug("Client shutdown.");
+
+
+    }
 
     public void discardClient(OPeNDAPClient odc) {
         if (odc != null && odc.isRunning()) {
             try {
-                BesAPI.shutdownClient(odc);
+                shutdownClient(odc);
             } catch (PPTException e) {
                 log.debug("BES: Discarding client " +
                         "encountered problems shutting down an " +
@@ -299,6 +320,7 @@ public class BES {
 
             log.debug("shutdownBES() - " +
                     "Waiting for BES client check in to complete.");
+
             _checkOutFlag.acquireUninterruptibly(getMaxClients());
             log.debug(" All clients checked in.");
 
@@ -312,12 +334,13 @@ public class BES {
                 log.debug("Retrieved OPeNDAPClient["
                         + i++ + "] from queue.");
 
-                BesAPI.shutdownClient(odc);
+                shutdownClient(odc);
 
 
             }
 
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             e.printStackTrace(); // Do nothing
         } catch (PPTException e) {
             e.printStackTrace();  // Do nothing..

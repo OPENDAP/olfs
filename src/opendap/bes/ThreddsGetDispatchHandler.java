@@ -37,44 +37,55 @@ import java.util.Date;
 import java.io.File;
 import java.net.URI;
 
-import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ThreddsDispatchHandler;
+import org.jdom.Element;
 
 /**
  * User: ndp
  * Date: Apr 16, 2007
  * Time: 11:28:25 AM
  */
-public class ThreddsDispatchHandler implements DispatchHandler {
+public class ThreddsGetDispatchHandler implements ThreddsDispatchHandler {
 
     private long threddsInitTime;
     private ReentrantLock threddsUpdateLock;
 
 
     private DataRootHandler dataRootHandler;
-    private org.slf4j.Logger log;
     private DispatchServlet servlet;
+    private org.slf4j.Logger log;
 
     private boolean initialized;
 
 
-    public ThreddsDispatchHandler(){
+    public ThreddsGetDispatchHandler(){
 
+        threddsInitTime = 0;
+        threddsUpdateLock = new ReentrantLock(true);
+        dataRootHandler = null;
+        servlet  = null;
 
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+        initialized = false;
+
+    }
+
+    public DataRootHandler getDataRootHandler(){
+        return dataRootHandler;
     }
 
 
 
 
-    public void init(DispatchServlet s) throws Exception{
+    public void init(DispatchServlet s,Element config) throws Exception{
 
-        if(initialized)
-            return;
+        if(initialized) return;
 
-        servlet = s;
+        servlet  = s;
 
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
         String contextPath = ServletUtil.getContextPath(servlet);
@@ -123,7 +134,6 @@ public class ThreddsDispatchHandler implements DispatchHandler {
                 "This is a collection  "                  // Alternate text for folder image
         );
 
-        threddsUpdateLock = new ReentrantLock(true);
         threddsInitTime = new Date().getTime();
 
         log.info("Initialized.");
@@ -131,8 +141,7 @@ public class ThreddsDispatchHandler implements DispatchHandler {
 
     }
 
-    public boolean requestCanBeHandled(DispatchServlet servlet,
-                                       HttpServletRequest request)
+    public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception{
 
 
@@ -142,6 +151,11 @@ public class ThreddsDispatchHandler implements DispatchHandler {
 
 
         String path = request.getPathInfo();
+
+
+        if(path.equals("/")){
+            path = "/catalog.html";
+        }
 
         log.debug("path:         " + path);
 
@@ -157,7 +171,7 @@ public class ThreddsDispatchHandler implements DispatchHandler {
 
             log.debug("catalogPath:  " + catalogPath);
             log.debug("basURI:       " + baseURI);
-            log.debug("dataRootHandler.getCatalog() returned:       " + ic);
+            log.debug("dataRootHandler.getCatalog() returned: " + ic);
 
             if(ic !=null){
                 isThreddsRequest = true;
@@ -188,9 +202,30 @@ public class ThreddsDispatchHandler implements DispatchHandler {
     }
 
 
+    /**
+     * Since the user can modify the THREDDS catalogs without
+     * changing the underlying data source, AND we can't ask the THREDDS
+     * library to tell us about the last modified times of the catalog, AND we
+     * don't know which time to return (catalog modified time, OR dataset
+     * modified time) we punt and return -1.
+     *
+     * @param req The request for which to get the last modified time.
+     * @return The last time the thing refered to in the request was modified.
+     */
+    public long getLastModified(HttpServletRequest req){
+        String name = ReqInfo.getFullSourceName(req);
+
+        log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
+                "collection: " + name );
+        log.debug("getLastModified(): Returning: -1" );
+
+        return -1;
+    }
+
 
 
     public void destroy(){
+        log.info("Destroy complete.");
 
     }
 

@@ -27,18 +27,14 @@ package opendap.coreServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
 
 /**
  * Implmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to
  * provide specific Server responses to HTTP GET requests. The DispatchServlet_OLD REQUIRES an implmentation of this interface
  * to be identified in the web.xml file.
  */
-public interface OpendapHttpDispatchHandler {
+public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
-    public void init(HttpServlet ds) throws ServletException;
-    public void destroy();
 
 
 
@@ -216,31 +212,9 @@ public interface OpendapHttpDispatchHandler {
                         HttpServletResponse response) throws Exception;
 
 
-    public boolean useOpendapDirectoryView();
-
-    public boolean allowDirectDataSourceAccess();
 
 
-
-    /**
-     * ************************************************************************
-     * Default handler for the client's version request.
-     * <p/>
-     * <p>Returns a plain text document with server version and OPeNDAP core
-     * version #'s
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @throws Exception When things go poorly.
-     */
-    public void sendVersion(HttpServletRequest request,
-                            HttpServletResponse response) throws Exception;
-
-    public void sendHelpPage(HttpServletRequest request,
-                             HttpServletResponse response) throws Exception;
-
+ 
     public void sendHTMLRequestForm(HttpServletRequest request,
                                     HttpServletResponse response) throws Exception;
 

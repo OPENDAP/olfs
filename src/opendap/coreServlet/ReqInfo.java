@@ -79,7 +79,9 @@ public class ReqInfo {
 
     public static String getBaseURI(HttpServletRequest req){
 
-        String buri = req.getRequestURI().substring(req.getContextPath().length(),req.getRequestURI().length());
+
+        int start = req.getContextPath().length() + req.getServletPath().length();
+        String buri = req.getRequestURI().substring(start,req.getRequestURI().length());
 
 
         buri  =  req.getRequestURL().substring(0,req.getRequestURL().lastIndexOf(buri));

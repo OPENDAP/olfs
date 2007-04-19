@@ -57,6 +57,7 @@ public class MimeTypes {
         typeMap.put("shtm",  "text/xhtml");
 
         typeMap.put("xml",   "text/xml");
+        typeMap.put("css",   "text/css");
 
 
         // Images

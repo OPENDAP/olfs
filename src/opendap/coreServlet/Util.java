@@ -81,18 +81,13 @@ public class Util {
      *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @param odh The dispatch handler.
      * @throws IOException When things go poorly.
      */
     static void sendSystemProperties(HttpServletRequest request,
-                                            HttpServletResponse response,
-                                            OpendapHttpDispatchHandler odh)
+                                            HttpServletResponse response)
             throws Exception {
 
 
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
 

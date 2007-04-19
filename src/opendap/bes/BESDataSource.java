@@ -128,6 +128,10 @@ public class BESDataSource implements DataSourceInfo {
         return lastModified;
     }
 
+    public long lastModified(){
+        return lastModified.getTime();
+    }
+
     public String getRequestedDataSource(){
         return requestedDataSource;
     }

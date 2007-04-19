@@ -50,16 +50,15 @@ public class DebugHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response object.
      */
-    public static void doDebug(HttpServlet servlet, HttpServletRequest request,
-                               HttpServletResponse response,
-                               OpendapHttpDispatchHandler odh,
-                               ServletConfig sc) throws Exception {
+    public static void doDebug(DispatchServlet servlet,
+                               HttpServletRequest request,
+                               HttpServletResponse response)
+            throws Exception {
+
+
 
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", odh.getXDAPVersion(request));
         response.setHeader("Content-Description", "dods_debug");
 
         PrintStream pw = new PrintStream(response.getOutputStream());
@@ -100,10 +99,10 @@ public class DebugHandler {
 
 
                 String ts = "  InitParameters:\n";
-                Enumeration e = sc.getInitParameterNames();
+                Enumeration e = servlet.getServletConfig().getInitParameterNames();
                 while (e.hasMoreElements()) {
                     String name = (String) e.nextElement();
-                    String value = sc.getInitParameter(name);
+                    String value = servlet.getServletConfig().getInitParameter(name);
 
                     ts += "    " + name + ": '" + value + "'\n";
                 }

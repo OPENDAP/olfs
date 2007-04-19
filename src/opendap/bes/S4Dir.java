@@ -68,6 +68,11 @@ public class S4Dir {
         Logger log = org.slf4j.LoggerFactory.getLogger("opendap.bes.S4Dir");
         log.debug("sendDIR() request = " + request);
 
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_directory");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
         String name;
         String size;
         String lastModified;

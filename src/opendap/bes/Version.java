@@ -33,8 +33,8 @@ import org.jdom.Text;
 public class Version {
 
 
-    private static String olfsVersion  = "1.1.1";
-    private static String hyraxVersion = "1.1.0";
+    private static String olfsVersion  = "1.2.0";
+    private static String hyraxVersion = "1.2.0";
 
 
 
@@ -94,5 +94,13 @@ public class Version {
         return "e93c3d09-a5d9-49a0-a912-a0ca16430b91";
     }
 
+
+    public static String getVersionStringForTHREDDSCatalog() {
+        return "OPeNDAP Hyrax (" + Version.getHyraxVersionString() + ")" +
+                "<font size='-5' color='#7A849E'> " +
+                "ServerUUID=" + Version.getServerUUID() + "-catalog" +
+                "</font><br />";
+
+    }
 
 }

@@ -37,6 +37,8 @@ public interface DataSourceInfo {
 
     public  boolean isDataset();
 
+    public  long    lastModified();
+
 
 
 

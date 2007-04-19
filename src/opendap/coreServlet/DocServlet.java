@@ -35,7 +35,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
-import java.util.Date;
+import java.util.concurrent.Semaphore;
 
 import thredds.servlet.ServletUtil;
 import org.slf4j.Logger;
@@ -53,8 +53,15 @@ public class DocServlet extends HttpServlet {
 
     private Logger log;
 
+    private Semaphore syncLock;
+
+    private int reqNumber;
+
 
     public void init() {
+
+        reqNumber = 0;
+        syncLock = new Semaphore(1);
 
         String dir = ServletUtil.getContentPath(this) + "docs";
 
@@ -95,7 +102,7 @@ public class DocServlet extends HttpServlet {
             lmt = -1;
 
 
-        log.debug("DocServlet - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
+        //log.debug("getLastModified() - Tomcat requested lastModified for: " + name + " Returning: " + new Date(lmt));
 
         return lmt;
 
@@ -136,7 +143,10 @@ public class DocServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        PerfLog.logServerAccessStart(request, "DocServletAccess");
+        syncLock.acquireUninterruptibly();
+        reqNumber++;
+        PerfLog.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber));
+        syncLock.release();
 
         if (!redirect(request, response)) {
 
