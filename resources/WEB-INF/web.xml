@@ -27,17 +27,6 @@
         <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
 
         <init-param>
-            <param-name>OpendapHttpDispatchHandlerImplementation</param-name>
-            <param-value>opendap.bes.DapDispatchHandler</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>OpendapSoapDispatchHandlerImplementation</param-name>
-            <param-value>opendap.bes.SoapDispatchHandler</param-value>
-        </init-param>
-
-
-        <init-param>
             <param-name>DebugOn</param-name>
             <param-value></param-value>
         </init-param>

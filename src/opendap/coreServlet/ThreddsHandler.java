@@ -31,7 +31,7 @@ import thredds.servlet.DataRootHandler;
  * Date: Apr 17, 2007
  * Time: 3:18:51 PM
  */
-public interface ThreddsDispatchHandler extends DispatchHandler {
+public interface ThreddsHandler extends DispatchHandler {
 
 
     public DataRootHandler getDataRootHandler();

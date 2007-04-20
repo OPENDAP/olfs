@@ -86,7 +86,7 @@ public class DispatchServlet extends HttpServlet {
 
     private OpendapHttpDispatchHandler odh = null;
     private OpendapSoapDispatchHandler sdh = null;
-    private ThreddsDispatchHandler tdh = null;
+    private ThreddsHandler tdh = null;
     private org.slf4j.Logger log;
 
     private Document configDoc;
@@ -140,7 +140,7 @@ public class DispatchServlet extends HttpServlet {
 
     }
 
-    public ThreddsDispatchHandler getThreddsDispatchHandler() {
+    public ThreddsHandler getThreddsDispatchHandler() {
         return tdh;
     }
 
@@ -202,7 +202,7 @@ public class DispatchServlet extends HttpServlet {
      * Navigates the config document to instantiate an ordered list of
      * Dispatch Handlers. Once built the list is searched for a single instance
      * of an OpendapHttpDispatchHandler and a single instance of a
-     * ThreddsDispatchHandler. Then all of the handlers are initialized by
+     * ThreddsHandler. Then all of the handlers are initialized by
      * calling their init() methods and passing into them the XML Element
      * that defined them from the config document.
      *
@@ -314,18 +314,18 @@ public class DispatchServlet extends HttpServlet {
 
 
         for (DispatchHandler dh : dhv) {
-            if (dh instanceof ThreddsDispatchHandler) {
+            if (dh instanceof ThreddsHandler) {
                 if (tdh == null)
-                    tdh = (ThreddsDispatchHandler) dh;
+                    tdh = (ThreddsHandler) dh;
                 else {
-                    msg = "Only one instance of ThreddsDispatchHandler is allowed in a configuration!";
+                    msg = "Only one instance of ThreddsHandler is allowed in a configuration!";
                     log.error(msg);
                     throw new ServletException(msg);
                 }
             }
         }
         if (tdh == null) {
-            msg = "There must be an instance ThreddsDispatchHandler in the configuration!";
+            msg = "There must be an instance ThreddsHandler in the configuration!";
             log.error(msg);
             throw new ServletException(msg);
         }

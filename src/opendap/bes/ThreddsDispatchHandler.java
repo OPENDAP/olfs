@@ -39,7 +39,7 @@ import java.net.URI;
 
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.ThreddsDispatchHandler;
+import opendap.coreServlet.ThreddsHandler;
 import org.jdom.Element;
 
 /**
@@ -47,7 +47,7 @@ import org.jdom.Element;
  * Date: Apr 16, 2007
  * Time: 11:28:25 AM
  */
-public class ThreddsGetDispatchHandler implements ThreddsDispatchHandler {
+public class ThreddsDispatchHandler implements ThreddsHandler {
 
     private long threddsInitTime;
     private ReentrantLock threddsUpdateLock;
@@ -60,7 +60,7 @@ public class ThreddsGetDispatchHandler implements ThreddsDispatchHandler {
     private boolean initialized;
 
 
-    public ThreddsGetDispatchHandler(){
+    public ThreddsDispatchHandler(){
 
         threddsInitTime = 0;
         threddsUpdateLock = new ReentrantLock(true);

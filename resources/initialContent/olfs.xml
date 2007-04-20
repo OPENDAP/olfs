@@ -54,7 +54,7 @@
                 <!-- <AllowDirectDataSourceAccess /> -->
             </Handler>
 
-            <Handler className="opendap.bes.ThreddsGetDispatchHandler" />
+            <Handler className="opendap.bes.ThreddsDispatchHandler" />
         </HttpGetHandlers>
 
 
