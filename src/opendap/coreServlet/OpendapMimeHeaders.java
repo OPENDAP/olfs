@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  * Date: Apr 20, 2007
  * Time: 10:18:02 AM
  */
-public interface OpendapContentHeaders {
+public interface OpendapMimeHeaders {
     public void setOpendapMimeHeaders(HttpServletRequest request,
                                       HttpServletResponse response)
             throws Exception;

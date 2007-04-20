@@ -169,11 +169,18 @@ public class BES {
 
     public String trimPrefix(String dataset) {
 
-        String trim = dataset.substring(getPrefix().length());
+        String trim;
+        if(getPrefix().equals("/"))
+            trim = dataset;
+        else
+            trim = dataset.substring(getPrefix().length());
 
         if (trim.indexOf("/") != 0)
             trim = "/" + trim;
         return trim;
+
+
+
     }
 
 

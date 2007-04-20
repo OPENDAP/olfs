@@ -82,8 +82,7 @@ public class DispatchServlet extends HttpServlet {
 
 
     private Vector<DispatchHandler> httpGetDispatchHandlers;
-    //private Vector<DispatchHandler> httpPostDispatchHandlers;
-
+    private Vector<DispatchHandler> httpPostDispatchHandlers;
 
     private OpendapHttpDispatchHandler odh = null;
     private OpendapSoapDispatchHandler sdh = null;
@@ -104,14 +103,19 @@ public class DispatchServlet extends HttpServlet {
      */
     public void init() throws ServletException {
 
-        syncLock = new Semaphore(1);
-
         super.init();
+
+        syncLock = new Semaphore(1);
+        httpGetDispatchHandlers = new Vector<DispatchHandler>();
+        Vector<Element> httpGetHandlerConfigs = new Vector<Element>();
+        httpPostDispatchHandlers = new Vector<DispatchHandler>();
+        Vector<Element> httpPostHandlerConfig = new Vector<Element>();
+
+
         initDebug();
         initLogging();
 
         ReqInfo.init();
-        SOAPRequestDispatcher.init();
 
         // init logging
         PerfLog.logServerSetup("init()");
@@ -121,36 +125,24 @@ public class DispatchServlet extends HttpServlet {
 
 
         loadConfig();
-        httpGetDispatchHandlers = buildHttpGetHandlers();
 
 
-        String className = getInitParameter("OpendapSoapDispatchHandlerImplementation");
-        if (className == null)
-            throw new ServletException("Missing servlet parameter \"OpendapSoapDispatchHandlerImplementation\"." +
-                    "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
-                    "be identified in this (missing) servlet parameter.");
+        buildHandlers("HttpGetHandlers", httpGetDispatchHandlers, httpGetHandlerConfigs);
+        identifyRequiredGetHandlers(httpGetDispatchHandlers);
+        intitializeHandlers(httpGetDispatchHandlers, httpGetHandlerConfigs);
 
-        log.info("OpendapSoapDispatchHandlerImplementation is " + className);
 
-        try {
-            Class classDefinition = Class.forName(className);
-            sdh = (OpendapSoapDispatchHandler) classDefinition.newInstance();
-        } catch (InstantiationException e) {
-            throw new ServletException("Cannot instantiate class: " + className, e);
-        } catch (IllegalAccessException e) {
-            throw new ServletException("Cannot access class: " + className, e);
-        } catch (ClassNotFoundException e) {
-            throw new ServletException("Cannot find class: " + className, e);
-        }
-
-        sdh.init(this, tdh.getDataRootHandler());
-
+        buildHandlers("HttpPostHandlers", httpPostDispatchHandlers, httpPostHandlerConfig);
+        intitializeHandlers(httpPostDispatchHandlers, httpPostHandlerConfig);
 
         log.info("init() complete.");
 
 
     }
 
+    public ThreddsDispatchHandler getThreddsDispatchHandler() {
+        return tdh;
+    }
 
     public String getDocsPath() {
         return "docs/";
@@ -162,7 +154,7 @@ public class DispatchServlet extends HttpServlet {
      * OLFSConfigFileName.
      *
      * @throws ServletException When the file is missing, unreadable, or fails
-     * to parse (as an XML document).
+     *                          to parse (as an XML document).
      */
     private void loadConfig() throws ServletException {
 
@@ -213,24 +205,28 @@ public class DispatchServlet extends HttpServlet {
      * ThreddsDispatchHandler. Then all of the handlers are initialized by
      * calling their init() methods and passing into them the XML Element
      * that defined them from the config document.
-     * @return a vector of DispatchHandler objects, ready to use.
+     *
+     * @param type             A String containing the name of DispatchHandler list from
+     *                         the OLFS to build from.
+     * @param dispatchHandlers A Vector in which to store the built
+     *                         DispatchHandler instances
+     * @param handlerConfigs   A Vector in which to store the configuration
+     *                         Element for each DispatchHandler
      * @throws ServletException When things go poorly
      */
-    private Vector<DispatchHandler> buildHttpGetHandlers() throws ServletException {
+    private void buildHandlers(String type, Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
 
         String msg;
-        Vector<DispatchHandler> dhv = new Vector<DispatchHandler>();
-        Vector<Element> handlerConfigElementVector = new Vector<Element>();
 
 
-        Element httpGetHandlerElements = configDoc.getRootElement().getChild("DispatchHandlers").getChild("HttpGetHandlers");
+        Element httpGetHandlerElements = configDoc.getRootElement().getChild("DispatchHandlers").getChild(type);
 
-        log.debug("Building HttpGetHandlers.");
+        log.debug("Building "+ type);
 
 
         for (Object o : httpGetHandlerElements.getChildren("Handler")) {
             Element handlerElement = (Element) o;
-            handlerConfigElementVector.add(handlerElement);
+            handlerConfigs.add(handlerElement);
             String className = handlerElement.getAttribute("className").getValue();
             DispatchHandler dh;
             try {
@@ -263,10 +259,42 @@ public class DispatchServlet extends HttpServlet {
 
             }
 
-            dhv.add(dh);
+            dispatchHandlers.add(dh);
+        }
+
+        log.debug(type + " Built.");
+
+    }
+
+    private void intitializeHandlers(Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
+
+        log.debug("Initializing Handlers.");
+        String msg;
+
+        try {
+            DispatchHandler dh;
+            Element config;
+            for (int i = 0; i < dispatchHandlers.size(); i++) {
+                dh = dispatchHandlers.get(i);
+                config = handlerConfigs.get(i);
+                dh.init(this, config);
+            }
+        }
+        catch (Exception e) {
+            msg = "Could not init() a handler! Caught " + e.getClass().getName() + " Msg: " + e.getMessage();
+            log.error(msg);
+            throw new ServletException(msg, e);
         }
 
 
+        log.debug("Handlers Initialized.");
+
+
+    }
+
+
+    private void identifyRequiredGetHandlers(Vector<DispatchHandler> dhv) throws ServletException {
+        String msg;
         for (DispatchHandler dh : dhv) {
             if (dh instanceof OpendapHttpDispatchHandler) {
                 if (odh == null)
@@ -301,31 +329,6 @@ public class DispatchServlet extends HttpServlet {
             log.error(msg);
             throw new ServletException(msg);
         }
-
-        log.debug("HttpGetHandlers built.");
-
-
-        log.debug("Initializing HttpGetHandlers.");
-
-        try {
-            DispatchHandler dh;
-            Element config;
-            for (int i = 0; i < dhv.size(); i++) {
-                dh = dhv.get(i);
-                config = handlerConfigElementVector.get(i);
-                dh.init(this, config);
-            }
-        }
-        catch (Exception e) {
-            msg = "Could not init() a handler! Caught " + e.getClass().getName() + " Msg: " + e.getMessage();
-            log.error(msg);
-            throw new ServletException(msg, e);
-        }
-
-
-        log.debug("HttpGetHandlers initialized.");
-
-        return dhv;
 
     }
 
@@ -432,7 +435,7 @@ public class DispatchServlet extends HttpServlet {
                 Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
 
 
-            DispatchHandler dh = getHandler(request);
+            DispatchHandler dh = getHandler(request, httpGetDispatchHandlers);
             if (dh != null) {
                 log.debug("Request being handled by: " + dh.getClass().getName());
                 dh.handleRequest(request, response);
@@ -454,17 +457,67 @@ public class DispatchServlet extends HttpServlet {
     //**************************************************************************
 
 
+
+    /**
+     * @param request  .
+     * @param response .
+     * @throws IOException
+     * @throws ServletException
+     */
+    @Override
+    public void doPost(HttpServletRequest request,
+                       HttpServletResponse response)
+            throws IOException, ServletException {
+
+        try {
+            // START Synchronized section
+
+            syncLock.acquireUninterruptibly();
+            reqNumber++;
+            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqNumber));
+            log.debug(Util.showRequest(request, reqNumber));
+
+            log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                   "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                   "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
+            syncLock.release();
+            // END Synchronized section
+
+            if (Debug.isSet("probeRequest"))
+                Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
+
+
+            DispatchHandler dh = getHandler(request, httpPostDispatchHandlers);
+            if (dh != null) {
+                log.debug("Request being handled by: " + dh.getClass().getName());
+                dh.handleRequest(request, response);
+                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+
+            } else {
+                sendResourceNotFound(request, response);
+                log.info("Sent Resource Not Found (404) - nothing left to check.");
+                PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+            }
+
+
+        } catch (Throwable e) {
+            OPeNDAPException.anyExceptionHandler(e, response);
+        }
+
+    }
     /**
      * Returns the first handler in the vector of DispatchHandlers that claims
      * be able to handle the incoming request.
      *
      * @param request The request we are looking to handle
+     * @param dhvec   A Vector of DispatchHandlers that will be asked if they can
+     *                handle the request.
      * @return The DispatchHandler that can handle the request, null if no
-     * handler claims the request.
+     *         handler claims the request.
      * @throws Exception For bad behaviour.
      */
-    private DispatchHandler getHandler(HttpServletRequest request) throws Exception {
-        for (DispatchHandler dh : httpGetDispatchHandlers) {
+    private DispatchHandler getHandler(HttpServletRequest request, Vector<DispatchHandler> dhvec) throws Exception {
+        for (DispatchHandler dh : dhvec) {
             log.debug("Checking handler: " + dh.getClass().getName());
             if (dh.requestCanBeHandled(request)) {
                 return dh;
@@ -486,12 +539,12 @@ public class DispatchServlet extends HttpServlet {
 
         try {
             syncLock.acquireUninterruptibly();
-            long reqno =  ++reqNumber;
+            long reqno = ++reqNumber;
             //lastModifiedHits++;
-            PerfLog.logServerAccessStart(req, "HyraxAccess","LastModified", Long.toString(reqno));
+            PerfLog.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
             syncLock.release();
 
-            DispatchHandler dh = getHandler(req);
+            DispatchHandler dh = getHandler(req, httpGetDispatchHandlers);
             if (dh != null) {
                 log.debug("getLastModified() -  Request being handled by: " + dh.getClass().getName());
                 return dh.getLastModified(req);
@@ -510,21 +563,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    /**
-     * @param request  .
-     * @param response .
-     * @throws IOException
-     * @throws ServletException
-     */
-    @Override
-    public void doPost(HttpServletRequest request,
-                       HttpServletResponse response)
-            throws IOException, ServletException {
-
-
-        SOAPRequestDispatcher.doPost(request, response, odh, sdh);
-    }
-
 
     public void destroy() {
 
@@ -532,6 +570,7 @@ public class DispatchServlet extends HttpServlet {
             log.debug("Shutting down handler: " + dh.getClass().getName());
             dh.destroy();
         }
+
 
         super.destroy();
     }

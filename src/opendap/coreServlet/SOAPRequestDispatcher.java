@@ -28,10 +28,10 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.*;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
-import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
@@ -42,15 +42,83 @@ import opendap.soap.ExceptionElementUtil;
 /**
  * Handles SOAP requests that arrive via HTTP POST.
  */
-public class SOAPRequestDispatcher {
+public class SOAPRequestDispatcher implements DispatchHandler {
 
 
-    private static Logger log;
+    private org.slf4j.Logger log;
+    private DispatchServlet servlet;
+    private boolean initialized;
+    private OpendapSoapDispatchHandler sdh;
 
-    public static void init(){
-        log = org.slf4j.LoggerFactory.getLogger(SOAPRequestDispatcher.class);
+    public SOAPRequestDispatcher() {
+
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        servlet = null;
+        initialized = false;
 
     }
+
+    public void init(DispatchServlet s, Element config) throws Exception {
+
+        if (initialized) return;
+
+
+        servlet = s;
+
+
+
+
+        String className = config.getChild("OpendapSoapDispatchHandler").getTextTrim();
+        if (className == null)
+            throw new ServletException("Missing configuration parameter \"OpendapSoapDispatchHandlerImplementation\"." +
+                    "A class that implements the opendap.coreServlet.OpendapSoapDispatchHandler interface must" +
+                    "be identified in this (missing) servlet configuration.");
+
+        log.info("OpendapSoapDispatchHandlerImplementation is " + className);
+
+        try {
+            Class classDefinition = Class.forName(className);
+            sdh = (OpendapSoapDispatchHandler) classDefinition.newInstance();
+        } catch (InstantiationException e) {
+            throw new ServletException("Cannot instantiate class: " + className, e);
+        } catch (IllegalAccessException e) {
+            throw new ServletException("Cannot access class: " + className, e);
+        } catch (ClassNotFoundException e) {
+            throw new ServletException("Cannot find class: " + className, e);
+        }
+
+        sdh.init(servlet);
+
+
+
+        initialized = true;
+
+        log.info("Initialized.");
+    }
+
+    public boolean requestCanBeHandled(HttpServletRequest request)
+            throws Exception {
+        return true;
+
+    }
+    public void handleRequest(HttpServletRequest request,
+                              HttpServletResponse response)
+            throws Exception {
+
+        doPost(request,response);
+
+    }
+
+    public long getLastModified(HttpServletRequest req) {
+        return -1;
+    }
+
+
+    public void destroy() {
+        log.info("Destroy complete.");
+
+    }
+
 
 
     /**
@@ -58,57 +126,49 @@ public class SOAPRequestDispatcher {
      *
      * @param request
      * @param response
-     * @param odh
-     * @param sdh
      */
-    public static void doPost(HttpServletRequest request,
-                              HttpServletResponse response,
-                              OpendapHttpDispatchHandler odh,
-                              OpendapSoapDispatchHandler sdh) {
+    public void doPost(HttpServletRequest request,
+                       HttpServletResponse response) throws Exception{
 
         log.debug("\n\n\nSOAPHandler.doPost(): Start of POST Handler.");
 
 
-        try {
 
-            Document doc = getSOAPDoc(request);
+        Document doc = getSOAPDoc(request);
 
-            if (qcSOAPDocument(doc)) {
-
-
-                log.debug("Building Multipart Response...");
-
-                MultipartResponse mpr = new MultipartResponse(request, response, odh);
-
-                Element soapEnvelope = doc.getRootElement();
-
-                mpr.setSoapEnvelope(soapEnvelope);
-
-                List soapContents = soapEnvelope.getChild("Body", XMLNamespaces.getDefaultSoapEnvNamespace()).getChildren();
-
-                log.debug("Got " + soapContents.size() + " SOAP Body Elements.");
-
-                for (Object soapContent : soapContents) {
-
-                    Element clientReq = (Element) soapContent;
-                    requestDispatcher(request, clientReq, mpr, sdh);
-                }
-
-                mpr.send(request);
+        if (qcSOAPDocument(doc)) {
 
 
-                log.debug("done.");
+            log.debug("Building Multipart Response...");
 
-            } else {
-                log.debug("Reflecting Document to client...");
+            MultipartResponse mpr = new MultipartResponse(request, response, sdh);
 
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                xmlo.output(doc, response.getOutputStream());
+            Element soapEnvelope = doc.getRootElement();
 
-                log.debug("done.");
+            mpr.setSoapEnvelope(soapEnvelope);
+
+            List soapContents = soapEnvelope.getChild("Body", XMLNamespaces.getDefaultSoapEnvNamespace()).getChildren();
+
+            log.debug("Got " + soapContents.size() + " SOAP Body Elements.");
+
+            for (Object soapContent : soapContents) {
+
+                Element clientReq = (Element) soapContent;
+                requestDispatcher(request, clientReq, mpr, sdh);
             }
-        } catch (Exception e) {
-            OPeNDAPException.anyExceptionHandler(e,response);
+
+            mpr.send();
+
+
+            log.debug("done.");
+
+        } else {
+            log.debug("Reflecting Document to client...");
+
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            xmlo.output(doc, response.getOutputStream());
+
+            log.debug("done.");
         }
 
 
@@ -123,7 +183,7 @@ public class SOAPRequestDispatcher {
      * @param mpr
      * @param sdh
      */
-    private static void requestDispatcher(HttpServletRequest srvReq,
+    private  void requestDispatcher(HttpServletRequest srvReq,
                                              Element reqElement,
                                              MultipartResponse mpr,
                                              OpendapSoapDispatchHandler sdh) {
@@ -198,7 +258,7 @@ public class SOAPRequestDispatcher {
      * @throws IOException
      * @throws JDOMException
      */
-    private static Document getSOAPDoc(HttpServletRequest req) throws IOException, JDOMException {
+    private  Document getSOAPDoc(HttpServletRequest req) throws IOException, JDOMException {
 
         SAXBuilder saxBldr = new SAXBuilder();
         Document doc = saxBldr.build(req.getReader());
@@ -215,7 +275,7 @@ public class SOAPRequestDispatcher {
      * @param doc
      * @return  Returns true if the SOAP document looks good, false if not.
      */
-    private static boolean qcSOAPDocument(Document doc) {
+    private  boolean qcSOAPDocument(Document doc) {
         boolean result;
 
 

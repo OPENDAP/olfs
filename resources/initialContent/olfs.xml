@@ -24,7 +24,7 @@
             </Handler>
 
             <Handler className="opendap.coreServlet.SpecialRequestDispatchHandler" />
-            
+
             <Handler className="opendap.bes.VersionDispatchHandler" />
 
             <Handler className="opendap.bes.DirectoryDispatchHandler">
@@ -58,7 +58,11 @@
         </HttpGetHandlers>
 
 
-        <HttpPostHandlers></HttpPostHandlers>
+        <HttpPostHandlers>
+            <Handler className="opendap.coreServlet.SOAPRequestDispatcher" >
+                <OpendapSoapDispatchHandler>opendap.bes.SoapDispatchHandler</OpendapSoapDispatchHandler>
+            </Handler>
+        </HttpPostHandlers>
 
 
     </DispatchHandlers>

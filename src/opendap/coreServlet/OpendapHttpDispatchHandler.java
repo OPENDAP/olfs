@@ -40,43 +40,6 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception;
 
-
-
-    /**
-     * @param request The client request for which to return the verison.
-     * @return A String containing the XDAP MIME header value that describes the
-     *         DAP specifcation that the server response conforms to. This methof should
-     *         determine which DAP secification that the client supports and then return
-     *         the lowest matching version for the server being queried.
-     * @throws Exception When things go poorly.
-     */
-    public String getXDAPVersion(HttpServletRequest request)throws Exception;
-
-
-    /**
-     * @param request The client request for which to return the verison.
-     * @return A String containing the value of the XOPeNDAP-Server MIME header
-     *         and conforming to the DAP4 specification.
-     * @throws Exception When things go poorly.
-     */
-    public String getXOPeNDAPServerVersion(HttpServletRequest request)throws Exception;
-
-
-    /**
-     * @param request The client request for which to return the verison.
-     * @return A string containing the value of the XDODS-Server MIME header.
-     * @throws Exception When things go poorly.
-     */
-    public String getXDODSServerVersion(HttpServletRequest request)throws Exception;
-
-
-    /**
-     *
-     * @return The version String for the THREDDS catalog.html page.
-     */
-    public String getVersionStringForTHREDDSCatalog();
-
-
     public long getLastModified(HttpServletRequest req);
 
 
@@ -214,7 +177,7 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
 
 
- 
+
     public void sendHTMLRequestForm(HttpServletRequest request,
                                     HttpServletResponse response) throws Exception;
 

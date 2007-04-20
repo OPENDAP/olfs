@@ -56,11 +56,11 @@ public class MultipartResponse {
     private Element soapEnvelope;
     private HttpServletResponse servResponse;
     private HttpServletRequest servRequest;
-    private OpendapHttpDispatchHandler odh;
     private Vector<Attachment> attachments;
     private String mimeBoundary;
     private String startID;
     private Logger log;
+    private OpendapMimeHeaders omhi;
 
 
     /**
@@ -68,12 +68,12 @@ public class MultipartResponse {
      *
      * @param request The HttpServletRequest to which we are replying
      * @param response The HttpServletResponse that we are going to send back.
-     * @param o The servlet's instance of the <code>OpendapHttpDispatchHandler</code>
+     * @param omhInstance An instance of a class that implements the OpendapMimeHeaders interface.
      */
-    MultipartResponse(HttpServletRequest request, HttpServletResponse response, OpendapHttpDispatchHandler o){
+    MultipartResponse(HttpServletRequest request, HttpServletResponse response, OpendapMimeHeaders omhInstance){
         servResponse = response;
         servRequest = request;
-        odh = o;
+        omhi = omhInstance;
         attachments  = new Vector<Attachment>();
         mimeBoundary = getNewMimeBoundary();
         startID = newUidString();
@@ -156,7 +156,7 @@ public class MultipartResponse {
      * Send the Multipart MIME docuemtn response to the client.
      * @throws IOException When things go wrong
      */
-    public void send(HttpServletRequest request) throws Exception {
+    public void send() throws Exception {
         log.debug("Sending Response...");
 
         log.debug("MIME Boundary: "+mimeBoundary);
@@ -168,9 +168,7 @@ public class MultipartResponse {
                                 "start=\""+startID+"\";  "+
                                 "boundary=\""+mimeBoundary+"\"");
 
-        servResponse.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
-        servResponse.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
-        servResponse.setHeader("XDAP", odh.getXDAPVersion(servRequest));
+        omhi.setOpendapMimeHeaders(servRequest,servResponse);
         servResponse.setHeader("Content-Description", "OPeNDAP WebServices");
 
         ServletOutputStream os = servResponse.getOutputStream();

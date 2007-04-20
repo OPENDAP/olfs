@@ -158,6 +158,11 @@ public class BESManager implements DispatchHandler {
         if(path==null)
             path = "/";
 
+        if(path.indexOf("/")!=0){
+            log.debug("Appending / to path: "+ path);
+            path = "/"+path;
+        }
+
         BES result = null;
         String prefix;
         for(BES bes : _besCollection){

@@ -177,7 +177,5 @@ public class VersionDispatchHandler implements DispatchHandler {
 
     }
 
-    /***************************************************************************/
-
 
 }

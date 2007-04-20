@@ -27,19 +27,16 @@ package opendap.coreServlet;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
-
-import thredds.servlet.DataRootHandler;
 
 /**
  * Impelmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to
  * provide specific Server responses to SOAP requests. The DispatchServlet_OLD REQUIRES an implmentation of this interface
  * to be identified in the web.xml file.
  */
-public interface OpendapSoapDispatchHandler {
+public interface OpendapSoapDispatchHandler extends OpendapMimeHeaders {
 
-    public void init(HttpServlet ds, DataRootHandler drh) throws ServletException;
+    public void init(DispatchServlet ds) throws ServletException;
 
 
 
@@ -73,4 +70,9 @@ public interface OpendapSoapDispatchHandler {
      * @throws Exception When things go awry.
      */
     public void getTHREDDSCatalog(HttpServletRequest srvReq,  String reqID, Element cmd, MultipartResponse mpr) throws Exception;
+
+
+
+
+
 }

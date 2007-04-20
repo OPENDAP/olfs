@@ -26,11 +26,13 @@ package opendap.bes;
 
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
+import opendap.coreServlet.DispatchServlet;
 import opendap.soap.XMLNamespaces;
 import opendap.soap.ExceptionElementUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 import org.jdom.Element;
@@ -61,12 +63,11 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
     /**
      * @param ds  The Servlet that is calling init().
-     * @param drh The DataRootHandler that will be used to handle THREDDS requests.
      * @throws ServletException When things go wrong.
      */
-    public void init(HttpServlet ds, DataRootHandler drh) throws ServletException {
+    public void init(DispatchServlet ds) throws ServletException {
 
-        _dataRootHandler = drh;
+        _dataRootHandler = ds.getThreddsDispatchHandler().getDataRootHandler();
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -164,7 +165,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         respElement.setAttribute("reqID", reqID, osnms);
 
         // Note that this call does not parse the DDX document into an opendap.dap.DDS, just
-        // into a jdom.Document that gets it's root element stuffed into the SOAP envelope.
+        // into a jdom. Document that gets it's root element stuffed into the SOAP envelope.
         respElement.addContent(BesAPI.getDDXDocument(datasetname, ce).detachRootElement());
 
         mpr.addSoapBodyPart(respElement);
@@ -264,6 +265,15 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         log.debug("getTHREDDSCatalog() completed.");
 
     }
+
+
+    public void setOpendapMimeHeaders(HttpServletRequest request,
+                                      HttpServletResponse response)
+            throws Exception{
+
+        Version.setOpendapMimeHeaders(request,response);
+    }
+
 
 
 }
