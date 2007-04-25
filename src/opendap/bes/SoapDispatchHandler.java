@@ -83,9 +83,9 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * the Multipart MIME message.
      *
      * @param reqID The request ID for this request.
-     * @param cmd
-     * @param mpr
-     * @throws Exception
+     * @param cmd The GetDATA command Element from the SOAP envelope.
+     * @param mpr The MultipartResponse into which to write the response.
+     * @throws Exception When the bad things happen
      */
     public void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
 

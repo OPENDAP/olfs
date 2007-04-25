@@ -33,9 +33,14 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 /**
- * User: ndp
- * Date: Apr 16, 2007
- * Time: 2:47:45 PM
+ * Performs dispatching for "special" server requests.
+ * <ui>
+ * <li> help - returns the help page for Hyrax  </li>
+ * <li> systemproperties - returns an html document describing the state of the "system" </li>
+ * <li> debug -   </li>
+ * <li> status -    </li>
+ * </ui>
+ *
  */
 public class SpecialRequestDispatchHandler implements DispatchHandler {
 
@@ -103,27 +108,6 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
 
 
 
-    /**
-     * Performs dispatching for "special" server requests. This server supports several diagnositic responses:
-     * <ui>
-     * <li> version - returns the OPeNDAP version document (XML) </li>
-     * <li> help - returns the help page for Hyrax  </li>
-     * <li> systemproperties - returns an html document describing the state of the "system" </li>
-     * <li> debug -   </li>
-     * <li> status -    </li>
-     * <li> contents.html -  Returns the OPeNDAP directory view of a collection (as an HTML document)</li>
-     * <li> catalog.html - Returns the THREDDS catalog view of a collection (as an HTML document)</li>
-     * <li> catalog.xml - Returns the THREDDS catalog of a collection (as an XML document)</li>
-     * </ui>
-     *
-     * @param request  The current request
-     * @param response The response to which we write.
-     * @param sendResponse If this is true a response will be sent. If it is
-     * the request will only be evaluated to determine if a response can be
-     * generated.
-     * @return true if the request was handled as a special request, false otherwise.
-     * @throws Exception When things go awry.
-     */
     private boolean specialRequestDispatch(HttpServletRequest request,
                                           HttpServletResponse response,
                                           boolean sendResponse)

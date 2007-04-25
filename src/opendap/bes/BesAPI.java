@@ -675,7 +675,7 @@ public class BesAPI {
             throw new BadConfigurationException(msg);
         }
 
-        
+
         OPeNDAPClient oc = bes.getClient();
 
         try {
@@ -707,12 +707,14 @@ public class BesAPI {
         catch (PPTException e){
             trouble = true;
             throw new PPTException("BesAPI.besShowTransaction(): " +
-                    "Problem with OPeNDAPClient.\n");
+                    "Problem with OPeNDAPClient. " +
+                    "OPeNDAPClient executed"+oc.getCommandCount()+" commands\n");
         }
         finally{
             if (trouble) {
                 log.error("besShowTransaction(): Problem encountered," +
-                        " discarding OPeNDAPCLient. ",trouble);
+                        " discarding OPeNDAPCLient. " +
+                        "OPeNDAPClient executed\"+oc.getCommandCount()+\" commands",trouble);
                 bes.discardClient(oc);
             }
             else {

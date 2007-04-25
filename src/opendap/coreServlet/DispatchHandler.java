@@ -30,25 +30,76 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * User: ndp
- * Date: Apr 16, 2007
- * Time: 11:25:17 AM
+ *
+ * The DispatchHandler interface is implmented by classes that are used to
+ * handle dispatch activities for Hyrax. 
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  */
 public interface DispatchHandler {
 
 
+    /**
+     * Since a constructor cannont be defined for an interface there needs to
+     * be a way to initalize the objects state. The inti() methd is that way.
+     * The DispatchServlet that creates an instance of DispatchHandler will
+     * pass itself into it along with an configuration information found in
+     * the XML element that declared the DispatchHandler in the configuration
+     * file (usually olfs.xml)
+     *
+     * @param servlet This should be the DispatchServlet that creates the
+     * instance of DispatychHandler that is being intialized.
+     * @param config A JDOM Element objct containing the XML Element that
+     * announced which implementation of DispatchHandler to use. It may (or
+     * may not) contain additional confguration information.
+     * @throws Exception When the bad things happen.
+     * @see DispatchServlet
+     */
     public void init(DispatchServlet servlet, Element config) throws Exception;
 
+    /**
+     *
+     * @param request The request to be handled.
+     * @return True if the DispatchHandler can service the request, false
+     * otherwise.
+     * @throws Exception When the bad things happen.
+     */
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception;
 
+    /**
+     *
+     * @param request The request to be handled.
+     * @param response The response object into which the response information
+     * will be placed.
+     * @throws Exception When the bad things happen.
+     */
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception;
 
+    /**
+     *
+     *
+     * @param req The request for which we need to get a last modified date.
+     * @return The last modified date of the URI referenced in th request.
+     * @see javax.servlet.http.HttpServlet
+     */
     public long getLastModified(HttpServletRequest req);
 
 
+    /**
+     * Called when the servlet is shutdown. Here is where to clean up open
+     * connections etc.
+     */
     public void destroy();
 
 }

@@ -25,6 +25,8 @@
 
 package opendap.ppt ;
 
+import org.slf4j.Logger;
+
 import java.io.*;
 
 /**
@@ -55,9 +57,11 @@ import java.io.*;
  */
 
 public class OPeNDAPClient {
+    private int commandCount;
     private PPTClient     _client = null;
     private OutputStream  _stream = null;
     private boolean       _isRunning;
+    private Logger        log = null;
 
     /**
      * Creates a OpenDAPClient to handle OpenDAP requests.
@@ -68,9 +72,14 @@ public class OPeNDAPClient {
     public OPeNDAPClient() {
         _stream = null;
         _isRunning = false;
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        commandCount = 0;
+
     }
 
 
+    public int getCommandCount(){return commandCount;}
+    
 
     public boolean isRunning()  {
         return _isRunning;
@@ -243,8 +252,10 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void executeCommand(String cmd) throws PPTException {
+        log.debug(cmd);
         _client.sendRequest(cmd);
         _client.getResponse(_stream);
+        commandCount++;
     }
 
     /**
@@ -258,7 +269,8 @@ public class OPeNDAPClient {
      *                 OpenDAP server to handle, one at a time.
      * @throws PPTException Thrown if there is a problem sending any of the
      *                      request to the server or a problem receiving any
-     *                      of the responses from the server.
+     *                      of the response
+     * s from the server.
      * @see String
      * @see PPTException
      */

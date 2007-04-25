@@ -43,19 +43,19 @@ import thredds.servlet.ServletUtil;
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
  * <p/>
- * <p>This server will respond to both HTTP GET and POST requests. The GET dispatching is
- * done in this class, and the POST dispatching (which is in fact the SOAP inrterface)
- * is done in <code>SOAPRequestDispatcher</code></p>
+ * <p>This server will respond to both HTTP GET and POST requests.
+ * activities are handled by ordered collections of DispatchHandlers.
  * <p/>
  * <p/>
- * <p>This server is built designed so that the actual handling of the dispatch is done
- * through code that is identified at run time through the web.xml configuration of the
- * servlet. In particular the HTTP GET request are handled by a class the implements the
- * OpendapHttpDispatchHandler interface. The SOAP requests (via HTTP POST) are handled by a
- * class the implements the OpendapSOAPDispatchHandler interface.<p>
+ * <p>This server is designed so that the dispatch activities are handled by
+ * ordered collections of DispatchHandlers are identified at run time through
+ * the olfs.xml configuration file. The olfs.xml file is identified in the
+ * servlets web.xml file. The olfs.xml file is typically located in
+ * $CATALINE_HOME/content/opendap.
+ *
  * <p/>
  * <p>The web.xml file used to configure this servlet must contain servlet parameters identifying
- * an implmentation clas for both these interfaces.</p>
+ * the location of the olfs.xml file.</p>
  * <p/>
  * <p/>
  * <p/>
@@ -85,7 +85,6 @@ public class DispatchServlet extends HttpServlet {
     private Vector<DispatchHandler> httpPostDispatchHandlers;
 
     private OpendapHttpDispatchHandler odh = null;
-    private OpendapSoapDispatchHandler sdh = null;
     private ThreddsHandler tdh = null;
     private org.slf4j.Logger log;
 

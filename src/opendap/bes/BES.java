@@ -56,6 +56,8 @@ public class BES {
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
 
+    private int clientMaxCommands;
+
 
     private DevNull devNull = new DevNull();
 
@@ -73,6 +75,8 @@ public class BES {
 
         log.debug("BES built with configuration: \n" + _config);
         _serverVersionDocument = null;
+
+        clientMaxCommands = 2000;
 
     }
 
@@ -100,6 +104,7 @@ public class BES {
                 " host: " + getHost() +
                 " port: " + getPort() +
                 " maxClients: " + getMaxClients() +
+                " maxClientCommands: " + clientMaxCommands +
                 "]";
 
 
@@ -266,16 +271,27 @@ public class BES {
 
             odc.setOutput(null, false);
 
-            _clientQueue.put(odc);
+            if(clientMaxCommands>0 && odc.getCommandCount() > clientMaxCommands) {
+                discardClient(odc);
+                log.debug("returnClient() This instance OPeNDAPClient has excecuted "+odc.getCommandCount()+
+                        " commands which is in excess of the maximum command " +
+                        "limit of "+clientMaxCommands+", discarding client.");
+
+            }
+            else {
+                _clientQueue.put(odc);
+                log.debug("returnClient() Returned OPeNDAPClient to queue.");
+            }
+
             _checkOutFlag.release();
-            log.debug("Returned OPeNDAPClient to queue.");
+
         }
         catch (InterruptedException e) {
             e.printStackTrace(); // Don't do a thing
         } catch (PPTException e) {
 
 
-            String msg = "\n*** BES - WARNING! Problem with " +
+            String msg = "returnClient()\n*** BES - WARNING! Problem with " +
                     "OPeNDAPClient, discarding.";
 
             discardClient(odc);
@@ -286,12 +302,12 @@ public class BES {
     }
 
     public void shutdownClient(OPeNDAPClient oc) throws PPTException {
-        log.debug("Shutting down client...");
+        log.debug("shutdownClient() Shutting down client...");
 
         oc.setOutput(null, false);
 
         oc.shutdownClient();
-        log.debug("Client shutdown.");
+        log.debug("shutdownClient() Client shutdown.");
 
 
     }
@@ -301,9 +317,9 @@ public class BES {
             try {
                 shutdownClient(odc);
             } catch (PPTException e) {
-                log.debug("BES: Discarding client " +
-                        "encountered problems shutting down an " +
-                        "OPeNDAPClient connection to the BES\n");
+                log.debug("discardClient() " +
+                        "Encountered problems shutting down an " +
+                        "OPeNDAPClient connection to the BES (prefix="+getPrefix()+")");
 
             }
         }
