@@ -99,6 +99,19 @@ class PPTClient {
     }
 
 
+    
+    public void dieNow(){
+        try{
+        _mySock.close();
+        }
+        catch(Throwable t){
+            log.error(t.getMessage());
+        }
+    }
+
+
+
+
     public boolean initConnection() throws PPTException {
         try {
             this.writeBuffer(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION);

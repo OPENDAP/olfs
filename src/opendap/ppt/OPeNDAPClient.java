@@ -79,7 +79,7 @@ public class OPeNDAPClient {
 
 
     public int getCommandCount(){return commandCount;}
-    
+
 
     public boolean isRunning()  {
         return _isRunning;
@@ -186,6 +186,11 @@ public class OPeNDAPClient {
      }
 
 
+
+    public void killClient(){
+        _client.dieNow();
+
+    }
 
 
     /**

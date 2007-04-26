@@ -51,12 +51,12 @@ public class BES {
     private ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
     private Semaphore _checkOutFlag;
     private BESConfig _config;
+    private OPeNDAPClient[] _allMyClients;
+    private int totalClients;
 
 
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
-    private ReentrantLock _poolGetLock;
-    private ReentrantLock _poolReturnLock;
 
     private int clientMaxCommands;
 
@@ -71,10 +71,10 @@ public class BES {
 
         _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(),true);
         _checkOutFlag = new Semaphore(getMaxClients(),true);
+        _allMyClients = new OPeNDAPClient[getMaxClients()];
+        totalClients = 0;
 
         _versionDocLock = new ReentrantLock(true);
-        _poolGetLock = new ReentrantLock(true);
-        _poolReturnLock = new ReentrantLock(true);
 
 
         log.debug("BES built with configuration: \n" + _config);
@@ -225,6 +225,8 @@ public class BES {
                         "Made new OPeNDAPClient. Starting...");
 
                 odc.startClient(getHost(), getPort());
+                _allMyClients[totalClients++]= odc;
+
                 log.debug("OPeNDAPClient started.");
 
 
@@ -332,11 +334,12 @@ public class BES {
                         "OPeNDAPClient connection to the BES (prefix="+getPrefix()+")");
 
         }
-
-        // By releasing the flag and not checking the OPeNDAPClient back in
-        // we essentially throw the client away. A new one will be made
-        // the next time it's needed.
-        _checkOutFlag.release();
+        finally {
+            // By releasing the flag and not checking the OPeNDAPClient back in
+            // we essentially throw the client away. A new one will be made
+            // the next time it's needed.
+            _checkOutFlag.release();
+        }
 
     }
 
@@ -362,7 +365,7 @@ public class BES {
      */
     public void shutdownBES() {
 
-
+/*
         try {
 
             log.debug("shutdownBES() - " +
@@ -386,12 +389,19 @@ public class BES {
 
             }
 
+
+
         }
         catch (InterruptedException e) {
             e.printStackTrace(); // Do nothing
         } catch (PPTException e) {
             e.printStackTrace();  // Do nothing..
         }
+*/
+
+        for(int i=0; i<totalClients; i++)
+            _allMyClients[i].killClient();
+        
 
 
     }
