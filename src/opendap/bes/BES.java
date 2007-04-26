@@ -55,6 +55,8 @@ public class BES {
 
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
+    private ReentrantLock _poolGetLock;
+    private ReentrantLock _poolReturnLock;
 
     private int clientMaxCommands;
 
@@ -67,10 +69,12 @@ public class BES {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients());
-        _checkOutFlag = new Semaphore(getMaxClients());
+        _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(),true);
+        _checkOutFlag = new Semaphore(getMaxClients(),true);
 
         _versionDocLock = new ReentrantLock(true);
+        _poolGetLock = new ReentrantLock(true);
+        _poolReturnLock = new ReentrantLock(true);
 
 
         log.debug("BES built with configuration: \n" + _config);
@@ -212,6 +216,7 @@ public class BES {
         OPeNDAPClient odc = null;
 
         try {
+
             _checkOutFlag.acquire();
 
             if (_clientQueue.size() == 0) {
@@ -227,7 +232,7 @@ public class BES {
 
                 odc = _clientQueue.take();
                 log.debug("getClient() - Retrieved " +
-                        "OPeNDAPClient from queue.");
+                        "OPeNDAPClient from Pool.");
             }
 
             //if (Debug.isSet("BES"))
@@ -248,6 +253,7 @@ public class BES {
             throw new PPTException(e);
         }
 
+
     }
 
     /**
@@ -261,6 +267,8 @@ public class BES {
 
         try {
 
+
+            odc.setOutput(devNull, false);
 
             String cmd = "delete definitions;\n";
             odc.executeCommand(cmd);
@@ -279,11 +287,17 @@ public class BES {
 
             }
             else {
+
+                if(_clientQueue.size() == getMaxClients()){
+                    log.error("returnClient(): OUCH! OUCH! OUCH! The Pool is full and I need to check in a client! This Should NEVER Happen!");
+                }
+
+
                 _clientQueue.put(odc);
-                log.debug("returnClient() Returned OPeNDAPClient to queue.");
+                _checkOutFlag.release();
+                log.debug("returnClient() Returned OPeNDAPClient to Pool.");
             }
 
-            _checkOutFlag.release();
 
         }
         catch (InterruptedException e) {
@@ -294,6 +308,7 @@ public class BES {
             String msg = "returnClient()\n*** BES - WARNING! Problem with " +
                     "OPeNDAPClient, discarding.";
 
+            log.error(msg);
             discardClient(odc);
 
             throw new PPTException(msg, e);
@@ -301,32 +316,41 @@ public class BES {
 
     }
 
-    public void shutdownClient(OPeNDAPClient oc) throws PPTException {
-        log.debug("shutdownClient() Shutting down client...");
-
-        oc.setOutput(null, false);
-
-        oc.shutdownClient();
-        log.debug("shutdownClient() Client shutdown.");
 
 
-    }
 
     public void discardClient(OPeNDAPClient odc) {
-        if (odc != null && odc.isRunning()) {
-            try {
-                shutdownClient(odc);
-            } catch (PPTException e) {
-                log.debug("discardClient() " +
+
+
+        try {
+            if (odc != null && odc.isRunning()) {
+                    shutdownClient(odc);
+            }
+        } catch (PPTException e) {
+                log.error("discardClient() " +
                         "Encountered problems shutting down an " +
                         "OPeNDAPClient connection to the BES (prefix="+getPrefix()+")");
 
-            }
         }
+
         // By releasing the flag and not checking the OPeNDAPClient back in
         // we essentially throw the client away. A new one will be made
         // the next time it's needed.
         _checkOutFlag.release();
+
+    }
+
+
+
+
+
+
+    private void shutdownClient(OPeNDAPClient oc) throws PPTException {
+
+        log.debug("shutdownClient() Shutting down client...");
+        oc.setOutput(null, false);
+        oc.shutdownClient();
+        log.debug("shutdownClient() Client shutdown.");
 
     }
 

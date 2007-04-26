@@ -27,7 +27,7 @@
 
 
 <!DOCTYPE project [
-    <!ENTITY globalprops      SYSTEM "file:./buildfiles/globalprops.xml">
+    <!ENTITY globalprops      SYSTEM "./buildfiles/globalprops.xml">
 ]>
 
 <!-- Build file for OPeNDAP core software -->
@@ -181,9 +181,9 @@
         >
 
         <javadoc destdir="${build.doc}/javadoc"
-            author="true"
-            version="true"
-            use="true"
+            Author="true"
+            Version="true"
+            Use="true"
             Verbose="true"
             failonerror="true"
             >

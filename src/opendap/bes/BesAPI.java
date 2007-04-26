@@ -606,6 +606,7 @@ public class BesAPI {
 
 
         OPeNDAPClient oc = bes.getClient();
+        String errMsg = null;
 
         try {
 
@@ -621,13 +622,17 @@ public class BesAPI {
         }
         catch (PPTException e){
             trouble = true;
-            throw new PPTException("BesAPI.besGetTransaction(): " +
-                    "Problem with OPeNDAPClient.\n");
+
+            errMsg = "besGetTransaction(): Problem encountered," +
+                        " discarding OPeNDAPCLient. " +
+                        "OPeNDAPClient executed "+oc.getCommandCount()+ " commands";
+
+            throw new PPTException(errMsg);
         }
         finally{
             if (trouble) {
-                log.error("besGetTransaction(): Problem encountered," +
-                        " discarding OPeNDAPCLient. ",trouble);
+
+                log.error(errMsg);
                 bes.discardClient(oc);
             }
             else {
@@ -677,6 +682,7 @@ public class BesAPI {
 
 
         OPeNDAPClient oc = bes.getClient();
+        String errMsg=null;
 
         try {
 
@@ -706,15 +712,15 @@ public class BesAPI {
         }
         catch (PPTException e){
             trouble = true;
-            throw new PPTException("BesAPI.besShowTransaction(): " +
+            errMsg = "BesAPI.besShowTransaction(): " +
                     "Problem with OPeNDAPClient. " +
-                    "OPeNDAPClient executed"+oc.getCommandCount()+" commands\n");
+                    "OPeNDAPClient executed "+oc.getCommandCount()+" commands\n";
+
+            throw new PPTException(errMsg);
         }
         finally{
             if (trouble) {
-                log.error("besShowTransaction(): Problem encountered," +
-                        " discarding OPeNDAPCLient. " +
-                        "OPeNDAPClient executed\"+oc.getCommandCount()+\" commands",trouble);
+                log.error(errMsg);
                 bes.discardClient(oc);
             }
             else {
