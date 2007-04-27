@@ -401,11 +401,12 @@ public class BES {
      */
     public void destroy() {
 
+        boolean nicely = false;
+        boolean flagLocked = false;
 
         try {
-            boolean nicely = false;
-
             if(_checkOutFlagLock.tryLock(10,TimeUnit.SECONDS)){
+                flagLocked = true;
                 Semaphore permits = _checkOutFlag;
 
                 log.debug("destroy() Attempting to acquire all clients...");
@@ -440,39 +441,40 @@ public class BES {
 
 
             }
-
-
-           if(!nicely) {
-                log.debug("destroy() Timed Out. Destroying Clients.");
-
-                try {
-                    _mapLock.lock();
-                    for (int i = 0; i < totalClients; i++) {
-                        OPeNDAPClient oc = _clients.get(i);
-                        if (oc != null) {
-                            log.debug("destroy() Killing OPeNDAPClient (id:"+
-                                    oc.getID()+")");
-                            oc.killClient();
-                        } else {
-                            log.debug("destroy() OPeNDAPClient (id:"+
-                                    i+")already discarded.");
-
-                        }
-
-                    }
-                } finally {
-                    _mapLock.unlock();
-                }
-            }
-
         }
         catch (Throwable e) {
             log.error("destroy() OUCH! Problem shutting down BESPool",e);
         }
         finally {
             _checkOutFlag = null;
-            _checkOutFlagLock.unlock();
+            if(flagLocked)
+                _checkOutFlagLock.unlock();
         }
+
+
+       if(!nicely) {
+            log.debug("destroy() Timed Out. Destroying Clients.");
+
+            try {
+                _mapLock.lock();
+                for (int i = 0; i < totalClients; i++) {
+                    OPeNDAPClient oc = _clients.get(i);
+                    if (oc != null) {
+                        log.debug("destroy() Killing OPeNDAPClient (id:"+
+                                oc.getID()+")");
+                        oc.killClient();
+                    } else {
+                        log.debug("destroy() OPeNDAPClient (id:"+
+                                i+")already discarded.");
+
+                    }
+
+                }
+            } finally {
+                _mapLock.unlock();
+            }
+        }
+
 
 
     }
