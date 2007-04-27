@@ -403,39 +403,46 @@ public class BES {
 
 
         try {
+            boolean nicely = false;
 
-            _checkOutFlagLock.lock();
-            Semaphore permits = _checkOutFlag;
+            if(_checkOutFlagLock.tryLock(10,TimeUnit.SECONDS)){
+                Semaphore permits = _checkOutFlag;
 
-            log.debug("destroy() Attempting to acquire all clients...");
-
-
-            if (permits.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
-                log.debug("destroy() All clients aquired.");
-
-                log.debug("destroy() " + _clientQueue.size() +
-                        " client(s) to shutdown.");
+                log.debug("destroy() Attempting to acquire all clients...");
 
 
-                int i = 0;
-                while (_clientQueue.size() > 0) {
-                    OPeNDAPClient odc = _clientQueue.take();
-                    log.debug("destroy() Retrieved OPeNDAPClient["
-                            + i++ + "] (id:"+odc.getID()+") from queue.");
+                if (permits.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
+                    log.debug("destroy() All clients aquired.");
 
-                    try {
-                        shutdownClient(odc);
+                    log.debug("destroy() " + _clientQueue.size() +
+                            " client(s) to shutdown.");
+
+
+                    int i = 0;
+                    while (_clientQueue.size() > 0) {
+                        OPeNDAPClient odc = _clientQueue.take();
+                        log.debug("destroy() Retrieved OPeNDAPClient["
+                                + i++ + "] (id:"+odc.getID()+") from queue.");
+
+                        try {
+                            shutdownClient(odc);
+                        }
+                        catch (Throwable t){
+                            log.error("destroy() Failed to shutdown " +
+                                    "OPeNDAPClient (id:"+odc.getID()+") msg: "+
+                                    t.getMessage(),t);
+                        }
+
+
                     }
-                    catch (Throwable t){
-                        log.error("destroy() Failed to shutdown " +
-                                "OPeNDAPClient (id:"+odc.getID()+") msg: "+
-                                t.getMessage(),t);
-                    }
-
-
+                    nicely = true;
                 }
 
-            } else {
+
+            }
+
+
+           if(!nicely) {
                 log.debug("destroy() Timed Out. Destroying Clients.");
 
                 try {
@@ -464,6 +471,7 @@ public class BES {
         }
         finally {
             _checkOutFlag = null;
+            _checkOutFlagLock.unlock();
         }
 
 
