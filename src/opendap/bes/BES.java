@@ -60,7 +60,7 @@ public class BES {
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
     private ReentrantLock _mapLock;
-    private ReentrantLock _poolGetLock;
+    private ReentrantLock _checkOutFlagLock;
 
     private int clientMaxCommands;
 
@@ -74,7 +74,7 @@ public class BES {
 
 
         _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(), true);
-        _poolGetLock = new ReentrantLock(true);
+        _checkOutFlagLock = new ReentrantLock(true);
 
         _checkOutFlag = new Semaphore(getMaxClients(), true);
         totalClients = 0;
@@ -224,7 +224,7 @@ public class BES {
             return null;
 
         try {
-            _poolGetLock.lock();
+            _checkOutFlagLock.lock();
 
             _checkOutFlag.acquire();
 
@@ -271,7 +271,7 @@ public class BES {
             throw new PPTException(e);
         }
         finally{
-            _poolGetLock.unlock();
+            _checkOutFlagLock.unlock();
         }
 
 
@@ -341,8 +341,8 @@ public class BES {
                     " commands which is in excess of the maximum command " +
                     "limit of " + clientMaxCommands + ", discarding client.");
 
-        } else {
-
+        }
+        else {
 
             if(_clientQueue.offer(odc)){
             log.debug("checkInClient() Returned OPeNDAPClient (id:"+
@@ -352,7 +352,6 @@ public class BES {
                 log.error("checkInClient(): OUCH! OUCH! OUCH! The Pool is " +
                         "full and I need to check in a client! This Should " +
                         "NEVER Happen!");
-
             }
 
         }
@@ -405,6 +404,7 @@ public class BES {
 
         try {
 
+            _checkOutFlagLock.lock();
             Semaphore permits = _checkOutFlag;
 
             log.debug("destroy() Attempting to acquire all clients...");
