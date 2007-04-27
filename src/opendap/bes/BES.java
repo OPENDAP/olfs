@@ -225,6 +225,7 @@ public class BES {
 
         try {
             _poolGetLock.lock();
+
             _checkOutFlag.acquire();
 
             if (_clientQueue.size() == 0) {
@@ -342,20 +343,18 @@ public class BES {
 
         } else {
 
-            if (_clientQueue.size() == getMaxClients()) {
+
+            if(_clientQueue.offer(odc)){
+            log.debug("checkInClient() Returned OPeNDAPClient (id:"+
+                    odc.getID()+") to Pool.");
+            }
+            else {
                 log.error("checkInClient(): OUCH! OUCH! OUCH! The Pool is " +
                         "full and I need to check in a client! This Should " +
                         "NEVER Happen!");
+
             }
 
-            try {
-                _clientQueue.put(odc);
-                log.debug("checkInClient() Returned OPeNDAPClient (id:"+
-                        odc.getID()+") to Pool.");
-            }
-            catch (InterruptedException e) {
-                log.error("checkInClient() INTERRUPTED! "+e.getMessage(),e);
-            }
         }
 
 
