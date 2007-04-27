@@ -62,6 +62,7 @@ public class OPeNDAPClient {
     private OutputStream  _stream = null;
     private boolean       _isRunning;
     private Logger        log = null;
+    private int           _id;
 
     /**
      * Creates a OpenDAPClient to handle OpenDAP requests.
@@ -77,6 +78,15 @@ public class OPeNDAPClient {
 
     }
 
+
+
+    public int getID(){
+        return _id;
+    }
+
+    public void setID(int ID){
+        _id = ID;
+    }
 
     public int getCommandCount(){return commandCount;}
 
@@ -176,14 +186,6 @@ public class OPeNDAPClient {
         }
     }
 
-     /**
-      * @deprecated
-      * @param os
-      * @throws PPTException
-      */
-     public void setOutput(OutputStream os) throws PPTException {
-         setOutput(os,true);
-     }
 
 
 

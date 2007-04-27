@@ -29,8 +29,10 @@ import opendap.ppt.PPTException;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.List;
+import java.util.HashMap;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -49,14 +51,15 @@ public class BES {
 
 
     private ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
+    private HashMap<Integer, OPeNDAPClient> _clients;
     private Semaphore _checkOutFlag;
     private BESConfig _config;
-    private OPeNDAPClient[] _allMyClients;
     private int totalClients;
 
 
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
+    private ReentrantLock _mapLock;
 
     private int clientMaxCommands;
 
@@ -69,12 +72,13 @@ public class BES {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(),true);
-        _checkOutFlag = new Semaphore(getMaxClients(),true);
-        _allMyClients = new OPeNDAPClient[getMaxClients()];
+        _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(), true);
+        _checkOutFlag = new Semaphore(getMaxClients(), true);
         totalClients = 0;
 
         _versionDocLock = new ReentrantLock(true);
+        _mapLock = new ReentrantLock(true);
+        _clients = new HashMap<Integer, OPeNDAPClient>();
 
 
         log.debug("BES built with configuration: \n" + _config);
@@ -102,9 +106,9 @@ public class BES {
     }
 
 
-    public String toString(){
+    public String toString() {
 
-        return "[BES prefix: "+getPrefix() +
+        return "[BES prefix: " + getPrefix() +
                 " host: " + getHost() +
                 " port: " + getPort() +
                 " maxClients: " + getMaxClients() +
@@ -179,7 +183,7 @@ public class BES {
     public String trimPrefix(String dataset) {
 
         String trim;
-        if(getPrefix().equals("/"))
+        if (getPrefix().equals("/"))
             trim = dataset;
         else
             trim = dataset.substring(getPrefix().length());
@@ -189,9 +193,7 @@ public class BES {
         return trim;
 
 
-
     }
-
 
 //------------------------------------------------------------------------------
 //-------------------------- CLIENT POOL CODE ----------------------------------
@@ -215,6 +217,9 @@ public class BES {
 
         OPeNDAPClient odc = null;
 
+        if (_checkOutFlag == null)
+            return null;
+
         try {
 
             _checkOutFlag.acquire();
@@ -225,7 +230,17 @@ public class BES {
                         "Made new OPeNDAPClient. Starting...");
 
                 odc.startClient(getHost(), getPort());
-                _allMyClients[totalClients++]= odc;
+
+                try {
+                    _mapLock.lock();
+                    odc.setID(totalClients);
+                    _clients.put(totalClients, odc);
+                    totalClients++;
+                }
+                finally {
+                    _mapLock.unlock();
+                }
+
 
                 log.debug("OPeNDAPClient started.");
 
@@ -234,7 +249,7 @@ public class BES {
 
                 odc = _clientQueue.take();
                 log.debug("getClient() - Retrieved " +
-                        "OPeNDAPClient from Pool.");
+                        "OPeNDAPClient (id:"+odc.getID()+" from Pool.");
             }
 
             //if (Debug.isSet("BES"))
@@ -242,12 +257,9 @@ public class BES {
             //else
             odc.setOutput(devNull, true);
 
-            //odc.isProperlyConnected();
-            //odc.setOutput(devNull, false);
-            //odc.executeCommand("show status;");
-
 
             return odc;
+
         }
         catch (Exception e) {
             log.error("ERROR encountered.");
@@ -258,93 +270,113 @@ public class BES {
 
     }
 
+
+
     /**
      * When a piece of code is done using an OPeNDAPClient, it should return it
      * to the pool using this method.
      *
-     * @param odc The OPeNDAPClient to return to the client pool.
+     * @param odc     The OPeNDAPClient to return to the client pool.
+     * @param discard Pitch it, it's broken.
      * @throws PPTException .
      */
-    public void returnClient(OPeNDAPClient odc) throws PPTException {
+    public void returnClient(OPeNDAPClient odc, boolean discard) throws PPTException {
+
+
+        if (odc == null)
+            return;
+
+        //log.debug("returnClient() clientID="+odc.getID()+"  discard="+discard);
+
 
         try {
 
-
-            odc.setOutput(devNull, false);
-
-            String cmd = "delete definitions;\n";
-            odc.executeCommand(cmd);
-
-            cmd = "delete containers;\n";
-            odc.executeCommand(cmd);
-
-
-            odc.setOutput(null, false);
-
-            if(clientMaxCommands>0 && odc.getCommandCount() > clientMaxCommands) {
+            if (discard){
                 discardClient(odc);
-                log.debug("returnClient() This instance OPeNDAPClient has excecuted "+odc.getCommandCount()+
-                        " commands which is in excess of the maximum command " +
-                        "limit of "+clientMaxCommands+", discarding client.");
-
             }
             else {
-
-                if(_clientQueue.size() == getMaxClients()){
-                    log.error("returnClient(): OUCH! OUCH! OUCH! The Pool is full and I need to check in a client! This Should NEVER Happen!");
-                }
-
-
-                _clientQueue.put(odc);
-                _checkOutFlag.release();
-                log.debug("returnClient() Returned OPeNDAPClient to Pool.");
+                checkInClient(odc);
             }
 
-
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace(); // Don't do a thing
         } catch (PPTException e) {
 
 
-            String msg = "returnClient()\n*** BES - WARNING! Problem with " +
+            String msg = "returnClient() *** BES - WARNING! Problem with " +
                     "OPeNDAPClient, discarding.";
 
             log.error(msg);
-            discardClient(odc);
+            try {
+                _mapLock.lock();
+                _clients.remove(odc.getID());
+            }
+            finally {
+                _mapLock.unlock();
+            }
 
             throw new PPTException(msg, e);
         }
-
-    }
-
-
-
-
-    public void discardClient(OPeNDAPClient odc) {
-
-
-        try {
-            if (odc != null && odc.isRunning()) {
-                    shutdownClient(odc);
-            }
-        } catch (PPTException e) {
-                log.error("discardClient() " +
-                        "Encountered problems shutting down an " +
-                        "OPeNDAPClient connection to the BES (prefix="+getPrefix()+")");
-
-        }
         finally {
-            // By releasing the flag and not checking the OPeNDAPClient back in
-            // we essentially throw the client away. A new one will be made
-            // the next time it's needed.
             _checkOutFlag.release();
         }
 
+
     }
 
 
+    private void checkInClient(OPeNDAPClient odc) throws PPTException {
 
+
+        if (clientMaxCommands > 0 && odc.getCommandCount() > clientMaxCommands) {
+            discardClient(odc);
+            log.debug("checkInClient() This instance of OPeNDAPClient (id:"+
+                    odc.getID()+") has " +
+                    "excecuted " + odc.getCommandCount() +
+                    " commands which is in excess of the maximum command " +
+                    "limit of " + clientMaxCommands + ", discarding client.");
+
+        } else {
+
+            if (_clientQueue.size() == getMaxClients()) {
+                log.error("checkInClient(): OUCH! OUCH! OUCH! The Pool is " +
+                        "full and I need to check in a client! This Should " +
+                        "NEVER Happen!");
+            }
+
+            try {
+                _clientQueue.put(odc);
+                log.debug("checkInClient() Returned OPeNDAPClient (id:"+
+                        odc.getID()+") to Pool.");
+            }
+            catch (InterruptedException e) {
+                log.error("checkInClient() INTERRUPTED! "+e.getMessage(),e);
+            }
+        }
+
+
+    }
+
+
+    private void discardClient(OPeNDAPClient odc) throws PPTException {
+        // By failing to put the client into the queue and
+        // removing the client from the _clients Map the client is
+        // discarded.
+
+        log.debug("discardClient() Discarding OPeNDAPClient #"+odc.getID());
+
+        try {
+            _mapLock.lock();
+            _clients.remove(odc.getID());
+        }
+        finally {
+            _mapLock.unlock();
+        }
+
+
+        if (odc.isRunning()) {
+            shutdownClient(odc);
+        }
+
+    }
 
 
 
@@ -363,45 +395,71 @@ public class BES {
      * clients are checked into the pool and then gracefully shuts down each
      * client's connection to the BES.
      */
-    public void shutdownBES() {
+    public void destroy() {
 
-/*
+
         try {
 
-            log.debug("shutdownBES() - " +
-                    "Waiting for BES client check in to complete.");
+            Semaphore permits = _checkOutFlag;
 
-            _checkOutFlag.acquireUninterruptibly(getMaxClients());
-            log.debug(" All clients checked in.");
-
-            log.debug("BES.shutdownBES() - " + _clientQueue.size() +
-                    " client(s) to shutdown.");
+            log.debug("destroy() Attempting to acquire all clients...");
 
 
-            int i = 0;
-            while (_clientQueue.size() > 0) {
-                OPeNDAPClient odc = _clientQueue.take();
-                log.debug("Retrieved OPeNDAPClient["
-                        + i++ + "] from queue.");
+            if (permits.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
+                log.debug("destroy() All clients aquired.");
 
-                shutdownClient(odc);
+                log.debug("destroy() " + _clientQueue.size() +
+                        " client(s) to shutdown.");
 
 
+                int i = 0;
+                while (_clientQueue.size() > 0) {
+                    OPeNDAPClient odc = _clientQueue.take();
+                    log.debug("destroy() Retrieved OPeNDAPClient["
+                            + i++ + "] (id:"+odc.getID()+") from queue.");
+
+                    try {
+                        shutdownClient(odc);
+                    }
+                    catch (Throwable t){
+                        log.error("destroy() Failed to shutdown " +
+                                "OPeNDAPClient (id:"+odc.getID()+") msg: "+
+                                t.getMessage(),t);
+                    }
+
+
+                }
+
+            } else {
+                log.debug("destroy() Timed Out. Destroying Clients.");
+
+                try {
+                    _mapLock.lock();
+                    for (int i = 0; i < totalClients; i++) {
+                        OPeNDAPClient oc = _clients.get(i);
+                        if (oc != null) {
+                            log.debug("destroy() Killing OPeNDAPClient (id:"+
+                                    oc.getID()+")");
+                            oc.killClient();
+                        } else {
+                            log.debug("destroy() OPeNDAPClient (id:"+
+                                    i+")already discarded.");
+
+                        }
+
+                    }
+                } finally {
+                    _mapLock.unlock();
+                }
             }
 
-
-
         }
-        catch (InterruptedException e) {
-            e.printStackTrace(); // Do nothing
-        } catch (PPTException e) {
-            e.printStackTrace();  // Do nothing..
+        catch (Throwable e) {
+            log.error("destroy() OUCH! Problem shutting down BESPool",e);
         }
-*/
-
-        for(int i=0; i<totalClients; i++)
-            _allMyClients[i].killClient();
-        
+        finally {
+            _checkOutFlag = null;
+        }
 
 
     }

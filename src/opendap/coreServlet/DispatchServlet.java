@@ -117,7 +117,7 @@ public class DispatchServlet extends HttpServlet {
         ReqInfo.init();
 
         // init logging
-        PerfLog.logServerSetup("init()");
+        PerfLog.logServerStartup("init()");
         log.info("init() start.");
 
         PersistentContentHandler.installInitialContent(this);
@@ -564,6 +564,8 @@ public class DispatchServlet extends HttpServlet {
 
 
     public void destroy() {
+
+        PerfLog.logServerShutdown("destroy()");
 
         for (DispatchHandler dh : httpGetDispatchHandlers) {
             log.debug("Shutting down handler: " + dh.getClass().getName());

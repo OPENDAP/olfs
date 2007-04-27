@@ -29,7 +29,6 @@ import org.jdom.Element;
 
 import java.util.Vector;
 import java.util.List;
-import java.util.Iterator;
 
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
@@ -188,7 +187,7 @@ public class BESManager implements DispatchHandler {
     public static void shutdown(){
         for(BES bes : _besCollection){
             log.debug("Shutting down BesPool " + bes);
-            bes.shutdownBES();
+            bes.destroy();
         }
         log.debug("All BesPools have been shut down.");
 

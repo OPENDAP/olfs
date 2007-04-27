@@ -24,7 +24,6 @@
 
 package opendap.ppt ;
 
-import opendap.coreServlet.Debug;
 
 import java.io.*;
 import java.net.*;
@@ -99,10 +98,10 @@ class PPTClient {
     }
 
 
-    
+
     public void dieNow(){
         try{
-        _mySock.close();
+            _mySock.close();
         }
         catch(Throwable t){
             log.error(t.getMessage());
@@ -155,8 +154,8 @@ class PPTClient {
                 this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
-            System.err.println("PPTClient.closeConnection(): Unable to inform server that client is exiting, continuing.");
-            System.err.println(e.getMessage());
+            log.error("closeConnection(): Unable to inform server that client is exiting, continuing.");
+            log.error(e.getMessage());
         }
 
         try {
@@ -165,8 +164,8 @@ class PPTClient {
             _out = null;
         }
         catch (IOException e) {
-            System.err.println("PPTClient.closeConnection(): Unable to close output stream, continuing");
-            System.err.println(e.getMessage());
+            log.error("closeConnection(): Unable to close output stream, continuing");
+            log.error(e.getMessage());
         }
 
         try {
@@ -175,8 +174,8 @@ class PPTClient {
             _in = null;
         }
         catch (IOException e) {
-            System.err.println("PPTClient.closeConnection(): Unable to close input stream, continuing");
-            System.err.println(e.getMessage());
+            log.error("closeConnection(): Unable to close input stream, continuing");
+            log.error(e.getMessage());
         }
 
         try {
@@ -185,8 +184,8 @@ class PPTClient {
             _mySock = null;
         }
         catch (IOException e) {
-            System.err.println("PPTClient.closeConnection(): Unable to close socket, continuing");
-            System.err.println(e.getMessage());
+            log.error("closeConnection(): Unable to close socket, continuing");
+            log.error(e.getMessage());
         }
     }
 

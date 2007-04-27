@@ -55,7 +55,7 @@ public class PerfLog {
      * <p/>
      * 1) Regular logging using the SLF4J API.
      * 2) Performance logging which can write Apache common logging format logs,
-     * use the PerfLog.logServerSetup(String) method.
+     * use the PerfLog.logServerStartup(String) method.
      * <p/>
      * The log directory is determined by the servlet containers content
      * directory. The configuration of logging is controlled by the log4j.xml
@@ -122,7 +122,35 @@ public class PerfLog {
      * method.
      *
      */
-    public static void logServerSetup(String source) {
+    public static void logServerStartup(String source) {
+        // Setup context.
+        synchronized (PerfLog.class) {
+            MDC.put("ID", "Server Startup");
+            MDC.put("SOURCE", source);
+        }
+        MDC.put("startTime", System.currentTimeMillis());
+        log.info("Logging started.");
+    }
+
+
+    /**
+     * Gather current thread information for inclusion in regular logging
+     * messages. Call this method only for non-request servlet activities, e.g.,
+     * during the init() or destroy().
+     * <p/>
+     * Use the SLF4J API to log a regular logging messages.
+     * <p/>
+     * This method gathers the following information:
+     * 1) "ID" - an identifier for the current thread; and
+     * 2) "startTime" - the system time in millis when this method is called.
+     * <p/>
+     * The appearance of the regular log messages are controlled in the
+     * log4j.xml configuration file.
+     * @param source The source id of who started the logging. Typically an init()
+     * method.
+     *
+     */
+    public static void logServerShutdown(String source) {
         // Setup context.
         synchronized (PerfLog.class) {
             MDC.put("ID", "Server Startup");

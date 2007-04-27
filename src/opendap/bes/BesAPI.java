@@ -196,19 +196,16 @@ public class BesAPI {
             configureTransaction(oc, besDataSource, null, "stream",errorMsgFormat);
 
             getDataProduct(oc, getAPINameForStream(), os);
+            resetBES(oc);
         }
         catch (PPTException e){
             trouble = true;
-            throw new PPTException("BesAPI.writeFile(): " +
-                    "Problem with OPeNDAPClient.\n");
+            String msg = "writeFile()  Problem with OPeNDAPClient.";
+            log.error(msg);
+            throw new PPTException(msg);
         }
         finally{
-            if (trouble) {
-                bes.discardClient(oc);
-            }
-            else {
-                bes.returnClient(oc);
-            }
+            bes.returnClient(oc,trouble);
         }
     }
 
@@ -329,20 +326,17 @@ public class BesAPI {
 
             oc.setOutput(os, false);
             oc.executeCommand(cmd);
+            resetBES(oc);
 
         }
         catch (PPTException e){
             trouble = true;
-            throw new PPTException("BesAPI.writeHTMLForm(): " +
-                    "Problem with OPeNDAPClient.\n");
+            String msg = "writeHTMLForm() Problem with OPeNDAPClient.";
+            log.error(msg);
+            throw new PPTException(msg);
         }
         finally{
-            if (trouble) {
-                bes.discardClient(oc);
-            }
-            else {
-                bes.returnClient(oc);
-            }
+            bes.returnClient(oc,trouble);
         }
     }
 
@@ -606,7 +600,7 @@ public class BesAPI {
 
 
         OPeNDAPClient oc = bes.getClient();
-        String errMsg = null;
+
 
         try {
 
@@ -618,26 +612,21 @@ public class BesAPI {
                                  errorMsgFormat);
 
             getDataProduct(oc, product, os);
+            resetBES(oc);
 
         }
         catch (PPTException e){
             trouble = true;
 
-            errMsg = "besGetTransaction(): Problem encountered," +
-                        " discarding OPeNDAPCLient. " +
+            String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
                         "OPeNDAPClient executed "+oc.getCommandCount()+ " commands";
+            log.error(msg);
 
-            throw new PPTException(errMsg);
+            throw new PPTException(msg);
         }
         finally{
-            if (trouble) {
+            bes.returnClient(oc,trouble);
 
-                log.error(errMsg);
-                bes.discardClient(oc);
-            }
-            else {
-                bes.returnClient(oc);
-            }
         }
         log.debug("besGetTransaction complete.");
 
@@ -682,7 +671,6 @@ public class BesAPI {
 
 
         OPeNDAPClient oc = bes.getClient();
-        String errMsg=null;
 
         try {
 
@@ -708,25 +696,21 @@ public class BesAPI {
             log.debug("Setting error context to: \""+XML_ERRORS+"\"");
             oc.executeCommand("set context errors to "+XML_ERRORS+";\n");
             oc.executeCommand(cmd);
+            resetBES(oc);
 
         }
         catch (PPTException e){
             trouble = true;
-            errMsg = "BesAPI.besShowTransaction(): " +
-                    "Problem with OPeNDAPClient. " +
-                    "OPeNDAPClient executed "+oc.getCommandCount()+" commands\n";
+            String msg = "besShowTransaction() Problem with OPeNDAPClient. " +
+                    "OPeNDAPClient executed "+oc.getCommandCount()+" commands";
 
-            throw new PPTException(errMsg);
+            log.error(msg);
+            throw new PPTException(msg);
         }
         finally{
-            if (trouble) {
-                log.error(errMsg);
-                bes.discardClient(oc);
-            }
-            else {
-                bes.returnClient(oc);
-            }
+            bes.returnClient(oc,trouble);
         }
+
         log.debug("besShowTransaction complete.");
 
     }
@@ -884,6 +868,21 @@ public class BesAPI {
         doc.setRootElement(topDataset);
 
         return doc;
+
+    }
+
+    public static void resetBES (OPeNDAPClient odc) throws PPTException {
+
+        odc.setOutput(new DevNull(), false);
+
+        String cmd = "delete definitions;\n";
+        odc.executeCommand(cmd);
+
+        cmd = "delete containers;\n";
+        odc.executeCommand(cmd);
+
+
+        odc.setOutput(null, false);
 
     }
 
