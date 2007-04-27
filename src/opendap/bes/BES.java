@@ -60,6 +60,7 @@ public class BES {
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
     private ReentrantLock _mapLock;
+    private ReentrantLock _poolGetLock;
 
     private int clientMaxCommands;
 
@@ -73,6 +74,8 @@ public class BES {
 
 
         _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(), true);
+        _poolGetLock = new ReentrantLock(true);
+
         _checkOutFlag = new Semaphore(getMaxClients(), true);
         totalClients = 0;
 
@@ -221,7 +224,7 @@ public class BES {
             return null;
 
         try {
-
+            _poolGetLock.lock();
             _checkOutFlag.acquire();
 
             if (_clientQueue.size() == 0) {
@@ -265,6 +268,9 @@ public class BES {
             log.error("ERROR encountered.");
             discardClient(odc);
             throw new PPTException(e);
+        }
+        finally{
+            _poolGetLock.unlock();
         }
 
 
