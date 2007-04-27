@@ -60,7 +60,7 @@ public class BES {
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
     private ReentrantLock _mapLock;
-    private ReentrantLock _checkOutFlagLock;
+    private ReentrantLock _clientCheckOutLock;
 
     private int clientMaxCommands;
 
@@ -74,7 +74,7 @@ public class BES {
 
 
         _clientQueue = new ArrayBlockingQueue<OPeNDAPClient>(getMaxClients(), true);
-        _checkOutFlagLock = new ReentrantLock(true);
+        _clientCheckOutLock = new ReentrantLock(true);
 
         _checkOutFlag = new Semaphore(getMaxClients(), true);
         totalClients = 0;
@@ -224,7 +224,7 @@ public class BES {
             return null;
 
         try {
-            _checkOutFlagLock.lock();
+            _clientCheckOutLock.lock();
 
             _checkOutFlag.acquire();
 
@@ -271,7 +271,7 @@ public class BES {
             throw new PPTException(e);
         }
         finally{
-            _checkOutFlagLock.unlock();
+            _clientCheckOutLock.unlock();
         }
 
 
@@ -405,7 +405,7 @@ public class BES {
         boolean flagLocked = false;
 
         try {
-            if(_checkOutFlagLock.tryLock(10,TimeUnit.SECONDS)){
+            if(_clientCheckOutLock.tryLock(10,TimeUnit.SECONDS)){
                 flagLocked = true;
                 Semaphore permits = _checkOutFlag;
 
@@ -448,7 +448,7 @@ public class BES {
         finally {
             _checkOutFlag = null;
             if(flagLocked)
-                _checkOutFlagLock.unlock();
+                _clientCheckOutLock.unlock();
         }
 
 
