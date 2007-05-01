@@ -108,7 +108,8 @@ public class VersionDispatchHandler implements DispatchHandler {
         if (dataSource != null) {
             if (        // Version Response?
                     dataSource.equalsIgnoreCase("/version") ||
-                    requestSuffix.equalsIgnoreCase("ver")
+                    (requestSuffix!=null &&
+                    requestSuffix.equalsIgnoreCase("ver"))
                     ) {
                 versionRequest = true;
                 if (sendResponse) {
@@ -121,6 +122,7 @@ public class VersionDispatchHandler implements DispatchHandler {
         }
         return versionRequest;
     }
+    
 
     /**
      * ************************************************************************
