@@ -101,12 +101,14 @@ public class VersionDispatchHandler implements DispatchHandler {
             throws Exception {
 
         String dataSource = ReqInfo.getDataSource(request);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         boolean versionRequest = false;
 
         if (dataSource != null) {
             if (        // Version Response?
-                    dataSource.equalsIgnoreCase("/version")
+                    dataSource.equalsIgnoreCase("/version") ||
+                    requestSuffix.equalsIgnoreCase("ver")
                     ) {
                 versionRequest = true;
                 if (sendResponse) {
