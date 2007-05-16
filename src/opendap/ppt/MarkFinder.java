@@ -49,7 +49,7 @@ public class MarkFinder {
         _markIndex = 0;
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        log.debug("New MarkFinder. _mark="+new String(_mark));
+        log.debug("New MarkFinder.   _mark="+new String(_mark));
     }
 
     public byte[] getMark(){
@@ -72,9 +72,12 @@ public class MarkFinder {
                 _markIndex = 0;
                 return (true);
             }
+        } else if (_mark[0] == b) {
+            log.debug(".");
+            _markIndex = 1;
         } else {
-            log.debug("*");
-            _markIndex = 0;
+           log.debug("*");
+           _markIndex = 0;
         }
 
         return false;
