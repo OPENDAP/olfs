@@ -251,12 +251,43 @@ class PPTClient {
                                 if (markBufBytes > 0) {                       // if we found part of the mark
                                                                               // (but got fooled) then
 
-                                    bstrm.write(markBuffer, 0, markBufBytes); // send the fragment.
-                                    markBufBytes = 0;
-                                }
+				    markBuffer[markBufBytes++] = inBuff[i] ;  // cache current char so we don't
+				                                              // have to worrk about it.
+				    boolean isdone = false ;
+				    while( !isdone )
+				    {
+					bstrm.write( markBuffer[0] ) ;        // write the first character
+					for( int j = 1; j < markBufBytes; j++ ) // shift the rest of the
+					{                                       // characters in markBuffer
+					    markBuffer[j-1] = markBuffer[j] ;   // to the left one
+					}
+					markBufBytes-- ;                      // we have one less in markBuffer
 
-                                bstrm.write(inBuff[i]);                       // send this byte that's not part
-                                                                              // of a mark.
+					boolean partof = true ;               // start checking the rest of the
+					                                      // markBuffer against the marker
+					for( int j = 0; j < markBufBytes && partof; j++ )
+					{
+					    mfinder.markCheck( markBuffer[j] ) ; // we won't find the whole
+					                                         // marker so dont' worry about
+										 // return value of markCheck
+
+					    if( mfinder.getMarkIndex() == 0 )         // if 0 then char not in marker
+					    {
+						partof = false ;
+					    }
+					}
+
+					if( partof == true )
+					{
+					    isdone = true ;
+					}
+				    }
+                                }
+				else
+				{
+				    bstrm.write(inBuff[i]);                   // send this byte that's not part
+									      // of a mark.
+				}
                             }
                         }
 
