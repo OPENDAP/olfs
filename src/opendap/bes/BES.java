@@ -165,15 +165,15 @@ public class BES {
 
         Element prefix = new Element("prefix");
         prefix.addContent(getPrefix());
-        Element host = new Element("host");
-        host.addContent(getHost());
-        Element port = new Element("port");
-        port.addContent(getPort() + "");
+//        Element host = new Element("host");
+//        host.addContent(getHost());
+//        Element port = new Element("port");
+//        port.addContent(getPort() + "");
 
 
         bes.addContent(prefix);
-        bes.addContent(host);
-        bes.addContent(port);
+//        bes.addContent(host);
+//        bes.addContent(port);
 
         bes.addContent(guts);
 
