@@ -482,9 +482,17 @@ public class BesAPI {
         oc.executeCommand("set context errors to "+errorMsgFormat+";\n");
 
 
+        String catalogName = "catalog";
+        String container = "hyraxContainer";
 
-        String cmd = "set container in catalog values "
-                + dataset
+        if(WcsCatalog.isWcsDataset(dataset)){
+            catalogName = "wcs";
+            dataset = "\""+WcsCatalog.getWcsRequestURL(dataset)+"\"";
+        }
+
+
+        String cmd = "set container in " + catalogName + " values "
+                + container
                 + ", "
                 + dataset
                 + (type == null ? "" : ", " + type) + ";\n";
@@ -502,13 +510,13 @@ public class BesAPI {
         if (constraintExpression == null ||
                 constraintExpression.equalsIgnoreCase("")) {
 
-            cmd = "define d1 as " + dataset + ";\n";
+            cmd = "define d1 as "+ container +";\n";
 
         } else {
             cmd = "define d1 as "
-                    + dataset
+                    + container
                     + " with "
-                    + dataset
+                    + container
                     + ".constraint=\""
                     + constraintExpression + "\"  ;\n";
 
@@ -576,9 +584,6 @@ public class BesAPI {
 
 
 
-
-
-
     private static void besGetTransaction(String product,
                                           String dataset,
                                           String constraintExpression,
@@ -587,6 +592,7 @@ public class BesAPI {
             throws BadConfigurationException, PPTException {
 
         boolean trouble = false;
+
 
 
 

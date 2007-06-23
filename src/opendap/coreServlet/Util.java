@@ -59,12 +59,9 @@ public class Util {
         msg += "    fullSourceName:            '" + ReqInfo.getFullSourceName(req) + "'\n";
         msg += "    dataSource:                '" + ReqInfo.getDataSource(req) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
-        msg += "    collectionName:            '" + ReqInfo.getCollectionName(req) + "'\n";
         msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
         msg += "    requestURL:                '" + ReqInfo.getRequestURL(req) + "'\n";
-        msg += "    requestForOpendapContents:  " + ReqInfo.requestForOpendapContents(req) + "\n";
-        msg += "    requestForTHREDDSCatalog:   " + ReqInfo.requestForTHREDDSCatalog(req) + "\n";
         msg += "-------------------------------------------";
 
         return msg;
@@ -286,6 +283,12 @@ public class Util {
 
 
     }
-    /***************************************************************************/
+
+
+
+    
+
+
+
 
 }

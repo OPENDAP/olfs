@@ -26,22 +26,26 @@ package opendap.bes;
 
 
 import opendap.coreServlet.*;
+import opendap.experiments.ThreddsTest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
+import java.util.Iterator;
+import java.net.URI;
 
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.slf4j.Logger;
+import thredds.servlet.DataRootHandler;
+import thredds.catalog.InvCatalog;
+import thredds.catalog.InvDataset;
+import thredds.catalog.InvProperty;
+import thredds.crawlabledataset.CrawlableDataset;
 
 /**
- * Handler fo HTTP GET requests.
+ * Handler for DAP requests.
  */
 public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
@@ -49,14 +53,20 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     private Logger log;
     private boolean initialized;
 
+    private DispatchServlet dispatchServlet;
+
+    private ThreddsTest tt;
 
     public DapDispatchHandler() {
 
         super();
 
+        dispatchServlet = null;
         mimeTypes = new MimeTypes();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
+
+        tt = new ThreddsTest();
     }
 
 
@@ -71,6 +81,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         if(initialized) return;
 
+        dispatchServlet = ds;
+
         log.info("Initialized.");
         initialized = true;
 
@@ -80,6 +92,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception {
 
+        if(!initialized)
+            throw new Exception("DapDispatchHandler has not been initialized!");
+
        return dataSetDispatch(request,null,false);
 
     }
@@ -87,6 +102,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception {
+
+        if(!initialized)
+            throw new Exception("DapDispatchHandler has not been initialized!");
 
         dataSetDispatch(request,response,true);
 
@@ -100,6 +118,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getDataSource(req);
 
 
+        if(!initialized)
+            return -1;
 
 
 
@@ -168,22 +188,36 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                                    boolean sendResponse) throws Exception {
 
 
+
+
         String dataSource = ReqInfo.getDataSource(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
+        DataSourceInfo dsi = null;
 
-        DataSourceInfo dsi = getDataSourceInfo(dataSource);
+        boolean isWCS = WcsCatalog.isWcsDataset(request);
+        if(isWCS){
+        log.debug("dataSetDispatch() - Request is for WCS dataset.\n" +
+                "WCS Request URL: " + WcsCatalog.getWcsRequestURL(request));
+        }
+        else {
+            dsi = getDataSourceInfo(dataSource);            
+        }
+
 
         boolean isDataRequest = false;
 
-        if (dsi.sourceExists()) {
 
-            if (requestSuffix != null && dsi.isDataset()) {
+
+        if (isWCS || dsi.sourceExists() ) {
+
+            if (requestSuffix != null && (isWCS || dsi.isDataset())) {
 
                 if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")
                         ) {
                     isDataRequest = true;
                     if(sendResponse){
+
                         sendDDS(request, response);
                         log.info("Sent DDS");
                     }
@@ -344,6 +378,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     public void sendDDS(HttpServletRequest request,
                         HttpServletResponse response)
             throws Exception {
+
 
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
@@ -742,11 +777,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     }
-
-
-
-
-
 
 
 

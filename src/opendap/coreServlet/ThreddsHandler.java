@@ -25,6 +25,7 @@
 package opendap.coreServlet;
 
 import thredds.servlet.DataRootHandler;
+import opendap.bes.WcsCatalog;
 
 /**
  * User: ndp
@@ -35,5 +36,7 @@ public interface ThreddsHandler extends DispatchHandler {
 
 
     public DataRootHandler getDataRootHandler();
+    
+
 
 }

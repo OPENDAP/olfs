@@ -59,6 +59,8 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
 
     private boolean initialized;
 
+    private WcsCatalog wcs;
+
 
     public ThreddsDispatchHandler(){
 
@@ -66,6 +68,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
         threddsUpdateLock = new ReentrantLock(true);
         dataRootHandler = null;
         servlet  = null;
+        wcs = null;
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -78,6 +81,11 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
     }
 
 
+    public WcsCatalog getWcsCatalog(){
+        return wcs;
+    }
+
+
 
 
     public void init(DispatchServlet s,Element config) throws Exception{
@@ -86,6 +94,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
 
         servlet  = s;
 
+        wcs = new WcsCatalog();
 
 
         String contextPath = ServletUtil.getContextPath(servlet);
@@ -108,8 +117,13 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
         // ie dynamic
         DataRootHandler.init(contentPath, contextPath);
         dataRootHandler = DataRootHandler.getInstance();
+
+        dataRootHandler.registerConfigListener(wcs);
+
         try {
+            wcs.configStart();
             dataRootHandler.initCatalog("catalog.xml");
+            wcs.configEnd();
             //dataRootHandler.initCatalog( "extraCatalog.xml" );
         }
         catch (Throwable e) {

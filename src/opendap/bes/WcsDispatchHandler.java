@@ -43,14 +43,14 @@ import org.slf4j.Logger;
 /**
  * Handler for DAP requests.
  */
-public class WcsHandler implements OpendapHttpDispatchHandler {
+public class WcsDispatchHandler implements OpendapHttpDispatchHandler {
 
     private MimeTypes mimeTypes;
     private Logger log;
     private boolean initialized;
 
 
-    public WcsHandler() {
+    public WcsDispatchHandler() {
 
         super();
 
@@ -180,7 +180,7 @@ public class WcsHandler implements OpendapHttpDispatchHandler {
             if (requestSuffix != null && dsi.isDataset()) {
 
                 if ( // DDS Response?
-                        requestSuffix.equalsIgnoreCase("dds")
+                        requestSuffix.equalsIgnoreCase("wcs")
                         ) {
                     isDataRequest = true;
                     if(sendResponse){
@@ -188,76 +188,6 @@ public class WcsHandler implements OpendapHttpDispatchHandler {
                         log.info("Sent DDS");
                     }
 
-                } else if ( // DAS Response?
-                        requestSuffix.equalsIgnoreCase("das")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDAS(request, response);
-                        log.info("Sent DAS");
-                    }
-
-                } else if (  // DDX Response?
-                        requestSuffix.equalsIgnoreCase("ddx")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDDX(request, response);
-                        log.info("Sent DDX");
-                    }
-
-                } else if ( // DAP2 (aka .dods) Response?
-                        requestSuffix.equalsIgnoreCase("dods")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDAP2Data(request, response);
-                        log.info("Sent DAP2 Data");
-                    }
-
-                } else if (  // ASCII Data Response.
-                        requestSuffix.equalsIgnoreCase("asc") ||
-                                requestSuffix.equalsIgnoreCase("ascii")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendASCII(request, response);
-                        log.info("Sent ASCII");
-                    }
-
-                } else if (  // Info Response?
-                        requestSuffix.equalsIgnoreCase("info")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendInfo(request, response);
-                        log.info("Sent Info");
-                    }
-
-                } else
-                if (  //HTML Request Form (aka The Interface From Hell) Response?
-                        requestSuffix.equalsIgnoreCase("html") ||
-                                requestSuffix.equalsIgnoreCase("htm")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendHTMLRequestForm(request, response);
-                        log.info("Sent HTML Request Form");
-                    }
-
-
-                } else if (requestSuffix.equals("")) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        badURL(response);
-                        log.info("Sent BAD URL (missing Suffix)");
-                    }
-                } else {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        badURL(response);
-                        log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                    }
                 }
 
             }

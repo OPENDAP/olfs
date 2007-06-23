@@ -170,6 +170,9 @@ public class ReqInfo {
         else
             cName = dSrc.substring(0,dSrc.lastIndexOf(dSetName));
 
+        if(cName.endsWith("/") && !cName.equalsIgnoreCase("/"))
+            cName = cName.substring(0,cName.length()-1);
+
         log.debug("getCollectionName(): " + cName);
 
         return cName;
@@ -334,6 +337,18 @@ public class ReqInfo {
         return dataSourceName;
 
     }
+
+
+    public static String getUrlPath(HttpServletRequest req){
+        String up = getDataSource(req);
+
+        if(up.startsWith("/")){
+            up = up.substring(1,up.length());
+        }
+
+        return up;
+    }
+
 
 
     /**
