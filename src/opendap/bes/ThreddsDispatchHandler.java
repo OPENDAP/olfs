@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.Date;
+import java.util.Vector;
 import java.io.File;
 import java.net.URI;
 
@@ -60,6 +61,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
     private boolean initialized;
 
     private WcsCatalog wcs;
+    private Vector<String> topLevelCatalogs;
 
 
     public ThreddsDispatchHandler(){
@@ -73,6 +75,8 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         initialized = false;
+
+        topLevelCatalogs = new Vector<String>();
 
     }
 
@@ -95,6 +99,12 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
         servlet  = s;
 
         wcs = new WcsCatalog();
+
+        // We may wish to add a configuration option that allows users
+        // to specify a number of top level catalogs. This is where we wd add
+        // those catalogs from the configuration to the THREDDS "database"
+        //
+        topLevelCatalogs.add("catalog.xml");
 
 
         String contextPath = ServletUtil.getContextPath(servlet);
@@ -121,10 +131,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
         dataRootHandler.registerConfigListener(wcs);
 
         try {
-            wcs.configStart();
-            dataRootHandler.initCatalog("catalog.xml");
-            wcs.configEnd();
-            //dataRootHandler.initCatalog( "extraCatalog.xml" );
+            dataRootHandler.initCatalogs(topLevelCatalogs);
         }
         catch (Throwable e) {
             log.error("Error initializing catalog: " + e.getMessage(), e);
@@ -239,6 +246,13 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
 
 
     public void destroy(){
+        threddsInitTime = 0;
+        threddsUpdateLock = null;
+        dataRootHandler = null;
+        servlet  = null;
+        wcs = null;
+        initialized = false;
+        topLevelCatalogs = null;
         log.info("Destroy complete.");
 
     }
@@ -253,7 +267,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
                 threddsInitTime = f.lastModified();
                 log.info("updateCatalog(): Reinitializing THREDDS catalogs.  ");
                 dataRootHandler.reinit();
-                dataRootHandler.initCatalog("catalog.xml");
+                dataRootHandler.initCatalogs(topLevelCatalogs);
                 log.info("updateCatalog(): THREDDS has been reinitialized.  ");
             }
         }
