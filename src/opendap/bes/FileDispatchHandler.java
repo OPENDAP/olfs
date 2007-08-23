@@ -84,7 +84,9 @@ public class FileDispatchHandler implements DispatchHandler {
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception {
-        fileDispatch(request, response, true);
+
+       if(!fileDispatch(request, response, true))
+           log.debug("FileDispatch request failed inexplicably!");
 
     }
 
@@ -201,16 +203,16 @@ public class FileDispatchHandler implements DispatchHandler {
         String topLevel = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf(request.getPathInfo()));
 
         pw.println("<h2>ACCESS DENIED</h2>");
-        pw.println("<p>The URL <i>'" + request.getRequestURL() + "'</i> references a data source directly. </p>" +
+        pw.println("<p>The requested URL references a data source directly. </p>" +
                 "<p>You must use the OPeNDAP request interface to get data from the data source.</p>");
 
 
         pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='" + topLevel + "'>" + topLevel + "</a></p>");
+        pw.println("<p><a href='" + Scrub.completeURL(topLevel) + "'>" + Scrub.completeURL(topLevel) + "</a></p>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
+        pw.println("<a href=\"mailto:support@opendap.org\">support@opendap.org</a></p>");
 
         pw.flush();
 

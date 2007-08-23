@@ -144,18 +144,6 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                     log.info("Sent System Properties");
                 }
 
-            } else if (    // Debug response?
-                    Debug.isSet("DebugInterface") &&
-                            dataSource.equals("/debug") &&
-                            (requestSuffix != null) &&
-                            requestSuffix.equals("")) {
-
-                specialRequest = true;
-                if(sendResponse){
-                    DebugHandler.doDebug(servlet, request, response);
-                    log.info("Sent Debug Response");
-                }
-
             } else if (  // Status Response?
 
                     dataSource.equalsIgnoreCase("/status")) {

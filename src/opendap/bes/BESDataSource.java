@@ -27,6 +27,7 @@ package opendap.bes;
 import opendap.coreServlet.DataSourceInfo;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.slf4j.Logger;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -53,7 +54,11 @@ public class BESDataSource implements DataSourceInfo {
 
 
 
+
     BESDataSource(String dataSourceName) throws Exception {
+
+        Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
+
 
         requestedDataSource = dataSourceName;
         exists              = false;
@@ -91,6 +96,8 @@ public class BESDataSource implements DataSourceInfo {
 
 
         } catch (BESException e) {
+
+            log.debug("BES failed to return info document for: \""+dataSourceName+"\"");
 
             exists        = false;
             collection    = false;

@@ -131,162 +131,162 @@ public class Util {
      * This method calls the <code>get*</code> methods of the request and prints
      * the results to standard out.
      *
-     * @param ps
-     * @param servlet
+     * @param servlet The Servlet to Probe
      * @param request The <code>HttpServletRequest</code> object to probe.
-     * @param scntxt
-     * @param scnfg
+     * @param scntxt The Servlet Contexrt to Probe
+     * @param scnfg The servlet Config to probe
+     * @return A string containing the probe inormation
      */
-    public static void probeRequest(PrintStream ps, HttpServlet servlet, HttpServletRequest request, ServletContext scntxt, ServletConfig scnfg) {
+    public static String probeRequest(HttpServlet servlet, HttpServletRequest request, ServletContext scntxt, ServletConfig scnfg) {
 
         Enumeration e;
         int i;
 
-
-        ps.println("####################### PROBE ##################################");
-        ps.println("");
-        ps.println("HttpServlet:");
-        ps.println("    getServletName(): "+servlet.getServletName());
-        ps.println("    getServletInfo(): "+servlet.getServletInfo());
-        ps.println("");
-        ps.println("");
-        ps.println("");
-        ps.println("");
-        ps.println("");
-        ps.println("");
-        ps.println("The HttpServletRequest object is actually an instance of:");
-        ps.println("    " + request.getClass().getName());
-        ps.println("");
-        ps.println("HttpServletRequest Interface:");
-        ps.println("    getAuthType:           " + request.getAuthType());
-        ps.println("    getContextPath:        " + request.getContextPath());
-        ps.println("    getMethod:             " + request.getMethod());
-        ps.println("    getPathInfo:           " + request.getPathInfo());
-        ps.println("    getPathTranslated:     " + request.getPathTranslated());
-        ps.println("    getRequestURL:         " + request.getRequestURL());
-        ps.println("    getQueryString:        " + request.getQueryString());
-        ps.println("    getRemoteUser:         " + request.getRemoteUser());
-        ps.println("    getRequestedSessionId: " + request.getRequestedSessionId());
-        ps.println("    getRequestURI:         " + request.getRequestURI());
-        ps.println("    getServletPath:        " + request.getServletPath());
-        ps.println("    isRequestedSessionIdFromCookie: " + request.isRequestedSessionIdFromCookie());
-        ps.println("    isRequestedSessionIdValid:      " + request.isRequestedSessionIdValid());
-        ps.println("    isRequestedSessionIdFromURL:    " + request.isRequestedSessionIdFromURL());
+        String probeMsg = "####################### PROBE ##################################\n";
+        probeMsg += "\n";
+        probeMsg += "HttpServlet:"+ "\n" ;
+        probeMsg += "    getServletName(): "+servlet.getServletName() + "\n" ;
+        probeMsg += "    getServletInfo(): "+servlet.getServletInfo() + "\n" ;
+        probeMsg += "\n";
+        probeMsg += "\n";
+        probeMsg += "\n";
+        probeMsg += "\n";
+        probeMsg += "\n";
+        probeMsg += "\n";
+        probeMsg += "The HttpServletRequest object is actually an instance of:" + "\n" ;
+        probeMsg += "    " + request.getClass().getName() + "\n" ;
+        probeMsg += "\n";
+        probeMsg += "HttpServletRequest Interface:"+ "\n" ;
+        probeMsg += "    getAuthType:           " + request.getAuthType() + "\n" ;
+        probeMsg += "    getContextPath:        " + request.getContextPath() + "\n" ;
+        probeMsg += "    getMethod:             " + request.getMethod() + "\n" ;
+        probeMsg += "    getPathInfo:           " + request.getPathInfo() + "\n" ;
+        probeMsg += "    getPathTranslated:     " + request.getPathTranslated() + "\n" ;
+        probeMsg += "    getRequestURL:         " + request.getRequestURL() + "\n" ;
+        probeMsg += "    getQueryString:        " + request.getQueryString() + "\n" ;
+        probeMsg += "    getRemoteUser:         " + request.getRemoteUser() + "\n" ;
+        probeMsg += "    getRequestedSessionId: " + request.getRequestedSessionId() + "\n" ;
+        probeMsg += "    getRequestURI:         " + request.getRequestURI() + "\n" ;
+        probeMsg += "    getServletPath:        " + request.getServletPath() + "\n" ;
+        probeMsg += "    isRequestedSessionIdFromCookie: " + request.isRequestedSessionIdFromCookie() + "\n" ;
+        probeMsg += "    isRequestedSessionIdValid:      " + request.isRequestedSessionIdValid() + "\n" ;
+        probeMsg += "    isRequestedSessionIdFromURL:    " + request.isRequestedSessionIdFromURL() + "\n" ;
         //ps.println("    isUserInRole:                   " + request.isUserInRole());
 
-        ps.println("");
-        ps.print("    Cookies:");
+        probeMsg += "\n";
+        probeMsg += "    Cookies:" + "\n";
         Cookie c[] = request.getCookies();
         if (c == null)
-            ps.println("   None.");
+            probeMsg += "   None." + "\n";
         else {
-            ps.println();
+            probeMsg += "\n";
             for (i = 0; i < c.length; i++)
-                ps.println("        cookie[" + i + "]: " + c[i]);
+                probeMsg += "        cookie[" + i + "]: " + c[i] + "\n";
         }
 
-        ps.println("");
+        probeMsg += "\n";
         i = 0;
         e = request.getHeaderNames();
-        ps.println("    Header Names:");
+        probeMsg += "    Header Names:"+ "\n" ;
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            ps.print("        Header[" + i + "]: " + s);
-            ps.println(": " + request.getHeader(s));
+            probeMsg += "       Header[" + i + "]: " + s;
+            probeMsg += ": " + request.getHeader(s)+ "\n" ;
         }
 
-        ps.println("");
-        ps.println("ServletRequest Interface:");
-        ps.println("    getCharacterEncoding:  " + request.getCharacterEncoding());
-        ps.println("    getContentType:        " + request.getContentType());
-        ps.println("    getContentLength:      " + request.getContentLength());
-        ps.println("    getProtocol:           " + request.getProtocol());
-        ps.println("    getScheme:             " + request.getScheme());
-        ps.println("    getServerName:         " + request.getServerName());
-        ps.println("    getServerPort:         " + request.getServerPort());
-        ps.println("    getRemoteAddr:         " + request.getRemoteAddr());
-        ps.println("    getRemoteHost:         " + request.getRemoteHost());
-        //ps.println("    getRealPath:           "+request.getRealPath());
+        probeMsg += "\n";
+        probeMsg += "ServletRequest Interface:"+ "\n" ;
+        probeMsg += "    getCharacterEncoding:  " + request.getCharacterEncoding()+ "\n" ;
+        probeMsg += "    getContentType:        " + request.getContentType()+ "\n" ;
+        probeMsg += "    getContentLength:      " + request.getContentLength()+ "\n" ;
+        probeMsg += "    getProtocol:           " + request.getProtocol()+ "\n" ;
+        probeMsg += "    getScheme:             " + request.getScheme()+ "\n" ;
+        probeMsg += "    getServerName:         " + request.getServerName()+ "\n" ;
+        probeMsg += "    getServerPort:         " + request.getServerPort()+ "\n" ;
+        probeMsg += "    getRemoteAddr:         " + request.getRemoteAddr()+ "\n" ;
+        probeMsg += "    getRemoteHost:         " + request.getRemoteHost()+ "\n" ;
+        //probeMsg += "    getRealPath:           "+request.getRealPath()+ "\n" ;
 
 
-        ps.println(".............................");
-        ps.println("");
+        probeMsg += "............................."+ "\n" ;
+        probeMsg += "\n";
         i = 0;
         e = request.getAttributeNames();
-        ps.println("    Attribute Names:");
+        probeMsg += "    Attribute Names:"+ "\n" ;
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            ps.print("        Attribute[" + i + "]: " + s);
-            ps.println(" Type: " + request.getAttribute(s));
+            probeMsg += "        Attribute[" + i + "]: " + s;
+            probeMsg += " Type: " + request.getAttribute(s)+ "\n" ;
         }
 
-        ps.println(".............................");
-        ps.println("");
+        probeMsg += "............................."+ "\n" ;
+        probeMsg += "\n";
         i = 0;
         e = request.getParameterNames();
-        ps.println("    Parameter Names:");
+        probeMsg += "    Parameter Names:"+ "\n" ;
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            ps.print("        Parameter[" + i + "]: " + s);
-            ps.println(" Value: " + request.getParameter(s));
+            probeMsg += "        Parameter[" + i + "]: " + s;
+            probeMsg += " Value: " + request.getParameter(s)+ "\n" ;
         }
 
-        ps.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        ps.println(" . . . . . . . . . Servlet Infomation API  . . . . . . . . . . . . . .");
-        ps.println("");
+        probeMsg += "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+ "\n" ;
+        probeMsg += " . . . . . . . . . Servlet Infomation API  . . . . . . . . . . . . . ."+ "\n" ;
+        probeMsg += "\n";
 
-        ps.println("Servlet Context:");
+        probeMsg += "Servlet Context:"+ "\n" ;
 
-        ps.println("    getMajorVersion:       " + scntxt.getMajorVersion());
-        ps.println("    getMinorVersion:       " + scntxt.getMinorVersion());
-        ps.println("    getServerInfo:         " + scntxt.getServerInfo());
-        ps.println("    getServletContextName: " + scntxt.getServletContextName());
-        ps.println("");
+        probeMsg += "    getMajorVersion:       " + scntxt.getMajorVersion()+ "\n" ;
+        probeMsg += "    getMinorVersion:       " + scntxt.getMinorVersion()+ "\n" ;
+        probeMsg += "    getServerInfo:         " + scntxt.getServerInfo()+ "\n" ;
+        probeMsg += "    getServletContextName: " + scntxt.getServletContextName()+ "\n" ;
+        probeMsg += "\n";
 
         i = 0;
         e = scntxt.getAttributeNames();
-        ps.println("    Attribute Names:");
+        probeMsg += "    Attribute Names:"+ "\n" ;
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            ps.print("        Attribute[" + i + "]: " + s);
-            ps.println(" Type: " + scntxt.getAttribute(s));
+            probeMsg += "        Attribute[" + i + "]: " + s;
+            probeMsg += " Type: " + scntxt.getAttribute(s)+ "\n" ;
         }
 
-        ps.println("    ServletContext.getRealPath(\".\"): " + scntxt.getRealPath("."));
-        ps.println("    ServletContext.getMajorVersion(): " + scntxt.getMajorVersion());
-//        ps.println("ServletContext.getMimeType():     " + scntxt.getMimeType());
-        ps.println("    ServletContext.getMinorVersion(): " + scntxt.getMinorVersion());
-//        ps.println("ServletContext.getRealPath(): " + sc.getRealPath());
+        probeMsg += "    ServletContext.getRealPath(\".\"): " + scntxt.getRealPath(".")+ "\n" ;
+        probeMsg += "    ServletContext.getMajorVersion(): " + scntxt.getMajorVersion()+ "\n" ;
+//        probeMsg += "ServletContext.getMimeType():     " + scntxt.getMimeType()+ "\n" ;
+        probeMsg += "    ServletContext.getMinorVersion(): " + scntxt.getMinorVersion()+ "\n" ;
+//        probeMsg += "ServletContext.getRealPath(): " + sc.getRealPath()+ "\n" ;
 
 
-        ps.println(".............................");
-        ps.println("Servlet Config:");
-        ps.println("");
+        probeMsg += "............................."+ "\n" ;
+        probeMsg += "Servlet Config:"+ "\n" ;
+        probeMsg += "\n";
 
 
         i = 0;
         e = scnfg.getInitParameterNames();
-        ps.println("    InitParameters:");
+        probeMsg += "    InitParameters:"+ "\n" ;
         while (e.hasMoreElements()) {
             String p = (String) e.nextElement();
-            ps.print("        InitParameter[" + i + "]: " + p);
-            ps.println(" Value: " + scnfg.getInitParameter(p));
+            probeMsg += "        InitParameter[" + i + "]: " + p;
+            probeMsg += " Value: " + scnfg.getInitParameter(p)+ "\n" ;
             i++;
         }
-        ps.println("");
-        ps.println("######################## END PROBE ###############################");
-        ps.println("");
+        probeMsg += "\n";
+        probeMsg += "######################## END PROBE ###############################"+ "\n" ;
+        probeMsg += "\n";
 
+        return probeMsg;
 
     }
 
 
 
-    
+
 
 
 

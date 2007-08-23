@@ -26,6 +26,7 @@
 package opendap.bes;
 
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,16 +80,13 @@ public class S4Dir {
         String link;
         String responseLinks;
         PrintWriter pw = new PrintWriter(response.getOutputStream());
-
-
         List datasets;
         Iterator it;
         BESCrawlableDataset childDataset;
 
-//        String collectionName  = ReqInfo.getCollectionName(request);
 
 
-        String collectionName  = ReqInfo.getFullSourceName(request);
+        String collectionName  = Scrub.urlContent(ReqInfo.getFullSourceName(request));
 
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
@@ -99,7 +97,7 @@ public class S4Dir {
 
 
 
-        String targetURL = request.getContextPath() + request.getServletPath() + collectionName;
+        String targetURL = Scrub.urlContent(request.getContextPath() + request.getServletPath() + collectionName);
 
 
         log.debug("targetURL:       "+targetURL);
@@ -150,6 +148,9 @@ public class S4Dir {
 
         // Strip basename from the end of the targetURL to make the link to the parent directory
         link = targetURL.substring(0, targetURL.lastIndexOf(baseName))+"/contents.html";
+
+
+
 
         // Set up the page.
         printHTMLHeader(collectionName, headerSpace, link, pw);
@@ -257,6 +258,7 @@ public class S4Dir {
 
 
     private static void printHTMLHeader(String collectionName, int headerSpace, String parentLink, PrintWriter pw) {
+
 
 
         pw.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +

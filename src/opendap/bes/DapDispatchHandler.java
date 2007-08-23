@@ -26,23 +26,15 @@ package opendap.bes;
 
 
 import opendap.coreServlet.*;
-import opendap.experiments.ThreddsTest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
-import java.util.Iterator;
-import java.net.URI;
 
 import org.jdom.Element;
 import org.slf4j.Logger;
-import thredds.servlet.DataRootHandler;
-import thredds.catalog.InvCatalog;
-import thredds.catalog.InvDataset;
-import thredds.catalog.InvProperty;
-import thredds.crawlabledataset.CrawlableDataset;
 
 /**
  * Handler for DAP requests.
@@ -55,7 +47,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     private DispatchServlet dispatchServlet;
 
-    private ThreddsTest tt;
 
     public DapDispatchHandler() {
 
@@ -66,7 +57,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
 
-        tt = new ThreddsTest();
     }
 
 
@@ -200,7 +190,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 "WCS Request URL: " + WcsCatalog.getWcsRequestURL(request));
         }
         else {
-            dsi = getDataSourceInfo(dataSource);            
+            dsi = getDataSourceInfo(dataSource);
         }
 
 
@@ -771,7 +761,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
+        pw.println("<a href=\"mailto:support@opendap.org\">support@opendap.org</a></p>");
 
         pw.flush();
 

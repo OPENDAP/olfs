@@ -431,7 +431,7 @@ public class DispatchServlet extends HttpServlet {
 
 
             if (Debug.isSet("probeRequest"))
-                Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
+                log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
             DispatchHandler dh = getHandler(request, httpGetDispatchHandlers);
@@ -483,7 +483,7 @@ public class DispatchServlet extends HttpServlet {
             // END Synchronized section
 
             if (Debug.isSet("probeRequest"))
-                Util.probeRequest(System.out, this, request, getServletContext(), getServletConfig());
+                log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
             DispatchHandler dh = getHandler(request, httpPostDispatchHandlers);
@@ -528,7 +528,7 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * Gets the last modified date of the requested resource. Because the data handler is really
-     * the only entity capable of determining the last modified dat the job is passed  through to it.
+     * the only entity capable of determining the last modified date the job is passed  through to it.
      *
      * @param req The current request
      * @return Returns the time the HttpServletRequest object was last modified, in milliseconds
@@ -588,13 +588,13 @@ public class DispatchServlet extends HttpServlet {
         String topLevel = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf(request.getPathInfo()));
 
         pw.println("<h2>Resource Not Found</h2>");
-        pw.println("<p>The URL <i>'" + request.getRequestURL() + "'</i> does not describe a resource that can be found on this server.</p>");
+        pw.println("<p>The URL requested does not describe a resource that can be found on this server.</p>");
         pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='" + topLevel + "'>" + topLevel + "</a></p>");
+        pw.println("<p><a href='" + Scrub.completeURL(topLevel) + "'>" + Scrub.completeURL(topLevel) + "</a></p>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@unidata.ucar.edu\">support@unidata.ucar.edu</a></p>");
+        pw.println("<a href=\"mailto:support@opendap.org\">support@opendap.org</a></p>");
 
         pw.flush();
 

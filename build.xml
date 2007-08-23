@@ -27,93 +27,102 @@
 
 
 <!DOCTYPE project [
-    <!ENTITY globalprops      SYSTEM "./buildfiles/globalprops.xml">
-]>
+        <!ENTITY globalprops      SYSTEM "./buildfiles/globalprops.xml">
+        ]>
 
 <!-- Build file for OPeNDAP core software -->
 
 
-<project name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project" default="all" basedir=".">
+<project
+        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+        default="all" basedir=".">
 
     <!-- Global Properties -->
     &globalprops;
 
+
+    <typedef name="sourceanalyzer"
+             classname="com.fortify.dev.ant.SourceanalyzerTask"/>
+
+
     <!-- Project directories -->
-    <property name="src.dir"         location="src"/>
-    <property name="doc.dir"         location="doc"/>
-    <property name="lib.dir"         location="lib"/>
-    <property name="bin.dir"         location="bin"/>
-    <property name="resources.dir"   location="resources"/>
-    <property name="datasets.dir"    location="datasets"/>
-    <property name="schema.dir"      location="schema"/>
-    <property name="buildfiles.dir"  location="buildfiles"/>
+    <property name="src.dir" location="src"/>
+    <property name="doc.dir" location="doc"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="bin.dir" location="bin"/>
+    <property name="resources.dir" location="resources"/>
+    <property name="datasets.dir" location="datasets"/>
+    <property name="schema.dir" location="schema"/>
+    <property name="buildfiles.dir" location="buildfiles"/>
     <property name="initialContent.dir"
-                                     location="${resources.dir}/initialContent"/>
+              location="${resources.dir}/initialContent"/>
     <property name="WebInfResources.dir"
-                                     location="${resources.dir}/WEB-INF"/>
+              location="${resources.dir}/WEB-INF"/>
     <property name="distributionResources.dir"
-                                     location="${resources.dir}/distribution"/>
+              location="${resources.dir}/distribution"/>
 
     <property name="THREDDSResources.dir"
-                                     location="${resources.dir}/THREDDS"/>
+              location="${resources.dir}/THREDDS"/>
 
 
     <!-- Build Directories -->
-    <property name="build.dir"       location="build"/>
-    <property name="build.classes"   location="${build.dir}/classes"/>
-    <property name="build.doc"       location="${build.dir}/doc"/>
-    <property name="build.dist"      location="${build.dir}/dist"/>
-    <property name="build.lib"       location="${build.dir}/lib"/>
-
-
+    <property name="build.dir" location="build"/>
+    <property name="build.classes" location="${build.dir}/classes"/>
+    <property name="build.doc" location="${build.dir}/doc"/>
+    <property name="build.dist" location="${build.dir}/dist"/>
+    <property name="build.lib" location="${build.dir}/lib"/>
 
 
     <!-- Libraries -->
-    <property name="jdom.lib"           value="jdom-1.0.jar"/>
-    <property name="servlet.lib"        value="tomcat-5.5.0-servlet.jar"/>
-    <property name="echo.lib"           value="echosoap.jar"/>
+    <property name="jdom.lib" value="jdom-1.0.jar"/>
+    <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
+    <property name="echo.lib" value="echosoap.jar"/>
 
 
-    <property name="thredds.lib"        value="tsf-3.16.07.jar"/>
-    <property name="netcdf.lib"         value="netcdf-2.2.20.jar"/>
-    <property name="nlog4j.lib"         value="nlog4j-1.2.21.jar"/>
+    <property name="thredds.lib" value="tsf-3.16.07.jar"/>
+    <property name="netcdf.lib" value="netcdf-2.2.20.jar"/>
+    <property name="nlog4j.lib" value="nlog4j-1.2.21.jar"/>
 
-    <property name="cli.lib"            value="apache-commons-cli-1.0.jar"/>
+    <property name="cli.lib" value="apache-commons-cli-1.0.jar"/>
 
-    <property name="xercesImpl.lib"     value="xercesImpl-2.8.1.jar"/>
-    <property name="xercesXmlApis.lib"  value="xml-apis-2.8.1.jar"/>
+    <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
+    <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
 
+    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
+               property="fortify.present"/>
+
+    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
+    <property name="rules.dir" value="fortify"/>
 
 
     <!-- Library (class)paths -->
     <path id="olfs.compile.classpath">
-        <pathelement path="${build.classes}" />
+        <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
-            <include name="${servlet.lib}" />
-            <include name="${jdom.lib}" />
-            <include name="${cli.lib}" />
-            <include name="${thredds.lib}" />
-            <include name="${netcdf.lib}" />
-            <include name="${nlog4j.lib}" />
+            <include name="${servlet.lib}"/>
+            <include name="${jdom.lib}"/>
+            <include name="${cli.lib}"/>
+            <include name="${thredds.lib}"/>
+            <include name="${netcdf.lib}"/>
+            <include name="${nlog4j.lib}"/>
         </fileset>
     </path>
 
 
+    <target name="all" depends="clean,clients,server,soap-lib"
+            description="Builds lots of stuff."/>
+    <target name="compile" depends="olfs"
+            description="Compiles the OLFS software."/>
 
-    <target name="all" depends="clean,clients,server,soap-lib" description="Builds lots of stuff."/>
-    <target name="compile" depends="olfs" description="Compiles the OLFS software."/>
 
-
-    <target name="clients" depends="BESclient" description="Compiles the clients."/>
-
+    <target name="clients" depends="BESclient"
+            description="Compiles the clients."/>
 
 
     <target name="clean" description="Clean up ALL build products.">
         <delete dir="${build.dir}"/>
     </target>
-
-
 
 
     <target name="init" description="Prepare all build directories.">
@@ -128,20 +137,20 @@
     </target>
 
 
-
     <target
-        name="olfs"
-        depends="init"
-        description="Compiles the OLFS."
-        >
+            name="olfs"
+            depends="init"
+            description="Compiles the OLFS."
+            >
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
-        <echo level="info" message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
         <javac compiler="${build.compiler}"
-            destdir="${build.classes}"
-            debug="${compile.debug}"
-            debuglevel="${compile.debuglevel}"
-            deprecation="${compile.deprecation}">
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
 
             <classpath refid="olfs.compile.classpath"/>
 
@@ -174,43 +183,44 @@
 
 
     <target
-        name="doc"
-        depends="init,IsJavaDocUpToDate"
-        description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
-        unless="JavaDocIsUpToDate"
-        >
+            name="doc"
+            depends="init,IsJavaDocUpToDate"
+            description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
+            unless="JavaDocIsUpToDate"
+            >
 
         <javadoc destdir="${build.doc}/javadoc"
-            Author="true"
-            Version="true"
-            Use="true"
-            Verbose="true"
-            failonerror="true"
-            >
+                 Author="true"
+                 Version="true"
+                 Use="true"
+                 Verbose="true"
+                 failonerror="true"
+                >
 
             <classpath refid="olfs.compile.classpath"/>
 
-            <fileset dir="${src.dir}/opendap/" >
+            <fileset dir="${src.dir}/opendap/">
 
             </fileset>
 
         </javadoc>
 
-        <copy todir="${build.doc}" >
+        <copy todir="${build.doc}">
             <fileset dir="${doc.dir}">
-                <exclude name="javadoc/**"/> <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="javadoc/**"/>
+                <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="_notes/**"/>
+                <!-- Exclude the _notes directory in the ${doc.dir} dir -->
             </fileset>
         </copy>
     </target>
 
 
-
     <target
-        name="doc-dist"
-        depends="clean,doc"
-        description="Builds documentation distribution"
-        >
+            name="doc-dist"
+            depends="clean,doc"
+            description="Builds documentation distribution"
+            >
 
         <jar destfile="${build.dist}/olfs-${VERSION}-doc.jar">
             <zipfileset dir="${build.doc}" prefix="olfs-${VERSION}-doc"/>
@@ -220,18 +230,20 @@
 
 
     <target
-        name="src-dist"
-        depends="clean,init"
-        description="Builds source distribution"
-        >
+            name="src-dist"
+            depends="clean,init"
+            description="Builds source distribution"
+            >
 
         <jar destfile="${build.dist}/olfs-${VERSION}-src.jar"
                 >
 
             <zipfileset dir="." prefix="olfs-${VERSION}-src">
                 <exclude name="build/**"/>
-                <exclude name="doc/javadoc/**"/> <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="doc/_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="doc/javadoc/**"/>
+                <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="doc/_notes/**"/>
+                <!-- Exclude the _notes directory in the ${doc.dir} dir -->
                 <exclude name="**/*.iml"/>
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
@@ -242,42 +254,42 @@
     </target>
 
     <target
-        name="server-dist"
-        depends="server"
-        description="Packages the war file into tar file with a release related name.">
+            name="server-dist"
+            depends="server"
+            description="Packages the war file into tar file with a release related name.">
 
-        <copy file="${distributionResources.dir}/WarFileReadme" tofile="${build.dist}/README" />
+        <copy file="${distributionResources.dir}/WarFileReadme"
+              tofile="${build.dist}/README"/>
 
-        <jar destfile="${build.dist}/olfs-${VERSION}-webapp.jar" >
+        <jar destfile="${build.dist}/olfs-${VERSION}-webapp.jar">
             <zipfileset dir="${build.dist}" prefix="olfs-${VERSION}-webapp">
-                <include name="opendap.war" />
-                <include name="README" />
+                <include name="opendap.war"/>
+                <include name="README"/>
             </zipfileset>
 
         </jar>
 
-        <delete file="${build.dist}/README" />
-        <delete file="${build.dist}/opendap.war" />
+        <delete file="${build.dist}/README"/>
+        <delete file="${build.dist}/opendap.war"/>
 
     </target>
 
 
-
     <target
-        name="DISTRO"
-        depends="clean,src-dist,doc-dist,server-dist"
-        description="Builds complete distribution"
-        >
+            name="DISTRO"
+            depends="clean,src-dist,doc-dist,server-dist"
+            description="Builds complete distribution"
+            >
 
     </target>
 
 
-
     <target
-        name="IsJavaDocUpToDate"
-        description="Checks to see if the JavaDoc is out of date."
-        >
-        <uptodate property="JavaDocIsUpToDate" targetfile="${build.doc}/opendap/index.html">
+            name="IsJavaDocUpToDate"
+            description="Checks to see if the JavaDoc is out of date."
+            >
+        <uptodate property="JavaDocIsUpToDate"
+                  targetfile="${build.doc}/opendap/index.html">
             <srcfiles dir="${src.dir}">
                 <include name="opendap/**/*.java"/>
             </srcfiles>
@@ -287,15 +299,15 @@
 
 
     <target
-        name="BESclient"
-        depends="olfs-lib"
-        description="Build and package the back end client."
-        >
+            name="BESclient"
+            depends="olfs-lib"
+            description="Build and package the back end client."
+            >
 
         <copy file="${lib.dir}/${cli.lib}" tofile="${build.dist}/${cli.lib}"/>
 
         <jar destfile="${build.dist}/beclient.jar"
-            manifest="resources/META-INF/BESclient.MANIFEST.MF">
+             manifest="resources/META-INF/BESclient.MANIFEST.MF">
             <fileset dir="${build.classes}">
                 <include name="opendap/ppt/**/*.class"/>
                 <include name="hao/**/*.class"/>
@@ -307,16 +319,15 @@
 
 
     <target
-        name="server"
-        depends="olfs-lib,doc"
-        description="Performs a clean build of the core software and assembles the WAR file."
-        >
-
+            name="server"
+            depends="olfs-lib,doc"
+            description="Performs a clean build of the core software and assembles the WAR file."
+            >
 
 
         <war destfile="${build.dist}/opendap.war"
-            webxml="${WebInfResources.dir}/web.xml"
-            >
+             webxml="${WebInfResources.dir}/web.xml"
+                >
 
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
@@ -334,9 +345,9 @@
                 <exclude name="_notes"/>
             </zipfileset>
 
-            <zipfileset dir="${THREDDSResources.dir}/views" prefix="views" />
+            <zipfileset dir="${THREDDSResources.dir}/views" prefix="views"/>
 
-            <zipfileset dir="${schema.dir}" prefix="schema" />
+            <zipfileset dir="${schema.dir}" prefix="schema"/>
 
             <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>
 
@@ -348,11 +359,11 @@
                 <include name="${nlog4j.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
-           </zipfileset>
+            </zipfileset>
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">
                 <include name="**/*"/>
-           </zipfileset>
+            </zipfileset>
 
             <webinf dir="${WebInfResources.dir}">
                 <include name="log4j.xml"/>
@@ -363,6 +374,45 @@
 
         <delete file="${build.dist}/index.html"/>
 
+    </target>
+
+
+    <target name="fortify" if="fortify.present">
+        <typedef name="sourceanalyzer"
+                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
+
+
+        <!-- call clean to ensure that all source files are recompiled -->
+        <antcall target="clean"/>
+
+
+
+        <!-- call the compile target using the SCA Compiler Adapter to -->
+        <!-- translate all source files -->
+        <antcall target="compile">
+            <param name="build.compiler"
+                   value="com.fortify.dev.ant.SCACompiler"/>
+        </antcall>
+
+
+        <!-- capture all configuration files in the WEB-INF directory -->
+        <echo>sourceanalyzer ${web-inf}</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}" >
+            <fileset dir="${WebInfResources.dir}">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </sourceanalyzer>
+
+
+
+        <!-- run analysis -->
+        <echo>sourceanalyzer scan</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                        scan="true"
+                        resultsfile="${build.dir}/issues.fpr"
+                        rules="${rules.dir}/OlfsRulePack.xml"
+                />
     </target>
 
 

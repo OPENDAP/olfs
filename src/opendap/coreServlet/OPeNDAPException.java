@@ -252,7 +252,6 @@ public class OPeNDAPException extends Exception {
 
         log.error("anyExceptionHandler(): " + t);
         t.printStackTrace();
-        DebugLog.printThrowable(t);
 
 
         try {
@@ -299,7 +298,6 @@ public class OPeNDAPException extends Exception {
 
         } catch (IOException ioe) {
             log.error("Cannot respond to client! IO Error: " + ioe.getMessage());
-            DebugLog.println("Cannot respond to client! IO Error: " + ioe.getMessage());
         }
 
 
