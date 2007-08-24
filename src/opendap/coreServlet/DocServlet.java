@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import thredds.servlet.ServletUtil;
 import org.slf4j.Logger;
@@ -53,15 +54,13 @@ public class DocServlet extends HttpServlet {
 
     private Logger log;
 
-    private Semaphore syncLock;
 
-    private int reqNumber;
+    private AtomicInteger reqNumber;
 
 
     public void init() {
 
-        reqNumber = 0;
-        syncLock = new Semaphore(1);
+        reqNumber = new AtomicInteger(0);
 
         String dir = ServletUtil.getContentPath(this) + "docs";
 
@@ -143,10 +142,7 @@ public class DocServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        syncLock.acquireUninterruptibly();
-        reqNumber++;
-        PerfLog.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber));
-        syncLock.release();
+        PerfLog.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
 
         if (!redirect(request, response)) {
 

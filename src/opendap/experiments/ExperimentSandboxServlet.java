@@ -41,6 +41,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * User: ndp
@@ -52,8 +53,8 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
     private int maxChunkSize = 8192;
 
-    private int hitCounter;
-    private int unitHitCounter;
+    private AtomicInteger hitCounter;
+    private AtomicInteger unitHitCounter;
 
     private Random rand;
 
@@ -62,8 +63,8 @@ public class ExperimentSandboxServlet extends HttpServlet {
     public void init() throws ServletException {
 
 
-        hitCounter=0;
-        unitHitCounter = 0;
+        hitCounter = new AtomicInteger(0);
+        unitHitCounter =  new AtomicInteger(0);
 
         rand = new Random();
 
@@ -83,9 +84,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
         String path = request.getPathInfo();
 
 
-        synchronized(this){
-            hitCounter++;
-        }
+        int reqno = hitCounter.incrementAndGet();
 
 
 
@@ -129,7 +128,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
             startTime = new Date();
 
             synchronized(this){
-                unitHitCounter++;
+                int unitreqno = unitHitCounter.incrementAndGet();
             }
 
             try {

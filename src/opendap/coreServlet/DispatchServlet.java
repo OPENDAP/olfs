@@ -33,6 +33,7 @@ import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -65,20 +66,12 @@ public class DispatchServlet extends HttpServlet {
 
     /**
      * ************************************************************************
-     * Count "hits" on the server...
+     * A thread safe hit counter
      *
      * @serial
      */
-    private long reqNumber = 0;
-    //private int lastModifiedHits = 0;
+    private AtomicInteger reqNumber;
 
-    /**
-     * ************************************************************************
-     * Used synchronize access to the hit counter.
-     *
-     * @serial
-     */
-    private Semaphore syncLock;
 
 
     private Vector<DispatchHandler> httpGetDispatchHandlers;
@@ -102,9 +95,10 @@ public class DispatchServlet extends HttpServlet {
      */
     public void init() throws ServletException {
 
+        reqNumber = new AtomicInteger(0);
+
         super.init();
 
-        syncLock = new Semaphore(1);
         httpGetDispatchHandlers = new Vector<DispatchHandler>();
         Vector<Element> httpGetHandlerConfigs = new Vector<Element>();
         httpPostDispatchHandlers = new Vector<DispatchHandler>();
@@ -418,16 +412,14 @@ public class DispatchServlet extends HttpServlet {
 
 
         try {
-            syncLock.acquireUninterruptibly();
-            reqNumber++;
-            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqNumber));
-            log.debug(Util.showRequest(request, reqNumber));
+            int hitCount = reqNumber.incrementAndGet();
+            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(hitCount));
+            log.debug(Util.showRequest(request, hitCount));
 
             log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
                     "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                     "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
-            syncLock.release();
 
 
             if (Debug.isSet("probeRequest"))
@@ -469,18 +461,14 @@ public class DispatchServlet extends HttpServlet {
             throws IOException, ServletException {
 
         try {
-            // START Synchronized section
 
-            syncLock.acquireUninterruptibly();
-            reqNumber++;
-            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqNumber));
-            log.debug(Util.showRequest(request, reqNumber));
+            int hitCount = reqNumber.incrementAndGet();
+            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(hitCount));
+            log.debug(Util.showRequest(request, hitCount));
 
             log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
                    "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                    "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
-            syncLock.release();
-            // END Synchronized section
 
             if (Debug.isSet("probeRequest"))
                 log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
@@ -537,11 +525,9 @@ public class DispatchServlet extends HttpServlet {
     protected long getLastModified(HttpServletRequest req) {
 
         try {
-            syncLock.acquireUninterruptibly();
-            long reqno = ++reqNumber;
+            long reqno = reqNumber.incrementAndGet();
             //lastModifiedHits++;
             PerfLog.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
-            syncLock.release();
 
             DispatchHandler dh = getHandler(req, httpGetDispatchHandlers);
             if (dh != null) {
