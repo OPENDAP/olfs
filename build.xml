@@ -40,11 +40,6 @@
     <!-- Global Properties -->
     &globalprops;
 
-
-    <typedef name="sourceanalyzer"
-             classname="com.fortify.dev.ant.SourceanalyzerTask"/>
-
-
     <!-- Project directories -->
     <property name="src.dir" location="src"/>
     <property name="doc.dir" location="doc"/>
