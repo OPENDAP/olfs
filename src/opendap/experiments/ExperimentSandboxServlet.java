@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -43,6 +43,8 @@ import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import opendap.coreServlet.OPeNDAPException;
+
 /**
  * User: ndp
  * Date: Sep 5, 2006
@@ -81,74 +83,80 @@ public class ExperimentSandboxServlet extends HttpServlet {
             throws IOException, ServletException {
 
 
-        String path = request.getPathInfo();
+        try {
+
+            String path = request.getPathInfo();
 
 
-        int reqno = hitCounter.incrementAndGet();
+            int reqno = hitCounter.incrementAndGet();
 
 
 
 
-        String msg = "NOOP";
+            String msg = "NOOP";
 
 
-        Date startTime = new Date();
-        Date endTime   = startTime;
+            Date startTime = new Date();
+            Date endTime   = startTime;
 
 
-        if(path == null){
+            if(path == null){
 
-        }else if(path.equals("/nio") || path.equals("/nio/")){
+            }else if(path.equals("/nio") || path.equals("/nio/")){
 
-            msg = ("NIOREAD");
-            startTime = new Date();
-            doNIO(request,response);
-            endTime = new Date();
-        }
-        else if(path.equals("/block") || path.equals("/block/")){
+                msg = ("NIOREAD");
+                startTime = new Date();
+                doNIO(request,response);
+                endTime = new Date();
+            }
+            else if(path.equals("/block") || path.equals("/block/")){
 
-            msg = ("BLOCKREAD");
-            startTime = new Date();
-            doBLOCK(request,response);
-            endTime = new Date();
-        }
-
-        else if(path.equals("/byte") || path.equals("/byte/")){
-
-            msg = ("BYTEREAD");
-            startTime = new Date();
-            doBYTE(request,response);
-            endTime = new Date();
-        }
-
-
-        else if(path.equals("/hitcount") || path.equals("/hitcount/")){
-
-            msg = ("HitCounter");
-            startTime = new Date();
-
-            synchronized(this){
-                int unitreqno = unitHitCounter.incrementAndGet();
+                msg = ("BLOCKREAD");
+                startTime = new Date();
+                doBLOCK(request,response);
+                endTime = new Date();
             }
 
-            try {
-                Thread.sleep(rand.nextInt(200));
-            } catch (InterruptedException e) {
-                log.error("Hmmmm, my thread got interrupted.",e);
+            else if(path.equals("/byte") || path.equals("/byte/")){
+
+                msg = ("BYTEREAD");
+                startTime = new Date();
+                doBYTE(request,response);
+                endTime = new Date();
             }
 
-            doHitCount(request,response);
-            endTime = new Date();
+
+            else if(path.equals("/hitcount") || path.equals("/hitcount/")){
+
+                msg = ("HitCounter");
+                startTime = new Date();
+
+                synchronized(this){
+                    int unitreqno = unitHitCounter.incrementAndGet();
+                }
+
+                try {
+                    Thread.sleep(rand.nextInt(200));
+                } catch (InterruptedException e) {
+                    log.error("Hmmmm, my thread got interrupted.",e);
+                }
+
+                doHitCount(request,response);
+                endTime = new Date();
+            }
+
+
+
+
+            long elapsed = endTime.getTime() - startTime.getTime();
+
+            log.debug(msg + "_Elapsed_Time: "+elapsed+" ms");
+
         }
+        catch(Throwable t){
+            OPeNDAPException.anyExceptionHandler(t, response);
 
-
-
-
-        long elapsed = endTime.getTime() - startTime.getTime();
-
-        log.debug(msg + "_Elapsed_Time: "+elapsed+" ms");
-
-
+        }
 
 
 
@@ -277,6 +285,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
         response.setContentType("image/jpeg");
         //response.setContentType("text/ascii");
         response.setHeader("Content-Description", "My Big Picture");
+        response.setStatus(200);
 
         Socket sc = new Socket();
         sc.connect(new InetSocketAddress("localhost",10007));
@@ -319,8 +328,10 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
         //System.out.println("Closing connections, flushing buffers, etc...");
         os.flush();
+        sourceOS.close();
+        sourceIS.close();
         sc.close();
-        response.setStatus(200);
+
 
 
 
@@ -343,6 +354,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
         response.setContentType("image/jpeg");
         //response.setContentType("text/ascii");
         response.setHeader("Content-Description", "My Big Picture");
+        response.setStatus(200);
 
         Socket sc = new Socket();
         sc.connect(new InetSocketAddress("localhost",10007));
@@ -388,8 +400,9 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
         //System.out.println("Closing connections, flushing buffers, etc...");
         os.flush();
+        sourceOS.close();
+        sourceIS.close();
         sc.close();
-        response.setStatus(200);
 
 
 

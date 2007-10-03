@@ -5,9 +5,10 @@
         "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"
 
 
->
+        >
 
 <web-app>
+
 
 
     <display-name>Hyrax</display-name>
@@ -17,8 +18,6 @@
         <param-name>ContextPath</param-name>
         <param-value>opendap</param-value>
     </context-param>
-
-
 
 
     <servlet>
@@ -44,10 +43,6 @@
     </servlet>
 
 
-
-
-
-
     <servlet>
         <servlet-name>docs</servlet-name>
 
@@ -58,11 +53,10 @@
     </servlet>
 
     <servlet>
-      <servlet-name>View</servlet-name>
-      <servlet-class>thredds.servlet.ViewServlet</servlet-class>
-       <load-on-startup>1</load-on-startup>
+        <servlet-name>View</servlet-name>
+        <servlet-class>thredds.servlet.ViewServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
-
 
 
     <servlet-mapping>
@@ -81,7 +75,6 @@
     </servlet-mapping>
 
 
-
     <servlet-mapping>
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs</url-pattern>
@@ -92,8 +85,8 @@
     </servlet-mapping>
 
     <servlet-mapping>
-      <servlet-name>View</servlet-name>
-      <url-pattern>/view/*</url-pattern>
+        <servlet-name>View</servlet-name>
+        <url-pattern>/view/*</url-pattern>
     </servlet-mapping>
 
 

@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -142,72 +142,85 @@ public class DocServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
-        PerfLog.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
+        try {
 
-        if (!redirect(request, response)) {
+            PerfLog.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
 
-            String name = getName(request);
+            if (!redirect(request, response)) {
 
-            log.debug("DocServlet - The client requested this: " + name);
+                String name = getName(request);
 
-
-            File f = new File(name);
-
-            if (f.exists()) {
-                log.debug("   Requested item exists.");
+                log.debug("DocServlet - The client requested this: " + name);
 
 
-                String suffix = null;
-                if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
-                    suffix = name.substring(name.lastIndexOf('.') + 1);
-                }
+                File f = new File(name);
+
+                if (f.exists()) {
+                    log.debug("   Requested item exists.");
 
 
-                if (suffix != null) {
-                    String mType = mimeTypes.getMimeType(suffix);
-                    if (mType != null)
-                        response.setContentType(mType);
-                    log.debug("   MIME type: " + mType + "  ");
-                }
-
-
-                log.debug("   Sending.");
-
-
-                FileInputStream fis = new FileInputStream(f);
-
-                ServletOutputStream sos = response.getOutputStream();
-
-                byte buff[] = new byte[8192];
-                int rc;
-                boolean doneReading = false;
-                while (!doneReading) {
-                    rc = fis.read(buff);
-                    if (rc < 0) {
-                        doneReading = true;
-                    } else if (rc > 0) {
-                        sos.write(buff, 0, rc);
+                    String suffix = null;
+                    if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
+                        suffix = name.substring(name.lastIndexOf('.') + 1);
                     }
 
+
+                    if (suffix != null) {
+                        String mType = mimeTypes.getMimeType(suffix);
+                        if (mType != null)
+                            response.setContentType(mType);
+                        log.debug("   MIME type: " + mType + "  ");
+                    }
+
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+
+                    log.debug("   Sending.");
+
+
+                    FileInputStream fis = new FileInputStream(f);
+
+                    ServletOutputStream sos = response.getOutputStream();
+
+                    try {
+                        byte buff[] = new byte[8192];
+                        int rc;
+                        boolean doneReading = false;
+                        while (!doneReading) {
+                            rc = fis.read(buff);
+                            if (rc < 0) {
+                                doneReading = true;
+                            } else if (rc > 0) {
+                                sos.write(buff, 0, rc);
+                            }
+
+                        }
+                    }
+                    finally {
+                        fis.close();
+                    }
+
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
+
+                    sos.flush();
+
+                } else {
+                    log.debug("   Requested item does not exist. Returning '404 Not Found'");
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
+
                 }
 
-                response.setStatus(HttpServletResponse.SC_OK);
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
-
-                sos.flush();
-
-            } else {
-                log.debug("   Requested item does not exist. Returning '404 Not Found'");
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
-
             }
+            else
+                PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
+
 
         }
-        else
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
-
-
+        catch( Throwable t){
+            OPeNDAPException.anyExceptionHandler(t, response);
+        }
     }
+
 
 }

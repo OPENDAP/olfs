@@ -2,10 +2,10 @@
 
 <!--
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "Java-OPeNDAP" project, a Java implementation
+// This file is part of the "Hyrax" project, a Java implementation
 // of the OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -179,24 +179,20 @@
 
     <target
             name="doc"
-            depends="init,IsJavaDocUpToDate"
+            depends="init,clean,IsJavaDocUpToDate"
             description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
             unless="JavaDocIsUpToDate"
             >
 
         <javadoc destdir="${build.doc}/javadoc"
                  Author="true"
-                 Version="true"
-                 Use="true"
                  Verbose="true"
+                 Version="true"
                  failonerror="true"
                 >
-
             <classpath refid="olfs.compile.classpath"/>
 
-            <fileset dir="${src.dir}/opendap/">
-
-            </fileset>
+            <packageset dir="${src.dir}" defaultexcludes="yes" />
 
         </javadoc>
 

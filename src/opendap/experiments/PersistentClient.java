@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Random;
 
 /**
@@ -63,13 +64,8 @@ public class PersistentClient {
 
         Thread requestor = new Thread(req);
         Thread reciever  = new Thread(rec);
-
-
         requestor.start();
         reciever.start();
-
-
-
 
 
 
@@ -120,6 +116,8 @@ public class PersistentClient {
 
 
         public void run() {
+
+
 
             while(true){
 

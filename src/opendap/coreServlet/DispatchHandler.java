@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * The DispatchHandler interface is implmented by classes that are used to
- * handle dispatch activities for Hyrax. 
+ * The DispatchHandler interface is implemented by classes that are used to
+ * handle dispatch activities for Hyrax.
  *
  *
  *
@@ -48,12 +48,14 @@ public interface DispatchHandler {
 
 
     /**
-     * Since a constructor cannont be defined for an interface there needs to
-     * be a way to initalize the objects state. The inti() methd is that way.
+     * Since a constructor cannot be defined for an interface there needs to
+     * be a way to initialize the objects state. The init() method is that way.
      * The DispatchServlet that creates an instance of DispatchHandler will
-     * pass itself into it along with an configuration information found in
-     * the XML element that declared the DispatchHandler in the configuration
-     * file (usually olfs.xml)
+     * pass itself into it along with the XML element that declared the
+     * DispatchHandler in the configuration file (usually olfs.xml). The
+     * contents of this XML Element are not restricted and may (should?)
+     * contain any required information for configuration not available by
+     * interogating the DispatchServlet’s methods.
      *
      * @param servlet This should be the DispatchServlet that creates the
      * instance of DispatychHandler that is being intialized.

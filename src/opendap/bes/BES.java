@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -144,7 +144,11 @@ public class BES {
             }
         }
         // Return a copy so nobody can break our stuff!
-        return (Document) _serverVersionDocument.clone();
+        if(_serverVersionDocument !=null){
+        return (Document)  _serverVersionDocument.clone();
+        }
+
+        return null;
     }
 
 

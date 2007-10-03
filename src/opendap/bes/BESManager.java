@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -35,6 +35,7 @@ import opendap.coreServlet.DispatchServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 
 
 /**

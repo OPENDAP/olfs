@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -106,7 +106,10 @@ public class BESConfig  {
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
-        Document doc  = sb.build(new FileInputStream(confFile));
+        FileInputStream fis = new FileInputStream(confFile);
+        Document doc  = sb.build(fis);
+
+        fis.close();
 
 
         configure(doc);
@@ -348,17 +351,17 @@ public class BESConfig  {
             System.out.println("\n\nYou Configured The BES Like This:\n"+bc);
             System.out.print("\nIs this acceptable? [Enter Y or N]: ");
             k = kybrd.readLine();
-            if (!k.equals("")){
+            if (k!=null && !k.equals("")){
                 if(k.equalsIgnoreCase("YES") || k.equalsIgnoreCase("Y")){
                     System.out.print("Would you like to save this configuration to a file? [Enter Y or N]: ");
                     k = kybrd.readLine();
-                    if (!k.equals("")){
+                    if (k!=null && !k.equals("")){
                         if(k.equalsIgnoreCase("YES") || k.equalsIgnoreCase("Y")){
                             boolean d2=false;
                             while(!d2){
                                 System.out.print("Enter the file name to which to save the configuration: ");
                                 k = kybrd.readLine();
-                                if (!k.equals("")){
+                                if (k!=null && !k.equals("")){
                                     bc.writeConfiguration(k);
                                     d2 = true;
                                 }
@@ -389,7 +392,7 @@ public class BESConfig  {
             System.out.print("\nEnter the path prefix that the OLFS will use for the BES "+bc.getHost()+":"+bc.getPort()+"   ");
             System.out.print("[" + bc.getPrefix() + "]: ");
             k = kybrd.readLine();
-            if (!k.equals("")){
+            if (k!=null && !k.equals("")){
                 bc.setPrefix(k);
                 done = true;
             }
@@ -405,7 +408,7 @@ public class BESConfig  {
             System.out.print("\nEnter the name (or IP address) of the BES host. ");
             System.out.print("[" + bc.getHost() + "]: ");
             k = kybrd.readLine();
-            if (!k.equals("")){
+            if (k!=null && !k.equals("")){
                 bc.setHost(k);
                 done = true;
             }
@@ -420,7 +423,7 @@ public class BESConfig  {
             System.out.print("\nEnter the port number for the BES host "+bc.getHost()+"   ");
             System.out.print("[" + bc.getPort() + "]: ");
             k = kybrd.readLine();
-            if (!k.equals("")){
+            if (k!=null && !k.equals("")){
                 bc.setPort(k);
                 done = true;
             }
@@ -439,7 +442,7 @@ public class BESConfig  {
             System.out.print("\nEnter the maximum size of the BES client connection pool. ");
             System.out.print("[" + bc.getMaxClients() + "]: ");
             k = kybrd.readLine();
-            if (!k.equals("")){
+            if (k!=null && !k.equals("")){
                 bc.setMaxClients(k);
             }
 

@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -25,8 +25,11 @@
 package opendap.coreServlet;
 
 
+import org.jdom.Element;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 
 /**
  * Implmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to
@@ -39,8 +42,6 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception;
-
-    public long getLastModified(HttpServletRequest req);
 
 
 

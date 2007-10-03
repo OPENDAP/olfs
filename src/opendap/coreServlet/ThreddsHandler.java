@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 package opendap.coreServlet;
 
 import thredds.servlet.DataRootHandler;
-import opendap.bes.WcsCatalog;
 
 /**
  * User: ndp
@@ -36,7 +35,7 @@ public interface ThreddsHandler extends DispatchHandler {
 
 
     public DataRootHandler getDataRootHandler();
-    
+
 
 
 }

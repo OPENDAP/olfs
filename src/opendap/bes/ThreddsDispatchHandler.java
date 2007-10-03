@@ -32,6 +32,7 @@ import thredds.catalog.InvCatalog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.Date;
 import java.util.Vector;
@@ -41,6 +42,7 @@ import java.net.URI;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ThreddsHandler;
+import opendap.coreServlet.Scrub;
 import org.jdom.Element;
 
 /**
@@ -89,7 +91,15 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
         return wcs;
     }
 
-
+    public void init(HttpServlet s,Element config) throws Exception{
+        if(s instanceof DispatchServlet){
+            init(s,config);
+        }
+        else {
+            throw new Exception(getClass().getName()+" must be used in " +
+                    "conjunction with a "+DispatchServlet.class.getName());
+        }
+    }
 
 
     public void init(DispatchServlet s,Element config) throws Exception{
@@ -187,7 +197,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
 
         } else {
             String catalogPath = path.endsWith(".html")?path.substring(0,path.lastIndexOf(".html"))+".xml":path;
-            URI baseURI = new URI(ReqInfo.getBaseURI(request));
+            URI baseURI = new URI(Scrub.completeURL(ReqInfo.getBaseURI(request)));
             InvCatalog ic = dataRootHandler.getCatalog(catalogPath,baseURI);
 
             log.debug("catalogPath:  " + catalogPath);

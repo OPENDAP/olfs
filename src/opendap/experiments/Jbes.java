@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -55,15 +55,18 @@ public class Jbes {
         int count;
 
         FileInputStream fis = new FileInputStream(args[0]);
-
         FileChannel fc = fis.getChannel();
-
-
         byte[] data = new byte[(int)fc.size()];
         ByteBuffer imageData = ByteBuffer.wrap(data);
-        count = fc.read(imageData);
-        imageData.flip();
-        fc.close();
+
+        try {
+            count = fc.read(imageData);
+            imageData.flip();
+        }
+        finally {
+            fc.close();
+            fis.close();
+        }
 
         double sizeinMB = count/(1024.0*1024.0);
         System.out.println("Read image data. ("+sizeinMB+" MB)");
@@ -385,6 +388,7 @@ public class Jbes {
         chunkSize = (StringUtil.toHexString(0,4)).getBytes();
         os.write(chunkSize);
         os.write(crlf);
+        os.close();
 
 
 

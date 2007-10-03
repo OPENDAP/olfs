@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -207,11 +207,26 @@ public class MimeTypes {
      * @return The MIME type associated with the passed file extension. Null if no mapping can be found.
      */
     public String getMimeType(String fileExtension){
-        return typeMap.get(fileExtension);
+        return typeMap.get(fileExtension.toLowerCase());
     }
 
 
+    public String getMimeTypeFromFileName(String fileName){
 
+        int index = fileName.lastIndexOf(".");
+        String mimeType = null;
+
+        if(index!=-1){
+            String extension = fileName.substring(index+1,fileName.length());
+            mimeType =  getMimeType(extension);
+
+        }
+        //System.out.println("MIME Type: "+mimeType);
+
+        return mimeType==null?"unknown":mimeType;
+
+
+    }
 
 
 

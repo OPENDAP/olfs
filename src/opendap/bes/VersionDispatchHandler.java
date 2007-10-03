@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -34,6 +34,7 @@ import org.jdom.output.Format;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletException;
 import java.io.PrintStream;
 
@@ -46,13 +47,12 @@ public class VersionDispatchHandler implements DispatchHandler {
 
 
     private org.slf4j.Logger log;
-    private DispatchServlet servlet;
     private boolean initialized;
 
     public VersionDispatchHandler() {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        servlet = null;
+
         initialized = false;
 
     }
@@ -62,7 +62,6 @@ public class VersionDispatchHandler implements DispatchHandler {
         if (initialized) return;
 
 
-        servlet = s;
 
         initialized = true;
 
@@ -122,7 +121,7 @@ public class VersionDispatchHandler implements DispatchHandler {
         }
         return versionRequest;
     }
-    
+
 
     /**
      * ************************************************************************

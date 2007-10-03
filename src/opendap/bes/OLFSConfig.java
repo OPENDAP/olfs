@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -64,7 +64,6 @@ public class OLFSConfig {
 
         File confFile = new File(filename);
 
-
         if(!confFile.exists()){
             throw new Exception("OLFS configuration file \""+filename+"\" does not exist.");
         }
@@ -72,11 +71,12 @@ public class OLFSConfig {
         if(!confFile.canRead())
             throw new Exception("OLFS configuration file \""+filename+"\" is not readable.");
 
+        FileInputStream fis = new FileInputStream(confFile);
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
-        Document doc  = sb.build(new FileInputStream(confFile));
-
+        Document doc  = sb.build(fis);
+        fis.close();
 
         configure(doc);
 
@@ -281,17 +281,17 @@ public class OLFSConfig {
             System.out.println("\n\nYou Configured The OLFS Like This:\n"+oc);
             System.out.print("\nIs this acceptable? [Enter Y or N]: ");
             k = kybrd.readLine();
-            if (!k.equals("")){
+            if (k!=null && !k.equals("")){
                 if(k.equalsIgnoreCase("YES") || k.equalsIgnoreCase("Y")){
                     System.out.print("Would you like to save this configuration to a file? [Enter Y or N]: ");
                     k = kybrd.readLine();
-                    if (!k.equals("")){
+                    if (k!=null && !k.equals("")){
                         if(k.equalsIgnoreCase("YES") || k.equalsIgnoreCase("Y")){
                             boolean d2=false;
                             while(!d2){
                                 System.out.print("Enter the file name to which to save the configuration: ");
                                 k = kybrd.readLine();
-                                if (!k.equals("")){
+                                if (k!=null && !k.equals("")){
                                     oc.writeConfiguration(k);
                                     d2 = true;
                                 }
@@ -350,7 +350,7 @@ public class OLFSConfig {
             System.out.print("\nDo you want to use the THREDDS catalog as the default directory view?");
             System.out.print("[" + olfsConfig.getTHREDDSDirectoryView() + "]: ");
             k = kybrd.readLine();
-            if (k.equalsIgnoreCase("y") || k.equalsIgnoreCase("yes")){
+            if (k!=null && (k.equalsIgnoreCase("y") || k.equalsIgnoreCase("yes"))){
                 olfsConfig.setTHREDDSDirectoryView(true);
                 done = true;
             }

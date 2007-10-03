@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -167,10 +167,16 @@ public class DispatchServlet extends HttpServlet {
         try {
 
             File confFile = new File(filename);
+            FileInputStream fis = new FileInputStream(confFile);
 
-            // Parse the XML doc into a Document object.
-            SAXBuilder sb = new SAXBuilder();
-            configDoc = sb.build(new FileInputStream(confFile));
+            try {
+                // Parse the XML doc into a Document object.
+                SAXBuilder sb = new SAXBuilder();
+                configDoc = sb.build(fis);
+            }
+            finally {
+            	fis.close();
+            }
 
         } catch (FileNotFoundException e) {
             String msg = "OLFS configuration file \"" + filename + "\" cannot be found.";
@@ -407,8 +413,7 @@ public class DispatchServlet extends HttpServlet {
      * @see ReqInfo
      */
     public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-            throws IOException, ServletException {
+                      HttpServletResponse response) {
 
 
         try {
@@ -457,8 +462,7 @@ public class DispatchServlet extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest request,
-                       HttpServletResponse response)
-            throws IOException, ServletException {
+                       HttpServletResponse response) {
 
         try {
 

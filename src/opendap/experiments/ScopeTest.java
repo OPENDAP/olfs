@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -23,6 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 package opendap.experiments;
+
+import opendap.coreServlet.OPeNDAPException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -53,19 +55,25 @@ public class ScopeTest extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 
-        resp.setContentType("text/html");
+        try {
 
-        PrintWriter pw = resp.getWriter();
+            resp.setContentType("text/html");
+
+            PrintWriter pw = resp.getWriter();
 
 
 
 
-        pw.println("<html>");
-        pw.println("<body>");
-        pw.println("<h1>Scope Variable: "+ScopeVar.getVar()+"</h1>");
-        pw.println("</body>");
-        pw.println("</html>");
+            pw.println("<html>");
+            pw.println("<body>");
+            pw.println("<h1>Scope Variable: "+ScopeVar.getVar()+"</h1>");
+            pw.println("</body>");
+            pw.println("</html>");
+        }
+        catch(Throwable t){
+            OPeNDAPException.anyExceptionHandler(t, resp);
 
+        }
 
     }
 

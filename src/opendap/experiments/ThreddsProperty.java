@@ -2,7 +2,7 @@
 // This file is part of the "Server4" project, a Java implementation of the
 // OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -109,17 +109,17 @@ public class ThreddsProperty {
             System.out.println("\n\nYou Configured The ThreddsProperty Like This:\n" + tp);
             System.out.print("\nIs this acceptable? [Enter Y or N]: ");
             k = kybrd.readLine();
-            if (!k.equals("")) {
+            if (k!=null && !k.equals("")) {
                 if (k.equalsIgnoreCase("YES") || k.equalsIgnoreCase("Y")) {
                     System.out.print("Would you like to save this ThreddProperty to a file? [Enter Y or N]: ");
                     k = kybrd.readLine();
-                    if (!k.equals("")) {
+                    if (k!=null && !k.equals("")) {
                         if (k.equalsIgnoreCase("YES") || k.equalsIgnoreCase("Y")) {
                             boolean d2 = false;
                             while (!d2) {
                                 System.out.print("Enter the file name to which to save the configuration: ");
                                 k = kybrd.readLine();
-                                if (!k.equals("")) {
+                                if (k!=null && !k.equals("")) {
                                     tp.writeConfiguration(k);
                                     d2 = true;
                                 } else
@@ -147,7 +147,7 @@ public class ThreddsProperty {
         while (!done) {
             System.out.print("What is the name of this property(" + tp.name + "): ");
             k = kybrd.readLine();
-            if (k.equals("")) {
+            if (k!=null && k.equals("")) {
                 System.out.println("The name may not be an empty string! Try again...");
             } else {
                 tp.name = k;
@@ -161,7 +161,7 @@ public class ThreddsProperty {
         while (!done) {
             System.out.print("What is the value of this property(" + tp.value + "): ");
             k = kybrd.readLine();
-            if (k.equals("")) {
+            if (k!=null && k.equals("")) {
                 System.out.println("The value may not be an empty string! Try again...");
             } else {
                 tp.value = k;

@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -124,55 +124,61 @@ public class SOAPRequestDispatcher implements DispatchHandler {
     /**
      * Handles SOAP requests that arrive via HTTP POST. No other POST functions supported.
      *
-     * @param request
-     * @param response
+     * @param request .
+     * @param response .
      */
     public void doPost(HttpServletRequest request,
-                       HttpServletResponse response) throws Exception{
+                       HttpServletResponse response) {
 
-        log.debug("\n\n\nSOAPHandler.doPost(): Start of POST Handler.");
+        try {
 
-
-
-        Document doc = getSOAPDoc(request);
-
-        if (qcSOAPDocument(doc)) {
+            log.debug("\n\n\nSOAPHandler.doPost(): Start of POST Handler.");
 
 
-            log.debug("Building Multipart Response...");
 
-            MultipartResponse mpr = new MultipartResponse(request, response, sdh);
+            Document doc = getSOAPDoc(request);
 
-            Element soapEnvelope = doc.getRootElement();
+            if (qcSOAPDocument(doc)) {
 
-            mpr.setSoapEnvelope(soapEnvelope);
 
-            List soapContents = soapEnvelope.getChild("Body", XMLNamespaces.getDefaultSoapEnvNamespace()).getChildren();
+                log.debug("Building Multipart Response...");
 
-            log.debug("Got " + soapContents.size() + " SOAP Body Elements.");
+                MultipartResponse mpr = new MultipartResponse(request, response, sdh);
 
-            for (Object soapContent : soapContents) {
+                Element soapEnvelope = doc.getRootElement();
 
-                Element clientReq = (Element) soapContent;
-                requestDispatcher(request, clientReq, mpr, sdh);
+                mpr.setSoapEnvelope(soapEnvelope);
+
+                List soapContents = soapEnvelope.getChild("Body", XMLNamespaces.getDefaultSoapEnvNamespace()).getChildren();
+
+                log.debug("Got " + soapContents.size() + " SOAP Body Elements.");
+
+                for (Object soapContent : soapContents) {
+
+                    Element clientReq = (Element) soapContent;
+                    requestDispatcher(request, clientReq, mpr, sdh);
+                }
+
+                mpr.send();
+
+
+                log.debug("done.");
+
+            } else {
+                log.debug("Reflecting Document to client...");
+
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                xmlo.output(doc, response.getOutputStream());
+
+                log.debug("done.");
             }
 
-            mpr.send();
 
-
-            log.debug("done.");
-
-        } else {
-            log.debug("Reflecting Document to client...");
-
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            xmlo.output(doc, response.getOutputStream());
-
-            log.debug("done.");
+            log.debug("SOAPRequestDispatcher.doPost(): End of POST Handler.\n\n\n");
         }
-
-
-        log.debug("SOAPRequestDispatcher.doPost(): End of POST Handler.\n\n\n");
+        catch(Throwable t){
+            OPeNDAPException.anyExceptionHandler(t, response);
+        }
     }
 
 
@@ -296,7 +302,7 @@ public class SOAPRequestDispatcher implements DispatchHandler {
                 sb = (Element) it.next();
                 i++;
             }
-            if (i == 1 || i == 2) {
+            if (sb!=null && (i == 1 || i == 2)) {
                 if (sb.getName().equals("Body") && sb.getNamespace().equals(soapEnvNameSpace)) {
 
                     List reqs = sb.getChildren();

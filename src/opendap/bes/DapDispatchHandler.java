@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
@@ -45,14 +46,12 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     private Logger log;
     private boolean initialized;
 
-    private DispatchServlet dispatchServlet;
 
 
     public DapDispatchHandler() {
 
         super();
 
-        dispatchServlet = null;
         mimeTypes = new MimeTypes();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
@@ -71,7 +70,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         if(initialized) return;
 
-        dispatchServlet = ds;
 
         log.info("Initialized.");
         initialized = true;
@@ -198,9 +196,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-        if (isWCS || dsi.sourceExists() ) {
+        if (isWCS || (dsi!=null && dsi.sourceExists()) ) {
 
-            if (requestSuffix != null && (isWCS || dsi.isDataset())) {
+            if (requestSuffix != null && (isWCS || (dsi!=null && dsi.isDataset()))) {
 
                 if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")

@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -49,14 +49,12 @@ import org.slf4j.Logger;
 public class BesAPI {
 
 
-    public static String XML_ERRORS  = "xml";
+    public static String XML_ERRORS = "xml";
     public static String DAP2_ERRORS = "dap2";
-
 
 
     private static Logger log;
     private static boolean _initialized = false;
-
 
 
     /**
@@ -67,13 +65,12 @@ public class BesAPI {
 
     /**
      * Initializes logging for the BesAPI class.
-     *
      */
     public static void init() {
 
-        if(_initialized) return;
+        if (_initialized) return;
 
-            log = org.slf4j.LoggerFactory.getLogger(BesAPI.class);
+        log = org.slf4j.LoggerFactory.getLogger(BesAPI.class);
 
         _initialized = true;
 
@@ -86,17 +83,19 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraint expression to be applied to
-     * the request..
+     *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param errorMsgFormat       The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeDDX(String dataSource,
                                 String constraintExpression,
                                 OutputStream os,
                                 String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException, BESException, IOException, PPTException {
 
         besGetTransaction(
                 getAPINameForDDX(),
@@ -128,7 +127,7 @@ public class BesAPI {
 
 
         log.debug("getDDXDocument got this array:\n" +
-                    os.toString());
+                os.toString());
 
         Document ddx = sb.build(new ByteArrayInputStream(os.toByteArray()));
 
@@ -145,17 +144,19 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraint expression to be applied to
-     * the request..
+     *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param errorMsgFormat       The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeDDS(String dataSource,
                                 String constraintExpression,
                                 OutputStream os,
                                 String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
         besGetTransaction(
                 getAPINameForDDS(),
@@ -170,42 +171,45 @@ public class BesAPI {
      * Writes the source data (it is often a file, thus the method name) to
      * the passed stream.
      *
-     * @param dataSource The requested DataSource
-     * @param os         The Stream to which to write the response.
+     * @param dataSource     The requested DataSource
+     * @param os             The Stream to which to write the response.
      * @param errorMsgFormat The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeFile(String dataSource,
                                  OutputStream os,
                                  String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
         boolean trouble = false;
 
         BES bes = BESManager.getBES(dataSource);
 
-        if(bes==null)
-            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataSource);
+        if (bes == null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: " + dataSource);
 
         OPeNDAPClient oc = bes.getClient();
 
         try {
 
             String besDataSource = bes.trimPrefix(dataSource);
-            configureTransaction(oc, besDataSource, null, "stream",errorMsgFormat);
+
+            configureTransaction(oc, besDataSource, null, getAPINameForStream(), errorMsgFormat);
 
             getDataProduct(oc, getAPINameForStream(), os);
             resetBES(oc);
         }
-        catch (PPTException e){
+        catch (PPTException e) {
             trouble = true;
             String msg = "writeFile()  Problem with OPeNDAPClient.";
             log.error(msg);
             throw new PPTException(msg);
         }
-        finally{
-            bes.returnClient(oc,trouble);
+        finally {
+            bes.returnClient(oc, trouble);
         }
     }
 
@@ -215,17 +219,19 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraint expression to be applied to
-     * the request..
+     *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param errorMsgFormat       The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeDAS(String dataSource,
                                 String constraintExpression,
                                 OutputStream os,
                                 String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
         besGetTransaction(
                 getAPINameForDAS(),
@@ -241,17 +247,19 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraint expression to be applied to
-     * the request..
+     *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param errorMsgFormat       The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeDap2Data(String dataSource,
                                      String constraintExpression,
                                      OutputStream os,
                                      String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
         besGetTransaction(
                 getAPINameForDODS(),
@@ -268,17 +276,19 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression The constraint expression to be applied to
-     * the request..
+     *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param errorMsgFormat       The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeASCII(String dataSource,
                                   String constraintExpression,
                                   OutputStream os,
                                   String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
         besGetTransaction(
                 getAPINameForASCII(),
@@ -297,19 +307,21 @@ public class BesAPI {
      * @param url        The URL to refernence in the HTML form.
      * @param os         The Stream to which to write the response.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeHTMLForm(String dataSource,
                                      String url,
                                      OutputStream os)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
 
         boolean trouble = false;
         BES bes = BESManager.getBES(dataSource);
 
-        if(bes==null)
-            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataSource);
+        if (bes == null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: " + dataSource);
 
 
         OPeNDAPClient oc = bes.getClient();
@@ -329,14 +341,14 @@ public class BesAPI {
             resetBES(oc);
 
         }
-        catch (PPTException e){
+        catch (PPTException e) {
             trouble = true;
             String msg = "writeHTMLForm() Problem with OPeNDAPClient.";
             log.error(msg);
             throw new PPTException(msg);
         }
-        finally{
-            bes.returnClient(oc,trouble);
+        finally {
+            bes.returnClient(oc, trouble);
         }
     }
 
@@ -345,16 +357,18 @@ public class BesAPI {
      * Writes the OPeNDAP INFO response for the dataSource to the passed
      * stream.
      *
-     * @param dataSource The requested DataSource
-     * @param os         The Stream to which to write the response.
+     * @param dataSource     The requested DataSource
+     * @param os             The Stream to which to write the response.
      * @param errorMsgFormat The message format scheme for BES generated errors.
      * @throws BadConfigurationException .
-     * @throws PPTException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static void writeINFOPage(String dataSource,
                                      OutputStream os,
                                      String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException,  BESException, IOException, PPTException {
 
         besGetTransaction(
                 getAPINameForINFOPage(),
@@ -372,16 +386,17 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression .
-     * @param errorMsgFormat .
+     * @param errorMsgFormat       .
      * @return A DAP2 data stream, no DDS just the XDR encoded binary data.
      * @throws BadConfigurationException .
-     * @throws PPTException .
-     * @throws IOException .
+     * @throws BESException              .
+     * @throws IOException               .
+     * @throws PPTException              .
      */
     public static InputStream getDap2DataStream(String dataSource,
                                                 String constraintExpression,
                                                 String errorMsgFormat)
-            throws BadConfigurationException, PPTException, IOException {
+            throws BadConfigurationException,  BESException, PPTException, IOException {
 
         //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
 
@@ -407,8 +422,43 @@ public class BesAPI {
     }
 
 
+    private static void besExceptionHandler(ByteArrayOutputStream baos, String errorContext) throws BESException {
 
+        if(baos.size()>0){
 
+            if (errorContext.equals(XML_ERRORS)) {
+                try {
+                    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+                    SAXBuilder sb = new SAXBuilder();
+                    Document doc = sb.build(bais);
+                    besExceptionHandler(doc);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JDOMException e) {
+                    e.printStackTrace();
+                }
+
+            } else if (errorContext.equals(DAP2_ERRORS)) {
+
+                String msg = baos.toString();
+                log.error("Got Dap ERROR: "+msg);
+                String messageTag = "message = \"";
+                String closeTag = "\";";
+
+                if(msg.startsWith("Error {")){
+                    int start = msg.indexOf(messageTag)+messageTag.length();
+                    int end = msg.lastIndexOf(closeTag);
+                    String newMsg = msg.substring(start,end);
+                    throw new BESException(newMsg);
+                }
+
+            } else {
+                throw new BESException("Invalid Error Context!");
+
+            }
+        }
+
+    }
 
 
     /**
@@ -465,7 +515,7 @@ public class BesAPI {
                                              String constraintExpression,
                                              String errorMsgFormat)
 
-            throws PPTException {
+            throws BESException, PPTException, IOException {
         configureTransaction(oc, dataset, constraintExpression, null, errorMsgFormat);
     }
 
@@ -475,19 +525,26 @@ public class BesAPI {
                                              String constraintExpression,
                                              String type,
                                              String errorMsgFormat)
-            throws PPTException {
+            throws BESException, PPTException, IOException {
 
 
-        log.debug("Setting error context to: \""+errorMsgFormat+"\"");
-        oc.executeCommand("set context errors to "+errorMsgFormat+";\n");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+
+        oc.setOutput(baos, false);
+
+        log.debug("Setting error context to: \"" + errorMsgFormat + "\"");
+        oc.executeCommand("set context errors to " + errorMsgFormat + ";\n");
+        besExceptionHandler(baos,errorMsgFormat);
+        baos.flush();
 
 
         String catalogName = "catalog";
         String container = "hyraxContainer";
 
-        if(WcsCatalog.isWcsDataset(dataset)){
+        if (WcsCatalog.isWcsDataset(dataset)) {
             catalogName = "wcs";
-            dataset = "\""+WcsCatalog.getWcsRequestURL(dataset)+"\"";
+            dataset = "\"" + WcsCatalog.getWcsRequestURL(dataset) + "\"";
         }
 
 
@@ -502,15 +559,27 @@ public class BesAPI {
 
 
         oc.executeCommand(cmd);
+        besExceptionHandler(baos,errorMsgFormat);
+        baos.flush();
 
 
+        if(constraintExpression != null ){
+            
+            // Encode all the double quotes as their hex representation of %22
+            constraintExpression = constraintExpression.replace("\"","%22");
+
+            // Use the backslash character (hex encoded as %5c) to escape
+            // all of the encoded double quotes
+            constraintExpression = constraintExpression.replace("%22","%5C%22");
+
+        }
         log.debug("ConstraintExpression: " + constraintExpression);
 
 
         if (constraintExpression == null ||
-                constraintExpression.equalsIgnoreCase("")) {
+            constraintExpression.equalsIgnoreCase("")) {
 
-            cmd = "define d1 as "+ container +";\n";
+            cmd = "define d1 as " + container + ";\n";
 
         } else {
             cmd = "define d1 as "
@@ -524,8 +593,12 @@ public class BesAPI {
 
         log.debug("Sending BES command: " + cmd);
         oc.executeCommand(cmd);
+        besExceptionHandler(baos,errorMsgFormat);
+        baos.flush();
+
 
     }
+
 
     private static String getGetCmd(String product) {
 
@@ -581,28 +654,22 @@ public class BesAPI {
     }
 
 
-
-
-
     private static void besGetTransaction(String product,
                                           String dataset,
                                           String constraintExpression,
                                           OutputStream os,
                                           String errorMsgFormat)
-            throws BadConfigurationException, PPTException {
+            throws BadConfigurationException, BESException, IOException, PPTException {
 
         boolean trouble = false;
-
-
 
 
         log.debug("besGetTransaction started.");
 
         BES bes = BESManager.getBES(dataset);
 
-        if(bes==null)
-            throw new BadConfigurationException("There is no BES to handle the requested data source: "+dataset);
-
+        if (bes == null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: " + dataset);
 
 
         OPeNDAPClient oc = bes.getClient();
@@ -610,50 +677,33 @@ public class BesAPI {
 
         try {
 
-            String besDataset  = bes.trimPrefix(dataset);
+            String besDataset = bes.trimPrefix(dataset);
 
             configureTransaction(oc,
-                                 besDataset,
-                                 constraintExpression,
-                                 errorMsgFormat);
+                    besDataset,
+                    constraintExpression,
+                    errorMsgFormat);
 
             getDataProduct(oc, product, os);
             resetBES(oc);
 
         }
-        catch (PPTException e){
+        catch (PPTException e) {
             trouble = true;
 
             String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
-                        "OPeNDAPClient executed "+oc.getCommandCount()+ " commands";
+                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
             log.error(msg);
 
             throw new PPTException(msg);
         }
-        finally{
-            bes.returnClient(oc,trouble);
+        finally {
+            bes.returnClient(oc, trouble);
 
         }
         log.debug("besGetTransaction complete.");
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private static void besShowTransaction(String product, String dataset, OutputStream os)
@@ -664,13 +714,12 @@ public class BesAPI {
         boolean trouble = false;
 
 
-
         String besDataset;
 
         BES bes = BESManager.getBES(dataset);
 
-        if(bes==null){
-            String msg = "There is no BES to handle the requested data source: "+dataset;
+        if (bes == null) {
+            String msg = "There is no BES to handle the requested data source: " + dataset;
             log.error(msg);
             throw new BadConfigurationException(msg);
         }
@@ -682,39 +731,36 @@ public class BesAPI {
 
             String cmd = "show " + product;
 
-            if(product.equals("version")){
+            if (product.equals("version")) {
 
                 cmd += ";\n";
+            } else {
+
+                besDataset = bes.trimPrefix(dataset);
+
+
+                cmd += " for \"" + besDataset + "\";\n";
             }
-            else {
-
-                besDataset  = bes.trimPrefix(dataset);
-
-
-                cmd += " for \""+besDataset+"\";\n";
-            }
-
-
 
 
             log.debug("Sending command: " + cmd);
             oc.setOutput(os, false);
-            log.debug("Setting error context to: \""+XML_ERRORS+"\"");
-            oc.executeCommand("set context errors to "+XML_ERRORS+";\n");
+            log.debug("Setting error context to: \"" + XML_ERRORS + "\"");
+            oc.executeCommand("set context errors to " + XML_ERRORS + ";\n");
             oc.executeCommand(cmd);
             resetBES(oc);
 
         }
-        catch (PPTException e){
+        catch (PPTException e) {
             trouble = true;
             String msg = "besShowTransaction() Problem with OPeNDAPClient. " +
-                    "OPeNDAPClient executed "+oc.getCommandCount()+" commands";
+                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
 
             log.error(msg);
             throw new PPTException(msg);
         }
-        finally{
-            bes.returnClient(oc,trouble);
+        finally {
+            bes.returnClient(oc, trouble);
         }
 
         log.debug("besShowTransaction complete.");
@@ -725,13 +771,12 @@ public class BesAPI {
      * Returns an the version document for the BES.
      *
      * @param path The path prefix for the BES whose version is being sought.
-     *
      * @return The version Document
      * @throws BadConfigurationException .
-     * @throws PPTException .
-     * @throws IOException .
-     * @throws JDOMException .
-     * @throws BESException .
+     * @throws PPTException              .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     * @throws BESException              .
      */
     public static Document showVersion(String path) throws
             BadConfigurationException,
@@ -745,9 +790,8 @@ public class BesAPI {
 
         besShowTransaction("version", path, baos);
 
-        log.debug("BES returned this document:\n"+
-                "-----------\n" + baos +"-----------");
-
+        log.debug("BES returned this document:\n" +
+                "-----------\n" + baos + "-----------");
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -777,11 +821,11 @@ public class BesAPI {
      *
      * @param dataSource .
      * @return The BES catalog Document.
-     * @throws PPTException .
+     * @throws PPTException              .
      * @throws BadConfigurationException .
-     * @throws IOException .
-     * @throws JDOMException .
-     * @throws BESException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     * @throws BESException              .
      */
     public static Document showCatalog(String dataSource) throws
             PPTException,
@@ -797,7 +841,7 @@ public class BesAPI {
         BesAPI.besShowTransaction(product, dataSource, baos);
 
         log.debug("BES returned this document:\n" +
-                "-----------\n" + baos +"-----------");
+                "-----------\n" + baos + "-----------");
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -822,18 +866,16 @@ public class BesAPI {
     }
 
 
-
-
     /**
      * Returns the BES INFO document for the spcified dataSource.
      *
      * @param dataSource .
      * @return The BES info document, stripped of it's <response> parent.
-     * @throws PPTException .
+     * @throws PPTException              .
      * @throws BadConfigurationException .
-     * @throws IOException .
-     * @throws JDOMException .
-     * @throws BESException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     * @throws BESException              .
      */
     public static Document getInfoDocument(String dataSource) throws
             PPTException,
@@ -851,8 +893,7 @@ public class BesAPI {
 
 
         log.debug("BES returned this document:\n" +
-                    "-----------\n" + baos +"-----------");
-
+                "-----------\n" + baos + "-----------");
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -877,7 +918,8 @@ public class BesAPI {
 
     }
 
-    public static void resetBES (OPeNDAPClient odc) throws PPTException {
+    public static void resetBES(OPeNDAPClient odc) throws PPTException {
+
 
         odc.setOutput(new DevNull(), false);
 
@@ -893,15 +935,16 @@ public class BesAPI {
     }
 
 
-    public static boolean isConfigured(){
+    public static boolean isConfigured() {
         return BESManager.isConfigured();
     }
 
 
-    public static Document getVersionDocument(String path) throws Exception{
+    public static Document getVersionDocument(String path) throws Exception {
         return BESManager.getVersionDocument(path);
     }
-    public static Document getCombinedVersionDocument() throws Exception{
+
+    public static Document getCombinedVersionDocument() throws Exception {
         return BESManager.getCombinedVersionDocument();
     }
 

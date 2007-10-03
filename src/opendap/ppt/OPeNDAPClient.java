@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrex)" project.
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2006 OPeNDAP, Inc.
+// Copyright (c) 2007 OPeNDAP, Inc.
 // Author:  Patrick West <pwest@hao.ucar.edu>
 //
 // This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-package opendap.ppt ;
+package opendap.ppt;
 
 import org.slf4j.Logger;
 
@@ -58,11 +58,11 @@ import java.io.*;
 
 public class OPeNDAPClient {
     private int commandCount;
-    private PPTClient     _client = null;
-    private OutputStream  _stream = null;
-    private boolean       _isRunning;
-    private Logger        log = null;
-    private int           _id;
+    private PPTClient _client = null;
+    private OutputStream _stream = null;
+    private boolean _isRunning;
+    private Logger log = null;
+    private int _id;
 
     /**
      * Creates a OpenDAPClient to handle OpenDAP requests.
@@ -79,19 +79,20 @@ public class OPeNDAPClient {
     }
 
 
-
-    public int getID(){
+    public int getID() {
         return _id;
     }
 
-    public void setID(int ID){
+    public void setID(int ID) {
         _id = ID;
     }
 
-    public int getCommandCount(){return commandCount;}
+    public int getCommandCount() {
+        return commandCount;
+    }
 
 
-    public boolean isRunning()  {
+    public boolean isRunning() {
         return _isRunning;
     }
 
@@ -132,7 +133,7 @@ public class OPeNDAPClient {
                 _stream.close();
             }
             catch (IOException e) {
-                throw(new PPTException(e.getMessage()));
+                throw (new PPTException(e.getMessage()));
             }
             finally {
                 _isRunning = false;
@@ -157,7 +158,7 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void setOutput(OutputStream strm, boolean nice) throws PPTException {
-        if(nice){
+        if (nice) {
             if (strm != null) {
                 try {
                     if (_stream != null) {
@@ -166,7 +167,7 @@ public class OPeNDAPClient {
                     _stream = strm;
                 }
                 catch (IOException e) {
-                    throw(new PPTException(e.getMessage()));
+                    throw (new PPTException(e.getMessage()));
                 }
             } else {
                 try {
@@ -176,20 +177,17 @@ public class OPeNDAPClient {
                     _stream = null;
                 }
                 catch (IOException e) {
-                    throw(new PPTException(e.getMessage()));
+                    throw (new PPTException(e.getMessage()));
                 }
             }
-        }
-        else {
-            _stream  = strm;
+        } else {
+            _stream = strm;
 
         }
     }
 
 
-
-
-    public void killClient(){
+    public void killClient() {
         _client.dieNow();
 
     }
@@ -220,10 +218,10 @@ public class OPeNDAPClient {
                 _stream = new FileOutputStream(outputFile);
             }
             catch (FileNotFoundException e) {
-                throw(new PPTException(e.getMessage()));
+                throw (new PPTException(e.getMessage()));
             }
             catch (IOException e) {
-                throw(new PPTException(e.getMessage()));
+                throw (new PPTException(e.getMessage()));
             }
         } else {
             try {
@@ -233,14 +231,10 @@ public class OPeNDAPClient {
                 _stream = null;
             }
             catch (IOException e) {
-                throw(new PPTException(e.getMessage()));
+                throw (new PPTException(e.getMessage()));
             }
         }
     }
-
-
-
-
 
 
     /**
@@ -277,7 +271,7 @@ public class OPeNDAPClient {
      * @throws PPTException Thrown if there is a problem sending any of the
      *                      request to the server or a problem receiving any
      *                      of the response
-     * s from the server.
+     *                      s from the server.
      * @see String
      * @see PPTException
      */
@@ -314,7 +308,7 @@ public class OPeNDAPClient {
             reader = new BufferedReader(new FileReader(inputFile));
         }
         catch (FileNotFoundException e) {
-            throw(new PPTException(e.getMessage()));
+            throw (new PPTException(e.getMessage()));
         }
 
         try {
@@ -328,34 +322,42 @@ public class OPeNDAPClient {
                     }
                     done = true;
                 } else {
-		    if( !nextLine.equals("") ) {
-			int i = nextLine.lastIndexOf(';');
-			if (i == -1) {
-			    if (cmd == null) {
-				cmd = nextLine;
-			    } else {
-				cmd += " " + nextLine;
-			    }
-			} else {
-			    String sub = nextLine.substring(0, i);
-			    if (cmd == null) {
-				cmd = sub;
-			    } else {
-				cmd += " " + sub;
-			    }
-			    this.executeCommands(cmd);
-			    if (i == nextLine.length() || i == nextLine.length() - 1) {
-				cmd = null;
-			    } else {
-				cmd = nextLine.substring(i + 1, nextLine.length());
-			    }
-			}
-		    }
+                    if (!nextLine.equals("")) {
+                        int i = nextLine.lastIndexOf(';');
+                        if (i == -1) {
+                            if (cmd == null) {
+                                cmd = nextLine;
+                            } else {
+                                cmd += " " + nextLine;
+                            }
+                        } else {
+                            String sub = nextLine.substring(0, i);
+                            if (cmd == null) {
+                                cmd = sub;
+                            } else {
+                                cmd += " " + sub;
+                            }
+                            this.executeCommands(cmd);
+                            if (i == nextLine.length() || i == nextLine.length() - 1) {
+                                cmd = null;
+                            } else {
+                                cmd = nextLine.substring(i + 1, nextLine.length());
+                            }
+                        }
+                    }
                 }
             }
         }
         catch (IOException e) {
-            throw(new PPTException(e.getMessage()));
+            throw (new PPTException(e.getMessage()));
+        }
+        finally {
+        	try {
+                reader.close();
+            } catch (IOException e) {
+                //Ignore the failure.
+            }
+
         }
     }
 
@@ -383,18 +385,20 @@ public class OPeNDAPClient {
             while (!done) {
                 System.out.print("OPeNDAP> ");
                 String fromUser = stdIn.readLine();
-                if (fromUser.compareTo("exit") == 0) {
-                    done = true;
-                } else if (fromUser.compareTo("") == 0) {
-                    //continue;
-                } else {
-                    this.executeCommands(fromUser);
+                if (fromUser != null) {
+                    if (fromUser.compareTo("exit") == 0) {
+                        done = true;
+                    } else if (fromUser.compareTo("") == 0) {
+                        //continue;
+                    } else {
+                        this.executeCommands(fromUser);
+                    }
                 }
             }
         }
         catch (Exception e) {
             _client.closeConnection(true);
-            throw(new PPTException(e.getMessage(),e));
+            throw (new PPTException(e.getMessage(), e));
         }
     }
 }
