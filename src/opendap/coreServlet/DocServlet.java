@@ -35,7 +35,6 @@ import javax.servlet.ServletOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import thredds.servlet.ServletUtil;
@@ -50,7 +49,6 @@ public class DocServlet extends HttpServlet {
 
     private String documentsDirectory;
 
-    private MimeTypes mimeTypes;
 
     private Logger log;
 
@@ -74,7 +72,6 @@ public class DocServlet extends HttpServlet {
 
         }
 
-        mimeTypes = new MimeTypes();
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -166,7 +163,7 @@ public class DocServlet extends HttpServlet {
 
 
                     if (suffix != null) {
-                        String mType = mimeTypes.getMimeType(suffix);
+                        String mType = MimeTypes.getMimeType(suffix);
                         if (mType != null)
                             response.setContentType(mType);
                         log.debug("   MIME type: " + mType + "  ");

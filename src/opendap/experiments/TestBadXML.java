@@ -21,6 +21,8 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
+package opendap.experiments;
+
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -32,11 +34,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Jan 25, 2006
- * Time: 4:19:14 PM
- * To change this template use File | Settings | File Templates.
  */
 public class TestBadXML {
 
@@ -65,9 +62,9 @@ public class TestBadXML {
             }
 
         } catch (JDOMException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
     }

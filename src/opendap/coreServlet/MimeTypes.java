@@ -34,13 +34,13 @@ import java.util.TreeMap;
  */
 public class MimeTypes {
 
-    private TreeMap<String, String> typeMap = new TreeMap<String, String>();
+    private static TreeMap<String, String> typeMap = new TreeMap<String, String>();
 
 
     /**
      * MIME Type to file extension mapping taken from: http://www.huw.id.au/code/fileTypeIDs.html
      */
-    public MimeTypes(){
+    static {
 
         // Plain Text
         typeMap.put("txt", "text/plain");
@@ -79,8 +79,8 @@ public class MimeTypes {
 
 
         // Video
-        typeMap.put("mov",   "video/quicktim");
-        typeMap.put("qt",    "video/quicktim");
+        typeMap.put("mov",   "video/quicktime");
+        typeMap.put("qt",    "video/quicktime");
 
         typeMap.put("avi",   "video/avi");
 
@@ -206,12 +206,12 @@ public class MimeTypes {
      * @param fileExtension The file type extension (suffix) to be mapped to a MIME type
      * @return The MIME type associated with the passed file extension. Null if no mapping can be found.
      */
-    public String getMimeType(String fileExtension){
+    public static String getMimeType(String fileExtension){
         return typeMap.get(fileExtension.toLowerCase());
     }
 
 
-    public String getMimeTypeFromFileName(String fileName){
+    public static String getMimeTypeFromFileName(String fileName){
 
         int index = fileName.lastIndexOf(".");
         String mimeType = null;

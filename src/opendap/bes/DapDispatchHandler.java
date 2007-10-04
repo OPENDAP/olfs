@@ -29,7 +29,6 @@ import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
@@ -42,7 +41,6 @@ import org.slf4j.Logger;
  */
 public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
-    private MimeTypes mimeTypes;
     private Logger log;
     private boolean initialized;
 
@@ -52,7 +50,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         super();
 
-        mimeTypes = new MimeTypes();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
 
@@ -697,7 +694,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String suffix = ReqInfo.getRequestSuffix(req);
 
         if (suffix != null) {
-            String mType = mimeTypes.getMimeType(suffix);
+            String mType = MimeTypes.getMimeType(suffix);
 
             if (mType != null)
                 response.setContentType(mType);
