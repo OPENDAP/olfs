@@ -5,7 +5,12 @@
         <HttpGetHandlers>
             <Handler className="opendap.bes.BESManager">
                 <BES>
-                    <!-- The path prefix for this BES -->
+                    <!-- The prefix is a URL token between server address/port
+                    and catalog root used to designate a particular BES instance
+                    in the case that multiple Back-End-Servers are available to
+                    a single OLFS.  The default is no additional tag,
+                    designated by "/". So, for a single BES the prefix MUST be
+                    set to "/".  -->
                     <prefix>/</prefix>
 
                     <!-- The hostname (or IP address) for this BES -->
@@ -24,7 +29,7 @@
             </Handler>
 
             <Handler className="opendap.tutorial.ExampleDispatchHandler" />
-            
+
             <Handler className="opendap.coreServlet.SpecialRequestDispatchHandler" />
 
             <Handler className="opendap.bes.VersionDispatchHandler" />
