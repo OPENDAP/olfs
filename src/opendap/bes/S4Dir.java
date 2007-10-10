@@ -120,6 +120,19 @@ public class S4Dir {
         // Compute White Space required for correct formating
         int headerSpace = 0;
         datasets = crds.listDatasets();
+
+
+
+        if(datasets==null)
+                throw new Exception("BESCrawlableDataset for " +
+                        "collection \""+collectionName+"\" is not able to get" +
+                        "a list of data sets. Collection may " +
+                        "not exist, or a BES may not be available to serve " +
+                        "data from the requested collection.");
+
+
+
+
         it = datasets.iterator();
         while (it.hasNext()) {
             childDataset = (BESCrawlableDataset) it.next();
