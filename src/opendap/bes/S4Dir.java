@@ -163,7 +163,7 @@ public class S4Dir {
         link = targetURL.substring(0, targetURL.lastIndexOf(baseName))+"/contents.html";
 
 
-
+        log.debug("Context Path: "+request.getContextPath());
 
         // Set up the page.
         printHTMLHeader(collectionName, headerSpace, link, pw);
