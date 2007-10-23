@@ -28,8 +28,6 @@
 
             </Handler>
 
-            <Handler className="opendap.tutorial.ExampleDispatchHandler" />
-
             <Handler className="opendap.coreServlet.SpecialRequestDispatchHandler" />
 
             <Handler className="opendap.bes.VersionDispatchHandler" />
