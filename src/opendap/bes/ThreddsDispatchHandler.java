@@ -192,7 +192,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
 
 
         if(dataRootHandler.hasDataRootMatch(path)){
-
+            
             isThreddsRequest = true;
 
         } else {
@@ -229,7 +229,8 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
             throws Exception {
 
         log.debug("Processing THREDDS request.");
-        dataRootHandler.processReqForCatalog(request,response);
+        boolean ret = dataRootHandler.processReqForCatalog(request,response);
+        log.debug("DataRootHandler returned: "+ret);
     }
 
 

@@ -438,7 +438,7 @@ public class DispatchServlet extends HttpServlet {
                 PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
             } else {
-                sendResourceNotFound(request, response);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 log.info("Sent Resource Not Found (404) - nothing left to check.");
                 PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
             }
@@ -485,7 +485,7 @@ public class DispatchServlet extends HttpServlet {
                 PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
             } else {
-                sendResourceNotFound(request, response);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 log.info("Sent Resource Not Found (404) - nothing left to check.");
                 PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
             }
@@ -567,29 +567,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    private void sendResourceNotFound(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "BadURL");
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-
-        String topLevel = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf(request.getPathInfo()));
-
-        pw.println("<h2>Resource Not Found</h2>");
-        pw.println("<p>The URL requested does not describe a resource that can be found on this server.</p>");
-        pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='" + Scrub.completeURL(topLevel) + "'>" + Scrub.completeURL(topLevel) + "</a></p>");
-        pw.println("<p>If you think that the server is broken (that the URL you");
-        pw.println("submitted should have worked), then please contact the");
-        pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@opendap.org\">support@opendap.org</a></p>");
-
-        pw.flush();
-
-
-    }
 
 
 }

@@ -268,13 +268,13 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 } else if (requestSuffix.equals("")) {
                     isDataRequest = true;
                     if(sendResponse){
-                        badURL(response);
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                         log.info("Sent BAD URL (missing Suffix)");
                     }
                 } else {
                     isDataRequest = true;
                     if(sendResponse){
-                        badURL(response);
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                         log.info("Sent BAD URL - not an OPeNDAP request suffix.");
                     }
                 }
@@ -732,8 +732,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         //response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
         //response.setHeader("XDAP", odh.getXDAPVersion(request));
 
-        response.setHeader("Content-Description", "BadURL");
-        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        response.setHeader("Content-Description", "Bad DAP URL");
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");

@@ -432,10 +432,9 @@ public class BesAPI {
                     SAXBuilder sb = new SAXBuilder();
                     Document doc = sb.build(bais);
                     besExceptionHandler(doc);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JDOMException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    throw new BESException("Something Bad Happened and I cannot parse the exception message" +
+                    		"returned by the BES.");
                 }
 
             } else if (errorContext.equals(DAP2_ERRORS)) {
@@ -564,7 +563,7 @@ public class BesAPI {
 
 
         if(constraintExpression != null ){
-            
+
             // Encode all the double quotes as their hex representation of %22
             constraintExpression = constraintExpression.replace("\"","%22");
 

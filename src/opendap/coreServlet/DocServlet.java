@@ -203,7 +203,7 @@ public class DocServlet extends HttpServlet {
 
                 } else {
                     log.debug("   Requested item does not exist. Returning '404 Not Found'");
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
 
                 }
