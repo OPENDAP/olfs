@@ -713,56 +713,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-    /**
-     * Sends an html document to the client explaining that they have used a
-     * poorly formed URL and then the help page...
-     *
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @throws IOException If it can't right the response.
-     */
-    private void badURL(HttpServletResponse response) throws Exception {
-
-        log.debug("Sending Bad URL Page.");
-
-        response.setContentType("text/html");
-
-        // OPeNDAP Headers not needed (James said so!)
-        //response.setHeader("XDODS-Server", odh.getXDODSServerVersion(request));
-        //response.setHeader("XOPeNDAP-Server", odh.getXOPeNDAPServerVersion(request));
-        //response.setHeader("XDAP", odh.getXDAPVersion(request));
-
-        response.setHeader("Content-Description", "Bad DAP URL");
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-
-        pw.println("<h3>Error in URL</h3>");
-        pw.println("<p>The URL extension did not match any that are known by this");
-        pw.println("server. Here is a list of the five extensions that are be recognized by");
-        pw.println("all OPeNDAP servers:</p>");
-        pw.println("<ui>");
-        pw.println("    <li>ddx</li>");
-        pw.println("    <li>dds</li>");
-        pw.println("    <li>das</li>");
-        pw.println("    <li>dods</li>");
-        pw.println("    <li>info</li>");
-        pw.println("    <li>html</li>");
-        pw.println("    <li>ascii</li>");
-        pw.println("</ui>");
-        pw.println("<p>If you think that the server is broken (that the URL you");
-        pw.println("submitted should have worked), then please contact the");
-        pw.println("OPeNDAP user support coordinator at: ");
-        pw.println("<a href=\"mailto:support@opendap.org\">support@opendap.org</a></p>");
-
-        pw.flush();
-
-
-    }
-
 
 
 
