@@ -28,5 +28,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         <Float32 name="Solar_Radiation"/>
     </Sequence>
 
-    <dataBLOB href=".blob?"/>
+    <dataBLOB href=""/>
 </Dataset>

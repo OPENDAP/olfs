@@ -16,5 +16,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
     </Attribute>
 
 
-    <dataBLOB href=".blob?geogrid(SST,-82,61,-19,38)"/>
+    <dataBLOB href=""/>
 </Dataset>

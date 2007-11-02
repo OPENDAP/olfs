@@ -250,11 +250,15 @@ public class OPeNDAPException extends Exception {
         Logger log = org.slf4j.LoggerFactory.getLogger(OPeNDAPException.class);
 
 
-        log.error("anyExceptionHandler(): " + t);
-        t.printStackTrace();
-
-
         try {
+
+            log.error("anyExceptionHandler(): " + t);
+
+
+            ByteArrayOutputStream baos =new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream( baos);
+            t.printStackTrace(ps);
+            log.debug(baos.toString());
 
 
             if(!response.isCommitted()){
@@ -296,8 +300,9 @@ public class OPeNDAPException extends Exception {
             oe.print(eOut);
 
 
-        } catch (IOException ioe) {
-            log.error("Cannot respond to client! IO Error: " + ioe.getMessage());
+        } catch (Throwable ioe) {
+            log.error("Bad things happened! Cannot process incoming exception! " +
+                    "New Exception thrown: " + ioe);
         }
 
 

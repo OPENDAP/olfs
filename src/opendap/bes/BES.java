@@ -145,7 +145,7 @@ public class BES {
         }
         // Return a copy so nobody can break our stuff!
         if(_serverVersionDocument !=null){
-        return (Document)  _serverVersionDocument.clone();
+            return (Document)  _serverVersionDocument.clone();
         }
 
         return null;

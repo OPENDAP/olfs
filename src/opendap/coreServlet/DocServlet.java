@@ -175,11 +175,14 @@ public class DocServlet extends HttpServlet {
                     log.debug("   Sending.");
 
 
-                    FileInputStream fis = new FileInputStream(f);
-
-                    ServletOutputStream sos = response.getOutputStream();
+                    FileInputStream fis = null;
+                    ServletOutputStream sos = null;
 
                     try {
+                        fis = new FileInputStream(f);
+
+                        sos = response.getOutputStream();
+
                         byte buff[] = new byte[8192];
                         int rc;
                         boolean doneReading = false;
@@ -194,12 +197,16 @@ public class DocServlet extends HttpServlet {
                         }
                     }
                     finally {
-                        fis.close();
+
+                        if(fis!=null)
+                            fis.close();
+
+                        if(sos!=null)
+                            sos.flush();
                     }
 
                     PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
 
-                    sos.flush();
 
                 } else {
                     log.debug("   Requested item does not exist. Returning '404 Not Found'");
@@ -215,7 +222,12 @@ public class DocServlet extends HttpServlet {
 
         }
         catch( Throwable t){
-            OPeNDAPException.anyExceptionHandler(t, response);
+            try {
+                OPeNDAPException.anyExceptionHandler(t, response);
+            }
+            catch(Throwable t2) {
+                log.error("BAD THINGS HAPPENED!", t2);
+            }
         }
     }
 

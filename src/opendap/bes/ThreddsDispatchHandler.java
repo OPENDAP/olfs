@@ -29,6 +29,7 @@ import thredds.servlet.HtmlWriter;
 import thredds.servlet.ServletUtil;
 import thredds.catalog.InvDatasetScan;
 import thredds.catalog.InvCatalog;
+import thredds.crawlabledataset.CrawlableDataset;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -192,8 +193,20 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
 
 
         if(dataRootHandler.hasDataRootMatch(path)){
-            
-            isThreddsRequest = true;
+
+            if(path.endsWith("catalog.html"))
+                path = path.substring(0,path.lastIndexOf("catalog.html"));
+            else if(path.endsWith("catalog.xml"))
+                path = path.substring(0,path.lastIndexOf("catalog.xml"));
+
+            CrawlableDataset cd = dataRootHandler.getCrawlableDataset(path);
+
+            if(cd!=null && cd.isCollection()){
+                log.debug("Request hasDataRootMatch, a CrawlableDataset and isCollection()");
+                isThreddsRequest = true;
+            }
+
+
 
         } else {
             String catalogPath = path.endsWith(".html")?path.substring(0,path.lastIndexOf(".html"))+".xml":path;
@@ -205,6 +218,7 @@ public class ThreddsDispatchHandler implements ThreddsHandler {
             log.debug("dataRootHandler.getCatalog() returned: " + ic);
 
             if(ic !=null){
+                log.debug("Request has a catalog.");
                 isThreddsRequest = true;
             }
         }

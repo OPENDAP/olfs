@@ -73,5 +73,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         <dimension name="i" size="2"/>
     </Array>
 
-    <dataBLOB href=".blob?bears,aloan,i"/>
+    <dataBLOB href=""/>
 </Dataset>

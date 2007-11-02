@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Iterator;
 
@@ -177,7 +179,12 @@ public class SOAPRequestDispatcher implements DispatchHandler {
             log.debug("SOAPRequestDispatcher.doPost(): End of POST Handler.\n\n\n");
         }
         catch(Throwable t){
-            OPeNDAPException.anyExceptionHandler(t, response);
+            try {
+                OPeNDAPException.anyExceptionHandler(t, response);
+            }
+            catch(Throwable t2) {
+                log.error("BAD THINGS HAPPENED!", t2);
+            }
         }
     }
 
@@ -250,7 +257,13 @@ public class SOAPRequestDispatcher implements DispatchHandler {
 
             }
         } catch (Exception e) {
-            mpr.addSoapBodyPart(ExceptionElementUtil.anyExceptionElementBuilder(e));
+            log.error("Something Bad Happened while processing a SOAP request (reqID :" + reqID+")");
+            ByteArrayOutputStream baos =new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream( baos);
+            e.printStackTrace(ps);
+            log.debug(baos.toString());
+
+            mpr.addSoapBodyPart(ExceptionElementUtil.makeExceptionElement(e));
         }
 
 

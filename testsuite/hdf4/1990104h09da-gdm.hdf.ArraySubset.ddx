@@ -140,5 +140,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         <dimension name="Latitude" size="21"/>
     </Array>
 
-    <dataBLOB href=".blob?Sea%20Surface%20Temperature[0:100:4095][0:100:2047]"/>
+    <dataBLOB href=""/>
 </Dataset>

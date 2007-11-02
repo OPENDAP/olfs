@@ -561,6 +561,7 @@ public class BesAPI {
         besExceptionHandler(baos,errorMsgFormat);
         baos.flush();
 
+        log.debug("UnEscaped ConstraintExpression: " + constraintExpression);
 
         if(constraintExpression != null ){
 
@@ -572,7 +573,7 @@ public class BesAPI {
             constraintExpression = constraintExpression.replace("%22","%5C%22");
 
         }
-        log.debug("ConstraintExpression: " + constraintExpression);
+        log.debug("Escaped ConstraintExpression: " + constraintExpression);
 
 
         if (constraintExpression == null ||

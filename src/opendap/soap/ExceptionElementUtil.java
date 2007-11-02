@@ -91,20 +91,6 @@ public class ExceptionElementUtil  {
     }
 
 
-    /**
-     * Builds a JDOM ELement called OPeNDAPException that holds the pertinent information
-     * about the passed Exeption
-     * @param e The Exception to wrapin an XML Element.
-     * @return A JDOM Element containing the all the Exception information.
-     */
-    public static Element anyExceptionElementBuilder(Exception e){
-        ByteArrayOutputStream baos =new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream( baos);
-        e.printStackTrace(ps);
-
-        return makeExceptionElement(e.getClass().getName(),e.getMessage(),baos.toString());
-
-    }
 
 
 

@@ -26,5 +26,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         <dimension name="lat" size="17"/>
     </Array>
 
-    <dataBLOB href=".blob?lat"/>
+    <dataBLOB href=""/>
 </Dataset>

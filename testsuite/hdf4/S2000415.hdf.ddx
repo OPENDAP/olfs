@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Dataset name="S2000415.HDF"
+<Dataset name="S2000415.hdf"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xmlns="http://xml.opendap.org/ns/DAP2"
 xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/dap2.xsd">
@@ -827,5 +827,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Sequence>
     </Structure>
 
-    <dataBLOB href=".blob?"/>
+    <dataBLOB href=""/>
 </Dataset>

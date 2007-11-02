@@ -16,5 +16,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
     </Attribute>
 
 
-    <dataBLOB href=".blob?geoarray(SST.SST,45,135,-45,225,90,0,-90,359)"/>
+    <dataBLOB href=""/>
 </Dataset>

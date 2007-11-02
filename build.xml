@@ -107,9 +107,7 @@
 
     <target name="all" depends="clean,clients,server,soap-lib"
             description="Builds lots of stuff."/>
-    <target name="compile" depends="olfs"
-            description="Compiles the OLFS software."/>
-
+    
 
     <target name="clients" depends="BESclient"
             description="Compiles the clients."/>
@@ -133,7 +131,34 @@
 
 
     <target
-            name="olfs"
+            name="compile"
+            depends="init"
+            description="Compiles the OLFS."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="olfs.compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/**/*.java"/>
+            <exclude name="opendap/experiments/**/*.java"/>
+
+        </javac>
+
+    </target>
+
+
+
+    <target
+            name="olfs-experiments"
             depends="init"
             description="Compiles the OLFS."
             >
@@ -152,9 +177,18 @@
             <src path="${src.dir}"/>
             <include name="opendap/**/*.java"/>
             <include name="hao/**/*.java"/>
+
         </javac>
 
     </target>
+
+
+
+
+
+
+
+
 
 
     <target name="olfs-lib" depends="clean,compile">

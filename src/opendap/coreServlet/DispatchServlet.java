@@ -444,8 +444,13 @@ public class DispatchServlet extends HttpServlet {
             }
 
 
-        } catch (Throwable e) {
-            OPeNDAPException.anyExceptionHandler(e, response);
+        } catch (Throwable t) {
+            try {
+                OPeNDAPException.anyExceptionHandler(t, response);
+            }
+            catch(Throwable t2) {
+                log.error("BAD THINGS HAPPENED!", t2);
+            }
         }
 
 
@@ -491,8 +496,13 @@ public class DispatchServlet extends HttpServlet {
             }
 
 
-        } catch (Throwable e) {
-            OPeNDAPException.anyExceptionHandler(e, response);
+        } catch (Throwable t) {
+            try {
+                OPeNDAPException.anyExceptionHandler(t, response);
+            }
+            catch(Throwable t2) {
+                log.error("BAD THINGS HAPPENED!", t2);
+            }
         }
 
     }

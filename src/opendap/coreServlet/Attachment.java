@@ -64,25 +64,29 @@ public class Attachment {
     void write(String mimeBoundary, ServletOutputStream sos) throws IOException {
 
 
-        sos.println("--"+mimeBoundary);
-        sos.println("Content-Type: "+contentType);
-        sos.println("Content-Transfer-Encoding: "+contentTransferEncoding);
-        sos.println("Content-Id: <"+contentId+">");
-        sos.println();
+        try {
+            sos.println("--"+mimeBoundary);
+            sos.println("Content-Type: "+contentType);
+            sos.println("Content-Transfer-Encoding: "+contentTransferEncoding);
+            sos.println("Content-Id: <"+contentId+">");
+            sos.println();
 
-        int val;
-        boolean done = false;
-        while(!done){
-            val = istream.read();
-            if(val == -1)
-                done = true;
-            else {
-                sos.write(val);
+            int val;
+            boolean done = false;
+            while(!done){
+                val = istream.read();
+                if(val == -1)
+                    done = true;
+                else {
+                    sos.write(val);
+                }
             }
+            //MIME Attachments need to end with a newline!
+            sos.println();
         }
-        //MIME Attachments need to end with a newline!
-        sos.println();
-
+        finally {
+            istream.close();
+        }
 
     }
 
