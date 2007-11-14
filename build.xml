@@ -107,7 +107,7 @@
 
     <target name="all" depends="clean,clients,server,soap-lib"
             description="Builds lots of stuff."/>
-    
+
 
     <target name="clients" depends="BESclient"
             description="Compiles the clients."/>
@@ -421,7 +421,7 @@
 
 
         <!-- capture all configuration files in the WEB-INF directory -->
-        <echo>sourceanalyzer ${web-inf}</echo>
+        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
         <sourceanalyzer buildid="${sourceanalyzer.buildid}" >
             <fileset dir="${WebInfResources.dir}">
                 <include name="**/*.properties"/>
