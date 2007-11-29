@@ -36,11 +36,11 @@ import opendap.coreServlet.OPeNDAPException;
  *
  */
 public class BESException extends OPeNDAPException {
-    BESException(String msg) {
+    public BESException(String msg) {
         super(msg);
     }
 
-    BESException(String msg, Exception e) {
+    public BESException(String msg, Exception e) {
         super(msg, e);
     }
 
