@@ -64,7 +64,12 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
         log.debug("Configuration START. Locking WCS Catalog.");
         configLock.writeLock().lock();
 
+        log.debug("WCS Catalog access locked.");
+        log.debug("Rebuilding wcsDatsets list...");
+
         wcsDatasets = new HashMap<String,InvDataset>();
+
+        log.debug("wcsDatsets list replaced with new empty map.");
 
     }
 
@@ -92,10 +97,11 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
      */
     public void configDataset( InvDataset dataset ){
 
+        //if(configLock.i)
 
 
         if(isWcsDataset(dataset)){
-            String msg = "WCS Dataset: \n";
+            String msg = "Adding WCS Dataset: \n";
             msg += "    Name: " + dataset.getName() + "\n";
 
             InvAccess access = dataset.getAccess(ServiceType.OPENDAP);
@@ -122,14 +128,9 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
               msg += "No Access!";
 
 
-            log.debug("configDataset()\n"+msg);
+            log.debug(msg);
 
         }
-
-
-
-
-
 
     }
 

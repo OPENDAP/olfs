@@ -539,10 +539,11 @@ public class BesAPI {
 
 
         String catalogName = "catalog";
-        String container = "hyraxContainer";
+        String container = "catalogContainer";
 
         if (WcsCatalog.isWcsDataset(dataset)) {
             catalogName = "wcs";
+            container = "wcsContainer";
             dataset = "\"" + WcsCatalog.getWcsRequestURL(dataset) + "\"";
         }
 
