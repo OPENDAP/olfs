@@ -94,7 +94,11 @@ public class OPeNDAPException extends Exception {
     }
 
     /**
+     *
      * Construct a <code>OPeNDAPException</code>.
+     *
+     * @param msg A message describing the error.
+     *
      */
     public OPeNDAPException(String msg) {
         super(msg);
@@ -105,31 +109,30 @@ public class OPeNDAPException extends Exception {
 
     /**
      * Construct a <code>OPeNDAPException</code>.
+     * @param msg A message describing the error.
+     * @param cause The cause (which is saved for later retrieval by the
+     * Throwable.getCause() method). (A null value is permitted, and indicates
+     * that the cause is nonexistent or unknown.)
      */
-    public OPeNDAPException(String msg, Exception e) {
-        super(msg, e);
+    public OPeNDAPException(String msg, Throwable cause) {
+        super(msg, cause);
         errorCode = UNKNOWN_ERROR;
         errorMessage = msg;
     }
 
 
-    /**
-     * Construct a <code>OPeNDAPException</code>.
-     */
-    public OPeNDAPException(String msg, Throwable t) {
-        super(msg, t);
-        errorCode = UNKNOWN_ERROR;
-        errorMessage = msg;
-    }
 
 
     /**
      * Construct a <code>OPeNDAPException</code>.
+     * @param cause The cause (which is saved for later retrieval by the
+     * Throwable.getCause() method). (A null value is permitted, and indicates
+     * that the cause is nonexistent or unknown.)
      */
-    public OPeNDAPException(Throwable t) {
-        super(t);
+    public OPeNDAPException(Throwable cause) {
+        super(cause);
         errorCode = UNKNOWN_ERROR;
-        errorMessage = t.getMessage();
+        errorMessage = cause.getMessage();
     }
 
 
@@ -260,22 +263,6 @@ public class OPeNDAPException extends Exception {
             t.printStackTrace(ps);
             log.debug(baos.toString());
 
-
-            if(!response.isCommitted()){
-                response.reset();
-                response.setHeader("Content-Description", "dods_error");
-
-                // This should probably be set to "plain" but this works, the
-                // C++ slients don't barf as they would if I sent "plain" AND
-                // the C++ don't expect compressed data if I do this...
-                response.setHeader("Content-Encoding", "");
-
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
-
-            BufferedOutputStream eOut = new BufferedOutputStream(response.getOutputStream());
-
-
             OPeNDAPException oe;
 
             if (t instanceof OPeNDAPException)
@@ -287,7 +274,8 @@ public class OPeNDAPException extends Exception {
                 msg += t.getMessage();
 
                 msg += " [" + t.getStackTrace()[0].getFileName() +
-                        " - line " + t.getStackTrace()[0].getLineNumber() + "]";
+                        " - line " + t.getStackTrace()[0].getLineNumber() +
+                        "]";
 
 
                 if (msg != null)
@@ -297,12 +285,21 @@ public class OPeNDAPException extends Exception {
                 oe = new OPeNDAPException(UNDEFINED_ERROR, msg);
 
             }
-            oe.print(eOut);
 
+
+            if(!response.isCommitted()){
+                response.reset();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        t.getMessage());
+            }
+            else {
+                OutputStream eOut = response.getOutputStream();
+                oe.print(eOut);
+            }
 
         } catch (Throwable ioe) {
-            log.error("Bad things happened! Cannot process incoming exception! " +
-                    "New Exception thrown: " + ioe);
+            log.error("Bad things happened! Cannot process incoming " +
+                    "exception! New Exception thrown: " + ioe);
         }
 
 

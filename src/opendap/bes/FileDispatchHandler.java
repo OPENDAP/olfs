@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletOutputStream;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import org.jdom.Element;
@@ -185,10 +186,15 @@ public class FileDispatchHandler implements DispatchHandler {
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         ServletOutputStream sos = response.getOutputStream();
-        BesAPI.writeFile(name, sos, BesAPI.DAP2_ERRORS);
+        if(!BesAPI.writeFile(name, sos, erros, BesAPI.XML_ERRORS)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+        }
 
 
     }

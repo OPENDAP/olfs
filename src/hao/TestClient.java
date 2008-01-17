@@ -39,8 +39,12 @@ public class TestClient {
         String inputStr = null;
         File inputFile = null;
         String outputStr = null;
-        File outputFile = null;
+        File outputFile;
         String timeoutStr;
+
+        OutputStream out = System.out;
+        OutputStream err = System.err;
+
         // jhrg int timeoutVal = 0;
         // jhrg boolean debug = false;
 
@@ -84,7 +88,7 @@ public class TestClient {
                 System.out.println("port must be specified");
                 badUsage = true;
             } else {
-                portVal = Integer.valueOf(portStr).intValue();
+                portVal = Integer.valueOf(portStr);
             }
 
             if (timeoutStr != null) {
@@ -123,6 +127,8 @@ public class TestClient {
                         System.out.println("unable to create output file " + outputStr);
                         badUsage = true;
                     }
+                    out = new FileOutputStream(outputFile);
+
                 }
                 catch (IOException e) {
                     System.out.println("unable to create output file " + outputStr);
@@ -137,15 +143,13 @@ public class TestClient {
             System.exit(1);
         }
 
+
+
+
         OPeNDAPClient client = null;
         try {
             client = new OPeNDAPClient();
             client.startClient(hostStr, portVal);
-            if (outputFile != null) {
-                client.setOutput(outputFile);
-            } else {
-                client.setOutput(System.out,true);
-            }
         }
         catch (PPTException e) {
             System.err.println("error starting the client");
@@ -155,11 +159,11 @@ public class TestClient {
 
         try {
             if (cmd != null) {
-                client.executeCommands(cmd);
+                client.executeCommands(cmd,out,err);
             } else if (inputFile != null) {
-                client.executeCommands(inputFile);
+                client.executeCommands(inputFile,out,err);
             } else {
-                client.interact();
+                client.interact(out,err);
             }
         }
         catch (PPTException e) {
@@ -182,7 +186,7 @@ public class TestClient {
 
     private static void showUsage() {
         System.out.println("");
-        System.out.println("the following flags are available:");
+        System.out.println("the following flags are availableInChunk:");
         System.out.println("    -h <host> - specifies a host for TCP/IP connection");
         System.out.println("    -p <port> - specifies a port for TCP/IP connection");
         System.out.println("    -x <command> - specifies a command for the server to execute");

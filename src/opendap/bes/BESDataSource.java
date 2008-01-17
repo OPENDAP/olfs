@@ -45,6 +45,7 @@ public class BESDataSource implements DataSourceInfo {
     private boolean exists;
     private boolean collection;
     private boolean data;
+    private boolean accessible;
 
     private String name;
     private long size;
@@ -62,6 +63,7 @@ public class BESDataSource implements DataSourceInfo {
 
         requestedDataSource = dataSourceName;
         exists              = false;
+        accessible          = false;
         collection          = false;
         data                = false;
         name                = null;
@@ -77,11 +79,12 @@ public class BESDataSource implements DataSourceInfo {
 
             Element dataset = info.getRootElement();
 
+            String isAccessible = dataset.getAttributeValue("isAccessible");
+            accessible = isAccessible == null || isAccessible.equalsIgnoreCase("true");
             String isCollection = dataset.getAttributeValue("thredds_collection");
+            collection = isCollection == null || isCollection.equalsIgnoreCase("true");
             String isData = dataset.getAttributeValue("isData");
-
-            collection = isCollection.equalsIgnoreCase("true");
-            data = isData.equalsIgnoreCase("true");
+            data = isData == null || isData.equalsIgnoreCase("true");
 
 
             name = dataset.getChildText("name");
@@ -113,6 +116,10 @@ public class BESDataSource implements DataSourceInfo {
 
     public  boolean sourceExists(){
         return exists;
+    }
+
+    public  boolean isAccessible(){
+        return accessible;
     }
 
     public  boolean isCollection(){

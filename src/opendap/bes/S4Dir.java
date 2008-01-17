@@ -27,6 +27,7 @@ package opendap.bes;
 
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
+import opendap.coreServlet.PerfLog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,12 +111,16 @@ public class S4Dir {
 
         BESCrawlableDataset crds = new BESCrawlableDataset(path, null);
 
-        if(!crds.exists())
-                throw new Exception("Unable to get BESCrawlableDataset for " +
-                        "collection \""+collectionName+"\". Collection may " +
-                        "not exist, or a BES may not be available to serve " +
-                        "data from the requested collection.");
-
+        if(!crds.exists()) {
+            log.info("Unable to get BESCrawlableDataset for " +
+                      "collection \""+collectionName+"\". Collection may " +
+                      "not exist, or a BES may not be available to serve " +
+                      "data from the requested collection.");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            log.info("Sent Resource Not Found (404).");
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+            return;
+        }
 
         // Compute White Space required for correct formating
         int headerSpace = 0;
@@ -123,13 +128,17 @@ public class S4Dir {
 
 
 
-        if(datasets==null)
-                throw new Exception("BESCrawlableDataset for " +
-                        "collection \""+collectionName+"\" is not able to get" +
-                        "a list of data sets. Collection may " +
-                        "not exist, or a BES may not be available to serve " +
-                        "data from the requested collection.");
-
+        if(datasets==null){
+            log.info("BESCrawlableDataset for " +
+                      "collection \""+collectionName+"\" is not able to get" +
+                      "a list of data sets. Collection may " +
+                      "not exist, or a BES may not be availableInChunk to serve " +
+                      "data from the requested collection.");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            log.info("Sent Resource Not Found (404).");
+            PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+            return;
+        }
 
 
 

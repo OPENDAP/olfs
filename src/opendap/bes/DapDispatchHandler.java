@@ -332,16 +332,17 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        OutputStream Out = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = new BufferedOutputStream(response.getOutputStream());
 
         BesAPI.writeDAS(
                 dataSource,
                 constraintExpression,
-                Out,
+                os,
+                os,
                 BesAPI.DAP2_ERRORS);
 
 
-        Out.flush();
+        os.flush();
 
     }
     /***************************************************************************/
@@ -380,18 +381,22 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        OutputStream Out = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = response.getOutputStream();
+
+        //@todo Make them all use a dumy error stream until we fix the error handling in libdap.
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
 
         BesAPI.writeDDS(
                 dataSource,
                 constraintExpression,
-                Out,
+                os,
+                os,
                 BesAPI.DAP2_ERRORS);
 
 
 
 
-        Out.flush();
+        os.flush();
 
 
     }
@@ -431,16 +436,17 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
 
-        OutputStream Out = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = new BufferedOutputStream(response.getOutputStream());
 
         BesAPI.writeDDX(
                 dataSource,
                 constraintExpression,
-                Out,
+                os,
+                os,
                 BesAPI.DAP2_ERRORS);
 
 
-        Out.flush();
+        os.flush();
 
     }
     /***************************************************************************/
@@ -481,34 +487,13 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         ServletOutputStream sOut = response.getOutputStream();
         OutputStream bOut;
 
-        //boolean compress = false;
-        /*
-        if (ReqInfo.getAcceptsCompressed(request)) {
-            //compress = true;
-            response.setHeader("Content-Encoding", "gzip");
-            //DeflaterOutputStream dos = new DeflaterOutputStream(sOut);
-            DeflaterOutputStream dos = new GZIPOutputStream(sOut);
-            BesAPI.writeDap2Data(dataSource, constraintExpression, dos);
-            //dos.finish();
-            //dos.flush();
-            dos.close();
-            response.setStatus(HttpServletResponse.SC_OK);
-
-        } else {
-            // Commented out because of a bug in the OPeNDAP C++ stuff...
-            //response.setHeader("Content-Encoding", "plain");
-            bOut = new BufferedOutputStream(sOut);
-            BesAPI.writeDap2Data(dataSource, constraintExpression, bOut);
-            response.setStatus(HttpServletResponse.SC_OK);
-            bOut.flush();
-        }
-*/
 
         bOut = new BufferedOutputStream(sOut);
 
         BesAPI.writeDap2Data(
                 dataSource,
                 constraintExpression,
+                bOut,
                 bOut,
                 BesAPI.DAP2_ERRORS);
 
@@ -578,7 +563,13 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         log.debug("sendHTMLRequestForm(): HTML Form URL: " + url);
 
-        BesAPI.writeHTMLForm(dataSource, url, os);
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        if(!BesAPI.writeHTMLForm(dataSource, url, os, erros)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+        }
 
         os.flush();
 
@@ -607,11 +598,18 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log.debug("sendINFO() for: " + dataSource);
 
         OutputStream os = new BufferedOutputStream(response.getOutputStream());
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        BesAPI.writeINFOPage(
+        if(!BesAPI.writeINFOPage(
                 dataSource,
                 os,
-                BesAPI.DAP2_ERRORS);
+                erros,
+                BesAPI.XML_ERRORS)){
+
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+        }
 
         os.flush();
 
@@ -643,37 +641,21 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         ServletOutputStream sOut = response.getOutputStream();
-
-        /*
-        //boolean compress = false;
-        if (ReqInfo.getAcceptsCompressed(request)) {
-            //compress = true;
-            response.setHeader("Content-Encoding", "deflate");
-            DeflaterOutputStream dos = new DeflaterOutputStream(sOut);
-            //DeflaterOutputStream dos = new GZIPOutputStream(sOut);
-            BesAPI.writeASCII(dataSource, constraintExpression, dos);
-            dos.finish();
-            dos.flush();
-            response.setStatus(HttpServletResponse.SC_OK);
-
-        } else {
-            // Commented out because of a bug in the OPeNDAP C++ stuff...
-            //response.setHeader("Content-Encoding", "plain");
-            bOut = new BufferedOutputStream(sOut);
-            BesAPI.writeASCII(dataSource, constraintExpression, bOut);
-            response.setStatus(HttpServletResponse.SC_OK);
-            bOut.flush();
-        }
-
-*/
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
         bOut = new BufferedOutputStream(sOut);
 
-        BesAPI.writeASCII(
+        if(!BesAPI.writeASCII(
                 dataSource,
                 constraintExpression,
                 bOut,
-                BesAPI.DAP2_ERRORS);
+                erros,
+                BesAPI.XML_ERRORS)){
+
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+        }
 
         bOut.flush();
 
@@ -703,10 +685,16 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        ServletOutputStream sos = response.getOutputStream();
-        BesAPI.writeFile(name, sos, BesAPI.DAP2_ERRORS);
+        ServletOutputStream os = response.getOutputStream();
+
+        if(!BesAPI.writeFile(name, os, erros, BesAPI.XML_ERRORS)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+        }
 
 
     }

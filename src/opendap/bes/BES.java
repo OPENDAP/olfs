@@ -208,14 +208,14 @@ public class BES {
 
 
     /**
-     * The pool of available OPeNDAPClient connections starts empty. When this
-     * method is called the pool is checked. If no client is available, and the
+     * The pool of availableInChunk OPeNDAPClient connections starts empty. When this
+     * method is called the pool is checked. If no client is availableInChunk, and the
      * number of clients has not reached the cap, then a new one is made,
-     * started, and returned. If no client is available and the cap has been
-     * reached then this method will BLOCK until a client becomes available.
-     * If a client is available, it is returned.
+     * started, and returned. If no client is availableInChunk and the cap has been
+     * reached then this method will BLOCK until a client becomes availableInChunk.
+     * If a client is availableInChunk, it is returned.
      *
-     * @return The next available OPeNDAPClient.
+     * @return The next availableInChunk OPeNDAPClient.
      * @throws opendap.ppt.PPTException  .
      * @throws BadConfigurationException .
      */
@@ -259,11 +259,6 @@ public class BES {
                 log.debug("getClient() - Retrieved " +
                         "OPeNDAPClient (id:"+odc.getID()+" from Pool.");
             }
-
-            //if (Debug.isSet("BES"))
-            //    odc.setOutput(System.out, true);
-            //else
-            odc.setOutput(devNull, true);
 
 
             return odc;
@@ -391,7 +386,6 @@ public class BES {
     private void shutdownClient(OPeNDAPClient oc) throws PPTException {
 
         log.debug("shutdownClient() Shutting down client...");
-        oc.setOutput(null, false);
         oc.shutdownClient();
         log.debug("shutdownClient() Client shutdown.");
 

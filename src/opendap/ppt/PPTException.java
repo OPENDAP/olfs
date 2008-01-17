@@ -55,13 +55,25 @@ public class PPTException  extends Exception{
      *            cases this message includes exception messages handled
      *            within OPeNDAP methods, including client server connection
      *            errors, send and receive error messages, etc...
+     * @param cause - the cause (which is saved for later retrieval by the
+     * Throwable.getCause() method). (A null value is permitted, and indicates
+     * that the cause is nonexistent or unknown.)
      */
-    public PPTException(String msg,Exception e) {
-        super(msg,e);
+    public PPTException(String msg,Throwable cause) {
+        super(msg,cause);
     }
 
-    public PPTException(Exception e) {
-        super(e);
+    /**
+     * Exception used with OPeNDAP client and server request handling where the
+     * msg passed to the constructor represents the error that has occurred
+     * in handling the OPeNDAP request.
+     *
+     * @param cause - the cause (which is saved for later retrieval by the
+     * Throwable.getCause() method). (A null value is permitted, and indicates
+     * that the cause is nonexistent or unknown.)
+     */
+    public PPTException(Throwable cause) {
+        super(cause);
     }
 }
 

@@ -176,7 +176,7 @@ public class ChunkedOutputStream  {
     public void finish() throws IOException {
 
         if(!isOpen) throw new IOException(closedMsg);
-        System.out.println("finish()");
+        log.debug("finish()");
 
         flushCache();
         Chunk.writeClosingChunkHeader(_rawOS);
@@ -191,7 +191,7 @@ public class ChunkedOutputStream  {
      */
     public void flush() throws IOException {
         if(!isOpen) throw new IOException(closedMsg);
-        System.out.println("flush(): Flushing underlying output stream.");
+        log.debug("flush(): Flushing underlying output stream.");
 
         _rawOS.flush();
 
@@ -208,7 +208,7 @@ public class ChunkedOutputStream  {
 
         if(cacheSize>0){
             Chunk.writeChunkHeader(_rawOS,cacheSize,currentChunkType);
-            System.out.println("flushCache() - cache contains: \""+new String(cache,0,cacheSize)+"\"");
+            log.debug("flushCache() - cache contains: \""+new String(cache,0,cacheSize)+"\"");
             _rawOS.write(cache,0,cacheSize);
             cacheSize = 0;
         }
@@ -317,7 +317,7 @@ public class ChunkedOutputStream  {
         cache[cacheSize] = (byte) b;
         cacheSize++;
 
-        System.out.println("write(byte) - cacheSize: "+cacheSize);
+        log.debug("write(byte) - cacheSize: "+cacheSize);
         if(cacheSize >= cache.length){
             flushCache();
         }

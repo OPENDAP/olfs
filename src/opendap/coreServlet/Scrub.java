@@ -40,19 +40,19 @@ public class Scrub {
 
 
 
-    private static String urlContentInclusionRegex = "[-a-zA-Z0-9:/.%]*";
-    private static String urlContentExclusionRegex = "[^-a-zA-Z0-9:/.%]";
+    private static String htmlContentInclusionRegex = "[-a-zA-Z0-9:/.%_-]*";
+    private static String htmlContentExclusionRegex = "[^-a-zA-Z0-9:/.%_-]";
 
-    private static Pattern urlContentInclusionPattern = Pattern.compile(urlContentInclusionRegex);
+    private static Pattern htmlContentInclusionPattern = Pattern.compile(htmlContentInclusionRegex);
 
 
 
     public static String urlContent(String urlContent){
 
 
-        Matcher m = urlContentInclusionPattern.matcher(urlContent);
+        Matcher m = htmlContentInclusionPattern.matcher(urlContent);
 
-        log.debug("URL() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ urlContentInclusionRegex +"    matches: "+m.matches());
+        log.debug("URL() - Scrubbing URL Content: "+urlContent+"   white list pattern: "+ htmlContentInclusionRegex +"    matches: "+m.matches());
 
 
 
@@ -60,7 +60,7 @@ public class Scrub {
             return urlContent;
         }
         else {
-            return urlContent.replaceAll(urlContentExclusionRegex,"#");
+            return urlContent.replaceAll(htmlContentExclusionRegex,"#");
         }
 
 
@@ -69,8 +69,8 @@ public class Scrub {
 
 
 
-    private static String completeURLInclusionRegex = "http://"+urlContentInclusionRegex;
-    private static String completeURLExclusionRegex = "http://"+urlContentExclusionRegex;
+    private static String completeURLInclusionRegex = "http://"+ htmlContentInclusionRegex;
+    private static String completeURLExclusionRegex = "http://"+ htmlContentExclusionRegex;
 
     private static Pattern completeURLInclusionPattern = Pattern.compile(completeURLInclusionRegex);
 

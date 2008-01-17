@@ -31,7 +31,6 @@ import opendap.soap.XMLNamespaces;
 import opendap.soap.ExceptionElementUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
@@ -43,7 +42,6 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 
 
-import thredds.cataloggen.SimpleCatalogBuilder;
 import thredds.servlet.DataRootHandler;
 import thredds.catalog.*;
 import thredds.catalog.parser.jdom.InvCatalogFactory10;
@@ -215,7 +213,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
             log.warn("getTHREDDSCatalog() DataRootHandler.getCatalog(" + path + ","+baseURI+") returned null.");
             respElement = ExceptionElementUtil.makeExceptionElement(
                     "BadSOAPRequest",
-                    "Requested catalog \"" + path + "\" is not available.",
+                    "Requested catalog \"" + path + "\" is not availableInChunk.",
                     "opendap.bes.SOAPDispatchHandler.getTHREDDSCatalog()"
             );
         } else {
@@ -235,7 +233,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                     log.warn("getTHREDDSCatalog()  InvCatalogFactory10.writeCatalog(" + path + ") returned null.");
                     respElement = ExceptionElementUtil.makeExceptionElement(
                             "BadSOAPRequest",
-                            "Requested catalog (" + path + " is not available.",
+                            "Requested catalog (" + path + " is not availableInChunk.",
                             "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
                     );
                 } else {

@@ -159,20 +159,20 @@ operations:
 
     <target
         name="checkForCatalina"
-        description="Check to see if a Jakarta-Tomcat (aka Catalina) configuration is available."
+        description="Check to see if a Jakarta-Tomcat (aka Catalina) configuration is availableInChunk."
         >
-        <available  property="Catalina.available" file="${Catalina.config}"/>
+        <availableInChunk  property="Catalina.availableInChunk" file="${Catalina.config}"/>
         <echo level="info" message="Catalina.config: ${Catalina.config}"/>
-        <echo level="info" message="Catalina.available: ${Catalina.available}"/>
+        <echo level="info" message="Catalina.availableInChunk: ${Catalina.availableInChunk}"/>
 
-        <fail message="Missing 'catalina-config' file. See 'docs/developerInfo.html' for instructions." unless="Catalina.available"/>
+        <fail message="Missing 'catalina-config' file. See 'docs/developerInfo.html' for instructions." unless="Catalina.availableInChunk"/>
     </target>
 
     <target
         name="configCatalina"
         description="Load Jakarta-Tomcat (aka Catalina) configuration properties"
         depends="checkForCatalina"
-        if="Catalina.available">
+        if="Catalina.availableInChunk">
 
         <loadproperties srcFile="${Catalina.config}"/>
         <echo level="info" message="Catalina.url:      ${Catalina.url}"/>

@@ -57,6 +57,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     private boolean _isCollection;
     private boolean _isData;
+    private boolean _isAccessible;
 
     private String _parentPath;
     private BESCrawlableDataset _parent;
@@ -305,7 +306,15 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
                 //------
 
                 dataset = new BESCrawlableDataset(newPath, _config);
-                processDatasetElement(e, dataset);
+                try {
+                    processDatasetElement(e, dataset);
+                }
+                catch(BESException besex){
+                    log.error("listDatasets(): Failed to process BES catalog element for " +
+                            "dataset " + getPath() + "  Returning null."+besex);
+                    return null;
+
+                }
 
                 dataset._parent = this;
                 dataset._config = this._config;
@@ -457,6 +466,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         _childDatasetElements = null;
         _isCollection = false;
         _isData = false;
+        _isAccessible = false;
         _haveCatalog = false;
         _haveInfo = false;
         _config = null;
@@ -593,32 +603,104 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     }
 
-    private void processDatasetElement(Element dataset, BESCrawlableDataset cds) {
+    private void processDatasetElement(Element dataset,
+                                       BESCrawlableDataset cds)
+            throws BESException {
 
-        // Process name
+        Element e;
+        String s;
+        // -- Process name
         String path = besPath2ThreddsPath(dataset.getChild("name").getTextTrim());
 
         cds._name = getNameFromPath(path);
         //cds._name = cds._name.equals("/") ? "" : cds._name;
+        // --- --- --- ---
 
-        // Process size
-        cds._length = Integer.parseInt(dataset.getChild("size").getTextTrim());
+        // -- Process Accessibility
+        String isAccessible = dataset.getAttributeValue("isAccessible");
+        if(isAccessible==null)
+            throw new BESException("Catalog dataset element is missing " +
+                "attribute  \"isAccessible\"");
 
-        // process date and time
-        String date = dataset.getChild("lastmodified").getChild("date").getTextTrim();
-        String time = dataset.getChild("lastmodified").getChild("time").getTextTrim();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        if (isAccessible.equalsIgnoreCase("true")) {
+            cds._isAccessible = true;
+        }
+        // --- --- --- ---
 
-        cds._lastModified = sdf.parse(date + " " + time + " UTC", new ParsePosition(0));
 
-        // Process collection (if it is one)
+        if(_isAccessible){
+
+            // -- Process size
+            e = dataset.getChild("size");
+            if(e==null)
+                throw new BESException("Catalog dataset element is missing " +
+                    "child element <size>.");
+            s = e.getTextTrim();
+            cds._length = Integer.parseInt(s);
+            // --- --- --- ---
+
+
+
+            // --- Process date
+            e = dataset.getChild("lastmodified");
+            if(e==null)
+                throw new BESException("Catalog dataset element is missing " +
+                    "child element <lastmodified>.");
+
+            e = e.getChild("date");
+            if(e==null)
+                throw new BESException("Catalog dataset element is missing " +
+                    "child element <date>.");
+
+            s = e.getTextTrim();
+            String date = s;
+            // --- --- --- ---
+
+
+
+
+            // -- Process time
+            e = dataset.getChild("lastmodified");
+            if(e==null)
+                throw new BESException("Catalog dataset element is missing " +
+                    "child element <lastmodified>.");
+
+            e = e.getChild("time");
+            if(e==null)
+                throw new BESException("Catalog dataset element is missing " +
+                    "child element <time>.");
+
+            String time = e.getTextTrim();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+
+            cds._lastModified = sdf.parse(date + " " + time + " UTC", new ParsePosition(0));
+            // --- --- --- ---
+
+
+        }
+
+        // -- Process collection (if it is one)
         String isCollection = dataset.getAttributeValue("thredds_collection");
+        if(isCollection==null)
+            throw new BESException("Catalog dataset element is missing " +
+                "attribute  \"thredds_collection\"");
+
         if (isCollection.equalsIgnoreCase("true")) {
             cds._isCollection = true;
             cds._childDatasetElements = dataset.getChildren("dataset");
         }
+        // --- --- --- ---
 
-        cds._isData = dataset.getAttributeValue("isData").equalsIgnoreCase("true");
+
+
+
+
+        // -- Process isData flag
+        String isData = dataset.getAttributeValue("isData");
+        if(isData==null)
+            throw new BESException("Catalog dataset element is missing " +
+                "attribute  \"isData\"");
+        cds._isData = isData.equalsIgnoreCase("true");
 
         cds._haveInfo = true;
         cds._exists = true;

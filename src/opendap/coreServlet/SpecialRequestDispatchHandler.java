@@ -163,7 +163,7 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
 
 
     /**
-     * Default handler for OPeNDAP status requests; not publically available,
+     * Default handler for OPeNDAP status requests; not publically availableInChunk,
      * used only for debugging
      *
      * @param request  The client's <code> HttpServletRequest</code> request

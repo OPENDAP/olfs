@@ -32,7 +32,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.PrintStream;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Enumeration;
@@ -71,7 +70,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically available,
+     * Default handler for OPeNDAP status requests; not publically availableInChunk,
      * used only for debugging
      *
      * @param request  The client's <code> HttpServletRequest</code> request

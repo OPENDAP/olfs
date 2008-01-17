@@ -138,7 +138,7 @@ public class HeaderInputStream extends FilterInputStream {
 
     /**
      * Reads up to len bytes of data from this input stream into an array of
-     * bytes. This method blocks until some input is available.
+     * bytes. This method blocks until some input is availableInChunk.
      */
     public int read(byte b[], int off, int len) throws IOException {
         if (len <= 0) {

@@ -23,6 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.io;
 
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -74,7 +76,7 @@ public class Chunk {
 
 
 
-
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(Chunk.class);
 
 
     /**
@@ -202,7 +204,7 @@ public class Chunk {
             throw new IOException("Chunk.writeClosingChunkHeader() - Passed " +
                     "OutputStream reference is null.");
 
-        System.out.println("writeClosingChunkHeader(): "+new String(closingChunk));
+        log.debug("writeClosingChunkHeader(): "+new String(closingChunk));
         os.write(closingChunk);
 
     }
@@ -241,7 +243,7 @@ public class Chunk {
             size = "0" + size;
         }
 
-        System.out.println("writeChunkHeader() - size: "+size+" size.length: "+size.length()+" type: "+(char)type);
+        log.debug("writeChunkHeader() - size: "+size+" size.length: "+size.length()+" type: "+(char)type);
 
         System.arraycopy(size.getBytes(),0,header,0,Chunk.HEADER_SIZE-1);
 
@@ -269,6 +271,52 @@ public class Chunk {
         return msg;
 
     }
+
+
+
+
+    /**
+     * Reads a chunk header into the passed byte buffer begining at location
+     * off. The number of bytes is determined by the value of the <code>
+     * HEADER_SIZE<code> constant
+     *
+     * @param is The InputStream from which to read the header.
+     * @param header The array into which to read the chunk header.
+     * @param off The offset within the array header at which to start placing
+     * the bytes of header.
+     * @return The number of bytes in the chunk, or -1 if the underlying stream
+     * has no more bytes to read.
+     * @throws java.io.IOException When the underlying stream does.
+     * @see #HEADER_SIZE
+     *
+     */
+    public static int readChunkHeader(InputStream is,
+                                      byte[] header,
+                                      int off)
+            throws IOException {
+
+        if(header.length-off<HEADER_SIZE)
+            throw new IOException("Header will exceed bounds of passed array.");
+
+        int ret;
+
+
+        // Read the header
+        ret = Chunk.readFully(is, header,off, HEADER_SIZE);
+
+        if(ret==-1)
+            return ret;
+
+        return getDataSize(header);
+
+
+    }
+
+
+
+
+
+
 
 
 }
