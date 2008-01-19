@@ -332,14 +332,20 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        OutputStream os = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        BesAPI.writeDAS(
+        if(!BesAPI.writeDAS(
                 dataSource,
                 constraintExpression,
                 os,
-                os,
-                BesAPI.DAP2_ERRORS);
+                erros,
+                BesAPI.DAP2_ERRORS)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+
+        }
 
 
         os.flush();
@@ -382,16 +388,19 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        //@todo Make them all use a dumy error stream until we fix the error handling in libdap.
-        ByteArrayOutputStream err = new ByteArrayOutputStream();
-
-        BesAPI.writeDDS(
+        if(!BesAPI.writeDDS(
                 dataSource,
                 constraintExpression,
                 os,
-                os,
-                BesAPI.DAP2_ERRORS);
+                erros,
+                BesAPI.DAP2_ERRORS)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+
+        }
 
 
 
@@ -436,14 +445,20 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
 
 
-        OutputStream os = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        BesAPI.writeDDX(
+        if(!BesAPI.writeDDX(
                 dataSource,
                 constraintExpression,
                 os,
-                os,
-                BesAPI.DAP2_ERRORS);
+                erros,
+                BesAPI.DAP2_ERRORS)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+
+        }
 
 
         os.flush();
@@ -484,22 +499,21 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        ServletOutputStream sOut = response.getOutputStream();
-        OutputStream bOut;
+        ServletOutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-
-        bOut = new BufferedOutputStream(sOut);
-
-        BesAPI.writeDap2Data(
+        if(!BesAPI.writeDap2Data(
                 dataSource,
                 constraintExpression,
-                bOut,
-                bOut,
-                BesAPI.DAP2_ERRORS);
+                os,
+                erros,
+                BesAPI.DAP2_ERRORS)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+        }
 
-
-
-        bOut.flush();
+        os.flush();
 
     }
 
@@ -552,7 +566,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 "    CE: '" + request.getQueryString() + "'");
 
 
-        OutputStream os = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = response.getOutputStream();
 
         String url = request.getRequestURL().toString();
 
@@ -565,7 +579,11 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeHTMLForm(dataSource, url, os, erros)){
+        if(!BesAPI.writeHTMLForm(
+                dataSource,
+                url,
+                os,
+                erros)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
@@ -597,7 +615,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         log.debug("sendINFO() for: " + dataSource);
 
-        OutputStream os = new BufferedOutputStream(response.getOutputStream());
+        OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
         if(!BesAPI.writeINFOPage(
@@ -637,18 +655,16 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log.debug("sendASCII(): Data For: " + dataSource +
                     "    CE: '" + request.getQueryString() + "'");
 
-        OutputStream bOut;
 
 
-        ServletOutputStream sOut = response.getOutputStream();
+        ServletOutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        bOut = new BufferedOutputStream(sOut);
 
         if(!BesAPI.writeASCII(
                 dataSource,
                 constraintExpression,
-                bOut,
+                os,
                 erros,
                 BesAPI.XML_ERRORS)){
 
@@ -657,7 +673,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
         }
 
-        bOut.flush();
+        os.flush();
 
 
     }
@@ -685,12 +701,16 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         ServletOutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeFile(name, os, erros, BesAPI.XML_ERRORS)){
+        if(!BesAPI.writeFile(
+                name,
+                os,
+                erros,
+                BesAPI.XML_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
