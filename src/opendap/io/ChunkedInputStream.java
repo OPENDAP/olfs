@@ -263,6 +263,7 @@ public class ChunkedInputStream {
 
                 // Is the status an error?
                 if(status.equalsIgnoreCase(Chunk.ERROR_STATUS)){
+                    log.error("status: error");
                     isError =  true;
                 }
                 // Is the status a mandatory exit?
