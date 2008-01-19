@@ -259,11 +259,11 @@ public class ChunkedInputStream {
             if(extension.startsWith(Chunk.STATUS_EXTENSION)){
 
                 String status = extension.substring(extension.indexOf('=')+1,extension.length());
-                log.debug("status: "+status);
+                //log.debug("status: "+status);
 
                 // Is the status an error?
                 if(status.equalsIgnoreCase(Chunk.ERROR_STATUS)){
-                    log.error("status: error");
+                    //log.error("status: error");
                     isError =  true;
                 }
                 // Is the status a mandatory exit?

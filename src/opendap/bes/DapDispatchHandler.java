@@ -108,7 +108,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + dataSource );
+        log.debug("getLastModified(): Tomcat requesting getlastModified() " +
+                "for collection: " + dataSource );
 
 
         try {

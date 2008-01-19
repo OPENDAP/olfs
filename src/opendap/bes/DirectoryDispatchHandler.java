@@ -167,7 +167,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         } else {
             try {
-                DataSourceInfo dsi = new BESDataSource(ReqInfo.getFullSourceName(request));
+                String dsName = ReqInfo.getFullSourceName(request);
+                DataSourceInfo dsi = new BESDataSource(dsName);
                 if (dsi.sourceExists() &&
                         dsi.isCollection() &&
                         useDefaultOpendapDirectoryView) {
