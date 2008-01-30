@@ -43,9 +43,9 @@ public class BESDataSource implements DataSourceInfo {
     private String BESDateFormat = "yyyy-MM-dd HH:mm:ss";
 
     private boolean exists;
+    private boolean accessible;
     private boolean collection;
     private boolean data;
-    private boolean accessible;
 
     private String name;
     private long size;
@@ -70,17 +70,18 @@ public class BESDataSource implements DataSourceInfo {
         size                = -1;
         lastModified        = null;
 
+        Document info = new Document();
 
-        try {
 
-            Document info = BesAPI.getInfoDocument(dataSourceName);
 
-            exists = true;
+
+        if(BesAPI.getInfoDocument(dataSourceName,info)){
+
+            exists      = true;
+            accessible  = true;
 
             Element dataset = info.getRootElement();
 
-            String isAccessible = dataset.getAttributeValue("isAccessible");
-            accessible = isAccessible == null || isAccessible.equalsIgnoreCase("true");
             String isCollection = dataset.getAttributeValue("thredds_collection");
             collection = isCollection == null || isCollection.equalsIgnoreCase("true");
             String isData = dataset.getAttributeValue("isData");
@@ -97,19 +98,24 @@ public class BESDataSource implements DataSourceInfo {
             lastModified = sdf.parse(dataset.getChild("lastmodified").getChildTextTrim("date") + " " +
                                      dataset.getChild("lastmodified").getChildTextTrim("time"));
 
+        }
+        else {
 
-        } catch (BESException e) {
+            BESError err = new BESError(info);
 
-            log.debug("BES failed to return info document for: \""+dataSourceName+"\"");
-
-            exists        = false;
+            exists        = !err.notFound();
+            accessible    = !err.forbidden();
             collection    = false;
             data          = false;
             name          = null;
             size          = -1;
             lastModified  = null;
 
+            log.debug("BES request for info document for: \""+dataSourceName+"\" returned an error");
+
         }
+
+
 
 
     }
@@ -118,9 +124,10 @@ public class BESDataSource implements DataSourceInfo {
         return exists;
     }
 
-    public  boolean isAccessible(){
+    public  boolean sourceIsAccesible(){
         return accessible;
     }
+
 
     public  boolean isCollection(){
         return collection;

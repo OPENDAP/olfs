@@ -41,8 +41,12 @@ import org.slf4j.Logger;
  * by OLFS.
  *
  * @author Nathan David Potter
+ * @Deprecated No longer used. Replaced by XSLT transforms operating on the
+ * BES catalog response.
  */
+@Deprecated
 public class S4Dir {
+
 
 
 
@@ -106,6 +110,14 @@ public class S4Dir {
 
 
         boolean isTopLevel = collectionName.equals("/");
+
+
+
+
+
+
+
+
 
         String path = BESCrawlableDataset.besPath2ThreddsPath(collectionName);
 
@@ -268,6 +280,7 @@ public class S4Dir {
 
         }
 
+        // Print the page Footer.
         printHTMLFooter(pw,targetURL,isTopLevel);
         pw.flush();
 

@@ -105,35 +105,45 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         respElement.setAttribute("href", "cid:" + contentId, osnms);
 
 
-        Document ddxDoc = BesAPI.getDDXDocument(datasetname, ce);
-        Element ddx = ddxDoc.getRootElement();
-        //@todo Fix The BES use of dodsBLOB!
+        Document ddxDoc = new Document();
 
-        Element blob = ddx.getChild("dataBLOB", XMLNamespaces.getOpendapDAP2Namespace());
-
-        String blobID = MultipartResponse.newUidString();
-
-        //@todo Add the namespace to the href - first we must add it to the schema!
-        blob.setAttribute("href", "cid:" + blobID);
+        boolean besError = BesAPI.getDDXDocument(datasetname, ce, ddxDoc, ddxDoc);
 
 
+        // Add the returned document to the message. It may be an error!
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
         xmlo.output(ddxDoc, baos);
-
-
         mpr.addAttachment("text/xml",
                 contentId,
                 new ByteArrayInputStream(baos.toByteArray()));
 
 
-        mpr.addAttachment("application/octet-stream",
-                blobID,
-                BesAPI.getDap2DataStream(datasetname, ce, BesAPI.XML_ERRORS));
+        // If it's not an error, then try to add the data attachment.
+        if(!besError){
 
-        mpr.addSoapBodyPart(respElement);
-        log.debug("getDATA() completed.");
+            Element ddx = ddxDoc.getRootElement();
+            //@todo Fix The BES use of dodsBLOB!
+
+            Element blob = ddx.getChild("dataBLOB", XMLNamespaces.getOpendapDAP2Namespace());
+
+            String blobID = MultipartResponse.newUidString();
+
+            //@todo Add the namespace to the href - first we must add it to the schema!
+            blob.setAttribute("href", "cid:" + blobID);
+
+            mpr.addAttachment("application/octet-stream",
+                    blobID,
+                    BesAPI.getDap2DataStream(datasetname, ce, BesAPI.XML_ERRORS));
+
+            mpr.addSoapBodyPart(respElement);
+            log.debug("getDATA() completed.");
+
+        }
+        else {
+
+        }
+
     }
 
 
@@ -163,8 +173,14 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         respElement.setAttribute("reqID", reqID, osnms);
 
         // Note that this call does not parse the DDX document into an opendap.dap.DDS, just
-        // into a jdom. Document that gets it's root element stuffed into the SOAP envelope.
-        respElement.addContent(BesAPI.getDDXDocument(datasetname, ce).detachRootElement());
+        // into a JDOM Document that gets it's root element stuffed into the SOAP envelope.
+        Document ddx = new Document();
+
+        // Note that f there is a BESError returned it will be stuffed into the
+        // SOAP eveope in lieu of the DDX.
+        BesAPI.getDDXDocument(datasetname, ce,ddx,ddx);
+
+        respElement.addContent(ddx.detachRootElement());
 
         mpr.addSoapBodyPart(respElement);
 

@@ -28,11 +28,18 @@ import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
 
 import org.jdom.Element;
+import org.jdom.Document;
+import org.jdom.transform.XSLTransformer;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+import org.slf4j.Logger;
 
 import java.util.Date;
+import java.io.ByteArrayInputStream;
+
+import thredds.servlet.ServletUtil;
 
 /**
  * User: ndp
@@ -44,6 +51,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private org.slf4j.Logger log;
     private boolean initialized;
     private boolean useDefaultOpendapDirectoryView;
+    private DispatchServlet dispatchServlet;
 
 
     public DirectoryDispatchHandler() {
@@ -62,6 +70,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if(initialized) return;
 
+        dispatchServlet = s;
 
         Element dv = config.getChild("DefaultDirectoryView");
         if(dv!=null){
@@ -176,7 +185,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                         isDirectoryResponse = true;
                 }
             }
-            catch (BESException e){
+            catch (BESError e){
                 isDirectoryResponse = false;
 
             }
@@ -186,7 +195,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if (isDirectoryResponse && sendResponse) {
 
-            S4Dir.sendDIR(request, response);
+            xsltDir(request, response);
 
         }
 
@@ -195,6 +204,76 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     }
 
+
+    /**
+     * ************************************************************************
+     * Handler for OPeNDAP directory requests. Returns an html document
+     * with a list of all datasets on this server with links to their
+     * DDS, DAS, Information, and HTML responses. Talks to the BES to get the
+     * information.
+     *
+     * @param request  The <code>HttpServletRequest</code> from the client.
+     * @param response The <code>HttpServletResponse</code> for the client.
+     * @throws Exception when things go poorly.
+     * @see opendap.coreServlet.ReqInfo
+     */
+    public void xsltDir(HttpServletRequest request,
+                               HttpServletResponse response)
+            throws Exception {
+
+
+        Logger log = org.slf4j.LoggerFactory.getLogger("opendap.bes.S4Dir");
+        log.debug("sendDIR() request = " + request);
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_directory");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+
+
+        String collectionName  = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+
+        if(collectionName.endsWith("/contents.html")){
+            collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
+        }
+
+        if(!collectionName.endsWith("/"))
+            collectionName += "/";
+
+
+
+        //String targetURL = Scrub.urlContent(request.getContextPath() + request.getServletPath() + collectionName);
+        //log.debug("targetURL:       "+targetURL);
+
+        log.debug("collectionName:  "+collectionName);
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        Document catalog = new Document();
+
+        if(BesAPI.showCatalog(collectionName,catalog)){
+
+
+            String xsltDoc = ServletUtil.getPath(dispatchServlet,"/docs/css/contents.xsl");
+
+            XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+            Document contentsPage = transformer.transform(catalog);
+
+
+            xmlo.output(contentsPage, response.getWriter());
+        }
+        else {
+            BESError besError = new BESError(catalog);
+            besError.sendErrorResponse(response);
+            log.error(besError.getMessage());
+
+        }
+
+        response.getWriter().flush();
+    }
 
 
 }

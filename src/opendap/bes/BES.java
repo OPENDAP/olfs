@@ -155,33 +155,33 @@ public class BES {
     private void cacheServerVersionDocument() throws IOException,
             PPTException,
             BadConfigurationException,
-            JDOMException, BESException {
+            JDOMException,
+            BESError {
 
         log.debug("Getting Server Version Document.");
 
-        Document doc = BesAPI.showVersion(getPrefix());
+        Document version = new Document();
 
-        Element bes = doc.getRootElement().getChild("BES");
+        if(BesAPI.showVersion(getPrefix(),version)){
 
+            Element bes = version.getRootElement().getChild("BES");
 
-        List guts = bes.removeContent();
+            List guts = bes.removeContent();
 
+            Element prefix = new Element("prefix");
+            prefix.addContent(getPrefix());
+            bes.addContent(prefix);
+            bes.addContent(guts);
 
-        Element prefix = new Element("prefix");
-        prefix.addContent(getPrefix());
-//        Element host = new Element("host");
-//        host.addContent(getHost());
-//        Element port = new Element("port");
-//        port.addContent(getPort() + "");
+            _serverVersionDocument = version;
+        }
+        else {
 
+            BESError besError = new BESError(version);
+            log.error(besError.getErrorMessage());
+            throw besError;
 
-        bes.addContent(prefix);
-//        bes.addContent(host);
-//        bes.addContent(port);
-
-        bes.addContent(guts);
-
-        _serverVersionDocument = doc;
+        }
 
 
     }

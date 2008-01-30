@@ -172,9 +172,6 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
     public void sendInfo(HttpServletRequest request,
                          HttpServletResponse response) throws Exception;
 
-    public void sendDir(HttpServletRequest request,
-                        HttpServletResponse response) throws Exception;
-
 
 
 

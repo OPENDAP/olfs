@@ -60,7 +60,7 @@ public class BesAPI {
     /**
      * The name of the BES Exception Element.
      */
-    private static String BES_EXCEPTION = "BESException";
+    private static String BES_ERROR = "BESError";
 
 
     /**
@@ -91,7 +91,7 @@ public class BesAPI {
      *                             errors.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -100,7 +100,7 @@ public class BesAPI {
                                 OutputStream os,
                                 OutputStream err,
                                 String errorMsgFormat)
-            throws BadConfigurationException, BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
                 getAPINameForDDX(),
@@ -112,16 +112,17 @@ public class BesAPI {
     }
 
 
-    public static Document getDDXDocument(String dataSource,
-                                          String constraintExpression)
+    public static boolean getDDXDocument(String dataSource,
+                                          String constraintExpression,
+                                          Document ddx,
+                                          Document err)
             throws PPTException,
             BadConfigurationException,
             IOException,
-            JDOMException,
-            BESException {
+            JDOMException {
 
         ByteArrayOutputStream os  = new ByteArrayOutputStream();
-        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        ByteArrayOutputStream er = new ByteArrayOutputStream();
         SAXBuilder sb = new SAXBuilder();
         Document doc;
 
@@ -130,8 +131,8 @@ public class BesAPI {
                 dataSource,
                 constraintExpression,
                 os,
-                err,
-                "xml")){
+                er,
+                XML_ERRORS)){
 
 
 
@@ -140,16 +141,23 @@ public class BesAPI {
 
             doc = sb.build(new ByteArrayInputStream(os.toByteArray()));
 
-            // Check for an exception:
-            besExceptionHandler(doc);
+            Element dataset = doc.getRootElement();
+            dataset.detach();
+            doc.detachRootElement();
 
-            return doc;
+            ddx.setRootElement(dataset);
+
+            return true;
 
         }
         else {
-            doc = sb.build(new ByteArrayInputStream(err.toByteArray()));
-            besExceptionHandler(doc);
-            return doc;
+            doc = sb.build(new ByteArrayInputStream(er.toByteArray()));
+            Element error = doc.getRootElement();
+            error.detach();
+            doc.detachRootElement();
+
+            err.setRootElement(error);
+            return false;
         }
     }
 
@@ -166,7 +174,7 @@ public class BesAPI {
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -175,7 +183,7 @@ public class BesAPI {
                                 OutputStream os,
                                 OutputStream err,
                                 String errorMsgFormat)
-            throws BadConfigurationException,  BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
                 getAPINameForDDS(),
@@ -198,7 +206,7 @@ public class BesAPI {
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -206,7 +214,7 @@ public class BesAPI {
                                  OutputStream os,
                                  OutputStream err,
                                  String errorMsgFormat)
-            throws BadConfigurationException,  BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         boolean trouble = false;
         boolean success;
@@ -255,7 +263,7 @@ public class BesAPI {
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -264,7 +272,7 @@ public class BesAPI {
                                 OutputStream os,
                                 OutputStream err,
                                 String errorMsgFormat)
-            throws BadConfigurationException,  BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
                 getAPINameForDAS(),
@@ -288,7 +296,7 @@ public class BesAPI {
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -297,7 +305,7 @@ public class BesAPI {
                                      OutputStream os,
                                      OutputStream err,
                                      String errorMsgFormat)
-            throws BadConfigurationException,  BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
                 getAPINameForDODS(),
@@ -322,7 +330,7 @@ public class BesAPI {
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -331,7 +339,7 @@ public class BesAPI {
                                   OutputStream os,
                                   OutputStream err,
                                   String errorMsgFormat)
-            throws BadConfigurationException,  BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
                 getAPINameForASCII(),
@@ -355,14 +363,14 @@ public class BesAPI {
      * @throws BadConfigurationException .
      * @throws PPTException              .
      * @throws IOException              .
-     * @throws BESException              .
+     * @throws BESError              .
      */
     public static boolean writeHTMLForm(String dataSource,
                                      String url,
                                      OutputStream os,
                                      OutputStream err)
             throws BadConfigurationException,
-            BESException,
+            BESError,
             IOException,
             PPTException {
 
@@ -417,7 +425,7 @@ public class BesAPI {
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
@@ -425,7 +433,7 @@ public class BesAPI {
                                         OutputStream os,
                                         OutputStream err,
                                         String errorMsgFormat)
-            throws BadConfigurationException,  BESException, IOException, PPTException {
+            throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
                 getAPINameForINFOPage(),
@@ -447,14 +455,14 @@ public class BesAPI {
      * @param errorMsgFormat       .
      * @return A DAP2 data stream, no DDS just the XDR encoded binary data.
      * @throws BadConfigurationException .
-     * @throws BESException              .
+     * @throws BESError              .
      * @throws IOException               .
      * @throws PPTException              .
      */
     public static InputStream getDap2DataStream(String dataSource,
                                                 String constraintExpression,
                                                 String errorMsgFormat)
-            throws BadConfigurationException,  BESException, PPTException, IOException {
+            throws BadConfigurationException, BESError, PPTException, IOException {
 
         //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
 
@@ -485,73 +493,6 @@ public class BesAPI {
 
 
 
-    /**
-     * Look for and process an Exception in the response from the BES.
-     *
-     * @param doc .
-     * @throws BESException .
-     */
-    private static void besExceptionHandler(Document doc) throws BESException {
-
-
-        Element exception;
-        String msg = "";
-
-        ElementFilter exceptionFilter = new ElementFilter(BES_EXCEPTION);
-        Iterator i = doc.getDescendants(exceptionFilter);
-        if (i.hasNext()) {
-            int j = 0;
-            while (i.hasNext()) {
-                if (j > 0)
-                    msg += "\n";
-                exception = (Element) i.next();
-                msg += makeBesExceptionMsg(exception, j++);
-            }
-            log.debug("Received exception from the BES: "+msg);
-
-            throw new BESException(msg);
-        }
-
-    }
-
-    private static String makeBesExceptionMsg(Element exception, int number) {
-
-        Element e1, e2;
-        String msg = "";
-
-        msg += "[";
-        msg += "[BESException: " + number + "]";
-
-        e1 = exception.getChild("Type");
-        if(e1!=null)
-            msg += "[Type: " + e1.getTextTrim() + "]";
-
-
-        e1 = exception.getChild("Message");
-        if(e1!=null)
-            msg += "[Message: " + e1.getTextTrim() + "]";
-
-        e1 = exception.getChild("Location");
-        if(e1!=null){
-            msg += "[Location: ";
-            e2 = e1.getChild("File");
-            if(e2!=null)
-                msg += e2.getTextTrim();
-
-            e2 = e1.getChild("Line");
-            if(e2!=null)
-                msg += " line " + e2.getTextTrim();
-
-            msg += "]";
-        }
-        msg += "]";
-
-
-        log.warn("Exception Message: " + msg);
-
-        return msg;
-    }
-
 
     private static boolean configureTransaction(OPeNDAPClient oc,
                                              String dataset,
@@ -559,7 +500,7 @@ public class BesAPI {
                                              OutputStream err,
                                              String errorMsgFormat)
 
-            throws BESException, PPTException, IOException {
+            throws PPTException, IOException {
         return configureTransaction(oc, dataset, constraintExpression, null, err, errorMsgFormat);
     }
 
@@ -570,7 +511,7 @@ public class BesAPI {
                                              String type,
                                              OutputStream erros,
                                              String errorMsgFormat)
-            throws BESException, PPTException, IOException {
+            throws  PPTException, IOException {
 
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -716,7 +657,7 @@ public class BesAPI {
                                           OutputStream os,
                                           OutputStream err,
                                           String errorMsgFormat)
-            throws BadConfigurationException, BESException, IOException, PPTException {
+            throws BadConfigurationException, IOException, PPTException {
 
         boolean besTrouble = false;
 
@@ -786,6 +727,7 @@ public class BesAPI {
         log.debug("besShowTransaction started.");
 
         boolean trouble = false;
+        boolean ret;
 
 
         String besDataset;
@@ -805,7 +747,8 @@ public class BesAPI {
 
             String cmd = "set context errors to " + XML_ERRORS + ";\n";
             log.debug("Sending command: " + cmd);
-            if(oc.executeCommand(cmd,os,err)){
+            ret = oc.executeCommand(cmd,os,err);
+            if(ret){
 
                 cmd = "show " + product;
 
@@ -818,21 +761,12 @@ public class BesAPI {
 
 
                 log.debug("Sending command: " + cmd);
-                if(oc.executeCommand(cmd,os,err)){
-                    resetBES(oc);
-                    return true;
-                }
-                else {
-                    resetBES(oc);
-                    return false;
-                }
+                ret = oc.executeCommand(cmd,os,err);
 
             }
-            else {
-                resetBES(oc);
-                return false;
-            }
 
+            resetBES(oc);
+            return ret;
 
 
         }
@@ -852,23 +786,55 @@ public class BesAPI {
 
     }
 
+
+
     /**
      * Returns an the version document for the BES.
      *
      * @param path The path prefix for the BES whose version is being sought.
-     * @return The version Document
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @param version  The version document for the BES associated with the
+     * parameter path, or if the request results in an error, the document
+     * will contain the BESError.
      * @throws BadConfigurationException .
      * @throws PPTException              .
      * @throws IOException               .
      * @throws JDOMException             .
-     * @throws BESException              .
      */
-    public static Document showVersion(String path) throws
+    public static boolean  showVersion(String path, Document version) throws
             BadConfigurationException,
             PPTException,
             IOException,
-            JDOMException,
-            BESException {
+            JDOMException{
+
+        return showVersion(path,version,version);
+    }
+
+
+
+
+    /**
+     * Returns an the version document for the BES.
+     *
+     * @param path The path prefix for the BES whose version is being sought.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @param version  The version document for the BES associated with the
+     * parameter path, or if the request results in an error, the document
+     * will not be changed.
+     * @param error  If the request results in an error, the error document is
+     * placed here.
+     * @throws BadConfigurationException .
+     * @throws PPTException              .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean  showVersion(String path, Document version, Document error) throws
+            BadConfigurationException,
+            PPTException,
+            IOException,
+            JDOMException{
 
         // Get the version response from the BES (an XML doc)
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -894,17 +860,29 @@ public class BesAPI {
             ver.detach();
             ver.setName("BES-Version");
 
-            doc.detachRootElement();
-            doc.setRootElement(ver);
+            version.detachRootElement();
+            version.setRootElement(ver);
 
-            return doc;
+            return true;
 
         }
         else {
             // Parse the XML doc into a Document object.
             doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
-            besExceptionHandler(doc);
-            return doc;
+            Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
+
+            Element err;
+            if(i.hasNext()){
+                err = (Element)i.next();
+            }
+            else {
+                err = doc.getRootElement();
+            }
+
+            err.detach();
+            error.detachRootElement();
+            error.setRootElement(err);
+            return false;
         }
 
 
@@ -914,20 +892,54 @@ public class BesAPI {
      * Returns the BES catalog Document for the specified dataSource, striped
      * of the <response> parent element.
      *
-     * @param dataSource .
-     * @return The BES catalog Document.
+     * @param dataSource The data set or collection for which catalog information
+     * is desired.
+     * @param catalog  The catalog associated with the datasource name, or if
+     * the request results in an error, the error document.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
      * @throws PPTException              .
      * @throws BadConfigurationException .
      * @throws IOException               .
      * @throws JDOMException             .
-     * @throws BESException              .
      */
-    public static Document showCatalog(String dataSource) throws
+    public static boolean showCatalog(String dataSource,
+                                      Document catalog) throws
             PPTException,
             BadConfigurationException,
             IOException,
-            JDOMException,
-            BESException {
+            JDOMException {
+
+
+        return showCatalog(dataSource,catalog,catalog);
+
+
+
+    }
+    /**
+     * Returns the BES catalog Document for the specified dataSource, striped
+     * of the <response> parent element.
+     *
+     * @param dataSource The data set or collection for which catalog information
+     * is desired.
+     * @param catalog  The catalog associated with the datasource name, or if
+     * the request results in an error, the document will not be changed.
+     * @param error  If the request results in an error, the error document is
+     * placed here.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean showCatalog(String dataSource,
+                                      Document catalog,
+                                      Document error) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
@@ -953,17 +965,30 @@ public class BesAPI {
 
             // Disconnect it from it's parent and then rename it.
             topDataset.detach();
-            doc.detachRootElement();
-            doc.setRootElement(topDataset);
+            catalog.detachRootElement();
+            catalog.setRootElement(topDataset);
 
-            return doc;
+            return true;
 
         }
         else {
 
             doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
-            besExceptionHandler(doc);
-            return doc;
+
+            Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
+
+            Element err;
+            if(i.hasNext()){
+                err = (Element)i.next();
+            }
+            else {
+                err = doc.getRootElement();
+            }
+
+            err.detach();
+            error.detachRootElement();
+            error.setRootElement(err);
+            return false;
 
         }
 
@@ -971,23 +996,47 @@ public class BesAPI {
     }
 
 
+
     /**
      * Returns the BES INFO document for the spcified dataSource.
      *
-     * @param dataSource .
-     * @return The BES info document, stripped of it's <response> parent.
+     * @param dataSource The data source whose information is to be retrieved
+     * @param info The information document associated with the datasource name,
+     * or if the request results in an error, the error document.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
      * @throws PPTException              .
      * @throws BadConfigurationException .
      * @throws IOException               .
      * @throws JDOMException             .
-     * @throws BESException              .
      */
-    public static Document getInfoDocument(String dataSource) throws
+    public static boolean getInfoDocument(String dataSource, Document info) throws
             PPTException,
             BadConfigurationException,
             IOException,
-            JDOMException,
-            BESException {
+            JDOMException {
+
+        return getInfoDocument(dataSource,info,info);
+    }
+
+    /**
+     * Returns the BES INFO document for the spcified dataSource.
+     *
+     * @param dataSource The data source whose information is to be retrieved
+     * @param info The information document.
+     * @param err The error document, if an error is returned.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean getInfoDocument(String dataSource, Document info, Document err) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
@@ -1017,14 +1066,29 @@ public class BesAPI {
             // Disconnect it from it's parent and then rename it.
             topDataset.detach();
             doc.detachRootElement();
-            doc.setRootElement(topDataset);
 
-            return doc;
+            info.setRootElement(topDataset);
+
+            return true;
         }
         else {
             doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
-            besExceptionHandler(doc);
-            return doc;
+
+            Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
+
+            Element error;
+            if(i.hasNext()){
+                error = (Element)i.next();
+            }
+            else {
+                error = doc.getRootElement();
+            }
+
+            error.detach();
+            doc.detachRootElement();
+            err.setRootElement(error);
+
+            return false;
         }
 
     }

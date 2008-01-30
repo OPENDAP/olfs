@@ -57,7 +57,6 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     private boolean _isCollection;
     private boolean _isData;
-    private boolean _isAccessible;
 
     private String _parentPath;
     private BESCrawlableDataset _parent;
@@ -309,7 +308,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
                 try {
                     processDatasetElement(e, dataset);
                 }
-                catch(BESException besex){
+                catch(BESError besex){
                     log.error("listDatasets(): Failed to process BES catalog element for " +
                             "dataset " + getPath() + "  Returning null."+besex);
                     return null;
@@ -466,7 +465,6 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         _childDatasetElements = null;
         _isCollection = false;
         _isData = false;
-        _isAccessible = false;
         _haveCatalog = false;
         _haveInfo = false;
         _config = null;
@@ -539,32 +537,57 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
     }
 
 
-    private void getCatalog() throws PPTException, IOException, JDOMException, BadConfigurationException, BESException {
+    private void getCatalog() throws PPTException, IOException, JDOMException, BadConfigurationException, BESError {
 
         if (_haveCatalog)
             return;
 
         String besPath = getBesPath();
         log.debug("Getting catalog for: \"" + besPath + "\"");
-        Document doc = BesAPI.showCatalog(besPath);
-        Element topDataset = doc.getRootElement();
+        Document doc = new Document();
+        if(BesAPI.showCatalog(besPath,doc)){
+
+            Element topDataset = doc.getRootElement();
 
 
-        if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
-//            throw new IOException("Returned dataset name does not match requested name.\n" +
-//                    "Requested: " + besPath + "  " +
-//                    "Returned: " + topDataset.getChild("name").getTextTrim());
-            log.warn("Returned dataset name does not match requested name.\n" +
-                    "Requested: " + besPath + "  " +
-                    "Returned: " + topDataset.getChild("name").getTextTrim());
+            if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
+    //            throw new IOException("Returned dataset name does not match requested name.\n" +
+    //                    "Requested: " + besPath + "  " +
+    //                    "Returned: " + topDataset.getChild("name").getTextTrim());
+                log.warn("Returned dataset name does not match requested name.\n" +
+                        "Requested: " + besPath + "  " +
+                        "Returned: " + topDataset.getChild("name").getTextTrim());
+            }
+
+            processDatasetElement(topDataset, this);
+        }
+        else {
+            processError(doc);
         }
 
-        processDatasetElement(topDataset, this);
 
         _haveCatalog = true;
 
 
     }
+
+
+    /**
+     * Basically set the set of this CrawableDataset to a state compatible with
+     * an error.
+     *
+     * @param besError the error to process
+     */
+    private void processError(Document besError){
+
+
+        init();
+
+    }
+
+
+
+
 
 
     private void getInfo() {
@@ -575,21 +598,37 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         try {
             String besPath = getBesPath();
             log.debug("Getting info for: \"" + besPath + "\"");
-            Document doc = BesAPI.getInfoDocument(besPath);
-            Element topDataset = doc.getRootElement();
 
-            if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
-//            throw new IOException("Returned dataset name does not match requested name.\n" +
-//                    "Requested: " + besPath + "  " +
-//                    "Returned: " + topDataset.getChild("name").getTextTrim());
 
-                log.warn("Returned dataset name does not match requested name.\n" +
-                        "Requested: " + besPath + "  " +
-                        "Returned: " + topDataset.getChild("name").getTextTrim());
+
+
+            Document doc = new Document();
+
+
+            if(BesAPI.getInfoDocument(besPath,doc)){
+                Element topDataset = doc.getRootElement();
+
+                if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
+    //            throw new IOException("Returned dataset name does not match requested name.\n" +
+    //                    "Requested: " + besPath + "  " +
+    //                    "Returned: " + topDataset.getChild("name").getTextTrim());
+
+                    log.warn("Returned dataset name does not match requested name.\n" +
+                            "Requested: " + besPath + "  " +
+                            "Returned: " + topDataset.getChild("name").getTextTrim());
+
+                }
+
+                processDatasetElement(topDataset, this);
+            }
+            else {
+
+                _haveInfo = true;
+                _exists = false;
+
+                log.debug("BES request for info document for: \""+besPath+"\" returned an error");
 
             }
-
-            processDatasetElement(topDataset, this);
 
         }
         catch (Exception e) {
@@ -605,7 +644,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
     private void processDatasetElement(Element dataset,
                                        BESCrawlableDataset cds)
-            throws BESException {
+            throws BESError {
 
         Element e;
         String s;
@@ -616,73 +655,60 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         //cds._name = cds._name.equals("/") ? "" : cds._name;
         // --- --- --- ---
 
-        // -- Process Accessibility
-        String isAccessible = dataset.getAttributeValue("isAccessible");
-        if(isAccessible==null)
-            throw new BESException("Catalog dataset element is missing " +
-                "attribute  \"isAccessible\"");
 
-        if (isAccessible.equalsIgnoreCase("true")) {
-            cds._isAccessible = true;
-        }
+
+        // -- Process size
+        e = dataset.getChild("size");
+        if(e==null)
+            throw new BESError("Catalog <dataset> element is missing " +
+                "child element <size>.");
+        s = e.getTextTrim();
+        cds._length = Integer.parseInt(s);
         // --- --- --- ---
 
 
-        if(_isAccessible){
 
-            // -- Process size
-            e = dataset.getChild("size");
-            if(e==null)
-                throw new BESException("Catalog dataset element is missing " +
-                    "child element <size>.");
-            s = e.getTextTrim();
-            cds._length = Integer.parseInt(s);
-            // --- --- --- ---
+        // --- Process date
+        e = dataset.getChild("lastmodified");
+        if(e==null)
+            throw new BESError("Catalog <dataset> element is missing " +
+                "child element <lastmodified>.");
 
+        e = e.getChild("date");
+        if(e==null)
+            throw new BESError("Catalog <lastmodified> element is missing " +
+                "child element <date>.");
 
-
-            // --- Process date
-            e = dataset.getChild("lastmodified");
-            if(e==null)
-                throw new BESException("Catalog dataset element is missing " +
-                    "child element <lastmodified>.");
-
-            e = e.getChild("date");
-            if(e==null)
-                throw new BESException("Catalog dataset element is missing " +
-                    "child element <date>.");
-
-            s = e.getTextTrim();
-            String date = s;
-            // --- --- --- ---
+        s = e.getTextTrim();
+        String date = s;
+        // --- --- --- ---
 
 
 
 
-            // -- Process time
-            e = dataset.getChild("lastmodified");
-            if(e==null)
-                throw new BESException("Catalog dataset element is missing " +
-                    "child element <lastmodified>.");
+        // -- Process time
+        e = dataset.getChild("lastmodified");
+        if(e==null)
+            throw new BESError("Catalog <dataset> element is missing " +
+                "child element <lastmodified>.");
 
-            e = e.getChild("time");
-            if(e==null)
-                throw new BESException("Catalog dataset element is missing " +
-                    "child element <time>.");
+        e = e.getChild("time");
+        if(e==null)
+            throw new BESError("Catalog <lastmodified> element is missing " +
+                "child element <time>.");
 
-            String time = e.getTextTrim();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        String time = e.getTextTrim();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
-            cds._lastModified = sdf.parse(date + " " + time + " UTC", new ParsePosition(0));
-            // --- --- --- ---
+        cds._lastModified = sdf.parse(date + " " + time + " UTC", new ParsePosition(0));
+        // --- --- --- ---
 
 
-        }
 
         // -- Process collection (if it is one)
         String isCollection = dataset.getAttributeValue("thredds_collection");
         if(isCollection==null)
-            throw new BESException("Catalog dataset element is missing " +
+            throw new BESError("Catalog <dataset> element is missing " +
                 "attribute  \"thredds_collection\"");
 
         if (isCollection.equalsIgnoreCase("true")) {
@@ -698,7 +724,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         // -- Process isData flag
         String isData = dataset.getAttributeValue("isData");
         if(isData==null)
-            throw new BESException("Catalog dataset element is missing " +
+            throw new BESError("Catalog <dataset> element is missing " +
                 "attribute  \"isData\"");
         cds._isData = isData.equalsIgnoreCase("true");
 

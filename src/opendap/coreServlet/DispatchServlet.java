@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jdom.Document;
@@ -416,7 +415,13 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response) {
 
 
+
+
+
         try {
+            if(redirectForContextOnlyRequest(request,response))
+                return;
+
             int hitCount = reqNumber.incrementAndGet();
             PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(hitCount));
             log.debug(Util.showRequest(request, hitCount));
@@ -457,6 +462,22 @@ public class DispatchServlet extends HttpServlet {
     }
     //**************************************************************************
 
+    private boolean redirectForContextOnlyRequest(HttpServletRequest req,
+                                                  HttpServletResponse res)
+            throws IOException {
+
+        String context = req.getContextPath();
+        String reqURI = req.getRequestURI();
+
+        if (reqURI.equals(context)) {
+            String newURI = context+"/";
+            res.sendRedirect(Scrub.urlContent(newURI));
+            log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
+                    "context to a URL that ends in a '/' character!");
+            return true;
+        }
+        return false;
+    }
 
 
     /**

@@ -32,8 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.jdom.Element;
+import org.jdom.Document;
+import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
 /**
@@ -342,9 +346,11 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 os,
                 erros,
                 BesAPI.DAP2_ERRORS)){
+
+
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            response.getWriter().println(msg);
 
         }
 
@@ -399,12 +405,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.DAP2_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            response.getWriter().println(msg);
 
         }
-
-
-
 
         os.flush();
 
@@ -457,7 +460,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.DAP2_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            response.getWriter().println(msg);
 
         }
 
@@ -511,7 +514,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.DAP2_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            response.getWriter().println(msg);
+
         }
 
         os.flush();
@@ -522,28 +526,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-    /**
-     * ***********************************************************************
-     */
-
-
-    public void sendDir(HttpServletRequest request,
-                        HttpServletResponse response)
-            throws Exception {
-
-        log.debug("sendDir()");
-
-        response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_directory");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        S4Dir.sendDIR(request, response);
-
-    }
 
 
     public void sendHTMLRequestForm(HttpServletRequest request,
@@ -585,9 +567,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 url,
                 os,
                 erros)){
-            String msg = new String(erros.toByteArray());
-            log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(response);
+            log.error(besError.getMessage());
         }
 
         os.flush();
@@ -625,9 +607,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 erros,
                 BesAPI.XML_ERRORS)){
 
-            String msg = new String(erros.toByteArray());
-            log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(response);
+            log.error(besError.getMessage());
         }
 
         os.flush();
@@ -669,9 +651,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 erros,
                 BesAPI.XML_ERRORS)){
 
-            String msg = new String(erros.toByteArray());
-            log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(response);
+            log.error(besError.getMessage());
         }
 
         os.flush();
@@ -712,13 +694,16 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 os,
                 erros,
                 BesAPI.XML_ERRORS)){
-            String msg = new String(erros.toByteArray());
-            log.error(msg);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);
+
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(response);
+            log.error(besError.getMessage());
+
         }
 
 
     }
+
 
 
 
