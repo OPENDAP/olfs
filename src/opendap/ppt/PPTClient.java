@@ -22,7 +22,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.ppt ;
+package opendap.ppt;
 
 
 import java.io.*;
@@ -98,17 +98,14 @@ class PPTClient {
     }
 
 
-
-    public void dieNow(){
-        try{
+    public void dieNow() {
+        try {
             _mySock.close();
         }
-        catch(Throwable t){
+        catch (Throwable t) {
             log.error(t.getMessage());
         }
     }
-
-
 
 
     public boolean initConnection() throws PPTException {
@@ -145,12 +142,13 @@ class PPTClient {
 
     /**
      * Attempts to gracefully close the connection to the Server.
+     *
      * @param informServer A true value will result in an attempt to inform the Server that the client is disconnecting.
-     * A false value will simple cause the client to close connections with out informing the server.
+     *                     A false value will simple cause the client to close connections with out informing the server.
      */
     public void closeConnection(boolean informServer) {
         try {
-            if(informServer && _out != null)
+            if (informServer && _out != null)
                 this.writeBuffer(PPTSessionProtocol.PPT_EXIT_NOW);
         }
         catch (PPTException e) {
@@ -214,7 +212,6 @@ class PPTClient {
     }
 
 
-
     /**
      * Get the response from the BES and write it to the passed OutputStream
      *
@@ -241,7 +238,8 @@ class PPTClient {
                 bytesRead = this.readBuffer(inBuff);                          // Read the response.
                 if (bytesRead != 0) {                                         // Got something?
 
-                    for (i = 0; i < bytesRead && !done; i++) {                // look at what we got...
+                    for (i = 0; i < bytesRead && !done; i++)
+                    {                // look at what we got...
                         done = mfinder.markCheck(inBuff[i]);                  // check for the mark
                         if (!done) {                                          // didn't find the mark?
                             if (mfinder.getMarkIndex() > 0) {                 // did ya find part of it?
@@ -251,43 +249,40 @@ class PPTClient {
                                 if (markBufBytes > 0) {                       // if we found part of the mark
                                                                               // (but got fooled) then
 
-				    markBuffer[markBufBytes++] = inBuff[i] ;  // cache current char so we don't
-				                                              // have to worrk about it.
-				    boolean isdone = false ;
-				    while( !isdone )
-				    {
-					bstrm.write( markBuffer[0] ) ;        // write the first character
-					for( int j = 1; j < markBufBytes; j++ ) // shift the rest of the
-					{                                       // characters in markBuffer
-					    markBuffer[j-1] = markBuffer[j] ;   // to the left one
-					}
-					markBufBytes-- ;                      // we have one less in markBuffer
+                                    markBuffer[markBufBytes++] = inBuff[i];   // cache current char so we don't
+                                                                              // have to worry about it.
+                                    boolean isdone = false;
+                                    while (!isdone) {
+                                        bstrm.write(markBuffer[0]);           // write the first character
+                                        for (int j = 1; j < markBufBytes; j++)// shift the rest of the
+                                        {                                     // characters in markBuffer
+                                            markBuffer[j - 1] = markBuffer[j];// to the left one
+                                        }
+                                        markBufBytes--;                       // we have one less in markBuffer
 
-					boolean partof = true ;               // start checking the rest of the
-					                                      // markBuffer against the marker
-					for( int j = 0; j < markBufBytes && partof; j++ )
-					{
-					    mfinder.markCheck( markBuffer[j] ) ; // we won't find the whole
-					                                         // marker so dont' worry about
-										 // return value of markCheck
+                                        boolean partof = true;                // start checking the rest of the
+                                                                              // markBuffer against the marker
 
-					    if( mfinder.getMarkIndex() == 0 )         // if 0 then char not in marker
-					    {
-						partof = false ;
-					    }
-					}
+                                        for (int j = 0; j < markBufBytes && partof; j++)
+                                        {
+                                            mfinder.markCheck(markBuffer[j]); // we won't find the whole
+                                                                              // marker so dont' worry about
+                                                                              // return value of markCheck
 
-					if( partof == true )
-					{
-					    isdone = true ;
-					}
-				    }
+                                            if (mfinder.getMarkIndex() == 0)  // if 0 then char not in marker
+                                            {
+                                                partof = false;
+                                            }
+                                        }
+
+                                        if (partof == true) {
+                                            isdone = true;
+                                        }
+                                    }
+                                } else {
+                                    bstrm.write(inBuff[i]);                   // send this byte that's not part
+                                                                              // of a mark.
                                 }
-				else
-				{
-				    bstrm.write(inBuff[i]);                   // send this byte that's not part
-									      // of a mark.
-				}
                             }
                         }
 
@@ -314,7 +309,7 @@ class PPTClient {
             bytesRead = _in.read(inBuff);
             log.debug("Got " + bytesRead + " bytes.");
 
-            if(bytesRead == -1)
+            if (bytesRead == -1)
                 throw new PPTException("Failed to read response from server. End Of Stream reached prematurely.  ");
 
 

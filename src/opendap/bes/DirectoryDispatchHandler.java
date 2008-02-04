@@ -255,6 +255,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if(BesAPI.showCatalog(collectionName,catalog)){
 
+            setCatalogPrefix(catalog,collectionName);
+
 
             String xsltDoc = ServletUtil.getPath(dispatchServlet,"/docs/css/contents.xsl");
 
@@ -262,6 +264,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             Document contentsPage = transformer.transform(catalog);
 
+            xmlo.output(catalog, System.out);
 
             xmlo.output(contentsPage, response.getWriter());
         }
@@ -273,6 +276,32 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
 
         response.getWriter().flush();
+    }
+
+
+    
+
+    private void setCatalogPrefix(Document catalog, String collectionName){
+
+        String path, prefix="";
+        if(collectionName.length()>1)
+            path = collectionName.substring(0,collectionName.length()-1);
+        else
+        path = collectionName;
+
+        String catalogPath = catalog.getRootElement().getChild("name").getTextTrim();
+
+        if(!path.equals(catalogPath)){
+            if(catalogPath.equals("/"))
+                prefix = path;
+            else
+                prefix = path.substring(0,path.lastIndexOf(catalogPath));
+        }
+        System.out.println("\n\n\n\npath: '" +path +
+                "'  catalogPath: '" + catalogPath +
+                "'  prefix: '"+prefix+"'\n\n\n\n");
+        catalog.getRootElement().setAttribute("prefix",prefix);
+
     }
 
 

@@ -350,7 +350,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.getWriter().println(msg);
+            os.write(msg.getBytes());
 
         }
 
@@ -405,7 +405,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.DAP2_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.getWriter().println(msg);
+            os.write(msg.getBytes());
 
         }
 
@@ -460,7 +460,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.DAP2_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.getWriter().println(msg);
+            os.write(msg.getBytes());
 
         }
 
@@ -514,7 +514,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.DAP2_ERRORS)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
-            response.getWriter().println(msg);
+            os.write(msg.getBytes());
 
         }
 
@@ -524,6 +524,54 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     /***************************************************************************/
 
+
+
+    public void sendASCII(HttpServletRequest request,
+                          HttpServletResponse response)
+            throws Exception {
+
+
+        String dataSource = ReqInfo.getDataSource(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+        response.setContentType("text/plain");
+        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
+        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        response.setHeader("Content-Description", "dods_ascii");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        log.debug("sendASCII(): Data For: " + dataSource +
+                    "    CE: '" + request.getQueryString() + "'");
+
+
+
+        ServletOutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+
+        if(!BesAPI.writeASCII(
+                dataSource,
+                constraintExpression,
+                os,
+                erros,
+//                BesAPI.DAP2_ERRORS)){
+                BesAPI.XML_ERRORS)){
+
+//            String msg = new String(erros.toByteArray());
+//            log.error(msg);
+//            os.write(msg.getBytes());
+
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(response);
+            log.error(besError.getMessage());
+        }
+
+        os.flush();
+
+
+    }
 
 
 
@@ -614,49 +662,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         os.flush();
 
-
-
-    }
-
-
-    public void sendASCII(HttpServletRequest request,
-                          HttpServletResponse response)
-            throws Exception {
-
-
-        String dataSource = ReqInfo.getDataSource(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_ascii");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        log.debug("sendASCII(): Data For: " + dataSource +
-                    "    CE: '" + request.getQueryString() + "'");
-
-
-
-        ServletOutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-        if(!BesAPI.writeASCII(
-                dataSource,
-                constraintExpression,
-                os,
-                erros,
-                BesAPI.XML_ERRORS)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(response);
-            log.error(besError.getMessage());
-        }
-
-        os.flush();
 
 
     }

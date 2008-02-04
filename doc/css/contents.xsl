@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                >
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:template match="/">
@@ -12,21 +13,21 @@
             </head>
             <body>
 
-                <!-- *********************************************************************** -->
-                <!--                           PAGE HEADER                                   -->
-                <!--                                                                         -->
-                <!--                                                                         -->
+                <!-- ****************************************************** -->
+                <!--                      PAGE BANNER                       -->
+                <!--                                                        -->
+                <!--                                                        -->
 
-                <img src='/opendap/docs/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
                 <h1>Contents of
                     <xsl:value-of select="/dataset/name"/>
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
-                <!-- *********************************************************************** -->
-                <!--                            PAGE BODY                                    -->
-                <!--                                                                         -->
-                <!--                                                                         -->
+                <!-- ****************************************************** -->
+                <!--                       PAGE BODY                        -->
+                <!--                                                        -->
+                <!--                                                        -->
                 <pre>
                     <table border="0" width="100%">
                         <tr>
@@ -34,6 +35,18 @@
                             <th align="center">Last Modified</th>
                             <th align="center">Size</th>
                             <th align="center">Response Links</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xsl:if test="/dataset/name!='/'" >
+                                    <a href="..">Parent Directory/</a>
+                                </xsl:if>
+                                <xsl:if test="/dataset/@prefix!=''" >
+                                    <xsl:if test="/dataset/name='/'" >
+                                        <a href="..">Parent Directory/</a>
+                                    </xsl:if>
+                                </xsl:if>
+                            </td>
                         </tr>
                         <xsl:for-each select="/dataset/dataset">
 
@@ -56,9 +69,10 @@
                                     </td>
 
                                     <td align="right">
-                                        <xsl:value-of select="size"/>
+                                        <!-- <xsl:value-of select="size"/> -->
                                     </td>
                                     <td align="center">
+                                        <!--
                                         <xsl:text disable-output-escaping="yes">
                                             &amp;nbsp;
                                         </xsl:text>
@@ -82,6 +96,7 @@
                                         <xsl:text disable-output-escaping="yes">
                                             &amp;nbsp;
                                         </xsl:text>
+                                        -->
                                     </td>
                                 </tr>
                             </xsl:if>
@@ -89,12 +104,20 @@
                             <!-- Process a data set -->
                             <xsl:if test="@thredds_collection='false'">
                                 <tr>
-                                    <td align="left">
-                                        <a href="{name}.html">
-                                            <xsl:value-of select="name"/>
-                                        </a>
-                                    </td>
-
+                                    <xsl:if test="@isData='false'">
+                                        <td align="left">
+                                            <a href="{name}">
+                                                <xsl:value-of select="name"/>
+                                            </a>
+                                        </td>
+                                    </xsl:if>
+                                    <xsl:if test="@isData='true'">
+                                        <td align="left">
+                                            <a href="{name}.html">
+                                                <xsl:value-of select="name"/>
+                                            </a>
+                                        </td>
+                                    </xsl:if>
                                     <td align="center">
                                         <xsl:value-of
                                                 select="lastmodified/date"/>
@@ -109,11 +132,13 @@
                                         <xsl:value-of select="size"/>
                                     </td>
                                     <td align="center">
-                                        <a href="{name}.ddx">ddx</a>
-                                        <a href="{name}.dds">dds</a>
-                                        <a href="{name}.das">das</a>
-                                        <a href="{name}.info">info</a>
-                                        <a href="{name}.html">html</a>
+                                        <xsl:if test="@isData='true'">
+                                            <a href="{name}.ddx">ddx</a>
+                                            <a href="{name}.dds">dds</a>
+                                            <a href="{name}.das">das</a>
+                                            <a href="{name}.info">info</a>
+                                            <a href="{name}.html">html</a>
+                                        </xsl:if>
                                     </td>
                                 </tr>
                             </xsl:if>
@@ -122,10 +147,10 @@
                         </xsl:for-each>
                     </table>
                 </pre>
-                <!-- *********************************************************************** -->
-                <!--                              FOOTER                                     -->
-                <!--                                                                         -->
-                <!--                                                                         -->
+                <!-- ****************************************************** -->
+                <!--                              FOOTER                    -->
+                <!--                                                        -->
+                <!--                                                        -->
                 <hr size="1" noshade="noshade"/>
                 <table width="100%" border="0">
                     <tr>
@@ -154,7 +179,11 @@
                     </tr>
                 </table>
 
+                <!-- ****************************************************** -->
+                <!--         HERE IS THE HYRAX VERSION NUMBER               -->
+                <!--                                                        -->
                 <h3>OPeNDAP Hyrax (1.3.1)
+
                     <xsl:if test="/dataset/name='/'">
                         <xsl:text disable-output-escaping="yes">&amp;nbsp;
                         </xsl:text>

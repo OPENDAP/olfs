@@ -114,9 +114,9 @@ public class BESError extends OPeNDAPException {
         SAXBuilder sb = new SAXBuilder();
 
         try {
-            Document errDoc = sb.build(is);
+            besError = sb.build(is);
 
-            Iterator i = errDoc.getDescendants(new ElementFilter(BES_ERROR));
+            Iterator i = besError.getDescendants(new ElementFilter(BES_ERROR));
 
             if(i.hasNext()){
                 Element error = (Element)i.next();
@@ -179,51 +179,26 @@ public class BESError extends OPeNDAPException {
 
 
 
-    /**
-     * Look for and process an Exception in the response from the BES.
-     *
-     * @param doc .
-     * @return Error message built from the BESError Document.
-     */
-    private  String msgBuilder(Document doc) {
 
 
-        Element exception;
-        String msg = "";
-
-        ElementFilter exceptionFilter = new ElementFilter(BES_ERROR);
-        Iterator i = doc.getDescendants(exceptionFilter);
-        if (i.hasNext()) {
-            int j = 0;
-            while (i.hasNext()) {
-                if (j > 0)
-                    msg += "\n";
-                exception = (Element) i.next();
-                msg += makeBesErrorMsg(exception, j++);
-            }
-        }
-
-        return msg;
-    }
-
-    private  String makeBesErrorMsg(Element exception, int number) {
+    private  String makeBesErrorMsg(Element besErrorElement) {
 
         Element e1, e2;
         String msg = "";
 
         msg += "[";
-        msg += "[BESError: " + number + "]";
+        msg += "[BESError]";
 
-        e1 = exception.getChild("Type");
+        e1 = besErrorElement.getChild("Type");
         if(e1!=null)
             msg += "[Type: " + e1.getTextTrim() + "]";
 
 
-        e1 = exception.getChild("Message");
+        e1 = besErrorElement.getChild("Message");
         if(e1!=null)
             msg += "[Message: " + e1.getTextTrim() + "]";
 
-        e1 = exception.getChild("Location");
+        e1 = besErrorElement.getChild("Location");
         if(e1!=null){
             msg += "[Location: ";
             e2 = e1.getChild("File");
@@ -258,7 +233,7 @@ public class BESError extends OPeNDAPException {
         }
 
 
-        setErrorMessage(msgBuilder(besError));
+        setErrorMessage(makeBesErrorMsg(error));
 
     }
 

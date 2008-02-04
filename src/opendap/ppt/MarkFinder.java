@@ -45,9 +45,10 @@ public class MarkFinder {
 
 
     public MarkFinder(byte[] mark){
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
         _mark = mark.clone();
         _markIndex = 0;
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         log.debug("New MarkFinder. _mark="+new String(_mark));
     }
