@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE stylesheet [
+<!ENTITY NBSP "&lt;xsl:text disable-output-escaping='yes'&gt;&amp;nbsp;&lt;/xsl:text&gt;" >
+]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 >
@@ -20,7 +23,17 @@
 
                 <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
                 <h1>Contents of
-                    <xsl:value-of select="/dataset/name"/>
+                    <xsl:if test="/dataset/@prefix!='/'" >
+                        <xsl:if test="/dataset/name='/'" >
+                            <xsl:value-of select="/dataset/@prefix"/>
+                        </xsl:if>
+                        <xsl:if test="/dataset/name!='/'" >
+                            <xsl:value-of select="/dataset/@prefix"/><xsl:value-of select="/dataset/name"/>
+                        </xsl:if>
+                    </xsl:if>
+                    <xsl:if test="/dataset/@prefix='/'" >
+                        <xsl:value-of select="/dataset/name"/>
+                    </xsl:if>
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
@@ -41,7 +54,7 @@
                                 <xsl:if test="/dataset/name!='/'" >
                                     <a href="..">Parent Directory/</a>
                                 </xsl:if>
-                                <xsl:if test="/dataset/@prefix!=''" >
+                                <xsl:if test="/dataset/@prefix!='/'" >
                                     <xsl:if test="/dataset/name='/'" >
                                         <a href="..">Parent Directory/</a>
                                     </xsl:if>
@@ -68,35 +81,9 @@
                                                 select="lastmodified/time"/>
                                     </td>
 
-                                    <td align="right">
-                                        <!-- <xsl:value-of select="size"/> -->
-                                    </td>
+                                    <td align="right">-</td>
                                     <td align="center">
-                                        <!--
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        -
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        -
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        -
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        -
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        -
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        -->
+                                        &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
                                     </td>
                                 </tr>
                             </xsl:if>
@@ -138,6 +125,9 @@
                                             <a href="{name}.das">das</a>
                                             <a href="{name}.info">info</a>
                                             <a href="{name}.html">html</a>
+                                        </xsl:if>
+                                        <xsl:if test="@isData='false'">
+                                            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
                                         </xsl:if>
                                     </td>
                                 </tr>

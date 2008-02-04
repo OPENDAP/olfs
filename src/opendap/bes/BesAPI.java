@@ -968,6 +968,12 @@ public class BesAPI {
             catalog.detachRootElement();
             catalog.setRootElement(topDataset);
 
+            // Add the appropriate prefix attribute to the top level dataset
+            // element in the catalog
+            BES bes = BESManager.getBES(dataSource);
+            if(bes!=null)
+                catalog.getRootElement().setAttribute("prefix",bes.getPrefix());
+
             return true;
 
         }
@@ -1068,6 +1074,12 @@ public class BesAPI {
             doc.detachRootElement();
 
             info.setRootElement(topDataset);
+
+            // Add the appropriate prefix attribute.
+            BES bes = BESManager.getBES(dataSource);
+            if(bes!=null)
+                info.getRootElement().setAttribute("prefix",bes.getPrefix());
+
 
             return true;
         }
