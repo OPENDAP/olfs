@@ -25,9 +25,13 @@
 package opendap.bes;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.DispatchServlet;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+import org.jdom.transform.XSLTransformer;
 import org.jdom.input.SAXBuilder;
 import org.jdom.filter.ElementFilter;
 
@@ -37,6 +41,8 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+
+import thredds.servlet.ServletUtil;
 
 /**
  * Thrown when something BAD happens in the BES - primairly used to wrap BES
@@ -96,8 +102,15 @@ public class BESError extends OPeNDAPException {
 
     public BESError(Document error) {
 
-        besError = error;
-        processError(besError.getRootElement());
+        Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
+
+        if(i.hasNext()){
+            Element e = (Element)i.next();
+            e.detach();
+            error.detachRootElement();
+            error.setRootElement(e);
+        }
+        besError = processError(error);
 
 
     }
@@ -114,19 +127,13 @@ public class BESError extends OPeNDAPException {
         SAXBuilder sb = new SAXBuilder();
 
         try {
-            besError = sb.build(is);
+            Document error = sb.build(is);
 
-            Iterator i = besError.getDescendants(new ElementFilter(BES_ERROR));
+            besError = processError(error);
 
-            if(i.hasNext()){
-                Element error = (Element)i.next();
-                processError(error);
-            }
-            else {
+            if(besError==null){
                 errorType = INVALID_ERROR;
-
                 setErrorMessage("Unable to locate <BESError> object in stream.");
-
             }
 
         } catch (Exception e) {
@@ -238,41 +245,80 @@ public class BESError extends OPeNDAPException {
     }
 
 
-    public void sendErrorResponse(HttpServletResponse response)
+    private Document processError(Document error){
+        Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
+
+        if(i.hasNext()){
+            Element e = (Element)i.next();
+            e.detach();
+            error.detachRootElement();
+            error.setRootElement(e);
+            processError(e);
+            return error;
+        }
+        else
+            return null;
+
+
+    }
+
+
+    public void sendErrorResponse(DispatchServlet dispatchServlet, HttpServletResponse response)
             throws IOException{
 
 
         int errorVal;
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         switch(getErrorType()){
 
             case BESError.INTERNAL_ERROR:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.INTERNAL_FATAL_ERROR:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.NOT_FOUND_ERROR:
                 errorVal = HttpServletResponse.SC_NOT_FOUND;
+                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.FORBIDDEN_ERROR:
                 errorVal = HttpServletResponse.SC_FORBIDDEN;
+                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.SYNTAX_USER_ERROR:
-                errorVal = HttpServletResponse.SC_BAD_REQUEST;
+                String xsltDoc = ServletUtil.getPath(dispatchServlet,
+                                                     "/docs/css/error400.xsl");
+
+                try {
+                    response.setContentType("text/html");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+                    XSLTransformer transformer = new XSLTransformer(xsltDoc);
+                    Document errorPage = transformer.transform(besError);
+
+                    xmlo.output(errorPage, response.getOutputStream());
+
+                }
+                catch(Exception e){
+                    errorVal = HttpServletResponse.SC_BAD_REQUEST;
+                    response.sendError(errorVal,getMessage());
+                }
                 break;
 
             default:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                response.sendError(errorVal,getMessage());
                 break;
 
         }
 
-        response.sendError(errorVal,getMessage());
 
     }
 

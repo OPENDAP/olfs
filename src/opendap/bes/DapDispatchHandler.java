@@ -47,7 +47,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     private Logger log;
     private boolean initialized;
-
+    private DispatchServlet dispatchServlet;
 
 
     public DapDispatchHandler() {
@@ -71,7 +71,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         if(initialized) return;
 
-
+        dispatchServlet = ds;
         log.info("Initialized.");
         initialized = true;
 
@@ -564,7 +564,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 //            os.write(msg.getBytes());
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
         }
 
@@ -616,7 +616,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 os,
                 erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
         }
 
@@ -656,7 +656,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.XML_ERRORS)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
         }
 
@@ -701,7 +701,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 BesAPI.XML_ERRORS)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
 
         }

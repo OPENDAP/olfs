@@ -222,7 +222,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        Logger log = org.slf4j.LoggerFactory.getLogger("opendap.bes.S4Dir");
         log.debug("sendDIR() request = " + request);
 
         response.setContentType("text/html");
@@ -261,13 +260,11 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             Document contentsPage = transformer.transform(catalog);
 
-            xmlo.output(catalog, System.out);
-
             xmlo.output(contentsPage, response.getWriter());
         }
         else {
             BESError besError = new BESError(catalog);
-            besError.sendErrorResponse(response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
 
         }
