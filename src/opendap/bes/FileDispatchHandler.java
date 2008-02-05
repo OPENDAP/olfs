@@ -149,10 +149,15 @@ public class FileDispatchHandler implements DispatchHandler {
             if (!dsi.isCollection()) {
                 isFileResponse = true;
                 if (sendResponse) {
-                    if (!dsi.isDataset() || allowDirectDataSourceAccess) {
-                        sendFile(request, response);
-                    } else {
-                        sendDirectAccessDenied(request, response);
+                    if(dsi.sourceIsAccesible()){
+                        if (!dsi.isDataset() || allowDirectDataSourceAccess) {
+                            sendFile(request, response);
+                        } else {
+                            sendDirectAccessDenied(request, response);
+                        }
+                    }
+                    else {
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN);
                     }
                 }
             }

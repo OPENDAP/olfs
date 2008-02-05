@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE stylesheet [
-        <!ENTITY NBSP "<xsl:text disable-output-escaping='yes'>&amp;nbsp;</xsl:text>" >
-        ]>
+<!ENTITY NBSP "<xsl:text disable-output-escaping='yes'>&amp;nbsp;</xsl:text>" >
+]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         >
@@ -15,18 +15,10 @@
                 <link rel='stylesheet' href='/opendap/docs/css/contents.css'
                       type='text/css' />
                 <title>Hyrax: ERROR</title>
-                <style type="text/css">
-                    <!--
-                    .style1 {
-                        font-size: 24px;
-                        font-weight: bold;
-                    }
-                    -->
-                </style>
             </head>
 
             <body>
-                <p>&NBSP;</p>
+                <p> &NBSP; </p>
                 <h1 align="center">Hyrax Error</h1>
                 <hr size="1" noshade="noshade"/>
                 <table width="100%" border="0">
@@ -37,22 +29,28 @@
                                  width="320" height="426"/>
                         </td>
                         <td>
-                            <p align="center" class="style1">OUCH!</p>
+                            <p align="center"><strong>OUCH!</strong></p>
                             <p align="center">
-                                Something Bad Happened On This Server.
+                                <strong>
+                                    Something Bad Happened On This Server.
+                                </strong>
                             </p>
+                            <p> &NBSP; </p>
+                            <p> &NBSP; </p>
                             <p align="center">
                                 The error message associated with this error is:
                             </p>
 
                             <blockquote>
-                                <p>
+                                <p align="center">
                                     <strong>
                                         <xsl:value-of select="Message"/>
                                     </strong>
                                 </p>
                             </blockquote>
-                            <p align="left">If you think that the server is
+                            <p> &NBSP; </p>
+                            <p> &NBSP; </p>
+                            <p align="center">If you think that the server is
                                 broken (that the URL you submitted should have
                                 worked), then please contact the user
                                 support coordinator for this server at:

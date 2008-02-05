@@ -564,6 +564,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 //            os.write(msg.getBytes());
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            //besError.setErrorCode(BESError.INTERNAL_ERROR);
             besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
         }

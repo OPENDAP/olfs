@@ -33,6 +33,8 @@ public interface DataSourceInfo {
 
     public  boolean sourceExists();
 
+    public  boolean sourceIsAccesible();
+
     public  boolean isCollection();
 
     public  boolean isDataset();

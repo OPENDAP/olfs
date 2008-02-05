@@ -254,7 +254,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if(BesAPI.showCatalog(collectionName,catalog)){
 
-            String xsltDoc = ServletUtil.getPath(dispatchServlet,"/docs/css/contents.xsl");
+            String xsltDoc = ServletUtil.getPath(dispatchServlet,"/docs/xsl/contents.xsl");
 
             XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
@@ -269,7 +269,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         }
 
-        response.getWriter().flush();
     }
 
 

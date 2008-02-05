@@ -37,10 +37,7 @@ import org.jdom.filter.ElementFilter;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Iterator;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 
 import thredds.servlet.ServletUtil;
 
@@ -98,7 +95,10 @@ public class BESError extends OPeNDAPException {
 
     Document besError = null;
 
-    private int errorType;
+
+
+
+
 
     public BESError(Document error) {
 
@@ -110,6 +110,7 @@ public class BESError extends OPeNDAPException {
             error.detachRootElement();
             error.setRootElement(e);
         }
+
         besError = processError(error);
 
 
@@ -132,13 +133,13 @@ public class BESError extends OPeNDAPException {
             besError = processError(error);
 
             if(besError==null){
-                errorType = INVALID_ERROR;
+                setErrorCode(INVALID_ERROR);
                 setErrorMessage("Unable to locate <BESError> object in stream.");
             }
 
         } catch (Exception e) {
 
-            errorType = INVALID_ERROR;
+            setErrorCode(INVALID_ERROR);
 
             setErrorMessage("Unable to process <BESError> object in stream.");
 
@@ -170,16 +171,13 @@ public class BESError extends OPeNDAPException {
     }
 
 
-    public int getErrorType(){
-        return errorType;
-    }
 
     public boolean notFound(){
-        return errorType==NOT_FOUND_ERROR;
+        return getErrorCode()==NOT_FOUND_ERROR;
     }
 
     public boolean forbidden(){
-        return errorType==FORBIDDEN_ERROR;
+        return getErrorCode()==FORBIDDEN_ERROR;
     }
 
 
@@ -229,14 +227,14 @@ public class BESError extends OPeNDAPException {
             Element e = error.getChild("Type");
             if(e!=null){
                 String s = e.getTextTrim();
-                errorType = Integer.valueOf(s);
+                setErrorCode(Integer.valueOf(s));
             }
             else {
-                errorType = -1;
+                setErrorCode(-1);
             }
         }
         catch(NumberFormatException nfe){
-            errorType = -1;
+            setErrorCode(-1);
         }
 
 
@@ -270,53 +268,58 @@ public class BESError extends OPeNDAPException {
         int errorVal;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        switch(getErrorType()){
+        switch(getErrorCode()){
 
             case BESError.INTERNAL_ERROR:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.INTERNAL_FATAL_ERROR:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.NOT_FOUND_ERROR:
                 errorVal = HttpServletResponse.SC_NOT_FOUND;
-                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.FORBIDDEN_ERROR:
                 errorVal = HttpServletResponse.SC_FORBIDDEN;
-                response.sendError(errorVal,getMessage());
                 break;
 
             case BESError.SYNTAX_USER_ERROR:
-                String xsltDoc = ServletUtil.getPath(dispatchServlet,
-                                                     "/docs/css/error400.xsl");
+                errorVal = HttpServletResponse.SC_BAD_REQUEST;
 
-                try {
-                    response.setContentType("text/html");
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-                    XSLTransformer transformer = new XSLTransformer(xsltDoc);
-                    Document errorPage = transformer.transform(besError);
-
-                    xmlo.output(errorPage, response.getOutputStream());
-
-                }
-                catch(Exception e){
-                    errorVal = HttpServletResponse.SC_BAD_REQUEST;
-                    response.sendError(errorVal,getMessage());
-                }
                 break;
 
             default:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-                response.sendError(errorVal,getMessage());
                 break;
 
+        }
+
+
+        try {
+            String xsltDoc = ServletUtil.getPath(dispatchServlet,
+                                                 "/docs/xsl/error"+errorVal+".xsl");
+
+            File xsltFile = new File(xsltDoc);
+
+            if(xsltFile.exists()){
+                XSLTransformer transformer = new XSLTransformer(xsltDoc);
+                Document errorPage = transformer.transform(besError);
+                response.setContentType("text/html");
+                response.setStatus(errorVal);
+                xmlo.output(errorPage, response.getOutputStream());
+            }
+            else {
+                response.reset();
+                response.sendError(errorVal,getMessage());
+            }
+
+        }
+        catch(Exception e){
+            response.reset();
+            response.sendError(errorVal,getMessage());
         }
 
 
