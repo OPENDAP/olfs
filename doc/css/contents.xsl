@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE stylesheet [
-<!ENTITY NBSP "&lt;xsl:text disable-output-escaping='yes'&gt;&amp;nbsp;&lt;/xsl:text&gt;" >
+<!ENTITY NBSP "<xsl:text disable-output-escaping='yes'>&amp;nbsp;</xsl:text>" >
 ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
