@@ -193,6 +193,20 @@ proc curl_all {url fileBase {constraint ""} } {
 
 
 }
+proc curl_all_but_ascii {url fileBase {constraint ""} } {
+
+    #send_user "${url}" "${fileBase}" "${constraint}"
+
+    curl_dds   "$url" "$fileBase" "$constraint"
+    curl_das   "$url" "$fileBase" "$constraint"
+    curl_ddx   "$url" "$fileBase" "$constraint"
+    curl_dap2  "$url" "$fileBase" "$constraint"
+    curl_info  "$url" "$fileBase" 
+    curl_html  "$url" "$fileBase" 
+
+
+
+}
 
 proc curl_dds { url fileBase {constraint ""} } {
     global verbose

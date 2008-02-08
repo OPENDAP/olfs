@@ -1,4 +1,0 @@
-Error {
-    code = 1001;
-    message = "Failed to read data: Wrong number of arguments to geoarray(). See geoarray() for more information.(1001)";
-};
