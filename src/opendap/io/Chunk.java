@@ -164,6 +164,11 @@ public class Chunk {
         int bytesRead;
 
 
+        if(buf.length<(off+len))
+            throw new IOException("Attempted to read "+len+" bytes starting " +
+                    "at "+off+" into a buffer of length "+buf.length+"  " +
+                    "I'm sorry Dave, I'm afraid I can't do that...");
+
 
         while(!done){
             bytesRead = is.read(buf,off,len);

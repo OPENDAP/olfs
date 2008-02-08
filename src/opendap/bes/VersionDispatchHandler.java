@@ -106,7 +106,8 @@ public class VersionDispatchHandler implements DispatchHandler {
 
         if (dataSource != null) {
             if (        // Version Response?
-                    dataSource.equalsIgnoreCase("/version") ||
+                    dataSource.equalsIgnoreCase("/version")  ||
+                    dataSource.equalsIgnoreCase("/version/") ||
                     (requestSuffix!=null &&
                     requestSuffix.equalsIgnoreCase("ver"))
                     ) {

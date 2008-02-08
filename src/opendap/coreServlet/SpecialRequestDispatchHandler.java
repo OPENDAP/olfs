@@ -133,7 +133,10 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                     log.info("Sent Help Page");
                 }
 
-            } else if ( // System Properties Response?
+            }
+/* @todo add these commented out responses to the as yet to be implemented admin interface
+
+            else if ( // System Properties Response?
                 //Debug.isSet("SystemProperties") &&
 
                     dataSource.equalsIgnoreCase("/systemproperties")
@@ -144,7 +147,8 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                     log.info("Sent System Properties");
                 }
 
-            } else if (  // Status Response?
+            }
+            else if (  // Status Response?
 
                     dataSource.equalsIgnoreCase("/status")) {
 
@@ -155,6 +159,9 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                 }
 
             }
+*/
+
+
         }
 
         return specialRequest;
@@ -200,55 +207,11 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                              HttpServletResponse response)
             throws Exception {
 
+        String context = request.getContextPath();
+        String helpPage = context+"/docs/help.html";
 
-        log.debug("sendHelpPage()");
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_help");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-        response.setStatus(HttpServletResponse.SC_OK);
-
-
-        PrintWriter pw = new PrintWriter(
-                new OutputStreamWriter(response.getOutputStream()));
-
-        pw.println("<h3>OPeNDAP Server Help</h3>");
-        pw.println("To access most of the features of this OPeNDAP server, append");
-        pw.println("one of the following a eight suffixes to a URL: .das, .dds, .dods, .ddx, .info,");
-        pw.println(".ver or .help. Using these suffixes, you can ask this server for:");
-        pw.println("<dl>");
-        pw.println("<dt> das  </dt> <dd> Dataset Attribute Structure (DAS)</dd>");
-        pw.println("<dt> dds  </dt> <dd> Dataset Descriptor Structure (DDS)</dd>");
-        pw.println("<dt> dods </dt> <dd> DataDDS object (A constrained DDS populated with data)</dd>");
-        pw.println("<dt> ddx  </dt> <dd> XML version of the DDS/DAS</dd>");
-        pw.println("<dt> info </dt> <dd> info object (attributes, types and other information)</dd>");
-        pw.println("<dt> html </dt> <dd> html form for this dataset</dd>");
-        pw.println("<dt> ver  </dt> <dd> return the version number of the server</dd>");
-        pw.println("<dt> help </dt> <dd> help information (this text)</dd>");
-        pw.println("</dl>");
-        pw.println("For example, to request the DAS object from the FNOC1 dataset at URI/GSO (a");
-        pw.println("experiments dataset) you would appand `.das' to the URL:");
-        pw.println("http://opendap.gso.uri.edu/cgi-bin/nph-nc/data/fnoc1.nc.das.");
-
-        pw.println("<p><b>Note</b>: Many OPeNDAP clients supply these extensions for you so you don't");
-        pw.println("need to append them (for example when using interfaces supplied by us or");
-        pw.println("software re-linked with a OPeNDAP client-library). Generally, you only need to");
-        pw.println("add these if you are typing a URL directly into a WWW browser.");
-        pw.println("<p><b>Note</b>: If you would like version information for this server but");
-        pw.println("don't know a specific data file or data set name, use `/version' for the");
-        pw.println("filename. For example: http://opendap.gso.uri.edu/cgi-bin/nph-nc/version will");
-        pw.println("return the version number for the netCDF server used in the first example. ");
-
-        pw.println("<p><b>Suggestion</b>: If you're typing this URL into a WWW browser and");
-        pw.println("would like information about the dataset, use the `.info' extension.");
-
-        pw.println("<p>If you'd like to see a data values, use the `.html' extension and submit a");
-        pw.println("query using the customized form.");
-
-
-        pw.flush();
-
+        response.sendRedirect(helpPage);
+        log.debug("Sent redirect to help page: "+helpPage);
 
     }
 

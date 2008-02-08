@@ -37,7 +37,6 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 
 import java.util.Date;
-import java.io.ByteArrayInputStream;
 
 import thredds.servlet.ServletUtil;
 
@@ -48,7 +47,7 @@ import thredds.servlet.ServletUtil;
  */
 public class DirectoryDispatchHandler implements DispatchHandler {
 
-    private org.slf4j.Logger log;
+    private Logger log;
     private boolean initialized;
     private boolean useDefaultOpendapDirectoryView;
     private DispatchServlet dispatchServlet;
@@ -163,9 +162,11 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         String dataSetName = ReqInfo.getDataSetName(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
+        String dsName = ReqInfo.getFullSourceName(request);
 
 
         boolean isDirectoryResponse = false;
+        boolean isContentsRequest = false;
 
         if(dataSetName != null &&
             dataSetName.equalsIgnoreCase("contents") &&
@@ -173,21 +174,15 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             requestSuffix.equalsIgnoreCase("html")) {
 
             isDirectoryResponse = true;
+            isContentsRequest = true;
 
         } else {
-            try {
-                String dsName = ReqInfo.getFullSourceName(request);
-                DataSourceInfo dsi = new BESDataSource(dsName);
-                if (dsi.sourceExists() &&
-                        dsi.isCollection() &&
-                        useDefaultOpendapDirectoryView) {
+            DataSourceInfo dsi = new BESDataSource(dsName);
+            if (dsi.sourceExists() &&
+                    dsi.isCollection() &&
+                    useDefaultOpendapDirectoryView) {
 
-                        isDirectoryResponse = true;
-                }
-            }
-            catch (BESError e){
-                isDirectoryResponse = false;
-
+                    isDirectoryResponse = true;
             }
 
         }
@@ -195,7 +190,17 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if (isDirectoryResponse && sendResponse) {
 
-            xsltDir(request, response);
+            if(dsName.endsWith("/") || isContentsRequest){
+                xsltDir(request, response);
+            }
+            else {
+                // Now that we certain that this is a directory request we
+                // redirect the URL without a trailing slash to the one with.
+                // This keeps everything copacetic downstream when it's time
+                // to build the directory document.
+                response.sendRedirect(Scrub.urlContent(request.getContextPath()+dsName+"/"));
+            }
+
 
         }
 
@@ -239,11 +244,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if(!collectionName.endsWith("/"))
             collectionName += "/";
-
-
-
-        //String targetURL = Scrub.urlContent(request.getContextPath() + request.getServletPath() + collectionName);
-        //log.debug("targetURL:       "+targetURL);
 
         log.debug("collectionName:  "+collectionName);
 

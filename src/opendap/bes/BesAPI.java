@@ -1084,7 +1084,9 @@ public class BesAPI {
             return true;
         }
         else {
-            doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
+            byte[] ba = erros.toByteArray();
+            String s = new String(ba);
+            doc = sb.build(new ByteArrayInputStream(ba));
 
             Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
 

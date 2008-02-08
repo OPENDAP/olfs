@@ -172,7 +172,7 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (1.3.1)
+                <h3>OPeNDAP Hyrax (1.4.0)
 
                     <xsl:if test="/dataset/name='/'">
                         <xsl:text disable-output-escaping="yes">&amp;nbsp;
