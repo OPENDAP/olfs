@@ -40,8 +40,8 @@ public class Scrub {
 
 
 
-    private static String htmlContentInclusionRegex = "[-a-zA-Z0-9/.%_]*";
-    private static String htmlContentExclusionRegex = "[^-a-zA-Z0-9/.%_]";
+    private static String htmlContentInclusionRegex = "[-a-zA-Z0-9/.%_ ]*";
+    private static String htmlContentExclusionRegex = "[^-a-zA-Z0-9/.%_ ]";
 
     private static Pattern htmlContentInclusionPattern = Pattern.compile(htmlContentInclusionRegex);
 
