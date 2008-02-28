@@ -1,2 +1,9 @@
 #!/bin/sh
-runtest --outdir testsuite/logs --srcdir testsuite --tool olfs 
+
+
+ant check
+unitTests=$?
+if [ "$unitTests" == 0 ]
+then
+    runtest --outdir testsuite/logs --srcdir testsuite --tool olfs
+fi

@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>OPeNDAP Hyrax</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<STYLE>
+<!--
+H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:22px;}
+H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:16px;}
+H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;font-size:14px;}
+BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;}
+B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#527CC1;}
+P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}
+A {color : black;}
+A.name {color : black;}
+HR {color : #525D76;}
+LI {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}
+-->
+</STYLE>
+</head>
+
+<body>
+<a href="http://www.opendap.org"><img src="images/logo.gif" width="206" height="93" border="0"></a>
+ <h1 align="left">Hyrax Server Help </h1>
+ <hr size="1" noshade="noshade">
+<p>To access most of the features of this OPeNDAP server, append one of the following a eight suffixes to a URL: .das, .dds, .dods, .ddx, .info, .ver or .help. </p>
+<p>Using these suffixes, you can ask this server for:</p>
+<table width="50%" border="0">
+  <tr>
+    <td width="14%"><div align="center">
+      <p><em>suffix</em></p>
+    </div></td>
+    <td width="86%"><p><em>Description</em></p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>das</strong></p>
+    </div></td>
+    <td><p>Dataset Attribute Structure (DAS)</p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>dds</strong></p>
+    </div></td>
+    <td><p>Dataset Descriptor Structure (DDS</p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>dods</strong></p>
+    </div></td>
+    <td><p>DAP2 data  object (A constrained DDS populated with data)</p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>ddx</strong></p>
+    </div></td>
+    <td><p>XML version of the DDS/DAS</p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>info</strong></p>
+    </div></td>
+    <td><p>An html document that displays the data set's attributes, types and other information.</p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>html</strong></p>
+    </div></td>
+    <td><p>The html data request form for the specified data set. </p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>ver</strong></p>
+    </div></td>
+    <td><p>The version document for the server</p></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <p><strong>help</strong></p>
+    </div></td>
+    <td><p>help information (this text)</p></td>
+  </tr>
+</table>
+<p>For example, to request the DAS object from the FNOC1 dataset at URI/GSO (a experiments dataset) you would appand `.das' to the URL: http://opendap.gso.uri.edu/cgi-bin/nph-nc/data/fnoc1.nc.das.<br>
+  </p>
+<p><strong>Note</strong>: Many OPeNDAP clients supply these extensions for you so you don't need to append them (for example when using interfaces supplied by us or software re-linked with a OPeNDAP client-library). Generally, you only need to add these if you are typing a URL directly into a WWW browser.</p>
+<p><strong>Note:</strong> If you would like version information for this server but don't know a specific data file or data set name, use `/version' for the filename. For example: http://opendap.gso.uri.edu/cgi-bin/nph-nc/version will return the version number for the netCDF server used in the first example.</p>
+<p><strong>Suggestion</strong>: If you're typing this URL into a WWW browser and would like information about the dataset, use the `.info' extension.</p>
+<p>If you'd like to see a data values, use the `.html' extension and submit a query using the customized form.</p>
+<p>For more information about the server look <a href="index.html">HERE</a>. </p>
+<h3>&nbsp;</h3>
+<blockquote>
+  <blockquote>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  </blockquote>
+</blockquote>
+</body>
+</html>

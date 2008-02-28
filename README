@@ -1,4 +1,4 @@
-The file install.html may have additional information...
+The file install.html or docs/index.html may have additional information...
 
 First:
 
@@ -16,7 +16,7 @@ Build it:
 Install it:
 
     rm -rf $TOMCAT_HOME/webapps/opendap
-    cp build/dist/opendap.war $TOMCAT_HOME/webapps 
+    cp build/dist/opendap.war $TOMCAT_HOME/webapps
 
 Launch it:
 
