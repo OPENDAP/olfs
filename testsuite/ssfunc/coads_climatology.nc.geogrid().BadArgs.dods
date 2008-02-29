@@ -1,4 +1,4 @@
 Error {
-    code = 1005;
-    message = "libdap error transmitting DataDDS: Wrong number of arguments to geogrid(). See geogrid() for more information.";
+    code = 1001;
+    message = "libdap exception transmitting DataDDS: error_code = 1001: Wrong number of arguments to geogrid(). See geogrid() for more information.";
 };
