@@ -344,7 +344,7 @@ public class ChunkedOutputStream  {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        ChunkedOutputStream cs = new ChunkedOutputStream(baos);
+        ChunkedOutputStream cs = new ChunkedOutputStream(baos,50);
 
         System.out.println(cs);
 
@@ -385,16 +385,20 @@ public class ChunkedOutputStream  {
     }
 
 
+
+
+
+
     public String toString(){
 
         String msg ="ChunkedOutputStream: \n";
 
-        msg += "    Minimum Chunk Size:           "+ minimumChunkSize +"\n";
-        msg += "    Cache Capacity:               "+cache.length+"\n";
+        msg += "    Minimum Chunk Size:           " + minimumChunkSize +"\n";
+        msg += "    Cache Capacity:               " + cache.length+"\n";
         msg += "\n";
-        msg += "    Current Cache Size:           "+cacheSize+"\n";
-        msg += "    Current Chunk Type:           '"+(char)currentChunkType+"'\n";
-        msg += "    isClosed:                       "+isOpen+"\n";
+        msg += "    Current Cache Size:           " + cacheSize+"\n";
+        msg += "    Current Chunk Type:           '" + (char)currentChunkType+"'\n";
+        msg += "    isOpen:                       " + isOpen+"\n";
 
         return msg;
 

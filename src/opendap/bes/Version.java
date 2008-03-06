@@ -45,15 +45,26 @@ public class Version  {
 
 
 
-
+    /**
+     * Returns a String containing the OLFS version.
+     * @return The version of OLFS.
+     */
     public static String getOLFSVersionString() {
         return (olfsVersion);
     }
 
-    public static String getHyraxVersionString() {
+    /**
+     * Returns a String containing the Hyrax version.
+     * @return The version of Hyrax.
+     */    public static String getHyraxVersionString() {
         return (hyraxVersion);
     }
 
+
+    /**
+     * Returns a JDOM ELement containing the OLFS version.
+     * @return The version of OLFS.
+     */
     public static Element getOLFSVersionElement() {
 
         Element olfs = new Element("OLFS");
@@ -75,6 +86,10 @@ public class Version  {
 
     }
 
+    /**
+     * Returns a JDOM ELement containing the Hyrax version.
+     * @return The version of Hyrax.
+     */
     public static Element getHyraxVersionElement() {
 
         Element olfs = new Element("Hyrax");
@@ -96,11 +111,22 @@ public class Version  {
 
     }
 
+    /**
+     *  Produce the ServerUUID value used by the top level of Hyrax.
+     * @return The UUID.
+     */
     public static String getServerUUID(){
         return "e93c3d09-a5d9-49a0-a912-a0ca16430b91";
     }
 
 
+    /**
+     * Get's the version string that we add to the base of the THREDDS
+     * generated catalog.html pages.
+     *
+     * @return A String containing a snippett of HTML that contains the
+     * Hyrax version and ServerUUID .
+     */
     public static String getVersionStringForTHREDDSCatalog() {
         return "OPeNDAP Hyrax (" + Version.getHyraxVersionString() + ")" +
                 "<font size='-5' color='#7A849E'> " +
@@ -122,11 +148,12 @@ public class Version  {
     /**
      *
      * @param request The client request for which to return the verison.
-     * @return A string containing the value of the XDODS-Server MIME header as ascertained
-     *         by querying the BES.
-     * @throws Exception
+     * @return A string containing the value of the XDODS-Server MIME header as
+     * ascertained by querying the BES.
+     * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXDODSServerVersion(HttpServletRequest request)throws Exception {
+    public static String getXDODSServerVersion(HttpServletRequest request)
+            throws Exception {
 
         if (getVersionDocument(ReqInfo.getDataSource(request)) != null) {
 
@@ -148,9 +175,11 @@ public class Version  {
      * @param request The client request for which to return the verison.
      * @return A String containing the value of the XOPeNDAP-Server MIME header ascertained by querying
      *         the BES and conforming to the DAP4 specification.
-     * @throws Exception
+     * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXOPeNDAPServerVersion(HttpServletRequest request)throws Exception {
+    public static String getXOPeNDAPServerVersion(HttpServletRequest request)
+            throws Exception {
+
         if (getVersionDocument(ReqInfo.getDataSource(request)) != null) {
 
             String opsrv = "";
@@ -174,11 +203,13 @@ public class Version  {
 
 
     /**
+     * Looks at an incoming client request and determines which version of the
+     * DAP the client can understand.
      *
-     * @param request
+     * @param request The client request.
      * @return A String containing the XDAP MIME header value that describes
      * the DAP specifcation that the server response conforms to.
-     * @throws Exception
+     * @throws Exception If these is a problem getting the version document.
      */
     public static String getXDAPVersion(HttpServletRequest request) throws Exception {
         double hval = 0.0;
@@ -218,7 +249,13 @@ public class Version  {
     }
 
 
-
+    /**
+     * Adds the response HTTP headers with the OPeNDAP version content.
+     *
+     * @param request Client request to serviced
+     * @param response The response in which to set the headers.
+     * @throws Exception If these is a problem getting the version document.
+     */
     public static void setOpendapMimeHeaders(HttpServletRequest request,
                                       HttpServletResponse response)
             throws Exception{
