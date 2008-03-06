@@ -280,8 +280,3 @@ proc curl_html { url fileBase} {
 }
 
 
-
-
-
-
-
