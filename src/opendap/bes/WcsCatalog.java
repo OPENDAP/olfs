@@ -137,6 +137,10 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
     public static boolean isWcsDataset(HttpServletRequest req){
 
+        if(wcsDatasets==null)
+            return false;
+
+
         String reqUrlPath = ReqInfo.getUrlPath(req);
 
         configLock.readLock().lock();
@@ -150,6 +154,9 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
     }
 
     public static boolean isWcsDataset(String dataset){
+        
+        if(wcsDatasets==null)
+            return false;
 
         String reqUrlPath = dataset.startsWith("/")?dataset.substring(1,dataset.length()):dataset;
 
@@ -166,9 +173,12 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
 
     public static String getWcsRequestURL(HttpServletRequest req){
+
+        if(wcsDatasets==null)
+            return "";
+
         String reqUrlPath = ReqInfo.getUrlPath(req);
         String wcsURL = null;
-
 
         configLock.readLock().lock();
 
@@ -186,9 +196,12 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
 
     public static String getWcsRequestURL(String dataset){
+
+        if(wcsDatasets==null)
+            return "";
+
         String reqUrlPath = dataset.startsWith("/")?dataset.substring(1,dataset.length()):dataset;
         String wcsURL = null;
-
 
         configLock.readLock().lock();
 
@@ -207,9 +220,14 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
     public static String getDatasetPropertyValue(HttpServletRequest req,
                                           String propertyName){
+
+
+        if(wcsDatasets==null)
+            return "";
+
+
         String reqUrlPath = ReqInfo.getUrlPath(req);
         String value = null;
-
 
         configLock.readLock().lock();
 
@@ -227,6 +245,9 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
 
     public static boolean isWcsDataset(InvDataset id){
+
+        if(wcsDatasets==null)
+            return false;
 
         Iterator ici = id.getProperties().iterator();
         InvProperty prop;
@@ -247,6 +268,11 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
 
     public static  String getPropertyValue(InvDataset id, String propertyName){
+
+
+        if(wcsDatasets==null)
+            return "";
+
         Iterator ici = id.getProperties().iterator();
         InvProperty prop;
 

@@ -134,8 +134,8 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                 }
 
             }
-/* @todo add these commented out responses to the as yet to be implemented admin interface
-
+ //@todo add these commented out responses to the as yet to be implemented admin interface
+/*
             else if ( // System Properties Response?
                 //Debug.isSet("SystemProperties") &&
 

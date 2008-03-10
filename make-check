@@ -2,6 +2,12 @@
 
 verbose=1
 
+
+
+
+###########################################################
+#            initialize the environment
+#
 init() {
 
 if [ $verbose -gt "0" ]
@@ -47,6 +53,11 @@ then
 fi
 }
 
+
+
+###########################################################
+#            Test ChunkedOutputStream
+#
 chunkedOutputStream() {
 
     if [ ! -f build/classes/opendap/io/ChunkedOutputStream.class ]
@@ -85,6 +96,9 @@ chunkedOutputStream() {
 }
 
 
+###########################################################
+#            Run JUnit Tests
+#
 junit() {
     ant check
     testResult=$?
@@ -104,6 +118,9 @@ junit() {
 }
 
 
+###########################################################
+#            Run DejaGnu Tests
+#
 dejaGnu(){
     runtest --outdir testsuite/logs --srcdir testsuite --tool olfs
     testResult=$?
@@ -121,6 +138,9 @@ dejaGnu(){
 
 }
 
+###########################################################
+#            Print Test Summary
+#
 summary() {
 
 
@@ -134,6 +154,11 @@ echo $summary | sed "s/;/    \\
 
 }
 
+
+
+###########################################################
+#            Main
+#
 
 init
 
