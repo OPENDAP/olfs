@@ -278,8 +278,9 @@ public class WcsDispatchHandler implements DispatchHandler {
 
                 log.debug("configuration file: " + filename);
 
-                WcsManager.init(filename);
+                WcsManager.init(filename);                
 
+                log.debug("configuration file: " + filename+" processing complete.");
             }
 
 

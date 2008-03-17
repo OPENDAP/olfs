@@ -56,11 +56,15 @@ public class WcsManager {
 
     public static void init(String fname) throws Exception {
 
-        if(isIntialized) return;
 
         log = org.slf4j.LoggerFactory.getLogger(WcsManager.class);
 
         log.debug("Configuring...");
+
+        if(isIntialized){
+            log.error(" Configuration has already been done. isInitialized(): "+isIntialized);
+            return;
+        }
 
         services = new HashMap<String,WcsService>();
         projects = new HashMap<String, Project>();
