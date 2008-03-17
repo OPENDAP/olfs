@@ -32,6 +32,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Enumeration;
@@ -70,24 +71,15 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
-     * used only for debugging
      *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
+     * @param pw  The PrintWriter to which the system properties should be
+     * written.
      * @throws IOException When things go poorly.
      */
-    static void sendSystemProperties(HttpServletRequest request,
-                                            HttpServletResponse response)
+    public static void printSystemProperties(PrintWriter pw)
             throws Exception {
 
 
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_status");
-
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
         pw.println("<html>");
         pw.println("<title>System Properties</title>");
         pw.println("<hr>");
@@ -107,18 +99,108 @@ public class Util {
         }
         pw.println("</ul>");
 
-        pw.println("<h3>Runtime Info:</h3>");
+        pw.flush();
 
+    }
+
+
+    /**
+     * ************************************************************************
+     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * used only for debugging
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request
+     *                 object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @param pw       The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @throws IOException When things go poorly.
+     */
+    public static void sendSystemProperties(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            PrintWriter pw)
+            throws Exception {
+
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_status");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        printSystemProperties(pw);
+        pw.println("<h3>Runtime Info:</h3>");
+        printMemoryReport(pw);
+        pw.println("<hr>");
+        pw.println("</body>");
+        pw.println("</html>");
+
+
+
+    }
+
+
+    public static void printMemoryReport(PrintWriter pw){
         Runtime rt = Runtime.getRuntime();
         pw.println("JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)<br>");
         pw.println("JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)<br>");
         pw.println("JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)<br>");
         pw.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)<br>");
 
-        pw.println("<hr>");
-        pw.println("</body>");
-        pw.println("</html>");
-        pw.flush();
+    }
+
+    /**
+     * ************************************************************************
+     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * used only for debugging
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request
+     *                 object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @param ps       The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @throws IOException When things go poorly.
+     */
+    public static void sendSystemProperties(HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     PrintStream ps)
+            throws Exception {
+
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_status");
+
+        ps.println("<html>");
+        ps.println("<title>System Properties</title>");
+        ps.println("<hr>");
+        ps.println("<body><h2>System Properties</h2>");
+        ps.println("<h3>Date: " + new Date() + "</h3>");
+
+        Properties sysp = System.getProperties();
+        Enumeration e = sysp.propertyNames();
+
+        ps.println("<ul>");
+        while (e.hasMoreElements()) {
+            String name = (String) e.nextElement();
+
+            String value = System.getProperty(name);
+
+            ps.println("<li>" + name + ": " + value + "</li>");
+        }
+        ps.println("</ul>");
+
+        ps.println("<h3>Runtime Info:</h3>");
+
+        Runtime rt = Runtime.getRuntime();
+        ps.println("JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)<br>");
+        ps.println("JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)<br>");
+        ps.println("JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)<br>");
+        ps.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)<br>");
+
+        ps.println("<hr>");
+        ps.println("</body>");
+        ps.println("</html>");
+        ps.flush();
         response.setStatus(HttpServletResponse.SC_OK);
 
     }

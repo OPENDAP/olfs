@@ -77,10 +77,15 @@
     <property name="netcdf.lib" value="netcdf-2.2.20.jar"/>
     <property name="nlog4j.lib" value="nlog4j-1.2.21.jar"/>
 
-    <property name="cli.lib" value="apache-commons-cli-1.0.jar"/>
+    <property name="commons-cli.lib" value="apache-commons-cli-1.0.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-logging.lib" value="apache-commons-logging-1.1.1.jar"/>
 
     <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+
+
+
 
 
     <available classname="com.fortify.dev.ant.SourceanalyzerTask"
@@ -97,7 +102,9 @@
             <include name="${servlet.lib}"/>
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
-            <include name="${cli.lib}"/>
+            <include name="${commons-cli.lib}"/>
+            <include name="${commons-httpclient.lib}"/>
+            <include name="${commons-logging.lib}"/>
             <include name="${thredds.lib}"/>
             <include name="${netcdf.lib}"/>
             <include name="${nlog4j.lib}"/>
@@ -351,7 +358,7 @@
             description="Build and package the back end client."
             >
 
-        <copy file="${lib.dir}/${cli.lib}" tofile="${build.dist}/${cli.lib}"/>
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
 
         <jar destfile="${build.dist}/beclient.jar"
              manifest="resources/META-INF/BESclient.MANIFEST.MF">
@@ -378,9 +385,13 @@
 
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
                 <include name="${thredds.lib}"/>
                 <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
             </lib>
@@ -401,9 +412,13 @@
 
             <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
                 <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
                 <include name="${thredds.lib}"/>
                 <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
             </zipfileset>
@@ -461,6 +476,53 @@
                         rules="${rules.dir}/OlfsRulePack.xml"
                 />
     </target>
+
+
+    <target
+            name="test"
+            depends="clean,init"
+            description="Performs a clean build of the Test thingy."
+            >
+
+        <echo level="info" message="AntFile: ${ant.file} Compiling test"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="olfs.compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/experiments/**/*.java"/>
+
+        </javac>
+
+
+
+        <war destfile="${build.dist}/test.war"
+             webxml="${WebInfResources.dir}/tesweb.xml"
+                >
+
+            <lib dir="${lib.dir}">
+            </lib>
+            <classes dir="${build.classes}"/>
+
+
+            <webinf dir="${WebInfResources.dir}">
+                <include name="log4j.xml"/>
+            </webinf>
+
+
+        </war>
+
+        <delete file="${build.dist}/index.html"/>
+
+    </target>
+
 
 
 </project>

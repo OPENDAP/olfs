@@ -32,18 +32,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.channels.SocketChannel;
 import java.nio.ByteBuffer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.Util;
+import thredds.servlet.ServletUtil;
+
+
 
 /**
  * User: ndp
@@ -126,6 +127,24 @@ public class ExperimentSandboxServlet extends HttpServlet {
             }
 
 
+            else if(path.equals("/loadTHREDDS") || path.equals("/byte/")){
+
+                msg = ("LOAD_THREDDS");
+                startTime = new Date();
+                loadTHREDDS(request,response);
+                endTime = new Date();
+            }
+
+
+            else if(path.equals("/memory") || path.equals("/byte/")){
+
+                msg = ("MEMORY");
+                startTime = new Date();
+                memory(request,response);
+                endTime = new Date();
+            }
+
+
             else if(path.equals("/hitcount") || path.equals("/hitcount/")){
 
                 msg = ("HitCounter");
@@ -162,6 +181,116 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
 
     }
+
+    private void loadTHREDDS(HttpServletRequest request,
+                             HttpServletResponse response) {
+
+
+        String contextPath = ServletUtil.getContextPath(this);
+        String contentPath = ServletUtil.getContentPath(this);
+        Date startTime, endTime;
+
+        String filename=contentPath + "CEOP/ReferenceSite/catalog.xml";
+
+        try {
+            PrintWriter pw = response.getWriter();
+
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "dods_status");
+            response.setStatus(HttpServletResponse.SC_OK);
+
+
+            pw.println("<hr/><h3>Start:</h3>");
+            Util.printMemoryReport(pw);
+            pw.flush();
+
+
+            startTime = new Date();
+            long snTime = System.nanoTime();
+            // ... the code being measured ...
+            ThreddsCatalog tc = new ThreddsCatalog(filename);
+
+
+            long estimatedTime = System.nanoTime() - snTime;
+
+
+            endTime = new Date();
+
+
+            long elapsed = endTime.getTime() - startTime.getTime();
+            pw.println("<h3>"+"Loaded "+tc.size()+" THREDDS datasets in an " +
+                    "elpased time of "+elapsed+" ms  (" + estimatedTime +
+                    " ns)</h3>");
+            Util.printMemoryReport(pw);
+
+            pw.println("<h3>Running Garbage Collector...</h3>");
+
+            Runtime r = Runtime.getRuntime();
+            r.gc();
+
+
+            Util.printMemoryReport(pw);
+            pw.println("<h3>End</h3><hr/>");
+
+
+
+
+
+        }
+        catch(Exception e){
+            e.printStackTrace(System.out);
+        }
+
+    }
+
+
+    private void memory(HttpServletRequest request,
+                             HttpServletResponse response) {
+
+
+        String contextPath = ServletUtil.getContextPath(this);
+        String contentPath = ServletUtil.getContentPath(this);
+        Date startTime, endTime;
+
+        String filename=contentPath + "CEOP/ReferenceSite/catalog.xml";
+
+        try {
+            PrintWriter pw = response.getWriter();
+
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "dods_status");
+            response.setStatus(HttpServletResponse.SC_OK);
+
+
+            pw.println("<hr/><h3>Start:</h3>");
+            Util.printMemoryReport(pw);
+            pw.flush();
+
+            pw.println("<h3>Running Garbage Collector...</h3>");
+
+            Runtime r = Runtime.getRuntime();
+            r.gc();
+
+
+            Util.printMemoryReport(pw);
+            pw.println("<h3>End</h3><hr/>");
+
+
+
+
+
+        }
+        catch(Exception e){
+            e.printStackTrace(System.out);
+        }
+
+    }
+
+
+
+
+
+
 
     public void doHitCount(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {

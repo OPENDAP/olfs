@@ -27,7 +27,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value></param-value>
+            <param-value> </param-value>
         </init-param>
 
 
@@ -55,6 +55,12 @@
     <servlet>
         <servlet-name>View</servlet-name>
         <servlet-class>thredds.servlet.ViewServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>exp</servlet-name>
+        <servlet-class>opendap.experiments.ExperimentSandboxServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
@@ -89,6 +95,11 @@
         <url-pattern>/view/*</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>exp</servlet-name>
+        <url-pattern>/exp/*</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Default Error Page Definitions -->
     <error-page>
@@ -105,11 +116,11 @@
     </error-page>
     <error-page>
         <error-code>500</error-code>
-        <location>error500.html</location>
+        <location>/docs/error500.html</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
-        <location>error500.html</location>
+        <location>/docs/error500.html</location>
     </error-page>
 
 

@@ -22,21 +22,16 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.bes;
+package opendap.wcs;
 
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.DispatchServlet;
 import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
-import org.jdom.input.SAXBuilder;
-import org.jdom.filter.ElementFilter;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Iterator;
 import java.io.*;
 
 import thredds.servlet.ServletUtil;
@@ -50,10 +45,10 @@ import thredds.servlet.ServletUtil;
  *
  *
  */
-public class BESError extends OPeNDAPException {
+public class WcsError extends OPeNDAPException {
 
 
-    public static final String BES_ERROR = "BESError";
+    public static final String WCS_ERROR = "WCSError";
 
 
     /**
@@ -93,80 +88,25 @@ public class BESError extends OPeNDAPException {
     public static final int NOT_FOUND_ERROR       = 5;
 
 
-    Document besError = null;
 
 
 
 
 
 
-    public BESError(Document error) {
-
-        Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
-
-        if(i.hasNext()){
-            Element e = (Element)i.next();
-            e.detach();
-            error.detachRootElement();
-            error.setRootElement(e);
-        }
-
-        besError = processError(error);
-
-
-    }
-
-    public BESError(Element error) {
-
-        besError = new Document(error);
-        processError(error);
-
-
-    }
-
-    public BESError(InputStream is) {
-        SAXBuilder sb = new SAXBuilder();
-
-        try {
-            Document error = sb.build(is);
-
-            besError = processError(error);
-
-            if(besError==null){
-                setErrorCode(INVALID_ERROR);
-                setErrorMessage("Unable to locate <BESError> object in stream.");
-            }
-
-        } catch (Exception e) {
-
-            setErrorCode(INVALID_ERROR);
-
-            setErrorMessage("Unable to process <BESError> object in stream.");
-
-
-        }
-
-
-    }
-
-
-
-
-
-
-    public BESError(String msg) {
+    public WcsError(String msg) {
         super(msg);
     }
 
-    public BESError(String msg, Exception e) {
+    public WcsError(String msg, Exception e) {
         super(msg, e);
     }
 
-    public BESError(String msg, Throwable cause) {
+    public WcsError(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    public BESError(Throwable cause) {
+    public WcsError(Throwable cause) {
         super(cause);
     }
 
@@ -181,84 +121,21 @@ public class BESError extends OPeNDAPException {
     }
 
 
+    /*
+        <BESError>
+            <Type>3</Type>
+            <Message>Command show ass does not have a registered response handler</Message>
+            <Administrator>ndp@opendap.org</Administrator>
+        </BESError>
+     */
+    public Document getErrorDocument(){
+        Document errDoc = new Document();
 
-
-
-
-
-    private  String makeBesErrorMsg(Element besErrorElement) {
-
-        Element e1, e2;
-        String msg = "";
-
-        msg += "[";
-        msg += "[BESError]";
-
-        e1 = besErrorElement.getChild("Type");
-        if(e1!=null)
-            msg += "[Type: " + e1.getTextTrim() + "]";
-
-
-        e1 = besErrorElement.getChild("Message");
-        if(e1!=null)
-            msg += "[Message: " + e1.getTextTrim() + "]";
-
-        e1 = besErrorElement.getChild("Location");
-        if(e1!=null){
-            msg += "[Location: ";
-            e2 = e1.getChild("File");
-            if(e2!=null)
-                msg += e2.getTextTrim();
-
-            e2 = e1.getChild("Line");
-            if(e2!=null)
-                msg += " line " + e2.getTextTrim();
-
-            msg += "]";
-        }
-        msg += "]";
-
-        return msg;
-    }
-
-
-    private void processError(Element error){
-        try {
-            Element e = error.getChild("Type");
-            if(e!=null){
-                String s = e.getTextTrim();
-                setErrorCode(Integer.valueOf(s));
-            }
-            else {
-                setErrorCode(-1);
-            }
-        }
-        catch(NumberFormatException nfe){
-            setErrorCode(-1);
-        }
-
-
-        setErrorMessage(makeBesErrorMsg(error));
+        return errDoc;
 
     }
 
 
-    private Document processError(Document error){
-        Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
-
-        if(i.hasNext()){
-            Element e = (Element)i.next();
-            e.detach();
-            error.detachRootElement();
-            error.setRootElement(e);
-            processError(e);
-            return error;
-        }
-        else
-            return null;
-
-
-    }
 
 
     public void sendErrorResponse(DispatchServlet dispatchServlet, HttpServletResponse response)
@@ -270,23 +147,23 @@ public class BESError extends OPeNDAPException {
 
         switch(getErrorCode()){
 
-            case BESError.INTERNAL_ERROR:
+            case WcsError.INTERNAL_ERROR:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
                 break;
 
-            case BESError.INTERNAL_FATAL_ERROR:
+            case WcsError.INTERNAL_FATAL_ERROR:
                 errorVal = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
                 break;
 
-            case BESError.NOT_FOUND_ERROR:
+            case WcsError.NOT_FOUND_ERROR:
                 errorVal = HttpServletResponse.SC_NOT_FOUND;
                 break;
 
-            case BESError.FORBIDDEN_ERROR:
+            case WcsError.FORBIDDEN_ERROR:
                 errorVal = HttpServletResponse.SC_FORBIDDEN;
                 break;
 
-            case BESError.SYNTAX_USER_ERROR:
+            case WcsError.SYNTAX_USER_ERROR:
                 errorVal = HttpServletResponse.SC_BAD_REQUEST;
 
                 break;
@@ -306,12 +183,10 @@ public class BESError extends OPeNDAPException {
 
             if(xsltFile.exists()){
                 XSLTransformer transformer = new XSLTransformer(xsltDoc);
-                Document errorPage = transformer.transform(besError);
+                Document errorPage = transformer.transform(getErrorDocument());
                 response.setContentType("text/html");
                 response.setStatus(errorVal);
                 xmlo.output(errorPage, response.getOutputStream());
-                xmlo.output(errorPage, System.out);
-                xmlo.output(besError, System.out);
             }
             else {
                 response.reset();

@@ -261,6 +261,10 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             Document contentsPage = transformer.transform(catalog);
 
             xmlo.output(contentsPage, response.getWriter());
+
+            xmlo.output(catalog,System.out);
+            xmlo.output(contentsPage,System.out);
+
         }
         else {
             BESError besError = new BESError(catalog);

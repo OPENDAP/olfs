@@ -104,6 +104,53 @@ public class PerfLog {
     }
 
 
+    /**
+     * Initialize logging for the web application context in which the given
+     * servlet is running. Two types of logging are supported:
+     * <p/>
+     * 1) Regular logging using the SLF4J API.
+     * 2) Performance logging which can write Apache common logging format logs,
+     * use the PerfLog.logServerStartup(String) method.
+     * <p/>
+     * The log directory is determined by the servlet containers content
+     * directory. The configuration of logging is controlled by the log4j.xml
+     * file.
+     *
+     * @param path - the path to the log4j.xml file
+     */
+    public static void initLogging(String path) {
+        // Initialize logging if not already done.
+        if (isLogInit)
+            return;
+
+        System.out.println("+++PerfLog.initLogging()");
+
+        // set up the log path
+        String logPath = path + "logs";
+        File logPathFile = new File(logPath);
+        if (!logPathFile.exists()) {
+            if (!logPathFile.mkdirs()) {
+                throw new RuntimeException("Creation of logfile directory failed." + logPath);
+            }
+        }
+
+        // read in Log4J config file
+        System.setProperty("logdir", logPath); // variable substitution
+        try {
+            String log4Jconfig = path + "log4j.xml";
+            System.out.println("+++PerfLog.initLogging() - Log4j configuration using: "+log4Jconfig);
+            DOMConfigurator.configure(log4Jconfig);
+            System.out.println("+++PerfLog.initLogging() - Log4j configured.");
+        } catch (FactoryConfigurationError t) {
+            t.printStackTrace();
+        }
+
+        log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+
+        isLogInit = true;
+    }
+
+
 
     /**
      * Gather current thread information for inclusion in regular logging

@@ -409,7 +409,7 @@ public class S4Dir {
     private static String computeSizeString(String size) {
 
         int sz = Integer.parseInt(size);
-        String result, leftPad;
+        String result;
 
         int mag = 0;
 

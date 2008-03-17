@@ -48,6 +48,16 @@ import org.slf4j.Logger;
  */
 public class BesAPI {
 
+    public static String DDS        = "dds";
+    public static String DAS        = "das";
+    public static String DDX        = "ddx";
+    public static String DAP2       = "dods";
+    public static String STREAM     = "stream";
+    public static String ASCII      = "ascii";
+    public static String HTML_FORM  = "html_form";
+    public static String INFO_PAGE  = "info_page";
+
+
 
     public static String XML_ERRORS = "xml";
     public static String DAP2_ERRORS = "dap2";
@@ -103,7 +113,7 @@ public class BesAPI {
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
-                getAPINameForDDX(),
+                DDX,
                 dataSource,
                 constraintExpression,
                 os,
@@ -127,7 +137,7 @@ public class BesAPI {
         Document doc;
 
         if(besGetTransaction(
-                getAPINameForDDX(),
+                DDX,
                 dataSource,
                 constraintExpression,
                 os,
@@ -186,7 +196,7 @@ public class BesAPI {
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
-                getAPINameForDDS(),
+                DDS,
                 dataSource,
                 constraintExpression,
                 os,
@@ -230,10 +240,10 @@ public class BesAPI {
 
             String besDataSource = bes.trimPrefix(dataSource);
 
-            success = configureTransaction(oc, besDataSource, null, getAPINameForStream(), err, errorMsgFormat);
+            success = configureTransaction(oc, besDataSource, null, STREAM, err, errorMsgFormat);
 
             if(success){
-                success = getDataProduct(oc, getAPINameForStream(), os, err);
+                success = getDataProduct(oc, STREAM, os, err);
             }
             resetBES(oc);
 
@@ -275,7 +285,7 @@ public class BesAPI {
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
-                getAPINameForDAS(),
+                DAS,
                 dataSource,
                 constraintExpression,
                 os,
@@ -308,7 +318,7 @@ public class BesAPI {
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
-                getAPINameForDODS(),
+                DAP2,
                 dataSource,
                 constraintExpression,
                 os,
@@ -342,7 +352,7 @@ public class BesAPI {
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
-                getAPINameForASCII(),
+                ASCII,
                 dataSource,
                 constraintExpression,
                 os,
@@ -389,7 +399,72 @@ public class BesAPI {
             String besDataSource = bes.trimPrefix(dataSource);
             success = configureTransaction(oc, besDataSource, null, err, XML_ERRORS);
             if(success){
-                String cmd = "get " + getAPINameForHTMLForm() +
+                String cmd = "get " + HTML_FORM +
+                        " for d1 using " + url + ";\n";
+
+                log.debug("Sending command: " + cmd);
+
+                success = oc.executeCommand(cmd,os,err);
+            }
+            resetBES(oc);
+
+        }
+        catch (PPTException e) {
+            trouble = true;
+            String msg = "writeHTMLForm() Problem with " +
+                    "OPeNDAPClient: " + e.getMessage();
+            log.error(msg);
+            throw new PPTException(msg,e);
+        }
+        finally {
+            bes.returnClient(oc, trouble);
+        }
+
+        return success;
+    }
+
+
+    /**
+     * Writes the HTML data request form (aka the I.F.H.) for the OPeNDAP the
+     * dataSource to the passed stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param url The URL to refernence in the HTML form.
+     * @param os  The Stream to which to write the response.
+     * @param err The Stream to which to write errors returned by the BES.
+     * @param wcsRequestURL The WCS request URL to use to get the data set.
+     * @return True is everything goes well, false if the BES returns an error.
+     * @throws BadConfigurationException .
+     * @throws PPTException              .
+     * @throws IOException              .
+     * @throws BESError              .
+     */
+    public static boolean writeWcsHTMLForm(String dataSource,
+                                     String url,
+                                     OutputStream os,
+                                     OutputStream err,
+                                     String wcsRequestURL)
+            throws BadConfigurationException,
+            BESError,
+            IOException,
+            PPTException {
+
+
+        boolean trouble = false, success = true;
+        BES bes = BESManager.getBES(dataSource);
+
+        if (bes == null)
+            throw new BadConfigurationException("There is no BES to handle " +
+                    "the requested data source: " + dataSource);
+
+
+        OPeNDAPClient oc = bes.getClient();
+        try {
+
+            String besDataSource = bes.trimPrefix(dataSource);
+            success = configureWcsTransaction(oc, besDataSource, null, err, XML_ERRORS,wcsRequestURL);
+            if(success){
+                String cmd = "get " + HTML_FORM +
                         " for d1 using " + url + ";\n";
 
                 log.debug("Sending command: " + cmd);
@@ -436,7 +511,7 @@ public class BesAPI {
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
-                getAPINameForINFOPage(),
+                INFO_PAGE,
                 dataSource,
                 null,
                 os,
@@ -596,45 +671,121 @@ public class BesAPI {
     }
 
 
+    private static boolean configureWcsTransaction(OPeNDAPClient oc,
+                                             String dataset,
+                                             String constraintExpression,
+                                             OutputStream err,
+                                             String errorMsgFormat,
+                                             String wcsRequestURL)
+
+
+            throws PPTException, IOException {
+        return configureWcsTransaction( oc,
+                                        dataset,
+                                        constraintExpression,
+                                        null,
+                                        err,
+                                        errorMsgFormat,
+                                        wcsRequestURL);
+    }
+
+
+    private static boolean configureWcsTransaction(OPeNDAPClient oc,
+                                             String dataset,
+                                             String constraintExpression,
+                                             String type,
+                                             OutputStream erros,
+                                             String errorMsgFormat,
+                                             String wcsRequestURL)
+            throws  PPTException, IOException {
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String cmd;
+        boolean success;
+
+        cmd = "set context errors to " + errorMsgFormat + ";\n";
+        log.debug("Sending BES command: " + cmd);
+
+
+
+        success = oc.executeCommand(cmd,baos,erros);
+        if(success) {
+
+            baos.reset();
+
+            String catalogName;
+            String container;
+
+            catalogName = "wcs";
+            container = "wcsContainer";
+            dataset = "\"" + wcsRequestURL + "\"";
+
+
+            cmd = "set container in " + catalogName + " values "
+                    + container
+                    + ", "
+                    + dataset
+                    + (type == null ? "" : ", " + type) + ";\n";
+
+
+            log.debug("Sending BES command: " + cmd);
+
+
+            success = oc.executeCommand(cmd,baos,erros);
+            if(success){
+
+                baos.reset();
+
+                log.debug("UnEscaped ConstraintExpression: " + constraintExpression);
+
+                if(constraintExpression != null ){
+
+                    // Encode all the double quotes as their hex representation of %22
+                    constraintExpression = constraintExpression.replace("\"","%22");
+
+                    // Use the backslash character (hex encoded as %5c) to escape
+                    // all of the encoded double quotes
+                    constraintExpression = constraintExpression.replace("%22","%5C%22");
+
+                }
+                log.debug("Escaped ConstraintExpression: " + constraintExpression);
+
+
+                if (constraintExpression == null ||
+                    constraintExpression.equalsIgnoreCase("")) {
+
+                    cmd = "define d1 as " + container + ";\n";
+
+                } else {
+                    cmd = "define d1 as "
+                            + container
+                            + " with "
+                            + container
+                            + ".constraint=\""
+                            + constraintExpression + "\"  ;\n";
+
+                }
+
+                log.debug("Sending BES command: " + cmd);
+                success = oc.executeCommand(cmd,baos,erros);
+
+            }
+
+        }
+        return success;
+
+
+    }
+
+
     private static String getGetCmd(String product) {
 
         return "get " + product + " for d1;\n";
 
     }
 
-    private static String getAPINameForDDS() {
-        return "dds";
-    }
-
-    private static String getAPINameForDAS() {
-        return "das";
-    }
-
-    private static String getAPINameForDODS() {
-        return "dods";
-    }
-
-    private static String getAPINameForDDX() {
-        return "ddx";
-    }
-
-
-    private static String getAPINameForStream() {
-        return "stream";
-    }
-
-
-    private static String getAPINameForASCII() {
-        return "ascii";
-    }
-
-    private static String getAPINameForHTMLForm() {
-        return "html_form";
-    }
-
-    private static String getAPINameForINFOPage() {
-        return "info_page";
-    }
 
 
     private static boolean  getDataProduct(OPeNDAPClient oc,
@@ -682,6 +833,74 @@ public class BesAPI {
                     constraintExpression,
                     err,
                     errorMsgFormat)){
+
+                if(getDataProduct(oc, product, os, err)){
+                    resetBES(oc);
+                    return true;
+                }
+                else {
+                    resetBES(oc);
+                    return false;
+                }
+
+            }
+            else {
+                resetBES(oc);
+                return false;
+            }
+
+
+        }
+        catch (PPTException e) {
+            besTrouble = true;
+
+            String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
+                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
+            log.error(msg);
+
+            throw new PPTException(msg);
+        }
+        finally {
+            bes.returnClient(oc, besTrouble);
+            log.debug("besGetTransaction complete.");
+
+        }
+
+    }
+
+    public static boolean besGetWcsTransaction(String product,
+                                          String dataset,
+                                          String constraintExpression,
+                                          OutputStream os,
+                                          OutputStream err,
+                                          String errorMsgFormat,
+                                          String wcsRequestURL)
+            throws BadConfigurationException, IOException, PPTException {
+
+        boolean besTrouble = false;
+
+
+        log.debug("besGetTransaction started.");
+
+        BES bes = BESManager.getBES(dataset);
+
+        if (bes == null)
+            throw new BadConfigurationException("There is no BES to handle the requested data source: " + dataset);
+
+
+        OPeNDAPClient oc = bes.getClient();
+
+
+        try {
+
+            String besDataset = bes.trimPrefix(dataset);
+
+            if(configureWcsTransaction(oc,
+                    besDataset,
+                    constraintExpression,
+                    err,
+                    errorMsgFormat,
+                    wcsRequestURL)){
 
                 if(getDataProduct(oc, product, os, err)){
                     resetBES(oc);
