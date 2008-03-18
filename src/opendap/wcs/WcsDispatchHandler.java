@@ -278,7 +278,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
                 log.debug("configuration file: " + filename);
 
-                WcsManager.init(filename);                
+                WcsManager.init(filename);
 
                 log.debug("configuration file: " + filename+" processing complete.");
             }
@@ -478,7 +478,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         }
 
 
-        Collection<Site> sites = project.getSites();
+        Vector<Site> sites = project.getSites();
 
         for (Site site : sites) {
             //size = WcsManager.getWcsServiceCount();

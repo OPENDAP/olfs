@@ -39,14 +39,16 @@ public class Project {
     private Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
     private Element config;
 
-    HashMap<String,Site> sites;
+    HashMap<String,Site> siteMapper;
+    Vector<Site> siteList;
 
 
     public Project(Element configuration) throws Exception{
 
         log.debug("Configuring...");
 
-        sites = new HashMap<String,Site>();
+        siteMapper = new HashMap<String,Site>();
+        siteList = new Vector<Site>();
 
         config = (Element) configuration.clone();
 
@@ -87,7 +89,8 @@ public class Project {
             elm = (Element)i.next();
 
             site = new Site(elm);
-            sites.put(site.getName(),site);
+            siteMapper.put(site.getName(),site);
+            siteList.add(site);
         }
 
 
@@ -96,7 +99,7 @@ public class Project {
     }
 
     public int getSize(){
-        return sites.size();
+        return siteMapper.size();
     }
 
     public String getName(){
@@ -105,21 +108,20 @@ public class Project {
 
 
     public Site getSite(String name){
-        return sites.get(name);
+        return siteMapper.get(name);
     }
 
 
-    public Collection<Site> getSites(){
-        return sites.values();
+    public Vector<Site> getSites(){
+        return siteList;
     }
+
     public  String[] getSiteNames(){
 
-        Collection<Site> sc = sites.values();
-
-        String[] names = new String[sites.size()];
-
+        String[] names = new String[siteList.size()];
         int j=0;
-        for (Site site : sc) {
+
+        for(Site site : siteList){
             names[j++] = site.getName();
         }
 
