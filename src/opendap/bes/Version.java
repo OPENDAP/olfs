@@ -33,6 +33,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import opendap.coreServlet.ReqInfo;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Contains the Version and UUID information for Hyrax Server.
  */
@@ -157,12 +160,28 @@ public class Version  {
 
         if (getVersionDocument(ReqInfo.getDataSource(request)) != null) {
 
-            for (Object o : getVersionDocument(ReqInfo.getDataSource(request)).getRootElement().getChild("BES").getChildren("lib")) {
-                Element e = (Element) o;
-                if (e.getChildTextTrim("name").equalsIgnoreCase("libdap")) {
-                    return ("dods/" + e.getChildTextTrim("version"));
+            Element e1;
+            String thisVer, highestVer;
+            int result;
+
+            e1 = getVersionDocument(ReqInfo.getDataSource(request)).getRootElement();
+            e1 = e1.getChild("Handlers");
+            e1 = e1.getChild("DAP");
+
+            highestVer="0.0";
+            for (Object o1 : e1.getChildren("version")) {
+                e1 = (Element) o1;
+                thisVer = e1.getTextTrim();
+
+                result = thisVer.compareToIgnoreCase(highestVer);
+
+                if(result>0){
+                    highestVer = thisVer;
                 }
+
             }
+
+            return ("dods/" + highestVer);
         }
 
         return ("Server-Version-Unknown");
