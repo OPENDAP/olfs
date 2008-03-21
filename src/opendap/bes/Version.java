@@ -33,9 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import opendap.coreServlet.ReqInfo;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Contains the Version and UUID information for Hyrax Server.
  */
