@@ -36,18 +36,27 @@ public class WCS {
     public static String    NAMESPACE_STRING = "http://www.opengis.net/wcs";
     public static Namespace NS = Namespace.getNamespace(NAMESPACE_STRING);
 
-    public static String    GML_NAMEPACES_STRING ="http://www.opengis.net/gml";
-    public static Namespace GML_NS = Namespace.getNamespace(GML_NAMEPACES_STRING);
+
+    public static String    DAPWCS_NAMEPACES_STRING ="http://www.opendap.org/ns/dapwcs";
+    public static Namespace DAPWCS_NS = Namespace.getNamespace(DAPWCS_NAMEPACES_STRING);
 
 
     public static String COVERAGE_OFFERING = "CoverageOffering";
+    public static String COVERAGE_OFFERING_BRIEF = "CoverageOfferingBrief";
+    public static String CONTENT_METADATA = "ContentMetadata";
     public static String NAME = "name";
     public static String LABEL = "label";
+    public static String LON_LAT_ENVELOPE = "lonLatEnvelope";
     public static String DOMAIN_SET = "domainSet";
     public static String TEMPORAL_DOMAIN = "temporalDomain";
-    public static String TIME_PERIOD = "timePeriod";
-    public static String BEGIN_POSITION = "beginPosition";
-    public static String END_POSITION = "endPosition";
+    public static String SPATIAL_DOMAIN = "spatialDomain";
+    public static String SRS_NAME = "srsName";
+
+    public static String SUPPORTED_CRSS = "supportedCRSs";
+    public static String REQUEST_CRSS = "requestCRSs";
+    public static String RESPONSE_CRSS = "responseCRSs";
+    public static String NATIVE_CRSS = "nativeCRSs";
+    public static String REQUEST_RESPONSE_CRSS = "requestResponseCRSs";
 
 
 

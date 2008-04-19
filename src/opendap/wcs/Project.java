@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
+import thredds.servlet.ServletUtil;
+
 /**
  * User: ndp
  * Date: Mar 13, 2008
@@ -38,9 +40,13 @@ public class Project {
 
     private Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
     private Element config;
+    private boolean isThreddsCatalog;
 
     HashMap<String,Site> siteMapper;
     Vector<Site> siteList;
+
+
+    Vector<Element> threddsRootCatalogs;
 
 
     public Project(Element configuration) throws Exception{
@@ -49,6 +55,7 @@ public class Project {
 
         siteMapper = new HashMap<String,Site>();
         siteList = new Vector<Site>();
+        isThreddsCatalog = false;
 
         config = (Element) configuration.clone();
 
@@ -62,8 +69,9 @@ public class Project {
 
         Attribute attr;
         Element elm;
-        List k;
+        List sites;
         Site site;
+        Iterator i;
 
         if(!config.getName().equals("Project"))
             throw new Exception("Cannot build a "+getClass()+" using " +
@@ -72,18 +80,19 @@ public class Project {
         attr = config.getAttribute("name");
         if(attr==null)
             throw new Exception("Missing \"name\" attribute. " +
-                    "WCSService elements must have a name attribute.");
+                    "Project elements must have a name attribute.");
         log.debug("name: "+attr.getValue());
 
 
-        k = config.getChildren("Site");
+        sites = config.getChildren("Site");
 
-        if(k.isEmpty())
-            throw new Exception("Missing <Site> element. " +
-                    "<WCSProject name=\""+getName()+"\"> elements must have a " +
-                    "<Site> element.");
+        if(sites.isEmpty())
+            throw new Exception("Invalid Configuration. " +
+                    "Project elements must contain (1 or more <Site> elements) " +
+                    "OR (1 or more<ThreddsCatalogRoot> elements.");
 
-        Iterator i = k.iterator();
+
+        i = sites.iterator();
 
         while(i.hasNext()){
             elm = (Element)i.next();
@@ -95,8 +104,12 @@ public class Project {
 
 
 
-
     }
+
+
+
+
+
 
     public int getSize(){
         return siteMapper.size();

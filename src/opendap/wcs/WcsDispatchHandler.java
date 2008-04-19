@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
@@ -192,7 +193,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 "  serviceName: " + serviceName +
                                 "  dataSource=" + dataSource);
 
-                        sendCoveragePage(request,
+                        sendCoverageOfferingsList(request,
                                 response,
                                 projectName,
                                 siteName,
@@ -212,7 +213,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 "  coverageName: " + coverageName +
                                 "  dataSource=" + dataSource);
 
-                        sendDatesPage(request,
+                        sendCoveragePage(request,
                                 response,
                                 projectName,
                                 siteName,
@@ -224,7 +225,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
                     default:
                         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        log.info("Sent BAD URL (missing Suffix)");
+                        log.info("Sent BAD URL.");
 
                         break;
 
@@ -253,17 +254,20 @@ public class WcsDispatchHandler implements DispatchHandler {
         List children;
         dispatchServlet = servlet;
 
+
+        Element e = config.getChild("prefix");
+        if(e!=null)
+            prefix = e.getTextTrim();
+        
+
         //Get config file name from config Element
         children = config.getChildren("File");
 
         if (children.isEmpty()) {
-            children = config.getChildren("WCSConfig");
-            if (children.isEmpty()) {
-                throw new Exception("Bad Configuration. The <Handler> " +
-                        "element that declares " + this.getClass().getName() +
-                        " MUST provide either a <File> or a <WCSConfig> " +
-                        "child element.");
-            }
+            throw new Exception("Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide 1 or more <File>  " +
+                    "child elements.");
         } else {
             log.debug("processing WCS configuration file(s)...");
 
@@ -572,7 +576,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     }
 
-    public void sendCoveragePage(HttpServletRequest request,
+    public void sendCoverageOfferingsList(HttpServletRequest request,
                                  HttpServletResponse response,
                                  String projectName,
                                  String siteName,
@@ -590,15 +594,85 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         log.debug("collectionName:  " + collectionName);
 
-        Document catalog = new Document();
-        Element s;
-        long size = 0;
 
+       /*
 
         Element root = newDataset(collectionName, false, true, size, new Date());
         root.setAttribute("prefix", "/");
 
         catalog.setRootElement(root);
+
+       */
+
+        Project project = WcsManager.getProject(projectName);
+        if (project == null) {
+            log.error("sendCoverageOfferingsList() Project:  \"" + projectName + "\" not found.");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        Site site = project.getSite(siteName);
+        if (site == null) {
+            log.error("sendCoverageOfferingsList() Site:  \"" + siteName + "\" not found.");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        WcsService service = WcsManager.getWcsService(serviceName);
+        if (service == null) {
+            log.error("sendCoverageOfferingsList() WcsService:  \"" + serviceName + "\" not found.");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
+        XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+        service.lock();
+        try {
+
+            Document capDoc = service.getCapabilitiesDocument();
+            //xmlo.output(capDoc, System.out);
+
+            Document contentsPage = transformer.transform(capDoc);
+
+            //xmlo.output(contentsPage, System.out);
+
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "dods_directory");
+            response.setStatus(HttpServletResponse.SC_OK);
+            xmlo.output(contentsPage, response.getWriter());
+
+        }
+        finally {
+            service.unlock();
+        }
+
+    }
+
+
+    public void sendCoveragePage(HttpServletRequest request,
+                              HttpServletResponse response,
+                              String projectName,
+                              String siteName,
+                              String serviceName,
+                              String coverageName)
+            throws Exception {
+
+        /*
+        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+
+        if (collectionName.endsWith("/contents.html")) {
+            collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
+        }
+
+        if (!collectionName.endsWith("/"))
+            collectionName += "/";
+
+        log.debug("collectionName:  " + collectionName);
+*/
 
         Project project = WcsManager.getProject(projectName);
         if (project == null) {
@@ -620,113 +694,69 @@ public class WcsDispatchHandler implements DispatchHandler {
             return;
         }
 
-        Vector<WcsCoverageOffering> coverages = service.getCoverageOfferings();
 
-        for (WcsCoverageOffering coverage : coverages) {
-            s = newDataset(coverage.getName(), false, true, 0, new Date());
-            root.addContent(s);
+        service.lock();
+        try {
+
+            WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
+            if (coverage == null) {
+                log.error("sendCoveragePage() Coverage:  \"" + serviceName + "\" not found.");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+            else {
+
+                Element coff = coverage.getConfigElement();
+                Element s;
+                DateFormat df = new SimpleDateFormat("yyy-mm-dd");
+
+                coff.detach();
+
+                Document doc = new Document(coff);
+
+                Document pageContent = null;
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragePage.xsl");
+                XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+                if(coverage.hasTemporalDomain()){
+                    Element dset = coff.getChild(WCS.DOMAIN_SET,WCS.NS);
+                    Element tdom = dset.getChild(WCS.TEMPORAL_DOMAIN,WCS.NS);
+
+                    Vector<String> dates = coverage.generateDateStrings();
+                    for (String day : dates) {
+                        s = newDataset(day, true, false, 0, df.parse(day));
+                        tdom.addContent(s);
+                    }
+
+                    pageContent = transformer.transform(doc);
+
+                }
+                else if(coverage.hasSpatialDomain()){
+                    pageContent = transformer.transform(doc);
+
+                }
+
+
+                xmlo.output(coff, System.out);
+                xmlo.output(pageContent, System.out);
+
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "dods_directory");
+                response.setStatus(HttpServletResponse.SC_OK);
+                xmlo.output(pageContent, response.getWriter());
+
+
+
+            }
+
+        }
+        catch(Exception e){
+            e.printStackTrace(System.out);
+        }
+        finally {
+            service.unlock();
         }
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document contentsPage = transformer.transform(catalog);
-
-
-        //xmlo.output(catalog, System.out);
-        //xmlo.output(contentsPage, System.out);
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-        response.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, response.getWriter());
-
-    }
-
-
-    public void sendDatesPage(HttpServletRequest request,
-                              HttpServletResponse response,
-                              String projectName,
-                              String siteName,
-                              String serviceName,
-                              String coverageName)
-            throws Exception {
-
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
-
-        if (collectionName.endsWith("/contents.html")) {
-            collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
-        }
-
-        if (!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        log.debug("collectionName:  " + collectionName);
-
-        Document catalog = new Document();
-        Element s;
-        long size = 0;
-
-
-        Element root = newDataset(collectionName, false, true, size, new Date());
-        root.setAttribute("prefix", "/");
-
-        catalog.setRootElement(root);
-
-        Project project = WcsManager.getProject(projectName);
-        if (project == null) {
-            log.error("sendDatesPage() Project:  \"" + projectName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        Site site = project.getSite(siteName);
-        if (site == null) {
-            log.error("sendDatesPage() Site:  \"" + siteName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        WcsService service = WcsManager.getWcsService(serviceName);
-        if (service == null) {
-            log.error("sendDatesPage() WcsService:  \"" + serviceName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
-        if (coverage == null) {
-            log.error("sendDatesPage() Coverage:  \"" + serviceName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-
-        Vector<String> dates = coverage.generateDateStrings();
-
-        for (String day : dates) {
-            s = newDataset(day, true, false, 0, new Date());
-            root.addContent(s);
-        }
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document contentsPage = transformer.transform(catalog);
-
-
-        //xmlo.output(catalog, System.out);
-        //xmlo.output(contentsPage, System.out);
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-        response.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, response.getWriter());
 
     }
 
@@ -764,17 +794,29 @@ public class WcsDispatchHandler implements DispatchHandler {
             return;
         }
 
-        WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
-        if (coverage == null) {
-            log.error("sendDAPResponse() Coverage:  \"" + serviceName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
+        String wcsRequestURL="";
+        service.lock();
+        try {
+
+            WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
+            if (coverage == null) {
+                log.error("sendDAPResponse() Coverage:  \"" + serviceName + "\" not found.");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            if(dateName.equals("dataset"))
+                dateName = null;
+
+            wcsRequestURL = service.getWcsRequestURL(site,coverage,dateName);
+            log.debug("wcsRequestURL: "+wcsRequestURL);
         }
-
-
-
-        String wcsRequestURL = service.getWcsRequestURL(site,coverage,dateName);
-        log.debug("wcsRequestURL: "+wcsRequestURL);
+        catch (Exception e){
+            e.printStackTrace(System.out);
+        }
+        finally{
+            service.unlock();
+        }
 
 
         if ( // DDS Response?

@@ -136,6 +136,8 @@ public class Site {
         fined for the selected layer.
         One of BBOX or TIME is required.
   */
+
+        /*
         boolean hasBounds = false;
 
         if(elm.getChild("bbox")!=null)
@@ -148,6 +150,10 @@ public class Site {
             throw new Exception("Missing bounds.  The " +
                     "<Site name=\""+getName()+"\"> <WCSParameters>  element must " +
                     "have 1 or both the child elements <bbox> and <time>.");
+*/
+
+
+
 
         /*
         WIDTH = w (integer)
@@ -197,6 +203,8 @@ CRS=crs_identifier Coordinate Reference System in which the request is ex-
 pressed. Required.
 */
 
+
+        /*
         boolean hasCRS = false;
         if(elm.getChild("crs")!=null)
             hasCRS = true;
@@ -206,6 +214,7 @@ pressed. Required.
                     "<Site name=\""+getName()+"\"> <WCSParameters>  element must " +
                     "have 1 <crs> child element.");
 
+*/
 
 /*
 FORMAT= format Requested output format of Coverage. Must be one of those
@@ -213,8 +222,9 @@ listed under the description of the selected coverage. Re-
 quired.
 */
 
+        /*
         boolean hasFormat = false;
-        if(elm.getChild("crs")!=null)
+        if(elm.getChild("format")!=null)
             hasFormat = true;
 
         if(!hasFormat)
@@ -222,7 +232,8 @@ quired.
                     "<Site name=\""+getName()+"\"> <WCSParameters>  element must " +
                     "have 1 <format> child element.");
 
-
+*/
+        
     }
 
 

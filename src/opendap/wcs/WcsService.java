@@ -44,17 +44,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class WcsService {
     private Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
     private Element config;
-    private Document capabilitiesDocument;
 
+    private Document capabilitiesDocument;
     private Date capabilitiesDocumentTimeAcquired;
-    private Document coverageDescriptionDocument;
-    private Date coverageDescriptionDocumentTimeAcquired;
+
+    //private Document coverageDescriptionDocument;
+    //private Date coverageDescriptionDocumentTimeAcquired;
+
+
     private long cacheTime;
     private ReentrantReadWriteLock capablitiesDocLock;
-    private ReentrantReadWriteLock coverageDescDocLock;
+    //private ReentrantReadWriteLock coverageDescDocLock;
+
     private HashMap<String,Element> coverages;
     private UpdateCapabilitiesThread  capabilitiesUpdater;
-    private UpdateCoverageThread  coverageUpdater;
+    //private UpdateCoverageThread  coverageUpdater;
 
 
 
@@ -79,6 +83,8 @@ public class WcsService {
 
         log.debug("\n"+this);
 
+        coverages = new HashMap<String,Element>();
+
 
         capablitiesDocLock = new ReentrantReadWriteLock();
         log.debug("Created capablitiesDocLock.");
@@ -93,7 +99,11 @@ public class WcsService {
         log.debug("UpdateCapabilitiesThread.update(true) completed");
         capabilitiesDocumentTimeAcquired = new Date();
 
-        coverages = new HashMap<String,Element>();
+        capabilitiesUpdater.start();
+
+
+/*
+
         coverageDescDocLock = new ReentrantReadWriteLock();
         log.debug("Created coverageDescDocLock.");
 
@@ -107,32 +117,45 @@ public class WcsService {
         log.debug("UpdateCoverageThread.update(true) completed");
         coverageDescriptionDocumentTimeAcquired = new Date();
 
-        capabilitiesUpdater.start();
         coverageUpdater.start();
 
-
-
-
+*/
 
 
     }
 
 
+    public void lock(){
+        capablitiesDocLock.readLock().lock();
+
+    }
+
+    public void unlock(){
+        capablitiesDocLock.readLock().unlock();
+    }
 
 
 
-    public String getWcsRequestURL(Site site,
+
+    public Document getCapabilitiesDocument(){
+        return capabilitiesDocument;
+    }
+
+
+
+
+    public String OLDgetWcsRequestURL(Site site,
                                 WcsCoverageOffering coverage,
                                 String dateName) {
 
 
 
-//"http://g0dup05u.ecs.nasa.gov/cgi-bin/ceopAIRX2RET?
-// service=WCS
-// &amp;version=1.0.0
-// &amp;request=GetCoverage
-// &amp;coverage=TSurfAir
-// &amp;TIME=2002-10-01
+        //"http://g0dup05u.ecs.nasa.gov/cgi-bin/ceopAIRX2RET?
+        // service=WCS
+        // &version=1.0.0
+        // &request=GetCoverage
+        // &coverage=TSurfAir
+        // &TIME=2002-10-01
 
         String url = getServiceURL();
 
@@ -144,16 +167,17 @@ public class WcsService {
         url += "&version="+getVersion();
         url += "&request=GetCoverage";
         url += "&coverage="+coverage.getName();
-        url += "&TIME="+dateName;
+        if(dateName!=null)
+            url += "&TIME="+dateName;
 
 
 
-// &amp;crs=WGS84
-// &amp;bbox=-107.375000,51.625000,-102.625000,56.375000
-// &amp;format=netCDF
-// &amp;resx=0.25
-// &amp;resy=0.25
-// &amp;interpolationMethod=Nearest%20neighbor"/>
+        // &crs=WGS84
+        // &bbox=-107.375000,51.625000,-102.625000,56.375000
+        // &format=netCDF
+        // &resx=0.25
+        // &resy=0.25
+        // &interpolationMethod=Nearest%20neighbor"/>
 
         List params = site.getWCSParameters();
 
@@ -163,6 +187,63 @@ public class WcsService {
                 url += "&" + param.getName() + "=" + param.getTextTrim();
         }
 
+
+        log.debug("WCS REQUEST URL: "+ url);
+        return url;
+
+    }
+
+
+
+    public String getWcsRequestURL(Site site,
+                                WcsCoverageOffering coverage,
+                                String dateName) {
+
+
+
+        //"http://g0dup05u.ecs.nasa.gov/cgi-bin/ceopAIRX2RET?
+        // service=WCS
+        // &version=1.0.0
+        // &request=GetCoverage
+        // &coverage=TSurfAir
+        // &TIME=2002-10-01
+
+        String url = getServiceURL();
+
+        if(!url.endsWith("?"))
+            url += "?";
+
+
+        url += "service="+getService();
+        url += "&version="+getVersion();
+        url += "&request=GetCoverage";
+
+        url += "&coverage="+coverage.getName();
+
+        //url += "&"+coverage.getSpatialDomainConstraint();
+
+
+        if(dateName!=null)
+            url += "&TIME="+dateName;
+
+
+
+        // &crs=WGS84
+        // &bbox=-107.375000,51.625000,-102.625000,56.375000
+        // &format=netCDF
+        // &resx=0.25
+        // &resy=0.25
+        // &interpolationMethod=Nearest%20neighbor"/>
+
+        List params = site.getWCSParameters();
+
+        for (Object param1 : params) {
+            Element param = (Element) param1;
+            if (!param.getName().equals("time"))
+                url += "&" + param.getName() + "=" + param.getTextTrim();
+        }
+
+        log.debug("WCS REQUEST URL: "+ url);
         return url;
 
     }
@@ -174,7 +255,7 @@ public class WcsService {
 
     public void destroy(){
         capabilitiesUpdater.interrupt();
-        coverageUpdater.interrupt();
+        //coverageUpdater.interrupt();
         log.debug("Destroyed");
     }
 
@@ -182,80 +263,91 @@ public class WcsService {
 
 
 
+/*
+
+
     public WcsCoverageOffering getCoverageOffering(String coverageName) throws Exception {
 
+        Element coverageElement  = coverages.get(coverageName);
+        if(coverageElement==null){
+            throw new Exception("Coverage \""+coverageName+"\" is not " +
+                    "avaliable on the WCS Service: "+getName());
+        }
+        return new WcsCoverageOffering(coverageElement);
 
-        coverageDescDocLock.readLock().lock();
-        try {
+    }
 
-            Element coverageElement  = coverages.get(coverageName);
-            if(coverageElement==null){
-                throw new Exception("Coverage \""+coverageName+"\" is not " +
-                        "avaliable on the WCS Service: "+getName());
+*/
+
+
+
+    public WcsCoverageOffering getCoverageOffering(String hashedName) throws Exception{
+        Element coverageOfferingBrief = coverages.get(hashedName);
+        String[] name = new String[1];
+        name[0] = coverageOfferingBrief.getChild(WCS.NAME,WCS.NS).getTextTrim();
+
+        Document doc = httpDescribeCoverage(name);
+        Element coverageOffering = doc.getRootElement().getChild(WCS.COVERAGE_OFFERING,WCS.NS);
+        return new WcsCoverageOffering(coverageOffering);
+    }
+
+
+    public Document httpDescribeCoverage(String[] coverages) throws Exception {
+
+        HttpClient httpClient = new HttpClient();
+
+        String q;
+        if(getServiceURL().endsWith("?"))
+            q="";
+        else
+            q="?";
+
+        String requestURI = getServiceURL() + q +
+                         "service="+getService()+
+                         "&version="+getVersion()+
+                         "&request=DescribeCoverage";
+
+        if(coverages != null){
+            String coverageString = "&coverage=";
+            for(int i=0; i< coverages.length ; i++){
+                if(i>0)
+                    coverageString += ",";
+                coverageString += coverages[i];
             }
-            return new WcsCoverageOffering(coverageElement);
-
-        }
-        finally {
-            coverageDescDocLock.readLock().unlock();
+            requestURI+=coverageString;
         }
 
 
-    }
+        log.debug("requestURI: "+requestURI);
 
-    public Vector<WcsCoverageOffering> getCoverageOfferings() throws Exception {
+        GetMethod request = new GetMethod(requestURI);
 
 
-        coverageDescDocLock.readLock().lock();
         try {
-            Vector<WcsCoverageOffering> vec = new Vector<WcsCoverageOffering>();
-            Element e;
+            // Execute the method.
+            int statusCode = httpClient.executeMethod(request);
 
-            List coList = coverageDescriptionDocument.getRootElement().getChildren(WCS.COVERAGE_OFFERING, WCS.NS);
-
-            for (Object aCoList : coList) {
-                e = (Element) aCoList;
-
-                vec.add(new WcsCoverageOffering(e));
+            if (statusCode != HttpStatus.SC_OK) {
+              log.error("Method failed: " + request.getStatusLine());
             }
 
-            return vec;
+            // Parse the XML doc into a Document object.
+            SAXBuilder sb = new SAXBuilder();
+            Document doc = sb.build(request.getResponseBodyAsStream());
+            log.debug("Got and parsed coverage description document.");
+            //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            //xmlo.output(doc, System.out);
+
+            return doc;
+
+
         }
         finally {
-            coverageDescDocLock.readLock().unlock();
+            request.releaseConnection();
         }
 
 
     }
-
-
-
-
-    public int getCoverageCount() throws Exception{
-
-
-        coverageDescDocLock.readLock().lock();
-        try {
-            List coverages = coverageDescriptionDocument.getRootElement().getChildren(WCS.COVERAGE_OFFERING, WCS.NS);
-            return coverages.size();
-        }
-        finally {
-            coverageDescDocLock.readLock().unlock();
-        }
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -316,11 +408,12 @@ public class WcsService {
                 try {
                     if(force || cacheTime<getCacheAge()){
                         log.debug("Updating Capabilities Document.");
-                        capabilitiesDocument = httpGetCapabilities();
+                        Document doc = httpGetCapabilities();
+                        ingestCapabilitiesDocument(doc);
                     }
                 }
                 catch(Exception e){
-                    log.error("I had a problem: "+
+                    log.error("I has a problem: "+
                             e.getMessage() +
                             " biffCount: "+ (++biffCount) );
                 }
@@ -390,6 +483,8 @@ public class WcsService {
 
 
 
+    /*
+
 
 
 
@@ -444,19 +539,10 @@ public class WcsService {
                 try {
                     if(force || cacheTime<getCacheAge()){
                         log.debug("Updating Coverage Description Document.");
-                        coverageDescriptionDocument = httpDescribeCoverage(null);
+                        Document doc = httpDescribeCoverage(null);
+                        ingestCoverageDesription(doc);
                     }
 
-
-                    Element coverageOffering;
-                    String name;
-                    List coverageList = coverageDescriptionDocument.getRootElement().getChildren(WCS.COVERAGE_OFFERING,WCS.NS);
-                    for (Object aCoverageList : coverageList) {
-                        coverageOffering = (Element) aCoverageList;
-                        name = coverageOffering.getChild(WCS.NAME, WCS.NS).getTextTrim();
-                        log.debug("Adding coverage "+name+" to coverage HashMap");
-                        coverages.put(name, coverageOffering);
-                    }
                 }
                 catch(Exception e){
                     log.error("I HAS A PROBLEM: "+
@@ -472,64 +558,85 @@ public class WcsService {
 
         }
 
-        public Document httpDescribeCoverage(String[] coverages) throws Exception {
 
 
-            String q;
-            if(getServiceURL().endsWith("?"))
-                q="";
-            else
-                q="?";
+    }
 
-            String requestURI = getServiceURL() + q +
-                             "service="+getService()+
-                             "&version="+getVersion()+
-                             "&request=DescribeCoverage";
+*/
 
-            if(coverages != null){
-                String coverageString = "&coverage=";
-                for(int i=0; i< coverages.length ; i++){
-                    if(i>0)
-                        coverageString += ",";
-                    coverageString += coverages[i];
-                }
-                requestURI+=coverageString;
-            }
+    /*
 
+    public void ingestCoverageDesription(Document doc){
 
-            log.debug("requestURI: "+requestURI);
+        coverageDescriptionDocument = doc;
 
-            GetMethod request = new GetMethod(requestURI);
+        Element coverageOffering;
+        String name, hashedName;
+        List coverageList = coverageDescriptionDocument.getRootElement().getChildren(WCS.COVERAGE_OFFERING,WCS.NS);
+        for (Object cvrgOffrElem : coverageList) {
+            coverageOffering = (Element) cvrgOffrElem;
+
+            name = coverageOffering.getChild(WCS.NAME, WCS.NS).getTextTrim();
+
+            hashedName = getHashedName(name);
+
+            log.debug("Adding coverage "+name+" to coverage HashMap. hashMapName: "+hashedName);
+            coverages.put(hashedName, coverageOffering);
 
 
-            try {
-                // Execute the method.
-                int statusCode = httpClient.executeMethod(request);
-
-                if (statusCode != HttpStatus.SC_OK) {
-                  log.error("Method failed: " + request.getStatusLine());
-                }
-
-                // Parse the XML doc into a Document object.
-                SAXBuilder sb = new SAXBuilder();
-                Document doc = sb.build(request.getResponseBodyAsStream());
-                log.debug("Got and parsed coverage description document.");
-                //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                //xmlo.output(doc, System.out);
-
-                return doc;
-
-
-            }
-            finally {
-                request.releaseConnection();
-            }
-
-
+            log.debug("Adding link name "+hashedName+" to CoverageOffering Element.");
+            Element link  = new Element("DapLink",WCS.DAPWCS_NS);
+            link.setText(hashedName);
+            coverageOffering.addContent(link);
         }
 
 
     }
+
+*/
+
+
+
+
+    public void ingestCapabilitiesDocument(Document doc){
+
+        capabilitiesDocument = doc;
+
+        Element coverageOfferingBrief, contentMetatdata;
+        String name, hashedName;
+        contentMetatdata = capabilitiesDocument.getRootElement().getChild(WCS.CONTENT_METADATA,WCS.NS);
+        List coverageList = contentMetatdata.getChildren(WCS.COVERAGE_OFFERING_BRIEF,WCS.NS);
+        for (Object cvrgOffrElem : coverageList) {
+            coverageOfferingBrief = (Element) cvrgOffrElem;
+
+            name = coverageOfferingBrief.getChild(WCS.NAME, WCS.NS).getTextTrim();
+
+            hashedName = getHashedName(name);
+
+
+            log.debug("Adding coverageOfferingBrief "+name+" to coverage HashMap. hashMapName: "+hashedName);
+            coverages.put(hashedName, coverageOfferingBrief);
+
+
+            log.debug("Adding link name "+hashedName+" to CoverageOfferingBrief Element.");
+            Element link  = new Element("DapLink",WCS.DAPWCS_NS);
+            link.setText(hashedName);
+            coverageOfferingBrief.addContent(link);
+        }
+
+
+    }
+
+    public static String getHashedName(String name){
+        String s = "";
+
+        byte[] b =  name.getBytes();
+        for (byte aB : b) {
+            s += Integer.toHexString(aB);
+        }
+        return s;
+    }
+
 
 
 
