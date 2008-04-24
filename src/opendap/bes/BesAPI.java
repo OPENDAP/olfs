@@ -1328,13 +1328,13 @@ public class BesAPI {
 
     public static void resetBES(OPeNDAPClient odc) throws PPTException {
 
-        DevNull devNull =  new DevNull();
+        //DevNull devNull =  new DevNull();
 
-        String cmd = "delete definitions;\n";
-        odc.executeCommand(cmd,devNull,devNull);
+        //String cmd = "delete definitions;\n";
+        //odc.executeCommand(cmd,devNull,devNull);
 
-        cmd = "delete containers;\n";
-        odc.executeCommand(cmd,devNull,devNull);
+        //cmd = "delete containers;\n";
+        //odc.executeCommand(cmd,devNull,devNull);
 
     }
 

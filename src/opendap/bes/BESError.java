@@ -261,7 +261,14 @@ public class BESError extends OPeNDAPException {
     }
 
 
-    public void sendErrorResponse(DispatchServlet dispatchServlet, HttpServletResponse response)
+    /**
+     *
+     * @param dispatchServlet
+     * @param response
+     * @return The HTTP status code returned to client.
+     * @throws IOException
+     */
+    public int sendErrorResponse(DispatchServlet dispatchServlet, HttpServletResponse response)
             throws IOException{
 
 
@@ -324,6 +331,7 @@ public class BESError extends OPeNDAPException {
             response.sendError(errorVal,getMessage());
         }
 
+        return errorVal;
 
     }
 
