@@ -52,6 +52,7 @@
 
     </servlet>
 
+
     <servlet>
         <servlet-name>View</servlet-name>
         <servlet-class>thredds.servlet.ViewServlet</servlet-class>
@@ -89,6 +90,7 @@
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>View</servlet-name>

@@ -218,7 +218,7 @@ public class ChunkedOutputStream  {
     /**
      * Writes the cache and bufferToAppend to the underlying stream as one
      * large chunk. If combined cache and bufferToAppend are to large to
-     * encode as a single chunk then it will be sent as multiple chunks. The
+     * stringToHex as a single chunk then it will be sent as multiple chunks. The
      * last chunk in the series MIGHT NOT be a full size chunk.
      *
      * @param bufferToAppend The buffer to append to the cache.

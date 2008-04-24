@@ -21,12 +21,11 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.thredds;
+package opendap.threddsHandler;
 
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Scrub;
 import opendap.wcs.*;
 import opendap.bes.Version;
 import opendap.bes.BesAPI;
@@ -41,8 +40,6 @@ import org.jdom.output.Format;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
@@ -54,7 +51,7 @@ import thredds.servlet.ServletUtil;
  * Date: Apr 18, 2008
  * Time: 3:46:50 PM
  */
-public class ThreddsHandler implements DispatchHandler{
+public class Dispatch implements DispatchHandler{
 
 
     private Logger log;
@@ -62,31 +59,99 @@ public class ThreddsHandler implements DispatchHandler{
     private Element config;
     private boolean initialized;
     private DispatchServlet dispatchServlet;
-    private String prefix;
+    private String _prefix;
+    boolean useMemoryCache = false;
 
-    public ThreddsHandler() {
+    public Dispatch() {
 
         super();
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        prefix = "/thredds";
         config = null;
         initialized = false;
+        _prefix = "thredds/";
 
     }
 
 
-    public void sendThreddsCatalogContents(HttpServletRequest request,
-                                HttpServletResponse response) {
+    public void sendThreddsCatalogResponse(HttpServletRequest request,
+                                HttpServletResponse response) throws Exception{
+
+        String relativeURL = ReqInfo.getFullSourceName(request);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+        if(relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1,relativeURL.length());
+
+
+        Document catDoc;
+        if(relativeURL.equals(_prefix)){
+            catDoc = CatalogManager.getTopLevelCatalogDocument();
+        }
+        else{
+
+            //if(requestSuffix.equals("html"))
+
+
+            if(relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+            if(cat!=null){
+                catDoc = cat.getCatalogDocument();
+                log.debug("\nFound catalog: "+relativeURL+"   " +
+                        "    requestSuffix: "+requestSuffix+"   " +
+                        "    prefix: " + _prefix
+
+
+                );
+            }
+            else {
+                log.error("Can't find catalog: "+relativeURL+"   " +
+                        "    requestSuffix: "+requestSuffix+"   " +
+                        "    prefix: " + _prefix
+
+
+                );
+
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+relativeURL);
+                return;
+            }
+        }
+
+        xmlo.output(catDoc, System.out);
+
+
+
+
+        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+
+        XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+        Document contentsPage = transformer.transform(catDoc);
+
+
+        //xmlo.output(catalog, System.out);
+        //xmlo.output(contentsPage, System.out);
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_directory");
+        response.setStatus(HttpServletResponse.SC_OK);
+        xmlo.output(contentsPage, response.getWriter());
+        xmlo.output(contentsPage, System.out);
 
 
 
     }
+
 
 
     public void init(DispatchServlet servlet, Element configuration) throws Exception {
 
 
+        String s;
 
         if (initialized) return;
 
@@ -97,10 +162,34 @@ public class ThreddsHandler implements DispatchHandler{
         List children;
         Element e;
 
-        e = config.getChild("prefix");
+        e = config.getChild("_prefix");
         if(e!=null)
-            prefix = e.getTextTrim();
+            _prefix = e.getTextTrim();
 
+        if(_prefix.equals("/"))
+            throw new Exception("Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide 1 <_prefix>  " +
+                    "child element whose value may not be equal to \"/\"");
+
+
+        if(!_prefix.endsWith("/"))
+            _prefix += "/";
+
+
+        //if(!_prefix.startsWith("/"))
+        //    _prefix = "/" + _prefix;
+
+        if(_prefix.startsWith("/"))
+            _prefix = _prefix.substring(1,_prefix.length());
+
+        e = config.getChild("useMemoryCache");
+        if(e!=null){
+            s = e.getTextTrim();
+            if(s.equalsIgnoreCase("true")){
+                useMemoryCache = true;
+            }
+        }
 
 
         // Get the RootCatalogs from the conifg
@@ -115,20 +204,63 @@ public class ThreddsHandler implements DispatchHandler{
             log.debug("Processing THREDDS catalog file(s)...");
 
             String contentPath = ServletUtil.getContentPath(servlet);
+            String contextPath = ServletUtil.getContextPath(servlet);
+
+
+            String urlPrefix = "";//ServletUtil.getContextPath(servlet);
+
+            if(!urlPrefix.endsWith("/") && !_prefix.startsWith("/"))
+                urlPrefix += "/";
+
+            while(urlPrefix.endsWith("/") && _prefix.startsWith("/"))
+                urlPrefix += urlPrefix.substring(0,urlPrefix.length()-1);
+
+            //urlPrefix = urlPrefix + _prefix;
+            //urlPrefix =  _prefix;
+
+
+            if(!urlPrefix.endsWith("/"))
+                urlPrefix += "/";
+
+            urlPrefix = "";
+
+
             Iterator i = children.iterator();
             Element fileElem;
-            String filename;
+            String fileName,  pathPrefix, thisUrlPrefix;
 
-            RootCatalog.init(contentPath);
+
+            System.out.println(urlPrefix);
+            CatalogManager.init(contentPath);
             while (i.hasNext()) {
+
                 fileElem = (Element) i.next();
-                filename = contentPath + fileElem.getTextTrim();
 
-                log.debug("configuration file: " + filename);
 
-                RootCatalog.addCatalog(filename);
+                s = fileElem.getTextTrim();
 
-                log.debug("configuration file: " + filename + " processing complete.");
+
+
+                thisUrlPrefix = s.substring(0,s.lastIndexOf(Util.basename(s)));
+                thisUrlPrefix = urlPrefix + thisUrlPrefix;
+
+
+
+                s = contentPath + s;
+                fileName = Util.basename(s);
+                pathPrefix = s.substring(0,s.lastIndexOf(fileName));
+
+                log.debug("Top Level Catalog - pathPrefix: " + pathPrefix);
+                log.debug("Top Level Catalog - urlPrefix: " + thisUrlPrefix);
+                log.debug("Top Level Catalog - fileName: " + fileName);
+
+                CatalogManager.addRootCatalog(
+                        pathPrefix,
+                        thisUrlPrefix,
+                        fileName,
+                        useMemoryCache);
+
+                log.debug("configuration file: " + fileName + " processing complete.");
             }
 
 
@@ -142,15 +274,15 @@ public class ThreddsHandler implements DispatchHandler{
     }
 
     public boolean requestCanBeHandled(HttpServletRequest request) throws Exception {
-        return wcsRequestDispatch(request, null, false);
+        return threddsRequestDispatch(request, null, false);
     }
 
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        wcsRequestDispatch(request, response, true);
+        threddsRequestDispatch(request, response, true);
     }
 
 
-    private boolean wcsRequestDispatch(HttpServletRequest request,
+    private boolean threddsRequestDispatch(HttpServletRequest request,
                                        HttpServletResponse response,
                                        boolean sendResponse)
             throws Exception {
@@ -159,19 +291,23 @@ public class ThreddsHandler implements DispatchHandler{
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
-        boolean wcsRequest = false;
+        if(dataSource.startsWith("/"))
+            dataSource = dataSource.substring(1,dataSource.length());
+
+        boolean threddsRequest = false;
 
         if (dataSource != null) {
 
-            if (dataSource.startsWith(prefix)) {
-                wcsRequest = true;
+            if (dataSource.startsWith(_prefix)) {
+                threddsRequest = true;
                 if (sendResponse) {
+                    sendThreddsCatalogResponse(request, response);
                     log.info("Sent THREDDS Response");
                 }
             }
         }
 
-        return wcsRequest;
+        return threddsRequest;
 
     }
 
@@ -188,412 +324,8 @@ public class ThreddsHandler implements DispatchHandler{
     }
 
 
-    private Element newDataset(String name,
-                               boolean isData,
-                               boolean thredds_collection,
-                               long size,
-                               Date date) {
 
-        Element e;
-        SimpleDateFormat sdf;
-        String s;
 
-
-        Element dataset = new Element("dataset");
-        dataset.setAttribute("isData", isData + "");
-        dataset.setAttribute("thredds_collection", thredds_collection + "");
-
-        e = new Element("name");
-        e.setText(name);
-        dataset.addContent(e);
-
-        e = new Element("size");
-        e.setText(size + "");
-        dataset.addContent(e);
-
-        Element lastModified = new Element("lastmodified");
-
-        e = new Element("date");
-        sdf = new SimpleDateFormat("yyyy-MM-dd");
-        s = sdf.format(date);
-        e.setText(s);
-        lastModified.addContent(e);
-
-        e = new Element("time");
-        sdf = new SimpleDateFormat("HH:mm:ss z");
-        s = sdf.format(date);
-        e.setText(s);
-        lastModified.addContent(e);
-
-
-        dataset.addContent(lastModified);
-
-
-        return dataset;
-
-    }
-
-
-    public void sendProjectsPage(HttpServletRequest request,
-                                 HttpServletResponse response)
-            throws Exception {
-
-        Element p;
-        long size = 0;
-
-
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
-
-        if (collectionName.endsWith("/contents.html")) {
-            collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
-        }
-
-        if (!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        log.debug("collectionName:  " + collectionName);
-
-
-        Element root = newDataset(collectionName, false, true, size, new Date());
-
-        root.setAttribute("prefix", "/");
-
-
-        Collection<Project> projects = WcsManager.getProjects();
-
-        for (Project proj : projects) {
-            //size = proj.getSize();
-            p = newDataset(proj.getName(), false, true, 0, new Date());
-            root.addContent(p);
-        }
-
-        Document catalog = new Document(root);
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document contentsPage = transformer.transform(catalog);
-
-        //xmlo.output(catalog, System.out);
-        //xmlo.output(contentsPage, System.out);
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-        response.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, response.getWriter());
-
-    }
-
-
-    public void sendSitesPage(HttpServletRequest request,
-                              HttpServletResponse response,
-                              String projectName)
-            throws Exception {
-
-
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
-
-        if (collectionName.endsWith("/contents.html")) {
-            collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
-        }
-
-        if (!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        log.debug("collectionName:  " + collectionName);
-
-        Document catalog = new Document();
-        Element s;
-        long size = 0;
-
-
-        Element root = newDataset(collectionName, false, true, size, new Date());
-        root.setAttribute("prefix", "/");
-
-        catalog.setRootElement(root);
-
-        Project project = WcsManager.getProject(projectName);
-        if (project == null) {
-            log.error("sendSitesPage() Project:  \"" + projectName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-
-        Vector<Site> sites = project.getSites();
-
-        for (Site site : sites) {
-            //size = WcsManager.getWcsServiceCount();
-            s = newDataset(site.getName(), false, true, 0, new Date());
-            root.addContent(s);
-        }
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document contentsPage = transformer.transform(catalog);
-
-        //xmlo.output(catalog, System.out);
-        //xmlo.output(contentsPage, System.out);
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-        response.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, response.getWriter());
-
-    }
-
-
-    public void sendServersPage(HttpServletRequest request,
-                                HttpServletResponse response,
-                                String projectName,
-                                String siteName)
-            throws Exception {
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
-
-        if (collectionName.endsWith("/contents.html")) {
-            collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
-        }
-
-        if (!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        log.debug("collectionName:  " + collectionName);
-
-        Document catalog = new Document();
-        Element s;
-        long size = 0;
-
-
-        Element root = newDataset(collectionName, false, true, size, new Date());
-        root.setAttribute("prefix", "/");
-
-        catalog.setRootElement(root);
-
-        Project project = WcsManager.getProject(projectName);
-        if (project == null) {
-            log.error("sendServersPage() Project:  \"" + projectName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        Site site = project.getSite(siteName);
-        if (site == null) {
-            log.error("sendServersPage() Site:  \"" + siteName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        Collection<WcsService> services = WcsManager.getWcsServices();
-
-        for (WcsService service : services) {
-            //size = service.getCoverageCount();
-            s = newDataset(service.getName(), false, true, 0, new Date());
-            root.addContent(s);
-        }
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document contentsPage = transformer.transform(catalog);
-
-        //xmlo.output(catalog, System.out);
-        //xmlo.output(contentsPage, System.out);
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-        response.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, response.getWriter());
-
-    }
-
-    public void sendCoverageOfferingsList(HttpServletRequest request,
-                                          HttpServletResponse response,
-                                          String projectName,
-                                          String siteName,
-                                          String serviceName)
-            throws Exception {
-
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
-
-        if (collectionName.endsWith("/contents.html")) {
-            collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
-        }
-
-        if (!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        log.debug("collectionName:  " + collectionName);
-
-        /*
-
-         Element root = newDataset(collectionName, false, true, size, new Date());
-         root.setAttribute("prefix", "/");
-
-         catalog.setRootElement(root);
-
-        */
-
-        Project project = WcsManager.getProject(projectName);
-        if (project == null) {
-            log.error("sendCoverageOfferingsList() Project:  \"" + projectName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        Site site = project.getSite(siteName);
-        if (site == null) {
-            log.error("sendCoverageOfferingsList() Site:  \"" + siteName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        WcsService service = WcsManager.getWcsService(serviceName);
-        if (service == null) {
-            log.error("sendCoverageOfferingsList() WcsService:  \"" + serviceName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        service.lock();
-        try {
-
-            Document capDoc = service.getCapabilitiesDocument();
-            //xmlo.output(capDoc, System.out);
-
-            Document contentsPage = transformer.transform(capDoc);
-
-            //xmlo.output(contentsPage, System.out);
-
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "dods_directory");
-            response.setStatus(HttpServletResponse.SC_OK);
-            xmlo.output(contentsPage, response.getWriter());
-
-        }
-        finally {
-            service.unlock();
-        }
-
-    }
-
-
-    public void sendCoveragePage(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 String projectName,
-                                 String siteName,
-                                 String serviceName,
-                                 String coverageName)
-            throws Exception {
-
-        /*
-                String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
-
-                if (collectionName.endsWith("/contents.html")) {
-                    collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
-                }
-
-                if (!collectionName.endsWith("/"))
-                    collectionName += "/";
-
-                log.debug("collectionName:  " + collectionName);
-        */
-
-        Project project = WcsManager.getProject(projectName);
-        if (project == null) {
-            log.error("sendCoveragePage() Project:  \"" + projectName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        Site site = project.getSite(siteName);
-        if (site == null) {
-            log.error("sendCoveragePage() Site:  \"" + siteName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        WcsService service = WcsManager.getWcsService(serviceName);
-        if (service == null) {
-            log.error("sendCoveragePage() WcsService:  \"" + serviceName + "\" not found.");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-
-        service.lock();
-        try {
-
-            WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
-            if (coverage == null) {
-                log.error("sendCoveragePage() Coverage:  \"" + serviceName + "\" not found.");
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } else {
-
-                Element coff = coverage.getConfigElement();
-                Element s;
-                DateFormat df = new SimpleDateFormat("yyy-mm-dd");
-
-                coff.detach();
-
-                Document doc = new Document(coff);
-
-                Document pageContent = null;
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragePage.xsl");
-                XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-                if (coverage.hasTemporalDomain()) {
-                    Element dset = coff.getChild(WCS.DOMAIN_SET, WCS.NS);
-                    Element tdom = dset.getChild(WCS.TEMPORAL_DOMAIN, WCS.NS);
-
-                    Vector<String> dates = coverage.generateDateStrings();
-                    for (String day : dates) {
-                        s = newDataset(day, true, false, 0, df.parse(day));
-                        tdom.addContent(s);
-                    }
-
-                    pageContent = transformer.transform(doc);
-
-                } else if (coverage.hasSpatialDomain()) {
-                    pageContent = transformer.transform(doc);
-
-                }
-
-
-                xmlo.output(coff, System.out);
-                xmlo.output(pageContent, System.out);
-
-                response.setContentType("text/html");
-                response.setHeader("Content-Description", "dods_directory");
-                response.setStatus(HttpServletResponse.SC_OK);
-                xmlo.output(pageContent, response.getWriter());
-
-
-            }
-
-        }
-        catch (Exception e) {
-            e.printStackTrace(System.out);
-        }
-        finally {
-            service.unlock();
-        }
-
-
-    }
 
 
     public void sendDAPResponse(HttpServletRequest request,

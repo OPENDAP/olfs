@@ -373,6 +373,22 @@
 
     </target>
 
+    <target name="hexEncoderApp"
+        depends="clean,compile"
+        description="Builds executable jar file of the hex encoder">
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
+
+        <jar destfile="${build.dist}/hexencoder.jar"
+             manifest="resources/META-INF/hexencoder.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/wcs_service/UrlEncoder.class"/>
+            </fileset>
+        </jar>
+
+
+    </target>
+
 
     <target
             name="server"
@@ -540,6 +556,7 @@
         <delete file="${build.dist}/index.html"/>
 
     </target>
+
 
 
 

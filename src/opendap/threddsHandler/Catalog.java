@@ -21,12 +21,11 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.thredds;
+package opendap.threddsHandler;
 
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.input.SAXBuilder;
@@ -43,21 +42,39 @@ public class Catalog {
 
 
     private  Logger log;
-    private  String path;
+    private  String _pathPrefix;
+    private  String _urlPrefix;
+    private String  _fileName;
     private  byte[] _buffer;
-    private String configFileName;
 
-    private String name;
+    private String _name;
 
-    public Catalog(String fname, boolean cacheFile) throws Exception{
+    public Catalog( String pathPrefix,
+                    String urlPrefix,
+                    String fname,
+                    boolean cacheFile) throws Exception{
 
-        log = org.slf4j.LoggerFactory.getLogger(RootCatalog.class);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         log.debug("Configuring...");
 
-        configFileName = fname;
+        _fileName = fname;
+        _pathPrefix = pathPrefix;
+        _urlPrefix = urlPrefix;
+
+
+        log.debug("pathPrefix: " + _pathPrefix);
+        log.debug("urlPrefix:  " + _urlPrefix);
+        log.debug("fileName:   " + _fileName);
+
+
+
 
         String msg;
+
+        fname = _pathPrefix + _fileName;
+
+        log.debug("Complete FileName: " + fname);
 
         File catalogFile = new File(fname);
 
@@ -83,15 +100,16 @@ public class Catalog {
 
         Element ce = catalog.getRootElement();
 
-        name = ce.getAttributeValue("name");
+        _name = ce.getAttributeValue("name");
 
-        if(name==null){
-            log.error("THREDDS ERROR: <catalog> element missing \"name\" attribute.");
-            throw new Exception("THREDDS ERROR: <catalog> element missing \"name\" attribute.");
+        if(_name ==null){
+            msg = "THREDDS ERROR: <catalog> element missing \"name\" attribute.";
+            log.error(msg);
+            throw new Exception(msg);
         }
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(catalog, System.out);
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        //xmlo.output(catalog, System.out);
 
 
 
@@ -101,23 +119,25 @@ public class Catalog {
     public void cacheCatalogFileContent() throws Exception {
 
         String msg;
+        String fname = _pathPrefix + _fileName;
 
-        File catalogFile = new File(configFileName);
+
+        File catalogFile = new File(fname);
 
         if(!catalogFile.exists()){
-            msg = "Cannot find file: "+ configFileName;
+            msg = "Cannot find file: "+ fname;
             log.error(msg);
             throw new IOException(msg);
         }
 
         if(!catalogFile.canRead()){
-            msg = "Cannot read file: "+ configFileName;
+            msg = "Cannot read file: "+ fname;
             log.error(msg);
             throw new IOException(msg);
         }
-        log.debug("Loading THREDDS catalog file: "+ configFileName);
+        log.debug("Loading THREDDS catalog file: "+ fname);
 
-        FileInputStream fis = new FileInputStream(configFileName);
+        FileInputStream fis = new FileInputStream(fname);
 
         byte[] buf  = new byte[(int)catalogFile.length()];
 
@@ -126,7 +146,7 @@ public class Catalog {
         while(count<catalogFile.length()){
             ret = fis.read(buf);
             if(ret<0){
-                log.error("Premature end of file reached. file: "+ configFileName);
+                log.error("Premature end of file reached. file: "+ fname);
                 throw new Exception("Premature end of file reached.");
             }
             count += ret;
@@ -145,7 +165,7 @@ public class Catalog {
              is= new ByteArrayInputStream(_buffer);
         }
         else {
-             is = new FileInputStream(configFileName);
+             is = new FileInputStream(_pathPrefix+_fileName);
         }
 
         // Parse the XML doc into a Document object.
@@ -155,11 +175,20 @@ public class Catalog {
     }
 
     public String getName(){
-        return name;
+        return _name;
     }
 
+    public String getPathPrefix(){
+        return _pathPrefix;
+    }
 
+    public String getUrlPrefix(){
+        return _urlPrefix;
+    }
 
+    public String getFileName(){
+        return _fileName;
+    }
 
 
 
