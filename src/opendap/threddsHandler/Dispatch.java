@@ -28,24 +28,15 @@ import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.wcs.*;
-import opendap.bes.Version;
-import opendap.bes.BesAPI;
-import opendap.bes.BESError;
 import org.slf4j.Logger;
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Templates;
 import java.util.*;
 import java.io.*;
 
@@ -366,49 +357,6 @@ public class Dispatch implements DispatchHandler{
     }
 
 
-    public Document transform(Document sourceDoc, File stylesheetFile) throws Exception {
-
-
-        // Set up the XSLT stylesheet for use with Xalan-J 2
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Templates stylesheet = transformerFactory.newTemplates(new StreamSource(stylesheetFile));
-        Transformer processor = stylesheet.newTransformer();
-
-
-        // Use I/O streams for source files
-        PipedInputStream sourceIn = new PipedInputStream();
-        PipedOutputStream sourceOut = new PipedOutputStream(sourceIn);
-        StreamSource source = new StreamSource(sourceIn);
-
-
-        // Use I/O streams for output files
-        PipedInputStream resultIn = new PipedInputStream();
-        PipedOutputStream resultOut = new PipedOutputStream(resultIn);
-
-
-        // Convert the output target for use in Xalan-J 2
-        StreamResult result = new StreamResult(resultOut);
-
-
-        // Get a means for output of the JDOM Document
-        XMLOutputter xmlOutputter = new XMLOutputter();
-
-
-        // Output to the I/O stream
-        xmlOutputter.output(sourceDoc, sourceOut);
-        sourceOut.close();
-
-        // Feed the resultant I/O stream into the XSLT processor
-        processor.transform(source, result);
-        resultOut.close();
-
-        // Convert the resultant transformed document back to JDOM
-        SAXBuilder builder = new SAXBuilder();
-        Document resultDoc = builder.build(resultIn);
-
-        
-        return resultDoc;
-    }
 
 
 }

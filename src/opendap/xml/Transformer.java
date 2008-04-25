@@ -32,6 +32,10 @@ import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.input.SAXBuilder;
 
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Templates;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
 import java.net.URI;
 import java.io.*;
 
@@ -71,7 +75,7 @@ public class Transformer {
 
 
         try {
-            parser.transformURI(args[0],args[1]);
+            parser.transformMoo(args[0],args[1]);
         } catch (Exception e) {
             e.printStackTrace(System.err);
 
@@ -79,6 +83,22 @@ public class Transformer {
 
     }
 
+
+    public void transformMoo(String srcFile, String xslFile) throws Exception {
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        Document sourceDoc, xsltDoc;
+
+        sourceDoc = getXMLDoc(srcFile);
+        System.err.println("Got and parsed XML document: "+srcFile);
+        xmlo.output(sourceDoc, System.err);
+
+        Document result = transform(sourceDoc, new File(xslFile));
+        xmlo.output(result, System.out);
+
+
+    }
 
     public void transformURI(String srcFile, String xslFile) throws Exception {
 
@@ -166,7 +186,12 @@ public class Transformer {
 
 
     public static String uriInfo(URI uri){
+
+
+
+
         String msg = "\n";
+
 
         msg += "URI: "+uri.toString()+"\n";
         msg += "  Authority:              "+uri.getAuthority()+"\n";
@@ -202,6 +227,57 @@ public class Transformer {
 
 
 
+    public Document transform(Document sourceDoc, File stylesheetFile) throws Exception {
+
+
+        // Set up the XSLT stylesheet for use with Xalan-J 2
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Templates stylesheet = transformerFactory.newTemplates(new StreamSource(stylesheetFile));
+        javax.xml.transform.Transformer processor = stylesheet.newTransformer();
+
+        System.err.println("TransformerFactory class: "+transformerFactory.getClass().getName());
+        System.err.println("Transformer class: "+processor.getClass().getName());
+
+
+
+
+
+
+
+        // Use I/O streams for source files
+        PipedInputStream sourceIn = new PipedInputStream();
+        PipedOutputStream sourceOut = new PipedOutputStream(sourceIn);
+        StreamSource source = new StreamSource(sourceIn);
+
+
+        // Use I/O streams for output files
+        PipedInputStream resultIn = new PipedInputStream();
+        PipedOutputStream resultOut = new PipedOutputStream(resultIn);
+
+
+        // Convert the output target for use in Xalan-J 2
+        StreamResult result = new StreamResult(resultOut);
+
+
+        // Get a means for output of the JDOM Document
+        XMLOutputter xmlOutputter = new XMLOutputter();
+
+
+        // Output to the I/O stream
+        xmlOutputter.output(sourceDoc, sourceOut);
+        sourceOut.close();
+
+        // Feed the resultant I/O stream into the XSLT processor
+        processor.transform(source, result);
+        resultOut.close();
+
+        // Convert the resultant transformed document back to JDOM
+        SAXBuilder builder = new SAXBuilder();
+        Document resultDoc = builder.build(resultIn);
+
+
+        return resultDoc;
+    }
 
 
 
