@@ -159,6 +159,47 @@ public class Catalog {
 
 
 
+    public void printCatalog(OutputStream os) throws Exception {
+
+        String fname = _pathPrefix+_fileName;
+
+        if(_buffer!=null){
+            os.write(_buffer);
+        }
+        else {
+
+            File catalogFile = new File(fname);
+
+            log.debug("Loading THREDDS catalog file: "+ fname);
+
+            FileInputStream fis = new FileInputStream(fname);
+
+            byte[] buf  = new byte[2048];
+
+            int count = 0, ret;
+
+            while(count<catalogFile.length()){
+                ret = fis.read(buf);
+                if(ret<0){
+                    log.error("Premature end of file reached. file: "+ fname);
+                    throw new Exception("Premature end of file reached.");
+                }
+
+                os.write(buf,0,ret);
+                count += ret;
+            }
+            fis.close();
+
+        }
+
+
+
+
+
+    }
+
+
+
     public Document getCatalogDocument() throws Exception {
 
         InputStream is;

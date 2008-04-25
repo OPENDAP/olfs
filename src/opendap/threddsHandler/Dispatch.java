@@ -34,17 +34,20 @@ import opendap.bes.BESError;
 import org.slf4j.Logger;
 import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Templates;
 import java.util.*;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
 
 import thredds.servlet.ServletUtil;
 
@@ -82,7 +85,7 @@ public class Dispatch implements DispatchHandler{
         String relativeURL = ReqInfo.getFullSourceName(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
+        boolean useXSLT = false;
 
 
         if(redirectForPrefixOnlyRequest(request,response))
@@ -92,13 +95,20 @@ public class Dispatch implements DispatchHandler{
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
 
+
+        if(requestSuffix!=null && requestSuffix.equals("html")){
+            useXSLT = true;
+            relativeURL = relativeURL.substring(0, relativeURL.lastIndexOf(".html")) + ".xml";
+        }
+
+
         Document catDoc;
         if(relativeURL.equals(_prefix)){
+            useXSLT = true;
             catDoc = CatalogManager.getTopLevelCatalogDocument();
         }
         else{
 
-            //if(requestSuffix.equals("html"))
 
 
             if(relativeURL.startsWith(_prefix))
@@ -106,13 +116,25 @@ public class Dispatch implements DispatchHandler{
             Catalog cat = CatalogManager.getCatalog(relativeURL);
 
             if(cat!=null){
-                catDoc = cat.getCatalogDocument();
                 log.debug("\nFound catalog: "+relativeURL+"   " +
                         "    requestSuffix: "+requestSuffix+"   " +
                         "    prefix: " + _prefix
 
 
                 );
+                if(useXSLT){
+                    catDoc = cat.getCatalogDocument();
+                }
+                else {
+
+                    response.setContentType("text/xml");
+                    response.setHeader("Content-Description", "dods_directory");
+                    response.setStatus(HttpServletResponse.SC_OK);
+
+                    cat.printCatalog(response.getOutputStream());
+                    log.debug("Sent THREDDS catalog (raw XML).");
+                    return;
+                }
             }
             else {
                 log.error("Can't find catalog: "+relativeURL+"   " +
@@ -128,27 +150,21 @@ public class Dispatch implements DispatchHandler{
         }
 
 
-        //xmlo.output(catDoc, System.out);
-
-
-
 
         String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
-
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
         Document contentsPage = transformer.transform(catDoc);
-
 
         //xmlo.output(catalog, System.out);
         //xmlo.output(contentsPage, System.out);
-
         response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
+        response.setHeader("Content-Description", "thredds_catalog");
         response.setStatus(HttpServletResponse.SC_OK);
         xmlo.output(contentsPage, response.getWriter());
         //xmlo.output(contentsPage, System.out);
+        log.debug("Sent transformed THREDDS catalog (XML->XSLT->HTML).");
 
+        log.debug("XSLT Transformer: "+System.getProperty("javax.xml.transform.TransformerFactory"));
 
 
     }
@@ -166,7 +182,7 @@ public class Dispatch implements DispatchHandler{
             String newURI = _prefix;
             res.sendRedirect(Scrub.urlContent(newURI));
             log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
-                    "context to a URL that ends in a '/' character!");
+                    "context to a URL that ends in a '/' character! Redirect to: "+Scrub.urlContent(newURI));
             return true;
         }
         return false;
@@ -347,6 +363,51 @@ public class Dispatch implements DispatchHandler{
         log.info("Destroy Complete");
 
 
+    }
+
+
+    public Document transform(Document sourceDoc, File stylesheetFile) throws Exception {
+
+
+        // Set up the XSLT stylesheet for use with Xalan-J 2
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Templates stylesheet = transformerFactory.newTemplates(new StreamSource(stylesheetFile));
+        Transformer processor = stylesheet.newTransformer();
+
+
+        // Use I/O streams for source files
+        PipedInputStream sourceIn = new PipedInputStream();
+        PipedOutputStream sourceOut = new PipedOutputStream(sourceIn);
+        StreamSource source = new StreamSource(sourceIn);
+
+
+        // Use I/O streams for output files
+        PipedInputStream resultIn = new PipedInputStream();
+        PipedOutputStream resultOut = new PipedOutputStream(resultIn);
+
+
+        // Convert the output target for use in Xalan-J 2
+        StreamResult result = new StreamResult(resultOut);
+
+
+        // Get a means for output of the JDOM Document
+        XMLOutputter xmlOutputter = new XMLOutputter();
+
+
+        // Output to the I/O stream
+        xmlOutputter.output(sourceDoc, sourceOut);
+        sourceOut.close();
+
+        // Feed the resultant I/O stream into the XSLT processor
+        processor.transform(source, result);
+        resultOut.close();
+
+        // Convert the resultant transformed document back to JDOM
+        SAXBuilder builder = new SAXBuilder();
+        Document resultDoc = builder.build(resultIn);
+
+        
+        return resultDoc;
     }
 
 
