@@ -155,7 +155,6 @@ public class Dispatch implements DispatchHandler{
         //xmlo.output(contentsPage, System.out);
         log.debug("Sent transformed THREDDS catalog (XML->XSLT->HTML).");
 
-        log.debug("XSLT Transformer: "+System.getProperty("javax.xml.transform.TransformerFactory"));
 
 
     }
