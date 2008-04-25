@@ -26,6 +26,7 @@ package opendap.threddsHandler;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.wcs.*;
 import opendap.bes.Version;
 import opendap.bes.BesAPI;
@@ -43,6 +44,7 @@ import java.util.*;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import thredds.servlet.ServletUtil;
 
@@ -81,6 +83,10 @@ public class Dispatch implements DispatchHandler{
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
+
+
+        if(redirectForPrefixOnlyRequest(request,response))
+            return;
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -121,6 +127,7 @@ public class Dispatch implements DispatchHandler{
             }
         }
 
+
         xmlo.output(catDoc, System.out);
 
 
@@ -144,6 +151,25 @@ public class Dispatch implements DispatchHandler{
 
 
 
+    }
+
+    private boolean redirectForPrefixOnlyRequest(HttpServletRequest req,
+                                                  HttpServletResponse res)
+            throws IOException {
+
+        String relativeURL = ReqInfo.getFullSourceName(req);
+
+
+        // We know the _prefix ens in slash. So, if this things is the same as
+        // prefix sans slash then we redirect
+        if (relativeURL.equals(_prefix.substring(0,_prefix.length()-1))) {
+            String newURI = _prefix;
+            res.sendRedirect(Scrub.urlContent(newURI));
+            log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
+                    "context to a URL that ends in a '/' character!");
+            return true;
+        }
+        return false;
     }
 
 

@@ -139,12 +139,12 @@ public class Catalog {
 
         FileInputStream fis = new FileInputStream(fname);
 
-        byte[] buf  = new byte[(int)catalogFile.length()];
+        _buffer  = new byte[(int)catalogFile.length()];
 
         int count = 0, ret;
 
         while(count<catalogFile.length()){
-            ret = fis.read(buf);
+            ret = fis.read(_buffer);
             if(ret<0){
                 log.error("Premature end of file reached. file: "+ fname);
                 throw new Exception("Premature end of file reached.");
@@ -152,6 +152,8 @@ public class Catalog {
             count += ret;
         }
         fis.close();
+
+        log.info("Using memory cache for file: "+fname);
 
     }
 
