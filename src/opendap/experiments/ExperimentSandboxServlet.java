@@ -73,7 +73,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        System.out.println("ExperimentSandboxServlet loaded.");
+        log.info("ExperimentSandboxServlet loaded.");
 
 
 
@@ -247,13 +247,6 @@ public class ExperimentSandboxServlet extends HttpServlet {
     private void memory(HttpServletRequest request,
                              HttpServletResponse response) {
 
-
-        String contextPath = ServletUtil.getContextPath(this);
-        String contentPath = ServletUtil.getContentPath(this);
-        Date startTime, endTime;
-
-        String filename=contentPath + "CEOP/ReferenceSite/catalog.xml";
-
         try {
             PrintWriter pw = response.getWriter();
 
@@ -262,7 +255,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
 
 
-            pw.println("<hr/><h3>Start:</h3>");
+            pw.println("<hr/><pre><h3>Start:</h3>");
             Util.printMemoryReport(pw);
             pw.flush();
 
@@ -273,10 +266,7 @@ public class ExperimentSandboxServlet extends HttpServlet {
 
 
             Util.printMemoryReport(pw);
-            pw.println("<h3>End</h3><hr/>");
-
-
-
+            pw.println("<h3>End</h3></pre><hr/>");
 
 
         }
