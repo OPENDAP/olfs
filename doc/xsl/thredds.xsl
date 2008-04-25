@@ -79,16 +79,6 @@
                 <table width="100%" border="0">
                     <tr>
                         <td>
-                            <div class="small" align="left">
-                                THREDDS Catalog
-                                <a href="/opendap/catalog.html">
-                                    HTML
-                                </a>
-                                &NBSP;
-                                <a href="/opendap/catalog.xml">
-                                    XML
-                                </a>
-                            </div>
                         </td>
                         <td>
                             <div class="small" align="right">
@@ -133,7 +123,51 @@
         <xsl:param name="indent" />
         <tr>
             <td align="left">
-                <xsl:value-of select="$indent"/><a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+
+                <xsl:if test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
+                    <xsl:value-of select="$indent"/><a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                </xsl:if>
+
+                <xsl:if test="not(substring(./@xlink:href,string-length(./@xlink:href) - 3))">
+                    <xsl:value-of select="$indent"/><a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                </xsl:if>
+
+            </td>
+            <td align="center">
+                &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;&NBSP;
+            </td>
+        </tr>
+
+
+    </xsl:template>
+
+
+
+    <!--***********************************************
+       -
+       -
+       -
+       -
+       -
+       -
+       -
+     -->
+    <xsl:template match="thredds:catalogRef" mode="EasierToReadVersion">
+        <xsl:param name="indent" />
+        <tr>
+            <td align="left">
+
+                <xsl:variable name="href" select="./@xlink:href" />
+                <xsl:variable name="linkSuffix" select="substring($href,string-length($href) - 3)" />
+                <xsl:variable name="linkBody" select="substring($href,1,string-length($href) - 4)" />
+
+                <xsl:if test="$linkSuffix='.xml'">
+                    <xsl:value-of select="$indent"/><a href="{concat($linkBody,'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
+               </xsl:if>
+
+                <xsl:if test="not($linkSuffix='.xml')">
+                    <xsl:value-of select="$indent"/><a href="{$href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+               </xsl:if>
             </td>
             <td align="center">
                 &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;&NBSP;
