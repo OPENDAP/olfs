@@ -82,7 +82,8 @@ public class Dispatch implements DispatchHandler{
         if(redirectForPrefixOnlyRequest(request,response))
             return;
 
-        if(relativeURL.startsWith("/"))
+        /* Make sure the relative URL is really relative */
+        while(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
 
@@ -95,15 +96,18 @@ public class Dispatch implements DispatchHandler{
 
         Document catDoc;
         if(relativeURL.equals(_prefix)){
-            useXSLT = true;
+            // useXSLT = true;      // There's no need to set this.
             catDoc = CatalogManager.getTopLevelCatalogDocument();
         }
         else{
 
 
 
+            // Strip the prefix off of the relativeURL)
             if(relativeURL.startsWith(_prefix))
                 relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+
+
             Catalog cat = CatalogManager.getCatalog(relativeURL);
 
             if(cat!=null){
@@ -114,10 +118,11 @@ public class Dispatch implements DispatchHandler{
 
                 );
                 if(useXSLT){
+                    // Grab the catalog to use for the Transform.
                     catDoc = cat.getCatalogDocument();
                 }
                 else {
-
+                    // Send the XML catalog.
                     response.setContentType("text/xml");
                     response.setHeader("Content-Description", "dods_directory");
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -141,6 +146,8 @@ public class Dispatch implements DispatchHandler{
         }
 
 
+
+        // Send the catalog using the transform.
 
         String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
@@ -236,19 +243,19 @@ public class Dispatch implements DispatchHandler{
             log.debug("Processing THREDDS catalog file(s)...");
 
             String contentPath = ServletUtil.getContentPath(servlet);
-            String contextPath = ServletUtil.getContextPath(servlet);
 
 
-            String urlPrefix = "";//ServletUtil.getContextPath(servlet);
+
+            // This next bit where I determine the urlPrefix is
+            // very ugly. It works. I don't really understand how I
+            // got here, and I don't like it. Just so you know.
+            String urlPrefix = "";
 
             if(!urlPrefix.endsWith("/") && !_prefix.startsWith("/"))
                 urlPrefix += "/";
 
             while(urlPrefix.endsWith("/") && _prefix.startsWith("/"))
                 urlPrefix += urlPrefix.substring(0,urlPrefix.length()-1);
-
-            //urlPrefix = urlPrefix + _prefix;
-            //urlPrefix =  _prefix;
 
 
             if(!urlPrefix.endsWith("/"))
