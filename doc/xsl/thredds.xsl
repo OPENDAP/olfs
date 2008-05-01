@@ -15,6 +15,7 @@
                 >
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
+    <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
     <xsl:template match="thredds:catalog">
         <html>
@@ -125,11 +126,11 @@
             <td align="left">
 
                 <xsl:if test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
-                    <xsl:value-of select="$indent"/><a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                    <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
                 </xsl:if>
 
                 <xsl:if test="not(substring(./@xlink:href,string-length(./@xlink:href) - 3))">
-                    <xsl:value-of select="$indent"/><a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                    <a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
                 </xsl:if>
 
             </td>
@@ -302,18 +303,17 @@
          </xsl:if >
 
         <xsl:if test="not(thredds:dataset)">
-            <xsl:variable name="sn" select="thredds:serviceName" />
             <tr>
                 <td>
-                    <xsl:value-of select="$indent"/><a href="{//thredds:service[@name = current()/thredds:serviceName]/@base}{@urlPath}.html" ><xsl:value-of select="@name" /></a>
+                    <xsl:value-of select="$indent"/><a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.html" ><xsl:value-of select="@name" /></a>&DBSP;
 
                 </td>
                 <td align="center">
-                    <a href="{//thredds:service[@name = $sn]/@base}{@urlPath}.ddx" >ddx</a>
-                    <a href="{//thredds:service[@name = $sn]/@base}{@urlPath}.dds" >dds</a>
-                    <a href="{//thredds:service[@name = $sn]/@base}{@urlPath}.das" >das</a>
-                    <a href="{//thredds:service[@name = $sn]/@base}{@urlPath}.info" >info</a>
-                    <a href="{//thredds:service[@name = $sn]/@base}{@urlPath}.html" >html</a>
+                    <a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.ddx" >ddx</a>
+                    <a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.dds" >dds</a>
+                    <a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.das" >das</a>
+                    <a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.info" >info</a>
+                    <a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.html" >html</a>
                 </td>
             </tr>
         </xsl:if>
