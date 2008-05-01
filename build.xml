@@ -390,6 +390,48 @@
     </target>
 
 
+
+    <target name="validatorApp"
+        depends="clean,compile"
+        description="Builds executable jar file of the hex encoder">
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
+        <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
+        <copy file="${lib.dir}/${commons-logging.lib}" tofile="${build.dist}/${commons-logging.lib}"/>
+        <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
+        <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
+        <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
+        <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
+
+        <jar destfile="${build.dist}/validator.jar"
+             manifest="resources/META-INF/validator.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/xml/Validator.class"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+
+
+
+    <target name="XSLTransformer"
+        depends="clean,compile"
+        description="Builds executable jar file of a simple XSL Transformer application">
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
+
+        <jar destfile="${build.dist}/xslt.jar"
+             manifest="resources/META-INF/xsltransformer.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/wcs_service/Transformer.class"/>
+            </fileset>
+        </jar>
+
+
+    </target>
+
+
     <target
             name="server"
             depends="olfs-lib,doc"
