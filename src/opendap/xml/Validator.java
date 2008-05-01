@@ -29,6 +29,10 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpClient;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.FileInputStream;
+
 /**
  * User: ndp
  * Date: Apr 17, 2008
@@ -52,7 +56,7 @@ public class Validator {
 
         for (String url : args) {
             try {
-                parser.validateURL(url);
+                parser.validateURI(url);
             } catch (Exception e) {
                 e.printStackTrace(System.out);
 
@@ -61,51 +65,61 @@ public class Validator {
     }
 
 
-    public Document validateURL(String url) throws Exception {
+    public Document validateURI(String s) throws Exception{
 
 
+        // get a validating jdom parser to parse and validate the XML document.
+        SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
+        parser.setFeature("http://apache.org/xml/features/validation/schema", true);
 
-        System.out.println("requestURI: "+url);
+        Document doc;
 
-        GetMethod request = new GetMethod(url);
+        if(s.startsWith("http://")){
+            System.err.println("Appears to be a URL: "+s);
 
-        System.out.println("HttpClient: "+httpClient);
+            GetMethod request = new GetMethod(s);
+
+            try {
+                // Execute the method.
+                int statusCode = httpClient.executeMethod(request);
+
+                if (statusCode != HttpStatus.SC_OK) {
+                  System.err.println("ERROR: Method failed " + request.getStatusLine());
+                }
+
+                doc = parser.build(request.getResponseBodyAsStream());
 
 
-        try {
-            // Execute the method.
-            int statusCode = httpClient.executeMethod(request);
+                return doc;
 
-            if (statusCode != HttpStatus.SC_OK) {
-              System.out.println("ERROR: Method failed " + request.getStatusLine());
+            }
+            finally {
+                System.err.println("Releasing Http connection.");
+                request.releaseConnection();
             }
 
-            // Parse the XML doc into a Document object.
+        }
+        else {
+            File file = new File(s);
+            if(!file.exists()){
+                throw new IOException("Cannot find file: "+ s);
+            }
 
-            // get a jdom parser to parse and validate the XML document.
-            SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
+            if(!file.canRead()){
+                throw new IOException("Cannot read file: "+ s);
+            }
 
-            // turn on validation
-            parser.setFeature("http://apache.org/xml/features/validation/schema", true);
+            System.out.println("Parsing file: "+s+"\n");
 
-            Document doc = parser.build(request.getResponseBodyAsStream());
-            System.out.println("Got and parsed and validated XML document: "+url);
-            //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            //xmlo.output(doc, System.out);
+            doc = parser.build(new FileInputStream(file));
+
+            System.out.println("Got and parsed and validated XML document: "+s);
 
             return doc;
 
-
         }
-        finally {
-            System.out.println("Releasing Http connection.");
-            request.releaseConnection();
-        }
-
 
     }
-
-
 
 
 
