@@ -675,7 +675,6 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         log.debug("collectionName:  " + collectionName);
 */
-
         Project project = WcsManager.getProject(projectName);
         if (project == null) {
             log.error("sendCoveragePage() Project:  \"" + projectName + "\" not found.");
@@ -702,10 +701,11 @@ public class WcsDispatchHandler implements DispatchHandler {
 
             WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
             if (coverage == null) {
-                log.error("sendCoveragePage() Coverage:  \"" + serviceName + "\" not found.");
+                log.error("sendCoveragePage() Coverage:  \"" + coverageName + "\" not found.");
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
             else {
+                log.debug("sendCoveragePage() Sending Coverage:  \"" + coverage.getName() + "\"");
 
                 Element coff = coverage.getConfigElement();
                 Element s;
@@ -721,6 +721,8 @@ public class WcsDispatchHandler implements DispatchHandler {
                 XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
                 if(coverage.hasTemporalDomain()){
+                    log.debug("sendCoveragePage() " + coverage.getName() +
+                            " has a temporal domain. Adding time datasets.");
                     Element dset = coff.getChild(WCS.DOMAIN_SET,WCS.NS);
                     Element tdom = dset.getChild(WCS.TEMPORAL_DOMAIN,WCS.NS);
 
@@ -734,6 +736,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
                 }
                 else if(coverage.hasSpatialDomain()){
+                    log.debug("sendCoveragePage() " + coverage.getName() +
+                            " has no temporal domain.");
                     pageContent = transformer.transform(doc);
 
                 }
