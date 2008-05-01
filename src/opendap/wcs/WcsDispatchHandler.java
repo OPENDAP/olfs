@@ -157,7 +157,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                     case 2:
                         projectName = path[1];
 
-                        log.debug("Requested Sites page. " +
+                        log.debug("Sending Sites page. " +
                                 "projectName=" + projectName +
                                 "  dataSource=" + dataSource);
                         sendSitesPage(request,
@@ -170,7 +170,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                         projectName = path[1];
                         siteName = path[2];
 
-                        log.debug("Requested WCSServers page." +
+                        log.debug("Sending WCSServers page." +
                                 "  projectName=" + projectName +
                                 "  siteName: " + siteName +
                                 "  dataSource=" + dataSource);
@@ -187,7 +187,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                         siteName = path[2];
                         serviceName = path[3];
 
-                        log.debug("Requested Coverage page." +
+                        log.debug("Sending CoverageOfferings page." +
                                 "  projectName=" + projectName +
                                 "  siteName: " + siteName +
                                 "  serviceName: " + serviceName +
@@ -206,7 +206,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                         serviceName = path[3];
                         coverageName = path[4];
 
-                        log.debug("Requested Dates page." +
+                        log.debug("Sending Coverage page." +
                                 "  projectName=" + projectName +
                                 "  siteName: " + siteName +
                                 "  serviceName: " + serviceName +
@@ -258,7 +258,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         Element e = config.getChild("prefix");
         if(e!=null)
             prefix = e.getTextTrim();
-        
+
 
         //Get config file name from config Element
         children = config.getChildren("File");
@@ -311,15 +311,17 @@ public class WcsDispatchHandler implements DispatchHandler {
                                        boolean sendResponse)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
+        String relativeURL = ReqInfo.getFullSourceName(request);
+
+        if(relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1,relativeURL.length());
 
 
         boolean wcsRequest = false;
 
-        if (dataSource != null) {
+        if (relativeURL != null) {
 
-            if (dataSource.startsWith(prefix)) {
+            if (relativeURL.startsWith(prefix)) {
                 wcsRequest = true;
                 if (sendResponse) {
                     sendWCSResponse(request, response);

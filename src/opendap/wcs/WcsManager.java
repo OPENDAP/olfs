@@ -94,8 +94,8 @@ public class WcsManager {
 
         fis.close();
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(config, System.out);
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        //xmlo.output(config, System.out);
 
         configure();
 
