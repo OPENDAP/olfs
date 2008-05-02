@@ -43,7 +43,10 @@ import java.io.*;
 import thredds.servlet.ServletUtil;
 
 /**
- * User: ndp
+ * Provides Dispatch Services for the XSLT based THREDDS catalog Handler.
+ *
+ *
+ *
  * Date: Apr 18, 2008
  * Time: 3:46:50 PM
  */
@@ -127,7 +130,7 @@ public class Dispatch implements DispatchHandler{
                     response.setHeader("Content-Description", "dods_directory");
                     response.setStatus(HttpServletResponse.SC_OK);
 
-                    cat.printCatalog(response.getOutputStream());
+                    cat.writeCatalogXML(response.getOutputStream());
                     log.debug("Sent THREDDS catalog (raw XML).");
                     return;
                 }
@@ -246,44 +249,19 @@ public class Dispatch implements DispatchHandler{
 
 
 
-            // This next bit where I determine the urlPrefix is
-            // very ugly. It works. I don't really understand how I
-            // got here, and I don't like it. Just so you know.
-            String urlPrefix = "";
-
-            if(!urlPrefix.endsWith("/") && !_prefix.startsWith("/"))
-                urlPrefix += "/";
-
-            while(urlPrefix.endsWith("/") && _prefix.startsWith("/"))
-                urlPrefix += urlPrefix.substring(0,urlPrefix.length()-1);
-
-
-            if(!urlPrefix.endsWith("/"))
-                urlPrefix += "/";
-
-            urlPrefix = "";
-
-
             Iterator i = children.iterator();
             Element fileElem;
             String fileName,  pathPrefix, thisUrlPrefix;
 
 
-            log.debug("urlPrefix: "+urlPrefix);
             CatalogManager.init(contentPath);
             while (i.hasNext()) {
 
                 fileElem = (Element) i.next();
 
-
                 s = fileElem.getTextTrim();
 
-
-
                 thisUrlPrefix = s.substring(0,s.lastIndexOf(Util.basename(s)));
-                thisUrlPrefix = urlPrefix + thisUrlPrefix;
-
-
 
                 s = contentPath + s;
                 fileName = Util.basename(s);

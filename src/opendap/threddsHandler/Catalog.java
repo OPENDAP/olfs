@@ -26,11 +26,12 @@ package opendap.threddsHandler;
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.input.SAXBuilder;
 
 import java.io.*;
+import java.util.Date;
+import java.util.Vector;
+import java.util.Enumeration;
 
 /**
  * User: ndp
@@ -42,12 +43,16 @@ public class Catalog {
 
 
     private  Logger log;
+    private  String _name;
     private  String _pathPrefix;
     private  String _urlPrefix;
-    private String  _fileName;
+    private  String _fileName;
     private  byte[] _buffer;
+    private boolean _cacheFile;
+    private Vector<Catalog> _children;
 
-    private String _name;
+    private Date _cacheTime;
+
 
     public Catalog( String pathPrefix,
                     String urlPrefix,
@@ -62,6 +67,8 @@ public class Catalog {
         _pathPrefix = pathPrefix;
         _urlPrefix = urlPrefix;
 
+        _cacheFile = cacheFile;
+        _children = new Vector<Catalog>();
 
         log.debug("pathPrefix: " + _pathPrefix);
         log.debug("urlPrefix:  " + _urlPrefix);
@@ -90,8 +97,9 @@ public class Catalog {
             throw new IOException(msg);
         }
 
-        if(cacheFile)
+        if(_cacheFile){
             cacheCatalogFileContent();
+        }
         else
             _buffer = null;
 
@@ -112,29 +120,45 @@ public class Catalog {
         //xmlo.output(catalog, System.out);
 
 
+    }
 
+    public void destroy(){
+        _children.clear();
+        _name        = null;
+        _pathPrefix  = null;
+        _urlPrefix   = null;
+        _fileName    = null;
+        _buffer      = null;
+        _cacheFile   = false;
+        _cacheTime   = null;
     }
 
 
-    public void cacheCatalogFileContent() throws Exception {
+    public void addChild(Catalog c){
+        _children.add(c);
+    }
 
-        String msg;
+    public Enumeration<Catalog> getChildren(){
+        return _children.elements();
+    }
+
+
+
+    public boolean usesCache(){
+        return _cacheFile;
+    }
+
+    /**
+     * CAREFUL! Only call this function if you have acquired a WriteLock for
+     * the catalog!!
+     * @throws Exception When it can't read the file.
+     */
+    private void cacheCatalogFileContent() throws Exception {
+
         String fname = _pathPrefix + _fileName;
-
 
         File catalogFile = new File(fname);
 
-        if(!catalogFile.exists()){
-            msg = "Cannot find file: "+ fname;
-            log.error(msg);
-            throw new IOException(msg);
-        }
-
-        if(!catalogFile.canRead()){
-            msg = "Cannot read file: "+ fname;
-            log.error(msg);
-            throw new IOException(msg);
-        }
         log.debug("Loading THREDDS catalog file: "+ fname);
 
         FileInputStream fis = new FileInputStream(fname);
@@ -153,49 +177,62 @@ public class Catalog {
         }
         fis.close();
 
-        log.info("Using memory cache for file: "+fname);
+        _cacheTime = new Date();
 
+        log.info("Using memory cache for: "+fname);
+
+
+    }
+
+    public boolean needsRefresh(){
+
+        String fname = _pathPrefix + _fileName;
+        File catalogFile = new File(fname);
+
+        if (catalogFile.lastModified() > _cacheTime.getTime()) {
+
+            log.debug("THREDDS Catalog file: "+fname+" needs to re-ingested");
+
+            return true;
+        }
+        return false;
     }
 
 
 
-    public void printCatalog(OutputStream os) throws Exception {
 
-        String fname = _pathPrefix+_fileName;
+    public void writeCatalogXML(OutputStream os) throws Exception {
 
-        if(_buffer!=null){
-            os.write(_buffer);
-        }
-        else {
+            String fname = _pathPrefix+_fileName;
 
-            File catalogFile = new File(fname);
-
-            log.debug("Loading THREDDS catalog file: "+ fname);
-
-            FileInputStream fis = new FileInputStream(fname);
-
-            byte[] buf  = new byte[2048];
-
-            int count = 0, ret;
-
-            while(count<catalogFile.length()){
-                ret = fis.read(buf);
-                if(ret<0){
-                    log.error("Premature end of file reached. file: "+ fname);
-                    throw new Exception("Premature end of file reached.");
-                }
-
-                os.write(buf,0,ret);
-                count += ret;
+            if(_buffer!=null){
+                os.write(_buffer);
             }
-            fis.close();
+            else {
 
-        }
+                File catalogFile = new File(fname);
 
+                log.debug("Loading THREDDS catalog file: "+ fname);
 
+                FileInputStream fis = new FileInputStream(fname);
 
+                byte[] buf  = new byte[2048];
 
+                int count = 0, ret;
 
+                while(count<catalogFile.length()){
+                    ret = fis.read(buf);
+                    if(ret<0){
+                        log.error("Premature end of file reached. file: "+ fname);
+                        throw new Exception("Premature end of file reached.");
+                    }
+
+                    os.write(buf,0,ret);
+                    count += ret;
+                }
+                fis.close();
+
+            }
     }
 
 
@@ -203,19 +240,20 @@ public class Catalog {
     public Document getCatalogDocument() throws Exception {
 
         InputStream is;
+        SAXBuilder sb = new SAXBuilder();
 
         if(_buffer!=null){
-             is= new ByteArrayInputStream(_buffer);
+            is= new ByteArrayInputStream(_buffer);
         }
         else {
              is = new FileInputStream(_pathPrefix+_fileName);
         }
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-
         return  sb.build(is);
+
     }
+
+
+
 
     public String getName(){
         return _name;

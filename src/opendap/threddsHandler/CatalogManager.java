@@ -27,12 +27,16 @@ import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.filter.Filter;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.Enumeration;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -52,7 +56,10 @@ public class CatalogManager {
     private static Vector<Catalog> rootCatalogs = new Vector<Catalog>();
 
     private static HashMap<String,Catalog> catalogs = new HashMap<String,Catalog>();
+    private static ReentrantReadWriteLock _catalogsLock;
     private static boolean isIntialized=false;
+
+
 
 
     public static void init(String contentPath){
@@ -69,6 +76,7 @@ public class CatalogManager {
             return;
         }
 
+        _catalogsLock = new ReentrantReadWriteLock();
         CatalogManager.contentPath = contentPath;
         isIntialized = true;
     }
@@ -124,7 +132,13 @@ public class CatalogManager {
         String index;
 
         index = catalog.getUrlPrefix()+catalog.getFileName();
-        catalogs.put(index,catalog);
+        _catalogsLock.writeLock().lock();
+        try {
+            catalogs.put(index,catalog);
+        }
+        finally {
+            _catalogsLock.writeLock().unlock();
+        }
 
         Document catDoc = catalog.getCatalogDocument();
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -132,29 +146,114 @@ public class CatalogManager {
 
         Element catRef;
         String href, catFname, thisUrlPrefix, thisPathPrefix;
-        for (Object o : catDoc.getRootElement().getChildren(THREDDS.CATALOG_REF,THREDDS.NS)) {
-            catRef = (Element) o;
+        Iterator i=  catDoc.getRootElement().getDescendants(new ElementFilter(THREDDS.CATALOG_REF,THREDDS.NS));
+
+        while(i.hasNext()){
+
+            catRef = (Element) i.next();
 
             href = catRef.getAttributeValue(XLINK.HREF,XLINK.NS);
-            thisUrlPrefix = catalog.getUrlPrefix() + href.substring(0,href.length() - Util.basename(href).length());
 
-            thisPathPrefix = catalog.getPathPrefix() + href;
-            catFname = Util.basename(thisPathPrefix);
-            thisPathPrefix = thisPathPrefix.substring(0,thisPathPrefix.lastIndexOf(catFname));
+            if(href.startsWith("http://")){
+                log.info("Found catalogRef that references an external " +
+                        "catalog. Target catalog not processed. The catalogRef element " +
+                        "will remain in the catalog.");
+            }
+            else {
+                thisUrlPrefix = catalog.getUrlPrefix() + href.substring(0,href.length() - Util.basename(href).length());
 
-            Catalog thisCatalog = new Catalog(thisPathPrefix,thisUrlPrefix,catFname,cacheCatalogFileContent);
-            addCatalog(thisCatalog,cacheCatalogFileContent);
+                thisPathPrefix = catalog.getPathPrefix() + href;
+                catFname = Util.basename(thisPathPrefix);
+                thisPathPrefix = thisPathPrefix.substring(0,thisPathPrefix.lastIndexOf(catFname));
+
+                Catalog thisCatalog = new Catalog(thisPathPrefix,thisUrlPrefix,catFname,cacheCatalogFileContent);
+                addCatalog(thisCatalog,cacheCatalogFileContent);
+                catalog.addChild(thisCatalog);
+            }
         }
     }
 
 
-
-
     public static Catalog getCatalog(String name){
 
-        return catalogs.get(name);
+        Catalog cat = null;
+
+
+        _catalogsLock.readLock().lock();
+        try {
+            cat =  catalogs.get(name);
+        }
+        finally {
+            _catalogsLock.readLock().unlock();
+        }
+        cat = updateCatalogIfRequired(cat);
+
+        return cat;
 
     }
+
+
+
+    public static Catalog  updateCatalogIfRequired(Catalog c){
+
+        _catalogsLock.writeLock().lock();
+        try {
+
+            if(c!=null && c.needsRefresh()){
+                Catalog newCat;
+                try {
+                    newCat = new Catalog(c.getPathPrefix(),c.getUrlPrefix(),c.getFileName(),c.usesCache());
+                    if(rootCatalogs.contains(c)){
+                        log.debug("Removing "+c.getName()+" from rootCatalogs collection.");
+                        rootCatalogs.remove(c);
+                        log.debug("Adding new "+newCat.getName()+" to rootCatalogs collection.");
+                        rootCatalogs.add(newCat);
+                    }
+                    log.debug("Purging "+c.getName());
+                    purgeCatalog(c);
+                    log.debug("Adding new catalog "+newCat.getName()+" to catalogs collection.");
+                    addCatalog(newCat, newCat.usesCache());
+                    return newCat;
+                }
+                catch(Exception e){
+                    log.error("Could not update Catalog: "+c.getName());
+                    return null;
+                }
+            }
+            else {
+                return c;
+
+            }
+
+        }
+        finally {
+                _catalogsLock.writeLock().unlock();
+
+        }
+
+
+
+    }
+    private static void purgeCatalog(Catalog c){
+         String index;
+         Catalog child;
+         Enumeration children;
+
+         children = c.getChildren();
+
+         while(children.hasMoreElements()){
+             child = (Catalog) children.nextElement();
+             purgeCatalog(child);
+         }
+
+        index = c.getUrlPrefix()+c.getFileName();
+        catalogs.remove(index);
+        c.destroy();
+        log.debug("Purged Catalog: "+index);
+
+    }
+
+
 
 
 
