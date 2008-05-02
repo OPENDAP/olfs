@@ -37,8 +37,9 @@ import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URI;
+import java.util.List;
 
 
 /**
@@ -49,20 +50,28 @@ import java.net.URISyntaxException;
 public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private Logger log;
-    private boolean initialized;
+    private boolean _initialized;
     private opendap.coreServlet.DispatchServlet dispatchServlet;
-    private String prefix = "wcs_service/";
+    private String _prefix = "wcs_service/";
+
+    private Element _config;
+
+
+
+
+
+
 
     public DispatchHandler() {
 
         super();
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        initialized = false;
+        _initialized = false;
 
     }
 
-    public String getWcsRequest(HttpServletRequest req) throws MalformedURLException {
+    public String getWcsRequest(HttpServletRequest req) throws Exception {
 
 
         String relativeURL = ReqInfo.getFullSourceName(req);
@@ -71,14 +80,27 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        String wcsURL = relativeURL.substring(prefix.length(),relativeURL.length());
+        String wcsURL = relativeURL.substring(_prefix.length(),relativeURL.length());
 
         wcsURL = wcsURL.substring(0,wcsURL.lastIndexOf("."+requestSuffix));
 
         wcsURL = UrlEncoder.hexToString(wcsURL);
 
-        URL url = new URL(wcsURL);
-        log.debug(urlInfo(url));
+
+        if(!_config.getChildren("wcsHost").isEmpty()){
+            String allowedHost;
+            boolean trusted = false;
+            for(Object o : _config.getChildren("wcsHost")){
+                allowedHost = ((Element)o).getTextTrim();
+                if(wcsURL.startsWith(allowedHost))
+                    trusted = true;
+            }
+
+            if(!trusted){
+                log.error("No trusted hosts found to match: "+wcsURL);
+                return null;
+            }
+        }
 
         return wcsURL;
 
@@ -112,37 +134,146 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
 
 
+
+
+    public static String uriInfo(URI uri){
+
+        String msg = "\n";
+
+
+        msg += "URI: "+uri.toString()+"\n";
+        msg += "  Authority:              "+uri.getAuthority()+"\n";
+        msg += "  Host:                   "+uri.getHost()+"\n";
+        msg += "  Port:                   "+uri.getPort()+"\n";
+        msg += "  Path:                   "+uri.getPath()+"\n";
+        msg += "  Query:                  "+uri.getQuery()+"\n";
+        msg += "  hashCode:               "+uri.hashCode()+"\n";
+        msg += "  Fragment:               "+uri.getFragment()+"\n";
+        msg += "  RawAuthority:           "+uri.getRawAuthority()+"\n";
+        msg += "  RawFragment:            "+uri.getRawFragment()+"\n";
+        msg += "  RawPath:                "+uri.getRawPath()+"\n";
+        msg += "  RawQuery:               "+uri.getRawQuery()+"\n";
+        msg += "  RawSchemeSpecificPart:  "+uri.getRawSchemeSpecificPart()+"\n";
+        msg += "  RawUSerInfo:            "+uri.getRawUserInfo()+"\n";
+        msg += "  Scheme:                 "+uri.getScheme()+"\n";
+        msg += "  SchemeSpecificPart:     "+uri.getSchemeSpecificPart()+"\n";
+        msg += "  UserInfo:               "+uri.getUserInfo()+"\n";
+        msg += "  isAbsoulte:             "+uri.isAbsolute()+"\n";
+        msg += "  isOpaque:               "+uri.isOpaque()+"\n";
+        msg += "  ASCIIString:            "+uri.toASCIIString()+"\n";
+
+        try {
+        msg += "  URL:                    "+uri.toURL()+"\n";
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return msg;
+    }
+
+
+
+
+
     public void init(DispatchServlet servlet, Element config) throws Exception {
-        if (initialized) return;
+        if (_initialized) return;
+
+        String msg;
+        Element host;
+        List hosts;
+        URL url;
+        URI uri;
 
 
         dispatchServlet = servlet;
+        _config = config;
 
+        ingestPrefix();
 
-        Element e = config.getChild("prefix");
-        if(e!=null)
-            prefix = e.getTextTrim();
+        hosts = config.getChildren("wcsHost");
 
-        if(prefix.equals("/"))
-            throw new Exception("Bad Configuration. The <Handler> " +
+        if(hosts.isEmpty()){
+            msg = "Configuration Warning: The <Handler> " +
                     "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 <_prefix>  " +
-                    "child element whose value may not be equal to \"/\"");
+                    " did not provide 1 or more <wcsHost> " +
+                    "child elements to limit the WCS services that " +
+                    "may be accessed. This not recomended.";
+
+            log.warn(msg);
+/*
+            msg = "Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide 1 or more <wcsHost>  " +
+                    "child elements whose value should be the base URL " +
+                    "for the WCS services that may be accessed.";
+            log.error(msg);
+            throw new Exception(msg);
+*/
+        }
+        else {
+
+            for (Object o : hosts) {
+                host = (Element) o;
+
+                url = new URL(host.getTextTrim());
+                log.debug(urlInfo(url));
 
 
-        if(!prefix.endsWith("/"))
-            prefix += "/";
+                uri = new URI(host.getTextTrim());
+                log.debug(uriInfo(uri));
+
+                log.info("Adding " + url + " to allowed hosts list.");
+            }
+
+        }
+
+
+
+
+
+
+
+
+        _initialized = true;
+    }
+
+
+    private void ingestPrefix() throws Exception{
+
+        String msg;
+
+        Element e = _config.getChild("prefix");
+        if(e!=null)
+            _prefix = e.getTextTrim();
+
+        if(_prefix.equals("/")){
+            msg = "Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide 1 <prefix>  " +
+                    "child element whose value may not be equal to \"/\"";
+            log.error(msg);
+            throw new Exception(msg);
+        }
+
+
+
+        if(!_prefix.endsWith("/"))
+            _prefix += "/";
 
 
         //if(!_prefix.startsWith("/"))
         //    _prefix = "/" + _prefix;
 
-        if(prefix.startsWith("/"))
-            prefix = prefix.substring(1,prefix.length());
+        if(_prefix.startsWith("/"))
+            _prefix = _prefix.substring(1, _prefix.length());
 
-        log.info("Initialized. prefix="+prefix);
-        initialized = true;
+        log.info("Initialized. prefix="+ _prefix);
+
     }
+
+
+
 
     public boolean requestCanBeHandled(HttpServletRequest request) throws Exception {
         return wcsRequestDispatch(request, null, false);
@@ -159,7 +290,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
             throws Exception {
 
         String relativeURL = ReqInfo.getFullSourceName(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -170,7 +300,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         if (relativeURL != null) {
 
-            if (relativeURL.startsWith(prefix)) {
+            if (relativeURL.startsWith(_prefix)) {
                 wcsRequest = true;
                 if (sendResponse) {
                     sendDAPResponse(request, response);
@@ -202,6 +332,14 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         String wcsRequestURL = getWcsRequest(request);
+
+
+        if(wcsRequestURL==null){
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+
 
         if ( // DDS Response?
                 requestSuffix.equalsIgnoreCase("dds")
