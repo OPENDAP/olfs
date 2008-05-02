@@ -87,8 +87,16 @@ public class CatalogManager {
             throws Exception {
 
         Catalog catalog = new Catalog(pathPrefix,urlPrefix,fname,cacheCatalogFileContent);
-        rootCatalogs.add(catalog);
-        addCatalog(catalog,cacheCatalogFileContent);
+
+        _catalogsLock.writeLock().lock();
+        try {
+            rootCatalogs.add(catalog);
+            addCatalog(catalog,cacheCatalogFileContent);
+        }
+        finally {
+            _catalogsLock.writeLock().unlock();
+        }
+
     }
 
 
@@ -104,20 +112,30 @@ public class CatalogManager {
         catalogRoot.addNamespaceDeclaration(XLINK.NS);
         catalogRoot.setAttribute(THREDDS.NAME, "HyraxThreddsHandler");
 
+        // We only need a read lock here because we are NOT going to reread
+        // our configuration. So - All of these top level catalogs can't change.
+        // Their content can change, but we can't add or remove from the list.
+        // If one of them has a change, then that will get loaded when the
+        // changed catalog gets accessed.
+        _catalogsLock.readLock().lock();
+        try {
+            for (Catalog cat : rootCatalogs) {
+                catRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
 
-        for (Catalog cat : rootCatalogs) {
-            catRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
+                href = cat.getUrlPrefix() + cat.getFileName();
+                catRef.setAttribute(XLINK.HREF,href,XLINK.NS);
 
-            href = cat.getUrlPrefix() + cat.getFileName();
-            catRef.setAttribute(XLINK.HREF,href,XLINK.NS);
+                title = cat.getName();
+                catRef.setAttribute(XLINK.TITLE,title,XLINK.NS);
 
-            title = cat.getName();
-            catRef.setAttribute(XLINK.TITLE,title,XLINK.NS);
+                name = cat.getName();
+                catRef.setAttribute(THREDDS.NAME,name);
 
-            name = cat.getName();
-            catRef.setAttribute(THREDDS.NAME,name);
-
-            catalogRoot.addContent(catRef);
+                catalogRoot.addContent(catRef);
+            }
+        }
+        finally {
+            _catalogsLock.readLock().unlock();
         }
 
 
@@ -132,13 +150,8 @@ public class CatalogManager {
         String index;
 
         index = catalog.getUrlPrefix()+catalog.getFileName();
-        _catalogsLock.writeLock().lock();
-        try {
-            catalogs.put(index,catalog);
-        }
-        finally {
-            _catalogsLock.writeLock().unlock();
-        }
+
+        catalogs.put(index,catalog);
 
         Document catDoc = catalog.getCatalogDocument();
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
