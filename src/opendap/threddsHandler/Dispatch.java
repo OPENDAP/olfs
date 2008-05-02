@@ -175,8 +175,11 @@ public class Dispatch implements DispatchHandler{
 
         String relativeURL = ReqInfo.getFullSourceName(req);
 
+        if(relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        // We know the _prefix ens in slash. So, if this things is the same as
+
+        // We know the _prefix ends in slash. So, if this things is the same as
         // prefix sans slash then we redirect
         if (relativeURL.equals(_prefix.substring(0,_prefix.length()-1))) {
             String newURI = _prefix;
@@ -313,9 +316,14 @@ public class Dispatch implements DispatchHandler{
 
         boolean threddsRequest = false;
 
-        if (dataSource != null) {
 
-            if (dataSource.startsWith(_prefix)) {
+
+
+        if (dataSource != null) {
+            // We know the _prefix ends in slash. So lets strip the slash
+            // before we compare. This makes sure that we pick up the URL
+            // that ends with the prefix and no slash
+            if (dataSource.startsWith(_prefix.substring(0,_prefix.length()-1))) {
                 threddsRequest = true;
                 if (sendResponse) {
                     sendThreddsCatalogResponse(request, response);

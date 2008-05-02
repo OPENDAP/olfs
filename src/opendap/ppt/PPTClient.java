@@ -30,6 +30,9 @@ import java.net.*;
 
 import org.slf4j.Logger;
 
+/**
+ * @deprecated
+ */
 class PPTClient {
 
     private Socket _mySock = null;

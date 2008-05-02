@@ -27,11 +27,7 @@ package opendap.ppt;
 import org.slf4j.Logger;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 9, 2006
- * Time: 1:23:14 PM
- * To change this template use File | Settings | File Templates.
+ * @deprecated
  */
 public class MarkFinder {
 
