@@ -195,8 +195,11 @@ public class BES {
         else
             trim = dataset.substring(getPrefix().length());
 
-        if (trim.indexOf("/") != 0)
-            trim = "/" + trim;
+        //if (trim.indexOf("/") != 0)
+        //    trim = "/" + trim;
+
+
+
         return trim;
 
 

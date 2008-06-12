@@ -7,8 +7,6 @@
                 xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
                 xmlns:wcs="http://www.opengis.net/wcs"
                 xmlns:gml="http://www.opengis.net/gml"
-                xmlns:dapwcs="http://www.opendap.org/ns/dapwcs"
-
                 >
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 

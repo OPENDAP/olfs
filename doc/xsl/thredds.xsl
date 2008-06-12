@@ -10,7 +10,6 @@
                 xmlns:gml="http://www.opengis.net/gml"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns:dapwcs="http://www.opendap.org/ns/dapwcs"
 
                 >
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>

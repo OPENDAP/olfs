@@ -1121,6 +1121,7 @@ public class BesAPI {
      * @throws BadConfigurationException .
      * @throws IOException               .
      * @throws JDOMException             .
+     * @deprecated
      */
     public static boolean showCatalog(String dataSource,
                                       Document catalog) throws
@@ -1192,6 +1193,126 @@ public class BesAPI {
             BES bes = BESManager.getBES(dataSource);
             if(bes!=null)
                 catalog.getRootElement().setAttribute("prefix",bes.getPrefix());
+
+            return true;
+
+        }
+        else {
+
+            doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
+
+            Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
+
+            Element err;
+            if(i.hasNext()){
+                err = (Element)i.next();
+            }
+            else {
+                err = doc.getRootElement();
+            }
+
+            err.detach();
+            error.detachRootElement();
+            error.setRootElement(err);
+            return false;
+
+        }
+
+
+    }
+
+
+
+    /**
+     * Returns the BES catalog Document for the specified dataSource.
+     *
+     * @param dataSource The data set or collection for which catalog information
+     * is desired.
+     * @param catalog  The catalog associated with the datasource name, or if
+     * the request results in an error, the error document.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean getCatalog(String dataSource,
+                                      Document catalog) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
+
+
+        return getCatalog(dataSource,catalog,catalog);
+
+
+
+    }
+    /**
+     * Returns the BES catalog Document for the specified dataSource.
+     *
+     * @param dataSource The data set or collection for which catalog information
+     * is desired.
+     * @param catalog  The catalog associated with the datasource name, or if
+     * the request results in an error, the document will not be changed.
+     * @param error  If the request results in an error, the error document is
+     * placed here.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean getCatalog(String dataSource,
+                                     Document catalog,
+                                     Document error) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+        Document doc;
+
+        SAXBuilder sb = new SAXBuilder();
+
+        String product = "catalog";
+
+        if(BesAPI.besShowTransaction(product, dataSource, baos,erros)){
+
+            log.debug("BES returned this document:\n" +
+                    "-----------\n" + baos + "-----------");
+
+            doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+            // Tweak it!
+
+            // Get the root element.
+            Element root = doc.getRootElement();
+
+            // Detach it from the document
+            root.detach();
+
+            // Pitch the root element that came with the passed catalog.
+            catalog.detachRootElement();
+
+            // Set the root element to be the one sent from the BES.
+            catalog.setRootElement(root);
+
+            // Find the top level dataset Element
+
+            Element topDataset = root.getChild("response").getChild("dataset");
+
+
+            // Add the appropriate prefix attribute to the top level dataset
+            // element in the catalog
+            BES bes = BESManager.getBES(dataSource);
+            if(bes!=null)
+                topDataset.setAttribute("prefix",bes.getPrefix());
 
             return true;
 

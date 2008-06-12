@@ -603,13 +603,17 @@ public class WcsService {
         capabilitiesDocument = doc;
 
         Element coverageOfferingBrief, contentMetatdata;
-        String name, hashedName;
+        String name;
+        //String hashedName;
         contentMetatdata = capabilitiesDocument.getRootElement().getChild(WCS.CONTENT_METADATA,WCS.NS);
         List coverageList = contentMetatdata.getChildren(WCS.COVERAGE_OFFERING_BRIEF,WCS.NS);
         for (Object cvrgOffrElem : coverageList) {
             coverageOfferingBrief = (Element) cvrgOffrElem;
 
             name = coverageOfferingBrief.getChild(WCS.NAME, WCS.NS).getTextTrim();
+
+
+            /*
 
             hashedName = getHashedName(name);
 
@@ -621,6 +625,19 @@ public class WcsService {
             log.debug("Adding link name "+hashedName+" to CoverageOfferingBrief Element.");
             Element link  = new Element("DapLink",WCS.DAPWCS_NS);
             link.setText(hashedName);
+            coverageOfferingBrief.addContent(link);
+            */
+
+
+
+
+            log.debug("Adding coverageOfferingBrief "+name+" to coverage HashMap. hashMapName: "+name);
+            coverages.put(name, coverageOfferingBrief);
+
+
+            log.debug("Adding link name "+name+" to CoverageOfferingBrief Element.");
+            Element link  = new Element("DapLink",WCS.DAPWCS_NS);
+            link.setText(name);
             coverageOfferingBrief.addContent(link);
         }
 

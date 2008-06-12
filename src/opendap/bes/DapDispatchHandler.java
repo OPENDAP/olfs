@@ -36,9 +36,13 @@ import java.util.Iterator;
 
 import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.transform.XSLTransformer;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
+import thredds.servlet.ServletUtil;
 
 /**
  * Handler for DAP requests.
@@ -201,7 +205,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         if (isWCS || (dsi!=null && dsi.sourceExists()) ) {
 
             if (requestSuffix != null && (isWCS || (dsi!=null && dsi.isDataset()))) {
-
                 if ( // DDS Response?
                         requestSuffix.equalsIgnoreCase("dds")
                         ) {
@@ -258,8 +261,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                         log.info("Sent Info");
                     }
 
-                } else
-                if (  //HTML Request Form (aka The Interface From Hell) Response?
+                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
                         requestSuffix.equalsIgnoreCase("html") ||
                                 requestSuffix.equalsIgnoreCase("htm")
                         ) {

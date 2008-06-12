@@ -393,15 +393,15 @@ public class WcsDispatchHandler implements DispatchHandler {
     }
 
 
-    public void sendProjectsPage(HttpServletRequest request,
-                                 HttpServletResponse response)
+    public void sendProjectsPage(HttpServletRequest req,
+                                 HttpServletResponse resp)
             throws Exception {
 
         Element p;
         long size = 0;
 
 
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(req));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -412,10 +412,17 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         log.debug("collectionName:  " + collectionName);
 
+        Element showCatalog = new Element("showCatalog");
+        Element responseElem = new Element("response");
 
-        Element root = newDataset(collectionName, false, true, size, new Date());
+        Element topDataset = newDataset(collectionName, false, true, size, new Date());
 
-        root.setAttribute("prefix", "/");
+        showCatalog.addContent(responseElem);
+        responseElem.addContent(topDataset);
+
+
+
+        topDataset.setAttribute("prefix", "/");
 
 
         Collection<Project> projects = WcsManager.getProjects();
@@ -423,10 +430,10 @@ public class WcsDispatchHandler implements DispatchHandler {
         for (Project proj : projects) {
             //size = proj.getSize();
             p = newDataset(proj.getName(), false, true, 0, new Date());
-            root.addContent(p);
+            topDataset.addContent(p);
         }
 
-        Document catalog = new Document(root);
+        Document catalog = new Document(showCatalog);
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -441,10 +448,10 @@ public class WcsDispatchHandler implements DispatchHandler {
         //xmlo.output(catalog, System.out);
         //xmlo.output(contentsPage, System.out);
 
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_directory");
-        response.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, response.getWriter());
+        resp.setContentType("text/html");
+        resp.setHeader("Content-Description", "dods_directory");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        xmlo.output(contentsPage, resp.getWriter());
 
     }
 
@@ -470,11 +477,17 @@ public class WcsDispatchHandler implements DispatchHandler {
         Element s;
         long size = 0;
 
+        Element showCatalog = new Element("showCatalog");
+        Element responseElem = new Element("response");
 
-        Element root = newDataset(collectionName, false, true, size, new Date());
-        root.setAttribute("prefix", "/");
+        Element topDataset = newDataset(collectionName, false, true, size, new Date());
 
-        catalog.setRootElement(root);
+        showCatalog.addContent(responseElem);
+        responseElem.addContent(topDataset);
+
+        topDataset.setAttribute("prefix", "/");
+
+        catalog.setRootElement(showCatalog);
 
         Project project = WcsManager.getProject(projectName);
         if (project == null) {
@@ -489,7 +502,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         for (Site site : sites) {
             //size = WcsManager.getWcsServiceCount();
             s = newDataset(site.getName(), false, true, 0, new Date());
-            root.addContent(s);
+            topDataset.addContent(s);
         }
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -533,10 +546,16 @@ public class WcsDispatchHandler implements DispatchHandler {
         long size = 0;
 
 
-        Element root = newDataset(collectionName, false, true, size, new Date());
-        root.setAttribute("prefix", "/");
+        Element showCatalog = new Element("showCatalog");
+        Element responseElem = new Element("response");
 
-        catalog.setRootElement(root);
+        Element topDataset = newDataset(collectionName, false, true, size, new Date());
+
+        showCatalog.addContent(responseElem);
+        responseElem.addContent(topDataset);
+        topDataset.setAttribute("prefix", "/");
+
+        catalog.setRootElement(showCatalog);
 
         Project project = WcsManager.getProject(projectName);
         if (project == null) {
@@ -556,7 +575,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         for (WcsService service : services) {
             //size = service.getCoverageCount();
             s = newDataset(service.getName(), false, true, 0, new Date());
-            root.addContent(s);
+            topDataset.addContent(s);
         }
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

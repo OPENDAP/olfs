@@ -5,14 +5,23 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 >
-    <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
+    <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
-    <xsl:template match="/">
+
+
+    <xsl:template match="showCatalog">
         <html>
+            <xsl:apply-templates />
+        </html>
+    </xsl:template>
+
+
+
+    <xsl:template match="response">
             <head>
                 <link rel='stylesheet' href='/opendap/docs/css/contents.css'
                       type='text/css'/>
-                <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="/dataset/name"/></title>
+                <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="dataset/name"/></title>
             </head>
             <body>
 
@@ -23,16 +32,16 @@
 
                 <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
                 <h1>Contents of
-                    <xsl:if test="/dataset/@prefix!='/'" >
-                        <xsl:if test="/dataset/name='/'" >
-                            <xsl:value-of select="/dataset/@prefix"/>
+                    <xsl:if test="dataset/@prefix!='/'" >
+                        <xsl:if test="dataset/name='/'" >
+                            <xsl:value-of select="dataset/@prefix"/>
                         </xsl:if>
-                        <xsl:if test="/dataset/name!='/'" >
-                            <xsl:value-of select="/dataset/@prefix"/><xsl:value-of select="/dataset/name"/>
+                        <xsl:if test="dataset/name!='/'" >
+                            <xsl:value-of select="dataset/@prefix"/><xsl:value-of select="dataset/name"/>
                         </xsl:if>
                     </xsl:if>
-                    <xsl:if test="/dataset/@prefix='/'" >
-                        <xsl:value-of select="/dataset/name"/>
+                    <xsl:if test="dataset/@prefix='/'" >
+                        <xsl:value-of select="dataset/name"/>
                     </xsl:if>
                 </h1>
                 <hr size="1" noshade="noshade"/>
@@ -61,7 +70,7 @@
                                 </xsl:if>
                             </td>
                         </tr>
-                        <xsl:for-each select="/dataset/dataset">
+                        <xsl:for-each select="dataset/dataset">
 
                             <!-- Process a collection. -->
                             <xsl:if test="@thredds_collection='true'">
@@ -187,6 +196,7 @@
                 </h3>
 
             </body>
-        </html>
     </xsl:template>
+
+
 </xsl:stylesheet>

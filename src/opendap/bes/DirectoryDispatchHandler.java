@@ -252,7 +252,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Document catalog = new Document();
 
-        if(BesAPI.showCatalog(collectionName,catalog)){
+        if(BesAPI.getCatalog(collectionName,catalog)){
 
             String xsltDoc = ServletUtil.getPath(dispatchServlet,"/docs/xsl/contents.xsl");
 

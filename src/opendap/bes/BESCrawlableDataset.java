@@ -545,9 +545,12 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         String besPath = getBesPath();
         log.debug("Getting catalog for: \"" + besPath + "\"");
         Document doc = new Document();
-        if(BesAPI.showCatalog(besPath,doc)){
+        if(BesAPI.getCatalog(besPath,doc)){
 
-            Element topDataset = doc.getRootElement();
+            Element root = doc.getRootElement();
+
+            Element response = root.getChild("response");
+            Element topDataset = response.getChild("dataset");
 
 
             if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {

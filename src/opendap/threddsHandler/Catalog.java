@@ -61,7 +61,7 @@ public class Catalog {
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        log.debug("Configuring...");
+        log.debug("Configuring new "+getClass().getName());
 
         _fileName = fname;
         _pathPrefix = pathPrefix;
