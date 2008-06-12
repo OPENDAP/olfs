@@ -50,6 +50,7 @@ import org.jdom.Element;
  * User: ndp
  * Date: Apr 16, 2007
  * Time: 11:28:25 AM
+ *@deprecated Use BESThreadsDispatchHandler
  */
 public class ThreddsDispatchHandler implements ThreddsHandler {
 

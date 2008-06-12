@@ -42,7 +42,7 @@ import org.jdom.output.Format;
  * Date: Apr 16, 2007
  * Time: 11:28:25 AM
  */
-public class tdh2 implements DispatchHandler {
+public class BESThreddsDispatchHandler implements DispatchHandler {
 
     private DispatchServlet servlet;
     private org.slf4j.Logger log;
@@ -51,7 +51,7 @@ public class tdh2 implements DispatchHandler {
 
 
 
-    public tdh2(){
+    public BESThreddsDispatchHandler(){
 
         servlet  = null;
 
