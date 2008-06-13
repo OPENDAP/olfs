@@ -70,7 +70,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
     public void sendWCSResponse(HttpServletRequest request,
-                                HttpServletResponse response) {
+                                HttpServletResponse response) throws Exception {
 
 
         String dataSource = ReqInfo.getDataSource(request);
@@ -101,148 +101,132 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         String projectName, siteName, serviceName, coverageName, dateName;
 
-        try {
 
+        if (path.length >= 6) {
+            projectName = path[1];
+            siteName = path[2];
+            serviceName = path[3];
+            coverageName = path[4];
+            dateName = path[5];
 
-            if(path.length >= 6){
-                projectName  = path[1];
-                siteName     = path[2];
-                serviceName  = path[3];
-                coverageName = path[4];
-                dateName     = path[5];
+            // By adding back the rest of the bits we can support date range
+            // subsampling because it uses "/" to seperate the bits.
+            for (int i = 6; i < path.length; i++)
+                dateName += "/" + path[i];
 
-                // By adding back the rest of the bits we can support date range
-                // subsampling because it uses "/" to seperate the bits.
-                for(int i=6; i<path.length ;i++)
-                    dateName += "/"+path[i];
+            log.debug("Requested DAP DATA!." +
+                    "  projectName=" + projectName +
+                    "  siteName: " + siteName +
+                    "  serviceName: " + serviceName +
+                    "  coverageName: " + coverageName +
+                    "  dateName: " + dateName +
+                    "  dataSource: " + dataSource);
 
-                log.debug("Requested DAP DATA!." +
-                        "  projectName=" + projectName +
-                        "  siteName: " + siteName +
-                        "  serviceName: " + serviceName +
-                        "  coverageName: " + coverageName +
-                        "  dateName: " + dateName +
-                        "  dataSource: " + dataSource);
+            sendDAPResponse(request,
+                    response,
+                    projectName,
+                    siteName,
+                    serviceName,
+                    coverageName,
+                    dateName);
+        } else {
 
-                sendDAPResponse(request,
-                                response,
-                                projectName,
-                                siteName,
-                                serviceName,
-                                coverageName,
-                                dateName);
-            }
-            else {
-
-                if (!dataSource.endsWith("/") && !isContentsRequest) {
-                    // Now that we certain that this is a directory request we
-                    // redirect the URL without a trailing slash to the one with.
-                    // This keeps everything copacetic downstream when it's time
-                    // to build the directory document.
-                    response.sendRedirect(Scrub.urlContent(request.getContextPath() + dataSource + "/"));
-                }
-
-                switch (path.length) {
-
-                    case 0:
-                        log.error("This line should never be executed.");
-                        break;
-
-                    case 1:
-                        log.debug("Requested Projects page. dataSource=" + dataSource);
-                        sendProjectsPage(request, response);
-                        break;
-
-
-                    case 2:
-                        projectName = path[1];
-
-                        log.debug("Sending Sites page. " +
-                                "projectName=" + projectName +
-                                "  dataSource=" + dataSource);
-                        sendSitesPage(request,
-                                response,
-                                projectName);
-
-                        break;
-
-                    case 3:
-                        projectName = path[1];
-                        siteName = path[2];
-
-                        log.debug("Sending WCSServers page." +
-                                "  projectName=" + projectName +
-                                "  siteName: " + siteName +
-                                "  dataSource=" + dataSource);
-
-                        sendServersPage(request,
-                                response,
-                                projectName,
-                                siteName);
-
-                        break;
-
-                    case 4:
-                        projectName = path[1];
-                        siteName = path[2];
-                        serviceName = path[3];
-
-                        log.debug("Sending CoverageOfferings page." +
-                                "  projectName=" + projectName +
-                                "  siteName: " + siteName +
-                                "  serviceName: " + serviceName +
-                                "  dataSource=" + dataSource);
-
-                        sendCoverageOfferingsList(request,
-                                response,
-                                projectName,
-                                siteName,
-                                serviceName);
-                        break;
-
-                    case 5:
-                        projectName = path[1];
-                        siteName = path[2];
-                        serviceName = path[3];
-                        coverageName = path[4];
-
-                        log.debug("Sending Coverage page." +
-                                "  projectName=" + projectName +
-                                "  siteName: " + siteName +
-                                "  serviceName: " + serviceName +
-                                "  coverageName: " + coverageName +
-                                "  dataSource=" + dataSource);
-
-                        sendCoveragePage(request,
-                                response,
-                                projectName,
-                                siteName,
-                                serviceName,
-                                coverageName);
-
-                        break;
-
-
-                    default:
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        log.info("Sent BAD URL.");
-
-                        break;
-
-
-                }
-
-
-
-
+            if (!dataSource.endsWith("/") && !isContentsRequest) {
+                // Now that we certain that this is a directory request we
+                // redirect the URL without a trailing slash to the one with.
+                // This keeps everything copacetic downstream when it's time
+                // to build the directory document.
+                response.sendRedirect(Scrub.urlContent(request.getContextPath() + dataSource + "/"));
             }
 
+            switch (path.length) {
 
-        }
-        catch (Exception e) {
-            log.error(e.getMessage());
-        }
+                case 0:
+                    log.error("This line should never be executed.");
+                    break;
 
+                case 1:
+                    log.debug("Requested Projects page. dataSource=" + dataSource);
+                    sendProjectsPage(request, response);
+                    break;
+
+
+                case 2:
+                    projectName = path[1];
+
+                    log.debug("Sending Sites page. " +
+                            "projectName=" + projectName +
+                            "  dataSource=" + dataSource);
+                    sendSitesPage(request,
+                            response,
+                            projectName);
+
+                    break;
+
+                case 3:
+                    projectName = path[1];
+                    siteName = path[2];
+
+                    log.debug("Sending WCSServers page." +
+                            "  projectName=" + projectName +
+                            "  siteName: " + siteName +
+                            "  dataSource=" + dataSource);
+
+                    sendServersPage(request,
+                            response,
+                            projectName,
+                            siteName);
+
+                    break;
+
+                case 4:
+                    projectName = path[1];
+                    siteName = path[2];
+                    serviceName = path[3];
+
+                    log.debug("Sending CoverageOfferings page." +
+                            "  projectName=" + projectName +
+                            "  siteName: " + siteName +
+                            "  serviceName: " + serviceName +
+                            "  dataSource=" + dataSource);
+
+                    sendCoverageOfferingsList(request,
+                            response,
+                            projectName,
+                            siteName,
+                            serviceName);
+                    break;
+
+                case 5:
+                    projectName = path[1];
+                    siteName = path[2];
+                    serviceName = path[3];
+                    coverageName = path[4];
+
+                    log.debug("Sending Coverage page." +
+                            "  projectName=" + projectName +
+                            "  siteName: " + siteName +
+                            "  serviceName: " + serviceName +
+                            "  coverageName: " + coverageName +
+                            "  dataSource=" + dataSource);
+
+                    sendCoveragePage(request,
+                            response,
+                            projectName,
+                            siteName,
+                            serviceName,
+                            coverageName);
+
+                    break;
+
+
+                default:
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    log.info("Sent BAD URL.");
+
+                    break;
+            }
+        }
 
     }
 
@@ -939,7 +923,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                 ){
 
             String msg = new String(erros.toByteArray());
-            log.error("sendDDS() encounterd a BESError: "+msg);
+            log.error("sendDDS() encounterd a BESError. Error Message: "+msg);
             os.write(msg.getBytes());
         }
 
