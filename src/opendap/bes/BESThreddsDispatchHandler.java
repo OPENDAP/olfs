@@ -97,7 +97,12 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         String reqSuffix = ReqInfo.getRequestSuffix(request);
 
 
-        if(datasetname.equalsIgnoreCase("catalog") && reqSuffix.equalsIgnoreCase("xml")){
+
+        if(     datasetname!=null &&
+                datasetname.equalsIgnoreCase("catalog") &&
+                reqSuffix!=null   &&
+                reqSuffix.equalsIgnoreCase("xml")
+                ){
             isThreddsRequest = true;
         }
 
