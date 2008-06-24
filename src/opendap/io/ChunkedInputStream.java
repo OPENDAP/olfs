@@ -52,7 +52,7 @@ public class ChunkedInputStream {
     private int currentChunkType;
 
 
-    private byte[] transferBuffer;
+    //private byte[] transferBuffer;
 
 
 
@@ -68,7 +68,7 @@ public class ChunkedInputStream {
 
         is = stream;
         currentChunkHeader = new byte[Chunk.HEADER_SIZE];
-        transferBuffer     = new byte[Chunk.MAX_SIZE];
+        //transferBuffer     = new byte[Chunk.MAX_SIZE];
         currentChunkType   = Chunk.DATA;
         isClosed           = false;
     }
@@ -171,20 +171,37 @@ public class ChunkedInputStream {
         int bytesReceived;
         boolean isError = false;
         boolean moreData = true;
+        byte[] buffer=null;
 
         while(moreData && !isClosed){
 
-            if(availableInChunk()>0){
+            if(availableInChunk()<=0){
 
+                ret = readChunkHeader();
+
+                if(ret == -1 || isLastChunk()){
+                    moreData = false;
+                }
+                else {
+                    buffer = new byte[currentChunkDataSize];
+                }
+
+            }
+            else {
                 switch (getCurrentChunkType()){
 
                     case Chunk.DATA:
+
+                        if(buffer==null)
+                            throw new IOException("Illegal state in readChunkedMessage. The receive buffer is null.");
+
+
                         // read the chunk body
-                        bytesReceived = Chunk.readFully(is,transferBuffer,0, availableInChunk());
+                        bytesReceived = Chunk.readFully(is,buffer,0, availableInChunk());
 
                         // write the data out to the appropriate stream,
                         // depending on the error status.
-                        (isError?errStream:dStream).write(transferBuffer,0,bytesReceived);
+                        (isError?errStream:dStream).write(buffer,0,bytesReceived);
                         (isError?errStream:dStream).flush();
 
                         // update the read pointer.show veriosn
@@ -200,15 +217,6 @@ public class ChunkedInputStream {
                     default:
                         throw new IOException("Unknown Chunk Type.");
 
-                }
-
-            }
-            else {
-
-                ret = readChunkHeader();
-
-                if(ret == -1 || isLastChunk()){
-                    moreData = false;
                 }
 
             }
@@ -240,9 +248,11 @@ public class ChunkedInputStream {
 
 
         // Get the extension content from the stream
-        byte[] ext = new byte[Chunk.MAX_SIZE];
+        byte[] ext = new byte[currentChunkDataSize];
         int bytesReceived = Chunk.readFully(is,ext,0, availableInChunk());
         chunkReadPosition += bytesReceived;
+
+
 
 
         // Make a string out of it

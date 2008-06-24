@@ -66,7 +66,20 @@ public class Chunk {
 
     public static final int DEFAULT_SIZE = 4096;
 
-    public static final byte[] closingChunk = {'0','0','0','0','d'};
+
+    public static final byte[] closingChunk = new byte[HEADER_SIZE];
+    static  {
+        int i;
+        for(i=0; i<HEADER_SIZE_ENCODING_BYTES; i++){
+            closingChunk[i] = '0';
+        }
+        closingChunk[i] = DATA;
+    }
+
+
+
+
+
 
     public static final String STATUS_EXTENSION = "status=";
     public static final String ERROR_STATUS = "error";
