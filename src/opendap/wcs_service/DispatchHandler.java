@@ -86,23 +86,23 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         wcsURL = UrlEncoder.hexToString(wcsURL);
 
+        boolean trusted = false;
 
         if(!_config.getChildren("wcsHost").isEmpty()){
             String allowedHost;
-            boolean trusted = false;
             for(Object o : _config.getChildren("wcsHost")){
                 allowedHost = ((Element)o).getTextTrim();
                 if(wcsURL.startsWith(allowedHost))
                     trusted = true;
             }
 
-            if(!trusted){
-                log.error("No trusted hosts found to match: "+wcsURL);
-                return null;
-            }
         }
-
-        return wcsURL;
+        if(!trusted){
+            log.error("No trusted hosts found to match: "+wcsURL);
+            return null;
+        }
+        else
+            return wcsURL;
 
 
     }

@@ -118,22 +118,26 @@ public class Transformer {
             System.err.println("Appears to be a URL: "+s);
 
             GetMethod request = new GetMethod(s);
-
+            InputStream is=null;
             try {
                 // Execute the method.
                 int statusCode = httpClient.executeMethod(request);
 
                 if (statusCode != HttpStatus.SC_OK) {
                   System.err.println("ERROR: Method failed " + request.getStatusLine());
+                  doc = null;
                 }
-
-                doc = parser.build(request.getResponseBodyAsStream());
-
+                else {
+                	is = request.getResponseBodyAsStream();
+                	doc = parser.build(is);
+                }
 
                 return doc;
 
             }
             finally {
+            	if(is!=null)
+            		is.close();
                 System.err.println("Releasing Http connection.");
                 request.releaseConnection();
             }

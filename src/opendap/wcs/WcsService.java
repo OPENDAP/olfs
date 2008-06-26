@@ -614,7 +614,6 @@ public class WcsService {
 
 
             /*
-
             hashedName = getHashedName(name);
 
 
@@ -626,6 +625,7 @@ public class WcsService {
             Element link  = new Element("DapLink",WCS.DAPWCS_NS);
             link.setText(hashedName);
             coverageOfferingBrief.addContent(link);
+
             */
 
 
@@ -653,6 +653,9 @@ public class WcsService {
         }
         return s;
     }
+
+
+    
 
 
 
