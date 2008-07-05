@@ -36,7 +36,7 @@ import java.io.OutputStream;
  */
 public class Chunk {
 
-    public static final int HEADER_SIZE_ENCODING_BYTES = 4;
+    public static final int HEADER_SIZE_ENCODING_BYTES = 7;
     public static final int HEADER_TYPE_ENCODING_BYTES = 1;
     public static final int HEADER_SIZE = HEADER_SIZE_ENCODING_BYTES + HEADER_TYPE_ENCODING_BYTES;
 
@@ -64,7 +64,7 @@ public class Chunk {
     public static final int EXTENSION = 'x';
 
 
-    public static final int DEFAULT_SIZE = 4096;
+    public static final int DEFAULT_SIZE = 65535;
 
 
     public static final byte[] closingChunk = new byte[HEADER_SIZE];
@@ -75,10 +75,6 @@ public class Chunk {
         }
         closingChunk[i] = DATA;
     }
-
-
-
-
 
 
     public static final String STATUS_EXTENSION = "status=";
