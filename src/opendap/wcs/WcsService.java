@@ -283,6 +283,11 @@ public class WcsService {
 
     public WcsCoverageOffering getCoverageOffering(String hashedName) throws Exception{
         Element coverageOfferingBrief = coverages.get(hashedName);
+
+        if(coverageOfferingBrief==null){
+            return null;
+        }
+
         String[] name = new String[1];
         name[0] = coverageOfferingBrief.getChild(WCS.NAME,WCS.NS).getTextTrim();
 
@@ -655,7 +660,7 @@ public class WcsService {
     }
 
 
-    
+
 
 
 
