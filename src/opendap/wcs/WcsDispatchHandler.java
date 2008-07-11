@@ -746,8 +746,8 @@ public class WcsDispatchHandler implements DispatchHandler {
                 }
 
 
-                xmlo.output(coff, System.out);
-                xmlo.output(pageContent, System.out);
+                //xmlo.output(coff, System.out);
+                //xmlo.output(pageContent, System.out);
 
                 response.setContentType("text/html");
                 response.setHeader("Content-Description", "dods_directory");
@@ -758,9 +758,6 @@ public class WcsDispatchHandler implements DispatchHandler {
 
             }
 
-        }
-        catch(Exception e){
-            e.printStackTrace(System.out);
         }
         finally {
             service.unlock();
@@ -819,9 +816,6 @@ public class WcsDispatchHandler implements DispatchHandler {
 
             wcsRequestURL = service.getWcsRequestURL(site,coverage,dateName);
             log.debug("wcsRequestURL: "+wcsRequestURL);
-        }
-        catch (Exception e){
-            e.printStackTrace(System.out);
         }
         finally{
             service.unlock();
@@ -1197,8 +1191,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
             String msg = besError.getMessage();
-            System.out.println(msg);
-            System.err.println(msg);
+            //System.out.println(msg);
+            //System.err.println(msg);
             log.error("sendHTMLRequestForm() encounterd a BESError: "+msg);
         }
 

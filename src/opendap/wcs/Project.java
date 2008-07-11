@@ -61,7 +61,7 @@ public class Project {
 
         config();
 
-        System.out.println(this);
+        log.debug(this.toString());
 
     }
 

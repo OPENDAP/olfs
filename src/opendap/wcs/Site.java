@@ -64,7 +64,7 @@ public class Site {
 
         config();
 
-        System.out.println(this);
+        log.debug(this.toString());
 
     }
 
@@ -233,7 +233,7 @@ quired.
                     "have 1 <format> child element.");
 
 */
-        
+
     }
 
 
