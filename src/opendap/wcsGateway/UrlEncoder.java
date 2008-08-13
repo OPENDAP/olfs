@@ -21,15 +21,13 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.wcs_service;
+package opendap.wcsGateway;
 
 import org.apache.commons.cli.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.PrintStream;
-import java.util.Iterator;
 
 /**
  * User: ndp
@@ -105,7 +103,7 @@ public class UrlEncoder {
                 achar = new String(b);
                 //System.err.println("achar: "+achar);
                 //System.err.println("ret: "+ret);
-                
+
                 b1 = Byte.parseByte(achar,16);
                 os.write(String.valueOf((char)b1).getBytes());
             }

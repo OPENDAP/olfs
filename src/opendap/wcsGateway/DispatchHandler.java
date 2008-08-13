@@ -21,73 +21,57 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.wcs_service;
+package opendap.wcsGateway;
 
 import org.slf4j.Logger;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URISyntaxException;
-
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.jdom.Element;
 import opendap.coreServlet.*;
+import opendap.coreServlet.DispatchServlet;
 import opendap.bes.Version;
 import opendap.bes.BesAPI;
 import opendap.bes.BESError;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.net.URL;
+import java.net.URISyntaxException;
+import java.net.URI;
+import java.util.List;
+
+
 /**
  * User: ndp
  * Date: Apr 22, 2008
- * Time: 3:36:36 PM
+ * Time: 3:44:39 PM
  */
-public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
-
-
+public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private Logger log;
+    private boolean _initialized;
+    private opendap.coreServlet.DispatchServlet dispatchServlet;
+    private String _prefix = "wcsGateway/";
+
+    private Element _config;
 
 
-    private AtomicInteger reqNumber;
 
 
-    public void init() {
-        reqNumber = new AtomicInteger(0);
+
+
+
+    public DispatchHandler() {
+
+        super();
+
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-    }
-
-
-    public long getLastModified(HttpServletRequest req) {
-
-        long lmt;
-        lmt = -1;
-        return lmt;
-
+        _initialized = false;
 
     }
 
-
-    private boolean redirect(HttpServletRequest req, HttpServletResponse res) throws IOException {
-
-        if (req.getPathInfo() == null) {
-            res.sendRedirect(Scrub.urlContent(req.getRequestURI()+"/"));
-            log.debug("Sent redirect to make the web page work!");
-            return true;
-        }
-        return false;
-    }
-
-
-    private String getName(HttpServletRequest req) {
-        return req.getPathInfo();
-    }
-
-
-    public String getWcsRequest(HttpServletRequest req) throws MalformedURLException {
+    public String getWcsRequest(HttpServletRequest req) throws Exception {
 
 
         String relativeURL = ReqInfo.getFullSourceName(req);
@@ -96,16 +80,29 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        String wcsURL = relativeURL;
+        String wcsURL = relativeURL.substring(_prefix.length(),relativeURL.length());
 
         wcsURL = wcsURL.substring(0,wcsURL.lastIndexOf("."+requestSuffix));
 
         wcsURL = UrlEncoder.hexToString(wcsURL);
 
-        URL url = new URL(wcsURL);
-        log.debug(urlInfo(url));
+        boolean trusted = false;
 
-        return wcsURL;
+        if(!_config.getChildren("wcsHost").isEmpty()){
+            String allowedHost;
+            for(Object o : _config.getChildren("wcsHost")){
+                allowedHost = ((Element)o).getTextTrim();
+                if(wcsURL.startsWith(allowedHost))
+                    trusted = true;
+            }
+
+        }
+        if(!trusted){
+            log.error("No trusted hosts found to match: "+wcsURL);
+            return null;
+        }
+        else
+            return wcsURL;
 
 
     }
@@ -136,99 +133,276 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
 
 
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-            {
+
+
+
+    public static String uriInfo(URI uri){
+
+        String msg = "\n";
+
+
+        msg += "URI: "+uri.toString()+"\n";
+        msg += "  Authority:              "+uri.getAuthority()+"\n";
+        msg += "  Host:                   "+uri.getHost()+"\n";
+        msg += "  Port:                   "+uri.getPort()+"\n";
+        msg += "  Path:                   "+uri.getPath()+"\n";
+        msg += "  Query:                  "+uri.getQuery()+"\n";
+        msg += "  hashCode:               "+uri.hashCode()+"\n";
+        msg += "  Fragment:               "+uri.getFragment()+"\n";
+        msg += "  RawAuthority:           "+uri.getRawAuthority()+"\n";
+        msg += "  RawFragment:            "+uri.getRawFragment()+"\n";
+        msg += "  RawPath:                "+uri.getRawPath()+"\n";
+        msg += "  RawQuery:               "+uri.getRawQuery()+"\n";
+        msg += "  RawSchemeSpecificPart:  "+uri.getRawSchemeSpecificPart()+"\n";
+        msg += "  RawUSerInfo:            "+uri.getRawUserInfo()+"\n";
+        msg += "  Scheme:                 "+uri.getScheme()+"\n";
+        msg += "  SchemeSpecificPart:     "+uri.getSchemeSpecificPart()+"\n";
+        msg += "  UserInfo:               "+uri.getUserInfo()+"\n";
+        msg += "  isAbsoulte:             "+uri.isAbsolute()+"\n";
+        msg += "  isOpaque:               "+uri.isOpaque()+"\n";
+        msg += "  ASCIIString:            "+uri.toASCIIString()+"\n";
 
         try {
+        msg += "  URL:                    "+uri.toURL()+"\n";
+        } catch (Exception e) {
 
-            PerfLog.logServerAccessStart(request, "WCS_SERVICE_ACCESS","HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
-
-            if (!redirect(request, response)) {
-
-                String name = getName(request);
-
-                log.debug("The client requested this: " + name);
-
-                String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-                String wcsRequestURL = getWcsRequest(request);
-
-                if ( // DDS Response?
-                        requestSuffix.equalsIgnoreCase("dds")
-                        ) {
-
-                    sendDDS(request, response, wcsRequestURL);
-                    log.info("Sent DDS");
-
-
-                } else if ( // DAS Response?
-                        requestSuffix.equalsIgnoreCase("das")
-                        ) {
-                    sendDAS(request, response, wcsRequestURL);
-                    log.info("Sent DAS");
-
-
-                } else if (  // DDX Response?
-                        requestSuffix.equalsIgnoreCase("ddx")
-                        ) {
-                    sendDDX(request, response, wcsRequestURL);
-                    log.info("Sent DDX");
-
-
-                } else if ( // DAP2 (aka .dods) Response?
-                        requestSuffix.equalsIgnoreCase("dods")
-                        ) {
-                    sendDAP2Data(request, response, wcsRequestURL);
-                    log.info("Sent DAP2 Data");
-
-
-                } else if (  // ASCII Data Response.
-                        requestSuffix.equalsIgnoreCase("asc") ||
-                                requestSuffix.equalsIgnoreCase("ascii")
-                        ) {
-                    sendASCII(request, response, wcsRequestURL);
-                    log.info("Sent ASCII");
-
-
-                } else if (  // Info Response?
-                        requestSuffix.equalsIgnoreCase("info")
-                        ) {
-                    sendINFO(request, response, wcsRequestURL);
-                    log.info("Sent Info");
-
-
-                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
-                        requestSuffix.equalsIgnoreCase("html") ||
-                                requestSuffix.equalsIgnoreCase("htm")
-                        ) {
-                    sendHTMLRequestForm(request, response, wcsRequestURL);
-                    log.info("Sent HTML Request Form");
-
-
-                } else if (requestSuffix.equals("")) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    log.info("Sent BAD URL (missing Suffix)");
-
-                } else {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                }
-
-
-            }
-
+            e.printStackTrace();
         }
-        catch( Throwable t){
-            try {
-                OPeNDAPException.anyExceptionHandler(t, response);
-            }
-            catch(Throwable t2) {
-                log.error("BAD THINGS HAPPENED!", t2);
-            }
-        }
+
+        return msg;
     }
 
+
+
+
+
+    public void init(DispatchServlet servlet, Element config) throws Exception {
+        if (_initialized) return;
+
+        String msg;
+        Element host;
+        List hosts;
+        URL url;
+        URI uri;
+
+
+        dispatchServlet = servlet;
+        _config = config;
+
+        ingestPrefix();
+
+        hosts = config.getChildren("wcsHost");
+
+        if(hosts.isEmpty()){
+            msg = "Configuration Warning: The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " did not provide 1 or more <wcsHost> " +
+                    "child elements to limit the WCS services that " +
+                    "may be accessed. This not recomended.";
+
+            log.warn(msg);
+/*
+            msg = "Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide 1 or more <wcsHost>  " +
+                    "child elements whose value should be the base URL " +
+                    "for the WCS services that may be accessed.";
+            log.error(msg);
+            throw new Exception(msg);
+*/
+        }
+        else {
+
+            for (Object o : hosts) {
+                host = (Element) o;
+
+                url = new URL(host.getTextTrim());
+                log.debug(urlInfo(url));
+
+
+                uri = new URI(host.getTextTrim());
+                log.debug(uriInfo(uri));
+
+                log.info("Adding " + url + " to allowed hosts list.");
+            }
+
+        }
+
+
+
+
+
+
+
+
+        _initialized = true;
+    }
+
+
+    private void ingestPrefix() throws Exception{
+
+        String msg;
+
+        Element e = _config.getChild("prefix");
+        if(e!=null)
+            _prefix = e.getTextTrim();
+
+        if(_prefix.equals("/")){
+            msg = "Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide 1 <prefix>  " +
+                    "child element whose value may not be equal to \"/\"";
+            log.error(msg);
+            throw new Exception(msg);
+        }
+
+
+
+        if(!_prefix.endsWith("/"))
+            _prefix += "/";
+
+
+        //if(!_prefix.startsWith("/"))
+        //    _prefix = "/" + _prefix;
+
+        if(_prefix.startsWith("/"))
+            _prefix = _prefix.substring(1, _prefix.length());
+
+        log.info("Initialized. prefix="+ _prefix);
+
+    }
+
+
+
+
+    public boolean requestCanBeHandled(HttpServletRequest request) throws Exception {
+        return wcsRequestDispatch(request, null, false);
+    }
+
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        wcsRequestDispatch(request, response, true);
+    }
+
+
+    private boolean wcsRequestDispatch(HttpServletRequest request,
+                                       HttpServletResponse response,
+                                       boolean sendResponse)
+            throws Exception {
+
+        String relativeURL = ReqInfo.getFullSourceName(request);
+
+        if(relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1,relativeURL.length());
+
+
+
+        boolean wcsRequest = false;
+
+        if (relativeURL != null) {
+
+            if (relativeURL.startsWith(_prefix)) {
+                wcsRequest = true;
+                if (sendResponse) {
+                    sendDAPResponse(request, response);
+                    log.info("Sent WCS Response");
+                }
+            }
+        }
+
+        return wcsRequest;
+
+    }
+
+    public long getLastModified(HttpServletRequest req) {
+        return -1;
+    }
+
+    public void destroy() {
+        log.info("Destroy Complete");
+    }
+
+
+
+
+
+    public void sendDAPResponse(HttpServletRequest request,
+                                HttpServletResponse response)
+            throws Exception {
+
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
+
+        String wcsRequestURL = getWcsRequest(request);
+
+
+        if(wcsRequestURL==null){
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+
+
+        if ( // DDS Response?
+                requestSuffix.equalsIgnoreCase("dds")
+                ) {
+
+            sendDDS(request, response, wcsRequestURL);
+            log.info("Sent DDS");
+
+
+        } else if ( // DAS Response?
+                requestSuffix.equalsIgnoreCase("das")
+                ) {
+            sendDAS(request, response, wcsRequestURL);
+            log.info("Sent DAS");
+
+
+        } else if (  // DDX Response?
+                requestSuffix.equalsIgnoreCase("ddx")
+                ) {
+            sendDDX(request, response, wcsRequestURL);
+            log.info("Sent DDX");
+
+
+        } else if ( // DAP2 (aka .dods) Response?
+                requestSuffix.equalsIgnoreCase("dods")
+                ) {
+            sendDAP2Data(request, response, wcsRequestURL);
+            log.info("Sent DAP2 Data");
+
+
+        } else if (  // ASCII Data Response.
+                requestSuffix.equalsIgnoreCase("asc") ||
+                        requestSuffix.equalsIgnoreCase("ascii")
+                ) {
+            sendASCII(request, response, wcsRequestURL);
+            log.info("Sent ASCII");
+
+
+        } else if (  // Info Response?
+                requestSuffix.equalsIgnoreCase("info")
+                ) {
+            sendINFO(request, response, wcsRequestURL);
+            log.info("Sent Info");
+
+
+        } else if (  //HTML Request Form (aka The Interface From Hell) Response?
+                requestSuffix.equalsIgnoreCase("html") ||
+                        requestSuffix.equalsIgnoreCase("htm")
+                ) {
+            sendHTMLRequestForm(request, response, wcsRequestURL);
+            log.info("Sent HTML Request Form");
+
+
+        } else if (requestSuffix.equals("")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            log.info("Sent BAD URL (missing Suffix)");
+
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+        }
+
+    }
 
     private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
@@ -264,10 +438,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             String msg = new String(erros.toByteArray());
             log.error("sendDDS() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_BAD_REQUEST, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
 
@@ -313,10 +483,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             log.error("sendDAS() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
 
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_BAD_REQUEST, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
 
@@ -361,10 +527,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             log.error("sendDDX() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
 
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_BAD_REQUEST, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
 
@@ -409,10 +571,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             log.error("sendDAP2Data() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
 
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_BAD_REQUEST, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
 
@@ -453,12 +611,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 wcsRequestURL)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            int err = besError.sendErrorResponse(this,response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error("sendASCII() encounterd a BESError: "+besError.getMessage());
-            PerfLog.logServerAccessEnd(err, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
 
@@ -499,13 +653,9 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 wcsRequestURL)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            int err = besError.sendErrorResponse(this,response);
+            besError.sendErrorResponse(dispatchServlet,response);
             log.error("sendINFO() encounterd a BESError: "+besError.getMessage());
 
-            PerfLog.logServerAccessEnd(err, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
 
@@ -556,17 +706,13 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 erros,wcsRequestURL)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
-            int err = besError.sendErrorResponse(this,response);
+            besError.sendErrorResponse(dispatchServlet,response);
 
 
             String msg = besError.getMessage();
             System.out.println(msg);
             System.err.println(msg);
             log.error("sendHTMLRequestForm() encounterd a BESError: "+msg);
-            PerfLog.logServerAccessEnd(err, -1, "WCS_SERVICE_ACCESS");
-        }
-        else {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "WCS_SERVICE_ACCESS");
         }
 
         os.flush();
@@ -575,6 +721,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
 
     }
+
+
 
 
 
