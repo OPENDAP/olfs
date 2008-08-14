@@ -31,8 +31,10 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.HashMap;
 import java.net.URL;
 import java.net.URI;
+import java.io.IOException;
 
 /**
  * User: ndp
@@ -102,11 +104,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         }
 
 
-
-        if(!_prefix.endsWith("/"))
-            _prefix += "/";
-
-
         //if(!_prefix.startsWith("/"))
         //    _prefix = "/" + _prefix;
 
@@ -161,18 +158,101 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
     public void processWcsRequest(HttpServletRequest request,
-                                  HttpServletResponse response)  {
+                                  HttpServletResponse response) throws IOException {
+
+        try {
+
+
+            HashMap<String,String> keyValuePairs = new HashMap<String,String>();
+
+            String query = request.getQueryString();
+
+            if(query==null)
+                throw new WcsException("Missing WxS query string.",
+                        WcsException.MISSING_PARAMETER_VALUE,"service");
+
+            String[] pairs = request.getQueryString().split("&");
+
+            String[] tmp;
+
+            for(String pair: pairs){
+                tmp = pair.split("=");
+                if(tmp.length != 2)
+                    throw new WcsException("Poorly formatted request URL.",
+                            WcsException.MISSING_PARAMETER_VALUE,
+                            tmp[0]);
+
+                keyValuePairs.put(tmp[0],tmp[1]);
+            }
 
 
 
 
 
+            // Make sure the client is looking for a WCS service....
+            String s = keyValuePairs.get("service");
+            if(s==null || !s.equals("WCS"))
+                throw new WcsException("Only the WCS service (version "+
+                        WCS.WCS_VERSION+") is supported.",
+                        WcsException.OPERATION_NOT_SUPPORTED,s);
 
 
 
 
+            // Make sure the client can accept the correct WCS version...
+            s = keyValuePairs.get("AcceptedVersions");
+            if(s!=null){
+                boolean compatible = false;
+                tmp = s.split(",");
+                for(String ver:tmp){
+                    if(ver.equals(WCS.WCS_VERSION))
+                        compatible=true;
+                }
+                if(!compatible)
+                    throw new WcsException("Client requested unsupported WCS " +
+                            "version(s): "+s,
+                            WcsException.VERSION_NEGOTIATION_FAILED,null);
+            }
 
 
+
+            
+            s = keyValuePairs.get("request");
+
+
+            if(s == null){
+                throw new WcsException("Poorly formatted request URL. Missing " +
+                        "key value pair for 'request'",
+                        WcsException.MISSING_PARAMETER_VALUE,"request");
+            }
+            else if(s.equals("GetCapabilities")){
+
+                GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
+                response.setContentType("text/ascii");
+                wcsRequest.serialize(response.getOutputStream());
+
+            }
+            else if(s.equals("DescribeCoverage")){
+
+            }
+            else if(s.equals("GetCoverage")){
+            }
+            else {
+                throw new WcsException("The parameter 'request' has an invalid " +
+                        "value of '"+s+"'.",
+                        WcsException.INVALID_PARAMETER_VALUE,"request");
+
+            }
+
+
+
+        }
+        catch(WcsException e){
+            log.error(e.getMessage());
+            ExceptionReport er = new ExceptionReport(e);
+            response.setContentType("text/xml");
+            er.serialize(response.getOutputStream());
+        }
 
 
 

@@ -23,10 +23,18 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
+import java.util.HashMap;
+
 /**
  * User: ndp
  * Date: Aug 13, 2008
  * Time: 4:01:09 PM
  */
 public class DescribeCoverageRequest {
+
+    public DescribeCoverageRequest(HashMap<String,String> kvp)
+            throws WcsException {
+
+    }
+
 }

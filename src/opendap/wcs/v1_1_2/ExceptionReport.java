@@ -23,18 +23,52 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import java.util.HashMap;
+import org.jdom.Document;
+import org.jdom.Namespace;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+
+import java.io.OutputStream;
+import java.io.IOException;
 
 /**
  * User: ndp
- * Date: Aug 13, 2008
- * Time: 4:00:22 PM
+ * Date: Aug 14, 2008
+ * Time: 1:15:27 PM
  */
-public class GetCoverageRequest {
+public class ExceptionReport {
 
-    public GetCoverageRequest(HashMap<String,String> kvp)
-            throws WcsException {
+    private static final Namespace _nameSpace = WCS.OWS_NS;
+    private static final String _schemaLocation = WCS.OWS_SCHEMA_LOCATION_BASE+"owsExceptionReport.xsd";
 
+
+
+
+    private Document report;
+
+    public ExceptionReport(){
+        Element root = new Element("ExceptionReport", _nameSpace);
+        root.addNamespaceDeclaration(WCS.XSI_NS);
+        root.setAttribute("_schemaLocation", _schemaLocation,WCS.XSI_NS);
+
+        report = new Document();
+        report.setRootElement(root);
     }
-    
+
+    public ExceptionReport(WcsException exp){
+        this();
+        addException(exp);
+    }
+
+    public void addException(WcsException exp){
+        report.getRootElement().addContent(exp.getExceptionElement());
+    }
+
+    public void serialize(OutputStream os) throws IOException {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(report, os);
+    }
+
+
 }
