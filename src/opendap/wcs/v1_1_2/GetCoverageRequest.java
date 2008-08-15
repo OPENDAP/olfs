@@ -23,7 +23,15 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+
 import java.util.HashMap;
+import java.io.OutputStream;
+import java.io.IOException;
 
 /**
  * User: ndp
@@ -32,9 +40,41 @@ import java.util.HashMap;
  */
 public class GetCoverageRequest {
 
+    private static final Namespace _nameSpace    = WCS.WCS_NS;
+    private static final String _schemaLocation  = WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCoverage.xsd";
+
+
+    private String   _service = "WCS";
+    private String   _request = "GetCoverage";
+
+
     public GetCoverageRequest(HashMap<String,String> kvp)
             throws WcsException {
 
     }
-    
+    public Element getRequestElement(){
+
+        Element requestElement;
+
+        requestElement = new Element(_request, _nameSpace);
+        requestElement.addNamespaceDeclaration(WCS.XSI_NS);
+        requestElement.setAttribute("_schemaLocation", _schemaLocation,WCS.XSI_NS);
+        requestElement.setAttribute("service",_service);
+
+        return requestElement;
+
+    }
+
+
+    public Document getRequestDoc(){
+        return new Document(getRequestElement());
+    }
+
+
+    public void serialize(OutputStream os) throws IOException {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(getRequestDoc(), os);
+    }
+
+
 }

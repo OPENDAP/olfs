@@ -216,7 +216,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
 
-            
+
             s = keyValuePairs.get("request");
 
 
@@ -233,9 +233,16 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
             }
             else if(s.equals("DescribeCoverage")){
+                DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
+                response.setContentType("text/ascii");
+                wcsRequest.serialize(response.getOutputStream());
+
 
             }
             else if(s.equals("GetCoverage")){
+                GetCoverageRequest wcsRequest = new GetCoverageRequest(keyValuePairs);
+                response.setContentType("text/ascii");
+                wcsRequest.serialize(response.getOutputStream());
             }
             else {
                 throw new WcsException("The parameter 'request' has an invalid " +

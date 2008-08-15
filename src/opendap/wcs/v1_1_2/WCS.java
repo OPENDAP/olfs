@@ -45,10 +45,9 @@ public class WCS {
 
 
 
-
-
     public static String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
     public static Namespace WCS_NS = Namespace.getNamespace(OWS_NAMESPACE_STRING);
+    public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
 
 
     public static String COVERAGE_OFFERING = "CoverageOffering";
