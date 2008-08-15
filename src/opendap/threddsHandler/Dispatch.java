@@ -27,7 +27,7 @@ import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
-import opendap.wcs.*;
+import opendap.wcs.gatewayClient.WcsManager;
 import org.slf4j.Logger;
 import org.jdom.Element;
 import org.jdom.Document;
