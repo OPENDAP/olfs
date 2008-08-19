@@ -74,11 +74,12 @@ import java.io.IOException;
 public class DescribeCoverageRequest {
 
     private static final Namespace _nameSpace    = WCS.WCS_NS;
-    private static final String _schemaLocation  = WCS.WCS_SCHEMA_LOCATION_BASE+"wcsDescribeCoverage.xsd";
-    private static final String _version         = WCS.WCS_VERSION;
+    private static final String _schemaLocation  =
+            WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsDescribeCoverage.xsd";
 
     private String   _service = "WCS";
     private String   _request = "DescribeCoverage";
+    private String _version;
     private String[] _ids;
 
 
@@ -86,7 +87,51 @@ public class DescribeCoverageRequest {
             throws WcsException {
 
 
-        String tmp[], s = kvp.get("identifiers");
+        String tmp[], s;
+
+
+        // Make sure the client is looking for a WCS service....
+        s = kvp.get("service");
+        if(s==null || !s.equals(_service))
+            throw new WcsException("Only the WCS service (version "+
+                    WCS.VERSIONS+") is supported.",
+                    WcsException.OPERATION_NOT_SUPPORTED,s);
+
+
+
+        // Make sure the client can accept a supported WCS version...
+        boolean compatible = false;
+        s = kvp.get("version");
+        if(s!=null){
+            if(WCS.VERSIONS.contains(s)){
+                compatible=true;
+                _version = s;
+            }
+        }
+        if(!compatible)
+            throw new WcsException("Client requested unsupported WCS " +
+                    "version(s): "+s,
+                    WcsException.VERSION_NEGOTIATION_FAILED,null);
+
+
+        // Make sure the client is acutally asking for this operation
+        s = kvp.get("request");
+        if(s == null){
+            throw new WcsException("Poorly formatted request URL. Missing " +
+                    "key value pair for 'request'",
+                    WcsException.MISSING_PARAMETER_VALUE,"request");
+        }
+        else if(!s.equals(_request)){
+            throw new WcsException("The servers internal dispatch operations " +
+                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "has been incorrectly routed to the 'GetCapabilities' " +
+                    "request processor.",
+                    WcsException.NO_APPLICABLE_CODE);
+        }
+
+
+        // Get the list of identifiers for the coverage to describe.
+        s = kvp.get("identifiers");
         if(s!=null){
             tmp = s.split(",");
             _ids = tmp;
@@ -98,6 +143,15 @@ public class DescribeCoverageRequest {
                     "identifiers");
 
         }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -133,7 +187,7 @@ public class DescribeCoverageRequest {
 
         requestElement = new Element(_request, _nameSpace);
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
-        requestElement.setAttribute("_schemaLocation", _schemaLocation,WCS.XSI_NS);
+        requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
         requestElement.setAttribute("service",_service);
         requestElement.setAttribute("version",_version);
 

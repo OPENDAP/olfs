@@ -193,28 +193,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             String s = keyValuePairs.get("service");
             if(s==null || !s.equals("WCS"))
                 throw new WcsException("Only the WCS service (version "+
-                        WCS.WCS_VERSION+") is supported.",
+                        WCS.VERSIONS+") is supported.",
                         WcsException.OPERATION_NOT_SUPPORTED,s);
-
-
-
-
-            // Make sure the client can accept the correct WCS version...
-            s = keyValuePairs.get("AcceptedVersions");
-            if(s!=null){
-                boolean compatible = false;
-                tmp = s.split(",");
-                for(String ver:tmp){
-                    if(ver.equals(WCS.WCS_VERSION))
-                        compatible=true;
-                }
-                if(!compatible)
-                    throw new WcsException("Client requested unsupported WCS " +
-                            "version(s): "+s,
-                            WcsException.VERSION_NEGOTIATION_FAILED,null);
-            }
-
-
 
 
             s = keyValuePairs.get("request");

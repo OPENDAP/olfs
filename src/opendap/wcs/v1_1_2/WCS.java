@@ -25,6 +25,8 @@ package opendap.wcs.v1_1_2;
 
 import org.jdom.Namespace;
 
+import java.util.HashSet;
+
 /**
  * User: ndp
  * Date: Aug 14, 2008
@@ -33,11 +35,15 @@ import org.jdom.Namespace;
 
 public class WCS {
 
-    public static final String WCS_VERSION = "1.1.2";
+    public static String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
+    public static Namespace WCS_NS = Namespace.getNamespace(WCS_NAMESPACE_STRING);
+    public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
 
-    public static final String    OWS_NAMESPACE_STRING = "http://www.opengis.net/ows/1.1";
-    public static final Namespace OWS_NS = Namespace.getNamespace(OWS_NAMESPACE_STRING);
-    public static final String    OWS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/ows/1.1.0/";
+
+    public static final HashSet<String> VERSIONS = new HashSet<String>();
+    static {
+        VERSIONS.add("1.1.2");
+    }
 
 
     public static final String    XSI_NAMESPACE_STRING = "http://www.w3.org/2001/XMLSchema-instance";
@@ -45,9 +51,18 @@ public class WCS {
 
 
 
-    public static String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
-    public static Namespace WCS_NS = Namespace.getNamespace(OWS_NAMESPACE_STRING);
-    public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
+    public static final String    OWS_NAMESPACE_STRING = "http://www.opengis.net/ows/1.1";
+    public static final Namespace OWS_NS = Namespace.getNamespace("ows",OWS_NAMESPACE_STRING);
+    public static final String    OWS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/ows/1.1.0/";
+
+
+    public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml";
+    public static final Namespace GML_NS = Namespace.getNamespace("gml",GML_NAMESPACE_STRING);
+    public static final String    GML_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/gml/3.2.1/";
+
+
+
+
 
 
     public static String COVERAGE_OFFERING = "CoverageOffering";

@@ -23,51 +23,39 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Document;
-import org.jdom.Namespace;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
-import java.io.OutputStream;
-import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * User: ndp
- * Date: Aug 14, 2008
- * Time: 1:15:27 PM
+ * Date: Aug 18, 2008
+ * Time: 1:32:03 PM
  */
-public class ExceptionReport {
+public class RangeSubset {
 
-    private static final Namespace _nameSpace = WCS.OWS_NS;
-    private static final String _schemaLocation = WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsExceptionReport.xsd";
+    private RangeSubset(){}
+
+    public static RangeSubset fromKVP(HashMap<String,String> kvp) throws WcsException{
 
 
 
+        String s = kvp.get("RangeSubset");
 
-    private Document report;
 
-    public ExceptionReport(){
-        Element root = new Element("ExceptionReport", _nameSpace);
-        root.addNamespaceDeclaration(WCS.XSI_NS);
-        root.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
+        if(s != null)
+            throw new WcsException("RangeSubsetting is not yet implmented.",
+                    WcsException.OPERATION_NOT_SUPPORTED,
+                    "RangeSubset");
 
-        report = new Document();
-        report.setRootElement(root);
+
+        return null;
     }
 
-    public ExceptionReport(WcsException exp){
-        this();
-        addException(exp);
-    }
 
-    public void addException(WcsException exp){
-        report.getRootElement().addContent(exp.getExceptionElement());
-    }
 
-    public void serialize(OutputStream os) throws IOException {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(report, os);
+    public Element getRangeSubsetElement(){
+        return null;
     }
 
 

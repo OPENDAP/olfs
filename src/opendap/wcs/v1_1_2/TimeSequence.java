@@ -23,51 +23,66 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Document;
-import org.jdom.Namespace;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
-import java.io.OutputStream;
-import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 
 /**
  * User: ndp
- * Date: Aug 14, 2008
- * Time: 1:15:27 PM
+ * Date: Aug 18, 2008
+ * Time: 1:11:15 PM
  */
-public class ExceptionReport {
-
-    private static final Namespace _nameSpace = WCS.OWS_NS;
-    private static final String _schemaLocation = WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsExceptionReport.xsd";
+public class TimeSequence {
 
 
+    private TimeSequenceItem _items[];
 
-
-    private Document report;
-
-    public ExceptionReport(){
-        Element root = new Element("ExceptionReport", _nameSpace);
-        root.addNamespaceDeclaration(WCS.XSI_NS);
-        root.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
-
-        report = new Document();
-        report.setRootElement(root);
+    private TimeSequence(){
+        _items = null;
     }
 
-    public ExceptionReport(WcsException exp){
-        this();
-        addException(exp);
+
+    public static TimeSequence fromKVP(HashMap<String,String> kvp) throws WcsException {
+
+        String s = kvp.get("TimeSequence");
+
+        if(s==null)
+            return null;
+
+        TimeSequence ts = new TimeSequence();
+
+        String tmp[];
+
+
+        // Time Sequences can be a comma separated list of time instances
+        // and time ranges.
+        tmp = s.split(",");
+
+        ts._items = new TimeSequenceItem[tmp.length];
+
+        for(int i=0; i<tmp.length ;i++){
+            ts._items[i] = new TimeSequenceItem(tmp[i]);
+        }
+        return ts;
+
+
+
     }
 
-    public void addException(WcsException exp){
-        report.getRootElement().addContent(exp.getExceptionElement());
-    }
 
-    public void serialize(OutputStream os) throws IOException {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(report, os);
+
+
+
+
+    public Element getTemporalSubsetElement() throws WcsException {
+        Element ts = new Element("TemporalSubset",WCS.WCS_NS);
+
+        for(TimeSequenceItem tsi: _items){
+            ts.addContent(tsi.getXMLElementRepresentation());
+        }
+
+        return ts;
     }
 
 

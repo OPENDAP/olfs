@@ -41,11 +41,14 @@ import java.io.OutputStream;
  */
 public class GetCapabilitiesRequest {
 
-    private static final Namespace _nameSpace    = WCS.OWS_NS;
-    private static final String _schemaLocation  = WCS.OWS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd";
+    private static final Namespace _nameSpace    = WCS.WCS_NS;
+    private static final String _schemaLocation  =
+            WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCapabilities.xsd";
+            //+ "  "+ WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd";
 
 
     private String   _service = "WCS";
+    private String   _version = null;
     private String   _request = "GetCapabilities";
     private String[] _Sections = null;
     private String   _updateSequence = null;
@@ -62,25 +65,91 @@ public class GetCapabilitiesRequest {
         sectionNames.add("All");
     }
 
+
+
     public GetCapabilitiesRequest(HashMap<String,String> kvp)
             throws WcsException {
 
-        String[] tmp;
+        String tmp[], s;
 
-        String s = kvp.get("Sections");
+
+        // Make sure the client is looking for a WCS service....
+        s = kvp.get("service");
+        if(s==null || !s.equals(_service))
+            throw new WcsException("Only the WCS service (version "+
+                    WCS.VERSIONS+") is supported.",
+                    WcsException.OPERATION_NOT_SUPPORTED,s);
+
+
+
+        // Make sure the client can accept the correct WCS version...
+        boolean compatible = false;
+        s = kvp.get("AcceptVersions");
+        if(s!=null){
+            tmp = s.split(",");
+            for(String ver:tmp){
+                if(WCS.VERSIONS.contains(ver)){
+                    compatible=true;
+                    _version = ver;
+                }
+            }
+            if(!compatible)
+                throw new WcsException("Client requested unsupported WCS " +
+                        "version(s): ["+s+"]\nThis WCS supports version(s) "+WCS.VERSIONS,
+                        WcsException.VERSION_NEGOTIATION_FAILED,null);
+
+            _AcceptVersions = tmp;
+        }
+
+
+
+
+
+
+
+
+        // Make sure the client is acutally asking for this operation
+        s = kvp.get("request");
+        if(s == null){
+            throw new WcsException("Poorly formatted request URL. Missing " +
+                    "key value pair for 'request'",
+                    WcsException.MISSING_PARAMETER_VALUE,"request");
+        }
+        else if(!s.equals(_request)){
+            throw new WcsException("The servers internal dispatch operations " +
+                    "have failed. The WCS request for the operation '"+s+"' " +
+                    "has been incorrectly routed to the 'GetCapabilities' " +
+                    "request processor.",
+                    WcsException.NO_APPLICABLE_CODE);
+        }
+
+
+
+
+
+        // Get the list of section the client has requested. Returning
+        // individual sections may not be supported, but we'll keep track of
+        // that partof the request regardless.
+        s = kvp.get("Sections");
         if(s!=null){
             tmp = s.split(",");
             for(String section:tmp){
-                if(sectionNames.contains(section))
+                if(!sectionNames.contains(section))
                     throw new WcsException("Client requested unsupported " +
-                            "section name: "+section,WcsException.INVALID_PARAMETER_VALUE,"Sections");
+                            "section name: "+section+"\n This WCS may support the following section names "+sectionNames,
+                            WcsException.INVALID_PARAMETER_VALUE,"Sections");
             }
             _Sections = tmp;
 
         }
 
+        // Store the updatSequence information in the event that the server
+        // supports it at some point...
         _updateSequence = kvp.get("updateSequence");
 
+
+        // Store the AccptedFormats offered by the client in the event that the
+        // the server eventually supports more than text/html
         s = kvp.get("AcceptFormats");
         if(s!=null){
             tmp = s.split(",");
@@ -88,12 +157,6 @@ public class GetCapabilitiesRequest {
 
         }
 
-        s = kvp.get("AcceptVersions");
-        if(s!=null){
-            tmp = s.split(",");
-            _AcceptVersions = tmp;
-
-        }
 
     }
 
@@ -103,7 +166,8 @@ public class GetCapabilitiesRequest {
 
         requestElement = new Element(_request, _nameSpace);
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
-        requestElement.setAttribute("_schemaLocation", _schemaLocation,WCS.XSI_NS);
+        //requestElement.addNamespaceDeclaration(WCS.OWS_NS);
+        requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
         requestElement.setAttribute("service",_service);
 
         if(_updateSequence!=null)
@@ -134,7 +198,7 @@ public class GetCapabilitiesRequest {
         }
 
         if(_AcceptFormats != null){
-            Element af = new Element("AcceptedFormats",_nameSpace);
+            Element af = new Element("AcceptFormats",_nameSpace);
             Element fe;
             for(String f : _AcceptFormats){
                 fe = new Element("OutputFormat",_nameSpace);
