@@ -43,8 +43,8 @@ public class GetCapabilitiesRequest {
 
     private static final Namespace _nameSpace    = WCS.WCS_NS;
     private static final String _schemaLocation  =
-            WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCapabilities.xsd";
-            //+ "  "+ WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd";
+            WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCapabilities.xsd"
+            + "  "+ WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd";
 
 
     private String   _service = "WCS";
@@ -166,7 +166,7 @@ public class GetCapabilitiesRequest {
 
         requestElement = new Element(_request, _nameSpace);
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
-        //requestElement.addNamespaceDeclaration(WCS.OWS_NS);
+        requestElement.addNamespaceDeclaration(WCS.OWS_NS);
         requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
         requestElement.setAttribute("service",_service);
 
