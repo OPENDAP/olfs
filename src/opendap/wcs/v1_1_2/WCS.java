@@ -35,8 +35,8 @@ import java.util.HashSet;
 
 public class WCS {
 
-    public static String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
-    public static Namespace WCS_NS = Namespace.getNamespace(WCS_NAMESPACE_STRING);
+    public static final String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
+    public static final Namespace WCS_NS = Namespace.getNamespace(WCS_NAMESPACE_STRING);
     public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
 
 
@@ -54,6 +54,10 @@ public class WCS {
     public static final String    OWS_NAMESPACE_STRING = "http://www.opengis.net/ows/1.1";
     public static final Namespace OWS_NS = Namespace.getNamespace("ows",OWS_NAMESPACE_STRING);
     public static final String    OWS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/ows/1.1.0/";
+
+    public static final String    OWCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1/ows";
+    public static final Namespace OWCS_NS = Namespace.getNamespace("owcs",OWCS_NAMESPACE_STRING);
+    public static final String    OWCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
 
 
     public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml";

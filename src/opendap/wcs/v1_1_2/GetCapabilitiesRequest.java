@@ -41,10 +41,6 @@ import java.io.OutputStream;
  */
 public class GetCapabilitiesRequest {
 
-    private static final Namespace _nameSpace    = WCS.WCS_NS;
-    private static final String _schemaLocation  =
-            WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCapabilities.xsd"
-            + "  "+ WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd";
 
 
     private String   _service = "WCS";
@@ -163,11 +159,19 @@ public class GetCapabilitiesRequest {
     public Element getRequestElement(){
 
         Element requestElement;
+        String _schemaLocation = "";
 
-        requestElement = new Element(_request, _nameSpace);
+        requestElement = new Element(_request, WCS.WCS_NS);
+        _schemaLocation += WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCapabilities.xsd  ";
+
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
-        requestElement.addNamespaceDeclaration(WCS.OWS_NS);
+
+        requestElement.addNamespaceDeclaration(WCS.OWCS_NS);
+        _schemaLocation += WCS.OWCS_NAMESPACE_STRING + "  " +WCS.OWCS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd  ";
+
         requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
+
+
         requestElement.setAttribute("service",_service);
 
         if(_updateSequence!=null)
@@ -176,10 +180,10 @@ public class GetCapabilitiesRequest {
 
 
         if(_AcceptVersions != null){
-            Element av = new Element("AcceptVersions",_nameSpace);
+            Element av = new Element("AcceptVersions",WCS.OWCS_NS);
             Element ver;
             for(String v: _AcceptVersions){
-                ver = new Element("Version",_nameSpace);
+                ver = new Element("Version",WCS.OWCS_NS);
                 ver.setText(v);
                 av.addContent(ver);
             }
@@ -187,10 +191,10 @@ public class GetCapabilitiesRequest {
         }
 
         if(_Sections != null){
-            Element sections = new Element("Sections",_nameSpace);
+            Element sections = new Element("Sections",WCS.OWCS_NS);
             Element sec;
             for(String sv : _Sections){
-                sec = new Element("Section",_nameSpace);
+                sec = new Element("Section",WCS.OWCS_NS);
                 sec.setText(sv);
                 sections.addContent(sec);
             }
@@ -198,10 +202,10 @@ public class GetCapabilitiesRequest {
         }
 
         if(_AcceptFormats != null){
-            Element af = new Element("AcceptFormats",_nameSpace);
+            Element af = new Element("AcceptFormats",WCS.OWCS_NS);
             Element fe;
             for(String f : _AcceptFormats){
-                fe = new Element("OutputFormat",_nameSpace);
+                fe = new Element("OutputFormat",WCS.OWCS_NS);
                 fe.setText(f);
                 af.addContent(fe);
             }

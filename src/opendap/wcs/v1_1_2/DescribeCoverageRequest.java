@@ -74,8 +74,7 @@ import java.io.IOException;
 public class DescribeCoverageRequest {
 
     private static final Namespace _nameSpace    = WCS.WCS_NS;
-    private static final String _schemaLocation  =
-            WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsDescribeCoverage.xsd";
+
 
     private String   _service = "WCS";
     private String   _request = "DescribeCoverage";
@@ -187,7 +186,11 @@ public class DescribeCoverageRequest {
 
         requestElement = new Element(_request, _nameSpace);
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
-        requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
+
+        String schemaLocation  =
+                WCS.WCS_NAMESPACE_STRING + "  " +WCS.WCS_SCHEMA_LOCATION_BASE+"wcsDescribeCoverage.xsd";
+
+        requestElement.setAttribute("schemaLocation", schemaLocation,WCS.XSI_NS);
         requestElement.setAttribute("service",_service);
         requestElement.setAttribute("version",_version);
 

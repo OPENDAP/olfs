@@ -42,8 +42,6 @@ import java.net.URISyntaxException;
  */
 public class GetCoverageRequest {
 
-    private static final Namespace _nameSpace    = WCS.WCS_NS;
-    private static final String _schemaLocation  = WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCoverage.xsd";
 
 
     private String   _service  = "WCS";
@@ -70,7 +68,7 @@ public class GetCoverageRequest {
     public GetCoverageRequest(HashMap<String,String> kvp)
             throws WcsException {
 
-        String tmp[], s;
+        String s;
 
 
         // Make sure the client is looking for a WCS service....
@@ -296,16 +294,35 @@ public class GetCoverageRequest {
     public Element getRequestElement() throws WcsException{
 
         Element requestElement;
+        String schemaLocation;
 
-        requestElement = new Element(_request, _nameSpace);
-        requestElement.addNamespaceDeclaration(WCS.GML_NS);
+        requestElement = new Element(_request, WCS.WCS_NS);
+        schemaLocation = WCS.WCS_NAMESPACE_STRING + "  "+ WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCoverage.xsd  ";
+
         requestElement.addNamespaceDeclaration(WCS.OWS_NS);
+        schemaLocation += WCS.OWS_NAMESPACE_STRING + "  "+ WCS.OWS_SCHEMA_LOCATION_BASE+"owsCommon.xsd  ";
+
+        requestElement.addNamespaceDeclaration(WCS.GML_NS);
+        schemaLocation += WCS.GML_NAMESPACE_STRING + "  "+ WCS.GML_SCHEMA_LOCATION_BASE+"gml.xsd  ";
+
+/*
+
+
+        requestElement.addNamespaceDeclaration(WCS.OWCS_NS);
+        _schemaLocation += WCS.OWCS_NAMESPACE_STRING + "  "+ WCS.OWCS_SCHEMA_LOCATION_BASE+"owcsAll.xsd  ";
+*/
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
-        requestElement.setAttribute("_schemaLocation", _schemaLocation,WCS.XSI_NS);
+
+
+
+
+        requestElement.setAttribute("schemaLocation", schemaLocation,WCS.XSI_NS);
+
+
         requestElement.setAttribute("service",_service);
         requestElement.setAttribute("version",_version);
 
-        Element e = new Element("Identifier",_nameSpace);
+        Element e = new Element("Identifier",WCS.WCS_NS);
         e.setText(_id);
         requestElement.addContent(e);
 
@@ -326,7 +343,7 @@ public class GetCoverageRequest {
     public Element getDomainSubsetElement() throws WcsException {
 
 
-        Element domainSubset = new Element("DomainSubset",_nameSpace);
+        Element domainSubset = new Element("DomainSubset",WCS.WCS_NS);
 
         Element e = _bbox.getBoundingBoxElement();
 
@@ -345,7 +362,7 @@ public class GetCoverageRequest {
 
 
     public Element getOutputTypeElement(){
-        Element ot = new Element("OutputType",_nameSpace);
+        Element ot = new Element("OutputType",WCS.WCS_NS);
         ot.setAttribute("format",_format);
 
         if(_store)
@@ -369,25 +386,25 @@ public class GetCoverageRequest {
         if(!hasUserGridCRS)
             return null;
 
-        Element crs = new Element("GridCRS",_nameSpace);
+        Element crs = new Element("GridCRS",WCS.WCS_NS);
         Element e;
 
         if(_gridBaseCRS!=null){
-            e = new Element("GridBaseCRS",_nameSpace);
+            e = new Element("GridBaseCRS",WCS.WCS_NS);
             e.setText(_gridBaseCRS.toString());
             crs.addContent(e);
         }
 
 
         if(_gridType!=null){
-            e = new Element("GridType",_nameSpace);
+            e = new Element("GridType",WCS.WCS_NS);
             e.setText(_gridType.toString());
             crs.addContent(e);
         }
 
 
         if(_gridOrigin!=null){
-            e = new Element("GridOrigin",_nameSpace);
+            e = new Element("GridOrigin",WCS.WCS_NS);
             String txt  = "";
 
             for (double originCoordinate : _gridOrigin) {
@@ -401,7 +418,7 @@ public class GetCoverageRequest {
 
 
         if(_gridOffsets!=null){
-            e = new Element("GridOffsets",_nameSpace);
+            e = new Element("GridOffsets",WCS.WCS_NS);
             String txt  = "";
 
             for (double offsetCoordinate : _gridOffsets) {
@@ -416,7 +433,7 @@ public class GetCoverageRequest {
 
 
         if(_gridCS!=null){
-            e = new Element("GridCS",_nameSpace);
+            e = new Element("GridCS",WCS.WCS_NS);
             e.setText(_gridCS.toString());
             crs.addContent(e);
         }
