@@ -57,6 +57,7 @@ public class Validator {
         for (String url : args) {
             try {
                 parser.validateURI(url);
+                System.out.println("\n\nDocument validates!\n");
             } catch (Exception e) {
                 e.printStackTrace(System.out);
 
@@ -66,7 +67,6 @@ public class Validator {
 
 
     public Document validateURI(String s) throws Exception{
-
 
         // get a validating jdom parser to parse and validate the XML document.
         SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
