@@ -248,7 +248,7 @@ public class TimeSequenceItem {
 
         SimpleDateFormat parseFormat;
         Date d;
-        String date, time, format;
+        String time, parseFormatString;
         String[] tmp1, tmp2;
 
         try {
@@ -288,12 +288,12 @@ public class TimeSequenceItem {
 
                 tmp2 = t.split("-");
 
-                format = "y";
+                parseFormatString = "y";
 
                 if(tmp2.length==2)
-                    format += "-M";
+                    parseFormatString += "-M";
                 if(tmp2.length==3)
-                    format += "-M-d";
+                    parseFormatString += "-M-d";
                 if(tmp2.length>3){
                     throw new WcsException("It appears you have attempted to " +
                             "specify a simple date ("+tmp1[0]+") as part of a " +
@@ -304,7 +304,7 @@ public class TimeSequenceItem {
                             "TimeSequence");
                 }
 
-                parseFormat = new SimpleDateFormat(format);
+                parseFormat = new SimpleDateFormat(parseFormatString);
                 if(stz!=null)
                     parseFormat.setTimeZone(stz);
 
@@ -313,20 +313,20 @@ public class TimeSequenceItem {
             else {
                 // Looks like we got a date and a time of some sort.
 
-                date = tmp1[0];
+                parseFormatString = "y-M-d'T'H";
+
                 time = tmp1[1];
 
                 tmp2 = time.split(":");
 
-                format = "y-M-d'T'H";
 
                 if(tmp2.length==2)
-                    format += ":m";
+                    parseFormatString += ":m";
                 if(tmp2.length==3) {
-                    format += ":m:s";
+                    parseFormatString += ":m:s";
 
                     if(tmp2[2].contains("."))
-                        format += ".S";
+                        parseFormatString += ".S";
 
                 }
                 if(tmp2.length>3) {
@@ -339,7 +339,7 @@ public class TimeSequenceItem {
                             "TimeSequence");
                 }
 
-                parseFormat = new SimpleDateFormat(format);
+                parseFormat = new SimpleDateFormat(parseFormatString);
                 if(stz!=null)
                     parseFormat.setTimeZone(stz);
 

@@ -178,7 +178,7 @@ public class DescribeCoverageRequest {
      *       &lt;/complexType&gt;
      *     &lt;/element&gt;
      * </pre>
-     * @return
+     * @return The DescribeCoverage request element.
      */
     public Element getRequestElement(){
 

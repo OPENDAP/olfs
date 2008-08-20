@@ -23,19 +23,15 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Namespace;
 import org.jdom.Element;
 
 /**
- * User: ndp
- * Date: Aug 13, 2008
- * Time: 4:18:20 PM
- *
+ * WCS exceptions 
  * <table>
  * <tr>
- * <td>exceptionCode value</td>
- * <td>Meaning of code</td>
- * <td>"locator value</td>
+ * <td align="center"><b>ExceptionCode</b></td>
+ * <td align="center"><b>Meaning of code</b></td>
+ * <td align="center"><b>locator value</b></td>
  * </tr>
  * <tr>
  * <td> OperationNotSupported</td>
@@ -55,16 +51,16 @@ import org.jdom.Element;
  * </tr>
  * <tr>
  * <td>VersionNegotiationFailed</td>
- * <td>List of versions in “AcceptVersions” parameter value in GetCapabilities
+ * <td>List of versions in &quot;AcceptVersions&quot; parameter value in GetCapabilities
  *     operation request did not include any version supported by this server.</td>
- * <td>None, omit “locator” parameter</td>
+ * <td>None, omit &quot;locator&quot; parameter</td>
  * </tr>
  * <tr>
  * <td>InvalidUpdateSequence</td>
  * <td>Value of (optional) updateSequence parameter in GetCapabilities operation
  *     request is greater than current value of service metadata updateSequence
  *     number </td>
- * <td>None, omit “locator” parameter</td>
+ * <td>None, omit &quot;locator&quot; parameter</td>
  * </tr>
  * <tr>
  * <td>OptionNotSupported</td>
@@ -79,10 +75,12 @@ import org.jdom.Element;
  * </tr>
  * </table>
  *
+ * User: ndp
+ * Date: Aug 13, 2008
+ * Time: 4:18:20 PM
  */
 public class WcsException extends Throwable {
 
-    private static final Namespace _nameSpace = WCS.OWS_NS;
 
 
     /**
@@ -158,7 +156,7 @@ public class WcsException extends Throwable {
 
     public Element getExceptionElement(){
 
-        Element exp = new Element("Exception", _nameSpace);
+        Element exp = new Element("Exception", WCS.OWS_NS);
 
         exp.setAttribute("exceptionCode",_exceptionCodeName[_exceptionCode]);
         if(_locator != null)
@@ -166,7 +164,7 @@ public class WcsException extends Throwable {
 
         String msg = getMessage();
         if(msg != null){
-            Element expText = new Element("ExceptionText", _nameSpace);
+            Element expText = new Element("ExceptionText", WCS.OWS_NS);
             expText.setText(msg);
             exp.addContent(expText);
         }

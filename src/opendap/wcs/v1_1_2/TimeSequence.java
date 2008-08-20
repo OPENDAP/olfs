@@ -25,7 +25,6 @@ package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 /**

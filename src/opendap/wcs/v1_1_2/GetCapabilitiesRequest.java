@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Namespace;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
@@ -44,7 +43,6 @@ public class GetCapabilitiesRequest {
 
 
     private String   _service = "WCS";
-    private String   _version = null;
     private String   _request = "GetCapabilities";
     private String[] _Sections = null;
     private String   _updateSequence = null;
@@ -86,7 +84,6 @@ public class GetCapabilitiesRequest {
             for(String ver:tmp){
                 if(WCS.VERSIONS.contains(ver)){
                     compatible=true;
-                    _version = ver;
                 }
             }
             if(!compatible)

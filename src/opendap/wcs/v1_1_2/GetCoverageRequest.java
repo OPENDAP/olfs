@@ -25,7 +25,6 @@ package opendap.wcs.v1_1_2;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
