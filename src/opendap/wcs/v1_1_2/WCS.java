@@ -60,7 +60,7 @@ public class WCS {
     public static final String    OWCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
 
 
-    public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml";
+    public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml/3.2";
     public static final Namespace GML_NS = Namespace.getNamespace("gml",GML_NAMESPACE_STRING);
     public static final String    GML_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/gml/3.2.1/";
 

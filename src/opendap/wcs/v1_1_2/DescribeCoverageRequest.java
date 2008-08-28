@@ -123,7 +123,7 @@ public class DescribeCoverageRequest {
         else if(!s.equals(_request)){
             throw new WcsException("The servers internal dispatch operations " +
                     "have failed. The WCS request for the operation '"+s+"' " +
-                    "has been incorrectly routed to the 'GetCapabilities' " +
+                    "has been incorrectly routed to the '"+_request+"' " +
                     "request processor.",
                     WcsException.NO_APPLICABLE_CODE);
         }

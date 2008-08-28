@@ -178,6 +178,7 @@ public class GetCoverageRequest {
 
         String s, tmp[];
 
+
         // Get the optional GridBaseCRS
         s = kvp.get("GridBaseCRS");
         if(s!=null){
@@ -304,12 +305,10 @@ public class GetCoverageRequest {
         requestElement.addNamespaceDeclaration(WCS.GML_NS);
         schemaLocation += WCS.GML_NAMESPACE_STRING + "  "+ WCS.GML_SCHEMA_LOCATION_BASE+"gml.xsd  ";
 
-/*
-
 
         requestElement.addNamespaceDeclaration(WCS.OWCS_NS);
-        _schemaLocation += WCS.OWCS_NAMESPACE_STRING + "  "+ WCS.OWCS_SCHEMA_LOCATION_BASE+"owcsAll.xsd  ";
-*/
+        schemaLocation += WCS.OWCS_NAMESPACE_STRING + "  "+ WCS.OWCS_SCHEMA_LOCATION_BASE+"owcsAll.xsd  ";
+
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
 
 
@@ -331,7 +330,7 @@ public class GetCoverageRequest {
             requestElement.addContent(_rs.getRangeSubsetElement());
         }
 
-        requestElement.addContent(getOutputTypeElement());
+        requestElement.addContent(getOutputTypeElement());Ï
 
         return requestElement;
 
