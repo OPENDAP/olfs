@@ -25,6 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 -->
 
+<!-- TEST CHECKIN -->
 
 <!DOCTYPE project [
         <!ENTITY globalprops      SYSTEM "./buildfiles/globalprops.xml">
