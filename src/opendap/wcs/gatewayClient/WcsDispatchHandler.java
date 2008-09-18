@@ -912,7 +912,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                           constraintExpression,
                                           os,
                                           erros,
-                                          BesAPI.DAP2_ERRORS,
+                                          BesAPI.DAP2_FORMAT,
                                           wcsRequestURL)
                 ){
 
@@ -958,7 +958,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS,
+                BesAPI.DAP2_FORMAT,
                 wcsRequestURL)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAS() encounterd a BESError: "+msg);
@@ -1002,7 +1002,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS,
+                BesAPI.DAP2_FORMAT,
                 wcsRequestURL)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encounterd a BESError: "+msg);
@@ -1046,7 +1046,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS,
+                BesAPI.DAP2_FORMAT,
                 wcsRequestURL)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encounterd a BESError: "+msg);
@@ -1088,7 +1088,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.XML_ERRORS,
+                BesAPI.DEFAULT_FORMAT,
                 wcsRequestURL)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
@@ -1130,7 +1130,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.XML_ERRORS,
+                BesAPI.DEFAULT_FORMAT,
                 wcsRequestURL)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));

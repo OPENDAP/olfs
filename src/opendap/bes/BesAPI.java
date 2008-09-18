@@ -59,8 +59,9 @@ public class BesAPI {
 
 
 
-    public static String XML_ERRORS = "xml";
-    public static String DAP2_ERRORS = "dap2";
+    public static String DEFAULT_FORMAT 	= "xml";
+    public static String DAP2_FORMAT 		= "dap2";
+    public static String DAP_FORMAT_CONTEXT 	= "dap_format";
 
 
     private static Logger log;
@@ -97,8 +98,8 @@ public class BesAPI {
      * @param os                   The Stream to which to write the response.
      * @param err                  The Stream to which to errors returned by
      *                             the BES..
-     * @param errorMsgFormat       The message format scheme for BES generated
-     *                             errors.
+     * @param dapFormat            The message format scheme for BES generated
+     *                             dap responses.
      * @return False if the BES returns an error, true otherwise.
      * @throws BadConfigurationException .
      * @throws BESError              .
@@ -109,7 +110,7 @@ public class BesAPI {
                                 String constraintExpression,
                                 OutputStream os,
                                 OutputStream err,
-                                String errorMsgFormat)
+                                String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
@@ -118,7 +119,7 @@ public class BesAPI {
                 constraintExpression,
                 os,
                 err,
-                errorMsgFormat);
+                dapFormat);
     }
 
 
@@ -142,7 +143,7 @@ public class BesAPI {
                 constraintExpression,
                 os,
                 er,
-                XML_ERRORS)){
+                DEFAULT_FORMAT)){
 
 
 
@@ -179,7 +180,8 @@ public class BesAPI {
      * @param constraintExpression The constraint expression to be applied to
      *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat       The message format scheme for BES generated errors.
+     * @param dapFormat            The message format scheme for BES
+     *                             generated dap responses.
      * @param err                  The Stream to which to write errors returned
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
@@ -192,7 +194,7 @@ public class BesAPI {
                                 String constraintExpression,
                                 OutputStream os,
                                 OutputStream err,
-                                String errorMsgFormat)
+                                String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
@@ -201,7 +203,7 @@ public class BesAPI {
                 constraintExpression,
                 os,
                 err,
-                errorMsgFormat);
+                dapFormat);
     }
 
 
@@ -211,7 +213,8 @@ public class BesAPI {
      *
      * @param dataSource     The requested DataSource
      * @param os             The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param dapFormat      The message format scheme for BES generated dap
+     *                       responses.
      * @param err                  The Stream to which to write errors returned
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
@@ -223,7 +226,7 @@ public class BesAPI {
     public static boolean writeFile(String dataSource,
                                  OutputStream os,
                                  OutputStream err,
-                                 String errorMsgFormat)
+                                 String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         boolean trouble = false;
@@ -240,7 +243,8 @@ public class BesAPI {
 
             String besDataSource = bes.trimPrefix(dataSource);
 
-            success = configureTransaction(oc, besDataSource, null, STREAM, err, errorMsgFormat);
+            success = configureTransaction(oc, besDataSource, null, STREAM,
+	                                   err, dapFormat);
 
             if(success){
                 success = getDataProduct(oc, STREAM, os, err);
@@ -268,7 +272,8 @@ public class BesAPI {
      * @param constraintExpression The constraint expression to be applied to
      *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat       The message format scheme for BES generated errors.
+     * @param dapFormat            The message format scheme for BES
+     *                             generated dap responses.
      * @param err                  The Stream to which to write errors returned
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
@@ -281,7 +286,7 @@ public class BesAPI {
                                 String constraintExpression,
                                 OutputStream os,
                                 OutputStream err,
-                                String errorMsgFormat)
+                                String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
@@ -290,7 +295,7 @@ public class BesAPI {
                 constraintExpression,
                 os,
                 err,
-                errorMsgFormat);
+                dapFormat);
     }
 
     /**
@@ -301,7 +306,8 @@ public class BesAPI {
      * @param constraintExpression The constraint expression to be applied to
      *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat       The message format scheme for BES generated errors.
+     * @param dapFormat            The message format scheme for BES
+     *                             generated dap responses.
      * @param err                  The Stream to which to write errors returned
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
@@ -314,7 +320,7 @@ public class BesAPI {
                                      String constraintExpression,
                                      OutputStream os,
                                      OutputStream err,
-                                     String errorMsgFormat)
+                                     String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
@@ -323,7 +329,7 @@ public class BesAPI {
                 constraintExpression,
                 os,
                 err,
-                errorMsgFormat);
+                dapFormat);
     }
 
 
@@ -335,7 +341,8 @@ public class BesAPI {
      * @param constraintExpression The constraint expression to be applied to
      *                             the request..
      * @param os                   The Stream to which to write the response.
-     * @param errorMsgFormat       The message format scheme for BES generated errors.
+     * @param dapFormat            The message format scheme for BES
+     *                             generated dap responses.
      * @param err                  The Stream to which to write errors returned
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
@@ -348,7 +355,7 @@ public class BesAPI {
                                   String constraintExpression,
                                   OutputStream os,
                                   OutputStream err,
-                                  String errorMsgFormat)
+                                  String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
@@ -357,7 +364,7 @@ public class BesAPI {
                 constraintExpression,
                 os,
                 err,
-                errorMsgFormat);
+                dapFormat);
     }
 
 
@@ -397,7 +404,7 @@ public class BesAPI {
         try {
 
             String besDataSource = bes.trimPrefix(dataSource);
-            success = configureTransaction(oc, besDataSource, null, err, XML_ERRORS);
+            success = configureTransaction(oc, besDataSource, null, err, DEFAULT_FORMAT);
             if(success){
                 String cmd = "get " + HTML_FORM +
                         " for d1 using " + url + ";\n";
@@ -462,7 +469,7 @@ public class BesAPI {
         try {
 
             String besDataSource = bes.trimPrefix(dataSource);
-            success = configureWcsTransaction(oc, besDataSource, null, err, XML_ERRORS,wcsRequestURL);
+            success = configureWcsTransaction(oc, besDataSource, null, err, DEFAULT_FORMAT, wcsRequestURL);
             if(success){
                 String cmd = "get " + HTML_FORM +
                         " for d1 using " + url + ";\n";
@@ -493,9 +500,10 @@ public class BesAPI {
      * Writes the OPeNDAP INFO response for the dataSource to the passed
      * stream.
      *
-     * @param dataSource     The requested DataSource
-     * @param os             The Stream to which to write the response.
-     * @param errorMsgFormat The message format scheme for BES generated errors.
+     * @param dataSource           The requested DataSource
+     * @param os                   The Stream to which to write the response.
+     * @param dapFormat            The message format scheme for BES
+     *                             generated dap responses.
      * @param err                  The Stream to which to write errors returned
      *                             by the BES.
      * @return False if the BES returns an error, true otherwise.
@@ -507,7 +515,7 @@ public class BesAPI {
     public static boolean writeINFOPage(String dataSource,
                                         OutputStream os,
                                         OutputStream err,
-                                        String errorMsgFormat)
+                                        String dapFormat)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besGetTransaction(
@@ -516,7 +524,7 @@ public class BesAPI {
                 null,
                 os,
                 err,
-                errorMsgFormat);
+                dapFormat);
     }
 
 
@@ -527,7 +535,7 @@ public class BesAPI {
      *
      * @param dataSource           The requested DataSource
      * @param constraintExpression .
-     * @param errorMsgFormat       .
+     * @param dapFormat            .
      * @return A DAP2 data stream, no DDS just the XDR encoded binary data.
      * @throws BadConfigurationException .
      * @throws BESError              .
@@ -536,14 +544,14 @@ public class BesAPI {
      */
     public static InputStream getDap2DataStream(String dataSource,
                                                 String constraintExpression,
-                                                String errorMsgFormat)
+                                                String dapFormat)
             throws BadConfigurationException, BESError, PPTException, IOException {
 
         //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        writeDap2Data(dataSource, constraintExpression, baos, baos, errorMsgFormat);
+        writeDap2Data(dataSource, constraintExpression, baos, baos, dapFormat);
 
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
@@ -573,10 +581,10 @@ public class BesAPI {
                                              String dataset,
                                              String constraintExpression,
                                              OutputStream err,
-                                             String errorMsgFormat)
+                                             String dapFormat)
 
             throws PPTException, IOException {
-        return configureTransaction(oc, dataset, constraintExpression, null, err, errorMsgFormat);
+        return configureTransaction(oc, dataset, constraintExpression, null, err, dapFormat);
     }
 
 
@@ -585,7 +593,7 @@ public class BesAPI {
                                              String constraintExpression,
                                              String type,
                                              OutputStream erros,
-                                             String errorMsgFormat)
+                                             String dapFormat)
             throws  PPTException, IOException {
 
 
@@ -594,7 +602,7 @@ public class BesAPI {
         String cmd;
         boolean success;
 
-        cmd = "set context errors to " + errorMsgFormat + ";\n";
+        cmd = "set context " + DAP_FORMAT_CONTEXT + " to " + dapFormat + ";\n";
         log.debug("Sending BES command: " + cmd);
 
 
@@ -675,7 +683,7 @@ public class BesAPI {
                                              String dataset,
                                              String constraintExpression,
                                              OutputStream err,
-                                             String errorMsgFormat,
+                                             String dapFormat,
                                              String wcsRequestURL)
 
 
@@ -685,7 +693,7 @@ public class BesAPI {
                                         constraintExpression,
                                         null,
                                         err,
-                                        errorMsgFormat,
+                                        dapFormat,
                                         wcsRequestURL);
     }
 
@@ -695,7 +703,7 @@ public class BesAPI {
                                              String constraintExpression,
                                              String type,
                                              OutputStream erros,
-                                             String errorMsgFormat,
+                                             String dapFormat,
                                              String wcsRequestURL)
             throws  PPTException, IOException {
 
@@ -705,7 +713,7 @@ public class BesAPI {
         String cmd;
         boolean success;
 
-        cmd = "set context errors to " + errorMsgFormat + ";\n";
+        cmd = "set context " + DAP_FORMAT_CONTEXT + " to " + dapFormat + ";\n";
         log.debug("Sending BES command: " + cmd);
 
 
@@ -807,7 +815,7 @@ public class BesAPI {
                                           String constraintExpression,
                                           OutputStream os,
                                           OutputStream err,
-                                          String errorMsgFormat)
+                                          String dapFormat)
             throws BadConfigurationException, IOException, PPTException {
 
         boolean besTrouble = false;
@@ -832,7 +840,7 @@ public class BesAPI {
                     besDataset,
                     constraintExpression,
                     err,
-                    errorMsgFormat)){
+                    dapFormat)){
 
                 if(getDataProduct(oc, product, os, err)){
                     resetBES(oc);
@@ -873,7 +881,7 @@ public class BesAPI {
                                           String constraintExpression,
                                           OutputStream os,
                                           OutputStream err,
-                                          String errorMsgFormat,
+                                          String dapFormat,
                                           String wcsRequestURL)
             throws BadConfigurationException, IOException, PPTException {
 
@@ -899,7 +907,7 @@ public class BesAPI {
                     besDataset,
                     constraintExpression,
                     err,
-                    errorMsgFormat,
+                    dapFormat,
                     wcsRequestURL)){
 
                 if(getDataProduct(oc, product, os, err)){
@@ -964,7 +972,7 @@ public class BesAPI {
 
         try {
 
-            String cmd = "set context errors to " + XML_ERRORS + ";\n";
+            String cmd = "set context " + DAP_FORMAT_CONTEXT + " to " + DEFAULT_FORMAT + ";\n";
             log.debug("Sending command: " + cmd);
             ret = oc.executeCommand(cmd,os,err);
             if(ret){

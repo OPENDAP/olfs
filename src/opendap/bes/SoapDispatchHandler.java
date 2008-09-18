@@ -134,7 +134,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
             mpr.addAttachment("application/octet-stream",
                     blobID,
-                    BesAPI.getDap2DataStream(datasetname, ce, BesAPI.XML_ERRORS));
+                    BesAPI.getDap2DataStream(datasetname, ce, BesAPI.DEFAULT_FORMAT));
 
             mpr.addSoapBodyPart(respElement);
             log.debug("getDATA() completed.");

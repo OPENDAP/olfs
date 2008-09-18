@@ -195,7 +195,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        if(!BesAPI.writeFile(name, sos, erros, BesAPI.XML_ERRORS)){
+        if(!BesAPI.writeFile(name, sos, erros, BesAPI.DEFAULT_FORMAT)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);

@@ -347,7 +347,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS)){
+                BesAPI.DAP2_FORMAT)){
 
 
             String msg = new String(erros.toByteArray());
@@ -404,7 +404,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS)){
+                BesAPI.DAP2_FORMAT)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -459,7 +459,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS)){
+                BesAPI.DAP2_FORMAT)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -513,7 +513,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-                BesAPI.DAP2_ERRORS)){
+                BesAPI.DAP2_FORMAT)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -558,8 +558,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 constraintExpression,
                 os,
                 erros,
-//                BesAPI.DAP2_ERRORS)){
-                BesAPI.XML_ERRORS)){
+//                BesAPI.DAP2_FORMAT)){
+                BesAPI.DEFAULT_FORMAT)){
 
 //            String msg = new String(erros.toByteArray());
 //            log.error(msg);
@@ -656,7 +656,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 dataSource,
                 os,
                 erros,
-                BesAPI.XML_ERRORS)){
+                BesAPI.DEFAULT_FORMAT)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(dispatchServlet,response);
@@ -701,7 +701,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 name,
                 os,
                 erros,
-                BesAPI.XML_ERRORS)){
+                BesAPI.DEFAULT_FORMAT)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(dispatchServlet,response);
