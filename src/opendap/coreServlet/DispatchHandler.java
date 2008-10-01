@@ -55,7 +55,7 @@ public interface DispatchHandler {
      * DispatchHandler in the configuration file (usually olfs.xml). The
      * contents of this XML Element are not restricted and may (should?)
      * contain any required information for configuration not availableInChunk by
-     * interogating the DispatchServlet’s methods.
+     * interogating the DispatchServlet's methods.
      *
      * @param servlet This should be the DispatchServlet that creates the
      * instance of DispatychHandler that is being intialized.

@@ -330,7 +330,7 @@ public class GetCoverageRequest {
             requestElement.addContent(_rs.getRangeSubsetElement());
         }
 
-        requestElement.addContent(getOutputTypeElement());Ï
+        requestElement.addContent(getOutputTypeElement());
 
         return requestElement;
 

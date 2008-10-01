@@ -71,7 +71,7 @@ import org.jdom.Element;
  * <td>NoApplicableCode</td>
  * <td>No other exceptionCode specified by this service and server applies to
  *     this exception.</td>
- * <td>None, omit “locator” parameter </td>
+ * <td>None, omit locator parameter </td>
  * </tr>
  * </table>
  *
@@ -106,9 +106,9 @@ public class WcsException extends Throwable {
 
 
     /**
-     * VersionNegotiationFailed: List of versions in “AcceptVersions” parameter
+     * VersionNegotiationFailed: List of versions in AcceptVersions parameter
      * value in GetCapabilities operation request did not include any version
-     * supported by this server. (locator = None, omit “locator” parameter)
+     * supported by this server. (locator = None, omit locator parameter)
      */
     public static final int VERSION_NEGOTIATION_FAILED  = 3;
 
@@ -116,7 +116,7 @@ public class WcsException extends Throwable {
     /**
      * InvalidUpdateSequence: Value of (optional) updateSequence parameter in
      * GetCapabilities operation request is greater than current value of
-     * service metadata updateSequence number. (locator = None, omit “locator”
+     * service metadata updateSequence number. (locator = None, omit locator
      * parameter)
      */
     public static final int INVALID_UPDATE_SEQUENCE     = 4;
@@ -124,7 +124,7 @@ public class WcsException extends Throwable {
 
     /**
      * NoApplicableCode: No other exceptionCode specified by this service
-     * and server applies to this exception. (locator = None, omit “locator”
+     * and server applies to this exception. (locator = None, omit locator
      * parameter)
      */
     public static final int NO_APPLICABLE_CODE          = 5;
