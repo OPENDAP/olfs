@@ -44,21 +44,23 @@ public interface OpendapSoapDispatchHandler extends OpendapMimeHeaders {
      * Handles a SOAP request for a OPeNDAP Data.
      *
      * @param reqID The request ID from the Request Element in the SOAP body
+     * @param xmlBase The request URL for use in the DDX.
      * @param cmd The GetDATA commad Element from the the Request.
      * @param mpr The multipart response into which the DATA response should be added.
      * @throws Exception When things go awry.
      */
-    public void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
+    public void getDATA(String reqID, String xmlBase, Element cmd, MultipartResponse mpr) throws Exception;
 
     /**
      * Handles a SOAP request for an OPeNDAP DDX.
      *
      * @param reqID The request ID from the Request Element in the SOAP body
+     * @param xmlBase The request URL for use in the DDX.
      * @param cmd The GetDDX commad Element from the the Request.
      * @param mpr The multipart response into which the DDX should be added.
      * @throws Exception When things go awry.
      */
-    public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception;
+    public void getDDX(String reqID, String xmlBase, Element cmd, MultipartResponse mpr) throws Exception;
 
     /**
      * Handles a SOAP request for a THREDDS catalog.

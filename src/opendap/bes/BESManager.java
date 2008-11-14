@@ -100,7 +100,8 @@ public class BESManager implements DispatchHandler {
 
         if(_isConfigured) return;
 
-        BesAPI.init();
+        // BesAPI.init();
+        BesXmlAPI.init();
 
 
         _besCollection  = new Vector<BES>();
@@ -224,19 +225,7 @@ public class BESManager implements DispatchHandler {
 
     public static Document getVersionDocument(String path) throws Exception {
 
-
-        BES bes = getBES(path);
-
-        // Get the Version info from the BES.
-        Document doc = bes.getVersionDocument();
-
-        // Add a version element for this, the OLFS server
-        doc.getRootElement().addContent(opendap.bes.Version.getOLFSVersionElement());
-
-        // Add a version element for this, the OLFS server
-        doc.getRootElement().addContent(opendap.bes.Version.getHyraxVersionElement());
-
-        return bes.getVersionDocument();
+        return getBES(path).getVersionDocument();
     }
 
 

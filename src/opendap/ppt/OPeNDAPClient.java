@@ -26,6 +26,10 @@
 package opendap.ppt;
 
 import org.slf4j.Logger;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 
 import java.io.*;
 
@@ -180,6 +184,69 @@ public class OPeNDAPClient {
         boolean success = _client.getResponse(target,error);
         commandCount++;
         return success;
+    }
+
+    /**
+     * Sends a single XML request document.
+     * <p/>
+     * The response is written to the output stream if one is specified,
+     * otherwise the output is ignored.
+     *
+     * @param request The XML request that is sent to
+     *            the BES to handle.
+     *
+     *
+     * @return True if successful, false if the server returned an error.
+     * @throws PPTException Thrown if there is a problem sending the request
+     *                      to the server or a problem receiving the response
+     *                      from the server.
+     * @throws JDOMException if the response fails to parse.
+     * @see String
+     * @see PPTException
+     */
+    /*
+    public Document sendRequest( Document request)
+            throws PPTException, JDOMException {
+
+
+        _client.sendXMLRequest(request);
+        Document doc = _client.getXMLResponse();
+        commandCount++;
+        return doc;
+    }
+    */
+
+
+
+    /**
+     * Sends a single XML request document.
+     * <p/>
+     * The response is written to the output stream if one is specified,
+     * otherwise the output is ignored.
+     *
+     * @param request The XML request that is sent to
+     *            the BES to handle.
+     *
+     * @param target The target OutputStream for the results of the command.
+     * @param error The error OutputStream for errors returned by the server.
+     *
+     * @return True if successful, false if the server returned an error.
+     * @throws PPTException Thrown if there is a problem sending the request
+     *                      to the server or a problem receiving the response
+     *                      from the server.
+     * @see String
+     * @see PPTException
+     */
+    public boolean sendRequest( Document request,
+                                OutputStream target,
+                                OutputStream error)
+            throws PPTException {
+
+
+        _client.sendXMLRequest(request);
+        boolean val = _client.getResponse(target,error);
+        commandCount++;
+        return val;
     }
 
     /**

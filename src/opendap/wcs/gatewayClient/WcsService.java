@@ -73,6 +73,7 @@ public class WcsService {
 
 
 
+    
     public WcsService(Element configuration) throws Exception{
 
         log.debug("Configuring...");

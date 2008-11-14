@@ -75,12 +75,12 @@ public class BESDataSource implements DataSourceInfo {
 
 
 
-        if(BesAPI.getInfoDocument(dataSourceName,info)){
+        if(BesXmlAPI.getInfo(dataSourceName,info)){
 
             exists      = true;
             accessible  = true;
-
-            Element dataset = info.getRootElement();
+           
+            Element dataset = info.getRootElement().getChild("response").getChild("dataset");
 
             String isCollection = dataset.getAttributeValue("thredds_collection");
             collection = isCollection == null || isCollection.equalsIgnoreCase("true");

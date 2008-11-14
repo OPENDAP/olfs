@@ -88,7 +88,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
         // We just check the BES to make sure it's configured. It should always
         // be configured at this point!
-        if (!BesAPI.isConfigured()) {
+        if (!BesXmlAPI.isConfigured()) {
             log.error("\n\n\n!!!!!!!!! BES IS NOT CONFIGURED !!!!!!!!\n\n\n");
             //throw new BESException("BES not configured!!!!");
         }
@@ -545,7 +545,7 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
         String besPath = getBesPath();
         log.debug("Getting catalog for: \"" + besPath + "\"");
         Document doc = new Document();
-        if(BesAPI.getCatalog(besPath,doc)){
+        if(BesXmlAPI.getCatalog(besPath,doc)){
 
             Element root = doc.getRootElement();
 
@@ -608,8 +608,10 @@ public class BESCrawlableDataset implements CrawlableDataset, Comparable {
             Document doc = new Document();
 
 
-            if(BesAPI.getInfoDocument(besPath,doc)){
-                Element topDataset = doc.getRootElement();
+            if(BesXmlAPI.getInfo(besPath,doc)){
+
+
+                Element topDataset = doc.getRootElement().getChild("response").getChild("dataset");
 
                 if (!besPath.equals(topDataset.getChild("name").getTextTrim())) {
     //            throw new IOException("Returned dataset name does not match requested name.\n" +

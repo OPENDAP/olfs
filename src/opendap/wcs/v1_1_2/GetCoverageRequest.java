@@ -118,7 +118,7 @@ public class GetCoverageRequest {
         }
         else {
             throw new WcsException("Request is missing required " +
-                    "Coverage identifier.",
+                    "Coverage 'identifier'.",
                     WcsException.MISSING_PARAMETER_VALUE,
                     "identifier");
 
@@ -285,6 +285,18 @@ public class GetCoverageRequest {
     public void serialize(OutputStream os) throws IOException, WcsException {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         xmlo.output(getRequestDoc(), os);
+    }
+
+    public String toString(){
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        try {
+            return xmlo.outputString(getRequestDoc());
+        } catch (WcsException e) {
+            ExceptionReport er = new ExceptionReport(e);
+            return er.toString();
+        }
+
     }
 
 

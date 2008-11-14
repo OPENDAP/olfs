@@ -32,15 +32,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
-import java.util.Iterator;
 
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.transform.XSLTransformer;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
+import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 import thredds.servlet.ServletUtil;
 
@@ -51,7 +50,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     private Logger log;
     private boolean initialized;
-    private DispatchServlet dispatchServlet;
+    private DispatchServlet _servlet;
 
 
     public DapDispatchHandler() {
@@ -75,7 +74,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         if(initialized) return;
 
-        dispatchServlet = ds;
+        _servlet = ds;
         log.info("Initialized.");
         initialized = true;
 
@@ -272,6 +271,16 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                     }
 
 
+                } else if (  //RDF Response?
+                        requestSuffix.equalsIgnoreCase("rdf")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendDDX2RDF(request, response);
+                        log.info("Sending DDX as RDF.");
+                    }
+
+
                 } else if (requestSuffix.equals("")) {
                     isDataRequest = true;
                     if(sendResponse){
@@ -337,17 +346,18 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
+        String xdap_accept = request.getHeader("XDAP-Accept");
         response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeDAS(
+        if(!BesXmlAPI.writeDAS(
                 dataSource,
                 constraintExpression,
+                xdap_accept,
                 os,
-                erros,
-                BesAPI.DAP2_FORMAT)){
+                erros)){
 
 
             String msg = new String(erros.toByteArray());
@@ -394,17 +404,19 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
         response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeDDS(
+        if(!BesXmlAPI.writeDDS(
                 dataSource,
                 constraintExpression,
+                xdap_accept,
                 os,
-                erros,
-                BesAPI.DAP2_FORMAT)){
+                erros)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -437,6 +449,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String xmlBase = request.getRequestURL().toString();
 
         log.debug("sendDDX() for dataset: " + dataSource);
 
@@ -444,24 +457,35 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
         response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
         response.setHeader("XDAP", Version.getXDAPVersion(request));
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
+        response.setHeader("Content-Description", "dods_ddx");
+
+        // This hedaer indicates to the client that the content of this response
+        // is dependant on the HTTP request header XDAP-Accept
+        response.setHeader("Vary", "XDAP-Accept");
+
+        // Because the content of this response is dependant on a client provided
+        // HTTP header (XDAP-Accept) it is useful to include this Cach-Control
+        // header to make caching work correctly...
+        response.setHeader("Cache-Control", "public");
+
 
         response.setStatus(HttpServletResponse.SC_OK);
+
+        String xdap_accept = request.getHeader("XDAP-Accept");
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeDDX(
+        if(!BesXmlAPI.writeDDX(
                 dataSource,
                 constraintExpression,
+                xdap_accept,
+                xmlBase,
                 os,
-                erros,
-                BesAPI.DAP2_FORMAT)){
+                erros)){
             String msg = new String(erros.toByteArray());
-            log.error(msg);
+            log.error("BES Error. Message: \n"+msg);
             os.write(msg.getBytes());
 
         }
@@ -505,15 +529,17 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
         ServletOutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeDap2Data(
+        if(!BesXmlAPI.writeDap2Data(
                 dataSource,
                 constraintExpression,
+                xdap_accept,
                 os,
-                erros,
-                BesAPI.DAP2_FORMAT)){
+                erros)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -544,6 +570,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+
         log.debug("sendASCII(): Data For: " + dataSource +
                     "    CE: '" + request.getQueryString() + "'");
 
@@ -553,13 +582,12 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        if(!BesAPI.writeASCII(
+        if(!BesXmlAPI.writeASCII(
                 dataSource,
                 constraintExpression,
+                xdap_accept,
                 os,
-                erros,
-//                BesAPI.DAP2_FORMAT)){
-                BesAPI.DEFAULT_FORMAT)){
+                erros)){
 
 //            String msg = new String(erros.toByteArray());
 //            log.error(msg);
@@ -567,7 +595,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             //besError.setErrorCode(BESError.INTERNAL_ERROR);
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(_servlet,response);
             log.error(besError.getMessage());
         }
 
@@ -595,6 +623,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
         log.debug("sendHTMLRequestForm(): Sending HTML Data Request Form For: "
                 + dataSource +
                 "    CE: '" + request.getQueryString() + "'");
@@ -613,13 +643,14 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeHTMLForm(
+        if(!BesXmlAPI.writeHTMLForm(
                 dataSource,
+                xdap_accept,
                 url,
                 os,
                 erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(_servlet,response);
             log.error(besError.getMessage());
         }
 
@@ -646,20 +677,21 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
+        String xdap_accept = request.getHeader("XDAP-Accept");
 
         log.debug("sendINFO() for: " + dataSource);
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeINFOPage(
+        if(!BesXmlAPI.writeHtmlInfoPage(
                 dataSource,
+                xdap_accept,
                 os,
-                erros,
-                BesAPI.DEFAULT_FORMAT)){
+                erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(_servlet,response);
             log.error(besError.getMessage());
         }
 
@@ -697,14 +729,13 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         ServletOutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        if(!BesAPI.writeFile(
+        if(!BesXmlAPI.writeFile(
                 name,
                 os,
-                erros,
-                BesAPI.DEFAULT_FORMAT)){
+                erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(_servlet,response);
             log.error(besError.getMessage());
 
         }
@@ -714,6 +745,92 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
+
+    /**
+     * ************************************************************************
+     * Default handler for the client's DDS request. Requires the writeDDS() method
+     * implemented by each server localization effort.
+     * <p/>
+     * <p>Once the DDS has been parsed and constrained it is sent to the
+     * requesting client.
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @see ReqInfo
+     */
+    public void sendDDX2RDF(HttpServletRequest request,
+                        HttpServletResponse response)
+            throws Exception {
+
+        String dataSource = ReqInfo.getDataSource(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
+
+
+        String xmlBase = request.getRequestURL().toString();
+        int suffix_start = xmlBase.lastIndexOf("." + requestSuffix);
+        xmlBase = xmlBase.substring(0, suffix_start);
+
+
+        log.debug("sendDDX2RDF() for dataset: " + dataSource);
+
+        response.setContentType("text/plain");
+        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
+        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        response.setHeader("Content-Description", "text/xml");
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+
+        String xdap_accept = "3.2";
+
+
+        ServletOutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        Document ddx = new Document();
+
+
+        if(!BesXmlAPI.getDDXDocument(
+                dataSource,
+                constraintExpression,
+                xdap_accept,
+                xmlBase,
+                ddx)){
+            String msg = new String(erros.toByteArray());
+            log.error("BES Error. Message: \n"+msg);
+            os.write(msg.getBytes());
+
+        }
+        else {
+
+            ddx.getRootElement().setAttribute("dataset_id",dataSource);
+
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+            String xsltDocName = ServletUtil.getPath(_servlet, "/docs/xsl/dap_3.2_ddxToRdfTriples.xsl");
+            SAXBuilder sb = new SAXBuilder();
+            Document xsltDoc = sb.build(xsltDocName);
+
+
+            //xsltDoc.getRootElement().addNamespaceDeclaration(Namespace.getNamespace("att",xmlBase+"/att#"));
+
+
+            XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+            Document rdf = transformer.transform(ddx);
+
+            xmlo.output(rdf,os);
+
+            os.flush();
+        }
+
+    }
+    /***************************************************************************/
 
 
 

@@ -36,7 +36,7 @@ import org.slf4j.Logger;
  * Date: Dec 19, 2007
  * Time: 9:14:01 AM
  */
-public class ChunkedInputStream {
+public class ChunkedInputStream  {
 
     private Logger log;
 
@@ -126,6 +126,20 @@ public class ChunkedInputStream {
     }
 
 
+    public int available() throws IOException {
+
+
+        if(availableInChunk()<=0){
+
+            int ret = readChunkHeader();
+
+            if(ret == -1 || isLastChunk()){
+                return 0;
+            }
+        }
+
+        return availableInChunk();
+    }
 
 
     public void close() throws IOException {
@@ -300,7 +314,108 @@ public class ChunkedInputStream {
     }
 
 
+    /*
 
+    public boolean markSupported() {
+        return false;
+    }
+
+    public void mark(int readLimit) {
+    }
+
+    public void reset() throws IOException {
+        throw new IOException("This stream has not been marked, and dude, marking is not supported.");
+    }
+
+
+    public long skip(long n)
+            throws IOException {
+
+        throw new IOException("Skip not currently suported on ChunkedInputStream.");
+    }
+
+    public int read()
+            throws IOException {
+
+        int val;
+        if(available()>0){
+            val = is.read();
+            if(val>=0)
+                chunkReadPosition += val;
+            return val;
+        }
+        else {
+            return -1;
+        }
+    }
+
+
+
+    public int read(byte[] b)
+            throws IOException {
+
+
+        return read(b,0,b.length);
+    }
+
+
+
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+
+        if (buffer == null)
+            throw new IOException("Illegal state in readChunkedMessage. " +
+                    "The read buffer is null.");
+
+        int ret;
+        int bytesReceived = 0;
+        boolean moreData = true;
+
+        while (moreData && !isClosed) {
+
+            if (availableInChunk() <= 0) {
+                ret = readChunkHeader();
+                if (ret == -1 || isLastChunk()) {
+                    moreData = false;
+                }
+            } else {
+
+                if (availableInChunk() >= length) {
+                    ret = Chunk.readFully(is, buffer, offset, length);
+                    if (ret < 0 && bytesReceived == 0) {
+                        bytesReceived = ret;
+                    } else {
+                        bytesReceived += ret;
+                        chunkReadPosition += bytesReceived;
+
+                    }
+                    moreData = false;
+
+                } else {
+                    ret = Chunk.readFully(is, buffer, offset, availableInChunk());
+                    if (ret < 0) {
+                        moreData = false;
+                        if (bytesReceived == 0)
+                            bytesReceived = ret;
+                    } else {
+                        bytesReceived += ret;
+                        chunkReadPosition += bytesReceived;
+                        offset += bytesReceived;
+                        length -= bytesReceived;
+                    }
+
+                }
+
+            }
+
+        }
+
+        return bytesReceived;
+
+
+    }
+
+
+    */
 
 
 

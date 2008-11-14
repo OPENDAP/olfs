@@ -70,5 +70,10 @@ public class ExceptionReport {
         xmlo.output(report, os);
     }
 
+    public String toString() {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        return xmlo.outputString(report);
+    }
+
 
 }

@@ -559,6 +559,7 @@ public class DispatchServlet extends HttpServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
+
         try {
             long reqno = reqNumber.incrementAndGet();
             //lastModifiedHits++;
@@ -579,6 +580,7 @@ public class DispatchServlet extends HttpServlet {
             PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
         }
+
 
     }
 

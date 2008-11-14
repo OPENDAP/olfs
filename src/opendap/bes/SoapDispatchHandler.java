@@ -27,6 +27,7 @@ package opendap.bes;
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
 import opendap.coreServlet.DispatchServlet;
+import opendap.coreServlet.ReqInfo;
 import opendap.soap.XMLNamespaces;
 import opendap.soap.ExceptionElementUtil;
 
@@ -85,7 +86,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * @param mpr The MultipartResponse into which to write the response.
      * @throws Exception When the bad things happen
      */
-    public void getDATA(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
+    public void getDATA(String reqID, String xmlBase,  Element cmd, MultipartResponse mpr) throws Exception {
 
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
@@ -107,7 +108,8 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         Document ddxDoc = new Document();
 
-        boolean besError = BesAPI.getDDXDocument(datasetname, ce, ddxDoc, ddxDoc);
+
+        boolean besError = BesXmlAPI.getDDXDocument(datasetname, ce, null, xmlBase, ddxDoc);
 
 
         // Add the returned document to the message. It may be an error!
@@ -134,7 +136,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
             mpr.addAttachment("application/octet-stream",
                     blobID,
-                    BesAPI.getDap2DataStream(datasetname, ce, BesAPI.DEFAULT_FORMAT));
+                    BesXmlAPI.getDap2DataStream(datasetname, ce, null));
 
             mpr.addSoapBodyPart(respElement);
             log.debug("getDATA() completed.");
@@ -155,7 +157,9 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * @param mpr
      * @throws Exception
      */
-    public void getDDX(String reqID, Element cmd, MultipartResponse mpr) throws Exception {
+    public void getDDX(String reqID, String xmlBase, Element cmd, MultipartResponse mpr) throws Exception {
+
+
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
 
 
@@ -178,7 +182,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         // Note that f there is a BESError returned it will be stuffed into the
         // SOAP eveope in lieu of the DDX.
-        BesAPI.getDDXDocument(datasetname, ce,ddx,ddx);
+        BesXmlAPI.getDDXDocument(datasetname, ce, null, xmlBase,  ddx);
 
         respElement.addContent(ddx.detachRootElement());
 

@@ -44,7 +44,7 @@ import java.io.ByteArrayOutputStream;
  * Date: Dec 19, 2007
  * Time: 9:14:18 AM
  */
-public class ChunkedOutputStream  {
+public class ChunkedOutputStream  extends OutputStream {
 
     private Logger log;
 
@@ -364,6 +364,14 @@ public class ChunkedOutputStream  {
         cs.finish();
         String buffer = new String(baos.toByteArray());
         System.out.println("Buffer: "+buffer);
+
+
+        /*
+
+        // This was a viable test when we used 4 bytes to encode the chunk size.
+        // That meant that the MAX_SIZE was only 2^16. Now that it's 2^28 it's
+        // not feasible to test the boundary condition of a chunk larger than 
+        // the maximum chunk size.
         baos.reset();
 
         byte[] buf = new byte[Chunk.MAX_SIZE +10];
@@ -380,6 +388,8 @@ public class ChunkedOutputStream  {
 
 
         System.out.println("Buffer: "+buffer);
+
+        */
 
 
     }

@@ -78,7 +78,7 @@ chunkedOutputStream() {
 
         
 
-    $testCmd 2>/dev/null | cmp - testsuite/ChunkedIO/ChunkedOutputStream.dat 
+    $testCmd 2>/dev/null | tee /tmp/$$.chunkedOutput | cmp - testsuite/ChunkedIO/ChunkedOutputStream.dat 
     testResult=$?
     
     if [ "$testResult" != 0 ]

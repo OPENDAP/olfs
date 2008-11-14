@@ -206,6 +206,7 @@ public class SOAPRequestDispatcher implements DispatchHandler {
 
         String reqID = reqElement.getAttributeValue("reqID", osnms);
 
+        String xmlBase = srvReq.getRequestURL().toString();
 
 
 
@@ -218,12 +219,12 @@ public class SOAPRequestDispatcher implements DispatchHandler {
                 if (cmd.getName().equals("GetDATA")) {
                     log.debug("requestDispatcher(): <GetDATA> Element.");
 
-                    sdh.getDATA( reqID, cmd, mpr);
+                    sdh.getDATA( reqID, xmlBase, cmd, mpr);
 
                 } else if (cmd.getName().equals("GetDDX")) {
                     log.debug("requestDispatcher(): <GetDDX> Element.");
 
-                    sdh.getDDX( reqID, cmd, mpr);
+                    sdh.getDDX( reqID, xmlBase, cmd, mpr);
 
                 } else if (cmd.getName().equals("GetTHREDDSCatalog")) {
                     log.debug("requestDispatcher(): <GetTHREDDSCatalog> Element.");

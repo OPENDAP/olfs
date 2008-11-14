@@ -162,12 +162,24 @@ public class BES {
 
         Document version = new Document();
 
-        if(BesAPI.showVersion(getPrefix(),version)){
+        if(BesXmlAPI.getVersion(getPrefix(),version)){
 
-            Element bes = version.getRootElement().getChild("BES");
+
+            Element ver = version.getRootElement().getChild("response");
+
+            // Disconnect it from it's parent and then rename it.
+            ver.detach();
+            ver.setName("BES-Version");
+
+            version.detachRootElement();
+            version.setRootElement(ver);
+            
+            Element bes = ver.getChild("BES");
 
             List guts = bes.removeContent();
 
+            // Add the prefix as the first item in the BES
+            // section of the version.
             Element prefix = new Element("prefix");
             prefix.addContent(getPrefix());
             bes.addContent(prefix);

@@ -98,6 +98,11 @@ public class Transformer {
         System.err.println("Applying transform...");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+        System.err.println("Transformer is an instance of  "+transformer.getClass().getName());
+
+
+
         Document result = transformer.transform(sourceDoc);
         xmlo.output(result, System.out);
 

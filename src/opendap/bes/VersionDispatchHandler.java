@@ -155,7 +155,7 @@ public class VersionDispatchHandler implements DispatchHandler {
 
         PrintStream ps = new PrintStream(response.getOutputStream());
 
-        Document vdoc = BesAPI.getCombinedVersionDocument();
+        Document vdoc = BesXmlAPI.getCombinedVersionDocument();
 
         if (vdoc == null) {
             throw new ServletException("Internal Error: Version Document not initialized.");

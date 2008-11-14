@@ -45,6 +45,9 @@ import org.slf4j.Logger;
  * maintains an internal pool of client connections to the BES. Since all of the
  * BES transaction code for the OLFS is wrapped in this class, future
  * optimizations should be easier... (right?)
+ *
+ * @deprecated Use BesXmlAPI
+ *
  */
 public class BesAPI {
 

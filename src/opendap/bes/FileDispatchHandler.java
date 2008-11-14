@@ -28,7 +28,6 @@ import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.ServletOutputStream;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
@@ -45,14 +44,12 @@ import org.jdom.Element;
 public class FileDispatchHandler implements DispatchHandler {
 
     private org.slf4j.Logger log;
-    private MimeTypes mimeTypes;
     private boolean allowDirectDataSourceAccess;
     private boolean initialized;
 
     public FileDispatchHandler() {
 
         allowDirectDataSourceAccess = false;
-        mimeTypes = new MimeTypes();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
 
@@ -182,7 +179,7 @@ public class FileDispatchHandler implements DispatchHandler {
         String suffix = ReqInfo.getRequestSuffix(req);
 
         if (suffix != null) {
-            String mType = mimeTypes.getMimeType(suffix);
+            String mType = MimeTypes.getMimeType(suffix);
 
             if (mType != null)
                 response.setContentType(mType);
@@ -195,7 +192,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        if(!BesAPI.writeFile(name, sos, erros, BesAPI.DEFAULT_FORMAT)){
+        if(!BesXmlAPI.writeFile(name, sos, erros)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);

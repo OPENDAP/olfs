@@ -6,18 +6,18 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
 
     <Attribute name="NC_GLOBAL" type="Container">
         <Attribute name="history" type="String">
-            <value>&quot;This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.&quot;</value>
+            <value>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.</value>
         </Attribute>
     </Attribute>
     <Attribute name="DODS_EXTRA" type="Container">
         <Attribute name="Unlimited_Dimension" type="String">
-            <value>&quot;k&quot;</value>
+            <value>k</value>
         </Attribute>
     </Attribute>
 
     <Grid name="bears">
         <Attribute name="act" type="String">
-            <value>&quot;text string\\012\\011123&quot;</value>
+            <value>text string\\012\\011123</value>
         </Attribute>
         <Attribute name="acs" type="Int16">
             <value>-40</value>
@@ -114,6 +114,25 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Map>
     </Grid>
     <Array name="i">
+        <Attribute name="attr1" type="String">
+            <value>1</value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <value>1</value>
+            <value>2</value>
+            <value>3</value>
+            <value>4</value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <value>17</value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <value>19</value>
+                <value>23</value>
+                <value>27</value>
+            </Attribute>
+        </Attribute>
         <Int32/>
         <dimension name="i" size="2"/>
     </Array>

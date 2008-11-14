@@ -141,7 +141,7 @@ public class Version  {
 
     private static Document getVersionDocument(String path) throws Exception{
 
-        return BesAPI.getVersionDocument(path);
+        return BesXmlAPI.getVersionDocument(path);
     }
 
 

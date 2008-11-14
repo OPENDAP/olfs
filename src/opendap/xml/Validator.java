@@ -25,6 +25,8 @@ package opendap.xml;
 
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpClient;
@@ -68,9 +70,17 @@ public class Validator {
 
     public Document validateURI(String s) throws Exception{
 
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
         // get a validating jdom parser to parse and validate the XML document.
-        SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
-        parser.setFeature("http://apache.org/xml/features/validation/schema", true);
+        SAXBuilder validatingParser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
+        validatingParser.setFeature("http://apache.org/xml/features/validation/schema", true);
+
+        // get a validating jdom parser to parse and validate the XML document.
+        SAXBuilder simpleParser = new SAXBuilder("org.apache.xerces.parsers.SAXParser");
+
+
 
         Document doc;
 
@@ -80,6 +90,8 @@ public class Validator {
             GetMethod request = new GetMethod(s);
 
             try {
+                System.err.println("\n\nParsing without validation...");
+
                 // Execute the method.
                 int statusCode = httpClient.executeMethod(request);
 
@@ -87,7 +99,19 @@ public class Validator {
                   System.err.println("ERROR: Method failed " + request.getStatusLine());
                 }
 
-                doc = parser.build(request.getResponseBodyAsStream());
+                doc = simpleParser.build(request.getResponseBodyAsStream());
+                xmlo.output(doc,System.out);
+
+
+                System.err.println("\n\nParsing WITH validation...");
+                // Execute the method.
+                statusCode = httpClient.executeMethod(request);
+
+                if (statusCode != HttpStatus.SC_OK) {
+                  System.err.println("ERROR: Method failed " + request.getStatusLine());
+                }
+                doc = validatingParser.build(request.getResponseBodyAsStream());
+                xmlo.output(doc,System.out);
 
 
                 return doc;
@@ -109,9 +133,14 @@ public class Validator {
                 throw new IOException("Cannot read file: "+ s);
             }
 
-            System.out.println("Parsing file: "+s+"\n");
+            System.out.println("Parsing file: '"+s+"' without validation.\n");
+            doc = simpleParser.build(new FileInputStream(file));
+            xmlo.output(doc,System.out);
 
-            doc = parser.build(new FileInputStream(file));
+            System.out.println("Parsing file: '"+s+"' WITH validation.\n");
+            doc = validatingParser.build(new FileInputStream(file));
+            xmlo.output(doc,System.out);
+
 
             System.out.println("Got and parsed and validated XML document: "+s);
 

@@ -216,6 +216,10 @@ public class DescribeCoverageRequest {
         xmlo.output(getRequestDoc(), os);
     }
 
+    public String toString(){
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        return xmlo.outputString(getRequestDoc());       
+    }
 
 
 

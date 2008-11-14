@@ -223,4 +223,10 @@ public class GetCapabilitiesRequest {
         xmlo.output(getRequestDoc(), os);
     }
 
+    public String toString(){
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        return xmlo.outputString(getRequestDoc());
+
+    }
+
 }

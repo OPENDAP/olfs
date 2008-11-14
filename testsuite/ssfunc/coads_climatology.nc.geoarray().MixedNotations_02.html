@@ -319,8 +319,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/nc/coads_climatology
 <td align="right" valign="top"><h3>
 <a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
 <td><textarea name="global_attr" rows="5" cols="70">
-NC_GLOBAL.history: "FERRET V4.30 (debug/no GUI) 15-Aug-96"
-DODS_EXTRA.Unlimited_Dimension: "TIME"
+NC_GLOBAL.history: FERRET V4.30 (debug/no GUI) 15-Aug-96
+DODS_EXTRA.Unlimited_Dimension: TIME
 </textarea><p>
 
 <tr><td><td><hr>
@@ -336,7 +336,7 @@ DODS_URL.add_dods_var(org_opendap_COADSX);
 </script>
 <b><input type="checkbox" name="get_org_opendap_COADSX"
 onclick="org_opendap_COADSX.handle_projection_change(get_org_opendap_COADSX) "  onfocus="describe_projection()">
-<font size="+1">COADSX</font>: Array of 64 bit Reals [COADSX = 0..179]</b><br>
+<font size="+1">COADSX</font></b>: Array of 64 bit Reals [COADSX = 0..179]<br>
 
 COADSX:<input type="text" name="org_opendap_COADSX_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -347,9 +347,9 @@ org_opendap_COADSX.add_dim(180);
 <br>
 
 <textarea name="COADSX_attr" rows="5" cols="70">
-units: "degrees_east"
-modulo: " "
-point_spacing: "even"
+units: degrees_east
+modulo:  
+point_spacing: even
 </textarea>
 
 
@@ -365,7 +365,7 @@ DODS_URL.add_dods_var(org_opendap_COADSY);
 </script>
 <b><input type="checkbox" name="get_org_opendap_COADSY"
 onclick="org_opendap_COADSY.handle_projection_change(get_org_opendap_COADSY) "  onfocus="describe_projection()">
-<font size="+1">COADSY</font>: Array of 64 bit Reals [COADSY = 0..89]</b><br>
+<font size="+1">COADSY</font></b>: Array of 64 bit Reals [COADSY = 0..89]<br>
 
 COADSY:<input type="text" name="org_opendap_COADSY_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -376,8 +376,8 @@ org_opendap_COADSY.add_dim(90);
 <br>
 
 <textarea name="COADSY_attr" rows="5" cols="70">
-units: "degrees_north"
-point_spacing: "even"
+units: degrees_north
+point_spacing: even
 </textarea>
 
 
@@ -393,7 +393,7 @@ DODS_URL.add_dods_var(org_opendap_TIME);
 </script>
 <b><input type="checkbox" name="get_org_opendap_TIME"
 onclick="org_opendap_TIME.handle_projection_change(get_org_opendap_TIME) "  onfocus="describe_projection()">
-<font size="+1">TIME</font>: Array of 64 bit Reals [TIME = 0..11]</b><br>
+<font size="+1">TIME</font></b>: Array of 64 bit Reals [TIME = 0..11]<br>
 
 TIME:<input type="text" name="org_opendap_TIME_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -404,9 +404,9 @@ org_opendap_TIME.add_dim(12);
 <br>
 
 <textarea name="TIME_attr" rows="5" cols="70">
-units: "hour since 0000-01-01 00:00:00"
-time_origin: "1-JAN-0000 00:00:00"
-modulo: " "
+units: hour since 0000-01-01 00:00:00
+time_origin: 1-JAN-0000 00:00:00
+modulo:  
 </textarea>
 
 
@@ -422,7 +422,7 @@ DODS_URL.add_dods_var(org_opendap_SST);
 </script>
 <b><input type="checkbox" name="get_org_opendap_SST"
 onclick="org_opendap_SST.handle_projection_change(get_org_opendap_SST) "  onfocus="describe_projection()">
-<font size="+1">SST</font>: Grid</b><br>
+<font size="+1">SST</font></b>: Grid of Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>
 
 TIME:<input type="text" name="org_opendap_SST_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -446,9 +446,9 @@ org_opendap_SST.add_dim(180);
 <textarea name="SST_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
 _FillValue: -9.999999790e+33
-long_name: "SEA SURFACE TEMPERATURE"
-history: "From coads_climatology"
-units: "Deg C"
+long_name: SEA SURFACE TEMPERATURE
+history: From coads_climatology
+units: Deg C
 </textarea>
 
 
@@ -464,7 +464,7 @@ DODS_URL.add_dods_var(org_opendap_AIRT);
 </script>
 <b><input type="checkbox" name="get_org_opendap_AIRT"
 onclick="org_opendap_AIRT.handle_projection_change(get_org_opendap_AIRT) "  onfocus="describe_projection()">
-<font size="+1">AIRT</font>: Grid</b><br>
+<font size="+1">AIRT</font></b>: Grid of Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>
 
 TIME:<input type="text" name="org_opendap_AIRT_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -488,9 +488,9 @@ org_opendap_AIRT.add_dim(180);
 <textarea name="AIRT_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
 _FillValue: -9.999999790e+33
-long_name: "AIR TEMPERATURE"
-history: "From coads_climatology"
-units: "DEG C"
+long_name: AIR TEMPERATURE
+history: From coads_climatology
+units: DEG C
 </textarea>
 
 
@@ -506,7 +506,7 @@ DODS_URL.add_dods_var(org_opendap_UWND);
 </script>
 <b><input type="checkbox" name="get_org_opendap_UWND"
 onclick="org_opendap_UWND.handle_projection_change(get_org_opendap_UWND) "  onfocus="describe_projection()">
-<font size="+1">UWND</font>: Grid</b><br>
+<font size="+1">UWND</font></b>: Grid of Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>
 
 TIME:<input type="text" name="org_opendap_UWND_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -530,9 +530,9 @@ org_opendap_UWND.add_dim(180);
 <textarea name="UWND_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
 _FillValue: -9.999999790e+33
-long_name: "ZONAL WIND"
-history: "From coads_climatology"
-units: "M/S"
+long_name: ZONAL WIND
+history: From coads_climatology
+units: M/S
 </textarea>
 
 
@@ -548,7 +548,7 @@ DODS_URL.add_dods_var(org_opendap_VWND);
 </script>
 <b><input type="checkbox" name="get_org_opendap_VWND"
 onclick="org_opendap_VWND.handle_projection_change(get_org_opendap_VWND) "  onfocus="describe_projection()">
-<font size="+1">VWND</font>: Grid</b><br>
+<font size="+1">VWND</font></b>: Grid of Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>
 
 TIME:<input type="text" name="org_opendap_VWND_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -572,9 +572,9 @@ org_opendap_VWND.add_dim(180);
 <textarea name="VWND_attr" rows="5" cols="70">
 missing_value: -9.999999790e+33
 _FillValue: -9.999999790e+33
-long_name: "MERIDIONAL WIND"
-history: "From coads_climatology"
-units: "M/S"
+long_name: MERIDIONAL WIND
+history: From coads_climatology
+units: M/S
 </textarea>
 
 

@@ -24,6 +24,11 @@
 package opendap.ppt;
 
 import org.slf4j.Logger;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 
 import java.net.Socket;
 import java.net.InetAddress;
@@ -222,7 +227,6 @@ public class NewPPTClient {
     }
 
 
-
     /**
      * Get the response from the BES and write it to the passed OutputStream
      *
@@ -259,8 +263,46 @@ public class NewPPTClient {
 
 
 
+    public boolean sendXMLRequest(Document req) throws PPTException {
+        try {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+            xmlo.output(req,_out);
+            _out.finish();
+            _out.flush();
+        } catch (IOException e) {
+            String msg = "Failed to write to socket:  ";
+            msg += e.getMessage();
+            closeConnection(false);
+            throw new PPTException(msg, e);
+        }
+
+        return true;
+    }
 
 
+
+    /*
+
+
+
+    public Document getXMLResponse() throws JDOMException, PPTException {
+
+        try {
+
+            SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
+            parser.setFeature("http://apache.org/xml/features/validation/schema", true);
+
+           return  parser.build(_in);
+
+        }
+        catch (IOException e) {
+            closeConnection(true);
+            throw new PPTException("Cannot read response to designated " +
+                    "stream. ", e);
+        }
+    }
+    */
 
 
 
