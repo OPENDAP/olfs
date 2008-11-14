@@ -303,6 +303,39 @@ public class BesXmlAPI {
                 err);
     }
 
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public static boolean writeNetcdfFileOut(String dataSource,
+                                             String constraintExpression,
+                                            String xdap_accept,
+                                            OutputStream os,
+                                            OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getNetcdfFileOutRequest(dataSource,constraintExpression,xdap_accept),
+                os,
+                err);
+    }
+
+
+
 
 
     /**
@@ -400,6 +433,7 @@ public class BesXmlAPI {
                 os,
                 err);
     }
+
 
 
     /**
@@ -874,6 +908,15 @@ public class BesXmlAPI {
             throws BadConfigurationException {
 
         return getRequestDocument(INFO_PAGE,dataSource,null,xdap_accept,null,null,null,XML_ERRORS);
+
+    }
+
+    public static Document getNetcdfFileOutRequest(String dataSource, String ce, String xdap_accept)
+            throws BadConfigurationException {
+
+
+        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,null,null,"netcdf",DAP2_ERRORS);
+
 
     }
 

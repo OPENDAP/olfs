@@ -271,6 +271,16 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                     }
 
 
+                } else if (  // NetCDF file out Response?
+                        requestSuffix.equalsIgnoreCase("nc")
+                        ) {
+                    isDataRequest = true;
+                    if(sendResponse){
+                        sendNetcdfFileOut(request, response);
+                        log.info("Sending DDX as RDF.");
+                    }
+
+
                 } else if (  //RDF Response?
                         requestSuffix.equalsIgnoreCase("rdf")
                         ) {
@@ -833,6 +843,66 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     /***************************************************************************/
 
 
+
+
+
+
+    /**
+     * ************************************************************************
+     * Default handler for the client's DDS request. Requires the writeDDS() method
+     * implemented by each server localization effort.
+     * <p/>
+     * <p>Once the DDS has been parsed and constrained it is sent to the
+     * requesting client.
+     *
+     * @param request  The client's <code> HttpServletRequest</code> request object.
+     * @param response The server's <code> HttpServletResponse</code> response
+     *                 object.
+     * @throws Exception When the bad things be happening
+     * @see ReqInfo
+     */
+    public void sendNetcdfFileOut(HttpServletRequest request,
+                        HttpServletResponse response)
+            throws Exception {
+
+        String dataSource = ReqInfo.getDataSource(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+
+        log.debug("sendNetcdfFileOut() for dataset: " + dataSource + "?" +
+                    constraintExpression);
+
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
+        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
+        response.setHeader("XDAP", Version.getXDAPVersion(request));
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+        ServletOutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        if(!BesXmlAPI.writeNetcdfFileOut(
+                dataSource,
+                constraintExpression,
+                xdap_accept,
+                os,
+                erros)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            os.write(msg.getBytes());
+
+        }
+
+        os.flush();
+
+
+
+    }
+    /***************************************************************************/
 
 
 
