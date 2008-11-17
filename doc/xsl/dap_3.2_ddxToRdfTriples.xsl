@@ -46,10 +46,10 @@
 
             <!-- The empty rdf:about defaults to the value of @xml:base -->
             <dapObj:Dataset rdf:about="">
-                
+
                 <rdfs:isDefinedBy rdf:resource="{$LocalOntology}"/>
 
-                <dapObj:dataset_id rdf:Datatype="http://www.w3.org/2001/XMLSchema#string"><xsl:value-of select="@dataset_id"/> </dapObj:dataset_id>
+                <dapObj:dataset_id rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><xsl:value-of select="@dataset_id"/> </dapObj:dataset_id>
 
                 <xsl:apply-templates select="*" mode="body"/>
             </dapObj:Dataset>
