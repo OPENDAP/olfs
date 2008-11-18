@@ -60,18 +60,25 @@ public class Transformer {
 
     public static void main(String args[]){
 
-        Transformer parser = new Transformer();
+        Transformer  t = new Transformer();
 
 
-        if(args.length!=2){
-            parser.printUsage(System.err);
+        System.setProperty("javax.xml.transform.TransformerFactory","com.icl.saxon.TransformerFactoryImpl");
+//        System.setProperty("javax.xml.transform.TransformerFactory","org.apache.xalan.processor.TransformerFactoryImpl");
+
+
+        System.out.println(getXSLTImpl());
+
+
+         if(args.length!=2){
+            t.printUsage(System.err);
             System.exit(-1);
         }
 
 
 
         try {
-            parser.transformURI(args[0],args[1]);
+            t.transformURI(args[0],args[1]);
         } catch (Exception e) {
             e.printStackTrace(System.err);
 
@@ -81,6 +88,8 @@ public class Transformer {
 
 
     public void transformURI(String srcFile, String xslFile) throws Exception {
+
+
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -166,6 +175,36 @@ public class Transformer {
     }
 
 
+
+    public static String getXSLTImpl(){
+
+        String str = "SystemProperty javax.xml.transform.TransformerFactory: \n";
+
+
+        try {
+
+            String impl = System.getProperty("javax.xml.transform.TransformerFactory");
+
+            if(impl!=null){
+
+                Class classDefinition = Class.forName(impl);
+                javax.xml.transform.TransformerFactory s = (javax.xml.transform.TransformerFactory) classDefinition.newInstance();
+
+                str += "    TransformerFactory class  = "+s.getClass().getName() +"\n";
+                str += "    Transformer class         = "+s.newTransformer().getClass().getName()+"\n";
+            }
+            else {
+                str += "    Java System Property Not Set.\n";
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace(System.out);
+            System.exit(1);
+        }
+
+        return str;
+
+    }
 
 
 

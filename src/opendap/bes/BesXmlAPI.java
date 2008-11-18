@@ -756,11 +756,14 @@ public class BesXmlAPI {
 
     public static Element setContainerElement(String name,
                                                String space,
-                                               String source) {
+                                               String source,
+                                               String type) {
 
         Element e = new Element("setContainer",BES_NS);
         e.setAttribute("name",name);
         e.setAttribute("space",space);
+        if(type.equals(STREAM))
+            e.setAttribute("type",type);
         e.setText(source);
         return e;
     }
@@ -950,7 +953,7 @@ public class BesXmlAPI {
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
 
-        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource));
+        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,type));
 
         Element def = defineElement("d1","default");
         e = (containerElement("catalogContainer"));
@@ -994,7 +997,7 @@ public class BesXmlAPI {
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
-        request.addContent(setContainerElement("wcsContainer","wcsg",wcsRequestURL));
+        request.addContent(setContainerElement("wcsContainer","wcsg",wcsRequestURL,type));
 
         Element def = defineElement("d1","default");
         e = (containerElement("wcsContainer"));

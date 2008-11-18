@@ -39,8 +39,8 @@ import opendap.coreServlet.ReqInfo;
 public class Version  {
 
 
-    private static String olfsVersion  = "1.4.0";
-    private static String hyraxVersion = "1.4.0";
+    private static String olfsVersion  = "1.5.0";
+    private static String hyraxVersion = "1.5.0";
 
 
 
