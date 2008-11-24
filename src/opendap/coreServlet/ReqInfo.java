@@ -27,9 +27,11 @@ package opendap.coreServlet;
 
 
 import org.slf4j.Logger;
+import org.jdom.Document;
 
 import javax.servlet.http.HttpServletRequest;
-
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 
 /**
@@ -69,12 +71,10 @@ public class ReqInfo {
 
 
     private static Logger log;
-
-    public static void init(){
+    static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
 
     }
-
 
 
     public static String getBaseURI(HttpServletRequest req){

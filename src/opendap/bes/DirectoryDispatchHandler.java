@@ -97,7 +97,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         boolean val = directoryDispatch(request, null, false);
 
-        log.debug("requestCanBeHandled: "+val);
+        log.info("requestCanBeHandled: "+val);
         return val;
 
     }
@@ -106,7 +106,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception {
-        log.debug("Handling Request.");
+        log.info("Handling Request.");
        directoryDispatch(request, response, true);
 
     }
@@ -119,7 +119,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(name.endsWith("contents.html"))
             name = name.substring(0,name.lastIndexOf("contents.html"));
 
-        log.debug("getLastModified():  Tomcat requesting getlastModified() for collection: " + name );
+        log.info("getLastModified():  Tomcat requesting getlastModified() for collection: " + name );
 
 
         try {
@@ -227,7 +227,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        log.debug("sendDIR() request = " + request);
+        log.info("sendDIR() request = " + request);
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_directory");
@@ -252,7 +252,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Document catalog = new Document();
 
-        if(BesXmlAPI.getCatalog(collectionName,catalog)){                        
+        if(BesXmlAPI.getCatalog(collectionName,catalog)){
 
             String xsltDoc = ServletUtil.getPath(dispatchServlet,"/docs/xsl/contents.xsl");
 
@@ -262,8 +262,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             xmlo.output(contentsPage, response.getWriter());
 
-            xmlo.output(catalog,System.out);
-            xmlo.output(contentsPage,System.out);
+            log.debug("Catalog from BES:\n"+xmlo.outputString(catalog));
+            log.debug("HTML Presentation view of BES Catalog:\n"+xmlo.outputString(contentsPage));
 
         }
         else {

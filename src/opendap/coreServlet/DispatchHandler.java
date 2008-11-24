@@ -28,6 +28,7 @@ import org.jdom.Element;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -58,7 +59,7 @@ public interface DispatchHandler {
      * interogating the DispatchServlet's methods.
      *
      * @param servlet This should be the DispatchServlet that creates the
-     * instance of DispatychHandler that is being intialized.
+     * instance of DispatchHandler that is being intialized.
      * @param config A JDOM Element objct containing the XML Element that
      * announced which implementation of DispatchHandler to use. It may (or
      * may not) contain additional confguration information.
@@ -66,6 +67,8 @@ public interface DispatchHandler {
      * @see DispatchServlet
      */
     public void init(DispatchServlet servlet, Element config) throws Exception;
+
+
 
     /**
      *

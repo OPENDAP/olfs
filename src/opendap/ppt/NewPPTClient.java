@@ -266,7 +266,7 @@ public class NewPPTClient {
     public boolean sendXMLRequest(Document req) throws PPTException {
         try {
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
+            log.debug("\n"+xmlo.outputString(req));
             xmlo.output(req,_out);
             _out.finish();
             _out.flush();

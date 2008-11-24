@@ -94,9 +94,26 @@ public class DispatchServlet extends HttpServlet {
      */
     public void init() throws ServletException {
 
+        super.init();
+        initDebug();
+        initLogging();
+
+
         reqNumber = new AtomicInteger(0);
 
-        super.init();
+        log.debug("init() start");
+
+        /*
+        String xslTransformerFactoryImpl = "com.icl.saxon.TransformerFactoryImpl";
+        String xslTransformerFactoryProperty = "javax.xml.transform.TransformerFactory";
+
+        log.info("init(): Setting System Property " +
+                xslTransformerFactoryProperty +
+                "="+xslTransformerFactoryImpl);
+        System.setProperty(xslTransformerFactoryProperty,xslTransformerFactoryImpl);
+        */
+
+
 
         httpGetDispatchHandlers = new Vector<DispatchHandler>();
         Vector<Element> httpGetHandlerConfigs = new Vector<Element>();
@@ -104,10 +121,6 @@ public class DispatchServlet extends HttpServlet {
         Vector<Element> httpPostHandlerConfig = new Vector<Element>();
 
 
-        initDebug();
-        initLogging();
-
-        ReqInfo.init();
 
         // init logging
         PerfLog.logServerStartup("init()");
@@ -415,16 +428,20 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response) {
 
 
+        RequestCache.startRequestIfNeeded();
 
+
+        int reqno = reqNumber.incrementAndGet();
+        PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+
+        log.debug(Util.showRequest(request, reqno));
 
 
         try {
+
             if(redirectForContextOnlyRequest(request,response))
                 return;
 
-            int hitCount = reqNumber.incrementAndGet();
-            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(hitCount));
-            log.debug(Util.showRequest(request, hitCount));
 
             log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
                     "' suffix: '" + ReqInfo.getRequestSuffix(request) +
@@ -436,7 +453,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
-            DispatchHandler dh = getHandler(request, httpGetDispatchHandlers);
+            DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
             if (dh != null) {
                 log.debug("Request being handled by: " + dh.getClass().getName());
                 dh.handleRequest(request, response);
@@ -456,6 +473,10 @@ public class DispatchServlet extends HttpServlet {
             catch(Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
+        }
+        finally {
+            RequestCache.endRequest();
+            log.info("doGet(): Response completed.\n");
         }
 
 
@@ -490,11 +511,16 @@ public class DispatchServlet extends HttpServlet {
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) {
 
+        RequestCache.startRequestIfNeeded();
+
+        int reqno = reqNumber.incrementAndGet();
+
+        PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
+
+        log.debug(Util.showRequest(request, reqno));
+
         try {
 
-            int hitCount = reqNumber.incrementAndGet();
-            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(hitCount));
-            log.debug(Util.showRequest(request, hitCount));
 
             log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
                    "' suffix: '" + ReqInfo.getRequestSuffix(request) +
@@ -504,7 +530,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
-            DispatchHandler dh = getHandler(request, httpPostDispatchHandlers);
+            DispatchHandler dh = getDispatchHandler(request, httpPostDispatchHandlers);
             if (dh != null) {
                 log.debug("Request being handled by: " + dh.getClass().getName());
                 dh.handleRequest(request, response);
@@ -525,8 +551,15 @@ public class DispatchServlet extends HttpServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         }
+        finally {
+            RequestCache.endRequest();
+            log.info("doPost(): Response completed.\n");
+        }
 
     }
+
+
+
     /**
      * Returns the first handler in the vector of DispatchHandlers that claims
      * be able to handle the incoming request.
@@ -538,7 +571,7 @@ public class DispatchServlet extends HttpServlet {
      *         handler claims the request.
      * @throws Exception For bad behaviour.
      */
-    private DispatchHandler getHandler(HttpServletRequest request, Vector<DispatchHandler> dhvec) throws Exception {
+    private DispatchHandler getDispatchHandler(HttpServletRequest request, Vector<DispatchHandler> dhvec) throws Exception {
         for (DispatchHandler dh : dhvec) {
             log.debug("Checking handler: " + dh.getClass().getName());
             if (dh.requestCanBeHandled(request)) {
@@ -559,13 +592,14 @@ public class DispatchServlet extends HttpServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
+        RequestCache.startRequest();
+
+        long reqno = reqNumber.incrementAndGet();
+        PerfLog.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
 
         try {
-            long reqno = reqNumber.incrementAndGet();
-            //lastModifiedHits++;
-            PerfLog.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
 
-            DispatchHandler dh = getHandler(req, httpGetDispatchHandlers);
+            DispatchHandler dh = getDispatchHandler(req, httpGetDispatchHandlers);
             if (dh != null) {
                 log.debug("getLastModified() -  Request being handled by: " + dh.getClass().getName());
                 return dh.getLastModified(req);

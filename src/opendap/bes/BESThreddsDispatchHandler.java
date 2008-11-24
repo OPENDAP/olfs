@@ -37,6 +37,8 @@ import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
+import java.util.regex.Pattern;
+
 /**
  * User: ndp
  * Date: Apr 16, 2007
@@ -46,6 +48,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
     private DispatchServlet servlet;
     private org.slf4j.Logger log;
+    private Pattern matchPattern =  Pattern.compile(".*.catalog.xml");
 
     private boolean initialized;
 

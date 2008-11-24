@@ -25,21 +25,130 @@
 /////////////////////////////////////////////////////////////////////////////
 -->
 
-
-
-<!DOCTYPE project [
-        <!ENTITY globalprops      SYSTEM "./buildfiles/globalprops.xml">
-        ]>
-
 <!-- Build file for OPeNDAP core software -->
-
 
 <project
         name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
         default="all" basedir=".">
 
-    <!-- Global Properties -->
-    &globalprops;
+    <!-- Global Properties for Java-OPeNDAP software development -->
+
+
+    <!-- ********************************************* -->
+    <!-- Project-wide settings. All directories are    -->
+    <!-- relative to the project "Basedir" directory,  -->
+    <!-- which is assumed (by this file) to be set to  -->
+    <!-- ".."                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Version Tag: Used for doing distribution builds.
+         This property should be set from the command
+         line by the distribution build script using
+         tag information from CVS.
+    -->
+    <property name="VERSION" value="Not.A.Release"/>
+
+
+    <!-- Compiler Settings -->
+
+    <property name="compile.debug" value="on"/>
+    <property name="compile.debuglevel" value="lines,vars,source"/>
+    <property name="compile.deprecation" value="on"/>
+
+    <property name="modern.compiler" value="modern"/>
+    <property name="classic.compiler" value="classic"/>
+
+    <!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+    <property name="build.compiler" value="${modern.compiler}"/>
+
+
+
+    <!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+    <property name="build.sysclasspath" value="ignore"/>
+
+
+
+    <!-- ********************************************* -->
+
+    <!-- Target to create the build directories -->
+    <!-- prior to a compile target. We also mark -->
+    <!-- the start time of the build for the log. -->
+
+    <target name="noop" description="Do Nothing Target">
+        <echo level="info" message="no-op target in ${ant.file}"/>
+    </target>
+
+
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="Project Name:       ${ant.project.name}"/>
+        <echo level="info" message="Project File:       ${ant.file}"/>
+        <echo level="info" message="VERSION:            ${VERSION}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="    src.dir:       ${src.dir}"/>
+        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
+        <echo level="info" message="    resources.dir: ${resources.dir}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="    build.dir:      ${build.dir}"/>
+        <echo level="info" message="    build.classes:  ${build.classes}"/>
+        <echo level="info" message="    build.doc:      ${build.doc}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="    ant.file:          ${ant.file}"/>
+        <echo level="info" message="    ant.home:          ${ant.home}"/>
+        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
+        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
+        <echo level="info" message="    ant.version:       ${ant.version}"/>
+        <echo level="info" message="    basedir:           ${basedir}"/>
+        <echo level="info" message="    user.name:         ${user.name}"/>
+        <echo level="info" message="    user.home:         ${user.home}"/>
+        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+
+    </target>
+
+
+    <!-- ################################################################# -->
+    <!--                      Project Settings                             -->
+    <!-- ................................................................. -->
+
+
 
     <!-- Project directories -->
     <property name="src.dir" location="src"/>
@@ -69,7 +178,7 @@
 
     <!-- Libraries -->
     <property name="junit.lib" value="junit-4.4.jar"/>
-    <property name="jdom.lib" value="jdom-1.0.jar"/>
+    <property name="jdom.lib" value="jdom-1.1.jar"/>
     <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
     <property name="echo.lib" value="echosoap.jar"/>
 
@@ -85,6 +194,10 @@
 
     <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+
+    <property name="saxon-jdom.lib" value="saxon-6.5.5-jdom.jar"/>
+    <property name="saxon-xml-apis.lib" value="saxon-6.5.5-xml-apis.jar"/>
+    <property name="saxon.lib"    value="saxon-6.5.5.jar"/>
 
 
 
@@ -402,6 +515,11 @@
         <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
         <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
         <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
+        <!--
+        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
+        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
+        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
+        -->
         <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
 
         <jar destfile="${build.dist}/validator.jar"
@@ -426,6 +544,11 @@
         <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
         <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
         <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
+        <!--
+        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
+        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
+        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
+        -->
         <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
 
         <jar destfile="${build.dist}/xslt.jar"
@@ -462,6 +585,12 @@
                 <include name="${commons-codec.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
+                <!--
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-xml-apis.lib}"/>
+                <include name="${saxon.lib}"/>
+                -->
+
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -490,6 +619,11 @@
                 <include name="${commons-codec.lib}"/>
                 <include name="${xercesImpl.lib}"/>
                 <include name="${xercesXmlApis.lib}"/>
+                <!--
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-xml-apis.lib}"/>
+                <include name="${saxon.lib}"/>
+                -->
             </zipfileset>
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">

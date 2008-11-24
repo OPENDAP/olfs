@@ -181,9 +181,4 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
 
 
-
-    public void sendFile(HttpServletRequest request,
-                            HttpServletResponse response) throws Exception;
-
-
 }

@@ -41,6 +41,7 @@ import opendap.coreServlet.ReqInfo;
  * User: ndp
  * Date: Jun 18, 2007
  * Time: 11:26:40 AM
+ * @deprecated Superceded by opendap.wcs.gatewayClient
  */
 public class WcsCatalog implements DataRootHandler.ConfigListener {
 
@@ -154,7 +155,7 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
     }
 
     public static boolean isWcsDataset(String dataset){
-        
+
         if(wcsDatasets==null)
             return false;
 

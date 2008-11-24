@@ -30,7 +30,7 @@ import opendap.coreServlet.*;
 import opendap.coreServlet.DispatchServlet;
 import opendap.bes.Version;
 import opendap.bes.BESError;
-import opendap.bes.BesXmlAPI;
+import opendap.wcs.gatewayClient.BesAPI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -428,16 +428,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.DDS,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.DDS,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
-                                                        BesXmlAPI.DAP2_ERRORS);
+                                                        null,
+                                                        BesAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
             log.error("sendDDS() encounterd a BESError: "+msg);
@@ -476,16 +477,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.DAS,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.DAS,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
-                                                        BesXmlAPI.DAP2_ERRORS);
+                                                        null,
+                                                        BesAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAS() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
@@ -505,6 +507,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String xmlBase = request.getRequestURL().toString();
 
         log.debug("sendDDX() for dataset: " + dataSource);
 
@@ -523,16 +526,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.DDX,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.DDX,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        xmlBase,
                                                         null,
                                                         null,
-                                                        BesXmlAPI.DAP2_ERRORS);
+                                                        BesAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
@@ -570,16 +574,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.DAP2,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.DAP2,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
-                                                        BesXmlAPI.DAP2_ERRORS);
+                                                        null,
+                                                        BesAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
@@ -615,16 +620,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.ASCII,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.ASCII,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
-                                                        BesXmlAPI.XML_ERRORS);
+                                                        null,
+                                                        BesAPI.XML_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(dispatchServlet,response);
@@ -660,16 +666,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.INFO_PAGE,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.INFO_PAGE,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
-                                                        BesXmlAPI.XML_ERRORS);
+                                                        null,
+                                                        BesAPI.XML_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(dispatchServlet,response);
@@ -719,16 +726,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
-                                                        BesXmlAPI.HTML_FORM,
+        Document reqDoc = BesAPI.getRequestDocument(
+                                                        BesAPI.HTML_FORM,
                                                         wcsRequestURL,
                                                         null,
                                                         xdap_accept,
+                                                        null,
                                                         url,
                                                         null,
-                                                        BesXmlAPI.XML_ERRORS);
+                                                        BesAPI.XML_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 

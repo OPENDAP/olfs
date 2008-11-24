@@ -60,11 +60,9 @@ public class BesAPI {
     public static String HTML_FORM  = "html_form";
     public static String INFO_PAGE  = "info_page";
 
-
-
-    public static String DEFAULT_FORMAT 	= "xml";
-    public static String DAP2_FORMAT 		= "dap2";
-    public static String DAP_FORMAT_CONTEXT 	= "dap_format";
+    public static String DEFAULT_FORMAT 	 = "xml";
+    public static String DAP2_FORMAT 		 = "dap2";
+    public static String DAP_FORMAT_CONTEXT  = "dap_format";
 
 
     private static Logger log;

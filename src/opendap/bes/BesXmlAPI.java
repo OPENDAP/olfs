@@ -66,14 +66,17 @@ public class BesXmlAPI {
     public static String DAP2_ERRORS     = "dap2";
     public static String XMLBASE_CONTEXT = "xml:base";
 
-    private static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
-    private static final String DEFAULT_XDAP_ACCEPT = "2.0";
+    public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
+    public static final String DEFAULT_XDAP_ACCEPT = "2.0";
 
-    private static final String EXPICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
+    public static final String EXPICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
 
 
 
     private static Logger log;
+    static {
+        log = org.slf4j.LoggerFactory.getLogger(BesXmlAPI.class);
+    }
     private static boolean _initialized = false;
 
 
@@ -89,7 +92,6 @@ public class BesXmlAPI {
 
         if (_initialized) return;
 
-        log = org.slf4j.LoggerFactory.getLogger(BesXmlAPI.class);
 
         _initialized = true;
 
@@ -462,9 +464,8 @@ public class BesXmlAPI {
     }
 
 
-
     /**
-     * Returns the BES INFO document for the spcified dataSource.
+     * Returns the BES CATALOG document for the specified dataSource.
      *
      * @param dataSource The data source whose information is to be retrieved
      * @param response The document where the response (be it a catalog
@@ -504,7 +505,7 @@ public class BesXmlAPI {
 
 
     /**
-     * Returns the BES INFO document for the spcified dataSource.
+     * Returns the BES INFO document for the specified dataSource.
      *
      * @param dataSource The data source whose information is to be retrieved
      * @param response The document where the response (be it datasource
@@ -937,7 +938,11 @@ public class BesXmlAPI {
         String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute("reqID","###");
+
+        String reqID = "["+Thread.currentThread().getName()+":"+
+                Thread.currentThread().getId()+":bes_request]";
+;
+        request.setAttribute("reqID",reqID);
 
 
         if(xdap_accept!=null)
@@ -974,49 +979,6 @@ public class BesXmlAPI {
     }
 
 
-    public static  Document getWcsRequestDocument(String type,
-                                                String wcsRequestURL,
-                                                String ce,
-                                                String xdap_accept,
-                                                String URL,
-                                                String returnAs,
-                                                String errorContext)
-                throws BadConfigurationException {
-
-
-        Element e, request = new Element("request", BES_NS);
-        request.setAttribute("reqID","###");
-
-
-        if(xdap_accept!=null)
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
-        else
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
-
-        request.addContent(setContextElement(EXPICIT_CONTAINERS_CONTEXT,"no"));
-
-        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-
-        request.addContent(setContainerElement("wcsContainer","wcsg",wcsRequestURL,type));
-
-        Element def = defineElement("d1","default");
-        e = (containerElement("wcsContainer"));
-
-        if(ce!=null && !ce.equals(""))
-            e.addContent(constraintElement(ce));
-
-        def.addContent(e);
-
-        request.addContent(def);
-
-        e = getElement(type,"d1",URL,returnAs);
-
-        request.addContent(e);
-
-        return new Document(request);
-
-    }
-
 
 
 
@@ -1050,7 +1012,9 @@ public class BesXmlAPI {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute("reqID","###");
+        String reqID = "["+Thread.currentThread().getName()+":"+
+                Thread.currentThread().getId()+":bes_request]";
+        request.setAttribute("reqID",reqID);
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
 
         e = new Element(type,BES_NS);
@@ -1101,6 +1065,21 @@ public class BesXmlAPI {
         return xmlo.outputString(request);
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

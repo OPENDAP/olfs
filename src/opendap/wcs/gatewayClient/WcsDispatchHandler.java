@@ -911,19 +911,20 @@ public class WcsDispatchHandler implements DispatchHandler {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.DDS,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
+                                                        null,
                                                         BesXmlAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
-            log.error("sendDDS() encounterd a BESError. Error Message: "+msg);
+            log.error("sendDDS() encounterd a BESError. Error Message:\n"+msg);
             os.write(msg.getBytes());
         }
 
@@ -958,16 +959,17 @@ public class WcsDispatchHandler implements DispatchHandler {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.DAS,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
+                                                        null,
                                                         BesXmlAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
             log.error("sendDAS() encounterd a BESError: "+msg);
@@ -988,6 +990,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String xmlBase = request.getRequestURL().toString();
 
         log.debug("sendDDX() for dataset: " + dataSource);
 
@@ -1006,16 +1009,17 @@ public class WcsDispatchHandler implements DispatchHandler {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.DDX,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        xmlBase,
                                                         null,
                                                         null,
                                                         BesXmlAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
@@ -1051,16 +1055,17 @@ public class WcsDispatchHandler implements DispatchHandler {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.DAP2,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
+                                                        null,
                                                         BesXmlAPI.DAP2_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encounterd a BESError: "+msg);
             os.write(msg.getBytes());
@@ -1096,16 +1101,17 @@ public class WcsDispatchHandler implements DispatchHandler {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.ASCII,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
+                                                        null,
                                                         BesXmlAPI.XML_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(dispatchServlet,response);
@@ -1140,16 +1146,17 @@ public class WcsDispatchHandler implements DispatchHandler {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.INFO_PAGE,
                                                         wcsRequestURL,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         null,
                                                         null,
+                                                        null,
                                                         BesXmlAPI.XML_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(dispatchServlet,response);
             log.error("sendINFO() encounterd a BESError: "+besError.getMessage());
@@ -1198,16 +1205,17 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesXmlAPI.getWcsRequestDocument(
+        Document reqDoc = BesAPI.getRequestDocument(
                                                         BesXmlAPI.HTML_FORM,
                                                         wcsRequestURL,
                                                         null,
                                                         xdap_accept,
+                                                        null,
                                                         url,
                                                         null,
                                                         BesXmlAPI.XML_ERRORS);
 
-        if(!BesXmlAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
             besError.sendErrorResponse(dispatchServlet,response);

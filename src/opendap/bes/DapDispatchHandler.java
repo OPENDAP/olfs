@@ -32,10 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+import java.lang.reflect.Method;
 
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -62,6 +64,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     }
 
+    private HashMap<Pattern,Method> dispatchMethods;
+
 
 
 
@@ -75,9 +79,48 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         if(initialized) return;
 
         _servlet = ds;
+
+        dispatchMethods = new HashMap<Pattern,Method>();
+
+
+        registerDispatchMethod(".*.ddx",     "sendDDX");
+        registerDispatchMethod(".*.dds",     "sendDDS");
+        registerDispatchMethod(".*.das",     "sendDAS");
+        registerDispatchMethod(".*.info",    "sendInfo");
+        registerDispatchMethod(".*.html?",   "sendHTMLRequestForm");
+        registerDispatchMethod(".*.asc(ii)?","sendASCII");
+        registerDispatchMethod(".*.nc",      "sendNetcdfFileOut");
+        registerDispatchMethod(".*.rdf",     "sendDDX2RDF");
+
+
+        log.info("masterDispatchRegex=\""+getDispatchRegex()+"\"");
         log.info("Initialized.");
         initialized = true;
 
+
+
+    }
+
+
+    private void registerDispatchMethod(String regexPattern, String methodName) throws NoSuchMethodException {
+        dispatchMethods.put(
+                Pattern.compile(regexPattern,Pattern.CASE_INSENSITIVE),
+                this.getClass().getMethod(methodName,HttpServletRequest.class,HttpServletResponse.class)
+        );
+    }
+
+    public Pattern getDispatchRegex(){
+        String masterRegex = null;
+
+        for(Pattern p : dispatchMethods.keySet()){
+            if(masterRegex != null)
+                masterRegex += "|";
+            else
+                masterRegex = "";
+
+            masterRegex += p.pattern();
+        }
+        return Pattern.compile(masterRegex);
     }
 
 
@@ -113,23 +156,35 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         if(!initialized)
             return -1;
 
-
-
         log.debug("getLastModified(): Tomcat requesting getlastModified() " +
                 "for collection: " + dataSource );
 
 
-        try {
-            DataSourceInfo dsi = new BESDataSource(dataSource);
-            log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
+        String requestURL = req.getRequestURL().toString();
 
-            return dsi.lastModified();
-        }
-        catch (Exception e) {
-            log.debug("getLastModified(): Returning: -1");
-            return -1;
+        for(Pattern p: dispatchMethods.keySet()){
+
+            if(p.matcher(requestURL).matches()){
+                log.info("The request URL: "+requestURL+" matches " +
+                        "the pattern: \""+p.pattern()+"\"");
+
+                try {
+                    log.debug("getLastModified(): Getting datasource info for "+dataSource);
+                    DataSourceInfo dsi = getDataSourceInfo(dataSource);
+                    log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
+
+                    return dsi.lastModified();
+
+                } catch (Exception e) {
+                    log.debug("getLastModified(): Returning: -1");
+                    return -1;
+                }
+
+            }
+
         }
 
+        return -1;
 
 
     }
@@ -181,136 +236,32 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                                    boolean sendResponse) throws Exception {
 
 
-
-
         String dataSource = ReqInfo.getDataSource(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-        DataSourceInfo dsi = null;
+        DataSourceInfo dsi;
 
-        boolean isWCS = WcsCatalog.isWcsDataset(request);
-        if(isWCS){
-        log.debug("dataSetDispatch() - Request is for WCS dataset.\n" +
-                "WCS Request URL: " + WcsCatalog.getWcsRequestURL(request));
-        }
-        else {
-            dsi = getDataSourceInfo(dataSource);
-        }
+        Method dispatchMethod;
 
+        String requestURL = request.getRequestURL().toString();
+        for(Pattern p: dispatchMethods.keySet()){
+            if(p.matcher(requestURL).matches()){
+                log.info("The request URL: "+requestURL+" matches " +
+                        "the pattern: \""+p.pattern()+"\"");
 
-        boolean isDataRequest = false;
+                dsi = getDataSourceInfo(dataSource);
 
-
-
-        if (isWCS || (dsi!=null && dsi.sourceExists()) ) {
-
-            if (requestSuffix != null && (isWCS || (dsi!=null && dsi.isDataset()))) {
-                if ( // DDS Response?
-                        requestSuffix.equalsIgnoreCase("dds")
-                        ) {
-                    isDataRequest = true;
+                if(dsi.isDataset()){
                     if(sendResponse){
 
-                        sendDDS(request, response);
-                        log.info("Sent DDS");
+                        dispatchMethod = dispatchMethods.get(p);
+                        dispatchMethod.invoke(this,request,response);
                     }
-
-                } else if ( // DAS Response?
-                        requestSuffix.equalsIgnoreCase("das")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDAS(request, response);
-                        log.info("Sent DAS");
-                    }
-
-                } else if (  // DDX Response?
-                        requestSuffix.equalsIgnoreCase("ddx")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDDX(request, response);
-                        log.info("Sent DDX");
-                    }
-
-                } else if ( // DAP2 (aka .dods) Response?
-                        requestSuffix.equalsIgnoreCase("dods")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDAP2Data(request, response);
-                        log.info("Sent DAP2 Data");
-                    }
-
-                } else if (  // ASCII Data Response.
-                        requestSuffix.equalsIgnoreCase("asc") ||
-                                requestSuffix.equalsIgnoreCase("ascii")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendASCII(request, response);
-                        log.info("Sent ASCII");
-                    }
-
-                } else if (  // Info Response?
-                        requestSuffix.equalsIgnoreCase("info")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendInfo(request, response);
-                        log.info("Sent Info");
-                    }
-
-                } else if (  //HTML Request Form (aka The Interface From Hell) Response?
-                        requestSuffix.equalsIgnoreCase("html") ||
-                                requestSuffix.equalsIgnoreCase("htm")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendHTMLRequestForm(request, response);
-                        log.info("Sent HTML Request Form");
-                    }
-
-
-                } else if (  // NetCDF file out Response?
-                        requestSuffix.equalsIgnoreCase("nc")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendNetcdfFileOut(request, response);
-                        log.info("Sending DDX as RDF.");
-                    }
-
-
-                } else if (  //RDF Response?
-                        requestSuffix.equalsIgnoreCase("rdf")
-                        ) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        sendDDX2RDF(request, response);
-                        log.info("Sending DDX as RDF.");
-                    }
-
-
-                } else if (requestSuffix.equals("")) {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        log.info("Sent BAD URL (missing Suffix)");
-                    }
-                } else {
-                    isDataRequest = true;
-                    if(sendResponse){
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                    }
+                    return true;
                 }
-
             }
         }
-
-
-        return isDataRequest;
+        return false;
     }
+
 
 
 
@@ -378,6 +329,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         os.flush();
+        log.info("Sent DAS");
+
 
     }
     /***************************************************************************/
@@ -435,6 +388,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         os.flush();
 
+        log.info("Sent DDS");
 
     }
     /***************************************************************************/
@@ -502,6 +456,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         os.flush();
+        log.info("Sent DDX");
 
     }
     /***************************************************************************/
@@ -557,6 +512,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
         os.flush();
+        log.info("Sent DAP2 dta response.");
 
     }
 
@@ -610,6 +566,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
         os.flush();
+        log.info("Sent ASCII.");
 
 
     }
@@ -667,6 +624,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         os.flush();
 
 
+        log.info("Sent HTML data request form.");
 
 
     }
@@ -707,51 +665,12 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         os.flush();
 
+        log.info("Sent Info.");
 
-
-    }
-
-
-    public void sendFile(HttpServletRequest req,
-                         HttpServletResponse response)
-            throws Exception {
-
-
-        String name = req.getPathInfo();
-
-
-        log.debug("sendFile(): Sending file \"" + name+"\"");
-
-        String suffix = ReqInfo.getRequestSuffix(req);
-
-        if (suffix != null) {
-            String mType = MimeTypes.getMimeType(suffix);
-
-            if (mType != null)
-                response.setContentType(mType);
-
-            log.debug("   MIME type: " + mType + "  ");
-        }
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-
-        ServletOutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-        if(!BesXmlAPI.writeFile(
-                name,
-                os,
-                erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_servlet,response);
-            log.error(besError.getMessage());
-
-        }
 
 
     }
+
 
 
 
@@ -837,6 +756,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             xmlo.output(rdf,os);
 
             os.flush();
+            log.info("Sent RDF version of DDX.");
         }
 
     }
@@ -899,6 +819,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         os.flush();
 
+        log.info("Sent DAP2 data as netCDF file.");
 
 
     }

@@ -29,9 +29,13 @@ import org.jdom.Element;
 
 import java.util.Vector;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
+import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +58,10 @@ public class BESManager implements DispatchHandler {
 
     private static boolean initialized;
 
+
+
+
+
     public BESManager(){
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
@@ -74,6 +82,7 @@ public class BESManager implements DispatchHandler {
 
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception{
+
         return false;
 
     }
@@ -81,6 +90,9 @@ public class BESManager implements DispatchHandler {
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception{
+
+        throw new Exception("handleRequest(): ERROR! THis method should never " +
+                "be called because requestCanBeHandled() always returns false.");
 
     }
 
@@ -111,7 +123,7 @@ public class BESManager implements DispatchHandler {
         if(besList.isEmpty())
             throw new BadConfigurationException("OLFS Configuration must " +
                     "contain at LEAST one BES configuration element. And " +
-                    "if you're smart it's prefix will be \"/\".");
+                    "the value of it's prefix element  must be \"/\".");
 
 
         boolean foundRootBES = false;
@@ -227,6 +239,18 @@ public class BESManager implements DispatchHandler {
 
         return getBES(path).getVersionDocument();
     }
+
+
+
+
+
+
+
+//    public static void removeThreadCache(Thread t){
+//        threadCache.remove(t);
+//        log.info("Removing ThreadCache for thread "+t.getName());
+//    }
+
 
 
 
