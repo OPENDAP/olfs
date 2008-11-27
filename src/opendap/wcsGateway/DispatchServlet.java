@@ -571,8 +571,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
 
             String msg = besError.getMessage();
-            System.out.println(msg);
-            System.err.println(msg);
             log.error("sendHTMLRequestForm() encounterd a BESError: "+msg);
         }
 

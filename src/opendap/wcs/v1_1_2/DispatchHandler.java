@@ -25,6 +25,7 @@ package opendap.wcs.v1_1_2;
 
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.bes.BesXmlAPI;
 import org.jdom.Element;
 import org.jdom.Document;
@@ -35,10 +36,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
-import java.util.List;
 import java.util.HashMap;
-import java.net.URL;
-import java.net.URI;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 
@@ -61,7 +59,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     private String _spoolPath;
     private String _testPath;
     private String _xmlEchoPath;
-    private String _ddx2rdf;
 
 
     private static final int GET_CAPABILITIES   = 0;
@@ -202,7 +199,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
 
-        String query = request.getQueryString();
+        String query = Scrub.urlContent(request.getQueryString());
 
         response.setContentType("text/xml");
 
@@ -340,7 +337,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document reqDoc;
-        String query = request.getQueryString();
+        String query = Scrub.urlContent(request.getQueryString());
 
         response.setContentType("text/xml");
 
@@ -392,8 +389,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
 
-        StringBuffer url = request.getRequestURL();
-        String query = request.getQueryString();
+        String url = Scrub.completeURL(request.getRequestURL().toString());
+        String query = Scrub.completeURL(request.getQueryString());
 
         response.setContentType("text/html");
 

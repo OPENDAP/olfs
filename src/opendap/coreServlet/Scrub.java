@@ -43,12 +43,34 @@ public class Scrub {
 
 
 
+    // The C++ coe uses this regex: Regex name("[-0-9A-z_./]+");
+
+    private static String fileNameInclusionRegex = "[-a-zA-Z0-9/.%_ ]*";
+    private static String fileNameExclusionRegex = "[^-a-zA-Z0-9/.%_ ]";
+    private static Pattern fileNameInclusionPattern = Pattern.compile(fileNameInclusionRegex);
+
+    public static String fileName(String fileName){
+        Matcher m = fileNameInclusionPattern.matcher(fileName);
+
+        log.debug("URL() - Scrubbing URL Content: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
+        if(m.matches()){
+            return fileName;
+        }
+        else {
+            return fileName.replaceAll(fileNameExclusionRegex,"#");
+        }
+
+    }
+
+
+
+
+
+
+
     private static String htmlContentInclusionRegex = "[-a-zA-Z0-9/.%_ ]*";
     private static String htmlContentExclusionRegex = "[^-a-zA-Z0-9/.%_ ]";
-
     private static Pattern htmlContentInclusionPattern = Pattern.compile(htmlContentInclusionRegex);
-
-
 
     public static String urlContent(String urlContent){
 
@@ -71,30 +93,19 @@ public class Scrub {
 
 
 
-
     private static String completeURLInclusionRegex = "http://"+ htmlContentInclusionRegex;
     private static String completeURLExclusionRegex = "http://"+ htmlContentExclusionRegex;
-
     private static Pattern completeURLInclusionPattern = Pattern.compile(completeURLInclusionRegex);
 
-
     public static String completeURL(String url){
-
-
         Matcher m = completeURLInclusionPattern.matcher(url);
-
         log.debug("URL() - Scrubbing URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
-
-
-
         if(m.matches()){
             return url;
         }
         else {
             return url.replaceAll(completeURLExclusionRegex,"#");
         }
-
-
     }
 
 
@@ -104,27 +115,17 @@ public class Scrub {
 
     private static String simpleStringInclusionRegex = "[a-zA-Z0-9_ ]*";
     private static String simpleStringExclusionRegex = "[^a-zA-Z0-9_ ]";
-
     private static Pattern simpleStringInclusionPattern = Pattern.compile(simpleStringInclusionRegex);
 
-
     public static String simpleString(String s){
-
-
         Matcher m = simpleStringInclusionPattern.matcher(s);
-
         log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
-
-
-
         if(m.matches()){
             return s;
         }
         else {
             return s.replaceAll(simpleStringExclusionRegex,"#");
         }
-
-
     }
 
 

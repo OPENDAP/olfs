@@ -27,10 +27,7 @@ import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.filter.Filter;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +46,7 @@ public class CatalogManager {
 
     private static Logger log;
     private static String contentPath;
-    private static Document config;
+    //private static Document config;
 
 
 
@@ -88,13 +85,14 @@ public class CatalogManager {
 
         Catalog catalog = new Catalog(pathPrefix,urlPrefix,fname,cacheCatalogFileContent);
 
-        _catalogsLock.writeLock().lock();
+        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
         try {
+            lock.lock();
             rootCatalogs.add(catalog);
             addCatalog(catalog,cacheCatalogFileContent);
         }
         finally {
-            _catalogsLock.writeLock().unlock();
+            lock.unlock();
         }
 
     }
@@ -117,8 +115,9 @@ public class CatalogManager {
         // Their content can change, but we can't add or remove from the list.
         // If one of them has a change, then that will get loaded when the
         // changed catalog gets accessed.
-        _catalogsLock.readLock().lock();
+        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
         try {
+            lock.lock();
             for (Catalog cat : rootCatalogs) {
                 catRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
 
@@ -135,7 +134,7 @@ public class CatalogManager {
             }
         }
         finally {
-            _catalogsLock.readLock().unlock();
+            lock.unlock();
         }
 
 
@@ -191,13 +190,13 @@ public class CatalogManager {
 
         Catalog cat = null;
 
-
-        _catalogsLock.readLock().lock();
+        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
         try {
+            lock.lock();
             cat =  catalogs.get(name);
         }
         finally {
-            _catalogsLock.readLock().unlock();
+            lock.unlock();
         }
         cat = updateCatalogIfRequired(cat);
 
@@ -209,8 +208,9 @@ public class CatalogManager {
 
     public static Catalog  updateCatalogIfRequired(Catalog c){
 
-        _catalogsLock.writeLock().lock();
+        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
         try {
+            lock.lock();
 
             if(c!=null && c.needsRefresh()){
                 Catalog newCat;
@@ -240,8 +240,7 @@ public class CatalogManager {
 
         }
         finally {
-                _catalogsLock.writeLock().unlock();
-
+            lock.unlock();
         }
 
 
@@ -276,5 +275,22 @@ public class CatalogManager {
         log.debug("Destroyed");
 
     }
+
+
+    public String toString(){
+        String s = "THREDDS Catalog Manager:\n";
+
+        s += "    ContentPath: " + contentPath + "\n";
+
+        for(Catalog c: catalogs.values()){
+            s += "    Catalog Name: "+c.getName() + "\n";
+            s += "        file:        " + c.getFileName() + "\n";
+            s += "        pathPrefix:  " + c.getPathPrefix() + "\n";
+            s += "        urlPrefix:   " + c.getUrlPrefix() + "\n";
+        }
+
+        return s;
+    }
+
 
 }

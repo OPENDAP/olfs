@@ -86,7 +86,7 @@ public class DocServlet extends HttpServlet {
         long lmt;
 
 
-        String name = getName(req);
+        String name = Scrub.fileName(getName(req));
 
 
 
@@ -145,7 +145,7 @@ public class DocServlet extends HttpServlet {
 
             if (!redirect(request, response)) {
 
-                String name = getName(request);
+                String name = Scrub.fileName(getName(request));
 
                 log.debug("DocServlet - The client requested this: " + name);
 
@@ -175,11 +175,11 @@ public class DocServlet extends HttpServlet {
                     log.debug("   Sending.");
 
 
-                    FileInputStream fis = null;
                     ServletOutputStream sos = null;
-
+                    FileInputStream fis = new FileInputStream(f);
+                    
                     try {
-                        fis = new FileInputStream(f);
+
 
                         sos = response.getOutputStream();
 

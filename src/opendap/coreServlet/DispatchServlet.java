@@ -171,7 +171,7 @@ public class DispatchServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-        filename = ServletUtil.getContentPath(this) + filename;
+        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
 
         log.debug("Loading Configuration File: " + filename);
 
@@ -428,55 +428,65 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response) {
 
 
-        RequestCache.startRequestIfNeeded();
-
-
-        int reqno = reqNumber.incrementAndGet();
-        PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
-
-        log.debug(Util.showRequest(request, reqno));
 
 
         try {
 
-            if(redirectForContextOnlyRequest(request,response))
-                return;
+            try {
+
+                RequestCache.startRequestIfNeeded();
+
+                int reqno = reqNumber.incrementAndGet();
+                PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+
+                log.debug(Util.showRequest(request, reqno));
+
+                if(redirectForContextOnlyRequest(request,response))
+                    return;
 
 
-            log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
-                    "' suffix: '" + ReqInfo.getRequestSuffix(request) +
-                    "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
+                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
 
 
-            if (Debug.isSet("probeRequest"))
-                log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
+                if (Debug.isSet("probeRequest"))
+                    log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
-            DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
-            if (dh != null) {
-                log.debug("Request being handled by: " + dh.getClass().getName());
-                dh.handleRequest(request, response);
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+                DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
+                if (dh != null) {
+                    log.debug("Request being handled by: " + dh.getClass().getName());
+                    dh.handleRequest(request, response);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                log.info("Sent Resource Not Found (404) - nothing left to check.");
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    log.info("Sent Resource Not Found (404) - nothing left to check.");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+                }
+
+
+            }
+            finally {
+                RequestCache.endRequest();
+                log.info("doGet(): Response completed.\n");
             }
 
-
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, response);
             }
             catch(Throwable t2) {
-                log.error("BAD THINGS HAPPENED!", t2);
+            	try {
+            		log.error("BAD THINGS HAPPENED!", t2);
+            	}
+            	catch(Throwable t3){
+                    // It's boned now.. Leave it be.
+            	}
             }
-        }
-        finally {
-            RequestCache.endRequest();
-            log.info("doGet(): Response completed.\n");
         }
 
 
@@ -511,50 +521,57 @@ public class DispatchServlet extends HttpServlet {
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) {
 
-        RequestCache.startRequestIfNeeded();
-
-        int reqno = reqNumber.incrementAndGet();
-
-        PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
-
-        log.debug(Util.showRequest(request, reqno));
-
         try {
+            try {
+
+                RequestCache.startRequestIfNeeded();
+
+                int reqno = reqNumber.incrementAndGet();
+
+                PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
+
+                log.debug(Util.showRequest(request, reqno));
 
 
-            log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
-                   "' suffix: '" + ReqInfo.getRequestSuffix(request) +
-                   "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
+                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                       "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                       "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
-            if (Debug.isSet("probeRequest"))
-                log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
+                if (Debug.isSet("probeRequest"))
+                    log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
-            DispatchHandler dh = getDispatchHandler(request, httpPostDispatchHandlers);
-            if (dh != null) {
-                log.debug("Request being handled by: " + dh.getClass().getName());
-                dh.handleRequest(request, response);
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+                DispatchHandler dh = getDispatchHandler(request, httpPostDispatchHandlers);
+                if (dh != null) {
+                    log.debug("Request being handled by: " + dh.getClass().getName());
+                    dh.handleRequest(request, response);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                log.info("Sent Resource Not Found (404) - nothing left to check.");
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    log.info("Sent Resource Not Found (404) - nothing left to check.");
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+                }
             }
-
+            finally {
+                RequestCache.endRequest();
+                log.info("doPost(): Response completed.\n");
+            }
 
         } catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, response);
             }
             catch(Throwable t2) {
-                log.error("BAD THINGS HAPPENED!", t2);
+            	try {
+            		log.error("BAD THINGS HAPPENED!", t2);
+            	}
+            	catch(Throwable t3){
+            		// It's boned now.. Leave it be.
+            	}
             }
         }
-        finally {
-            RequestCache.endRequest();
-            log.info("doPost(): Response completed.\n");
-        }
+
 
     }
 

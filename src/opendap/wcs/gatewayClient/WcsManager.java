@@ -88,9 +88,12 @@ public class WcsManager {
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
         FileInputStream fis = new FileInputStream(fname);
-        config  = sb.build(fis);
-
-        fis.close();
+        try {
+            config  = sb.build(fis);
+        }
+        finally {
+            fis.close();
+        }
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         //xmlo.output(config, System.out);
@@ -107,11 +110,8 @@ public class WcsManager {
     public static void destroy(){
 
         Collection<WcsService> servCol = services.values();
-        WcsService service;
 
-        Iterator i = servCol.iterator();
-        while(i.hasNext()){
-            service = (WcsService) i.next();
+        for (WcsService service : servCol) {
             service.destroy();
         }
         log.debug("Destroyed");

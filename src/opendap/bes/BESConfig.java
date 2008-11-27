@@ -33,6 +33,8 @@ import org.jdom.output.Format;
 
 import java.io.*;
 
+import opendap.coreServlet.Scrub;
+
 /**
  * Holds a configuarrtion for the BES. The persistent representation of this is an XML element, usually incorporated
  * into a larger document such as the OLFS configuration document.
@@ -107,12 +109,11 @@ public class BESConfig  {
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
         FileInputStream fis = new FileInputStream(confFile);
-        Document doc  = sb.build(fis);
-
-        fis.close();
-
-
-        configure(doc);
+        try {
+            Document doc  = sb.build(fis);
+            configure(doc);
+        }
+        finally { fis.close(); }
 
 
     }
@@ -199,8 +200,8 @@ public class BESConfig  {
 
     public void writeConfiguration(String filename) throws IOException {
         OutputStream os = new FileOutputStream(filename);
-        writeConfiguration(os);
-        os.close();
+        try {  writeConfiguration(os); }
+        finally { os.close(); }
     }
 
 
@@ -362,7 +363,7 @@ public class BESConfig  {
                                 System.out.print("Enter the file name to which to save the configuration: ");
                                 k = kybrd.readLine();
                                 if (k!=null && !k.equals("")){
-                                    bc.writeConfiguration(k);
+                                    bc.writeConfiguration(Scrub.fileName(k));
                                     d2 = true;
                                 }
                                 else

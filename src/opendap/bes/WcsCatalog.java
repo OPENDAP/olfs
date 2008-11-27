@@ -46,14 +46,18 @@ import opendap.coreServlet.ReqInfo;
 public class WcsCatalog implements DataRootHandler.ConfigListener {
 
     private static Logger log;
+    static {
+        log = org.slf4j.LoggerFactory.getLogger(WcsCatalog.class);
+
+    }
     private static ReentrantReadWriteLock configLock;
+    static {
+        configLock = new ReentrantReadWriteLock();
+    }
 
     private static HashMap<String,InvDataset> wcsDatasets;
 
     public WcsCatalog(){
-
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-        configLock = new ReentrantReadWriteLock();
         wcsDatasets = null;
     }
 
@@ -144,13 +148,14 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
         String reqUrlPath = ReqInfo.getUrlPath(req);
 
-        configLock.readLock().lock();
-
-        boolean ret =  wcsDatasets.containsKey(reqUrlPath);
-
-        configLock.readLock().unlock();
-
-        return ret;
+        ReentrantReadWriteLock.ReadLock lock = configLock.readLock();
+        try{
+            lock.lock();
+            return wcsDatasets.containsKey(reqUrlPath);
+        }
+        finally {
+            lock.unlock();
+        }
 
     }
 
@@ -161,13 +166,14 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
 
         String reqUrlPath = dataset.startsWith("/")?dataset.substring(1,dataset.length()):dataset;
 
-        configLock.readLock().lock();
-
-        boolean ret =  wcsDatasets.containsKey(reqUrlPath);
-
-        configLock.readLock().unlock();
-
-        return ret;
+        ReentrantReadWriteLock.ReadLock lock = configLock.readLock();
+        try{
+            lock.lock();
+            return wcsDatasets.containsKey(reqUrlPath);
+        }
+        finally {
+            lock.unlock();
+        }
 
     }
 
@@ -181,17 +187,20 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
         String reqUrlPath = ReqInfo.getUrlPath(req);
         String wcsURL = null;
 
-        configLock.readLock().lock();
+        ReentrantReadWriteLock.ReadLock lock = configLock.readLock();
+        try{
+            lock.lock();
+            InvDataset id = wcsDatasets.get(reqUrlPath);
 
-        InvDataset id = wcsDatasets.get(reqUrlPath);
-
-        if(id!=null){
-            wcsURL = getPropertyValue(id,"wcs-request");
+            if(id!=null){
+                wcsURL = getPropertyValue(id,"wcs-request");
+            }
+            return wcsURL;
+        }
+        finally {
+            lock.unlock();
         }
 
-        configLock.readLock().unlock();
-
-        return wcsURL;
 
     }
 
@@ -204,17 +213,19 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
         String reqUrlPath = dataset.startsWith("/")?dataset.substring(1,dataset.length()):dataset;
         String wcsURL = null;
 
-        configLock.readLock().lock();
+        ReentrantReadWriteLock.ReadLock lock = configLock.readLock();
+        try{
+            lock.lock();
+            InvDataset id = wcsDatasets.get(reqUrlPath);
 
-        InvDataset id = wcsDatasets.get(reqUrlPath);
-
-        if(id!=null){
-            wcsURL = getPropertyValue(id,"wcs-request");
+            if(id!=null){
+                wcsURL = getPropertyValue(id,"wcs-request");
+            }
+            return wcsURL;
         }
-
-        configLock.readLock().unlock();
-
-        return wcsURL;
+        finally {
+            lock.unlock();
+        }
 
     }
 
@@ -230,17 +241,22 @@ public class WcsCatalog implements DataRootHandler.ConfigListener {
         String reqUrlPath = ReqInfo.getUrlPath(req);
         String value = null;
 
-        configLock.readLock().lock();
 
-        InvDataset id = wcsDatasets.get(reqUrlPath);
+        ReentrantReadWriteLock.ReadLock lock = configLock.readLock();
+        try{
+            lock.lock();
+            InvDataset id = wcsDatasets.get(reqUrlPath);
 
-        if(id!=null){
-            value = getPropertyValue(id,propertyName);
+            if(id!=null){
+                value = getPropertyValue(id,propertyName);
+            }
+
+            return value;
+        }
+        finally {
+            lock.unlock();
         }
 
-        configLock.readLock().unlock();
-
-        return value;
 
     }
 

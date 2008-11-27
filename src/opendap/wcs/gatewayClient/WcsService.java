@@ -34,6 +34,7 @@ import org.apache.commons.httpclient.HttpClient;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.io.InputStream;
 
 
 /**
@@ -73,7 +74,7 @@ public class WcsService {
 
 
 
-    
+
     public WcsService(Element configuration) throws Exception{
 
         log.debug("Configuring...");
@@ -339,12 +340,18 @@ public class WcsService {
 
             // Parse the XML doc into a Document object.
             SAXBuilder sb = new SAXBuilder();
-            Document doc = sb.build(request.getResponseBodyAsStream());
-            log.debug("Got and parsed coverage description document.");
-            //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            //xmlo.output(doc, System.out);
+            InputStream is = request.getResponseBodyAsStream();
+            try {
+                Document doc = sb.build(is);
+                log.debug("Got and parsed coverage description document.");
+                //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                //xmlo.output(doc, System.out);
+                return doc;
+           }
+            finally {
+            	is.close();
+            }
 
-            return doc;
 
 
         }
@@ -408,10 +415,11 @@ public class WcsService {
 
             if(force || cacheTime<getCacheAge()){
 
-                capablitiesDocLock.writeLock().lock();
-                log.debug("capablitiesDocLock WriteLock Acquired.");
+            	ReentrantReadWriteLock.WriteLock lock = capablitiesDocLock.writeLock();
 
                 try {
+                	lock.lock();
+                	log.debug("capablitiesDocLock WriteLock Acquired.");
                     if(force || cacheTime<getCacheAge()){
                         log.debug("Updating Capabilities Document.");
                         Document doc = httpGetCapabilities();
@@ -424,7 +432,7 @@ public class WcsService {
                             " biffCount: "+ (++biffCount) );
                 }
                 finally {
-                    capablitiesDocLock.writeLock().unlock();
+                    lock.unlock();
                     log.debug("WriteLock Released.");
                 }
 
@@ -465,12 +473,17 @@ public class WcsService {
 
                 // Parse the XML doc into a Document object.
                 SAXBuilder sb = new SAXBuilder();
-                Document doc = sb.build(request.getResponseBodyAsStream());
-                log.debug("Got and parsed capabilites document.");
-                //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                //xmlo.output(doc, System.out);
-
-                return doc;
+                InputStream is = request.getResponseBodyAsStream();
+                try {
+                    Document doc = sb.build(is);
+                    log.debug("Got and parsed capabilites document.");
+                    //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    //xmlo.output(doc, System.out);
+                    return doc;
+                }
+                finally {
+                	is.close();
+                }
 
 
             }

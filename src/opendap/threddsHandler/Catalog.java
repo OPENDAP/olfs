@@ -158,25 +158,26 @@ public class Catalog {
         String fname = _pathPrefix + _fileName;
 
         File catalogFile = new File(fname);
+        _buffer  = new byte[(int)catalogFile.length()];
 
         log.debug("Loading THREDDS catalog file: "+ fname);
 
         FileInputStream fis = new FileInputStream(fname);
 
-        _buffer  = new byte[(int)catalogFile.length()];
-
-        int count = 0, ret;
-
-        while(count<catalogFile.length()){
-            ret = fis.read(_buffer);
-            if(ret<0){
-                log.error("Premature end of file reached. file: "+ fname);
-                throw new Exception("Premature end of file reached.");
+        try {
+            int count = 0, ret;
+            while(count<catalogFile.length()){
+                ret = fis.read(_buffer);
+                if(ret<0){
+                    log.error("Premature end of file reached. file: "+ fname);
+                    throw new Exception("Premature end of file reached.");
+                }
+                count += ret;
             }
-            count += ret;
         }
-        fis.close();
-
+        finally {
+            fis.close();
+        }
         _cacheTime = new Date();
 
         log.info("Using memory cache for: "+fname);
@@ -214,23 +215,27 @@ public class Catalog {
 
                 log.debug("Loading THREDDS catalog file: "+ fname);
 
-                FileInputStream fis = new FileInputStream(fname);
-
                 byte[] buf  = new byte[2048];
 
-                int count = 0, ret;
+                FileInputStream fis = new FileInputStream(fname);
 
-                while(count<catalogFile.length()){
-                    ret = fis.read(buf);
-                    if(ret<0){
-                        log.error("Premature end of file reached. file: "+ fname);
-                        throw new Exception("Premature end of file reached.");
+                try {
+                    int count = 0, ret;
+
+                    while(count<catalogFile.length()){
+                        ret = fis.read(buf);
+                        if(ret<0){
+                            log.error("Premature end of file reached. file: "+ fname);
+                            throw new Exception("Premature end of file reached.");
+                        }
+
+                        os.write(buf,0,ret);
+                        count += ret;
                     }
-
-                    os.write(buf,0,ret);
-                    count += ret;
                 }
-                fis.close();
+                finally {
+                    fis.close();
+                }
 
             }
     }
@@ -239,9 +244,10 @@ public class Catalog {
 
     public Document getCatalogDocument() throws Exception {
 
-        InputStream is;
+        InputStream is=null;
         SAXBuilder sb = new SAXBuilder();
 
+        try {
         if(_buffer!=null){
             is= new ByteArrayInputStream(_buffer);
         }
@@ -249,6 +255,11 @@ public class Catalog {
              is = new FileInputStream(_pathPrefix+_fileName);
         }
         return  sb.build(is);
+        }
+        finally {
+            if(is!=null)
+                is.close();
+        }
 
     }
 

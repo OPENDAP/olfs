@@ -164,10 +164,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         msg += "  ASCIIString:            "+uri.toASCIIString()+"\n";
 
         try {
-        msg += "  URL:                    "+uri.toURL()+"\n";
+            msg += "  URL:                    "+uri.toURL()+"\n";
         } catch (Exception e) {
-
-            e.printStackTrace();
+            msg += "  URL:                    uri.toURL() FAILED msg="+e.getMessage();
         }
 
         return msg;
@@ -744,8 +743,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
 
             String msg = besError.getMessage();
-            System.out.println(msg);
-            System.err.println(msg);
             log.error("sendHTMLRequestForm() encounterd a BESError: "+msg);
         }
 

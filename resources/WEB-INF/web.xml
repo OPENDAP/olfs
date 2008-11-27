@@ -124,6 +124,11 @@
         <exception-type>java.lang.Throwable</exception-type>
         <location>/docs/error500.html</location>
     </error-page>
+    
+    <session-config>
+        <session-timeout>20</session-timeout> 
+    </session-config>
+    
 
 
 </web-app>

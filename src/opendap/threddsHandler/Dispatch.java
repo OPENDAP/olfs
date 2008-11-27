@@ -142,7 +142,7 @@ public class Dispatch implements DispatchHandler{
 
                 );
 
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+relativeURL);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
                 return;
             }
         }
@@ -307,7 +307,7 @@ public class Dispatch implements DispatchHandler{
             throws Exception {
 
         String dataSource = ReqInfo.getDataSource(request);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
+        //String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
         if(dataSource.startsWith("/"))

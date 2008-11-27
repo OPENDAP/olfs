@@ -86,6 +86,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         registerDispatchMethod(".*.ddx",     "sendDDX");
         registerDispatchMethod(".*.dds",     "sendDDS");
         registerDispatchMethod(".*.das",     "sendDAS");
+        registerDispatchMethod(".*.dods",    "sendDAP2Data");
         registerDispatchMethod(".*.info",    "sendInfo");
         registerDispatchMethod(".*.html?",   "sendHTMLRequestForm");
         registerDispatchMethod(".*.asc(ii)?","sendASCII");

@@ -32,7 +32,8 @@ import org.jdom.output.Format;
 import org.jdom.input.SAXBuilder;
 
 import java.io.*;
-import java.util.Iterator;
+
+import opendap.coreServlet.Scrub;
 
 /**
  * This class holds configuration information for the OLFS. It has a main() method and can be run as an application
@@ -73,12 +74,15 @@ public class OLFSConfig {
 
         FileInputStream fis = new FileInputStream(confFile);
 
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document doc  = sb.build(fis);
-        fis.close();
-
-        configure(doc);
+        try {
+            // Parse the XML doc into a Document object.
+            SAXBuilder sb = new SAXBuilder();
+            Document doc  = sb.build(fis);
+            configure(doc);
+        }
+        finally {
+            fis.close();
+        }
 
 
     }
@@ -125,9 +129,11 @@ public class OLFSConfig {
 
 
     public void writeConfiguration(String filename) throws IOException {
-        OutputStream os = new FileOutputStream(filename);
-        writeConfiguration(os);
-        os.close();
+        String fname = Scrub.fileName(filename);
+
+        OutputStream os = new FileOutputStream(fname);
+        try { writeConfiguration(os); }
+        finally { os.close(); }
     }
 
 
@@ -244,7 +250,7 @@ public class OLFSConfig {
     /**
      * Provides a console interface to initialize (or configure if you will) an OLFSConfig object, which provides
      * BES configuration information to the OLFS.
-     * @throws IOException
+     * @throws IOException When the Bad Things happen.
      */
     public void userConfigure() throws IOException {
         userConfigure(this);
@@ -260,7 +266,7 @@ public class OLFSConfig {
      * BES configuration information for the OLFS. After the intialization is complete, the user will be prompted to
      * save the configuration into a file (as an XML document).
      * @param oc The OLFSConfig to initialize.
-     * @throws IOException
+     * @throws IOException When the Bad Things happen.
      */
 
     public static void userConfigure(OLFSConfig oc) throws IOException {
