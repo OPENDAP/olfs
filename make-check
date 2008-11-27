@@ -1,6 +1,6 @@
 #!/bin/sh
 
-verbose=1
+verbose="2"
 
 
 
