@@ -29,9 +29,6 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import org.slf4j.Logger;
 import org.jdom.Element;
-import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +57,7 @@ public class Dispatch implements DispatchHandler{
     private DispatchServlet dispatchServlet;
     private String _prefix;
     boolean useMemoryCache = false;
-    Transform xsltTransform = null;
+    Transformer xsltTransform = null;
     ReentrantLock transformLock;
 
     public Dispatch() {
@@ -80,9 +77,9 @@ public class Dispatch implements DispatchHandler{
 
         String relativeURL = ReqInfo.getFullSourceName(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
+        String query = request.getQueryString();
 
-
-        if(redirectForPrefixOnlyRequest(request,response))
+        if(redirectRequest(request,response))
             return;
 
         /* Make sure the relative URL is really relative */
@@ -92,7 +89,21 @@ public class Dispatch implements DispatchHandler{
 
         // Is the request for a presentation view (HTML version) of the catalog?
         if(requestSuffix!=null && requestSuffix.equals("html")){
-            sendCatalogHTML(response,relativeURL);
+
+            if(query!=null){
+                if(query.startsWith("dataset=")){
+                    sendDatasetHtmlPage(response,relativeURL,query);
+                }
+                else{
+                    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED,"Cannot process query: "+Scrub.urlContent(query));
+                }
+
+
+            }
+            else {
+                sendCatalogHTML(response,relativeURL);
+            }
+
         }
         else { // Send the the raw catalog XML.
             sendCatalogXML(response,relativeURL);
@@ -100,9 +111,95 @@ public class Dispatch implements DispatchHandler{
 
     }
 
+
+
+
+
+    private void sendDatasetHtmlPage(HttpServletResponse response,
+                                     String relativeURL,
+                                     String query) throws IOException, SaxonApiException {
+
+
+        try {
+
+            transformLock.lock();
+
+            XdmNode catDoc;
+
+            // Patch up the request URL so we can find the source catalog
+            relativeURL = relativeURL.substring(0,
+                    relativeURL.lastIndexOf(".html")) + ".xml";
+
+
+            if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
+
+                // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(xsltTransform.getProcessor());
+
+                // Disabled this code because code based changed to require a
+                // single top level catalog, catalog.xml. Thus, this clause
+                // should never get excecuted.
+                //
+                throw new IOException("Synthetic top level catalog not supported.");
+            }
+            else{
+
+                // Strip the prefix off of the relativeURL)
+                if(relativeURL.startsWith(_prefix))
+                    relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+
+
+                Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+                if(cat!=null){
+                    log.debug("\nFound catalog: "+relativeURL+"   " +
+                            "    prefix: " + _prefix
+                    );
+                    catDoc = cat.getCatalogAsXdmNode(xsltTransform.getProcessor());
+                    log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
+                }
+                else {
+                    log.error("Can't find catalog: "+relativeURL+"   " +
+                            "    prefix: " + _prefix
+                    );
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
+                    return;
+                }
+            }
+
+
+
+
+
+            // Send the catalog using the transform.
+
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "thredds_catalog");
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            xsltTransform.transform(catDoc,response.getOutputStream());
+
+            log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+        }
+        finally {
+            transformLock.unlock();
+        }
+
+
+
+    }
+
+
+
+
+
+
     private void sendCatalogXML(HttpServletResponse response, String relativeURL)throws Exception {
+
+
         if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
 
+            /*
             Document catalog = CatalogManager.getTopLevelCatalogDocument();
 
             // Send the XML catalog.
@@ -112,6 +209,10 @@ public class Dispatch implements DispatchHandler{
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             response.getOutputStream().print(xmlo.outputString(catalog));
             log.debug("Sent THREDDS catalog (raw XML).");
+            */
+            throw new IOException("We should never be attempting to send a " +
+                    "catalog for  just the handlers prefix. The URL should" +
+                    "have been redirected to $prefix/catalog.xml");
 
         }
         else{
@@ -147,8 +248,10 @@ public class Dispatch implements DispatchHandler{
     }
 
     private void sendCatalogHTML(HttpServletResponse response, String relativeURL)throws SaxonApiException, IOException{
-        transformLock.lock();
+
         try {
+
+            transformLock.lock();
 
             XdmNode catDoc;
 
@@ -158,7 +261,14 @@ public class Dispatch implements DispatchHandler{
 
 
             if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
-                catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(xsltTransform.getProcessor());
+
+                // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(xsltTransform.getProcessor());
+
+                // Disabled this code because code based changed to require a
+                // single top level catalog, catalog.xml. Thus, this clause
+                // should never get excecuted.
+                //
+                throw new IOException("Synthetic top level catalog not supported.");
             }
             else{
                 // Strip the prefix off of the relativeURL)
@@ -173,6 +283,7 @@ public class Dispatch implements DispatchHandler{
                             "    prefix: " + _prefix
                     );
                     catDoc = cat.getCatalogAsXdmNode(xsltTransform.getProcessor());
+                    log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
                 }
                 else {
                     log.error("Can't find catalog: "+relativeURL+"   " +
@@ -205,26 +316,51 @@ public class Dispatch implements DispatchHandler{
 
 
 
-    private boolean redirectForPrefixOnlyRequest(HttpServletRequest req,
+    private boolean redirectRequest(HttpServletRequest req,
                                                   HttpServletResponse res)
             throws IOException {
 
+        boolean redirect = false;
         String relativeURL = ReqInfo.getFullSourceName(req);
 
+        // Make sure it really is a relative URL.
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
 
         // We know the _prefix ends in slash. So, if this things is the same as
-        // prefix sans slash then we redirect.
+        // prefix sans slash then we redirect to catalog.html
         if (relativeURL.equals(_prefix.substring(0,_prefix.length()-1))) {
-            String newURI = _prefix;
+            redirect = true;
+        }
+
+        // Redirect _prefix only requests to catalog.html
+        if (relativeURL.equals(_prefix)) {
+            redirect = true;
+        }
+
+        // And redirect _prefix+contents.html to catalog.html
+        if (relativeURL.equals(_prefix+"contents.html")) {
+            redirect = true;
+        }
+
+        if(redirect){
+
+            String newURI;
+
+            // make sure that we redirect to the right spot. If the relativeURL
+            // ends with a slash then we don't want to add the prefix.
+            if(relativeURL.endsWith("/") || relativeURL.endsWith("contents.html")  )
+                newURI = "catalog.html";
+            else
+                newURI = _prefix + "catalog.html";
+
             res.sendRedirect(Scrub.urlContent(newURI));
             log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
                     "context to a URL that ends in a '/' character! Redirect to: "+Scrub.urlContent(newURI));
-            return true;
         }
-        return false;
+
+        return redirect;
     }
 
 
@@ -272,64 +408,70 @@ public class Dispatch implements DispatchHandler{
             }
         }
 
-
-        // Get the RootCatalogs from the conifg
-        children = config.getChildren("threddsCatalogRoot");
-
-        if (children.isEmpty()) {
-            throw new Exception("Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 or more <threddsCatalogRoot>  " +
-                    "child elements.");
-        } else {
-            log.debug("Processing THREDDS catalog file(s)...");
-
-            String contentPath = ServletUtil.getContentPath(servlet);
-            CatalogManager.init(contentPath);
+        log.debug("Configuration file processing complete.");
 
 
+        log.debug("Processing THREDDS catalog.xml file...");
 
-            Iterator i = children.iterator();
-            Element fileElem;
-            String fileName,  pathPrefix, thisUrlPrefix;
-            while (i.hasNext()) {
-
-                fileElem = (Element) i.next();
-
-                s = fileElem.getTextTrim();
-
-                thisUrlPrefix = s.substring(0,s.lastIndexOf(Util.basename(s)));
-
-                s = contentPath + s;
-                fileName = Util.basename(s);
-                pathPrefix = s.substring(0,s.lastIndexOf(fileName));
-
-                log.debug("Top Level Catalog - pathPrefix: " + pathPrefix);
-                log.debug("Top Level Catalog - urlPrefix: " + thisUrlPrefix);
-                log.debug("Top Level Catalog - fileName: " + fileName);
-
-                CatalogManager.addRootCatalog(
-                        pathPrefix,
-                        thisUrlPrefix,
-                        fileName,
-                        useMemoryCache);
-
-                log.debug("configuration file: " + fileName + " processing complete.");
-            }
+        String contentPath = ServletUtil.getContentPath(servlet);
+        CatalogManager.init(contentPath);
 
 
-        }
+        String fileName,  pathPrefix, thisUrlPrefix;
 
-        // ---------------------
-        // Get XSLT document name
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+        s = "catalog.xml";
 
-        // Build an cache an XSLT transformer for the XSLT document.
-        xsltTransform = new Transform(xsltDoc);
+        thisUrlPrefix = s.substring(0,s.lastIndexOf(Util.basename(s)));
+
+        s = contentPath + s;
+        fileName = "catalog.xml";
+        pathPrefix = s.substring(0,s.lastIndexOf(fileName));
+
+        log.debug("Top Level Catalog - pathPrefix: " + pathPrefix);
+        log.debug("Top Level Catalog - urlPrefix: " + thisUrlPrefix);
+        log.debug("Top Level Catalog - fileName: " + fileName);
+
+        /*
+        CatalogManager.addRootCatalog(
+                pathPrefix,
+                thisUrlPrefix,
+                fileName,
+                useMemoryCache);
+        */
+        CatalogManager.addCatalog(
+                pathPrefix,
+                thisUrlPrefix,
+                fileName,
+                useMemoryCache);
+
+        log.debug("THREDDS catalog.xml (and children thereof) have been ingested.");
+
+
+        log.debug("Loading XSLT for thredds presentation views.");
 
         // Create a lock for use with the thread-unsafe transformer.
         transformLock = new ReentrantLock(true);
 
+        try {
+            transformLock.lock();
+
+            // ---------------------
+            // Get XSLT document name
+            String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+
+            // Build an cache an XSLT transformer for the XSLT document.
+            xsltTransform = new Transformer(xsltDoc);
+
+
+
+
+
+            log.debug("XSLT loaded & parsed. Transfrom object created and " +
+                    "cached. Transform lock created.");
+        }
+        finally{
+            transformLock.unlock();
+        }
 
         log.info("Initialized.");
         initialized = true;
@@ -345,24 +487,28 @@ public class Dispatch implements DispatchHandler{
 
 
     private boolean threddsRequestDispatch(HttpServletRequest request,
-                                       HttpServletResponse response,
-                                       boolean sendResponse)
+                                           HttpServletResponse response,
+                                           boolean sendResponse)
             throws Exception {
 
         String dataSource = ReqInfo.getDataSource(request);
         //String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-
-        if(dataSource.startsWith("/"))
-            dataSource = dataSource.substring(1,dataSource.length());
-
         boolean threddsRequest = false;
 
         if (dataSource != null) {
+
+
+            // Since we know the _prefix does not begin with slahs, strip any
+            // leading slashes from the dataSource name.
+            while (dataSource.startsWith("/"))
+                dataSource = dataSource.substring(1, dataSource.length());
+
+
             // We know the _prefix ends in slash. So let's strip the slash
             // before we compare. This makes sure that we pick up the URL
             // that ends with the prefix and no slash
-            if (dataSource.startsWith(_prefix.substring(0,_prefix.length()-1))) {
+            if (dataSource.startsWith(_prefix.substring(0, _prefix.length() - 1))) {
                 threddsRequest = true;
                 if (sendResponse) {
                     sendThreddsCatalogResponse(request, response);
@@ -372,8 +518,6 @@ public class Dispatch implements DispatchHandler{
         }
         return threddsRequest;
     }
-
-
 
 
     public long getLastModified(HttpServletRequest req) {
@@ -397,7 +541,7 @@ public class Dispatch implements DispatchHandler{
                 }
 
                 long lm = CatalogManager.getLastModified(relativeURL);
-                log.debug("lastModified("+relativeURL+"): "+new Date(lm));
+                log.debug("lastModified("+relativeURL+"): "+(lm==-1?"unknown":new Date(lm)));
                 return lm;
             }
         }

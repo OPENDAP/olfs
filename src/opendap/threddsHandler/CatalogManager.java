@@ -26,26 +26,12 @@ package opendap.threddsHandler;
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.FileInputStream;
-
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.SaxonApiException;
-
-import javax.xml.transform.stream.StreamSource;
 
 
 /**
@@ -62,9 +48,9 @@ public class CatalogManager {
 
 
 
-    private static Vector<Catalog> rootCatalogs = new Vector<Catalog>();
+    //private static Vector<Catalog> rootCatalogs = new Vector<Catalog>();
 
-    private static HashMap<String,Catalog> catalogs = new HashMap<String,Catalog>();
+    private static HashMap<String, LocalFileCatalog> catalogs = new HashMap<String, LocalFileCatalog>();
     private static ReentrantReadWriteLock _catalogsLock;
     private static boolean isIntialized=false;
 
@@ -88,7 +74,7 @@ public class CatalogManager {
         _catalogsLock = new ReentrantReadWriteLock();
         CatalogManager.contentPath = contentPath;
 
-        
+
 
 
 
@@ -97,6 +83,7 @@ public class CatalogManager {
     }
 
 
+    /*
     public static void addRootCatalog(String pathPrefix,String urlPrefix, String fname,
                                   boolean cacheCatalogFileContent)
             throws Exception {
@@ -114,9 +101,31 @@ public class CatalogManager {
         }
 
     }
+    */
+
+    public static void addCatalog(String pathPrefix,
+                                  String urlPrefix,
+                                  String fname,
+                                  boolean cacheCatalogFileContent)
+            throws Exception {
+
+        LocalFileCatalog catalog = new LocalFileCatalog(pathPrefix,urlPrefix,fname,cacheCatalogFileContent);
+
+        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
+        try {
+            lock.lock();
+            addCatalog(catalog,cacheCatalogFileContent);
+        }
+        finally {
+            lock.unlock();
+        }
+
+    }
 
 
 
+
+    /*
     public static Document getTopLevelCatalogDocument() {
 
         Element catRef, catalogRoot;
@@ -158,7 +167,9 @@ public class CatalogManager {
 
         return catalog;
     }
+    */
 
+    /*
     public static XdmNode getTopLevelCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
 
         XdmNode source;
@@ -177,9 +188,9 @@ public class CatalogManager {
 
         return source;
     }
+    */
 
-
-    private static void addCatalog(Catalog catalog,
+    public static void addCatalog(LocalFileCatalog catalog,
                                   boolean cacheCatalogFileContent)
             throws Exception {
 
@@ -208,15 +219,34 @@ public class CatalogManager {
                 log.info("Found catalogRef that references an external " +
                         "catalog. Target catalog not processed. The catalogRef element " +
                         "will remain in the catalog.");
+                // @todo Added reomte catalog support.
+            }
+            else if(href.startsWith("/")) {
+                //thisUrlPrefix = href.substring(0,href.length() - Util.basename(href).length());
+                //thisPathPrefix = catalog.getPathPrefix() + href;
+                log.info("Found thredds:catalogRef whose xlink:href attribute " +
+                        "begins with a \"/\" character. " +
+                        "This may mean that the catalog is pointing " +
+                        "to another catalog service. Also, it is not an href " +
+                        "expressed in terms of the relative content path. " +
+                        "Target catalog not processed as a file. " +
+                        "The catalogRef element " +
+                        "will remain in the catalog. This will allow it to " +
+                        "appear correctly in thredds catalog output.");
+                // @todo Added support for cataloging within the local server....
+
+
             }
             else {
+
+
                 thisUrlPrefix = catalog.getUrlPrefix() + href.substring(0,href.length() - Util.basename(href).length());
 
                 thisPathPrefix = catalog.getPathPrefix() + href;
                 catFname = Util.basename(thisPathPrefix);
                 thisPathPrefix = thisPathPrefix.substring(0,thisPathPrefix.lastIndexOf(catFname));
 
-                Catalog thisCatalog = new Catalog(thisPathPrefix,thisUrlPrefix,catFname,cacheCatalogFileContent);
+                LocalFileCatalog thisCatalog = new LocalFileCatalog(thisPathPrefix,thisUrlPrefix,catFname,cacheCatalogFileContent);
                 addCatalog(thisCatalog,cacheCatalogFileContent);
                 catalog.addChild(thisCatalog);
             }
@@ -243,7 +273,7 @@ public class CatalogManager {
     }
 
     public static long getLastModified(String name){
-        Catalog cat;
+        LocalFileCatalog cat;
 
         ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
         try {
@@ -268,19 +298,23 @@ public class CatalogManager {
             lock.lock();
 
             if(c!=null && c.needsRefresh()){
-                Catalog newCat;
+                LocalFileCatalog newCat;
                 try {
-                    newCat = new Catalog(c.getPathPrefix(),c.getUrlPrefix(),c.getFileName(),c.usesCache());
+                    newCat = new LocalFileCatalog(c.getPathPrefix(),c.getUrlPrefix(),c.getFileName(),c.usesMemoryCache());
+
+                    /*
                     if(rootCatalogs.contains(c)){
                         log.debug("Removing "+c.getName()+" from rootCatalogs collection.");
                         rootCatalogs.remove(c);
                         log.debug("Adding new "+newCat.getName()+" to rootCatalogs collection.");
                         rootCatalogs.add(newCat);
                     }
+                    */
+
                     log.debug("Purging "+c.getName());
                     purgeCatalog(c);
                     log.debug("Adding new catalog "+newCat.getName()+" to catalogs collection.");
-                    addCatalog(newCat, newCat.usesCache());
+                    addCatalog(newCat, newCat.usesMemoryCache());
                     return newCat;
                 }
                 catch(Exception e){

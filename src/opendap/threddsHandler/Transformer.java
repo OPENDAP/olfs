@@ -35,16 +35,17 @@ import java.util.Date;
  * Date: Dec 29, 2008
  * Time: 8:38:21 AM
  */
-public class Transform {
+public class Transformer {
 
     private Processor proc;
+    private XPathCompiler xPathCompiler;
     private Serializer out;
     private XsltTransformer transform;
     private Date cacheTime;
     private String xsltDoc;
 
 
-    public Transform(String xsltDocument) throws SaxonApiException {
+    public Transformer(String xsltDocument) throws SaxonApiException {
 
 
         init(xsltDocument);
@@ -57,6 +58,7 @@ public class Transform {
 
         // Get an XSLT processor and serializer
         proc = new Processor(false);
+        xPathCompiler = proc.newXPathCompiler();
         out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -86,6 +88,10 @@ public class Transform {
 
     public Processor getProcessor(){
         return proc;
+    }
+
+    public XPathCompiler getXPathCompiler(){
+        return xPathCompiler;
     }
 
     public void transform(XdmNode doc, OutputStream os) throws SaxonApiException {
