@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+//
+//
+// Copyright (c) 2008 OPeNDAP, Inc.
+// Author: Nathan David Potter  <ndp@opendap.org>
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
+-->
 <!DOCTYPE xsl:stylesheet [
 ]>
 <xsl:stylesheet version="1.0"
@@ -69,6 +94,7 @@
 
                 </pre>
 
+
                 <!-- ****************************************************** -->
                 <!--                              FOOTER                    -->
                 <!--                                                        -->
@@ -77,6 +103,21 @@
                 <table width="100%" border="0">
                     <tr>
                         <td>
+                            <div class="small" align="left">
+                                THREDDS Catalog
+                                <SCRIPT LANGUAGE="JavaScript">
+                                    <xsl:comment >
+                                    {
+                                        catalog = location.href.replace('.html','.xml');
+                                        document.write('&lt;a href="' + catalog +'"&gt;');
+                                        document.write('XML');
+                                        document.write('&lt;/a&gt;');
+                                    }
+                                    </xsl:comment>
+                                </SCRIPT>
+                            </div>
+
+
                         </td>
                         <td>
                             <div class="small" align="right">
@@ -93,7 +134,7 @@
 
                 <!-- ****************************************************** -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax THREDDS Catalog Service
+                <h3>OPeNDAP Hyrax <font class="small">(THREDDS Catalog Service)</font>
 
                     <br/>
                     <a href='/opendap/docs/'>Documentation</a>
@@ -120,7 +161,7 @@
     <xsl:template match="thredds:catalogRef">
         <xsl:param name="indent" />
         <tr>
-            <td align="left">
+            <td align="left" >
 
                 <xsl:if test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
                     <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
@@ -131,14 +172,11 @@
                 </xsl:if>
 
             </td>
-            <td align="center">
-                &#160; - &#160; - &#160; - &#160; - &#160; - &#160;&#160;
-            </td>
+            <xsl:call-template name="NoServiceLinks" />
         </tr>
 
 
     </xsl:template>
-
 
 
     <!--***********************************************
@@ -167,9 +205,7 @@
                     <xsl:value-of select="$indent"/><a href="{$href}" ><xsl:value-of select="./@xlink:title"/> /</a>
                </xsl:if>
             </td>
-            <td align="center">
-                &#160; - &#160; - &#160; - &#160; - &#160; - &#160;&#160;
-            </td>
+            <xsl:call-template name="NoServiceLinks" />
         </tr>
 
     </xsl:template>
@@ -180,27 +216,18 @@
        -
        -
        -
-       -
+       - <datasetScan location="/bes/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
        -
        -
      -->
     <xsl:template match="thredds:datasetScan" >
         <xsl:param name="indent" />
         <tr>
-                <td class="small" align="left">
-                    <font size="0">
-                    <xsl:value-of select="$indent"/><xsl:value-of select="@name" />
-                    </font>(datasetScan)<font size="0">/</font>
-
-                    <!-- xsl:if test="./@serviceName">
-                        (serviceName: <xsl:value-of select="./@serviceName" />)
-                    </xsl:if -->
-
-                </td>
-
-            <td align="center">
-                &#160; - &#160; - &#160; - &#160; - &#160; - &#160;&#160;
+            <td align="left">
+                <xsl:value-of select="$indent"/><a href="{key('service-by-name', @serviceName)/@base}{@path}/catalog.html"><xsl:value-of select="@name" /></a>/
             </td>
+
+            <xsl:call-template name="NoServiceLinks" />
         </tr>
     </xsl:template>
 
@@ -268,20 +295,11 @@
 
         <xsl:if test="thredds:dataset">
             <tr>
-                <td class="small" align="left">
-                    <font size="0">
-                    <xsl:value-of select="$indent"/><xsl:value-of select="@name" />
-                    </font>
-                    <!-- xsl:if test="./thredds:serviceName">
-                        (serviceName: <xsl:value-of select="./thredds:serviceName" />)
-                    </xsl:if -->
-                    <font size="0">/</font>
+                <td  align="left">
+                    <xsl:value-of select="$indent"/><xsl:value-of select="@name" />/
 
                 </td>
-
-                <td align="center">
-                    &#160; - &#160; - &#160; - &#160; - &#160; - &#160;&#160;
-                </td>
+                <xsl:call-template name="NoServiceLinks" />
             </tr>
             <xsl:apply-templates>
                 <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
@@ -297,7 +315,14 @@
         <xsl:if test="not(thredds:dataset)">
             <tr>
                 <td>
-                    <tr><td><xsl:value-of select="$indent"/><a href="{key('service-by-name', thredds:serviceName)/@base}{@urlPath}.html" ><xsl:value-of select="@name" /></a></td></tr>
+                    <!-- I don't like this next line. Should this really be a link? Why not just in bold...-->
+                    <!-- <tr><td><xsl:value-of select="$indent"/><a href="{key('service-by-name', 'OPeNDAP-Hyrax')/@base}{@urlPath}.html" ><xsl:value-of select="@name" /></a></td></tr> -->
+                    <tr>
+                        <td class="dark"><xsl:value-of select="$indent"/><xsl:value-of select="@name" /></td>
+                        <xsl:call-template name="NoServiceLinks" />
+                    </tr>
+
+                    <!-- <tr><td class="dark"><xsl:value-of select="$indent"/><xsl:call-template name="generateXPath" /></td></tr> -->
 
 
                     <xsl:apply-templates select="thredds:serviceName" mode="ServiceLinks" >
@@ -318,6 +343,7 @@
 
     </xsl:template>
 
+<xsl:template name="generateXPath"><xsl:for-each select="ancestor::*">/<xsl:value-of select="name()"/>[<xsl:number/>]</xsl:for-each>/<xsl:value-of select="name()"/>[<xsl:number/>]</xsl:template>
 
 
     <xsl:template match="thredds:serviceName" mode="ServiceLinks" >
@@ -334,6 +360,14 @@
 
 
 
+    <xsl:template name="NoServiceLinks" >
+            <td align="center">
+                &#160; - &#160; - &#160; - &#160; - &#160; - &#160;&#160;
+            </td>
+    </xsl:template>
+
+
+
 
 
 
@@ -343,7 +377,7 @@
         <xsl:param name="currentDataset" />
         <tr>
             <td>
-                <xsl:value-of select="$indent"/>&#160;&#160;<xsl:value-of select="./@name" />
+                <xsl:value-of select="$indent"/>&#160;&#160;<xsl:value-of select="./@name" />  <font size="1pt"> (<xsl:value-of select="./@serviceType" />)</font>
             </td>
 
             <xsl:if test="./@serviceType[.='Compound']" >
@@ -489,7 +523,6 @@
     <xsl:template match="thredds:authority">
         <xsl:param name="indent" />
     </xsl:template>
-
 
 
 
