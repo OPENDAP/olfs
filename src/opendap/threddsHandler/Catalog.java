@@ -27,11 +27,20 @@ import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
 
 import java.io.*;
 import java.util.Date;
 import java.util.Vector;
 import java.util.Enumeration;
+
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * User: ndp
@@ -50,7 +59,6 @@ public class Catalog {
     private  byte[] _buffer;
     private boolean _cacheFile;
     private Vector<Catalog> _children;
-
     private Date _cacheTime;
 
 
@@ -187,14 +195,19 @@ public class Catalog {
 
     public boolean needsRefresh(){
 
-        String fname = _pathPrefix + _fileName;
-        File catalogFile = new File(fname);
+        if(_cacheFile){ // It only needs refreshed if it's
+                        // cached in the first place
 
-        if (catalogFile.lastModified() > _cacheTime.getTime()) {
+            String fname = _pathPrefix + _fileName;
+            File catalogFile = new File(fname);
 
-            log.debug("THREDDS Catalog file: "+fname+" needs to re-ingested");
+            if (catalogFile.lastModified() > _cacheTime.getTime()) {
 
-            return true;
+                log.debug("THREDDS Catalog file: "+fname+" needs to re-ingested");
+
+                return true;
+            }
+
         }
         return false;
     }
@@ -249,10 +262,12 @@ public class Catalog {
 
         try {
         if(_buffer!=null){
-            is= new ByteArrayInputStream(_buffer);
+            is = new ByteArrayInputStream(_buffer);
+            log.debug("getCatalogDocument(): Reading catalog from memory cache.");
         }
         else {
-             is = new FileInputStream(_pathPrefix+_fileName);
+            is = new FileInputStream(_pathPrefix+_fileName);
+            log.debug("getCatalogDocument(): Reading catalog from file.");
         }
         return  sb.build(is);
         }
@@ -263,7 +278,27 @@ public class Catalog {
 
     }
 
+    public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
 
+        XdmNode source;
+        InputStream is = null;
+
+        try {
+            if (_buffer != null) {
+                is = new ByteArrayInputStream(_buffer);
+                log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+            } else {
+                is = new FileInputStream(_pathPrefix + _fileName);
+                log.debug("getCatalogDocument(): Reading catalog from file.");
+            }
+            source = proc.newDocumentBuilder().build(new StreamSource(is));
+        }
+        finally {
+            if (is != null)
+                is.close();
+        }
+        return source;
+    }
 
 
     public String getName(){
@@ -282,6 +317,12 @@ public class Catalog {
         return _fileName;
     }
 
+
+    public long getLastModified(){
+        String fname = _pathPrefix + _fileName;
+        File catalogFile = new File(fname);
+        return catalogFile.lastModified();        
+    }
 
 
 }

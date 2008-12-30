@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 
 import java.util.HashMap;
@@ -34,6 +36,16 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.FileInputStream;
+
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+
+import javax.xml.transform.stream.StreamSource;
 
 
 /**
@@ -75,6 +87,12 @@ public class CatalogManager {
 
         _catalogsLock = new ReentrantReadWriteLock();
         CatalogManager.contentPath = contentPath;
+
+        
+
+
+
+
         isIntialized = true;
     }
 
@@ -141,6 +159,26 @@ public class CatalogManager {
         return catalog;
     }
 
+    public static XdmNode getTopLevelCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
+
+        XdmNode source;
+        InputStream is;
+
+        Document tlcat = getTopLevelCatalogDocument();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        byte[] buffer = xmlo.outputString(tlcat).getBytes();
+
+        is = new ByteArrayInputStream(buffer);
+        log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+
+        source = proc.newDocumentBuilder().build(new StreamSource(is));
+
+        return source;
+    }
+
+
     private static void addCatalog(Catalog catalog,
                                   boolean cacheCatalogFileContent)
             throws Exception {
@@ -204,9 +242,26 @@ public class CatalogManager {
 
     }
 
+    public static long getLastModified(String name){
+        Catalog cat;
+
+        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
+        try {
+            lock.lock();
+            cat =  catalogs.get(name);
+            if(cat!=null)
+                return cat.getLastModified();
+        }
+        finally {
+            lock.unlock();
+        }
+
+        return -1;
+    }
 
 
-    public static Catalog  updateCatalogIfRequired(Catalog c){
+
+    public static Catalog updateCatalogIfRequired(Catalog c){
 
         ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
         try {
