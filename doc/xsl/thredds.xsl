@@ -83,7 +83,8 @@
                     <table border="0" width="100%">
                         <tr>
                             <th align="left">Dataset</th>
-                            <th align="center">ResponseLinks</th>
+                            <th align="center">Size</th>
+                            <th align="center">Last Modified</th>
                         </tr>
 
 
@@ -172,7 +173,7 @@
                 </xsl:if>
 
             </td>
-            <xsl:call-template name="NoServiceLinks" />
+            <xsl:call-template name="NoSizeNoTime" />
         </tr>
 
 
@@ -205,7 +206,7 @@
                     <xsl:value-of select="$indent"/><a href="{$href}" ><xsl:value-of select="./@xlink:title"/> /</a>
                </xsl:if>
             </td>
-            <xsl:call-template name="NoServiceLinks" />
+            <xsl:call-template name="NoSizeNoTime" />
         </tr>
 
     </xsl:template>
@@ -227,23 +228,10 @@
                 <xsl:value-of select="$indent"/><a href="{key('service-by-name', @serviceName)/@base}{@path}/catalog.html"><xsl:value-of select="@name" /></a>/
             </td>
 
-            <xsl:call-template name="NoServiceLinks" />
+            <xsl:call-template name="NoSizeNoTime" />
         </tr>
     </xsl:template>
 
-    <!--***********************************************
-       -
-       -
-       -
-       -
-       -
-       -
-       -
-     -->
-    <xsl:template match="thredds:datasetScan" mode="empty">
-        <xsl:param name="indent" />
-        <xsl:apply-templates />
-    </xsl:template>
 
     <!--***********************************************
        -
@@ -299,7 +287,7 @@
                     <xsl:value-of select="$indent"/><xsl:value-of select="@name" />/
 
                 </td>
-                <xsl:call-template name="NoServiceLinks" />
+                <xsl:call-template name="NoSizeNoTime" />
             </tr>
             <xsl:apply-templates>
                 <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
@@ -314,216 +302,88 @@
 
         <xsl:if test="not(thredds:dataset)">
             <tr>
-                <td>
-                    <!-- I don't like this next line. Should this really be a link? Why not just in bold...-->
-                    <!-- <tr><td><xsl:value-of select="$indent"/><a href="{key('service-by-name', 'OPeNDAP-Hyrax')/@base}{@urlPath}.html" ><xsl:value-of select="@name" /></a></td></tr> -->
-                    <tr>
-                        <td class="dark"><xsl:value-of select="$indent"/><xsl:value-of select="@name" /></td>
-                        <xsl:call-template name="NoServiceLinks" />
-                    </tr>
+                <td class="dark">
 
-                    <!-- <tr><td class="dark"><xsl:value-of select="$indent"/><xsl:call-template name="generateXPath" /></td></tr> -->
-
-
-                    <xsl:apply-templates select="thredds:serviceName" mode="ServiceLinks" >
-                        <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
-                        <xsl:with-param name="currentDataset" select="." />
-                    </xsl:apply-templates>
-
-                    <xsl:if test="boolean($inheritedMetadata)" >
-                        <xsl:apply-templates select="$inheritedMetadata/thredds:serviceName" mode="ServiceLinks" >
-                                <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
-                                <xsl:with-param name="currentDataset" select="." />
-                        </xsl:apply-templates>
-                    </xsl:if>
+                    <xsl:value-of select="$indent"/><a>
+                        <xsl:attribute name="href">
+                            ?dataset=<xsl:value-of select="preceding::*/last()" />
+                        </xsl:attribute>
+                        <xsl:value-of select="@name" />
+                        </a>
 
                 </td>
+                <xsl:call-template name="SizeAndTime" >
+                    <xsl:with-param name="currentDataset" select="." />
+                    <xsl:with-param name="metadata" select="thredds:metadata" />
+                    <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata[boolean($inheritedMetadata)]" />
+                </xsl:call-template>
             </tr>
         </xsl:if>
 
     </xsl:template>
 
-<xsl:template name="generateXPath"><xsl:for-each select="ancestor::*">/<xsl:value-of select="name()"/>[<xsl:number/>]</xsl:for-each>/<xsl:value-of select="name()"/>[<xsl:number/>]</xsl:template>
-
-
-    <xsl:template match="thredds:serviceName" mode="ServiceLinks" >
-        <xsl:param name="indent" />
-        <xsl:param name="currentDataset" />
-
-        <xsl:apply-templates select="key('service-by-name', .)" mode="ServiceLinks" >
-            <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
-            <xsl:with-param name="currentDataset" select="$currentDataset" />
-        </xsl:apply-templates>
-
-
-    </xsl:template>
-
-
-
-    <xsl:template name="NoServiceLinks" >
+    <xsl:template name="NoSizeNoTime" >
             <td align="center">
-                &#160; - &#160; - &#160; - &#160; - &#160; - &#160;&#160;
+                --
+            </td>
+            <td align="center">
+                --
             </td>
     </xsl:template>
 
 
-
-
-
-
-
-    <xsl:template match="thredds:service" mode="ServiceLinks" >
-        <xsl:param name="indent" />
+    <xsl:template name="SizeAndTime" >
         <xsl:param name="currentDataset" />
-        <tr>
-            <td>
-                <xsl:value-of select="$indent"/>&#160;&#160;<xsl:value-of select="./@name" />  <font size="1pt"> (<xsl:value-of select="./@serviceType" />)</font>
-            </td>
+        <xsl:param name="metadata" />
+        <xsl:param name="inheritedMetadata" />
+        <!-- Do the Size -->
+        <td class="small" align="center">
+            <xsl:choose>
 
-            <xsl:if test="./@serviceType[.='Compound']" >
+                <xsl:when test="$currentDataset/thredds:dataSize">
+                    <xsl:value-of select="$currentDataset/thredds:dataSize" />&#160;<xsl:value-of select="$currentDataset/thredds:dataSize/@units" />
+                </xsl:when>
 
-                <xsl:apply-templates select="./thredds:service" mode="ServiceLinks" >
-                        <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
-                        <xsl:with-param name="currentDataset" select="$currentDataset" />
-                </xsl:apply-templates>
+                <xsl:when test="$metadata/thredds:dataSize">
+                    <xsl:value-of select="$metadata/thredds:dataSize" />&#160;<xsl:value-of select="$metadata/thredds:dataSize/@units" />
+                </xsl:when>
 
-            </xsl:if>
+                <xsl:when test="$inheritedMetadata/thredds:dataSize">
+                    <xsl:value-of select="$inheritedMetadata/thredds:dataSize" />&#160;<xsl:value-of select="$inheritedMetadata/thredds:dataSize/@units" />
+                </xsl:when>
 
+                <xsl:otherwise>--</xsl:otherwise>
+            </xsl:choose>
+        </td>
 
-            <!-- Produces service URL's for the OPeNDAP serviceType -->
-            <xsl:if test="./@serviceType[.='OPeNDAP'] |
-                          ./@serviceType[.='OPENDAP'] |
-                          ./@serviceType[.='OpenDAP'] |
-                          ./@serviceType[.='OpenDap'] |
-                          ./@serviceType[.='openDap'] |
-                          ./@serviceType[.='opendap']"
-                          >
+        <!-- Do the Time -->
+        <td class="small" align="center">
+            <xsl:choose>
 
-                <td align="center">
-                    <a href="{./@base}{$currentDataset/@urlPath}.ddx" >ddx</a>
-                    <a href="{./@base}{$currentDataset/@urlPath}.dds" >dds</a>
-                    <a href="{./@base}{$currentDataset/@urlPath}.das" >das</a>
-                    <a href="{./@base}{$currentDataset/@urlPath}.info" >info</a>
-                    <a href="{./@base}{$currentDataset/@urlPath}.html" >html</a>
-                </td>
+                <xsl:when test="$currentDataset/thredds:date">
+                    <xsl:value-of select="$currentDataset/thredds:date" />
+                </xsl:when>
 
-            </xsl:if>
+                <xsl:when test="$metadata/thredds:date">
+                    <xsl:value-of select="$metadata/thredds:date" />
+                </xsl:when>
 
-             <!-- Produces service URL's for the WCS serviceType -->
-           <xsl:if test="./@serviceType[.='WCS']" >
-                <td align="center">
-                    <a href="{./@base}{$currentDataset/@urlPath}.ddx" >CoverageDescription</a>
-                </td>
-            </xsl:if>
+                <xsl:when test="$inheritedMetadata/thredds:date">
+                    <xsl:value-of select="$inheritedMetadata/thredds:date" />
+                </xsl:when>
 
+                <xsl:otherwise>--</xsl:otherwise>
+            </xsl:choose>
+        </td>
 
-             <!-- Produces service URL's for the HTTPServer serviceType -->
-           <xsl:if test="./@serviceType[.='HTTPServer']" >
-                <td align="center">
-                    <a href="{./@base}{$currentDataset/@urlPath}" >File Download</a>
-                </td>
-            </xsl:if>
-
-
-
-
-        </tr>
     </xsl:template>
 
 
-    <!--***********************************************
-      <xsd:group name="threddsMetadataGroup">
-          <xsd:choice>
-                <xsd:element name="documentation" type="documentationType"/>
-                <xsd:element ref="metadata"  />
-                <xsd:element ref="property" />
-
-                <xsd:element ref="contributor"/>
-                <xsd:element name="creator" type="sourceType"/>
-                <xsd:element name="date" type="dateTypeFormatted" />
-                <xsd:element name="keyword" type="controlledVocabulary" />
-                <xsd:element name="project" type="controlledVocabulary" />
-                <xsd:element name="publisher" type="sourceType"/>
-
-                <xsd:element ref="geospatialCoverage"/>
-                <xsd:element name="timeCoverage" type="timeCoverageType"/>
-                <xsd:element ref="variables"/>
-
-                <xsd:element name="dataType" type="dataTypes"/>
-                <xsd:element name="dataFormat" type="dataFormatTypes"/>
-                <xsd:element name="serviceName" type="xsd:string" />
-                <xsd:element name="authority" type="xsd:string" />
-               <xsd:element ref="dataSize"/>
-            </xsd:choice>
-       </xsd:group>
-     -->
 
 
-
-    <xsl:template match="thredds:documentation">
+    <xsl:template match="thredds:*">
         <xsl:param name="indent" />
     </xsl:template>
-
-    <xsl:template match="thredds:metadata">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:property">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:contributor">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:creator">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:date">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:keyword">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:project">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:publisher">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:geospatialCoverage">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:timeCoverage">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:variables">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:dataType">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:dataFormat">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:serviceName">
-        <xsl:param name="indent" />
-    </xsl:template>
-
-    <xsl:template match="thredds:authority">
-        <xsl:param name="indent" />
-    </xsl:template>
-
 
 
 
