@@ -26,6 +26,9 @@ package opendap.threddsHandler;
 import net.sf.saxon.s9api.*;
 
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.dom.DOMSource;
 import java.io.OutputStream;
 import java.io.File;
 import java.util.Date;
@@ -38,7 +41,6 @@ import java.util.Date;
 public class Transformer {
 
     private Processor proc;
-    private XPathCompiler xPathCompiler;
     private Serializer out;
     private XsltTransformer transform;
     private Date cacheTime;
@@ -52,13 +54,13 @@ public class Transformer {
 
     }
 
+
     private void init(String xsltDocument) throws SaxonApiException {
 
         xsltDoc = xsltDocument;
 
         // Get an XSLT processor and serializer
         proc = new Processor(false);
-        xPathCompiler = proc.newXPathCompiler();
         out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -69,6 +71,7 @@ public class Transformer {
 
     }
 
+
     private void reloadTransformIfRequired() throws SaxonApiException {
         File f = new File(xsltDoc);
         if(f.lastModified()>cacheTime.getTime()){
@@ -76,6 +79,7 @@ public class Transformer {
         }
 
     }
+
 
     private void loadTransform() throws SaxonApiException{
         // Get an XSLT compiler with our transform in it.
@@ -90,8 +94,8 @@ public class Transformer {
         return proc;
     }
 
-    public XPathCompiler getXPathCompiler(){
-        return xPathCompiler;
+    public XPathCompiler newXPathCompiler(){
+        return proc.newXPathCompiler();
     }
 
     public void transform(XdmNode doc, OutputStream os) throws SaxonApiException {

@@ -29,14 +29,26 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import org.slf4j.Logger;
 import org.jdom.Element;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
+import org.jdom.input.SAXBuilder;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.sax.SAXSource;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.io.*;
 
 import thredds.servlet.ServletUtil;
+
+
 import net.sf.saxon.s9api.*;
 
 /**
@@ -57,8 +69,11 @@ public class Dispatch implements DispatchHandler{
     private DispatchServlet dispatchServlet;
     private String _prefix;
     boolean useMemoryCache = false;
-    Transformer xsltTransform = null;
-    ReentrantLock transformLock;
+    Transformer catalogToHtmlTransform = null;
+    ReentrantLock catalogToHtmlTransformLock;
+
+    Transformer datasetToHtmlTransform = null;
+    ReentrantLock datasetToHtmlTransformLock;
 
     public Dispatch() {
 
@@ -92,7 +107,7 @@ public class Dispatch implements DispatchHandler{
 
             if(query!=null){
                 if(query.startsWith("dataset=")){
-                    sendDatasetHtmlPage(response,relativeURL,query);
+                    NEWsendDatasetHtmlPage(response,relativeURL,query);
                 }
                 else{
                     response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED,"Cannot process query: "+Scrub.urlContent(query));
@@ -115,79 +130,310 @@ public class Dispatch implements DispatchHandler{
 
 
 
+    private void NEWsendDatasetHtmlPage(HttpServletResponse response,
+                                     String relativeURL,
+                                     String query) throws IOException, JDOMException, SaxonApiException {
+
+
+
+        //datasetToHtmlTransformLock.lock();
+        Processor proc = new Processor(false);
+        DocumentBuilder builder = proc.newDocumentBuilder();
+        //builder.setLineNumbering(true);
+        XdmNode catDoc;
+
+        // Patch up the request URL so we can find the source catalog
+        relativeURL = relativeURL.substring(0,
+                relativeURL.lastIndexOf(".html")) + ".xml";
+
+
+        if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
+
+            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
+
+            // Disabled this code because code based changed to require a
+            // single top level catalog, catalog.xml. Thus, this clause
+            // should never get excecuted.
+            //
+            throw new IOException("Synthetic top level catalog not supported.");
+        }
+        else{
+
+            // Strip the prefix off of the relativeURL)
+            if(relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+
+
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+            if(cat!=null){
+                log.debug("\nFound catalog: "+relativeURL+"   " +
+                        "    prefix: " + _prefix
+                );
+                catDoc = cat.getCatalogAsXdmNode(proc);
+                log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
+            }
+            else {
+                log.error("Can't find catalog: "+relativeURL+"   " +
+                        "    prefix: " + _prefix
+                );
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
+                return;
+            }
+        }
+
+        query = query.substring("dataset=".length(),query.length());
+
+        //query = "//*";
+
+        log.debug("Processed query string: "+query);
+
+
+        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/dataset.xsl");
+
+
+        /*
+        // get a validating jdom parser to parse and validate the XML document.
+        SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
+        parser.setFeature("http://apache.org/xml/features/validation/schema", false);
+        XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
+
+        File file = new File(xsltDocName);
+        if(!file.exists()){
+            throw new IOException("Cannot find file: "+ xsltDocName);
+        }
+
+        if(!file.canRead()){
+            throw new IOException("Cannot read file: "+ xsltDocName);
+        }
+        Document xsltDoc = parser.build(new FileInputStream(file));
+
+        Element stylesheet = xsltDoc.getRootElement();
+
+
+
+        Element xpathTarget = new Element("variable", Namespace.getNamespace("xsl","http://www.w3.org/1999/XSL/Transform"));
+
+        xpathTarget.setAttribute("name","targetDataset");
+        xpathTarget.setAttribute("select","generate-id("+query+")");
+
+        stylesheet.addContent(5,xpathTarget);
+
+        //DocumentWrapper dw = new DocumentWrapper(xsltDoc,"",new Configuration());
+        String xsltDocString = xo.outputString(xsltDoc);
+        System.out.println(xsltDocString);
+        ByteArrayInputStream bais = new ByteArrayInputStream(xsltDocString.getBytes());
+
+        */
+
+        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+
+/*
+        nodeString += "<xsl:value-of  \n" +
+                      "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +
+                      "xmlns:thredds=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\"\n" +
+                      "select=\"generate-id("+query+")\" />";
+*/
+        nodeString += "<targetDataset>"+query+"</targetDataset>";
+
+
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
+
+
+        XsltCompiler comp = proc.newXsltCompiler();
+
+
+        XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
+        XsltTransformer transform = exp.load(); // loads the transform file.
+
+        transform.setParameter(new QName("targetDataset"), targetDatasetNode);
+
+
+        transform.setInitialContextNode(catDoc);
+
+
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(response.getOutputStream());
+
+        transform.setDestination(out);
+
+
+
+
+        // Send the catalog using the transform.
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "thredds_catalog");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        transform.transform();
+
+        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
     private void sendDatasetHtmlPage(HttpServletResponse response,
                                      String relativeURL,
                                      String query) throws IOException, SaxonApiException {
 
 
-        try {
 
-            transformLock.lock();
+        datasetToHtmlTransformLock.lock();
 
-            XdmNode catDoc;
+        XdmNode catDoc;
 
-            // Patch up the request URL so we can find the source catalog
-            relativeURL = relativeURL.substring(0,
-                    relativeURL.lastIndexOf(".html")) + ".xml";
+        // Patch up the request URL so we can find the source catalog
+        relativeURL = relativeURL.substring(0,
+                relativeURL.lastIndexOf(".html")) + ".xml";
 
 
-            if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
+        if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
 
-                // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(xsltTransform.getProcessor());
+            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
 
-                // Disabled this code because code based changed to require a
-                // single top level catalog, catalog.xml. Thus, this clause
-                // should never get excecuted.
-                //
-                throw new IOException("Synthetic top level catalog not supported.");
+            // Disabled this code because code based changed to require a
+            // single top level catalog, catalog.xml. Thus, this clause
+            // should never get excecuted.
+            //
+            throw new IOException("Synthetic top level catalog not supported.");
+        }
+        else{
+
+            // Strip the prefix off of the relativeURL)
+            if(relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+
+
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+            if(cat!=null){
+                log.debug("\nFound catalog: "+relativeURL+"   " +
+                        "    prefix: " + _prefix
+                );
+                catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
+                log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
             }
-            else{
-
-                // Strip the prefix off of the relativeURL)
-                if(relativeURL.startsWith(_prefix))
-                    relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
-
-
-                Catalog cat = CatalogManager.getCatalog(relativeURL);
-
-                if(cat!=null){
-                    log.debug("\nFound catalog: "+relativeURL+"   " +
-                            "    prefix: " + _prefix
-                    );
-                    catDoc = cat.getCatalogAsXdmNode(xsltTransform.getProcessor());
-                    log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
-                }
-                else {
-                    log.error("Can't find catalog: "+relativeURL+"   " +
-                            "    prefix: " + _prefix
-                    );
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
-                    return;
-                }
+            else {
+                log.error("Can't find catalog: "+relativeURL+"   " +
+                        "    prefix: " + _prefix
+                );
+                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
+                return;
             }
+        }
+
+
+
+        query = query.substring("dataset=".length(),query.length());
+
+        //query = "//*";
+
+        log.debug("Processing query string: "+query);
+
+
+
+        //Processor proc = new Processor(false);
+        //XPathCompiler xpath = proc.newXPathCompiler();
+        //xpath.declareNamespace("saxon", "http://saxon.sf.net/"); // not actually used, just for demonstration
+
+        Processor proc = datasetToHtmlTransform.getProcessor();
+        XPathCompiler xpath = proc.newXPathCompiler();
+        xpath.declareNamespace(THREDDS.NAMESPACE_PREFIX,THREDDS.NAMESPACE_STRING);
+
+
+        // DocumentBuilder builder = proc.newDocumentBuilder();
+        // builder.setLineNumbering(true);
+        // builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
+        // XdmNode booksDoc = builder.build(new File("data/books.xml"));
+
+        catDoc = catDoc;// Already read the document....
+
+
+
+
+        // find all the ITEM elements, and for each one display the TITLE child
+
+        // XPathSelector selector = xpath.compile("//ITEM").load();
+
+        XPathSelector xps = xpath.compile(query).load();
+
+
+        //selector.setContextItem(booksDoc);
+        xps.setContextItem(catDoc);
+
+
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(response.getOutputStream());
 
 
 
 
 
-            // Send the catalog using the transform.
 
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "thredds_catalog");
-            response.setStatus(HttpServletResponse.SC_OK);
 
-            xsltTransform.transform(catDoc,response.getOutputStream());
-
-            log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+        QName titleName = new QName("dataset");
+        for (XdmItem item: xps) {
+            XdmNode node = (XdmNode) item;
+            System.out.println(node.getNodeName() +
+                    "(" + node.getLineNumber() + ") ");
+            //proc.writeXdmValue(node, out);
 
         }
-        finally {
-            transformLock.unlock();
+
+        // Send the catalog using the transform.
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "thredds_catalog");
+        response.setStatus(HttpServletResponse.SC_OK);
+        for(XdmItem dataset:xps){
+            if(!dataset.isAtomicValue()){
+                proc.writeXdmValue(dataset, out);
+                //datasetToHtmlTransform.transform((XdmNode)dataset,response.getOutputStream());
+            }
         }
+
+
+        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
 
 
 
     }
+
+    // Helper method to get the first child of an element having a given name.
+    // If there is no child with the given name it returns null
+
+    private static XdmNode getChild(XdmNode parent, QName childName) {
+        XdmSequenceIterator iter = parent.axisIterator(Axis.CHILD, childName);
+        if (iter.hasNext()) {
+            return (XdmNode)iter.next();
+        } else {
+            return null;
+        }
+    }
+
+
+
+
 
 
 
@@ -251,7 +497,7 @@ public class Dispatch implements DispatchHandler{
 
         try {
 
-            transformLock.lock();
+            catalogToHtmlTransformLock.lock();
 
             XdmNode catDoc;
 
@@ -262,7 +508,7 @@ public class Dispatch implements DispatchHandler{
 
             if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
 
-                // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(xsltTransform.getProcessor());
+                // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
 
                 // Disabled this code because code based changed to require a
                 // single top level catalog, catalog.xml. Thus, this clause
@@ -282,7 +528,7 @@ public class Dispatch implements DispatchHandler{
                     log.debug("\nFound catalog: "+relativeURL+"   " +
                             "    prefix: " + _prefix
                     );
-                    catDoc = cat.getCatalogAsXdmNode(xsltTransform.getProcessor());
+                    catDoc = cat.getCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
                     log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
                 }
                 else {
@@ -301,13 +547,13 @@ public class Dispatch implements DispatchHandler{
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
-            xsltTransform.transform(catDoc,response.getOutputStream());
+            catalogToHtmlTransform.transform(catDoc,response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
         }
         finally {
-            transformLock.unlock();
+            catalogToHtmlTransformLock.unlock();
         }
 
 
@@ -376,7 +622,6 @@ public class Dispatch implements DispatchHandler{
         config = configuration;
 
 
-        List children;
         Element e;
 
         e = config.getChild("prefix");
@@ -450,28 +695,54 @@ public class Dispatch implements DispatchHandler{
         log.debug("Loading XSLT for thredds presentation views.");
 
         // Create a lock for use with the thread-unsafe transformer.
-        transformLock = new ReentrantLock(true);
+        catalogToHtmlTransformLock = new ReentrantLock(true);
 
         try {
-            transformLock.lock();
+            catalogToHtmlTransformLock.lock();
 
             // ---------------------
             // Get XSLT document name
-            String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+            String catalogToHtmlXslt = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
 
             // Build an cache an XSLT transformer for the XSLT document.
-            xsltTransform = new Transformer(xsltDoc);
+            catalogToHtmlTransform = new Transformer(catalogToHtmlXslt);
 
 
-
-
-
-            log.debug("XSLT loaded & parsed. Transfrom object created and " +
-                    "cached. Transform lock created.");
+            log.debug("XSLT file \""+catalogToHtmlXslt+"\"loaded & parsed. " +
+                    "Transfrom object created and cached. " +
+                    "Transform lock created.");
         }
         finally{
-            transformLock.unlock();
+            catalogToHtmlTransformLock.unlock();
         }
+
+
+
+        // Create a lock for use with the thread-unsafe transformer.
+        datasetToHtmlTransformLock = new ReentrantLock(true);
+
+        try {
+            datasetToHtmlTransformLock.lock();
+
+            // ---------------------
+            // Get XSLT document name
+            String datasetToHtmlXslt = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+
+            // Build an cache an XSLT transformer for the XSLT document.
+            datasetToHtmlTransform = new Transformer(datasetToHtmlXslt);
+
+            log.debug("XSLT file \""+datasetToHtmlXslt+"\"loaded & parsed. " +
+                    "Transfrom object created and cached. " +
+                    "Transform lock created.");
+        }
+        finally{
+            datasetToHtmlTransformLock.unlock();
+        }
+
+
+
+
+
 
         log.info("Initialized.");
         initialized = true;

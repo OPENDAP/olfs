@@ -34,9 +34,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.Enumeration;
 
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.*;
 
 import javax.xml.transform.stream.StreamSource;
 
@@ -292,7 +290,7 @@ public class LocalFileCatalog implements Catalog {
      //@todo Consider optimizing this to cache the document after parsing.
     public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
 
-        XdmNode source;
+        XdmNode catalog;
         InputStream is = null;
 
         try {
@@ -303,13 +301,19 @@ public class LocalFileCatalog implements Catalog {
                 is = new FileInputStream(_pathPrefix + _fileName);
                 log.debug("getCatalogDocument(): Reading catalog from file.");
             }
-            source = proc.newDocumentBuilder().build(new StreamSource(is));
+
+
+            DocumentBuilder builder = proc.newDocumentBuilder();
+            builder.setLineNumbering(true);
+            //builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
+
+            catalog = builder.build(new StreamSource(is));
         }
         finally {
             if (is != null)
                 is.close();
         }
-        return source;
+        return catalog;
     }
 
 
