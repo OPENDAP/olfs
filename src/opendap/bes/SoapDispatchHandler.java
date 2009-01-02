@@ -58,7 +58,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
     Logger log;
 
-    DataRootHandler _dataRootHandler;
+    //DataRootHandler _dataRootHandler;
 
     /**
      * @param ds  The Servlet that is calling init().
@@ -66,7 +66,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      */
     public void init(DispatchServlet ds) throws ServletException {
 
-        _dataRootHandler = ds.getThreddsDispatchHandler().getDataRootHandler();
+        //_dataRootHandler = ds.getThreddsDispatchHandler().getDataRootHandler();
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -206,6 +206,15 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      */
     public void getTHREDDSCatalog(HttpServletRequest srvReq, String reqID, Element cmd, MultipartResponse mpr) throws Exception {
 
+
+        log.error("THREDDS catalogs not currently implemented for SOAP interface.");
+        throw new Exception("THREDDS catalogs not currently implemented for SOAP interface.");
+
+
+        /*
+
+
+
         Namespace osnms = XMLNamespaces.getOpendapSoapNamespace();
         Element respElement;
 
@@ -281,6 +290,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
         mpr.addSoapBodyPart(respElement);
 
         log.debug("getTHREDDSCatalog() completed.");
+        */
 
     }
 

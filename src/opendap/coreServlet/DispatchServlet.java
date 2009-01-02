@@ -77,7 +77,7 @@ public class DispatchServlet extends HttpServlet {
     private Vector<DispatchHandler> httpPostDispatchHandlers;
 
     private OpendapHttpDispatchHandler odh = null;
-    private ThreddsHandler tdh = null;
+    // private ThreddsHandler tdh = null;
     private org.slf4j.Logger log;
 
     private Document configDoc;
@@ -121,7 +121,6 @@ public class DispatchServlet extends HttpServlet {
         Vector<Element> httpPostHandlerConfig = new Vector<Element>();
 
 
-
         // init logging
         PerfLog.logServerStartup("init()");
         log.info("init() start.");
@@ -146,7 +145,7 @@ public class DispatchServlet extends HttpServlet {
     }
 
     public ThreddsHandler getThreddsDispatchHandler() {
-        return tdh;
+        return null;
     }
 
     public String getDocsPath() {
@@ -324,22 +323,6 @@ public class DispatchServlet extends HttpServlet {
         }
 
 
-        for (DispatchHandler dh : dhv) {
-            if (dh instanceof ThreddsHandler) {
-                if (tdh == null)
-                    tdh = (ThreddsHandler) dh;
-                else {
-                    msg = "Only one instance of ThreddsHandler is allowed in a configuration!";
-                    log.error(msg);
-                    throw new ServletException(msg);
-                }
-            }
-        }
-        if (tdh == null) {
-            msg = "There must be an instance ThreddsHandler in the configuration!";
-            log.error(msg);
-            throw new ServletException(msg);
-        }
 
     }
 

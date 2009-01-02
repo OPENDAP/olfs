@@ -98,7 +98,11 @@ public class Dispatch implements DispatchHandler {
 
 
         if (query != null && query.startsWith("browseCatalog=")) {
-            browseRemoteCatalog(response, relativeURL, query);
+            browseRemoteCatalog(response, query);
+        }
+
+        else if (query != null && query.startsWith("browseDataset=")) {
+            browseRemoteDataset(response, query);
         }
 
         // Is the request for a presentation view (HTML version) of the catalog?
@@ -171,8 +175,132 @@ public class Dispatch implements DispatchHandler {
 
 
 
+    private void browseRemoteDataset(HttpServletResponse response,
+                                     String query) throws IOException, SaxonApiException {
+
+
+        //datasetToHtmlTransformLock.lock();
+
+
+        String http = "http://";
+
+
+
+        // Sanitize the incoming query.
+        if(!query.startsWith("browseDataset=")){
+            log.error("Not a browseDataset request: " + Scrub.completeURL(query));
+            throw new IOException("Not a browseDataset request!");
+        }
+
+
+        query = query.substring("browseDataset=".length(), query.length());
+        query = Scrub.completeURL(query);
+
+        String targetDataset = query.substring(0,query.indexOf('&'));
+
+        String remoteCatalog = query.substring(query.indexOf('&')+1,query.length());
+
+
+        if (!remoteCatalog.startsWith(http)) {
+            log.error("Catalog Must be remote: " + remoteCatalog);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Catalog Must be remote: " + remoteCatalog);
+            return;
+        }
+
+
+        String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+
+
+
+        log.debug("Processed query string: " + query);
+        log.debug("targetDataset: " + targetDataset);
+        log.debug("remoteCatalog: " + remoteCatalog);
+        log.debug("remoteHost: " + remoteHost);
+
+
+        // Go get the target catalog:
+        HttpClient httpClient = new HttpClient();
+        GetMethod request = new GetMethod(remoteCatalog);
+        int statusCode = httpClient.executeMethod(request);
+
+        if (statusCode != HttpStatus.SC_OK) {
+            log.error("Can't find catalog: " + remoteCatalog);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
+            return;
+        }
+        InputStream catDocIs = request.getResponseBodyAsStream();
+
+        // Get a processor and build the catalog document as an XdmNode.
+        Processor proc = new Processor(false);
+        DocumentBuilder builder = proc.newDocumentBuilder();
+        XdmNode catDoc = builder.build(new StreamSource(catDocIs));
+
+
+        // Find the transform.
+        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/dataset.xsl");
+
+
+        // Build the targetDataset parameter to pass into the XSLT
+        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<targetDataset>" + targetDataset + "</targetDataset>";
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
+
+        // Build the remoteCatalog parameter to pass into the XSLT
+        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
+        reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode remoteCatalogNode = builder.build(new StreamSource(reader));
+
+        // Build the remoteHost parameter to pass into the XSLT
+        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
+        reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode remoteHostNode = builder.build(new StreamSource(reader));
+
+
+        // Get an XSLTCompiler and load the transform.
+        XsltCompiler comp = proc.newXsltCompiler();
+
+        XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
+        XsltTransformer transform = exp.load(); // loads the transform file.
+
+        // Pass the remoteHost parameter
+        transform.setParameter(new QName("targetDataset"), targetDatasetNode);
+
+        // Pass the remoteRelativeURL parameter
+        transform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
+
+        // Pass the remoteRelativeURL parameter
+        transform.setParameter(new QName("remoteHost"), remoteHostNode);
+
+        // Target the catalog document.
+        transform.setInitialContextNode(catDoc);
+
+        // Set up the transform to send the result to the client.
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(response.getOutputStream());
+
+        transform.setDestination(out);
+
+
+        // Send the catalog using the transform.
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "thredds_catalog");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        transform.transform();
+
+        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+
+    }
+
+
     private void browseRemoteCatalog(HttpServletResponse response,
-                                     String relativeURL,
                                      String query) throws IOException, SaxonApiException {
 
 
@@ -185,31 +313,33 @@ public class Dispatch implements DispatchHandler {
 
         // Sanitize the incoming query.
         query = query.substring("browseCatalog=".length(), query.length());
-        query = Scrub.completeURL(query);
+        String remoteCatalog = Scrub.completeURL(query);
 
-        if (!query.startsWith(http)) {
-            log.error("Catalog Must be remote: " + Scrub.completeURL(query));
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Catalog Must be remote: " + query);
+        if (!remoteCatalog.startsWith(http)) {
+            log.error("Catalog Must be remote: " + Scrub.completeURL(remoteCatalog));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Catalog Must be remote: " + remoteCatalog);
             return;
         }
 
         // Build URL for remote system:
 
-        String remoteHost = query.substring(0, query.indexOf('/', http.length()) + 1);
+        String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
+        String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/')+1);
 
 
-        log.debug("Processed query string: " + query);
+        log.debug("Remote Catalog: " + remoteCatalog);
         log.debug("Remote Catalog Host: " + remoteHost);
+        log.debug("Remote Catalog RelativeURL: " + remoteRelativeURL);
 
 
         // Go get the target catalog:
         HttpClient httpClient = new HttpClient();
-        GetMethod request = new GetMethod(query);
+        GetMethod request = new GetMethod(remoteCatalog);
         int statusCode = httpClient.executeMethod(request);
 
         if (statusCode != HttpStatus.SC_OK) {
-            log.error("Can't find catalog: " + Scrub.completeURL(query));
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + query);
+            log.error("Can't find catalog: " + remoteCatalog);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
             return;
         }
         InputStream catDocIs = request.getResponseBodyAsStream();
@@ -224,11 +354,23 @@ public class Dispatch implements DispatchHandler {
         String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
 
 
-        // Build a parameter to pass into the XSLT
+        // Build the remoteHost parameter to pass into the XSLT
         String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
         nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
         ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
+        XdmNode remoteHostNode = builder.build(new StreamSource(reader));
+
+        // Build the remoteRelativeURL parameter to pass into the XSLT
+        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<remoteRelativeURL>" + remoteRelativeURL + "</remoteRelativeURL>";
+        reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode remoteRelativeURLNode = builder.build(new StreamSource(reader));
+
+        // Build the remoteRelativeURL parameter to pass into the XSLT
+        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
+        reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode remoteCatalogNode = builder.build(new StreamSource(reader));
 
 
         // Get an XSLTCompiler and load the transform.
@@ -237,8 +379,14 @@ public class Dispatch implements DispatchHandler {
         XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
         XsltTransformer transform = exp.load(); // loads the transform file.
 
-        // Pass the query string as a parameter
-        transform.setParameter(new QName("remoteHost"), targetDatasetNode);
+        // Pass the remoteHost parameter
+        transform.setParameter(new QName("remoteHost"), remoteHostNode);
+
+        // Pass the remoteRelativeURL parameter
+        transform.setParameter(new QName("remoteRelativeURL"), remoteRelativeURLNode);
+
+        // Pass the remoteRelativeURL parameter
+        transform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
 
         // Target the catalog document.
         transform.setInitialContextNode(catDoc);

@@ -46,6 +46,7 @@ import opendap.ppt.PPTException;
  * Date: Dec 4, 2005
  * Time: 8:08:25 AM
  * To change this template use File | Settings | File Templates.
+ * @deprecated Abandoned along with TDS libraries.
  */
 public class BESCrawlableDataset implements CrawlableDataset, Comparable {
 
