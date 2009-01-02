@@ -29,19 +29,14 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import org.slf4j.Logger;
 import org.jdom.Element;
-import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-import org.jdom.input.SAXBuilder;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.XMLFilterImpl;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.HttpClient;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.sax.SAXSource;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.io.*;
@@ -53,13 +48,13 @@ import net.sf.saxon.s9api.*;
 
 /**
  * Provides Dispatch Services for the XSLT based THREDDS catalog Handler.
- *
- *
- *
+ * <p/>
+ * <p/>
+ * <p/>
  * Date: Apr 18, 2008
  * Time: 3:46:50 PM
  */
-public class Dispatch implements DispatchHandler{
+public class Dispatch implements DispatchHandler {
 
 
     private Logger log;
@@ -88,179 +83,173 @@ public class Dispatch implements DispatchHandler{
 
 
     public void sendThreddsCatalogResponse(HttpServletRequest request,
-                                HttpServletResponse response) throws Exception{
+                                           HttpServletResponse response) throws Exception {
 
         String relativeURL = ReqInfo.getFullSourceName(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         String query = request.getQueryString();
 
-        if(redirectRequest(request,response))
+        if (redirectRequest(request, response))
             return;
 
         /* Make sure the relative URL is really relative */
-        while(relativeURL.startsWith("/"))
-            relativeURL = relativeURL.substring(1,relativeURL.length());
+        while (relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1, relativeURL.length());
 
+
+        if (query != null && query.startsWith("browseCatalog=")) {
+            browseRemoteCatalog(response, relativeURL, query);
+        }
 
         // Is the request for a presentation view (HTML version) of the catalog?
-        if(requestSuffix!=null && requestSuffix.equals("html")){
+        else if (requestSuffix != null && requestSuffix.equals("html")) {
 
-            if(query!=null){
-                if(query.startsWith("dataset=")){
-                    NEWsendDatasetHtmlPage(response,relativeURL,query);
+            if (query != null) {
+                if (query.startsWith("dataset=")) {
+                    sendDatasetHtmlPage(response, relativeURL, query);
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Cannot process query: " + Scrub.urlContent(query));
                 }
-                else{
-                    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED,"Cannot process query: "+Scrub.urlContent(query));
-                }
 
 
-            }
-            else {
-                sendCatalogHTML(response,relativeURL);
+            } else {
+                sendCatalogHTML(response, relativeURL);
             }
 
-        }
-        else { // Send the the raw catalog XML.
-            sendCatalogXML(response,relativeURL);
+        } else { // Send the the raw catalog XML.
+            sendCatalogXML(response, relativeURL);
         }
 
     }
 
+    private boolean redirectRequest(HttpServletRequest req,
+                                    HttpServletResponse res)
+            throws IOException {
+
+        boolean redirect = false;
+        String relativeURL = ReqInfo.getFullSourceName(req);
+
+        // Make sure it really is a relative URL.
+        if (relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1, relativeURL.length());
+
+
+        // We know the _prefix ends in slash. So, if this things is the same as
+        // prefix sans slash then we redirect to catalog.html
+        if (relativeURL.equals(_prefix.substring(0, _prefix.length() - 1))) {
+            redirect = true;
+        }
+
+        // Redirect _prefix only requests to catalog.html
+        if (relativeURL.equals(_prefix) && req.getQueryString()==null) {
+            redirect = true;
+        }
+
+        // And redirect _prefix+contents.html to catalog.html
+        if (relativeURL.equals(_prefix + "contents.html")) {
+            redirect = true;
+        }
+
+        if (redirect) {
+
+            String newURI;
+
+            // make sure that we redirect to the right spot. If the relativeURL
+            // ends with a slash then we don't want to add the prefix.
+            if (relativeURL.endsWith("/") || relativeURL.endsWith("contents.html"))
+                newURI = "catalog.html";
+            else
+                newURI = _prefix + "catalog.html";
+
+            res.sendRedirect(Scrub.urlContent(newURI));
+            log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
+                    "context to a URL that ends in a '/' character! Redirect to: " + Scrub.urlContent(newURI));
+        }
+
+        return redirect;
+    }
 
 
 
-
-    private void NEWsendDatasetHtmlPage(HttpServletResponse response,
+    private void browseRemoteCatalog(HttpServletResponse response,
                                      String relativeURL,
-                                     String query) throws IOException, JDOMException, SaxonApiException {
-
+                                     String query) throws IOException, SaxonApiException {
 
 
         //datasetToHtmlTransformLock.lock();
+
+
+        String http = "http://";
+
+
+
+        // Sanitize the incoming query.
+        query = query.substring("browseCatalog=".length(), query.length());
+        query = Scrub.completeURL(query);
+
+        if (!query.startsWith(http)) {
+            log.error("Catalog Must be remote: " + Scrub.completeURL(query));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Catalog Must be remote: " + query);
+            return;
+        }
+
+        // Build URL for remote system:
+
+        String remoteHost = query.substring(0, query.indexOf('/', http.length()) + 1);
+
+
+        log.debug("Processed query string: " + query);
+        log.debug("Remote Catalog Host: " + remoteHost);
+
+
+        // Go get the target catalog:
+        HttpClient httpClient = new HttpClient();
+        GetMethod request = new GetMethod(query);
+        int statusCode = httpClient.executeMethod(request);
+
+        if (statusCode != HttpStatus.SC_OK) {
+            log.error("Can't find catalog: " + Scrub.completeURL(query));
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + query);
+            return;
+        }
+        InputStream catDocIs = request.getResponseBodyAsStream();
+
+        // Get a processor and build the catalog document as an XdmNode.
         Processor proc = new Processor(false);
         DocumentBuilder builder = proc.newDocumentBuilder();
-        //builder.setLineNumbering(true);
-        XdmNode catDoc;
-
-        // Patch up the request URL so we can find the source catalog
-        relativeURL = relativeURL.substring(0,
-                relativeURL.lastIndexOf(".html")) + ".xml";
+        XdmNode catDoc = builder.build(new StreamSource(catDocIs));
 
 
-        if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
-
-            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-
-            // Disabled this code because code based changed to require a
-            // single top level catalog, catalog.xml. Thus, this clause
-            // should never get excecuted.
-            //
-            throw new IOException("Synthetic top level catalog not supported.");
-        }
-        else{
-
-            // Strip the prefix off of the relativeURL)
-            if(relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+        // Find the transform.
+        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
 
 
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
-
-            if(cat!=null){
-                log.debug("\nFound catalog: "+relativeURL+"   " +
-                        "    prefix: " + _prefix
-                );
-                catDoc = cat.getCatalogAsXdmNode(proc);
-                log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
-            }
-            else {
-                log.error("Can't find catalog: "+relativeURL+"   " +
-                        "    prefix: " + _prefix
-                );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
-                return;
-            }
-        }
-
-        query = query.substring("dataset=".length(),query.length());
-
-        //query = "//*";
-
-        log.debug("Processed query string: "+query);
-
-
-        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/dataset.xsl");
-
-
-        /*
-        // get a validating jdom parser to parse and validate the XML document.
-        SAXBuilder parser = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
-        parser.setFeature("http://apache.org/xml/features/validation/schema", false);
-        XMLOutputter xo = new XMLOutputter(Format.getPrettyFormat());
-
-        File file = new File(xsltDocName);
-        if(!file.exists()){
-            throw new IOException("Cannot find file: "+ xsltDocName);
-        }
-
-        if(!file.canRead()){
-            throw new IOException("Cannot read file: "+ xsltDocName);
-        }
-        Document xsltDoc = parser.build(new FileInputStream(file));
-
-        Element stylesheet = xsltDoc.getRootElement();
-
-
-
-        Element xpathTarget = new Element("variable", Namespace.getNamespace("xsl","http://www.w3.org/1999/XSL/Transform"));
-
-        xpathTarget.setAttribute("name","targetDataset");
-        xpathTarget.setAttribute("select","generate-id("+query+")");
-
-        stylesheet.addContent(5,xpathTarget);
-
-        //DocumentWrapper dw = new DocumentWrapper(xsltDoc,"",new Configuration());
-        String xsltDocString = xo.outputString(xsltDoc);
-        System.out.println(xsltDocString);
-        ByteArrayInputStream bais = new ByteArrayInputStream(xsltDocString.getBytes());
-
-        */
-
+        // Build a parameter to pass into the XSLT
         String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-
-/*
-        nodeString += "<xsl:value-of  \n" +
-                      "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n" +
-                      "xmlns:thredds=\"http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0\"\n" +
-                      "select=\"generate-id("+query+")\" />";
-*/
-        nodeString += "<targetDataset>"+query+"</targetDataset>";
-
-
+        nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
         ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
         XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
 
 
+        // Get an XSLTCompiler and load the transform.
         XsltCompiler comp = proc.newXsltCompiler();
-
 
         XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
         XsltTransformer transform = exp.load(); // loads the transform file.
 
-        transform.setParameter(new QName("targetDataset"), targetDatasetNode);
+        // Pass the query string as a parameter
+        transform.setParameter(new QName("remoteHost"), targetDatasetNode);
 
-
+        // Target the catalog document.
         transform.setInitialContextNode(catDoc);
 
-
+        // Set up the transform to send the result to the client.
         Serializer out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
         out.setOutputStream(response.getOutputStream());
 
         transform.setDestination(out);
-
-
 
 
         // Send the catalog using the transform.
@@ -274,25 +263,113 @@ public class Dispatch implements DispatchHandler{
         log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
 
+    }
 
 
+    private void sendDatasetHtmlPage(HttpServletResponse response,
+                                     String relativeURL,
+                                     String query) throws IOException, JDOMException, SaxonApiException {
+
+
+        //datasetToHtmlTransformLock.lock();
+        Processor proc = new Processor(false);
+        DocumentBuilder builder = proc.newDocumentBuilder();
+        //builder.setLineNumbering(true);
+        XdmNode catDoc;
+
+        // Patch up the request URL so we can find the source catalog
+        relativeURL = relativeURL.substring(0,
+                relativeURL.lastIndexOf(".html")) + ".xml";
+
+
+        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
+
+            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
+
+            // Disabled this code because code based changed to require a
+            // single top level catalog, catalog.xml. Thus, this clause
+            // should never get excecuted.
+            //
+            throw new IOException("Synthetic top level catalog not supported.");
+        } else {
+
+            // Strip the prefix off of the relativeURL)
+            if (relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
+
+
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+            if (cat != null) {
+                log.debug("\nFound catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
+                catDoc = cat.getCatalogAsXdmNode(proc);
+                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+            } else {
+                log.error("Can't find catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
+                return;
+            }
+        }
+
+        query = query.substring("dataset=".length(), query.length());
+
+        //query = "//*";
+
+        log.debug("Processed query string: " + query);
+
+        // Find the transform.
+        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/dataset.xsl");
+
+
+        // Build a parameter to pass into the XSLT
+        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<targetDataset>" + query + "</targetDataset>";
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
+
+
+        //Get an XSLTCompiler and load the transform.
+        XsltCompiler comp = proc.newXsltCompiler();
+
+        XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
+        XsltTransformer transform = exp.load(); // loads the transform file.
+
+        // Pass the query string as a parameter
+        transform.setParameter(new QName("targetDataset"), targetDatasetNode);
+
+        // Target the catalog document.
+        transform.setInitialContextNode(catDoc);
+
+        // Set up the transform to send the result to the client.
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(response.getOutputStream());
+
+        transform.setDestination(out);
+
+
+        // Send the catalog using the transform.
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "thredds_catalog");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        transform.transform();
+
+        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
 
     }
 
 
-
-
-
-
-
-
-
-
-    private void sendDatasetHtmlPage(HttpServletResponse response,
-                                     String relativeURL,
-                                     String query) throws IOException, SaxonApiException {
-
+    private void OLDsendDatasetHtmlPage(HttpServletResponse response,
+                                        String relativeURL,
+                                        String query) throws IOException, SaxonApiException {
 
 
         datasetToHtmlTransformLock.lock();
@@ -304,7 +381,7 @@ public class Dispatch implements DispatchHandler{
                 relativeURL.lastIndexOf(".html")) + ".xml";
 
 
-        if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
+        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
 
             // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
 
@@ -313,40 +390,36 @@ public class Dispatch implements DispatchHandler{
             // should never get excecuted.
             //
             throw new IOException("Synthetic top level catalog not supported.");
-        }
-        else{
+        } else {
 
             // Strip the prefix off of the relativeURL)
-            if(relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+            if (relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
 
             Catalog cat = CatalogManager.getCatalog(relativeURL);
 
-            if(cat!=null){
-                log.debug("\nFound catalog: "+relativeURL+"   " +
+            if (cat != null) {
+                log.debug("\nFound catalog: " + relativeURL + "   " +
                         "    prefix: " + _prefix
                 );
                 catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
-                log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
-            }
-            else {
-                log.error("Can't find catalog: "+relativeURL+"   " +
+                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+            } else {
+                log.error("Can't find catalog: " + relativeURL + "   " +
                         "    prefix: " + _prefix
                 );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
                 return;
             }
         }
 
 
-
-        query = query.substring("dataset=".length(),query.length());
+        query = query.substring("dataset=".length(), query.length());
 
         //query = "//*";
 
-        log.debug("Processing query string: "+query);
-
+        log.debug("Processing query string: " + query);
 
 
         //Processor proc = new Processor(false);
@@ -355,7 +428,7 @@ public class Dispatch implements DispatchHandler{
 
         Processor proc = datasetToHtmlTransform.getProcessor();
         XPathCompiler xpath = proc.newXPathCompiler();
-        xpath.declareNamespace(THREDDS.NAMESPACE_PREFIX,THREDDS.NAMESPACE_STRING);
+        xpath.declareNamespace(THREDDS.NAMESPACE_PREFIX, THREDDS.NAMESPACE_STRING);
 
 
         // DocumentBuilder builder = proc.newDocumentBuilder();
@@ -364,8 +437,6 @@ public class Dispatch implements DispatchHandler{
         // XdmNode booksDoc = builder.build(new File("data/books.xml"));
 
         catDoc = catDoc;// Already read the document....
-
-
 
 
         // find all the ITEM elements, and for each one display the TITLE child
@@ -385,13 +456,8 @@ public class Dispatch implements DispatchHandler{
         out.setOutputStream(response.getOutputStream());
 
 
-
-
-
-
-
         QName titleName = new QName("dataset");
-        for (XdmItem item: xps) {
+        for (XdmItem item : xps) {
             XdmNode node = (XdmNode) item;
             System.out.println(node.getNodeName() +
                     "(" + node.getLineNumber() + ") ");
@@ -404,8 +470,8 @@ public class Dispatch implements DispatchHandler{
         response.setContentType("text/html");
         response.setHeader("Content-Description", "thredds_catalog");
         response.setStatus(HttpServletResponse.SC_OK);
-        for(XdmItem dataset:xps){
-            if(!dataset.isAtomicValue()){
+        for (XdmItem dataset : xps) {
+            if (!dataset.isAtomicValue()) {
                 proc.writeXdmValue(dataset, out);
                 //datasetToHtmlTransform.transform((XdmNode)dataset,response.getOutputStream());
             }
@@ -413,8 +479,6 @@ public class Dispatch implements DispatchHandler{
 
 
         log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
-
-
 
 
     }
@@ -425,25 +489,17 @@ public class Dispatch implements DispatchHandler{
     private static XdmNode getChild(XdmNode parent, QName childName) {
         XdmSequenceIterator iter = parent.axisIterator(Axis.CHILD, childName);
         if (iter.hasNext()) {
-            return (XdmNode)iter.next();
+            return (XdmNode) iter.next();
         } else {
             return null;
         }
     }
 
 
+    private void sendCatalogXML(HttpServletResponse response, String relativeURL) throws Exception {
 
 
-
-
-
-
-
-
-    private void sendCatalogXML(HttpServletResponse response, String relativeURL)throws Exception {
-
-
-        if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
+        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
 
             /*
             Document catalog = CatalogManager.getTopLevelCatalogDocument();
@@ -460,16 +516,15 @@ public class Dispatch implements DispatchHandler{
                     "catalog for  just the handlers prefix. The URL should" +
                     "have been redirected to $prefix/catalog.xml");
 
-        }
-        else{
+        } else {
             // Strip the prefix off of the relativeURL)
-            if(relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+            if (relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
             Catalog cat = CatalogManager.getCatalog(relativeURL);
 
-            if(cat!=null){
-                log.debug("\nFound catalog: "+relativeURL+"   " +
+            if (cat != null) {
+                log.debug("\nFound catalog: " + relativeURL + "   " +
                         "    prefix: " + _prefix
                 );
 
@@ -480,20 +535,19 @@ public class Dispatch implements DispatchHandler{
                 cat.writeCatalogXML(response.getOutputStream());
                 log.debug("Sent THREDDS catalog (raw XML).");
 
-            }
-            else {
-                log.error("Can't find catalog: "+relativeURL+"   " +
+            } else {
+                log.error("Can't find catalog: " + relativeURL + "   " +
                         "    prefix: " + _prefix
                 );
 
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't " +
-                        "find catalog: "+Scrub.urlContent(relativeURL));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
+                        "find catalog: " + Scrub.urlContent(relativeURL));
             }
         }
 
     }
 
-    private void sendCatalogHTML(HttpServletResponse response, String relativeURL)throws SaxonApiException, IOException{
+    private void sendCatalogHTML(HttpServletResponse response, String relativeURL) throws SaxonApiException, IOException {
 
         try {
 
@@ -506,7 +560,7 @@ public class Dispatch implements DispatchHandler{
                     relativeURL.lastIndexOf(".html")) + ".xml";
 
 
-            if(relativeURL.equals(_prefix)){ // Then we have to make a top level catalog.
+            if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
 
                 // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
 
@@ -515,27 +569,25 @@ public class Dispatch implements DispatchHandler{
                 // should never get excecuted.
                 //
                 throw new IOException("Synthetic top level catalog not supported.");
-            }
-            else{
+            } else {
                 // Strip the prefix off of the relativeURL)
-                if(relativeURL.startsWith(_prefix))
-                    relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+                if (relativeURL.startsWith(_prefix))
+                    relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
 
                 Catalog cat = CatalogManager.getCatalog(relativeURL);
 
-                if(cat!=null){
-                    log.debug("\nFound catalog: "+relativeURL+"   " +
+                if (cat != null) {
+                    log.debug("\nFound catalog: " + relativeURL + "   " +
                             "    prefix: " + _prefix
                     );
                     catDoc = cat.getCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-                    log.debug("catDoc.getBaseURI(): "+catDoc.getBaseURI());
-                }
-                else {
-                    log.error("Can't find catalog: "+relativeURL+"   " +
+                    log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+                } else {
+                    log.error("Can't find catalog: " + relativeURL + "   " +
                             "    prefix: " + _prefix
                     );
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND,"Can't find catalog: "+Scrub.urlContent(relativeURL));
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
                     return;
                 }
             }
@@ -547,7 +599,7 @@ public class Dispatch implements DispatchHandler{
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
-            catalogToHtmlTransform.transform(catDoc,response.getOutputStream());
+            catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
@@ -557,56 +609,6 @@ public class Dispatch implements DispatchHandler{
         }
 
 
-    }
-
-
-
-
-    private boolean redirectRequest(HttpServletRequest req,
-                                                  HttpServletResponse res)
-            throws IOException {
-
-        boolean redirect = false;
-        String relativeURL = ReqInfo.getFullSourceName(req);
-
-        // Make sure it really is a relative URL.
-        if(relativeURL.startsWith("/"))
-            relativeURL = relativeURL.substring(1,relativeURL.length());
-
-
-        // We know the _prefix ends in slash. So, if this things is the same as
-        // prefix sans slash then we redirect to catalog.html
-        if (relativeURL.equals(_prefix.substring(0,_prefix.length()-1))) {
-            redirect = true;
-        }
-
-        // Redirect _prefix only requests to catalog.html
-        if (relativeURL.equals(_prefix)) {
-            redirect = true;
-        }
-
-        // And redirect _prefix+contents.html to catalog.html
-        if (relativeURL.equals(_prefix+"contents.html")) {
-            redirect = true;
-        }
-
-        if(redirect){
-
-            String newURI;
-
-            // make sure that we redirect to the right spot. If the relativeURL
-            // ends with a slash then we don't want to add the prefix.
-            if(relativeURL.endsWith("/") || relativeURL.endsWith("contents.html")  )
-                newURI = "catalog.html";
-            else
-                newURI = _prefix + "catalog.html";
-
-            res.sendRedirect(Scrub.urlContent(newURI));
-            log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
-                    "context to a URL that ends in a '/' character! Redirect to: "+Scrub.urlContent(newURI));
-        }
-
-        return redirect;
     }
 
 
@@ -625,30 +627,30 @@ public class Dispatch implements DispatchHandler{
         Element e;
 
         e = config.getChild("prefix");
-        if(e!=null)
+        if (e != null)
             _prefix = e.getTextTrim();
 
-        if(_prefix.equals("/"))
+        if (_prefix.equals("/"))
             throw new Exception("Bad Configuration. The <Handler> " +
                     "element that declares " + this.getClass().getName() +
                     " MUST provide 1 <_prefix>  " +
                     "child element whose value may not be equal to \"/\"");
 
 
-        if(!_prefix.endsWith("/"))
+        if (!_prefix.endsWith("/"))
             _prefix += "/";
 
 
         //if(!_prefix.startsWith("/"))
         //    _prefix = "/" + _prefix;
 
-        if(_prefix.startsWith("/"))
-            _prefix = _prefix.substring(1,_prefix.length());
+        if (_prefix.startsWith("/"))
+            _prefix = _prefix.substring(1, _prefix.length());
 
         e = config.getChild("useMemoryCache");
-        if(e!=null){
+        if (e != null) {
             s = e.getTextTrim();
-            if(s.equalsIgnoreCase("true")){
+            if (s.equalsIgnoreCase("true")) {
                 useMemoryCache = true;
             }
         }
@@ -662,15 +664,15 @@ public class Dispatch implements DispatchHandler{
         CatalogManager.init(contentPath);
 
 
-        String fileName,  pathPrefix, thisUrlPrefix;
+        String fileName, pathPrefix, thisUrlPrefix;
 
         s = "catalog.xml";
 
-        thisUrlPrefix = s.substring(0,s.lastIndexOf(Util.basename(s)));
+        thisUrlPrefix = s.substring(0, s.lastIndexOf(Util.basename(s)));
 
         s = contentPath + s;
         fileName = "catalog.xml";
-        pathPrefix = s.substring(0,s.lastIndexOf(fileName));
+        pathPrefix = s.substring(0, s.lastIndexOf(fileName));
 
         log.debug("Top Level Catalog - pathPrefix: " + pathPrefix);
         log.debug("Top Level Catalog - urlPrefix: " + thisUrlPrefix);
@@ -708,14 +710,13 @@ public class Dispatch implements DispatchHandler{
             catalogToHtmlTransform = new Transformer(catalogToHtmlXslt);
 
 
-            log.debug("XSLT file \""+catalogToHtmlXslt+"\"loaded & parsed. " +
+            log.debug("XSLT file \"" + catalogToHtmlXslt + "\"loaded & parsed. " +
                     "Transfrom object created and cached. " +
                     "Transform lock created.");
         }
-        finally{
+        finally {
             catalogToHtmlTransformLock.unlock();
         }
-
 
 
         // Create a lock for use with the thread-unsafe transformer.
@@ -731,17 +732,13 @@ public class Dispatch implements DispatchHandler{
             // Build an cache an XSLT transformer for the XSLT document.
             datasetToHtmlTransform = new Transformer(datasetToHtmlXslt);
 
-            log.debug("XSLT file \""+datasetToHtmlXslt+"\"loaded & parsed. " +
+            log.debug("XSLT file \"" + datasetToHtmlXslt + "\"loaded & parsed. " +
                     "Transfrom object created and cached. " +
                     "Transform lock created.");
         }
-        finally{
+        finally {
             datasetToHtmlTransformLock.unlock();
         }
-
-
-
-
 
 
         log.info("Initialized.");
@@ -793,30 +790,30 @@ public class Dispatch implements DispatchHandler{
 
     public long getLastModified(HttpServletRequest req) {
         try {
-            if(requestCanBeHandled(req)){
+            if (requestCanBeHandled(req)) {
                 String relativeURL = ReqInfo.getFullSourceName(req);
 
                 // Make sure it's a relative URL
-                while(relativeURL.startsWith("/"))
-                        relativeURL = relativeURL.substring(1,relativeURL.length());
+                while (relativeURL.startsWith("/"))
+                    relativeURL = relativeURL.substring(1, relativeURL.length());
 
                 // Strip the prefix off of the relativeURL)
-                if(relativeURL.startsWith(_prefix))
-                    relativeURL = relativeURL.substring(_prefix.length(),relativeURL.length());
+                if (relativeURL.startsWith(_prefix))
+                    relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
                 // If it's a request for an HTML view of the catalog, replace the
                 // .html suffix with .xml so we can find the catalog.
-                if(relativeURL.endsWith(".html")){
+                if (relativeURL.endsWith(".html")) {
                     relativeURL = relativeURL.substring(0,
-                        relativeURL.lastIndexOf(".html")) + ".xml";
+                            relativeURL.lastIndexOf(".html")) + ".xml";
                 }
 
                 long lm = CatalogManager.getLastModified(relativeURL);
-                log.debug("lastModified("+relativeURL+"): "+(lm==-1?"unknown":new Date(lm)));
+                log.debug("lastModified(" + relativeURL + "): " + (lm == -1 ? "unknown" : new Date(lm)));
                 return lm;
             }
         }
-        catch(Exception e){
+        catch (Exception e) {
             log.error(e.getMessage());
         }
         return -1;

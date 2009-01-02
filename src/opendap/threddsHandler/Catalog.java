@@ -63,4 +63,6 @@ public interface Catalog {
     String getUrlPrefix();
 
     String getFileName();
+
+    long getLastModified();
 }

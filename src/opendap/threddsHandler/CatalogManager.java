@@ -50,7 +50,7 @@ public class CatalogManager {
 
     //private static Vector<Catalog> rootCatalogs = new Vector<Catalog>();
 
-    private static HashMap<String, LocalFileCatalog> catalogs = new HashMap<String, LocalFileCatalog>();
+    private static HashMap<String, Catalog> catalogs = new HashMap<String, Catalog>();
     private static ReentrantReadWriteLock _catalogsLock;
     private static boolean isIntialized=false;
 
@@ -190,7 +190,7 @@ public class CatalogManager {
     }
     */
 
-    public static void addCatalog(LocalFileCatalog catalog,
+    public static void addCatalog(Catalog catalog,
                                   boolean cacheCatalogFileContent)
             throws Exception {
 
@@ -237,6 +237,12 @@ public class CatalogManager {
 
 
             }
+            else if(href.contains("?browseCatalog=")){
+                log.info("Found catalogRef for browseCatalog " +
+                        "catalog. Target catalog not processed. The catalogRef element " +
+                        "will remain in the catalog.");
+                // @todo Added reomte catalog support.
+            }
             else {
 
 
@@ -273,7 +279,8 @@ public class CatalogManager {
     }
 
     public static long getLastModified(String name){
-        LocalFileCatalog cat;
+
+        Catalog cat;
 
         ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
         try {

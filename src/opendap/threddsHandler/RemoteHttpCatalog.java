@@ -187,4 +187,7 @@ public class RemoteHttpCatalog implements Catalog {
     public String getFileName() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+    public long getLastModified() {
+        return -1;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
