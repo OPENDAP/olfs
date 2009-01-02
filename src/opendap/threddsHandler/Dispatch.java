@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
 import java.io.*;
 
 import thredds.servlet.ServletUtil;
@@ -64,9 +65,12 @@ public class Dispatch implements DispatchHandler {
     private DispatchServlet dispatchServlet;
     private String _prefix;
     boolean useMemoryCache = false;
+
+    String catalogToHtmlTransformFile = "/docs/xsl/thredds.xsl";
     Transformer catalogToHtmlTransform = null;
     ReentrantLock catalogToHtmlTransformLock;
 
+    String datasetToHtmlTransformFile = "/docs/xsl/dataset.xsl";
     Transformer datasetToHtmlTransform = null;
     ReentrantLock datasetToHtmlTransformLock;
 
@@ -179,14 +183,13 @@ public class Dispatch implements DispatchHandler {
                                      String query) throws IOException, SaxonApiException {
 
 
-        //datasetToHtmlTransformLock.lock();
-
 
         String http = "http://";
 
-
-
         // Sanitize the incoming query.
+        query = Scrub.completeURL(query);
+        log.debug("Processing query string: " + query);
+        
         if(!query.startsWith("browseDataset=")){
             log.error("Not a browseDataset request: " + Scrub.completeURL(query));
             throw new IOException("Not a browseDataset request!");
@@ -194,7 +197,6 @@ public class Dispatch implements DispatchHandler {
 
 
         query = query.substring("browseDataset=".length(), query.length());
-        query = Scrub.completeURL(query);
 
         String targetDataset = query.substring(0,query.indexOf('&'));
 
@@ -210,9 +212,6 @@ public class Dispatch implements DispatchHandler {
 
         String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
 
-
-
-        log.debug("Processed query string: " + query);
         log.debug("targetDataset: " + targetDataset);
         log.debug("remoteCatalog: " + remoteCatalog);
         log.debug("remoteHost: " + remoteHost);
@@ -230,71 +229,65 @@ public class Dispatch implements DispatchHandler {
         }
         InputStream catDocIs = request.getResponseBodyAsStream();
 
-        // Get a processor and build the catalog document as an XdmNode.
-        Processor proc = new Processor(false);
-        DocumentBuilder builder = proc.newDocumentBuilder();
-        XdmNode catDoc = builder.build(new StreamSource(catDocIs));
 
 
-        // Find the transform.
-        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/dataset.xsl");
+        try {
+            datasetToHtmlTransformLock.lock();
+            datasetToHtmlTransform.reloadTransformIfRequired();
+
+            // Build the catalog document as an XdmNode.
+            XdmNode catDoc = datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
 
-        // Build the targetDataset parameter to pass into the XSLT
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<targetDataset>" + targetDataset + "</targetDataset>";
-        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
-
-        // Build the remoteCatalog parameter to pass into the XSLT
-        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
-        reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode remoteCatalogNode = builder.build(new StreamSource(reader));
-
-        // Build the remoteHost parameter to pass into the XSLT
-        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
-        reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode remoteHostNode = builder.build(new StreamSource(reader));
+            // Build the targetDataset parameter to pass into the XSLT
+            String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<targetDataset>" + targetDataset + "</targetDataset>";
+            ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode targetDatasetNode = datasetToHtmlTransform.build(new StreamSource(reader));
+            // Pass the targetDataset parameter to the transform
+            datasetToHtmlTransform.setParameter(new QName("targetDataset"), targetDatasetNode);
 
 
-        // Get an XSLTCompiler and load the transform.
-        XsltCompiler comp = proc.newXsltCompiler();
-
-        XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
-        XsltTransformer transform = exp.load(); // loads the transform file.
-
-        // Pass the remoteHost parameter
-        transform.setParameter(new QName("targetDataset"), targetDatasetNode);
-
-        // Pass the remoteRelativeURL parameter
-        transform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
-
-        // Pass the remoteRelativeURL parameter
-        transform.setParameter(new QName("remoteHost"), remoteHostNode);
-
-        // Target the catalog document.
-        transform.setInitialContextNode(catDoc);
-
-        // Set up the transform to send the result to the client.
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        out.setOutputStream(response.getOutputStream());
-
-        transform.setDestination(out);
+            // Build the remoteCatalog parameter to pass into the XSLT
+            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
+            reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode remoteCatalogNode = datasetToHtmlTransform.build(new StreamSource(reader));
+            // Pass the remoteRelativeURL parameter to the transform
+            datasetToHtmlTransform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
 
 
-        // Send the catalog using the transform.
+            // Build the remoteHost parameter to pass into the XSLT
+            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
+            reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode remoteHostNode = datasetToHtmlTransform.build(new StreamSource(reader));
+            // Pass the remoteRelativeURL parameter to the transform
+            datasetToHtmlTransform.setParameter(new QName("remoteHost"), remoteHostNode);
 
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "thredds_catalog");
-        response.setStatus(HttpServletResponse.SC_OK);
 
-        transform.transform();
+            // Set up the Http headers.
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "thredds_catalog");
+            response.setStatus(HttpServletResponse.SC_OK);
 
-        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+            // Send the transformed documet.
+            datasetToHtmlTransform.transform(catDoc,response.getOutputStream());
+
+            log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
+
+            datasetToHtmlTransform.setParameter(new QName("targetDataset"), null);
+            datasetToHtmlTransform.setParameter(new QName("remoteCatalog"), null);
+            datasetToHtmlTransform.setParameter(new QName("remoteHost"), null);
+        }
+        finally {
+            datasetToHtmlTransformLock.unlock();
+        }
+
+
+
+
 
 
     }
@@ -304,7 +297,6 @@ public class Dispatch implements DispatchHandler {
                                      String query) throws IOException, SaxonApiException {
 
 
-        //datasetToHtmlTransformLock.lock();
 
 
         String http = "http://";
@@ -344,71 +336,61 @@ public class Dispatch implements DispatchHandler {
         }
         InputStream catDocIs = request.getResponseBodyAsStream();
 
-        // Get a processor and build the catalog document as an XdmNode.
-        Processor proc = new Processor(false);
-        DocumentBuilder builder = proc.newDocumentBuilder();
-        XdmNode catDoc = builder.build(new StreamSource(catDocIs));
+
+        try {
+            catalogToHtmlTransformLock.lock();
+            catalogToHtmlTransform.reloadTransformIfRequired();
+
+            // Build the catalog document as an XdmNode.
+            XdmNode catDoc = catalogToHtmlTransform.build(new StreamSource(catDocIs));
 
 
-        // Find the transform.
-        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+            // Build the remoteHost parameter to pass into the XSLT
+            String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
+            ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode remoteHostNode = catalogToHtmlTransform.build(new StreamSource(reader));
+            // Pass the remoteHost parameter
+            catalogToHtmlTransform.setParameter(new QName("remoteHost"), remoteHostNode);
 
 
-        // Build the remoteHost parameter to pass into the XSLT
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
-        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode remoteHostNode = builder.build(new StreamSource(reader));
-
-        // Build the remoteRelativeURL parameter to pass into the XSLT
-        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<remoteRelativeURL>" + remoteRelativeURL + "</remoteRelativeURL>";
-        reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode remoteRelativeURLNode = builder.build(new StreamSource(reader));
-
-        // Build the remoteRelativeURL parameter to pass into the XSLT
-        nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
-        reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode remoteCatalogNode = builder.build(new StreamSource(reader));
+            // Build the remoteRelativeURL parameter to pass into the XSLT
+            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<remoteRelativeURL>" + remoteRelativeURL + "</remoteRelativeURL>";
+            reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode remoteRelativeURLNode = catalogToHtmlTransform.build(new StreamSource(reader));
+            // Pass the remoteRelativeURL parameter
+            catalogToHtmlTransform.setParameter(new QName("remoteRelativeURL"), remoteRelativeURLNode);
 
 
-        // Get an XSLTCompiler and load the transform.
-        XsltCompiler comp = proc.newXsltCompiler();
+            // Build the remoteRelativeURL parameter to pass into the XSLT
+            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
+            reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode remoteCatalogNode = catalogToHtmlTransform.build(new StreamSource(reader));
+            // Pass the remoteCatalog parameter
+            catalogToHtmlTransform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
 
-        XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
-        XsltTransformer transform = exp.load(); // loads the transform file.
+            // Set up the Http headers.
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "thredds_catalog");
+            response.setStatus(HttpServletResponse.SC_OK);
 
-        // Pass the remoteHost parameter
-        transform.setParameter(new QName("remoteHost"), remoteHostNode);
+            // Send the transformed documet.
+            catalogToHtmlTransform.transform(catDoc,response.getOutputStream());
 
-        // Pass the remoteRelativeURL parameter
-        transform.setParameter(new QName("remoteRelativeURL"), remoteRelativeURLNode);
-
-        // Pass the remoteRelativeURL parameter
-        transform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
-
-        // Target the catalog document.
-        transform.setInitialContextNode(catDoc);
-
-        // Set up the transform to send the result to the client.
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        out.setOutputStream(response.getOutputStream());
-
-        transform.setDestination(out);
+            log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
 
-        // Send the catalog using the transform.
+            catalogToHtmlTransform.setParameter(new QName("remoteHost"), null);
+            catalogToHtmlTransform.setParameter(new QName("remoteRelativeURL"), null);
+            catalogToHtmlTransform.setParameter(new QName("remoteCatalog"), null);
+        }
+        finally {
+            catalogToHtmlTransformLock.unlock();
+        }
 
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "thredds_catalog");
-        response.setStatus(HttpServletResponse.SC_OK);
 
-        transform.transform();
-
-        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
 
     }
@@ -419,10 +401,6 @@ public class Dispatch implements DispatchHandler {
                                      String query) throws IOException, JDOMException, SaxonApiException {
 
 
-        //datasetToHtmlTransformLock.lock();
-        Processor proc = new Processor(false);
-        DocumentBuilder builder = proc.newDocumentBuilder();
-        //builder.setLineNumbering(true);
         XdmNode catDoc;
 
         // Patch up the request URL so we can find the source catalog
@@ -439,289 +417,114 @@ public class Dispatch implements DispatchHandler {
             // should never get excecuted.
             //
             throw new IOException("Synthetic top level catalog not supported.");
-        } else {
+        }
+
+        try {
+            datasetToHtmlTransformLock.lock();
+            datasetToHtmlTransform.reloadTransformIfRequired();
+
 
             // Strip the prefix off of the relativeURL)
             if (relativeURL.startsWith(_prefix))
                 relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
+            Lock catLock = CatalogManager.getRWLock().readLock();
 
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
+            try {
+                catLock.lock();
 
-            if (cat != null) {
-                log.debug("\nFound catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-                catDoc = cat.getCatalogAsXdmNode(proc);
-                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
-            } else {
-                log.error("Can't find catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
-                return;
+
+                Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+                if (cat != null) {
+                    log.debug("\nFound catalog: " + relativeURL + "   " +
+                            "    prefix: " + _prefix
+                    );
+                    catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
+                    log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+                } else {
+                    log.error("Can't find catalog: " + relativeURL + "   " +
+                            "    prefix: " + _prefix
+                    );
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
+                    return;
+                }
             }
-        }
-
-        query = query.substring("dataset=".length(), query.length());
-
-        //query = "//*";
-
-        log.debug("Processed query string: " + query);
-
-        // Find the transform.
-        String xsltDocName = ServletUtil.getPath(dispatchServlet, "/docs/xsl/dataset.xsl");
-
-
-        // Build a parameter to pass into the XSLT
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<targetDataset>" + query + "</targetDataset>";
-        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-        XdmNode targetDatasetNode = builder.build(new StreamSource(reader));
-
-
-        //Get an XSLTCompiler and load the transform.
-        XsltCompiler comp = proc.newXsltCompiler();
-
-        XsltExecutable exp = comp.compile(new StreamSource(new File(xsltDocName)));
-        XsltTransformer transform = exp.load(); // loads the transform file.
-
-        // Pass the query string as a parameter
-        transform.setParameter(new QName("targetDataset"), targetDatasetNode);
-
-        // Target the catalog document.
-        transform.setInitialContextNode(catDoc);
-
-        // Set up the transform to send the result to the client.
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        out.setOutputStream(response.getOutputStream());
-
-        transform.setDestination(out);
-
-
-        // Send the catalog using the transform.
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "thredds_catalog");
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        transform.transform();
-
-        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
-
-
-    }
-
-
-    private void OLDsendDatasetHtmlPage(HttpServletResponse response,
-                                        String relativeURL,
-                                        String query) throws IOException, SaxonApiException {
-
-
-        datasetToHtmlTransformLock.lock();
-
-        XdmNode catDoc;
-
-        // Patch up the request URL so we can find the source catalog
-        relativeURL = relativeURL.substring(0,
-                relativeURL.lastIndexOf(".html")) + ".xml";
-
-
-        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
-
-            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-
-            // Disabled this code because code based changed to require a
-            // single top level catalog, catalog.xml. Thus, this clause
-            // should never get excecuted.
-            //
-            throw new IOException("Synthetic top level catalog not supported.");
-        } else {
-
-            // Strip the prefix off of the relativeURL)
-            if (relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
-
-
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
-
-            if (cat != null) {
-                log.debug("\nFound catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-                catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
-                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
-            } else {
-                log.error("Can't find catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
-                return;
+            finally {
+                catLock.unlock();
             }
-        }
 
 
-        query = query.substring("dataset=".length(), query.length());
+            String targetDataset = query.substring("dataset=".length(), query.length());
 
-        //query = "//*";
+            //query = "//*";
 
-        log.debug("Processing query string: " + query);
+            log.debug("targetDataset: " + targetDataset);
 
-
-        //Processor proc = new Processor(false);
-        //XPathCompiler xpath = proc.newXPathCompiler();
-        //xpath.declareNamespace("saxon", "http://saxon.sf.net/"); // not actually used, just for demonstration
-
-        Processor proc = datasetToHtmlTransform.getProcessor();
-        XPathCompiler xpath = proc.newXPathCompiler();
-        xpath.declareNamespace(THREDDS.NAMESPACE_PREFIX, THREDDS.NAMESPACE_STRING);
-
-
-        // DocumentBuilder builder = proc.newDocumentBuilder();
-        // builder.setLineNumbering(true);
-        // builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
-        // XdmNode booksDoc = builder.build(new File("data/books.xml"));
-
-        catDoc = catDoc;// Already read the document....
+            // Build a parameter to pass into the XSLT
+            String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+            nodeString += "<targetDataset>" + targetDataset + "</targetDataset>";
+            ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+            XdmNode targetDatasetNode = datasetToHtmlTransform.build(new StreamSource(reader));
+            // Pass the query string as a parameter
+            datasetToHtmlTransform.setParameter(new QName("targetDataset"), targetDatasetNode);
 
 
-        // find all the ITEM elements, and for each one display the TITLE child
-
-        // XPathSelector selector = xpath.compile("//ITEM").load();
-
-        XPathSelector xps = xpath.compile(query).load();
-
-
-        //selector.setContextItem(booksDoc);
-        xps.setContextItem(catDoc);
-
-
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        out.setOutputStream(response.getOutputStream());
-
-
-        QName titleName = new QName("dataset");
-        for (XdmItem item : xps) {
-            XdmNode node = (XdmNode) item;
-            System.out.println(node.getNodeName() +
-                    "(" + node.getLineNumber() + ") ");
-            //proc.writeXdmValue(node, out);
-
-        }
-
-        // Send the catalog using the transform.
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "thredds_catalog");
-        response.setStatus(HttpServletResponse.SC_OK);
-        for (XdmItem dataset : xps) {
-            if (!dataset.isAtomicValue()) {
-                proc.writeXdmValue(dataset, out);
-                //datasetToHtmlTransform.transform((XdmNode)dataset,response.getOutputStream());
-            }
-        }
-
-
-        log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
-
-
-    }
-
-    // Helper method to get the first child of an element having a given name.
-    // If there is no child with the given name it returns null
-
-    private static XdmNode getChild(XdmNode parent, QName childName) {
-        XdmSequenceIterator iter = parent.axisIterator(Axis.CHILD, childName);
-        if (iter.hasNext()) {
-            return (XdmNode) iter.next();
-        } else {
-            return null;
-        }
-    }
-
-
-    private void sendCatalogXML(HttpServletResponse response, String relativeURL) throws Exception {
-
-
-        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
-
-            /*
-            Document catalog = CatalogManager.getTopLevelCatalogDocument();
-
-            // Send the XML catalog.
-            response.setContentType("text/xml");
-            response.setHeader("Content-Description", "dods_directory");
+            // Set up the http headers.
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            response.getOutputStream().print(xmlo.outputString(catalog));
-            log.debug("Sent THREDDS catalog (raw XML).");
-            */
-            throw new IOException("We should never be attempting to send a " +
-                    "catalog for  just the handlers prefix. The URL should" +
-                    "have been redirected to $prefix/catalog.xml");
 
-        } else {
-            // Strip the prefix off of the relativeURL)
-            if (relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
+            // Send the transformed documet.
+            datasetToHtmlTransform.transform(catDoc,response.getOutputStream());
 
-            if (cat != null) {
-                log.debug("\nFound catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
+            log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
-                // Send the XML catalog.
-                response.setContentType("text/xml");
-                response.setHeader("Content-Description", "dods_directory");
-                response.setStatus(HttpServletResponse.SC_OK);
-                cat.writeCatalogXML(response.getOutputStream());
-                log.debug("Sent THREDDS catalog (raw XML).");
+            datasetToHtmlTransform.setParameter(new QName("targetDataset"), null);
 
-            } else {
-                log.error("Can't find catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
-                        "find catalog: " + Scrub.urlContent(relativeURL));
-            }
         }
+        finally {
+            datasetToHtmlTransformLock.unlock();
+
+        }
+
+
+
 
     }
 
     private void sendCatalogHTML(HttpServletResponse response, String relativeURL) throws SaxonApiException, IOException {
 
+
+        // Patch up the request URL so we can find the source catalog
+        relativeURL = relativeURL.substring(0,
+                relativeURL.lastIndexOf(".html")) + ".xml";
+
+
+        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
+
+            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
+
+            // Disabled this code because code based changed to require a
+            // single top level catalog, catalog.xml. Thus, this clause
+            // should never get excecuted.
+            //
+            throw new IOException("Synthetic top level catalog not supported.");
+        }
+        // Strip the prefix off of the relativeURL)
+        if (relativeURL.startsWith(_prefix))
+            relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
+
         try {
 
             catalogToHtmlTransformLock.lock();
+            catalogToHtmlTransform.reloadTransformIfRequired();
 
             XdmNode catDoc;
-
-            // Patch up the request URL so we can find the source catalog
-            relativeURL = relativeURL.substring(0,
-                    relativeURL.lastIndexOf(".html")) + ".xml";
-
-
-            if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
-
-                // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-
-                // Disabled this code because code based changed to require a
-                // single top level catalog, catalog.xml. Thus, this clause
-                // should never get excecuted.
-                //
-                throw new IOException("Synthetic top level catalog not supported.");
-            } else {
-                // Strip the prefix off of the relativeURL)
-                if (relativeURL.startsWith(_prefix))
-                    relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
-
+            Lock catLock = CatalogManager.getRWLock().readLock();
+            try {
+                catLock.lock();
 
                 Catalog cat = CatalogManager.getCatalog(relativeURL);
 
@@ -738,6 +541,9 @@ public class Dispatch implements DispatchHandler {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
                     return;
                 }
+            }
+            finally {
+                catLock.unlock();
             }
 
 
@@ -759,6 +565,54 @@ public class Dispatch implements DispatchHandler {
 
     }
 
+
+    private void sendCatalogXML(HttpServletResponse response, String relativeURL) throws Exception {
+
+
+        if (relativeURL.equals(_prefix)) { // Then we would have to make a top level catalog.
+
+            throw new IOException("We should never be attempting to send a " +
+                    "catalog for  just the handlers prefix. The URL should" +
+                    "have been redirected to $prefix/catalog.xml");
+
+        } else {
+            // Strip the prefix off of the relativeURL)
+            if (relativeURL.startsWith(_prefix))
+                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
+
+            Lock catLock = CatalogManager.getRWLock().readLock();
+
+            try {
+                catLock.lock();
+                Catalog cat = CatalogManager.getCatalog(relativeURL);
+
+                if (cat != null) {
+                    log.debug("\nFound catalog: " + relativeURL + "   " +
+                            "    prefix: " + _prefix
+                    );
+
+                    // Send the XML catalog.
+                    response.setContentType("text/xml");
+                    response.setHeader("Content-Description", "dods_directory");
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    cat.writeCatalogXML(response.getOutputStream());
+                    log.debug("Sent THREDDS catalog (raw XML).");
+
+                } else {
+                    log.error("Can't find catalog: " + relativeURL + "   " +
+                            "    prefix: " + _prefix
+                    );
+
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
+                            "find catalog: " + Scrub.urlContent(relativeURL));
+                }
+            }
+            finally{
+                catLock.unlock();
+            }
+        }
+
+    }
 
 
     public void init(DispatchServlet servlet, Element configuration) throws Exception {
@@ -852,7 +706,7 @@ public class Dispatch implements DispatchHandler {
 
             // ---------------------
             // Get XSLT document name
-            String catalogToHtmlXslt = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+            String catalogToHtmlXslt = ServletUtil.getPath(dispatchServlet, catalogToHtmlTransformFile);
 
             // Build an cache an XSLT transformer for the XSLT document.
             catalogToHtmlTransform = new Transformer(catalogToHtmlXslt);
@@ -875,7 +729,7 @@ public class Dispatch implements DispatchHandler {
 
             // ---------------------
             // Get XSLT document name
-            String datasetToHtmlXslt = ServletUtil.getPath(dispatchServlet, "/docs/xsl/thredds.xsl");
+            String datasetToHtmlXslt = ServletUtil.getPath(dispatchServlet, datasetToHtmlTransformFile);
 
             // Build an cache an XSLT transformer for the XSLT document.
             datasetToHtmlTransform = new Transformer(datasetToHtmlXslt);

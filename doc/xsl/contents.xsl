@@ -117,7 +117,7 @@
 
                                     <td align="right">-</td>
                                     <td align="center">
-                                        &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
+                                        &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
                                     </td>
                                 </tr>
                             </xsl:if>
@@ -154,6 +154,7 @@
                                     </td>
                                     <td align="center">
                                         <xsl:if test="@isData='true'">
+                                            <a href="{name}.rdf">rdf</a>
                                             <a href="{name}.ddx">ddx</a>
                                             <a href="{name}.dds">dds</a>
                                             <a href="{name}.das">das</a>
@@ -161,7 +162,7 @@
                                             <a href="{name}.html">html</a>
                                         </xsl:if>
                                         <xsl:if test="@isData='false'">
-                                            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
+                                            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
                                         </xsl:if>
                                     </td>
                                 </tr>

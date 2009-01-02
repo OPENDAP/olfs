@@ -182,21 +182,20 @@
 
                     <xsl:choose>
 
-                        <!-- Is it a browse Catalog command?. -->
-                        <xsl:when test="contains(@xlink:href,'?browseCatalog')">
+                        <!-- Does it point towards a remote catalog?. -->
+                        <xsl:when test="starts-with(@xlink:href,'http://')">
                             <a>
-                            <xsl:attribute name="href"><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                            <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
                                 <xsl:choose>
-                                    <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/></xsl:when>
+                                    <xsl:when test="@xlink:title"><xsl:value-of select="./@xlink:title"/>/</xsl:when>
                                     <xsl:otherwise>Link</xsl:otherwise>
                                 </xsl:choose>
                             </a>
                         </xsl:when>
 
-
-                        <!-- Does it end in ? Then replace that with .html -->
+                        <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
                         <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
-
+                            <!--Then replace that with '.html'   -->
                             <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
                         </xsl:when>
 
@@ -205,7 +204,6 @@
                             <a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
                         </xsl:otherwise>
                     </xsl:choose>
-
 
                 </td>
                 <xsl:call-template name="NoSizeNoTime" />
@@ -317,7 +315,7 @@
 
         <xsl:if test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
             <tr>
-                <td  align="left">
+                <td  class="dark" align="left">
                     <xsl:value-of select="$indent"/><xsl:value-of select="@name" />/
                 </td>
                 <xsl:call-template name="NoSizeNoTime" />

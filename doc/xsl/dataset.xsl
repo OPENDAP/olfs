@@ -355,6 +355,10 @@
                                               ./@serviceType[.='openDap'] |
                                               ./@serviceType[.='opendap']">
 
+                                <xsl:if test="not($remoteHost)">
+                                    <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.rdf" >rdf</a>&#160;
+                                </xsl:if>
+
                                 <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.ddx" >ddx</a>&#160;
                                 <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.dds" >dds</a>&#160;
                                 <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.das" >das</a>&#160;

@@ -38,6 +38,7 @@ import java.io.File;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.DocumentBuilder;
 
 /**
  * User: ndp
@@ -169,6 +170,10 @@ public class RemoteHttpCatalog implements Catalog {
     }
 
     public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public XdmNode getCatalogAsXdmNode(DocumentBuilder builder) throws IOException, SaxonApiException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

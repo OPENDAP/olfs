@@ -33,6 +33,7 @@ import java.io.IOException;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.DocumentBuilder;
 
 /**
  * User: ndp
@@ -55,6 +56,7 @@ public interface Catalog {
     Document getCatalogDocument() throws IOException, JDOMException;
 
     XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException;
+    XdmNode getCatalogAsXdmNode(DocumentBuilder builder) throws IOException, SaxonApiException;
 
     String getName();
 

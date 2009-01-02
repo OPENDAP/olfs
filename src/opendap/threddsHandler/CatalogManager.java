@@ -44,16 +44,20 @@ public class CatalogManager {
 
     private static Logger log;
     private static String contentPath;
-    //private static Document config;
 
 
 
-    //private static Vector<Catalog> rootCatalogs = new Vector<Catalog>();
 
     private static HashMap<String, Catalog> catalogs = new HashMap<String, Catalog>();
     private static ReentrantReadWriteLock _catalogsLock;
     private static boolean isIntialized=false;
 
+    private static ReentrantReadWriteLock _myLock;
+
+
+    public static ReentrantReadWriteLock getRWLock(){
+        return _myLock;
+    }
 
 
 
@@ -71,37 +75,14 @@ public class CatalogManager {
             return;
         }
 
+        _myLock = new ReentrantReadWriteLock();
         _catalogsLock = new ReentrantReadWriteLock();
         CatalogManager.contentPath = contentPath;
-
-
-
-
-
 
         isIntialized = true;
     }
 
 
-    /*
-    public static void addRootCatalog(String pathPrefix,String urlPrefix, String fname,
-                                  boolean cacheCatalogFileContent)
-            throws Exception {
-
-        Catalog catalog = new Catalog(pathPrefix,urlPrefix,fname,cacheCatalogFileContent);
-
-        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
-        try {
-            lock.lock();
-            rootCatalogs.add(catalog);
-            addCatalog(catalog,cacheCatalogFileContent);
-        }
-        finally {
-            lock.unlock();
-        }
-
-    }
-    */
 
     public static void addCatalog(String pathPrefix,
                                   String urlPrefix,
@@ -122,73 +103,6 @@ public class CatalogManager {
 
     }
 
-
-
-
-    /*
-    public static Document getTopLevelCatalogDocument() {
-
-        Element catRef, catalogRoot;
-        String href, title, name;
-
-        Document catalog = new Document(new Element(THREDDS.CATALOG));
-        catalogRoot = catalog.getRootElement();
-        catalogRoot.setNamespace(Namespace.getNamespace(THREDDS.NAMESPACE_STRING));
-        catalogRoot.addNamespaceDeclaration(XLINK.NS);
-        catalogRoot.setAttribute(THREDDS.NAME, "HyraxThreddsHandler");
-
-        // We only need a read lock here because we are NOT going to reread
-        // our configuration. So - All of these top level catalogs can't change.
-        // Their content can change, but we can't add or remove from the list.
-        // If one of them has a change, then that will get loaded when the
-        // changed catalog gets accessed.
-        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
-        try {
-            lock.lock();
-            for (Catalog cat : rootCatalogs) {
-                catRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
-
-                href = cat.getUrlPrefix() + cat.getFileName();
-                catRef.setAttribute(XLINK.HREF,href,XLINK.NS);
-
-                title = cat.getName();
-                catRef.setAttribute(XLINK.TITLE,title,XLINK.NS);
-
-                name = cat.getName();
-                catRef.setAttribute(THREDDS.NAME,name);
-
-                catalogRoot.addContent(catRef);
-            }
-        }
-        finally {
-            lock.unlock();
-        }
-
-
-        return catalog;
-    }
-    */
-
-    /*
-    public static XdmNode getTopLevelCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
-
-        XdmNode source;
-        InputStream is;
-
-        Document tlcat = getTopLevelCatalogDocument();
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        byte[] buffer = xmlo.outputString(tlcat).getBytes();
-
-        is = new ByteArrayInputStream(buffer);
-        log.debug("getCatalogDocument(): Reading catalog from memory cache.");
-
-        source = proc.newDocumentBuilder().build(new StreamSource(is));
-
-        return source;
-    }
-    */
 
     public static void addCatalog(Catalog catalog,
                                   boolean cacheCatalogFileContent)
@@ -218,12 +132,10 @@ public class CatalogManager {
             if(href.startsWith("http://")){
                 log.info("Found catalogRef that references an external " +
                         "catalog. Target catalog not processed. The catalogRef element " +
-                        "will remain in the catalog.");
-                // @todo Added reomte catalog support.
+                        "will remain in the catalog and will not be cached.");
+                // @todo Add remote catalog caching support?
             }
             else if(href.startsWith("/")) {
-                //thisUrlPrefix = href.substring(0,href.length() - Util.basename(href).length());
-                //thisPathPrefix = catalog.getPathPrefix() + href;
                 log.info("Found thredds:catalogRef whose xlink:href attribute " +
                         "begins with a \"/\" character. " +
                         "This may mean that the catalog is pointing " +
@@ -232,16 +144,9 @@ public class CatalogManager {
                         "Target catalog not processed as a file. " +
                         "The catalogRef element " +
                         "will remain in the catalog. This will allow it to " +
-                        "appear correctly in thredds catalog output.");
-                // @todo Added support for cataloging within the local server....
-
-
-            }
-            else if(href.contains("?browseCatalog=")){
-                log.info("Found catalogRef for browseCatalog " +
-                        "catalog. Target catalog not processed. The catalogRef element " +
-                        "will remain in the catalog.");
-                // @todo Added reomte catalog support.
+                        "appear correctly in thredds catalog output. But it's contents " +
+                        "will not be cached.");
+                // @todo Add support for catalog caching within the local server? Mabye not.
             }
             else {
 
@@ -387,6 +292,96 @@ public class CatalogManager {
 
         return s;
     }
+
+
+    //private static Vector<Catalog> rootCatalogs = new Vector<Catalog>();
+    //private static Document config;
+
+    /*
+    public static void addRootCatalog(String pathPrefix,String urlPrefix, String fname,
+                                  boolean cacheCatalogFileContent)
+            throws Exception {
+
+        Catalog catalog = new Catalog(pathPrefix,urlPrefix,fname,cacheCatalogFileContent);
+
+        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
+        try {
+            lock.lock();
+            rootCatalogs.add(catalog);
+            addCatalog(catalog,cacheCatalogFileContent);
+        }
+        finally {
+            lock.unlock();
+        }
+
+    }
+    */
+
+
+    /*
+    public static Document getTopLevelCatalogDocument() {
+
+        Element catRef, catalogRoot;
+        String href, title, name;
+
+        Document catalog = new Document(new Element(THREDDS.CATALOG));
+        catalogRoot = catalog.getRootElement();
+        catalogRoot.setNamespace(Namespace.getNamespace(THREDDS.NAMESPACE_STRING));
+        catalogRoot.addNamespaceDeclaration(XLINK.NS);
+        catalogRoot.setAttribute(THREDDS.NAME, "HyraxThreddsHandler");
+
+        // We only need a read lock here because we are NOT going to reread
+        // our configuration. So - All of these top level catalogs can't change.
+        // Their content can change, but we can't add or remove from the list.
+        // If one of them has a change, then that will get loaded when the
+        // changed catalog gets accessed.
+        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
+        try {
+            lock.lock();
+            for (Catalog cat : rootCatalogs) {
+                catRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
+
+                href = cat.getUrlPrefix() + cat.getFileName();
+                catRef.setAttribute(XLINK.HREF,href,XLINK.NS);
+
+                title = cat.getName();
+                catRef.setAttribute(XLINK.TITLE,title,XLINK.NS);
+
+                name = cat.getName();
+                catRef.setAttribute(THREDDS.NAME,name);
+
+                catalogRoot.addContent(catRef);
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+
+
+        return catalog;
+    }
+    */
+
+    /*
+    public static XdmNode getTopLevelCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
+
+        XdmNode source;
+        InputStream is;
+
+        Document tlcat = getTopLevelCatalogDocument();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        byte[] buffer = xmlo.outputString(tlcat).getBytes();
+
+        is = new ByteArrayInputStream(buffer);
+        log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+
+        source = proc.newDocumentBuilder().build(new StreamSource(is));
+
+        return source;
+    }
+    */
 
 
 }

@@ -193,14 +193,8 @@
     <property name="xercesImpl.lib" value="xercesImpl-2.8.1.jar"/>
     <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
 
-    <property name="saxon-dom.lib"   value="saxon-9.1.0.5-dom.jar"/>
-    <property name="saxon-dom4j.lib" value="saxon-9.1.0.5-dom4j.jar"/>
     <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
-    <property name="saxon-sql.lib"   value="saxon-9.1.0.5-sql.jar"/>
-    <property name="saxon-xom.lib"   value="saxon-9.1.0.5-xom.jar"/>
-    <property name="saxon-xpath.lib" value="saxon-9.1.0.5-xpath.jar"/>
-    <property name="saxon-xqj.lib"   value="saxon-9.1.0.5-xqj.jar"/>
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
 

@@ -33,6 +33,8 @@ import java.io.*;
 import java.util.Date;
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
 
 import net.sf.saxon.s9api.*;
 
@@ -56,7 +58,7 @@ public class LocalFileCatalog implements Catalog {
     private boolean _useMemoryCache;
     private Vector<Catalog> _children;
     private Date _cacheTime;
-
+    private static ReentrantReadWriteLock _catalogLock;
 
     public LocalFileCatalog( String pathPrefix,
                     String urlPrefix,
@@ -64,8 +66,13 @@ public class LocalFileCatalog implements Catalog {
                     boolean useMemoryCache) throws Exception{
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
         log.debug("Configuring new "+getClass().getName());
+
+        _catalogLock = new ReentrantReadWriteLock();
+
+       
+
+
 
         _fileName = fname;
         _pathPrefix = pathPrefix;
@@ -104,8 +111,11 @@ public class LocalFileCatalog implements Catalog {
         if(_useMemoryCache){
             cacheCatalogFileContent();
         }
-        else
+        else{
             _buffer = null;
+            _cacheTime = new Date(catalogFile.lastModified());
+        }
+
 
 
         Document catalog  = getCatalogDocument();
@@ -119,6 +129,7 @@ public class LocalFileCatalog implements Catalog {
             log.error(msg);
             throw new Exception(msg);
         }
+
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         //xmlo.output(catalog, System.out);
@@ -139,11 +150,26 @@ public class LocalFileCatalog implements Catalog {
 
 
     public void addChild(LocalFileCatalog c){
-        _children.add(c);
+
+        Lock lock =  _catalogLock.writeLock();
+        try {
+            lock.lock();
+            _children.add(c);
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     public Enumeration<Catalog> getChildren(){
-        return _children.elements();
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            return _children.elements();
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
 
@@ -159,44 +185,50 @@ public class LocalFileCatalog implements Catalog {
      */
     private void cacheCatalogFileContent() throws Exception {
 
-        String fname = _pathPrefix + _fileName;
-
-        File catalogFile = new File(fname);
-        _buffer  = new byte[(int)catalogFile.length()];
-
-        log.debug("Loading THREDDS catalog file: "+ fname);
-
-        FileInputStream fis = new FileInputStream(fname);
-
+        Lock lock =  _catalogLock.writeLock();
         try {
-            int count = 0, ret;
-            while(count<catalogFile.length()){
-                ret = fis.read(_buffer);
-                if(ret<0){
-                    log.error("Premature end of file reached. file: "+ fname);
-                    throw new Exception("Premature end of file reached.");
+            lock.lock();
+            String fname = _pathPrefix + _fileName;
+
+            File catalogFile = new File(fname);
+            _buffer  = new byte[(int)catalogFile.length()];
+
+            log.debug("Loading THREDDS catalog file: "+ fname);
+
+            FileInputStream fis = new FileInputStream(fname);
+
+            try {
+                int count = 0, ret;
+                while(count<catalogFile.length()){
+                    ret = fis.read(_buffer);
+                    if(ret<0){
+                        log.error("Premature end of file reached. file: "+ fname);
+                        throw new Exception("Premature end of file reached.");
+                    }
+                    count += ret;
                 }
-                count += ret;
             }
+            finally {
+                fis.close();
+            }
+            _cacheTime = new Date();
+
+            log.info("Using memory cache for: "+fname);
         }
         finally {
-            fis.close();
+            lock.unlock();
         }
-        _cacheTime = new Date();
-
-        log.info("Using memory cache for: "+fname);
 
 
     }
 
     public boolean needsRefresh(){
 
-        if(_useMemoryCache){ // It only needs refreshed if it's
-                        // cached in the first place
-
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
             String fname = _pathPrefix + _fileName;
             File catalogFile = new File(fname);
-
             if (catalogFile.lastModified() > _cacheTime.getTime()) {
 
                 log.debug("THREDDS Catalog file: "+fname+" needs to re-ingested");
@@ -204,8 +236,11 @@ public class LocalFileCatalog implements Catalog {
                 return true;
             }
 
+            return false;
         }
-        return false;
+        finally{
+            lock.unlock();
+        }
     }
 
 
@@ -213,6 +248,9 @@ public class LocalFileCatalog implements Catalog {
 
     public void writeCatalogXML(OutputStream os) throws Exception {
 
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
             String fname = _pathPrefix+_fileName;
 
             if(_buffer!=null){
@@ -247,6 +285,10 @@ public class LocalFileCatalog implements Catalog {
                 }
 
             }
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
 
@@ -259,23 +301,26 @@ public class LocalFileCatalog implements Catalog {
     //@todo Consider optimizing this to cache the document after parsing.
     public Document getCatalogDocument() throws IOException, JDOMException {
 
-        InputStream is=null;
-        SAXBuilder sb = new SAXBuilder();
+        InputStream is = null;
 
+        Lock lock =  _catalogLock.readLock();
         try {
-        if(_buffer!=null){
-            is = new ByteArrayInputStream(_buffer);
-            log.debug("getCatalogDocument(): Reading catalog from memory cache.");
-        }
-        else {
-            is = new FileInputStream(_pathPrefix+_fileName);
-            log.debug("getCatalogDocument(): Reading catalog from file.");
-        }
-        return  sb.build(is);
+            lock.lock();
+            SAXBuilder sb = new SAXBuilder();
+            if(_buffer!=null){
+                is = new ByteArrayInputStream(_buffer);
+                log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+            }
+            else {
+                is = new FileInputStream(_pathPrefix+_fileName);
+                log.debug("getCatalogDocument(): Reading catalog from file.");
+            }
+            return  sb.build(is);
         }
         finally {
             if(is!=null)
                 is.close();
+            lock.unlock();
         }
 
     }
@@ -293,7 +338,9 @@ public class LocalFileCatalog implements Catalog {
         XdmNode catalog;
         InputStream is = null;
 
+        Lock lock =  _catalogLock.readLock();
         try {
+            lock.lock();
             if (_buffer != null) {
                 is = new ByteArrayInputStream(_buffer);
                 log.debug("getCatalogDocument(): Reading catalog from memory cache.");
@@ -312,32 +359,104 @@ public class LocalFileCatalog implements Catalog {
         finally {
             if (is != null)
                 is.close();
+            lock.unlock();
+        }
+        return catalog;
+    }
+
+    /**
+     *
+     * @param builder The DocumentBuilder used to build the document.
+     * @return The catalog parsed into an XdmNode
+     * @throws IOException When things can't be read.
+     * @throws SaxonApiException When things can't be parsed.
+     */
+     //@todo Consider optimizing this to cache the document after parsing.
+    public XdmNode getCatalogAsXdmNode(DocumentBuilder builder) throws IOException, SaxonApiException {
+
+        XdmNode catalog;
+        InputStream is = null;
+
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            if (_buffer != null) {
+                is = new ByteArrayInputStream(_buffer);
+                log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+            } else {
+                is = new FileInputStream(_pathPrefix + _fileName);
+                log.debug("getCatalogDocument(): Reading catalog from file.");
+            }
+            //builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
+
+            catalog = builder.build(new StreamSource(is));
+        }
+        finally {
+            if (is != null)
+                is.close();
+            lock.unlock();
         }
         return catalog;
     }
 
 
     public String getName(){
-        return _name;
+
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            return _name;
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     public String getPathPrefix(){
-        return _pathPrefix;
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            return _pathPrefix;
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     public String getUrlPrefix(){
-        return _urlPrefix;
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            return _urlPrefix;
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     public String getFileName(){
-        return _fileName;
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            return _fileName;
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
 
     public long getLastModified(){
-        String fname = _pathPrefix + _fileName;
-        File catalogFile = new File(fname);
-        return catalogFile.lastModified();
+        Lock lock =  _catalogLock.readLock();
+        try {
+            lock.lock();
+            String fname = _pathPrefix + _fileName;
+            File catalogFile = new File(fname);
+            return catalogFile.lastModified();
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
 

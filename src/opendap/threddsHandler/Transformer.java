@@ -45,6 +45,7 @@ public class Transformer {
     private XsltTransformer transform;
     private Date cacheTime;
     private String xsltDoc;
+    private DocumentBuilder builder;
 
 
     public Transformer(String xsltDocument) throws SaxonApiException {
@@ -64,15 +65,29 @@ public class Transformer {
         out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        builder = getDocumentBuilder();
 
         loadTransform();
 
+    }
 
+    public XdmNode build(java.io.File file ) throws SaxonApiException {
+        return builder.build(file);
+    }
+
+    public XdmNode build(javax.xml.transform.Source source) throws SaxonApiException {
+        return builder.build(source);
+    }
+
+    public DocumentBuilder getDocumentBuilder() {
+        DocumentBuilder builder = proc.newDocumentBuilder();
+        builder.setLineNumbering(true);
+        return builder;
 
     }
 
 
-    private void reloadTransformIfRequired() throws SaxonApiException {
+    public void reloadTransformIfRequired() throws SaxonApiException {
         File f = new File(xsltDoc);
         if(f.lastModified()>cacheTime.getTime()){
             loadTransform();
@@ -99,7 +114,6 @@ public class Transformer {
     }
 
     public void transform(XdmNode doc, OutputStream os) throws SaxonApiException {
-        reloadTransformIfRequired();
         out.setOutputStream(os);
         transform.setInitialContextNode(doc);
         transform.setDestination(out);
@@ -107,6 +121,10 @@ public class Transformer {
     }
 
 
+    public void setParameter(QName name,
+                             XdmValue value){
+        transform.setParameter(name,value);
+    }
 
 
 
