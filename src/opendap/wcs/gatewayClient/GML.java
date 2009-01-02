@@ -26,14 +26,9 @@ package opendap.wcs.gatewayClient;
 import org.jdom.Namespace;
 
 /**
- * User: ndp
- * Date: Apr 16, 2008
- * Time: 10:29:17 AM
+ * GML Namespaces and vocabulary.
  */
 public class GML {
-
-
-
 
     public static String    NAMEPACES_STRING ="http://www.opengis.net/gml";
     public static Namespace NS = Namespace.getNamespace(NAMEPACES_STRING);

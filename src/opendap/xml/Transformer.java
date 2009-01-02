@@ -23,6 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.xml;
 
+
+
+import net.sf.saxon.s9api.*;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -31,6 +36,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.input.SAXBuilder;
+import org.slf4j.Logger;
 
 import java.net.URI;
 import java.io.*;
@@ -43,10 +49,12 @@ import java.io.*;
 public class Transformer {
 
 
-    private HttpClient httpClient;
+    private static Logger log;
+    static {
+        log = org.slf4j.LoggerFactory.getLogger(Transformer.class);
+    }
 
-    public Transformer(){
-        httpClient = new HttpClient();
+    private Transformer(){
     }
 
 
@@ -62,23 +70,14 @@ public class Transformer {
 
         Transformer  t = new Transformer();
 
-
-        System.setProperty("javax.xml.transform.TransformerFactory","com.icl.saxon.TransformerFactoryImpl");
-//        System.setProperty("javax.xml.transform.TransformerFactory","org.apache.xalan.processor.TransformerFactoryImpl");
-
-
-        System.out.println(getXSLTImpl());
-
-
          if(args.length!=2){
             t.printUsage(System.err);
             System.exit(-1);
         }
-
-
-
         try {
-            t.transformURI(args[0],args[1]);
+            jdomXsltTransfom(args[0],args[1],System.out);
+            saxonXsltTransform(args[0],args[1],System.out);
+
         } catch (Exception e) {
             e.printStackTrace(System.err);
 
@@ -87,7 +86,7 @@ public class Transformer {
     }
 
 
-    public void transformURI(String srcFile, String xslFile) throws Exception {
+    public static void jdomXsltTransfom(String srcDocUri, String xslDocUri, OutputStream os) throws Exception {
 
 
 
@@ -95,13 +94,13 @@ public class Transformer {
 
         Document sourceDoc, xsltDoc;
 
-        sourceDoc = getXMLDoc(srcFile);
-        System.err.println("Got and parsed XML document: "+srcFile);
-        xmlo.output(sourceDoc, System.err);
+        sourceDoc = getXMLDoc(srcDocUri);
+        log.debug("Got and parsed XML document: "+srcDocUri);
+        log.debug(xmlo.outputString(sourceDoc));
 
-        xsltDoc = getXMLDoc(xslFile);
-        System.err.println("Got and parsed XSL document: "+xslFile);
-        xmlo.output(xsltDoc, System.err);
+        xsltDoc = getXMLDoc(xslDocUri);
+        log.debug("Got and parsed XSL document: "+xslDocUri);
+        log.debug(xmlo.outputString(xsltDoc));
 
 
         System.err.println("Applying transform...");
@@ -113,13 +112,20 @@ public class Transformer {
 
 
         Document result = transformer.transform(sourceDoc);
-        xmlo.output(result, System.out);
+        xmlo.output(result, os);
+        log.debug(xmlo.outputString(result));
+
+
+
+
+
+
 
 
     }
 
 
-    public Document getXMLDoc(String s) throws Exception{
+    public static Document getXMLDoc(String s) throws Exception{
 
 
         // get a validating jdom parser to parse and validate the XML document.
@@ -129,17 +135,19 @@ public class Transformer {
         Document doc;
 
         if(s.startsWith("http://")){
-            System.err.println("Appears to be a URL: "+s);
+            log.debug("Appears to be a URL: "+s);
 
             GetMethod request = new GetMethod(s);
             InputStream is=null;
             try {
+
+                HttpClient httpClient = new HttpClient();
                 // Execute the method.
                 int statusCode = httpClient.executeMethod(request);
 
                 if (statusCode != HttpStatus.SC_OK) {
-                  System.err.println("ERROR: Method failed " + request.getStatusLine());
-                  doc = null;
+                    log.error("HttpClient failed to executeMethod(). Status: " + request.getStatusLine());
+                    doc = null;
                 }
                 else {
                 	is = request.getResponseBodyAsStream();
@@ -152,7 +160,7 @@ public class Transformer {
             finally {
             	if(is!=null)
             		is.close();
-                System.err.println("Releasing Http connection.");
+                log.debug("Releasing Http connection.");
                 request.releaseConnection();
             }
 
@@ -203,6 +211,204 @@ public class Transformer {
         }
 
         return str;
+
+    }
+
+    public static void saxonXsltTransform(String srcDocUri, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
+
+
+        log.debug("Performing transform using Saxon");
+
+        Processor proc = new Processor(false);
+
+        XsltTransformer trans = Transformer.getXsltTransformer(proc, xslTransformUri);
+
+        XdmNode source = Transformer.getXdmNode(proc,srcDocUri);
+
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(os);
+
+        trans.setInitialContextNode(source);
+        trans.setDestination(out);
+        trans.transform();
+
+        log.debug("Output written to: "+os);
+
+    }
+
+
+    public static void saxonXsltTransform(InputStream srcDoc, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
+
+
+        log.debug("Performing transform using Saxon");
+
+        Processor proc = new Processor(false);
+
+        XsltTransformer trans = Transformer.getXsltTransformer(proc, xslTransformUri);
+
+        XdmNode source = proc.newDocumentBuilder().build(new StreamSource(srcDoc));
+
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(os);
+
+        trans.setInitialContextNode(source);
+        trans.setDestination(out);
+        trans.transform();
+
+        log.debug("Output written to: "+os);
+
+    }
+
+
+    public static void saxonXsltTransform(InputStream srcDoc, InputStream xslTransform, OutputStream os) throws IOException, SaxonApiException {
+
+
+        log.debug("Performing transform using Saxon");
+
+        Processor proc = new Processor(false);
+
+        XsltCompiler comp = proc.newXsltCompiler();
+
+        XsltExecutable exp = comp.compile(new StreamSource(xslTransform));
+        XsltTransformer trans = exp.load();
+
+        XdmNode source = proc.newDocumentBuilder().build(new StreamSource(srcDoc));
+
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        out.setOutputStream(os);
+
+        trans.setInitialContextNode(source);
+        trans.setDestination(out);
+        trans.transform();
+
+        log.debug("Output written to: "+os);
+
+    }
+
+
+
+
+
+
+    public static XdmNode getXdmNode(Processor proc, String srcDocUri) throws IOException, SaxonApiException {
+
+        XdmNode source;
+
+        if(srcDocUri.startsWith("http://")){
+            log.debug("Appears to be a URL: "+srcDocUri);
+
+            GetMethod request = new GetMethod(srcDocUri);
+            InputStream is = null;
+            try {
+
+                HttpClient httpClient = new HttpClient();
+                // Execute the method.
+                int statusCode = httpClient.executeMethod(request);
+
+                if (statusCode != HttpStatus.SC_OK) {
+                    log.error("HttpClient failed to executeMethod(). Status: " + request.getStatusLine());
+                  source = null;
+                }
+                else {
+                	is = request.getResponseBodyAsStream();
+                    source = proc.newDocumentBuilder().build(new StreamSource(is));
+                }
+
+                return source;
+
+            }
+            finally {
+            	if(is!=null)
+            		is.close();
+                log.debug("Releasing Http connection.");
+                request.releaseConnection();
+            }
+
+        }
+        else {
+            File file = new File(srcDocUri);
+            if(!file.exists()){
+                throw new IOException("Cannot find file: "+ srcDocUri);
+            }
+
+            if(!file.canRead()){
+                throw new IOException("Cannot read file: "+ srcDocUri);
+            }
+            source = proc.newDocumentBuilder().build(new StreamSource(file));
+
+            return source;
+
+        }
+
+    }
+
+
+
+
+
+
+    public static XsltTransformer getXsltTransformer(Processor proc, String xslTransformUri) throws IOException, SaxonApiException {
+
+        XsltCompiler comp = proc.newXsltCompiler();
+        XsltExecutable exp;
+        XsltTransformer trans;
+
+
+        if(xslTransformUri.startsWith("http://")){
+            log.debug("Appears to be a URL: "+xslTransformUri);
+
+            GetMethod request = new GetMethod(xslTransformUri);
+            InputStream is = null;
+            try {
+
+                HttpClient httpClient = new HttpClient();
+
+                // Execute the method.
+                int statusCode = httpClient.executeMethod(request);
+
+                if (statusCode != HttpStatus.SC_OK) {
+                    log.error("HttpClient failed to executeMethod(). Status: " + request.getStatusLine());
+                  trans = null;
+                }
+                else {
+                	is = request.getResponseBodyAsStream();
+                    exp = comp.compile(new StreamSource(is));
+                    trans = exp.load();
+
+                }
+
+                return trans;
+
+            }
+            finally {
+            	if(is!=null)
+            		is.close();
+                log.debug("Releasing Http connection.");
+                request.releaseConnection();
+            }
+
+        }
+        else {
+            File file = new File(xslTransformUri);
+            if(!file.exists()){
+                throw new IOException("Cannot find file: "+ xslTransformUri);
+            }
+
+            if(!file.canRead()){
+                throw new IOException("Cannot read file: "+ xslTransformUri);
+            }
+            exp = comp.compile(new StreamSource(file));
+            trans = exp.load();
+
+            return trans;
+
+        }
 
     }
 

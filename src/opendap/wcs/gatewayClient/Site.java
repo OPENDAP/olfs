@@ -30,24 +30,29 @@ import org.slf4j.Logger;
 import java.util.List;
 
 /**
- * User: ndp
- * Date: Mar 13, 2008
- * Time: 2:40:32 PM
- */
-
-/*
-        <Site name="BER">
-            <label>BERMS Old Black Spruce</label>
-            <WCSParameters>
-                <bbox>-107.475000,45.935000,-102.725000,50.685000</bbox>
-                <time>2003-10-01/2003-11-30</time>
-                <format>netCDF</format>
-                <resx>0.25</resx>
-                <resy>0.25</resy>
-                <interpolationMethod>Nearest neighbor</interpolationMethod>
-            </WCSParameters>
-        </Site>
-    */
+ * This class represents a study site. Each Project has one or more Site object.
+ * The Site contains the WCS Parameters that will be used to create queries
+ * for thhe site. These parameter include (for WCS 1.0) bbox, time, format,
+ * resx, resy, and interpolation method. </p>
+ *
+ * <p><b>ConfigurationExample:</b>
+ *
+ * <pre>
+        &lt;Site name="BER"&gt;
+            &lt;label&gt;BERMS Old Black Spruce&lt;/label&gt;
+            &lt;WCSParameters&gt;
+                &lt;bbox&gt;-107.475000,45.935000,-102.725000,50.685000&lt;/bbox&gt;
+                &lt;time&gt;2003-10-01/2003-11-30&lt;/time&gt;
+                &lt;format&gt;netCDF&lt;/format&gt;
+                &lt;resx&gt;0.25&lt;/resx&gt;
+                &lt;resy&gt;0.25&lt;/resy&gt;
+                &lt;interpolationMethod&gt;Nearest neighbor&lt;/interpolationMethod&gt;
+            &lt;/WCSParameters&gt;
+        &lt;/Site&gt;
+ * </pre>
+ * It is possible this can be used with later versions of WCS as long as the
+ * general structure of the holdings remains.
+*/
 public class Site {
 
     private Logger log = org.slf4j.LoggerFactory.getLogger(getClass());

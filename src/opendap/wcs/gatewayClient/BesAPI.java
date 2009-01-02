@@ -30,9 +30,14 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 
 /**
- * User: ndp
- * Date: Nov 24, 2008
- * Time: 10:42:40 AM
+ * This child class of opendap.bes.BesXmlAPI provides an implementation of the
+ * getRequestDocument method that utilizes the BES wcs_gateway_module. The
+ * intention was to override the methd from the parent class but that didn't
+ * work out (can't override static methods? I don't know why) So the
+ * implementation of the DAP dispatch methods had to be recreated.
+ *
+ * @see opendap.wcs.gatewayClient.WcsDispatchHandler
+ *
  */
 public class BesAPI extends BesXmlAPI {
 
@@ -43,6 +48,22 @@ public class BesAPI extends BesXmlAPI {
     }
 
 
+    /**
+     * This child class of opendap.bes.BesXmlAPI provides an implementation of the
+     * getRequestDocument method that utilizes the BES wcs_gateway_module.
+     * @param type The type of thing being requested. For example a DDX would be
+     * opendap.bes.BesXmlAPI.DDX
+     * @param wcsRequestURL See opendap.bes.BesXmlAPI.DDX
+     * @param ce See opendap.bes.BesXmlAPI
+     * @param xdap_accept See opendap.bes.BesXmlAPI
+     * @param xmlBase See opendap.bes.BesXmlAPI
+     * @param formURL See opendap.bes.BesXmlAPI
+     * @param returnAs See opendap.bes.BesXmlAPI
+     * @param errorContext See opendap.bes.BesXmlAPI
+     * @return The request Document
+     * @throws BadConfigurationException When the bad things happen.
+     * @see opendap.bes.BesXmlAPI
+     */
     public static  Document getRequestDocument(String type,
                                                 String wcsRequestURL,
                                                 String ce,

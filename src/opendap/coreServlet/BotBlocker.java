@@ -157,7 +157,7 @@ public class BotBlocker implements DispatchHandler {
             throws Exception {
 
 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         // For some reason using sendError() causes the HTTP headers to say
         // return status is 200 OK and not 403 Forbidden... Wierd.

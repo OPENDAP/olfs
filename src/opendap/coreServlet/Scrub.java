@@ -52,7 +52,7 @@ public class Scrub {
     public static String fileName(String fileName){
         Matcher m = fileNameInclusionPattern.matcher(fileName);
 
-        log.debug("URL() - Scrubbing URL Content: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
+        log.debug("URL() - Scrubbing file Name: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
             return fileName;
         }

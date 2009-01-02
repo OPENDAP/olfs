@@ -27,9 +27,7 @@ import org.jdom.Namespace;
 import org.jdom.Element;
 
 /**
- * User: ndp
- * Date: Mar 14, 2008
- * Time: 8:16:30 AM
+ * WCS Namespaces and vocabulary.
  */
 public class WCS {
 

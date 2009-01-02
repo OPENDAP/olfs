@@ -167,40 +167,54 @@ public class Chunk {
 
     public static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException{
 
-        boolean done = false;
-        int bytesToRead = len;
-        int totalBytesRead =0;
-        int bytesRead;
 
+        if(     buf!=null &&         // Make sure the buffer is not null
+                len>=0 &&            // Make sure they want a positive number of bytes
+                off>=0 &&            // Make sure the offset is positive
+                buf.length<=(off+len) // Guard against buffer overflow
+            ){
 
-        if(buf.length<(off+len))
-            throw new IOException("Attempted to read "+len+" bytes starting " +
-                    "at "+off+" into a buffer of length "+buf.length+"  " +
-                    "I'm sorry Dave, I'm afraid I can't do that...");
+            boolean done = false;
+            int bytesToRead = len;
+            int totalBytesRead =0;
+            int bytesRead;
 
-
-        while(!done){
-            bytesRead = is.read(buf,off,len);
-            if(bytesRead == -1){
-                if(totalBytesRead==0)
-                    totalBytesRead=-1;
-                done = true;
-            }
-            else {
-                totalBytesRead += bytesRead;
-                if(totalBytesRead == bytesToRead){
+            while(!done){
+                bytesRead = is.read(buf,off,len);
+                if(bytesRead == -1){
+                    if(totalBytesRead==0)
+                        totalBytesRead=-1;
                     done = true;
                 }
                 else {
-                    len = bytesToRead - totalBytesRead;
-                    off += bytesRead;
+                    totalBytesRead += bytesRead;
+                    if(totalBytesRead == bytesToRead){
+                        done = true;
+                    }
+                    else {
+                        len = bytesToRead - totalBytesRead;
+                        off += bytesRead;
+                    }
                 }
             }
+
+            return totalBytesRead;
+
+        }
+        else {
+            String msg = "Attempted to read "+len+" bytes starting " +
+                    "at "+off;
+            if(buf==null)
+                msg += " into a null reference. ";
+            else
+                msg += " into a buffer of length "+buf.length+"  ";
+            msg += "I'm afraid I can't allow that...";
+            throw new IOException(msg);
         }
 
 
 
-        return totalBytesRead;
+
     }
 
     /**

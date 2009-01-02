@@ -298,8 +298,6 @@ public class ChunkedInputStream  {
                     }
                     log.debug("Stream closed by Source.");
 
-
-
                 }
                 else {
                     log.debug("Received status extension: "+extension);

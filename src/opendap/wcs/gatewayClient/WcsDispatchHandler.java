@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.io.OutputStream;
@@ -635,9 +636,9 @@ public class WcsDispatchHandler implements DispatchHandler {
         String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
-        service.lock();
+        ReentrantReadWriteLock.ReadLock lock = service.getReadLock();
         try {
-
+            lock.lock();
             Document capDoc = service.getCapabilitiesDocument();
             //xmlo.output(capDoc, System.out);
 
@@ -652,7 +653,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         }
         finally {
-            service.unlock();
+            lock.unlock();
         }
 
     }
@@ -699,8 +700,9 @@ public class WcsDispatchHandler implements DispatchHandler {
         }
 
 
-        service.lock();
+        ReentrantReadWriteLock.ReadLock lock = service.getReadLock();
         try {
+            lock.lock();
 
             WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
             if (coverage == null) {
@@ -760,7 +762,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         }
         finally {
-            service.unlock();
+            lock.unlock();
         }
 
 
@@ -801,9 +803,9 @@ public class WcsDispatchHandler implements DispatchHandler {
         }
 
         String wcsRequestURL="";
-        service.lock();
+        ReentrantReadWriteLock.ReadLock lock = service.getReadLock();
         try {
-
+            lock.lock();
             WcsCoverageOffering coverage = service.getCoverageOffering(coverageName);
             if (coverage == null) {
                 log.error("sendDAPResponse() Coverage:  \"" + serviceName + "\" not found.");
@@ -818,7 +820,7 @@ public class WcsDispatchHandler implements DispatchHandler {
             log.debug("wcsRequestURL: "+wcsRequestURL);
         }
         finally{
-            service.unlock();
+            lock.unlock();
         }
 
 

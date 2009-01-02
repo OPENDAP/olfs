@@ -127,13 +127,8 @@ public class WcsService {
     }
 
 
-    public void lock(){
-        capablitiesDocLock.readLock().lock();
-
-    }
-
-    public void unlock(){
-        capablitiesDocLock.readLock().unlock();
+    public ReentrantReadWriteLock.ReadLock getReadLock(){
+        return capablitiesDocLock.readLock();
     }
 
 

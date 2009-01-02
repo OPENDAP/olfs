@@ -30,9 +30,11 @@ import org.slf4j.Logger;
 import java.util.*;
 
 /**
- * User: ndp
- * Date: Mar 13, 2008
- * Time: 2:03:01 PM
+ *
+ * A Project is the top level organization.
+ * Each Project instance should have one or more Sites.
+ *
+ * @see opendap.wcs.gatewayClient.Site
  */
 public class Project {
 
