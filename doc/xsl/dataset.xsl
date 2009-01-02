@@ -201,12 +201,14 @@
                     </xsl:if>
 
 
+                    <hr/>
+
                     <xsl:variable name="metadataTest" select="thredds:metadata |
                                         $inheritedMetadata[boolean($inheritedMetadata)]" />
                     <xsl:if test="$metadataTest" >
                         <h2>Metadata Detail: </h2>
                         <ul class="small">
-                            <xsl:apply-templates select="$metadataTest" mode="metadataSumary" >
+                            <xsl:apply-templates select="$metadataTest" mode="metadataDetail" >
                                 <xsl:with-param name="currentDataset" select="." />
                             </xsl:apply-templates>
                         </ul>
@@ -558,6 +560,12 @@
 
 
 
+    <!-- ******************************************************
+      -  contributorDetail
+     -->
+    <xsl:template match="thredds:contributor" mode="contributorDetail">
+        <li><em>Contributor: </em><xsl:value-of select="." />, <xsl:value-of select="@role" /></li>
+    </xsl:template>
 
 
 
@@ -630,7 +638,7 @@
 
 
     <!-- ******************************************************
-      -  metadataSumary
+      -  metadataDetail
 
           <xsd:group name="threddsMetadataGroup">
               <xsd:choice>
@@ -659,17 +667,17 @@
      -->
 
 
-    <xsl:template match="*" mode="metadataSumary" />
+    <xsl:template match="*" mode="metadataDetail" />
 
-    <xsl:template match="thredds:metadata" mode="metadataSumary">
+    <xsl:template match="thredds:metadata" mode="metadataDetail">
         <xsl:param name="currentDataset" />
         <li><b><xsl:if test="./@inherited[.='true']">Inherited</xsl:if> Metadata Group:</b></li>
         <ul>
-        <xsl:apply-templates mode="metadataSumary" />
+        <xsl:apply-templates mode="metadataDetail" />
         </ul>
     </xsl:template>
 
-    <xsl:template match="thredds:documentation" mode="metadataSumary">
+    <xsl:template match="thredds:documentation" mode="metadataDetail">
         <xsl:if test="@type">
             <li><em>documentation[<b><xsl:value-of select="@type"/>]: </b></em><xsl:value-of select="."/></li>
         </xsl:if>
@@ -682,64 +690,64 @@
 
 
 
-    <xsl:template match="thredds:property" mode="metadataSumary">
+    <xsl:template match="thredds:property" mode="metadataDetail">
         <xsl:apply-templates select="." mode="propertyDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:contributor" mode="metadataSumary">
+    <xsl:template match="thredds:contributor" mode="metadataDetail">
         Contributer:<xsl:apply-templates select="." mode="contributorDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:creator" mode="metadataSumary">
+    <xsl:template match="thredds:creator" mode="metadataDetail">
         Creator:<xsl:apply-templates select="." mode="creatorDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:date" mode="metadataSumary">
+    <xsl:template match="thredds:date" mode="metadataDetail">
         <xsl:apply-templates select="." mode="dateDetail" />
     </xsl:template>
 
 
-    <xsl:template match="thredds:keyword" mode="metadataSumary">
+    <xsl:template match="thredds:keyword" mode="metadataDetail">
         <xsl:apply-templates select="." mode="keywordDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:project" mode="metadataSumary">
+    <xsl:template match="thredds:project" mode="metadataDetail">
         <xsl:apply-templates select="." mode="projectDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:publisher" mode="metadataSumary">
+    <xsl:template match="thredds:publisher" mode="metadataDetail">
         Publisher:<xsl:apply-templates select="." mode="publisherDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:geospatialCoverage" mode="metadataSumary">
+    <xsl:template match="thredds:geospatialCoverage" mode="metadataDetail">
         <xsl:apply-templates select="." mode="geospatialCoverageDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:timeCoverage" mode="metadataSumary">
+    <xsl:template match="thredds:timeCoverage" mode="metadataDetail">
         <xsl:apply-templates select="." mode="timeCoverageDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:variables" mode="metadataSumary">
+    <xsl:template match="thredds:variables" mode="metadataDetail">
         <xsl:apply-templates select="." mode="variablesDetail" />
     </xsl:template>
 
-    <xsl:template match="thredds:dataType" mode="metadataSumary">
+    <xsl:template match="thredds:dataType" mode="metadataDetail">
          <li><em>Data type: </em><xsl:value-of select="."/></li>
     </xsl:template>
 
-    <xsl:template match="thredds:dataSize" mode="metadataSumary">
+    <xsl:template match="thredds:dataSize" mode="metadataDetail">
          <li><em>Data size: </em><xsl:value-of select="."/></li>
     </xsl:template>
 
-    <xsl:template match="thredds:dataFormat" mode="metadataSumary">
+    <xsl:template match="thredds:dataFormat" mode="metadataDetail">
          <li><em>Data Format: </em><xsl:value-of select="."/></li>
     </xsl:template>
 
-    <xsl:template match="thredds:serviceName" mode="metadataSumary">
+    <xsl:template match="thredds:serviceName" mode="metadataDetail">
          <li><em>Service Name: </em><xsl:value-of select="."/></li>
     </xsl:template>
 
-    <xsl:template match="thredds:authority" mode="metadataSumary">
+    <xsl:template match="thredds:authority" mode="metadataDetail">
          <li><em>Naming Authority: </em><xsl:value-of select="."/></li>
     </xsl:template>
 

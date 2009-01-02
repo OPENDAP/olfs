@@ -44,4 +44,6 @@ HR {
 .small {
     font-size: 10px;
 }
-
+.dark {
+    font-weight: bold;
+}

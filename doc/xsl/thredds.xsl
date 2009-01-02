@@ -35,6 +35,7 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
                 >
+    <xsl:param name="remoteHost" />
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -70,6 +71,7 @@
 
                     </div>
                 </h1>
+                <h3>Remote Host: <xsl:value-of select="$remoteHost" /></h3>
 
                 <hr size="1" noshade="noshade"/>
 
@@ -161,21 +163,43 @@
      -->
     <xsl:template match="thredds:catalogRef">
         <xsl:param name="indent" />
-        <tr>
-            <td align="left" >
+        
+        <xsl:if test="false()">
+            <tr>
+                <td align="left" >
+    
+                    <!-- If the href ends in .xml, change it to .html
+                         so the link in the presentation points to
+                         another HTML page. -->
+                    <xsl:if test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
+                        <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                    </xsl:if>
+    
+                    <!-- Since it doesn't end in .xml we don't know how to promote it, so leave it be. -->
+                    <xsl:if test="not(substring(./@xlink:href,string-length(./@xlink:href) - 3))">
+                        <a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
+                    </xsl:if>
+    
+                </td>
+                <xsl:call-template name="NoSizeNoTime" />
+            </tr>
+        </xsl:if>
 
-                <xsl:if test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
-                    <a href="{concat(substring(./@xlink:href,1,string-length(./@xlink:href) - 4),'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
-                </xsl:if>
 
-                <xsl:if test="not(substring(./@xlink:href,string-length(./@xlink:href) - 3))">
-                    <a href="{./@xlink:href}" ><xsl:value-of select="./@xlink:title"/> /</a>
-                </xsl:if>
-
-            </td>
-            <xsl:call-template name="NoSizeNoTime" />
-        </tr>
-
+        <xsl:if test="true()">
+            <tr>
+                <td align="left" >
+    
+                    <a>
+                    <xsl:attribute name="href">.?browseCatalog=<xsl:value-of select="$remoteHost"/><xsl:value-of select="@xlink:href" /></xsl:attribute>
+                    <xsl:value-of select="./@xlink:title"/>
+                    </a> 
+    
+    
+                </td>
+                <xsl:call-template name="NoSizeNoTime" />
+            </tr>
+        </xsl:if>
 
     </xsl:template>
 
@@ -196,7 +220,7 @@
 
                 <xsl:variable name="href" select="./@xlink:href" />
                 <xsl:variable name="linkSuffix" select="substring($href,string-length($href) - 3)" />
-                <xsl:variable name="linkBody" select="substring($href,1,string-length($href) - 4)" />
+                <xsl:variable name="linkBody"   select="substring($href,1,string-length($href) - 4)" />
 
                 <xsl:if test="$linkSuffix='.xml'">
                     <xsl:value-of select="$indent"/><a href="{concat($linkBody,'.html')}" ><xsl:value-of select="./@xlink:title"/> /</a>
