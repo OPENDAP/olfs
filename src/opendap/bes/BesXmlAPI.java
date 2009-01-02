@@ -493,9 +493,27 @@ public class BesXmlAPI {
         if(ret){
             // Get the root element.
             Element root = response.getRootElement();
+            if(root==null)
+                throw new BadConfigurationException("The BES returned an empty " +
+                        "document in response to " +
+                        "a showCatalog request. This may indicate a problem " +
+                        "with the configuration of the BES.");
+
+            // Find the respnse Element
+            Element resp = root.getChild("response");
+            if(resp==null)
+                throw new BadConfigurationException("The BES returned a " +
+                        "document without a <response> element in respose to " +
+                        "a showCatalog request. This may indicate a problem " +
+                        "with the configuration of the BES.");
 
             // Find the top level dataset Element
-            Element topDataset = root.getChild("response").getChild("dataset");
+            Element topDataset = resp.getChild("dataset");
+            if(topDataset==null)
+                throw new BadConfigurationException("The BES returned a " +
+                        "document without a <dataset> element in respose to " +
+                        "a showCatalog request. This may indicate a problem with " +
+                        "the configuration of the BES.");
 
             topDataset.setAttribute("prefix", getBESprefix(dataSource));
         }
@@ -534,9 +552,28 @@ public class BesXmlAPI {
         if(ret) {
             // Get the root element.
             Element root = response.getRootElement();
+            if(root==null)
+                throw new BadConfigurationException("The BES returned an " +
+                        "empty document in response to " +
+                        "a showInfo request. This may indicate a problem " +
+                        "with the configuration of the BES.");
+
+            // Find the respnse Element
+            Element resp = root.getChild("response");
+            if(resp==null)
+                throw new BadConfigurationException("The BES returned a " +
+                        "document without a <response> element in respose to " +
+                        "a showInfo request. This may indicate a problem " +
+                        "with the configuration of the BES.");
 
             // Find the top level dataset Element
-            Element topDataset = root.getChild("response").getChild("dataset");
+            Element topDataset = resp.getChild("dataset");
+            if(topDataset==null)
+                throw new BadConfigurationException("The BES returned a " +
+                        "document without a <dataset> element in respose to " +
+                        "a showInfo request. This may indicate a problem with " +
+                        "the configuration of the BES.");
+
 
             // Add the prefix attribute for this BES.
             topDataset.setAttribute("prefix", getBESprefix(dataSource));
@@ -693,6 +730,7 @@ public class BesXmlAPI {
 
 
     }
+
 
     /**
      *
