@@ -168,20 +168,23 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         boolean isDirectoryResponse = false;
         boolean isContentsRequest = false;
 
-        if(dataSetName != null &&
-            dataSetName.equalsIgnoreCase("contents") &&
-            requestSuffix != null &&
-            requestSuffix.equalsIgnoreCase("html")) {
+        if(dataSetName != null) {
+            if(
+                (dataSetName.equalsIgnoreCase("contents") ||
+                dataSetName.equalsIgnoreCase("catalog")) &&
+                requestSuffix != null &&
+                requestSuffix.equalsIgnoreCase("html")
 
-            isDirectoryResponse = true;
-            isContentsRequest = true;
+               ){
+
+                isDirectoryResponse = true;
+                isContentsRequest = true;
+            }
 
         } else {
             DataSourceInfo dsi = new BESDataSource(dsName);
             if (dsi.sourceExists() &&
-                    dsi.isCollection() &&
-                    useDefaultOpendapDirectoryView) {
-
+                    dsi.isCollection() ) {
                     isDirectoryResponse = true;
             }
 
@@ -240,6 +243,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
+        }
+        else if(collectionName.endsWith("/catalog.html")){
+            collectionName = collectionName.substring(0,collectionName.lastIndexOf("catalog.html"));
         }
 
         if(!collectionName.endsWith("/"))
