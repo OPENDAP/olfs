@@ -144,10 +144,6 @@ public class DispatchServlet extends HttpServlet {
 
     }
 
-    public ThreddsHandler getThreddsDispatchHandler() {
-        return null;
-    }
-
     public String getDocsPath() {
         return "docs/";
     }
