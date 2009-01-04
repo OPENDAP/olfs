@@ -104,7 +104,7 @@ public class CatalogManager {
     }
 
 
-    public static void addCatalog(Catalog catalog,
+    private static void addCatalog(Catalog catalog,
                                   boolean cacheCatalogFileContent)
             throws Exception {
 

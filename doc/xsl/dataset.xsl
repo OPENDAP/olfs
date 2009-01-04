@@ -51,7 +51,17 @@
         <xsl:param name="inheritedMetadata" />
 
 
-        <xsl:if test="thredds:dataset">
+        <xsl:choose>
+
+            <!-- Is this the dataset that we are supposed to summary? -->
+            <xsl:when test="$targetDataset=preceding::*/last()">
+                <xsl:call-template name="targetDatasetPage">
+                <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]" />
+
+                </xsl:call-template>
+            </xsl:when>
+
+        <xsl:otherwise >
             <xsl:apply-templates>
                 <!--
                   -   Note that the followiing parameter uses an XPath that
@@ -60,12 +70,19 @@
                   -->
                 <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]" />
             </xsl:apply-templates>
-         </xsl:if >
+         </xsl:otherwise >
 
-        <xsl:if test="not(thredds:dataset)">
+        </xsl:choose>
 
-            <!-- Is this the dataset that we are supposed to summary? -->
-            <xsl:if test="$targetDataset=preceding::*/last()">
+    </xsl:template>
+
+
+    <!-- ******************************************************
+      -  targetDatasetPage template
+     -->
+    <xsl:template name="targetDatasetPage" >
+
+        <xsl:param name="inheritedMetadata" />
 
                 <!-- ****************************************************** -->
                 <!--                      PAGE HEADER                       -->
@@ -214,26 +231,22 @@
 
                     <hr/>
 
-                    <xsl:variable name="metadataTest" select="thredds:metadata |
-                                        $inheritedMetadata[boolean($inheritedMetadata)]" />
-                    <xsl:if test="$metadataTest" >
-                        <h2>Metadata Detail: </h2>
-                        <ul class="small">
+
+                    <h2>Metadata Detail: </h2>
+
+                    <ul class="small">
+                        <xsl:apply-templates select="." mode="metadataDetail" >
+                            <xsl:with-param name="currentDataset" select="." />
+                        </xsl:apply-templates>
+
+                        <xsl:variable name="metadataTest" select="$inheritedMetadata[boolean($inheritedMetadata)]" />
+                        <xsl:if test="$metadataTest" >
                             <xsl:apply-templates select="$metadataTest" mode="metadataDetail" >
                                 <xsl:with-param name="currentDataset" select="." />
                             </xsl:apply-templates>
-                        </ul>
-                    </xsl:if>
+                        </xsl:if>
+                    </ul>
 
-
-                    <xsl:if test="true()" >
-                        <h2>Metadata Detail: </h2>
-                        <ul class="small">
-                            <xsl:apply-templates select="." mode="metadataDetail" >
-                                <xsl:with-param name="currentDataset" select="." />
-                            </xsl:apply-templates>
-                        </ul>
-                    </xsl:if>
 
 
 
@@ -271,12 +284,11 @@
 
                 </body>
 
-            </xsl:if>
-        </xsl:if>
-
-
-
     </xsl:template>
+
+
+
+
 
 
     <!-- ******************************************************
@@ -428,7 +440,7 @@
         <date type="modified">2008-12-23 23:58:40Z</date>
     -->
     <xsl:template match="thredds:date" mode="dateDetail">
-        <li><xsl:value-of select="."/> <em><b>(<xsl:value-of select="@type"/>)</b></em></li>
+        <li><xsl:value-of select="."/> <em>(<xsl:value-of select="@type"/>)</em></li>
     </xsl:template>
 
 
@@ -708,8 +720,9 @@
       -  variableDetail
      -->
     <xsl:template match="thredds:variable" mode="variableDetail">
-        <li> <b><xsl:value-of select="@vocabulary_name" />[</b><xsl:value-of select="@name" /><b>]</b> <xsl:if test="@units">
-             <tr><td>units: </td><td><xsl:value-of select="@units" /></td></tr>
+        <li> <b><xsl:value-of select="@vocabulary_name" />[</b><xsl:value-of select="@name" /><b>]</b>
+             <xsl:if test="@units">
+                <em>units: <xsl:value-of select="@units" /></em>
              </xsl:if>
         </li>
     </xsl:template>
@@ -737,10 +750,10 @@
      -->
     <xsl:template match="thredds:dataset" mode="datasetDetail">
         <li>
-            <em>dataset: </em>
+            <b>Dataset Metadata: </b>
             <ul>
                 <li><em>name: </em><xsl:value-of select="@name" /></li>
-            <xsl:apply-templates select="*" mode="metadataDetail"/>
+                <xsl:apply-templates select="*" mode="metadataDetail"/>
             </ul>
         </li>
     </xsl:template>

@@ -115,6 +115,13 @@
                         <td>
                             <div class="small" align="left">
                                 THREDDS Catalog
+
+                            <xsl:choose>
+                                <xsl:when test="$remoteCatalog">
+                                    <a href="{$remoteCatalog}">XML</a>
+                                </xsl:when>
+
+                                <xsl:otherwise>
                                 <SCRIPT LANGUAGE="JavaScript">
                                     <xsl:comment >
                                     {
@@ -125,19 +132,22 @@
                                     }
                                     </xsl:comment>
                                 </SCRIPT>
+                                </xsl:otherwise>
+                            </xsl:choose>
+
                             </div>
 
 
                         </td>
                         <td>
-                            <div class="small" align="right">
-                                Hyrax development sponsored by
-                                <a href='http://www.nsf.gov/'>NSF</a>
-                                ,
-                                <a href='http://www.nasa.gov/'>NASA</a>
-                                , and
-                                <a href='http://www.noaa.gov/'>NOAA</a>
-                            </div>
+                        <div class="small" align="right">
+                            Hyrax development sponsored by
+                            <a href='http://www.nsf.gov/'>NSF</a>
+                            ,
+                            <a href='http://www.nasa.gov/'>NASA</a>
+                            , and
+                            <a href='http://www.noaa.gov/'>NOAA</a>
+                        </div>
                         </td>
                     </tr>
                 </table>
@@ -316,7 +326,21 @@
         <xsl:if test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
             <tr>
                 <td  class="dark" align="left">
-                    <xsl:value-of select="$indent"/><xsl:value-of select="@name" />/
+                    <xsl:value-of select="$indent"/>
+                    <a>
+                        <xsl:if test="$remoteCatalog">
+                            <xsl:attribute name="href">
+                                ?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="not($remoteCatalog)">
+                            <xsl:attribute name="href">
+                                ?dataset=<xsl:value-of select="preceding::*/last()"/>
+                            </xsl:attribute>
+                        </xsl:if>
+
+                        <xsl:value-of select="@name"/>/
+                    </a>
                 </td>
                 <xsl:call-template name="NoSizeNoTime" />
             </tr>
