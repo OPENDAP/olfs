@@ -377,10 +377,22 @@ public class Dispatch implements DispatchHandler {
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
-
+            // Clean up the transform before releasing it.
             catalogToHtmlTransform.setParameter(new QName("remoteHost"), null);
             catalogToHtmlTransform.setParameter(new QName("remoteRelativeURL"), null);
             catalogToHtmlTransform.setParameter(new QName("remoteCatalog"), null);
+        }
+        catch(SaxonApiException sapie){
+            if(response.isCommitted()){
+                return;
+            }
+            // Set up the Http headers.
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "ERROR");
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+
+            // Responed with error.
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
             catalogToHtmlTransformLock.unlock();

@@ -352,10 +352,11 @@
 
                     <td>
                         <xsl:choose>
+                        
+                            <!-- Check to see if we can build an access URL. -->
                             <xsl:when test="not($currentDataset/@urlPath)">
                             No Service Links Available (Missing thredds:dataset/@urlPath)
                             </xsl:when>
-
 
 
 
@@ -388,9 +389,42 @@
                             <xsl:when test="./@serviceType[.='HTTPServer']" >
                                 <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >File Download</a>
                             </xsl:when>
+                            
+                            
+                            <!-- #####################################################
+                              - 
+                              -
+                              - Here is where you would add code to provide data access 
+                              - for a new service. 
+                              -
+                              - Simply add a when statement with one or more link items. 
+                              - 
+                              - In this example:
 
+                                    <xsl:when test="./@serviceType[.='YOUR_SERVICE_TYPE']" >
+                                        <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >TEXT_OF_RESPONSE_LINK</a>
+                                    </xsl:when>
+                                    
+                              - The href is formed to be the minium correct URL for a THREDDS catalog listing:
+                              - 
+                              -     remoteHost + thredds:service/@base + thredds:dataset/@urlPath
+                              -
+                              - Example:
+                              - 
+                              -    "http://test.opendap.org:8080" + "/opendap/" + "data/nc/fnoc1.nc"
+                              -
+                              - This should be how correct data access links can be formed from a THREDDS catalog. 
+                              -
+                              -->
+
+
+                            <!-- 
+                              - No way to map service to a particular set of access URLs, so
+                              - Give them the baseic service link.
+                              -->
                             <xsl:otherwise>
-                                <em>Service Links Not Available.</em>
+                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >THREDDS Service link.</a>
+                                <em>This is an unfamiliar service type for this transform, so no additional links are avail;able.)</em> 
                             </xsl:otherwise>
 
                         </xsl:choose>

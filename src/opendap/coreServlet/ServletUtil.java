@@ -44,7 +44,7 @@ public class ServletUtil {
       if ( contextPath == null ) {
         ServletContext servletContext = servlet.getServletContext();
         String tmpContextPath = servletContext.getInitParameter( "ContextPath" );
-        if ( tmpContextPath == null ) tmpContextPath = "thredds";
+        if ( tmpContextPath == null ) tmpContextPath = "opendap";
         contextPath = "/"+tmpContextPath;
       }
       return contextPath;
