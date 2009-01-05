@@ -38,7 +38,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import thredds.servlet.ServletUtil;
 
 /**
  * This servlet provides the dispatching for all OPeNDAP requests.
@@ -345,7 +344,6 @@ public class DispatchServlet extends HttpServlet {
      * Starts the logging process.
      */
     private void initLogging() {
-        thredds.servlet.ServletUtil.initLogging(this);
         PerfLog.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 

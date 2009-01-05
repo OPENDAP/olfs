@@ -27,9 +27,7 @@ package opendap.bes;
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
 import opendap.coreServlet.DispatchServlet;
-import opendap.coreServlet.ReqInfo;
 import opendap.soap.XMLNamespaces;
-import opendap.soap.ExceptionElementUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,13 +41,8 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 
 
-import thredds.servlet.DataRootHandler;
-import thredds.catalog.*;
-import thredds.catalog.parser.jdom.InvCatalogFactory10;
-
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.net.URI;
 
 /**
  * Handler for SOAP requests.

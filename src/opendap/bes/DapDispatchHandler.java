@@ -43,7 +43,6 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
-import thredds.servlet.ServletUtil;
 
 /**
  * Handler for DAP requests.

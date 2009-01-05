@@ -26,6 +26,7 @@ package opendap.wcs.gatewayClient;
 
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.DispatchServlet;
+import opendap.coreServlet.ServletUtil;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -34,7 +35,6 @@ import org.jdom.transform.XSLTransformer;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
-import thredds.servlet.ServletUtil;
 
 /**
  * Thrown when something BAD happens in the BES - primairly used to wrap BES

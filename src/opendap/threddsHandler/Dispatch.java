@@ -23,10 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
-import opendap.coreServlet.DispatchHandler;
-import opendap.coreServlet.DispatchServlet;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import org.slf4j.Logger;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -42,7 +39,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 import java.io.*;
 
-import thredds.servlet.ServletUtil;
 
 
 import net.sf.saxon.s9api.*;

@@ -24,7 +24,6 @@
 
 package opendap.bes;
 
-import thredds.servlet.ServletUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

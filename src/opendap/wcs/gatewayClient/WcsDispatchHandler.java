@@ -23,10 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import opendap.coreServlet.DispatchHandler;
-import opendap.coreServlet.DispatchServlet;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BESError;
 import opendap.bes.BesXmlAPI;
@@ -47,7 +44,6 @@ import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 
-import thredds.servlet.ServletUtil;
 
 /**
  * User: ndp

@@ -26,11 +26,8 @@ package opendap.coreServlet;
 
 
 import javax.servlet.http.HttpServlet;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
-import thredds.util.IO;
-import thredds.servlet.ServletUtil;
 import org.slf4j.Logger;
 
 /**
@@ -54,7 +51,7 @@ public class PersistentContentHandler {
 
         log.debug("PersistentContentHandler:");
         log.debug("    contentPath:        " + ServletUtil.getContentPath(servlet));
-        log.debug("    initialContentPath: " + ServletUtil.getInitialContentPath(servlet));
+        log.debug("    initialContentPath: " + getInitialContentPath(servlet));
         log.debug("    semaphore:          " + semaphore);
 
 
@@ -77,10 +74,6 @@ public class PersistentContentHandler {
 
     }
 
-    private static String getInitialContentPath(HttpServlet servlet) {
-      return ServletUtil.getRootPath(servlet) + "initialContent/";
-    }
-
 
     private static  boolean copyDirIfSemaphoreNotPresent(
             String fromDir,
@@ -90,7 +83,7 @@ public class PersistentContentHandler {
 
       File contentFile = new File(toDir+semaphore);
       if (!contentFile.exists()) {
-        IO.copyDirTree(fromDir, toDir);
+        copyDirTree(fromDir, toDir);
         contentFile.createNewFile();
         return true;
       }
@@ -98,7 +91,76 @@ public class PersistentContentHandler {
     }
 
 
+ /* #################################################################################################################
+  *
+  * FILE UTILITY METHODS
+  *
+  *
+  */
 
+    private static String getInitialContentPath(HttpServlet servlet) {
+      return ServletUtil.getRootPath(servlet) + "initialContent/";
+    }
+
+
+
+    /**
+     * Copy an entire directory tree.
+     * @param fromDirName from this directory (do nothing if not exist)
+     * @param toDirName to this directory (will create if not exist)
+     * @throws java.io.IOException on io error
+     */
+    static public void copyDirTree(String fromDirName, String toDirName) throws IOException {
+      File fromDir = new File(fromDirName);
+      File toDir = new File(toDirName);
+      if (!fromDir.exists())
+        return;
+      if (!toDir.exists())
+        toDir.mkdirs();
+
+      File[] files = fromDir.listFiles();
+      for (int i=0; i<files.length; i++) {
+        File f = files[i];
+        if (f.isDirectory())
+          copyDirTree(f.getAbsolutePath(), toDir.getAbsolutePath() + "/" + f.getName());
+        else
+          copyFile( f.getAbsolutePath(), toDir.getAbsolutePath() + "/" + f.getName());
+      }
+    }
+    /**
+     * copy one file to another.
+     * @param fileInName copy from this file, which must exist.
+     * @param fileOutName copy to this file, which is overrwritten if already exists.
+     * @throws java.io.IOException on io error
+     */
+   static public void copyFile(String fileInName, String fileOutName) throws IOException {
+     InputStream in = null;
+     OutputStream out = null;
+     try {
+       in = new BufferedInputStream( new FileInputStream( fileInName));
+       out = new BufferedOutputStream( new FileOutputStream( fileOutName));
+       copy( in, out);
+     } finally {
+       if (null != in) in.close();
+       if (null != out) out.close();
+     }
+   }
+
+    /**
+     * copy all bytes from in to out.
+     * @param in InputStream
+     * @param out OutputStream
+     * @throws java.io.IOException on io error
+     */
+    static private int default_file_buffersize = 9200;
+    static public void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[default_file_buffersize];
+        while (true) {
+          int bytesRead = in.read(buffer);
+          if (bytesRead == -1) break;
+          out.write(buffer, 0, bytesRead);
+        }
+    }
 
 
 }

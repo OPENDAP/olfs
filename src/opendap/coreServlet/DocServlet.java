@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import thredds.servlet.ServletUtil;
 import org.slf4j.Logger;
 
 /**

@@ -42,8 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.Util;
-import thredds.servlet.ServletUtil;
-
+import opendap.coreServlet.ServletUtil;
 
 
 /**

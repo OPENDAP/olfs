@@ -181,8 +181,6 @@
     <property name="echo.lib" value="echosoap.jar"/>
 
 
-    <property name="thredds.lib" value="tsf-3.16.22.jar"/>
-    <property name="netcdf.lib" value="netcdf-2.2.20.jar"/>
     <property name="nlog4j.lib" value="nlog4j-1.2.21.jar"/>
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.0.jar"/>
@@ -218,8 +216,6 @@
             <include name="${commons-httpclient.lib}"/>
             <include name="${commons-logging.lib}"/>
             <include name="${commons-codec.lib}"/>
-            <include name="${thredds.lib}"/>
-            <include name="${netcdf.lib}"/>
             <include name="${nlog4j.lib}"/>
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
@@ -576,8 +572,6 @@
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
-                <include name="${thredds.lib}"/>
-                <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
                 <include name="${commons-cli.lib}"/>
                 <include name="${commons-httpclient.lib}"/>
@@ -607,8 +601,6 @@
             <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
-                <include name="${thredds.lib}"/>
-                <include name="${netcdf.lib}"/>
                 <include name="${nlog4j.lib}"/>
                 <include name="${commons-cli.lib}"/>
                 <include name="${commons-httpclient.lib}"/>

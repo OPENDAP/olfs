@@ -35,7 +35,6 @@ import javax.servlet.ServletContext;
 import javax.xml.parsers.FactoryConfigurationError;
 import java.io.File;
 
-import thredds.servlet.ServletUtil;
 
 /**
  * User: ndp
@@ -149,7 +148,7 @@ public class PerfLog {
 
         isLogInit = true;
     }
-
+                    
 
 
     /**
