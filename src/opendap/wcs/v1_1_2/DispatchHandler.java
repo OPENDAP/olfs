@@ -66,6 +66,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     private static final int GET_COVERAGE       = 2;
 
 
+
     public DispatchHandler() {
 
         super();

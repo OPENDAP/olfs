@@ -30,77 +30,52 @@
             <param-value> </param-value>
         </init-param>
 
-
         <init-param>
             <param-name>OLFSConfigFileName</param-name>
             <param-value>olfs.xml</param-value>
         </init-param>
 
-
         <load-on-startup>1</load-on-startup>
-
 
     </servlet>
 
 
     <servlet>
         <servlet-name>docs</servlet-name>
-
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
-
-        <load-on-startup>1</load-on-startup>
-
-    </servlet>
-
-
-    <servlet>
-        <servlet-name>View</servlet-name>
-        <servlet-class>thredds.servlet.ViewServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet>
-        <servlet-name>exp</servlet-name>
-        <servlet-class>opendap.experiments.ExperimentSandboxServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+
+    
 
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
         <url-pattern>/hyrax</url-pattern>
     </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
         <url-pattern>/hyrax/*</url-pattern>
     </servlet-mapping>
-
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
         <url-pattern>*</url-pattern>
     </servlet-mapping>
 
-
     <servlet-mapping>
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs</url-pattern>
     </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
 
 
-    <servlet-mapping>
-        <servlet-name>View</servlet-name>
-        <url-pattern>/view/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>exp</servlet-name>
-        <url-pattern>/exp/*</url-pattern>
-    </servlet-mapping>
 
 
     <!-- Default Error Page Definitions -->
@@ -123,6 +98,10 @@
     <error-page>
         <error-code>501</error-code>
         <location>/docs/error501.html</location>
+    </error-page>
+    <error-page>
+        <error-code>502</error-code>
+        <location>/docs/error502.html</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>

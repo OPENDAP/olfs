@@ -11,6 +11,8 @@ public class ServletUtil {
     static private org.slf4j.Logger log;
     static private boolean isLogInit = false;
 
+    public static String DEFAULT_CONTEXT_PATH = "opendap"; ;
+
 
     public static String getPath(HttpServlet servlet, String path) {
         ServletContext sc = servlet.getServletContext();
@@ -44,7 +46,9 @@ public class ServletUtil {
       if ( contextPath == null ) {
         ServletContext servletContext = servlet.getServletContext();
         String tmpContextPath = servletContext.getInitParameter( "ContextPath" );
-        if ( tmpContextPath == null ) tmpContextPath = "opendap";
+        if ( tmpContextPath == null )
+            tmpContextPath = DEFAULT_CONTEXT_PATH;
+
         contextPath = "/"+tmpContextPath;
       }
       return contextPath;

@@ -277,6 +277,18 @@ public class Dispatch implements DispatchHandler {
             datasetToHtmlTransform.setParameter(new QName("remoteCatalog"), null);
             datasetToHtmlTransform.setParameter(new QName("remoteHost"), null);
         }
+        catch(SaxonApiException sapie){
+            if(response.isCommitted()){
+                return;
+            }
+            // Set up the Http headers.
+            response.setContentType("text/html");
+            response.setHeader("Content-Description", "ERROR");
+            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+
+            // Responed with error.
+            response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
+        }
         finally {
             datasetToHtmlTransformLock.unlock();
         }
