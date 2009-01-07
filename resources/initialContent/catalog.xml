@@ -11,136 +11,23 @@ FIRST: Go Read The THREDDS Documentation:
 
     http://www.unidata.ucar.edu/projects/THREDDS/tech/cataloggen/devel/datasetScanElement.html
 
-
-
-Now, to get THREDDS catalogs working on Hyrax YOU MUST do at least the following:
-
-
-    1) For each collection that appears in the top level of the OPeNDAP directory response
-       (http://localhost:8080/opendap/contents.html if Hyrax is running out of the box on
-       this machine) you MUST create a <datasetScan> in the catalog.xml file located in the
-       persistent content directory ($TOMCAT_HOME/content/opendap).
-
-       The THREDDS catalog views will NOT include a collection for which this is not done!
-
-
-    2) In each <datasetScan> element that you create you MUST use the following element:
-       <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" /> This is the only
-       CrawlableDataset implementation available!
-
-
-    3) No matter what your BES collection looks like, the location attribute of the <datasetScan>
-       element must begin with "/root". This is a THREDDS requirement.
-
-
-    4) The service attribute in the <datasetScan> element must be set to "OPeNDAP".
-
-    5) The path attribute in the <datasetScan> element appears in the URL after the servlet name,
-       and MUST be the same as the value of the location attribute with the leading "/root/" removed.
-       In other words it MUST NOT start with a "/" character .
-
-    6) You should apply a filter to the data that coincides with the value of the
-       "BES.Catalog.catalog.TypeMatch" for the data types being served. I suggest that you make the
-       filter expose ALL of the data types served by the BES. See the THREDDS pages on the satasetScan
-       element for filter details:
-
-           http://www.unidata.ucar.edu/projects/THREDDS/tech/cataloggen/devel/datasetScanElement.html
-
-       The point of this to remove files from the catalog view that are NOT OPeNDAP data. README files
-       for example.
-
-
-    7) Add metadata as you see fit. If you REALLY did read the THREDDS documentation you will
-       already have a clue about this. If you haven't DO SO NOW.
-
-
-
 -->
-<catalog name="Hyrax Test Catalog"
+<catalog name="THREDDS Catalog"
         xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
         xmlns:xlink="http://www.w3.org/1999/xlink">
 
     <!-- ************************************************************************************* -->
-    <!--                     Don't Change The Service Description!                             -->
 
-    <service name="OPeNDAP-Hyrax" serviceType="OPeNDAP" base="/opendap/"/>
+    <service name="Hyrax" serviceType="OPeNDAP" base="/opendap/"/>
 
     <!-- ************************************************************************************* -->
 
 
 
-    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
-
-    <datasetScan location="/bes/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
-
-        <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
-        <filter>
-            <exclude wildcard=".*" atomic="true" collection="true"/>
-            <include wildcard="*"/>
-        </filter>
-        <addDatasetSize />
-
-        <metadata inherited="true">
-            <serviceName>OPeNDAP-Hyrax</serviceName>
-            <authority>opendap.org</authority>
-        </metadata>
-
-    </datasetScan>
-
-    <!--   -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -    -   -->
+    <catalogRef xlink:href="/opendap/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
 
 
 
 
 
 </catalog>
-<!--
-
-In particular note the following:
-
-    1) The line in which the CrawlableDataset implementation is defined:
-
-       <crawlableDatasetImpl className="opendap.bes.BESCrawlableDataset" />
-
-       Identifies the correct CrawlableDataset class for Hyrax - the one that works with the BES
-       to automatically generate catalogs.
-
-
-    2) In the <datasetScan> element the location attribute's value MUST begin with /bes. So, if the
-       top level collection in the BES contains 4 sub collections they may each be identified using
-       a separate <datasetScan> element like so:
-
-	       <datasetScan location="/bes/nc"  path="nc"  name="NetCDF Archive"   serviceName="OPeNDAP-Hyrax">
-	       . . .
-	       </datasetScan>
-
-	       <datasetScan location="/bes/hdf" path="hdf" name="HDF Archive"      serviceName="OPeNDAP-Hyrax">
-	       . . .
-	       </datasetScan>
-
-	       <datasetScan location="/bes/jg"  path="jg"  name="JGOFFS Archive"   serviceName="OPeNDAP-Hyrax">
-	       . . .
-	       </datasetScan>
-
-	       <datasetScan location="/bes/ff"  path="ff"  name="FreeForm Archive" serviceName="OPeNDAP-Hyrax">
-	       . . .
-	       </datasetScan>
-
-       Where each <datasetScan> element may have it's own filter and inheritance rules. You MUST NOT
-       lump them all into one <datasetScan> element with one set of filter rules like so:
-
-	       <datasetScan location="/bes"     path="DATA"  name="AllYourDataAreUs"   serviceName="OPeNDAP-Hyrax">
-	       . . .
-	       </datasetScan>
-
-       Because it does not work. If you want them all to be in one a single collection then configure
-       the BES so that it has one top level collection (see Example 1)
-
-
-
-    3) The path attribute in the <datasetScan> element appears in the URL after the servlet name, and
-       MUST be the same as the value of the location attribute with the leading "/root/" removed. In
-       other words it MUST NOT start with a "/" character .
-
-
--->
