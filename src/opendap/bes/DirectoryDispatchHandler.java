@@ -57,7 +57,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        useDefaultOpendapDirectoryView = false;
         initialized = false;
 
     }
@@ -70,23 +69,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         dispatchServlet = s;
 
-        Element dv = config.getChild("DefaultDirectoryView");
-        if(dv!=null){
-            String val = dv.getTextTrim();
-            if(val!=null) {
-                if(val.equalsIgnoreCase("opendap")){
-                    useDefaultOpendapDirectoryView = true;
-                } else if(val.equalsIgnoreCase("thredds")){
-                    useDefaultOpendapDirectoryView = false;
-                } else {
-                    throw new BadConfigurationException("The " +
-                            "<DefaultDirectoryView> may have one of two " +
-                            "values. Ethier \"OPeNDAP\" or \"THREDDS\".");
-                }
-            }
-        }
 
-        log.info("Initialized. Using " + (useDefaultOpendapDirectoryView?"OPeNDAP":"THREDDS") + " default directory view.");
 
         initialized = true;
     }

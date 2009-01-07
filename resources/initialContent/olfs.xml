@@ -2,7 +2,9 @@
 <OLFSConfig>
 
     <DispatchHandlers>
+
         <HttpGetHandlers>
+            
             <Handler className="opendap.bes.BESManager">
                 <BES>
                     <!-- The prefix is a URL token between server address/port
@@ -28,22 +30,20 @@
 
             </Handler>
 
+
+            <Handler className="opendap.threddsHandler.Dispatch">
+                <prefix>thredds</prefix>
+                <useMemoryCache>true</useMemoryCache>
+            </Handler>
+
             <Handler className="opendap.coreServlet.SpecialRequestDispatchHandler" />
 
             <Handler className="opendap.bes.VersionDispatchHandler" />
 
-            <Handler className="opendap.bes.DirectoryDispatchHandler">
-                <!-- DirectoryView:
-                  - Used to indicate the default directory view clients see. This DOES NOT
-                  - affect the THREDDS catalogs! Only the HTML views of them. A value
-                  - of "THREDDS" will provide the THREDDS directory view and a value
-                  - of "OPeNDAP" will produce the OPeNDAP directory view for URL's
-                  - that end with a "/".
-                  -->
-                <DefaultDirectoryView>OPeNDAP</DefaultDirectoryView>
-
-            </Handler>
             <Handler className="opendap.bes.DapDispatchHandler" />
+
+            <Handler className="opendap.bes.DirectoryDispatchHandler" />
+
             <Handler className="opendap.bes.FileDispatchHandler" >
 
                 <!-- AllowDirectDataSourceAccess
@@ -56,10 +56,12 @@
                   - and allowing their transmission with out subsetting can put heavy loads
                   - on the network and the server.
                   -->
-                <!-- <AllowDirectDataSourceAccess /> -->
+                <AllowDirectDataSourceAccess />
             </Handler>
 
             <Handler className="opendap.bes.ThreddsDispatchHandler" />
+
+
         </HttpGetHandlers>
 
 
