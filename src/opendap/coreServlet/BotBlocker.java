@@ -159,8 +159,8 @@ public class BotBlocker implements DispatchHandler {
 
         //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        // For some reason using sendError() causes the HTTP headers to say
-        // return status is 200 OK and not 403 Forbidden... Wierd.
+        // For some reason using sendError() causes the HTTP heieaders to say
+        // return status is 200 OK and not 403 Forbidden... Weird.
         //response.sendError(HttpServletResponse.SC_FORBIDDEN);
 
         log.info("Denied access to "+request.getRemoteAddr()+" because it is " +

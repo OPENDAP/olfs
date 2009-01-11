@@ -50,6 +50,8 @@ public class Scrub {
     private static Pattern fileNameInclusionPattern = Pattern.compile(fileNameInclusionRegex);
 
     public static String fileName(String fileName){
+        if(fileName==null)
+            return null;
         Matcher m = fileNameInclusionPattern.matcher(fileName);
 
         log.debug("URL() - Scrubbing file Name: "+fileName+"   white list pattern: "+ fileNameInclusionRegex +"    matches: "+m.matches());
@@ -74,6 +76,8 @@ public class Scrub {
 
     public static String urlContent(String urlContent){
 
+        if(urlContent==null)
+            return null;
 
         Matcher m = htmlContentInclusionPattern.matcher(urlContent);
 
@@ -98,6 +102,8 @@ public class Scrub {
     private static Pattern completeURLInclusionPattern = Pattern.compile(completeURLInclusionRegex);
 
     public static String completeURL(String url){
+        if(url==null)
+            return null;
         Matcher m = completeURLInclusionPattern.matcher(url);
         log.debug("URL() - Scrubbing URL: "+url+"   white list pattern: "+ completeURLInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){
@@ -118,6 +124,8 @@ public class Scrub {
     private static Pattern simpleStringInclusionPattern = Pattern.compile(simpleStringInclusionRegex);
 
     public static String simpleString(String s){
+        if(s==null)
+            return null;
         Matcher m = simpleStringInclusionPattern.matcher(s);
         log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ simpleStringInclusionRegex +"    matches: "+m.matches());
         if(m.matches()){

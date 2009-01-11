@@ -49,7 +49,8 @@ public class ServletUtil {
         if ( tmpContextPath == null )
             tmpContextPath = DEFAULT_CONTEXT_PATH;
 
-        contextPath = "/"+tmpContextPath;
+        if(!tmpContextPath.startsWith("/"))
+          contextPath = "/"+tmpContextPath;
       }
       return contextPath;
 

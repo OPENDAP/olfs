@@ -26,6 +26,7 @@ package opendap.wcs.v1_1_2;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.bes.BesXmlAPI;
 import org.jdom.Element;
 import org.jdom.Document;
@@ -37,8 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.util.HashMap;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 
 /**
  * User: ndp
@@ -65,6 +65,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     private static final int DESCRIBE_COVERAGE  = 1;
     private static final int GET_COVERAGE       = 2;
 
+    private static String cannedCoverageDoc = "preBuiltGetCoverageResponse.xml";
+    private static String cannedCapabilitiesDoc = "preBuiltGetCabailitesResponse.xml";
+    private static String cannedCoverageDescriptionDoc = "preBuiltDescribeCoverageResponse.xml";
 
 
     public DispatchHandler() {
@@ -198,9 +201,11 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     public void processWcsRequest(HttpServletRequest request,
                                   HttpServletResponse response) throws IOException {
 
+        ServletOutputStream os = response.getOutputStream();
+
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
 
-        String query = Scrub.urlContent(request.getQueryString());
+        String query = request.getQueryString();
 
         response.setContentType("text/xml");
 
@@ -209,15 +214,15 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             switch(getRequestType(query,keyValuePairs)){
 
                 case  GET_CAPABILITIES:
-                    getCapabilities(keyValuePairs,response.getOutputStream());
+                    getCapabilities(keyValuePairs,os);
                     break;
 
                 case  DESCRIBE_COVERAGE:
-                    describeCoverage(keyValuePairs,response.getOutputStream());
+                    describeCoverage(keyValuePairs,os);
                     break;
 
                 case GET_COVERAGE:
-                    getCoverage(keyValuePairs,response.getOutputStream());
+                    getCoverage(keyValuePairs,os);
                     break;
 
                 default:
@@ -228,15 +233,12 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         catch(WcsException e){
             log.error(e.getMessage());
             ExceptionReport er = new ExceptionReport(e);
-            response.getOutputStream().println(er.toString());
+            os.println(er.toString());
         }
 
 
 
     }
-
-
-
 
 
 
@@ -251,11 +253,31 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
     public void getCapabilities(HashMap<String,String> keyValuePairs, ServletOutputStream os) throws WcsException {
-        throw new WcsException("GetCapabilities is not supported (yet).",WcsException.OPERATION_NOT_SUPPORTED);
+        GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
+
+        try {
+
+            sendFile(cannedCapabilitiesDoc, os);
+        }
+        catch(Exception e){
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+        //#####################################################################
+
     }
 
     public void describeCoverage(HashMap<String,String> keyValuePairs, ServletOutputStream os) throws WcsException {
-        throw new WcsException("DescribeCoverage is not supported (yet).",WcsException.OPERATION_NOT_SUPPORTED);
+        DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
+
+        try {
+
+            sendFile(cannedCoverageDescriptionDoc, os);
+        }
+        catch(Exception e){
+            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+        //#####################################################################
+
     }
 
 
@@ -263,61 +285,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         GetCoverageRequest wcsRequest = new GetCoverageRequest(keyValuePairs);
 
-        Element besRequest = new Element ("request",BesXmlAPI.BES_NS);
-        besRequest.setAttribute("reqID","###");
-
-        besRequest.addContent(wcsRequest.getRequestElement());
-
-        Document besReqDoc = new Document(besRequest);
-
-
-        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-         *
-         * @todo Do It Like This Once We Fix The BES output!
-         *
         try {
-            if(!BesXmlAPI.besTransaction(_prefix,besReqDoc, os, os)){
-                log.debug("WCS GetCoverage request failed. ");
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                log.debug("besRequest:\n"+xmlo.outputString(besRequest));
-            }
-        }
-        catch(Exception e){
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-        }
-        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-
-        //#####################################################################
-        // @todo  Remove this section when the BES output is fixed.
-        try {
-            Document besResponse = new Document();
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            if(!BesXmlAPI.besTransaction(_prefix,besReqDoc, besResponse)){
-                log.debug("WCS GetCoverage request failed. ");
-                log.debug("besRequest:\n"+xmlo.outputString(besRequest));
-
-
-
-            }
-
-            Element root = besResponse.getRootElement();
-            Element re = root.getChild("response");
-            Element wcsContent = re.getChild("Coverages",WCS.WCS_NS);
-
-            if(wcsContent == null)
-                wcsContent = re.getChild("ExceptionReport",WCS.OWS_NS);
-
-            if(wcsContent == null)
-                throw new WcsException("Failed to find correct WCS content in " +
-                        "BES response.\n\n"+xmlo.outputString(re),WcsException.NO_APPLICABLE_CODE);
-
-
-            besResponse.detachRootElement();
-            wcsContent.detach();
-            besResponse.setRootElement(wcsContent);
-            xmlo.output(besResponse,os);
-
+            sendFile(cannedCoverageDoc, os);
         }
         catch(Exception e){
             throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
@@ -327,6 +297,36 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
+    private void sendFile(String fname, ServletOutputStream os) throws IOException {
+        String fileName = ServletUtil.getContentPath(dispatchServlet)+ fname;
+
+        InputStream is = null;
+        File f = new File(fileName);
+
+
+        try {
+            is = new FileInputStream(f);
+            byte b[] = new byte[(int)f.length()];
+            int ret;
+            boolean done = false;
+            while(!done){
+
+                ret = is.read(b);
+
+                if(ret<=0 ){
+                    done = true;
+                }
+                else {
+                    os.write(b,0,ret);
+                }
+            }
+
+        }
+        finally {
+            if(is!=null)
+                is.close();
+        }
+    }
 
 
 
@@ -338,7 +338,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document reqDoc;
-        String query = Scrub.urlContent(request.getQueryString());
+        String query = request.getQueryString();
 
         response.setContentType("text/xml");
 
@@ -495,16 +495,23 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         Element root = responseDoc.getRootElement();
         Element re = root.getChild("response");
-        Element coverages = re.getChild("Capabilities",WCS.OWS_NS);
 
-        responseDoc.detachRootElement();
-        coverages.detach();
-        responseDoc.setRootElement(coverages);
+        if(re!=null){
+            Element capabilities = re.getChild("Capabilities",WCS.OWS_NS);
 
-        page += "    <h3>The WCS response: </h3>";
-        page += "    <pre>";
-        page += xmlo.outputString(responseDoc).replaceAll("<","&lt;").replaceAll(">","&gt;");
-        page += "    </pre>";
+            responseDoc.detachRootElement();
+
+
+            page += "    <h3>The WCS response: </h3>";
+            page += "    <pre>";
+
+            if(capabilities!=null){
+                capabilities.detach();
+                responseDoc.setRootElement(capabilities);
+                page += xmlo.outputString(responseDoc).replaceAll("<","&lt;").replaceAll(">","&gt;");
+            }
+            page += "    </pre>";
+        }
 
 
         return page;
@@ -548,17 +555,23 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         }
         Element root = responseDoc.getRootElement();
         Element re = root.getChild("response");
-        Element coverages = re.getChild("CoverageDescriptions",WCS.WCS_NS);
 
-        responseDoc.detachRootElement();
-        coverages.detach();
-        responseDoc.setRootElement(coverages);
 
-        page += "    <h3>The WCS response: </h3>";
-        page += "    <pre>";
-        page += xmlo.outputString(responseDoc).replaceAll("<","&lt;").replaceAll(">","&gt;");
-        page += "    </pre>";
+        if(re!=null){
+            Element coverages = re.getChild("CoverageDescriptions",WCS.WCS_NS);
 
+            responseDoc.detachRootElement();
+
+            page += "    <h3>The WCS response: </h3>";
+            page += "    <pre>";
+
+            if(coverages!=null){
+                coverages.detach();
+                responseDoc.setRootElement(coverages);
+                page += xmlo.outputString(responseDoc).replaceAll("<","&lt;").replaceAll(">","&gt;");
+            }
+            page += "    </pre>";
+        }
         return page;
 
     }
@@ -606,17 +619,26 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         Element root = responseDoc.getRootElement();
         Element re = root.getChild("response");
-        Element coverages = re.getChild("Coverages",WCS.WCS_NS);
 
-        responseDoc.detachRootElement();
-        coverages.detach();
-        responseDoc.setRootElement(coverages);
 
-        page += "    <h3>The WCS response: </h3>";
-        page += "    <pre>";
-        page += xmlo.outputString(responseDoc).replaceAll("<","&lt;").replaceAll(">","&gt;");
-        page += "    </pre>";
+        if(re!=null){
+            Element coverages = re.getChild("Coverages",WCS.WCS_NS);
 
+            responseDoc.detachRootElement();
+
+
+
+            page += "    <h3>The WCS response: </h3>";
+            page += "    <pre>";
+
+            if(coverages!=null){
+                coverages.detach();
+                responseDoc.setRootElement(coverages);
+                page += xmlo.outputString(responseDoc).replaceAll("<","&lt;").replaceAll(">","&gt;");
+            }
+            page += "    </pre>";
+
+        }
 
 
         return page;
