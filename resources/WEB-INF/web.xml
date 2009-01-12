@@ -47,8 +47,6 @@
     </servlet>
 
 
-    
-
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>

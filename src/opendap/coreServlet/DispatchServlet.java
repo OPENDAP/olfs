@@ -32,11 +32,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.regex.Pattern;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 import org.jdom.input.SAXBuilder;
 
 /**
@@ -401,6 +404,7 @@ public class DispatchServlet extends HttpServlet {
      *                 object.
      * @see ReqInfo
      */
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
@@ -408,47 +412,35 @@ public class DispatchServlet extends HttpServlet {
 
 
         try {
+            RequestCache.startRequestIfNeeded();
 
-            try {
+            int reqno = reqNumber.incrementAndGet();
+            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
 
-                RequestCache.startRequestIfNeeded();
+            log.debug(Util.showRequest(request, reqno));
 
-                int reqno = reqNumber.incrementAndGet();
-                PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
-
-                log.debug(Util.showRequest(request, reqno));
-
-                if(redirectForContextOnlyRequest(request,response))
-                    return;
+            if(redirectForContextOnlyRequest(request,response))
+                return;
 
 
-                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
-                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
-                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
+            log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                    "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                    "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
 
 
-                if (Debug.isSet("probeRequest"))
-                    log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
+            if (Debug.isSet("probeRequest"))
+                log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
-                DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
-                if (dh != null) {
-                    log.debug("Request being handled by: " + dh.getClass().getName());
-                    dh.handleRequest(request, response);
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+            DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
+            if (dh != null) {
+                log.debug("Request being handled by: " + dh.getClass().getName());
+                dh.handleRequest(request, response);
+                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    log.info("Sent Resource Not Found (404) - nothing left to check.");
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
-                }
-
-
-            }
-            finally {
-                RequestCache.endRequest();
-                log.info("doGet(): Response completed.\n");
+            } else {
+                send404(request,response);
             }
 
         }
@@ -465,10 +457,69 @@ public class DispatchServlet extends HttpServlet {
             	}
             }
         }
+        finally {
+            RequestCache.endRequest();
+            log.info("doGet(): Response completed.\n");
+        }
 
 
     }
     //**************************************************************************
+
+
+    private void send404(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+
+        // Build a regex to use to see if they are looking for a DAP2 response:
+        String dap2Regex = ".*.(";
+        dap2Regex += "dds";
+        dap2Regex += "|das";
+        dap2Regex += "|dods";
+        dap2Regex += "|asc(ii)?";
+        dap2Regex += ")";
+        Pattern dap2Pattern = Pattern.compile(dap2Regex,Pattern.CASE_INSENSITIVE);
+
+
+        // Build a regex to use to see if they are looking for a DAP3/4 response:
+        String dap4Regex = ".*.(";
+        dap4Regex += "ddx";
+        dap4Regex += "|rdf";
+        dap4Regex += ")";
+        Pattern dap4Pattern = Pattern.compile(dap4Regex,Pattern.CASE_INSENSITIVE);
+
+
+        String requestURL = req.getRequestURL().toString();
+        if(dap2Pattern.matcher(requestURL).matches()){   // Is it a DAP2 request?
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getOutputStream().print(
+                    OPeNDAPException.getDAP2Error(
+                            OPeNDAPException.NO_SUCH_FILE,
+                            "Cannot locate resource: "+Scrub.completeURL(requestURL)));
+        }
+        else if (dap4Pattern.matcher(requestURL).matches()){  // Is it a DAP3/4 request?
+
+            Document err = OPeNDAPException.getDAP32Error(
+                    HttpServletResponse.SC_NOT_FOUND,
+                    "Cannot locate resource: "+Scrub.completeURL(requestURL));
+
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            xmlo.output(err, resp.getOutputStream());
+
+        }
+        else { // Otherwise just send a web page.
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        log.info("Sent Resource Not Found (404) - nothing left to check.");
+        PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+
+    }
+
+
+
+
+
+
 
     private boolean redirectForContextOnlyRequest(HttpServletRequest req,
                                                   HttpServletResponse res)
@@ -486,13 +537,13 @@ public class DispatchServlet extends HttpServlet {
         }
         return false;
     }
-
+    
 
     /**
      * @param request  .
      * @param response .
-     * @throws IOException
-     * @throws ServletException
+     * @throws IOException       .
+     * @throws ServletException    .
      */
     @Override
     public void doPost(HttpServletRequest request,

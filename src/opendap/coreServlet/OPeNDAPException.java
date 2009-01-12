@@ -27,9 +27,14 @@ package opendap.coreServlet;
 
 
 import org.slf4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+
+import opendap.namespaces.DAP;
 
 /**
  * Wraps the Exception class so that it can be serialized as a DAP2 error object.
@@ -196,7 +201,7 @@ public class OPeNDAPException extends Exception {
     }
 
 
-    public String getDAP2Error() {
+    public static String getDAP2Error(int errorCode, String errorMessage) {
 
         String err = "Error {\n";
 
@@ -223,7 +228,7 @@ public class OPeNDAPException extends Exception {
      */
     public void print(PrintWriter os) {
 
-        os.println(getDAP2Error());
+        os.println(getDAP2Error(errorCode,errorMessage));
     }
 
     /**
@@ -305,6 +310,27 @@ public class OPeNDAPException extends Exception {
 
     }
     /***************************************************************************/
+
+
+    /**
+     *
+     * @param errorCode
+     * @param errorMessage
+     * @return
+     */
+    public static Document getDAP32Error(int errorCode, String errorMessage) {
+
+
+        Element err = new Element("Error", DAP.DAPv32_NS);
+
+        err.setAttribute("code",errorCode+"");
+
+        err.setText(errorMessage);
+
+        return new Document(err);
+
+    }
+
 
 
 }
