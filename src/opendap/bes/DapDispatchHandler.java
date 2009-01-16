@@ -127,6 +127,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception {
 
+
+
         if(!initialized)
             throw new Exception("DapDispatchHandler has not been initialized!");
 
@@ -137,6 +139,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
             throws Exception {
+
 
         if(!initialized)
             throw new Exception("DapDispatchHandler has not been initialized!");

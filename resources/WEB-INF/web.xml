@@ -47,6 +47,25 @@
     </servlet>
 
 
+    <servlet>
+        <servlet-name>test</servlet-name>
+        <servlet-class>opendap.experiments.SendErrorTest</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
+
+
+
+    <servlet-mapping>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
