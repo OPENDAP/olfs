@@ -38,6 +38,7 @@ import java.util.Iterator;
 
 import opendap.ppt.PPTException;
 import opendap.ppt.OPeNDAPClient;
+import opendap.coreServlet.RequestCache;
 
 /**
  * User: ndp
@@ -477,7 +478,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws JDOMException             .
      */
-    public static boolean getCatalog(String dataSource, Document response) throws
+    public static boolean OLDgetCatalog(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,
@@ -535,7 +536,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws JDOMException             .
      */
-    public static boolean getInfo(String dataSource, Document response) throws
+    public static boolean OLDgetInfo(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,
@@ -582,6 +583,216 @@ public class BesXmlAPI {
 
     }
 
+
+    /**
+     * Returns the BES INFO document for the spcified dataSource.
+     *
+     * @param dataSource The data source whose information is to be retrieved
+     * @param response The document where the response (be it a catalog
+     * document or an error) will be placed.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean getCatalog(String dataSource, Document response) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
+
+        boolean ret;
+
+        String responseCacheKey = BesXmlAPI.class.getName()+".showCatalog(\""+dataSource+"\")";
+
+        log.info("getCatalog(): Looking for cached copy of BES showCatalog response for responseCacheKey=\""+responseCacheKey+"\"");
+
+        Object o  = RequestCache.get(responseCacheKey);
+
+        if(o == null){
+
+            ret = besTransaction(dataSource,
+                    showCatalogRequest(dataSource),
+                    response);
+
+            if(ret){
+                // Get the root element.
+                Element root = response.getRootElement();
+
+                // Find the top level dataset Element
+                Element topDataset = root.getChild("response").getChild("dataset");
+
+                topDataset.setAttribute("prefix", getBESprefix(dataSource));
+
+                RequestCache.put(responseCacheKey, response.clone());
+                log.info("getCatalog(): Cached copy of BES showCatalog response for dataSource: \""+dataSource+"\"   (responseCacheKey=\""+responseCacheKey+"\")");
+
+
+            }
+            else {
+                RequestCache.put(responseCacheKey, new NoSuchDatasource((Document)response.clone()));
+                log.info("getInfo():  BES showInfo response failed, cached a NoSuchDatasource object. responseCacheKey=\""+responseCacheKey+"\"");
+            }
+
+            return ret;
+        }
+        else {
+            log.info("getCatalog(): Using cached copy of BES showCatalog.  responseCacheKey=\""+responseCacheKey+"\"");
+
+            Document result;
+
+            if(o instanceof NoSuchDatasource){
+                result = ((NoSuchDatasource)o).getErrDoc();
+                ret = false;
+            }
+            else {
+                result = (Document) ((Document) o).clone();
+                ret = true;
+            }
+
+            Element root = result.getRootElement();
+            root.detach();
+            response.setRootElement(root);
+
+            return ret;
+
+        }
+
+    }
+
+
+    /**
+     * Returns the BES INFO document for the spcified dataSource.
+     *
+     * @param dataSource The data source whose information is to be retrieved
+     * @param response The document where the response (be it datasource
+     * information or an error) will be placed.
+     * @return True if successful, false if the BES generated an error in
+     * while servicing the request.
+     * @throws PPTException              .
+     * @throws BadConfigurationException .
+     * @throws IOException               .
+     * @throws JDOMException             .
+     */
+    public static boolean getInfo(String dataSource, Document response) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
+
+
+        boolean ret;
+        String responseCacheKey = BesXmlAPI.class.getName()+".showInfo(\""+dataSource+"\")";
+
+
+        log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \""+dataSource+"\"  (responseCacheKey=\""+responseCacheKey+"\")");
+
+        Object o = RequestCache.get(responseCacheKey);
+
+        if(o == null){
+            log.info("getInfo(): Copy of BES showInfo for  responseCacheKey=\""+responseCacheKey+"\"  not found in cache.");
+
+
+            Document request = showInfoRequest(dataSource);
+
+            ret = besTransaction(dataSource,
+                    request,
+                    response);
+
+
+            if(ret) {
+                // Get the root element.
+                Element root = response.getRootElement();
+
+                // Find the top level dataset Element
+                Element topDataset = root.getChild("response").getChild("dataset");
+
+                // Add the prefix attribute for this BES.
+                topDataset.setAttribute("prefix", getBESprefix(dataSource));
+
+                RequestCache.put(responseCacheKey, response.clone());
+                log.info("getInfo(): Cached copy of BES showInfo response. responseCacheKey=\""+responseCacheKey+"\"");
+
+            }
+            else {
+                RequestCache.put(responseCacheKey, new NoSuchDatasource((Document)response.clone()));
+                log.info("getInfo():  BES showInfo response failed, cached the BES (error) response Document. responseCacheKey=\""+responseCacheKey+"\"");
+            }
+
+        }
+        else {
+            log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\""+responseCacheKey+"\" returned an object of type "+o.getClass().getName());
+
+            Document result;
+
+            if(o instanceof NoSuchDatasource){
+                result = ((NoSuchDatasource)o).getErrDoc();
+                ret = false;
+            }
+            else {
+                result = (Document) ((Document) o).clone();
+                ret = true;
+            }
+
+            Element root = result.getRootElement();
+            root.detach();
+            response.setRootElement(root);
+
+
+        }
+
+        return ret;
+
+
+    }
+
+    private static class NoSuchDatasource {
+        Document err;
+        NoSuchDatasource(Document besError){
+            err = besError;
+        }
+
+        Document getErrDoc(){
+            return (Document)err.clone();
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 
