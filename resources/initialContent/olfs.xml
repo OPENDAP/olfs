@@ -59,7 +59,7 @@
                 <AllowDirectDataSourceAccess />
             </Handler>
 
-            <Handler className="opendap.bes.ThreddsDispatchHandler" />
+            <Handler className="opendap.bes.BESThreddsDispatchHandler" />
 
 
         </HttpGetHandlers>
