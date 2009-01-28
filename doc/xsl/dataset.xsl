@@ -35,6 +35,7 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
                 >
+    <xsl:import href="version.xsl"/>
     <xsl:param name="targetDataset" />
     <xsl:param name="remoteCatalog" />
     <xsl:param name="remoteHost" />
@@ -275,7 +276,7 @@
 
                     <!-- ****************************************************** -->
                     <!--                                                        -->
-                    <h1><font size="0">OPeNDAP Hyrax <font class="small">(THREDDS Catalog Dataset Detail)</font>
+                    <h1><font size="0">OPeNDAP Hyrax <font class="small">(<xsl:value-of select="$HyraxVersion"/>)</font>
 
                         <br/>
                         <a href='/opendap/docs/'>Documentation</a>

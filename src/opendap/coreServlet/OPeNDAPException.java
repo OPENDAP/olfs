@@ -294,8 +294,12 @@ public class OPeNDAPException extends Exception {
 
             if(!response.isCommitted()){
                 response.reset();
+                response.setHeader("XDODS-Server", "dods/3.2");
+                response.setHeader("XOPeNDAP-Server", "Server-Version-Unknown");
+                response.setHeader("XDAP", "3.2");
+                response.setHeader("Content-Description", "dods_error");
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        t.getMessage());
+                        oe.getMessage());
             }
             else {
                 OutputStream eOut = response.getOutputStream();

@@ -36,49 +36,27 @@
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
 
+    <xsl:template match="dap:Attribute">
+        <xsl:copy>
+            <xsl:call-template name="copyTextAndAttributes"/>
+            <xsl:apply-templates />
+        </xsl:copy>
+    </xsl:template>
+
     <!--
        - xmlElementNode
       -->
-    <xsl:template match="dap:Attribute[@type='xmlElementNode']" name="xmlEleementNode">
-        <xsl:choose>
-            <xsl:when test="@prefix">
-                <xsl:choose>
-                    <xsl:when test="@namespace">
-                        <xsl:element name="{@prefix}:{@name}" namespace="{@namespace}">
-                            <xsl:apply-templates/>
-                        </xsl:element>
-                    </xsl:when>
-                    <xsl:otherwise >
-                        <xsl:element name="{@prefix}:{@name}">
-                            <xsl:apply-templates/>
-                        </xsl:element>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:when>
-            <xsl:otherwise >
-                <xsl:choose>
-                    <xsl:when test="@namespace">
-                        <xsl:element name="{@name}" namespace="{@namespace}">
-                            <xsl:apply-templates/>
-                        </xsl:element>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:element name="{@name}">
-                            <xsl:apply-templates/>
-                        </xsl:element>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:otherwise>
-        </xsl:choose>
-
+    <xsl:template match="dap:Attribute[@type!='xmlAttributeNode' and (boolean(@namespace) or boolean(@prefix))]">
+        <xsl:call-template name="xmlElement"/>
     </xsl:template>
 
+    <xsl:template match="dap:Attribute[@type='xmlAttributeNode']" />
 
 
     <!--
        - xmlAttributeNode
       -->
-    <xsl:template match="dap:Attribute[@type='xmlAttributeNode']" name="xmlAttributeNode">
+    <xsl:template match="dap:Attribute[@type='xmlAttributeNode']" mode="xmlAttributeMode">
             <xsl:choose>
                 <xsl:when test="@prefix">
                     <xsl:attribute name="{@prefix}:{@name}">
@@ -90,7 +68,11 @@
                         <xsl:value-of select="normalize-space(dap:value)" />
                     </xsl:attribute>
                 </xsl:when>
-                <xsl:otherwise><xsl:value-of select="normalize-space(dap:value)" /></xsl:otherwise>
+                <xsl:otherwise>
+                    <xsl:attribute name="{@name}">
+                        <xsl:value-of select="normalize-space(dap:value)" />
+                    </xsl:attribute>
+                </xsl:otherwise>
             </xsl:choose>
 
     </xsl:template>
@@ -98,16 +80,83 @@
     <!--
        - xmlTextNode
       -->
-    <xsl:template match="dap:Attribute[@type='xmlTextNode']" name="xmlTextNode">
-        <xsl:value-of select="dap:value" />
+    <xsl:template name="xmlTextNode">
+        <xsl:choose>
+            <xsl:when test="@type='Container'">
+                <xsl:if test="dap:Attribute[@type=String]">
+                    <xsl:value-of select="dap:Attribute[@type=String]/dap:value"/>
+                </xsl:if>
+
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="dap:value"/>
+            </xsl:otherwise>
+
+        </xsl:choose>
     </xsl:template>
 
 
     <!--
        - supress regular text and attributes.
       -->
-
     <xsl:template  match="@*|text()" />
+    <xsl:template  match="@*|text()" mode="xmlAttributeMode"/>
+
+
+    <xsl:template name="xmlElement">
+        <xsl:choose>
+            <xsl:when test="@prefix">
+                <xsl:choose>
+                    <xsl:when test="@namespace">
+                        <xsl:element name="{@prefix}:{@name}" namespace="{@namespace}">
+                            <xsl:apply-templates select="." mode="xmlAttributeMode"/>
+                            <xsl:call-template name="xmlTextNode"/>
+                            <xsl:apply-templates />
+                        </xsl:element>
+                    </xsl:when>
+                    <xsl:otherwise >
+                        <xsl:element name="{@prefix}:{@name}">
+                            <xsl:apply-templates select="." mode="xmlAttributeMode"/>
+                            <xsl:call-template name="xmlTextNode"/>
+                            <xsl:apply-templates />
+                        </xsl:element>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="@namespace" >
+                <xsl:choose>
+                    <xsl:when test="@namespace">
+                        <xsl:element name="{@name}" namespace="{@namespace}">
+                            <xsl:apply-templates select="." mode="xmlAttributeMode"/>
+                            <xsl:call-template name="xmlTextNode"/>
+                            <xsl:apply-templates />
+                        </xsl:element>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:element name="{@name}">
+                            <xsl:apply-templates select="." mode="xmlAttributeMode"/>
+                            <xsl:call-template name="xmlTextNode"/>
+                            <xsl:apply-templates />
+                        </xsl:element>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise >
+                <BONK />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+
+
+
+    <xsl:template name="copyTextAndAttributes" ><xsl:copy-of select="text()|@*" /></xsl:template>
+
+
+
+
+
+
 
 
 </xsl:stylesheet>

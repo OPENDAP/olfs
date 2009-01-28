@@ -488,7 +488,12 @@ public class DispatchServlet extends HttpServlet {
 
 
         String requestURL = req.getRequestURL().toString();
+
         if(dap2Pattern.matcher(requestURL).matches()){   // Is it a DAP2 request?
+            resp.setHeader("XDODS-Server", "dods/3.2");
+            resp.setHeader("XOPeNDAP-Server", "Server-Version-Unknown");
+            resp.setHeader("XDAP", "3.2");
+            resp.setHeader("Content-Description", "dods_error");
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getOutputStream().print(
                     OPeNDAPException.getDAP2Error(
@@ -496,7 +501,10 @@ public class DispatchServlet extends HttpServlet {
                             "Cannot locate resource: "+Scrub.completeURL(requestURL)));
         }
         else if (dap4Pattern.matcher(requestURL).matches()){  // Is it a DAP3/4 request?
-
+            resp.setHeader("XDODS-Server", "dods/3.2");
+            resp.setHeader("XOPeNDAP-Server", "Server-Version-Unknown");
+            resp.setHeader("XDAP", "3.2");
+            resp.setHeader("Content-Description", "dods_error");
             Document err = OPeNDAPException.getDAP32Error(
                     HttpServletResponse.SC_NOT_FOUND,
                     "Cannot locate resource: "+Scrub.completeURL(requestURL));

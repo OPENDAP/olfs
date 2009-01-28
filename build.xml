@@ -244,6 +244,8 @@
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.lib}"/>
 
+        <filter token="HyraxVersion" value="${VERSION}"/>
+
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
     </target>
@@ -371,12 +373,13 @@
 
         </javadoc>
 
-        <copy todir="${build.doc}">
+        <!-- Turning on filtering here allows us to inject the version number
+           - into the XSLT code that is hanging off of the docs tree.
+           - 
+        <copy todir="${build.doc}" filtering="true" >
             <fileset dir="${doc.dir}">
-                <exclude name="javadoc/**"/>
-                <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="_notes/**"/>
-                <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="javadoc/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
             </fileset>
         </copy>
     </target>
@@ -586,8 +589,7 @@
             </lib>
             <classes dir="${build.classes}"/>
 
-
-            <zipfileset dir="${build.doc}" prefix="docs">
+            <zipfileset dir="${build.doc}" prefix="docs" >
                 <exclude name="src.distribution.readme"/>
                 <exclude name="_notes"/>
             </zipfileset>

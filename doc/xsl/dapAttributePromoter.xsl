@@ -26,40 +26,39 @@
 -->
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:dap="http://xml.opendap.org/ns/DAP2" >
-    <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
+                xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#"
+        >
 
+    <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
+    <xsl:key name="AttributeNames" match="dap:Attribute" use="@name" />
+    <xsl:key name="embeddedNamespaces" match="dap:Attribute[starts-with(@name,'xmlns:')]" use="substring-after(@name,'xmlns:')" />
     <xsl:strip-space elements="*" />
 
 
-<!--
-    <xsl:template match="dap:*">
-        <xsl:copy >
-            <xsl:call-template name="textAndattributes" />
-            <xsl:apply-templates />
-        </xsl:copy>
-    </xsl:template>
+    <xsl:template match="dap:Attribute">
 
-    <xsl:template match="*"><xsl:apply-templates /></xsl:template>
-
--->
-
-
-
-    <xsl:template match="*">
         <xsl:choose>
-            <xsl:when test="namespace-uri()='http://xml.opendap.org/ns/DAP2'">
+            <xsl:when test="key('embeddedNamespaces',substring-before(@name,':'))">
+                <xsl:element name="{@name}" namespace="{key('embeddedNamespaces',substring-before(@name,':'))/dap:value}">
+                    <xsl:value-of select="dap:value"/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
                 <xsl:copy >
                     <xsl:call-template name="textAndattributes" />
                     <xsl:apply-templates />
                 </xsl:copy>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates />
             </xsl:otherwise>
         </xsl:choose>
+        
     </xsl:template>
 
+    <xsl:template match="*">
+        <xsl:copy >
+            <xsl:call-template name="textAndattributes" />
+            <xsl:apply-templates />
+        </xsl:copy>        
+    </xsl:template>
 
 
     <xsl:template  match="@*|text()" />

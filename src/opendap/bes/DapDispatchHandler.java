@@ -323,6 +323,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 os,
                 erros)){
 
+            response.setHeader("Content-Description", "dods_error");
 
             String msg = new String(erros.toByteArray());
             log.error(msg);
@@ -383,6 +384,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 xdap_accept,
                 os,
                 erros)){
+
+            response.setHeader("Content-Description", "dods_error");
+
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -451,6 +455,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 xmlBase,
                 os,
                 erros)){
+            response.setHeader("Content-Description", "dods_error");
             String msg = new String(erros.toByteArray());
             log.error("BES Error. Message: \n"+msg);
             os.write(msg.getBytes());
@@ -508,6 +513,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 xdap_accept,
                 os,
                 erros)){
+            response.setHeader("Content-Description", "dods_error");
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());
@@ -562,6 +568,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 //            log.error(msg);
 //            os.write(msg.getBytes());
 
+            response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             //besError.setErrorCode(BESError.INTERNAL_ERROR);
             besError.sendErrorResponse(_servlet,response);
@@ -619,6 +626,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 url,
                 os,
                 erros)){
+            response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_servlet,response);
             log.error(besError.getMessage());
@@ -661,6 +669,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 os,
                 erros)){
 
+            response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_servlet,response);
             log.error(besError.getMessage());
@@ -733,6 +742,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 xdap_accept,
                 xmlBase,
                 ddx)){
+            response.setHeader("Content-Description", "dods_error");
             String msg = new String(erros.toByteArray());
             log.error("BES Error. Message: \n"+msg);
             os.write(msg.getBytes());
@@ -814,6 +824,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 xdap_accept,
                 os,
                 erros)){
+            response.setHeader("Content-Description", "dods_error");
             String msg = new String(erros.toByteArray());
             log.error(msg);
             os.write(msg.getBytes());

@@ -53,39 +53,56 @@
                     <xsl:value-of select="namespace-uri()"/>
                 </xsl:attribute>
 
-                <!--  Make it type xmlElementNode -->
-                <xsl:attribute name="type">xmlElementNode</xsl:attribute>
+                <!--  Map it to a namespaced dap:Attribute -->
 
-                <!-- Make special Attributes for each of the xml elements attributes. -->
-                <xsl:for-each select="@*">
-                    <xsl:element name="dap:Attribute">
-                        <xsl:attribute name="name">
-                            <xsl:value-of select="local-name()"/>
-                        </xsl:attribute>
-                        <xsl:attribute name="type">xmlAttributeNode</xsl:attribute>
-                        <xsl:attribute name="namespace">
-                            <xsl:value-of select="namespace-uri()"/>
-                        </xsl:attribute>
-                        <xsl:element name="dap:value">
-                            <xsl:value-of select="."/>
-                        </xsl:element>                        
-                    </xsl:element>
-                </xsl:for-each>
+                <xsl:choose>
+                    <!--  If it has child elements or xml attributes it's going into an Attribute Container. -->
+                    <xsl:when test="* | @*">
+                        <xsl:attribute name="type">Container</xsl:attribute>
 
-                <!-- A 1:1  mapping would fail here because the DAP does not allow a
-                 - a dap:Attributes@type to be 'Container' AND have XML text content.
-                 - Maybe we need another value for dap:Attribute@type, say 'xmlText'?
-                -->
-                <!-- Make special Attributes for source xml elements text node. -->
-                <xsl:if test="text()">
-                    <xsl:element name="dap:Attribute">
-                        <xsl:attribute name="name">textNode</xsl:attribute>
-                        <xsl:attribute name="type">xmlTextNode</xsl:attribute>
-                        <xsl:element name="dap:value">
-                            <xsl:copy-of select="text()"/>
-                        </xsl:element>
-                    </xsl:element>
-                </xsl:if>
+                        <!-- Make special Attributes for each of the xml elements attributes. -->
+                        <xsl:for-each select="@*">
+                            <xsl:element name="dap:Attribute">
+                                <xsl:attribute name="name">
+                                    <xsl:value-of select="local-name()"/>
+                                </xsl:attribute>
+                                <xsl:attribute name="type">xmlAttributeNode</xsl:attribute>
+                                <xsl:attribute name="namespace">
+                                    <xsl:value-of select="namespace-uri()"/>
+                                </xsl:attribute>
+                                <xsl:element name="dap:value">
+                                    <xsl:value-of select="."/>
+                                </xsl:element>
+                            </xsl:element>
+                        </xsl:for-each>
+
+                        <!--
+                           - And it's text value has to be wrapped in another dap:Attribute because dap:Attribute
+                           - elements may not have a type of Container AND have values
+                          -->
+                        <xsl:if test="text()">
+                            <xsl:element name="dap:Attribute">
+                                <xsl:attribute name="name">textNode</xsl:attribute>
+                                <xsl:attribute name="type">String</xsl:attribute>
+                                <xsl:element name="dap:value">
+                                    <xsl:copy-of select="text()"/>
+                                </xsl:element>
+                            </xsl:element>
+                        </xsl:if>
+                    </xsl:when>
+
+                    <xsl:otherwise>
+                        <!--
+                           - IT looks like an element with only text (or empty content) so we
+                           - can make the dap:Attribute of type String.
+                          -->
+                        <xsl:attribute name="type">String</xsl:attribute>
+                                <xsl:element name="dap:value">
+                                    <xsl:copy-of select="text()"/>
+                            </xsl:element>
+
+                    </xsl:otherwise>
+                </xsl:choose>
 
                 <xsl:apply-templates/>
 
@@ -99,5 +116,7 @@
 
         <xsl:template  match="@*|text()" />
 
-
+        <LowerCorner xmlns="http://www.opengis.net/ows/1.1"
+                     xmlns:gml="http://www.opengis.net/gml/3.2"
+                     gml:crs="urn:ogc:def:crs:EPSG::4326" >-97.8839 21.736</LowerCorner>
     </xsl:stylesheet>

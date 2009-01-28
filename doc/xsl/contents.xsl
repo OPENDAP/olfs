@@ -30,6 +30,7 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 >
+    <xsl:import href="version.xsl"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
 
@@ -203,7 +204,7 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax (###HYRAX_VERSION###)
+                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
 
                     <xsl:if test="/dataset/name='/'">
                         <xsl:text disable-output-escaping="yes">&amp;nbsp;
