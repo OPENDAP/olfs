@@ -26,9 +26,9 @@
 -->
 <!DOCTYPE xsl:stylesheet [
         <!ENTITY DAPOBJ  "http://iridl.ldeo.columbia.edu/ontologies/opendap.owl#" >
-        <!ENTITY DAP     "http://xml.opendap.org/ns/DAP/3.2#" >
+        <!ENTITY DAP     "http://xml.opendap.org/ns/DAP/3.3#" >
         <!ENTITY XSD     "http://www.w3.org/2001/XMLSchema#" >
-]>
+        ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -42,14 +42,14 @@
 
         >
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
-    <xsl:key name="AttributeNames" match="dap:Attribute" use="@name" />
+    <xsl:key name="AttributeNames" match="dap:Attribute" use="@name"/>
 
-    <xsl:variable name="XML_BASE"><xsl:value-of select="/dap:Dataset/@xml:base" /></xsl:variable>
-    <xsl:variable name="LocalOntology"><xsl:value-of select="$XML_BASE" />.rdf</xsl:variable>
-    <xsl:variable name="LocalAttributeNS"><xsl:value-of select="$XML_BASE" />/att#</xsl:variable>
+    <xsl:variable name="XML_BASE"><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:variable>
+    <xsl:variable name="LocalOntology"><xsl:value-of select="$XML_BASE"/>.rdf</xsl:variable>
+    <xsl:variable name="LocalAttributeNS"><xsl:value-of select="$XML_BASE"/>/att#</xsl:variable>
 
 
-
+    <xsl:strip-space elements="*"/>
 
     <!-- ###################################################################
       -
@@ -59,7 +59,9 @@
     <xsl:template match="/dap:Dataset">
 
         <rdf:RDF>
-            <xsl:attribute name="base" namespace="http://www.w3.org/XML/1998/namespace"><xsl:value-of select="$XML_BASE" /></xsl:attribute>
+            <xsl:attribute name="base" namespace="http://www.w3.org/XML/1998/namespace">
+                <xsl:value-of select="$XML_BASE"/>
+            </xsl:attribute>
 
             <owl:Ontology
                     rdf:about="{$LocalOntology}">
@@ -74,17 +76,18 @@
 
                 <rdfs:isDefinedBy rdf:resource="{$LocalOntology}"/>
 
-                <dapObj:dataset_id rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><xsl:value-of select="@dataset_id"/> </dapObj:dataset_id>
+                <dapObj:dataset_id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+                    <xsl:value-of select="@dataset_id"/>
+                </dapObj:dataset_id>
 
                 <xsl:apply-templates select="*" mode="body"/>
             </dapObj:Dataset>
 
-            <xsl:call-template name="AttPropDef" />
+            <xsl:call-template name="AttPropDef"/>
 
         </rdf:RDF>
     </xsl:template>
     <!-- ################################################################### -->
-
 
 
     <!-- ###################################################################
@@ -94,39 +97,55 @@
      -
      -
     -->
-    <xsl:template match="dap:Attribute" mode="body" >
+    <xsl:template match="dap:Attribute" mode="body">
 
-        <xsl:element name="att:{@name}" namespace="{$LocalAttributeNS}" >
 
-            <xsl:if test="@type='Container'" >
-                <xsl:attribute name="rdf:parseType" >Resource</xsl:attribute>
-                <xsl:apply-templates select="./*" mode="body"/>
-            </xsl:if>
+        <xsl:choose>
 
-            <xsl:if test="not(@type='Container')" >
+            <xsl:when test="@type='Container'">
+                <xsl:element name="att:{@name}" namespace="{$LocalAttributeNS}">
+                    <xsl:attribute name="rdf:parseType">Resource</xsl:attribute>
+                    <xsl:apply-templates select="./*" mode="body"/>
+                </xsl:element>
+            </xsl:when>
 
-                <xsl:if test="dap:value[last()=1]">
-                    <xsl:call-template name="attributeType" >
-                        <xsl:with-param name="thisAttribute" select="." />
-                    </xsl:call-template>
-                    <!-- <xsl:comment> Single Value </xsl:comment> -->
+            <xsl:when test="@type='OtherXML'">
+                <xsl:apply-templates select="*" mode="OtherXML">
+                    <xsl:with-param name="relationship" select="@relationship"/>
+                </xsl:apply-templates>
+            </xsl:when>
 
-                    <xsl:value-of select="." />
+            <xsl:otherwise>
 
-                </xsl:if>
+                <xsl:element name="att:{@name}" namespace="{$LocalAttributeNS}">
 
-                <xsl:if test="dap:value[last()>1]">
-                    <xsl:attribute name="rdf:parseType" >Resource</xsl:attribute>
-                    <!-- <xsl:comment> Multi Value </xsl:comment> -->
+                    <xsl:if test="dap:value[last()=1]">
+                        <xsl:call-template name="attributeType">
+                            <xsl:with-param name="thisAttribute" select="."/>
+                        </xsl:call-template>
+                        <!-- <xsl:comment> Single Value </xsl:comment> -->
 
-                    <xsl:call-template name="attributeValues">
-                        <xsl:with-param name="values" select="dap:value" />
-                    </xsl:call-template>
+                        <xsl:value-of select="."/>
 
-                </xsl:if>
+                    </xsl:if>
 
-            </xsl:if>
-        </xsl:element>
+                    <xsl:if test="dap:value[last()>1]">
+                        <xsl:attribute name="rdf:parseType">Resource</xsl:attribute>
+                        <!-- <xsl:comment> Multi Value </xsl:comment> -->
+
+                        <xsl:call-template name="attributeValues">
+                            <xsl:with-param name="values" select="dap:value"/>
+                        </xsl:call-template>
+
+                    </xsl:if>
+
+                </xsl:element>
+
+            </xsl:otherwise>
+
+        </xsl:choose>
+
+
     </xsl:template>
 
     <!--
@@ -135,36 +154,36 @@
      - isn't a very pretty thing.
     -->
 
-    <xsl:template name="attributeValues" >
+    <xsl:template name="attributeValues">
 
 
-        <xsl:param name="values" />
+        <xsl:param name="values"/>
 
-<!--
-        <xsl:comment>############################################</xsl:comment>
-        <xsl:comment>                                            </xsl:comment>
-        <xsl:comment> values                                  </xsl:comment>
-        <xsl:copy-of select="$values" />
-        <xsl:comment>                                            </xsl:comment>
-        <xsl:comment>############################################</xsl:comment>
+        <!--
+                <xsl:comment>############################################</xsl:comment>
+                <xsl:comment>                                            </xsl:comment>
+                <xsl:comment> values                                  </xsl:comment>
+                <xsl:copy-of select="$values" />
+                <xsl:comment>                                            </xsl:comment>
+                <xsl:comment>############################################</xsl:comment>
 
--->
+        -->
         <rdf:first>
-                <xsl:call-template name="attributeType" >
-                    <xsl:with-param name="thisAttribute" select="$values[1]/.." />
-                </xsl:call-template>
-            <xsl:value-of select="$values[1]" />
+            <xsl:call-template name="attributeType">
+                <xsl:with-param name="thisAttribute" select="$values[1]/.."/>
+            </xsl:call-template>
+            <xsl:value-of select="$values[1]"/>
         </rdf:first>
-        <rdf:rest >
+        <rdf:rest>
 
-            <xsl:if test="boolean($values[position()>1])" >
+            <xsl:if test="boolean($values[position()>1])">
                 <xsl:attribute name="rdf:parseType">Resource</xsl:attribute>
                 <xsl:call-template name="attributeValues">
-                    <xsl:with-param name="values" select="$values[position()>1]" />
+                    <xsl:with-param name="values" select="$values[position()>1]"/>
                 </xsl:call-template>
             </xsl:if>
 
-            <xsl:if test="not(boolean($values[position()>1]))" >
+            <xsl:if test="not(boolean($values[position()>1]))">
                 <xsl:attribute name="rdf:resource">http://www.w3.org/1999/02/22-rdf-syntax-ns#nil</xsl:attribute>
             </xsl:if>
 
@@ -174,13 +193,10 @@
     </xsl:template>
 
 
+    <xsl:template name="attributeType">
 
-    <xsl:template name="attributeType" >
-
-        <xsl:param name="thisAttribute" />
-
-
-        <xsl:attribute name="rdf:datatype" >
+        <xsl:param name="thisAttribute"/>
+        <xsl:attribute name="rdf:datatype">
             <xsl:if test="$thisAttribute/@type='Byte'">&XSD;byte</xsl:if>
             <xsl:if test="$thisAttribute/@type='Int16'">&XSD;short</xsl:if>
             <xsl:if test="$thisAttribute/@type='UInt16'">&XSD;unsignedShort</xsl:if>
@@ -194,13 +210,138 @@
 
     </xsl:template>
 
-<!--
-    <xsl:template match="dap:dataBLOB" mode="body">
-        <dapObj:hasdataBLOB>
-            <dap:dataBLOB rdf:about="{@href}"/>
-        </dapObj:hasdataBLOB>
+
+    <!--
+     -  mode="anyXMLToRDF"
+     -
+     - Maps the OtherXML dap:Attribute type to RDF while expressing the appropriate relationship
+     - of the XML to the parent DAP object.
+     -
+     -
+     -
+    -->
+    <xsl:template name="OtherXML" match="*" mode="OtherXML">
+        <xsl:param name="relationship"/>
+
+        <xsl:choose>
+
+            <xsl:when test="boolean($relationship) and $relationship='is-a'">
+                <xsl:apply-templates select="." mode="anyXMLToRDF"/>
+            </xsl:when>
+            <xsl:when test="boolean($relationship) and $relationship='has-a'">
+                <HAS-A>
+                    <xsl:copy-of select="."/>
+                </HAS-A>
+            </xsl:when>
+            <xsl:otherwise>
+                <HAS-A>
+                    <xsl:copy-of select="."/>
+
+                </HAS-A>
+            </xsl:otherwise>
+        </xsl:choose>
+
     </xsl:template>
--->
+
+
+    <!--
+     -  mode="anyXMLToRDF"
+     -
+     -  Map arbitrary XML (OtherXML) into RDF.
+     -
+     -
+     -
+     -
+    -->
+
+
+    <xsl:template name="textAndattributes">
+        <xsl:copy-of select="text()|@*"/>
+    </xsl:template>
+
+
+    <xsl:template match="@*|text()" mode="anyXMLToRDF"/>
+    <xsl:template match="*" mode="anyXMLToRDF">
+
+        <dapObj:type>
+            <xsl:apply-templates select="." mode="anyXMLToRDFWorker"/>
+        </dapObj:type>
+
+    </xsl:template>
+
+
+    <xsl:template match="@*|text()" mode="anyXMLToRDFWorker"/>
+    <xsl:template match="*" mode="anyXMLToRDFWorker">
+        <xsl:choose>
+            <xsl:when test="*">
+                <xsl:copy>
+
+                    <!-- XML Attributes with namespaces-->
+                    <xsl:for-each select="@*[namespace-uri()!='']">
+                        <xsl:attribute name="{local-name()}" namespace="{namespace-uri()}">
+                            <xsl:value-of select="."/>
+                        </xsl:attribute>
+                    </xsl:for-each>
+
+                    <!-- XML Attributes without namespaces-->
+                    <xsl:for-each select="@*[namespace-uri()='']">
+                        <xsl:apply-templates select="." mode="xmlAttributeNode"/>
+                    </xsl:for-each>
+
+                    <!-- XML Text -->
+                    <xsl:apply-templates select="text()" mode="xmlTextNode"/>
+
+
+                    <!-- XML Child Elements -->
+                    <xsl:for-each select="*">
+                        <xsl:choose>
+                            <!-- Child Elements with children elements -->
+                            <xsl:when test="*">
+                                <dapObj:xmlContains>
+                                    <xsl:apply-templates select="." mode="anyXMLToRDFWorker"/>
+                                </dapObj:xmlContains>
+                            </xsl:when>
+
+                            <!-- Simple Children -->
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="." mode="anyXMLToRDFWorker"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
+
+                </xsl:copy>
+
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="."/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+
+    <xsl:template match="@*" mode="xmlTextNode"/>
+
+    <xsl:template match="text()" mode="xmlTextNode">
+        <dapObj:xmlText>
+            <xsl:value-of select="."/>
+        </dapObj:xmlText>
+    </xsl:template>
+
+
+    <xsl:template match="text()" mode="xmlAttributeNode"/>
+
+    <xsl:template match="@*" mode="xmlAttributeNode">
+        <dapObj:xmlAttribute dapObj:name="{local-name()}" rdf:value="{.}"/>
+    </xsl:template>
+
+
+    <!--
+        <xsl:template match="dap:dataBLOB" mode="body">
+            <dapObj:hasdataBLOB>
+                <dap:dataBLOB rdf:about="{@href}"/>
+            </dapObj:hasdataBLOB>
+        </xsl:template>
+    -->
 
     <xsl:template match="dap:Grid" mode="body">
         <dapObj:isContainerOf>
@@ -227,7 +368,7 @@
                     <xsl:call-template name="localIdWorker"/>
                 </xsl:attribute>
 
-                <xsl:apply-templates  mode="body"/>
+                <xsl:apply-templates mode="body"/>
 
                 <xsl:call-template name="localId"/>
             </dap:Structure>
@@ -242,7 +383,7 @@
                     <xsl:call-template name="localIdWorker"/>
                 </xsl:attribute>
 
-                <xsl:apply-templates  mode="body"/>
+                <xsl:apply-templates mode="body"/>
 
                 <xsl:call-template name="localId"/>
             </dap:Sequence>
@@ -252,7 +393,7 @@
 
     <xsl:template match="dap:Array" mode="body">
         <dapObj:isContainerOf>
-                <xsl:apply-templates mode="array"/>
+            <xsl:apply-templates mode="array"/>
         </dapObj:isContainerOf>
     </xsl:template>
 
@@ -261,8 +402,6 @@
             <xsl:apply-templates mode="array"/>
         </dapObj:hasMap>
     </xsl:template>
-
-
 
 
     <xsl:template match="dap:Byte" mode="body">
@@ -376,8 +515,6 @@
     <!-- ################################################################### -->
 
 
-
-
     <!-- ###################################################################
      -
      -    dapObj:localId
@@ -385,9 +522,7 @@
      -
     -->
     <xsl:template name="localId">
-        <dapObj:localId rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
-            <xsl:call-template name="localIdWorker" />
-        </dapObj:localId>
+        <dapObj:localId rdf:datatype="http://www.w3.org/2001/XMLSchema#string"><xsl:call-template name="localIdWorker"/></dapObj:localId>
     </xsl:template>
 
     <xsl:template match="*" name="localIdWorker" mode="localId">
@@ -395,15 +530,9 @@
             <xsl:apply-templates select=".." mode="localId"/>
             <xsl:if test="generate-id(..)!=generate-id(/dap:Dataset) and
                           not(parent::dap:Array) and
-                          not(parent::dap:Map)" >.</xsl:if>
-            <xsl:value-of select="@name"/>
-        </xsl:if>
+                          not(parent::dap:Map)">.</xsl:if><xsl:value-of select="@name"/></xsl:if>
     </xsl:template>
     <!-- ################################################################### -->
-
-
-
-
 
 
     <!-- ###################################################################
@@ -413,15 +542,19 @@
      -
      -
     -->
-    <xsl:template match="*" mode="array" />
+    <xsl:template match="*" mode="array"/>
 
     <xsl:template name="arrayDimension">
-        <dapObj:hasDimensions rdf:parseType="Collection" >
+        <dapObj:hasDimensions rdf:parseType="Collection">
             <xsl:for-each select="../dap:dimension">
                 <dap:dimension>
-                    <dapObj:size><xsl:value-of select="@size" /></dapObj:size>
+                    <dapObj:size>
+                        <xsl:value-of select="@size"/>
+                    </dapObj:size>
                     <xsl:if test="@name">
-                        <dapObj:name><xsl:value-of select="@name" /></dapObj:name>
+                        <dapObj:name>
+                            <xsl:value-of select="@name"/>
+                        </dapObj:name>
                     </xsl:if>
                 </dap:dimension>
             </xsl:for-each>
@@ -429,38 +562,38 @@
     </xsl:template>
 
 
-
     <!-- - - - - - - - - - - - - - - - - - -
-     -
-     - Template:    basicArrayTypeContents
-     -
-     - All Arrays have this set of stuff
-     -
-     -
-     -->
-    <xsl:template  name="basicArrayTypeContents">
-            <xsl:attribute name="rdf:ID">
-                <xsl:call-template name="localIdWorker"/>
-            </xsl:attribute>
+    -
+    - Template:    basicArrayTypeContents
+    -
+    - All Arrays have this set of stuff
+    -
+    -
+    -->
+    <xsl:template name="basicArrayTypeContents">
+        <xsl:attribute name="rdf:ID">
+            <xsl:call-template name="localIdWorker"/>
+        </xsl:attribute>
 
-            <!-- Since at this point the current node is the Array template,
-            we need to look to the parent node (the Array) to get our Attribute
-            elements. -->
-            <xsl:apply-templates select="../dap:Attribute" mode="body"/>
+        <!-- Since at this point the current node is the Array template,
+       we need to look to the parent node (the Array) to get our Attribute
+       elements. -->
+        <xsl:apply-templates select="../dap:Attribute" mode="body"/>
 
-            <!-- The template object should not have Attributes. We
-            check for those anyway.... -->
-            <xsl:apply-templates select="dap:Attribute" mode="body"/>
+        <!-- The template object should not have Attributes. We
+    check for those anyway.... -->
+        <xsl:apply-templates select="dap:Attribute" mode="body"/>
 
-            <xsl:call-template name="arrayDimension"/>
-            <xsl:call-template name="localId"/>
+        <xsl:call-template name="arrayDimension"/>
+        <xsl:call-template name="localId"/>
     </xsl:template>
 
 
     <xsl:template match="dap:Array" mode="array">
         <ERROR>Arrays of Arrays ar not permitted in the DAP. Since this XSL
-        should be processing a legitimate DDX, this error should never occur.
-        (rofl)</ERROR>
+            should be processing a legitimate DDX, this error should never occur.
+            (rofl)
+        </ERROR>
     </xsl:template>
 
 
@@ -475,14 +608,14 @@
     <xsl:template match="dap:Sequence" mode="array">
         <dap:Sequence>
             <xsl:call-template name="basicArrayTypeContents"/>
-            <xsl:apply-templates  mode="body"/>
+            <xsl:apply-templates mode="body"/>
         </dap:Sequence>
     </xsl:template>
 
     <xsl:template match="dap:Structure" mode="array">
         <dap:Structure>
             <xsl:call-template name="basicArrayTypeContents"/>
-            <xsl:apply-templates  mode="body"/>
+            <xsl:apply-templates mode="body"/>
         </dap:Structure>
     </xsl:template>
 
@@ -543,27 +676,22 @@
     <!-- ################################################################### -->
 
 
-
-
-
-
-
     <!-- ###################################################################
       -
       -   Summary of Content
       -
     -->
     <xsl:template mode="summary"
-                  match="dap:Attribute"  />
+                  match="dap:Attribute"/>
 
     <xsl:template mode="OFF"
-                  match="dap:Attribute"  >
+                  match="dap:Attribute">
 
 
         <xsl:element name="{@name}">
 
             <xsl:if test="@type='Container'">
-                <xsl:apply-templates mode="summary" select="dap:Attribute" />
+                <xsl:apply-templates mode="summary" select="dap:Attribute"/>
             </xsl:if>
 
             <xsl:if test="not(./Attribute)">
@@ -574,21 +702,20 @@
 
 
     <xsl:template mode="summary"
-                  match="child::dap:value"  />
+                  match="child::dap:value"/>
 
 
     <xsl:template mode="summary"
                   match="*[not(self::dap:Attribute)  and
                          not(parent::dap:Attribute)  and
                          not(self::dap:dataBLOB)]"
-                  >
+            >
         <!-- Applying mode Summary template to <xsl:copy /> -->
         <dapObj:isContainerOf rdf:resource="#{@name}"/>
 
     </xsl:template>
 
     <!-- ################################################################### -->
-
 
 
     <!-- ###################################################################

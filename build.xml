@@ -195,6 +195,7 @@
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
 
+    <property name="catalina.lib"       value="catalina-6.0.14.jar"/>
 
 
 
@@ -220,6 +221,7 @@
             <include name="${saxon-jdom.lib}"/>
             <include name="${saxon-s9api.lib}"/>
             <include name="${saxon.lib}"/>
+            <include name="${catalina.lib}"/>
         </fileset>
     </path>
 
@@ -375,7 +377,8 @@
 
         <!-- Turning on filtering here allows us to inject the version number
            - into the XSLT code that is hanging off of the docs tree.
-           - 
+           -
+           -->
         <copy todir="${build.doc}" filtering="true" >
             <fileset dir="${doc.dir}">
                 <exclude name="javadoc/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
