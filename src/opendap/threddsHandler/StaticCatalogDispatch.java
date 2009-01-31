@@ -51,7 +51,7 @@ import net.sf.saxon.s9api.*;
  * Date: Apr 18, 2008
  * Time: 3:46:50 PM
  */
-public class Dispatch implements DispatchHandler {
+public class StaticCatalogDispatch implements DispatchHandler {
 
 
     private Logger log;
@@ -70,7 +70,7 @@ public class Dispatch implements DispatchHandler {
     Transformer datasetToHtmlTransform = null;
     ReentrantLock datasetToHtmlTransformLock;
 
-    public Dispatch() {
+    public StaticCatalogDispatch() {
 
         super();
 
