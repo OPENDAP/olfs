@@ -394,9 +394,11 @@
             description="Builds documentation distribution"
             >
 
-        <jar destfile="${build.dist}/olfs-${VERSION}-doc.jar">
+        <tar destfile="${build.dist}/olfs-${VERSION}-doc.tgz"
+             compression="gzip"
+                >
             <zipfileset dir="${build.doc}" prefix="olfs-${VERSION}-doc"/>
-        </jar>
+        </tar>
 
     </target>
 
@@ -407,7 +409,8 @@
             description="Builds source distribution"
             >
 
-        <jar destfile="${build.dist}/olfs-${VERSION}-src.jar"
+        <tar destfile="${build.dist}/olfs-${VERSION}-src.tgz"
+             compression="gzip"
                 >
 
             <zipfileset dir="." prefix="olfs-${VERSION}-src">
@@ -421,7 +424,7 @@
                 <exclude name="**/*.iws"/>
             </zipfileset>
 
-        </jar>
+        </tar>
 
     </target>
 
@@ -433,13 +436,15 @@
         <copy file="${distributionResources.dir}/WarFileReadMe"
               tofile="${build.dist}/README"/>
 
-        <jar destfile="${build.dist}/olfs-${VERSION}-webapp.jar">
+        <tar destfile="${build.dist}/olfs-${VERSION}-webapp.tgz"
+             compression="gzip"
+                >
             <zipfileset dir="${build.dist}" prefix="olfs-${VERSION}-webapp">
                 <include name="opendap.war"/>
                 <include name="README"/>
             </zipfileset>
 
-        </jar>
+        </tar>
 
         <delete file="${build.dist}/README"/>
         <delete file="${build.dist}/opendap.war"/>
