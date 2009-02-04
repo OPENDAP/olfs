@@ -229,15 +229,10 @@
                 <xsl:apply-templates select="." mode="anyXMLToRDF"/>
             </xsl:when>
             <xsl:when test="boolean($relationship) and $relationship='has-a'">
-                <HAS-A>
-                    <xsl:copy-of select="."/>
-                </HAS-A>
+                <xsl:copy-of select="."/>
             </xsl:when>
             <xsl:otherwise>
-                <HAS-A>
-                    <xsl:copy-of select="."/>
-
-                </HAS-A>
+                <xsl:copy-of select="."/>
             </xsl:otherwise>
         </xsl:choose>
 
@@ -263,9 +258,9 @@
     <xsl:template match="@*|text()" mode="anyXMLToRDF"/>
     <xsl:template match="*" mode="anyXMLToRDF">
 
-        <dapObj:type>
+        <rdf:type>
             <xsl:apply-templates select="." mode="anyXMLToRDFWorker"/>
-        </dapObj:type>
+        </rdf:type>
 
     </xsl:template>
 
