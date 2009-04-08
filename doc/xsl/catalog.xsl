@@ -31,13 +31,9 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-                xmlns:wcs="http://www.opengis.net/wcs"
-                xmlns:gml="http://www.opengis.net/gml"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns:dapwcs="http://www.opendap.org/ns/dapwcs"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0 http://www.unidata.ucar.edu/schemas/thredds/InvCatalog.1.0.xsd"
+                xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
@@ -49,9 +45,9 @@
        -
        -
      -->
-    <xsl:template match="showCatalog">
+    <xsl:template match="bes:showCatalog">
         <thredds:catalog>
-            <thredds:service name="OPeNDAP-Hyrax" serviceType="OPeNDAP" base="/opendap/hyrax/"/>
+            <thredds:service name="dap" serviceType="OPeNDAP" base="/opendap/hyrax/"/>
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -71,14 +67,12 @@
        -
        -
      -->
-    <xsl:template match="dataset">
+    <xsl:template match="bes:dataset">
 
 
-        <xsl:if test="dataset">
-            <thredds:dataset name="{name}" ID="{name}">
-                <thredds:serviceName>OPeNDAP-Hyrax</thredds:serviceName>
+        <xsl:if test="bes:dataset">
+            <thredds:dataset name="{@name}" ID="{@name}">
                 <thredds:metadata inherited="true">
-                    <thredds:serviceName>OPeNDAP-Hyrax</thredds:serviceName>
                     <thredds:authority>opendap.org</thredds:authority>
                     <thredds:dataType>unknown</thredds:dataType>
                     <thredds:dataFormat>unknown</thredds:dataFormat>
@@ -87,59 +81,47 @@
             </thredds:dataset>
         </xsl:if>
 
-        <xsl:if test="not(dataset)">
+        <xsl:if test="not(bes:dataset)">
 
-            <xsl:if test="@thredds_collection='true'">
-                <thredds:catalogRef name="{name}" xlink:href="{name}/catalog.xml" xlink:title="{name}" xlink:type="simple" >
+            <xsl:if test="@node='true'">
+                <thredds:catalogRef name="{@name}" xlink:href="{@name}/catalog.xml" xlink:title="{@name}" xlink:type="simple" >
                     <xsl:attribute name="ID">
-                        <xsl:value-of select="../name" /><xsl:if test="not(../name[.='/'])">/</xsl:if><xsl:value-of select="name" />
+                        <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
                     </xsl:attribute>
                 </thredds:catalogRef>
             </xsl:if >
 
-            <xsl:if test="not(@thredds_collection='true')">
-                <thredds:dataset name="{name}"  >
-                    <xsl:attribute name="urlPath">
-                        <xsl:value-of select="../name" /><xsl:if test="not(../name[.='/'])">/</xsl:if><xsl:value-of select="name" />
-                    </xsl:attribute>
-                    <xsl:attribute name="ID">
-                        <xsl:value-of select="../name" /><xsl:if test="not(../name[.='/'])">/</xsl:if><xsl:value-of select="name" />
-                    </xsl:attribute>
-                    <thredds:dataSize units="bytes">
-                        <xsl:value-of select="size" />
-                    </thredds:dataSize>
-                    <thredds:date type="modified">
-                        <xsl:value-of select="lastmodified/date" />T<xsl:value-of select="lastmodified/time" />
-                    </thredds:date>
-                </thredds:dataset>
-            </xsl:if >
+            <xsl:if test="not(@node='true')">
 
+                <xsl:if test="bes:serviceRef">
+
+
+                    <thredds:dataset name="{@name}"  >
+                        <xsl:attribute name="urlPath">
+                            <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                        </xsl:attribute>
+                        <xsl:attribute name="ID">
+                            <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                        </xsl:attribute>
+                        <thredds:dataSize units="bytes">
+                            <xsl:value-of select="@size" />
+                        </thredds:dataSize>
+                        <thredds:date type="modified">
+                            <xsl:value-of select="@lastModified" />
+                        </thredds:date>
+
+                        <xsl:call-template name="ServiceNames"/>
+                    </thredds:dataset>
+
+                </xsl:if>
+            </xsl:if >
         </xsl:if>
 
-
-
     </xsl:template>
 
-
-    <xsl:template match="name">
+    <xsl:template name="ServiceNames">
+        <thredds:serviceName><xsl:value-of select="bes:serviceRef"/></thredds:serviceName>
     </xsl:template>
-
-    <xsl:template match="size">
-    </xsl:template>
-
-    <xsl:template match="lastmodified">
-        <xsl:apply-templates />
-    </xsl:template>
-
-    <xsl:template match="date">
-    </xsl:template>
-
-    <xsl:template match="time">
-    </xsl:template>
-
-    <xsl:template match="count">
-    </xsl:template>
-
 
 
 </xsl:stylesheet>

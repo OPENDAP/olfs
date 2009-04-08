@@ -25,6 +25,7 @@ package opendap.wcs.gatewayClient;
 
 import opendap.bes.BesXmlAPI;
 import opendap.bes.BadConfigurationException;
+import opendap.namespaces.BES;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -76,7 +77,7 @@ public class BesAPI extends BesXmlAPI {
 
 
         log.debug("Building request for BES wcs_gateway_module request. wcsRequestURL: "+wcsRequestURL);
-        Element e, request = new Element("request", BES_NS);
+        Element e, request = new Element("request", BES.BES_NS);
 
         String reqID = "["+Thread.currentThread().getName()+":"+
                 Thread.currentThread().getId()+":wcs_request]";

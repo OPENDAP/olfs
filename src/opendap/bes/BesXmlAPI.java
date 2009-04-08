@@ -47,7 +47,6 @@ import opendap.coreServlet.RequestCache;
  */
 public class BesXmlAPI {
 
-    public static final Namespace BES_NS = Namespace.getNamespace("http://xml.opendap.org/ns/bes/1.0#");
 
     public static String DDS        = "dds";
     public static String DAS        = "das";
@@ -57,6 +56,9 @@ public class BesXmlAPI {
     public static String ASCII      = "ascii";
     public static String HTML_FORM  = "html_form";
     public static String INFO_PAGE  = "info_page";
+
+
+    private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
 
@@ -465,123 +467,7 @@ public class BesXmlAPI {
     }
 
 
-    /**
-     * Returns the BES CATALOG document for the specified dataSource.
-     *
-     * @param dataSource The data source whose information is to be retrieved
-     * @param response The document where the response (be it a catalog
-     * document or an error) will be placed.
-     * @return True if successful, false if the BES generated an error in
-     * while servicing the request.
-     * @throws PPTException              .
-     * @throws BadConfigurationException .
-     * @throws IOException               .
-     * @throws JDOMException             .
-     */
-    public static boolean OLDgetCatalog(String dataSource, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException {
 
-        boolean ret;
-
-
-        ret = besTransaction(dataSource,
-                showCatalogRequest(dataSource),
-                response);
-
-        if(ret){
-            // Get the root element.
-            Element root = response.getRootElement();
-            if(root==null)
-                throw new BadConfigurationException("The BES returned an empty " +
-                        "document in response to " +
-                        "a showCatalog request. This may indicate a problem " +
-                        "with the configuration of the BES.");
-
-            // Find the respnse Element
-            Element resp = root.getChild("response");
-            if(resp==null)
-                throw new BadConfigurationException("The BES returned a " +
-                        "document without a <response> element in respose to " +
-                        "a showCatalog request. This may indicate a problem " +
-                        "with the configuration of the BES.");
-
-            // Find the top level dataset Element
-            Element topDataset = resp.getChild("dataset");
-            if(topDataset==null)
-                throw new BadConfigurationException("The BES returned a " +
-                        "document without a <dataset> element in respose to " +
-                        "a showCatalog request. This may indicate a problem with " +
-                        "the configuration of the BES.");
-
-            topDataset.setAttribute("prefix", getBESprefix(dataSource));
-        }
-        return ret;
-
-    }
-
-
-    /**
-     * Returns the BES INFO document for the specified dataSource.
-     *
-     * @param dataSource The data source whose information is to be retrieved
-     * @param response The document where the response (be it datasource
-     * information or an error) will be placed.
-     * @return True if successful, false if the BES generated an error in
-     * while servicing the request.
-     * @throws PPTException              .
-     * @throws BadConfigurationException .
-     * @throws IOException               .
-     * @throws JDOMException             .
-     */
-    public static boolean OLDgetInfo(String dataSource, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException {
-
-        boolean ret;
-        Document request = showInfoRequest(dataSource);
-
-        ret = besTransaction(dataSource,
-                request,
-                response);
-
-
-        if(ret) {
-            // Get the root element.
-            Element root = response.getRootElement();
-            if(root==null)
-                throw new BadConfigurationException("The BES returned an " +
-                        "empty document in response to " +
-                        "a showInfo request. This may indicate a problem " +
-                        "with the configuration of the BES.");
-
-            // Find the respnse Element
-            Element resp = root.getChild("response");
-            if(resp==null)
-                throw new BadConfigurationException("The BES returned a " +
-                        "document without a <response> element in respose to " +
-                        "a showInfo request. This may indicate a problem " +
-                        "with the configuration of the BES.");
-
-            // Find the top level dataset Element
-            Element topDataset = resp.getChild("dataset");
-            if(topDataset==null)
-                throw new BadConfigurationException("The BES returned a " +
-                        "document without a <dataset> element in respose to " +
-                        "a showInfo request. This may indicate a problem with " +
-                        "the configuration of the BES.");
-
-
-            // Add the prefix attribute for this BES.
-            topDataset.setAttribute("prefix", getBESprefix(dataSource));
-        }
-        return ret;
-
-    }
 
 
     /**
@@ -622,7 +508,7 @@ public class BesXmlAPI {
                 Element root = response.getRootElement();
 
                 // Find the top level dataset Element
-                Element topDataset = root.getChild("response").getChild("dataset");
+                Element topDataset = root.getChild("showCatalog",BES_NS).getChild("dataset",BES_NS);
 
                 topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
@@ -704,10 +590,10 @@ public class BesXmlAPI {
 
             if(ret) {
                 // Get the root element.
-                Element root = response.getRootElement();
+                Element responseElement = response.getRootElement();
 
                 // Find the top level dataset Element
-                Element topDataset = root.getChild("response").getChild("dataset");
+                Element topDataset = responseElement.getChild("showInfo",BES_NS).getChild("dataset",BES_NS);
 
                 // Add the prefix attribute for this BES.
                 topDataset.setAttribute("prefix", getBESprefix(dataSource));
@@ -843,11 +729,15 @@ public class BesXmlAPI {
 
 
     /**
+     * Executes a command/response transaction with the BES
      *
-     * @param dataSource
-     * @param request
-     * @param response
-     * @return
+     * @param dataSource  The BES datasource that is going to be acccessed. This is used to determine which BES should
+     * be used to fulfill the request (In the event that Hyrax is configured to use multiple BESs this string will
+     * be used to locate the appropriate BES).
+     * @param request   The BES request document.
+     * @param response  The document into which the BES response will be placed. If the passed Document object contains
+     * conent, then the content will be discarded.
+     * @return true if the request is successful, false if there is a problem fulfilling the request.
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
@@ -860,6 +750,7 @@ public class BesXmlAPI {
             throws IOException, PPTException, BadConfigurationException, JDOMException {
 
         log.debug("besTransaction started.");
+        log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
 
         boolean trouble = false;
         Document doc;
@@ -905,6 +796,9 @@ public class BesXmlAPI {
             }
             else {
 
+                log.debug("BES returned this ERROR document:\n" +
+                        "-----------\n" + erros + "-----------");
+                
                 doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
 
                 Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
@@ -927,7 +821,12 @@ public class BesXmlAPI {
 
         }
         catch (PPTException e) {
+
             trouble = true;
+
+            log.debug("OLFS Encountered a PPT Problem!",e);
+            //e.printStackTrace();
+
             String msg = "besTransaction() Problem with OPeNDAPClient. " +
                     "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
 
@@ -944,12 +843,16 @@ public class BesXmlAPI {
 
 
     /**
+     * Executes a command/response transaction with the BES
      *
-     * @param dataSource
-     * @param request
-     * @param os
-     * @param err
-     * @return
+     * @param dataSource  The BES datasource that is going to be acccessed. This is used to determine which BES should
+     * be used to fulfill the request (In the event that Hyrax is configured to use multiple BESs this string will
+     * be used to locate the appropriate BES).
+     * @param request   The BES request document.
+     * @param os   The outputstream to write the BES response to.
+     * @param err  The output stream to which BES errors should be written
+     * @return true if the request is successful, false if there is a problem fulfilling the request. If false, then
+     * any error information will be written to the OutputStream err.
      * @throws BadConfigurationException
      * @throws IOException
      * @throws PPTException
@@ -963,7 +866,7 @@ public class BesXmlAPI {
 
 
         log.debug("besTransaction() started.");
-        log.debug("besTransaction() request document: \n"+showRequest(request));
+        log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
 
 
         boolean besTrouble = false;
@@ -979,13 +882,15 @@ public class BesXmlAPI {
 
         }
         catch (PPTException e) {
+
+            // e.printStackTrace();
             besTrouble = true;
 
             String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
                     "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
             log.error(msg);
 
-            throw new PPTException(msg);
+            throw new PPTException(msg,e);
         }
         finally {
             bes.returnClient(oc, besTrouble);

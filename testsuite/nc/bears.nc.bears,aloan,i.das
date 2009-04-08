@@ -5,6 +5,7 @@ Attributes {
         Int32 acl 17000;
         Float32 acf -2.000000000, 1.000000000, 0.000000000;
         Float64 acd -1.0000000000000000, 0.75000000000000000;
+        Int32 string_length 3;
     }
     order {
     }

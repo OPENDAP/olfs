@@ -157,9 +157,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             Document threddsCatalogDoc = transformer.transform(showCatalogDoc);
 
             response.setContentType("text/plain");
-            response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-            response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-            response.setHeader("XDAP", Version.getXDAPVersion(request));
+            Version.setOpendapMimeHeaders(request,response);
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 

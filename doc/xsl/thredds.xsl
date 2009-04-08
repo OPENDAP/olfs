@@ -48,7 +48,9 @@
             <head>
                 <link rel='stylesheet' href='/opendap/docs/css/contents.css'
                       type='text/css'/>
-                <title><xsl:value-of select="@name"/></title>
+                <title>
+                    <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
+                </title>
 
             </head>
             <body>
@@ -60,7 +62,7 @@
 
                 <img alt="Logo" src='/opendap/docs/images/logo.gif'/>
                 <h1>
-                    <xsl:value-of select="@name"/>
+                    <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left">
                         <xsl:if test="thredds:service">
                             <br/>services:
@@ -194,6 +196,7 @@
                     <xsl:choose>
 
                         <!-- Does it point towards a remote catalog?. -->
+                        <!--
                         <xsl:when test="starts-with(@xlink:href,'http://')">
                             <a>
                             <xsl:attribute name="href">?browseCatalog=<xsl:value-of select="@xlink:href" /></xsl:attribute>
@@ -203,6 +206,7 @@
                                 </xsl:choose>
                             </a>
                         </xsl:when>
+                        -->
 
                         <!-- Does it end in '.xml'? --> <!--Then replace that with '.html'   -->
                         <xsl:when test="substring(./@xlink:href,string-length(./@xlink:href) - 3)='.xml'">
@@ -222,14 +226,19 @@
         </xsl:if>
 
 
+        <!--
+
         <xsl:if test="$remoteHost">
             <tr>
                 <td align="left" >
-                    <!--ul xlass="small">
+
+                    <ul class="small">
                         <li><em>xlink:href: </em><xsl:value-of select="@xlink:href" /></li>
                         <li><em>remoteHost: </em><xsl:value-of select="$remoteHost" /></li>
                         <li><em>remoteRelativeURL: </em><xsl:value-of select="$remoteRelativeURL" /></li>
-                    </ul -->
+                    </ul>
+
+
                     <xsl:value-of select="$indent"/>
                     <a>
                     <xsl:choose>
@@ -249,6 +258,8 @@
                 <xsl:call-template name="NoSizeNoTime" />
             </tr>
         </xsl:if>
+
+        -->
 
     </xsl:template>
 
@@ -330,17 +341,20 @@
                     <xsl:value-of select="$indent"/>
                     <a>
                         <xsl:if test="$remoteCatalog">
-                            <xsl:attribute name="href">
-                                ?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/>
-                            </xsl:attribute>
+                            <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
                         </xsl:if>
                         <xsl:if test="not($remoteCatalog)">
-                            <xsl:attribute name="href">
-                                ?dataset=<xsl:value-of select="preceding::*/last()"/>
-                            </xsl:attribute>
+                            <xsl:attribute name="href">?dataset=<xsl:value-of select="preceding::*/last()"/></xsl:attribute>
                         </xsl:if>
 
-                        <xsl:value-of select="@name"/>/
+                        <xsl:choose>
+                            <xsl:when test="@name='/'">
+                                Catalog of /
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="@name"/>/
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </a>
                 </td>
                 <xsl:call-template name="NoSizeNoTime" />
@@ -363,9 +377,7 @@
                     <xsl:value-of select="$indent"/>
                     <a>
                         <xsl:if test="$remoteCatalog">
-                            <xsl:attribute name="href">
-                                ?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/>
-                            </xsl:attribute>
+                            <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
                         </xsl:if>
                         <xsl:if test="not($remoteCatalog)">
                             <xsl:attribute name="href">

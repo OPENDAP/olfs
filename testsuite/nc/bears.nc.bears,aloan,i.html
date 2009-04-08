@@ -5,7 +5,7 @@
 <script type="text/javascript">
 <!--
 
-// $Id: www.js 15676 2007-02-01 18:50:10Z jimg $
+// $Id: www.js 20400 2009-02-18 23:59:19Z jimg $
 
 var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
 
@@ -27,6 +27,25 @@ function ascii_button() {
     }
 
     window.open(ascii_url, "ASCII_Data");
+}
+
+/* The netcdf_button handler loads the data to the current window. Since it 
+   is netcdf/binary, Netscape will ask the user for a filename and save the data
+   to that file. The parameter 'ext' should be 'nc'. */
+
+function netcdf_button(ext) {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
+    }
+    else {
+        var binary_url = url_parts[0] + "." + ext + "?";
+    }
+
+    window.location = binary_url;
 }
 
 /* The binary_button handler loads the data to the current window. Since it 
@@ -306,7 +325,8 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/nc/bears.nc");
 <a href="opendap_form_help.html#disposition" target="help">Action:</a></h3>
 <td>
 <input type="button" value="Get ASCII" onclick="ascii_button()">
-<input type="button" value="Binary Data Object " onclick="binary_button('dods')">
+<input type="button" value="Get as NetCDF" onclick="binary_button('nc')">
+<input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')">
 <input type="button" value="Show Help" onclick="help_button()">
 
 <tr>
@@ -336,7 +356,7 @@ DODS_URL.add_dods_var(org_opendap_bears);
 </script>
 <b><input type="checkbox" name="get_org_opendap_bears"
 onclick="org_opendap_bears.handle_projection_change(get_org_opendap_bears) "  onfocus="describe_projection()">
-<font size="+1">bears</font></b>: Grid of Array of strings [i = 0..1][j = 0..2][l = 0..2]<br>
+<font size="+1">bears</font></b>: Grid of Array of strings [i = 0..1][j = 0..2]<br>
 
 i:<input type="text" name="org_opendap_bears_0" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -350,12 +370,6 @@ j:<input type="text" name="org_opendap_bears_1" size=8 onfocus="describe_index()
 org_opendap_bears.add_dim(3);
 // -->
 </script>
-l:<input type="text" name="org_opendap_bears_2" size=8 onfocus="describe_index()"onChange="DODS_URL.update_url()">
-<script type="text/javascript">
-<!--
-org_opendap_bears.add_dim(3);
-// -->
-</script>
 <br>
 <textarea name="bears_attr" rows="5" cols="70">
 act: text string\\012\\011123
@@ -363,6 +377,7 @@ acs: -40
 acl: 17000
 acf: -2.000000000, 1.000000000, 0.000000000
 acd: -1.0000000000000000, 0.75000000000000000
+string_length: 3
 </textarea>
 
 
@@ -477,59 +492,6 @@ org_opendap_cross.add_dim(3);
 // -->
 </script>
 <br>
-
-<p><p>
-
-<tr><td><td>
-
-<script type="text/javascript">
-<!--
-org_opendap_i = new dods_var("i", "org_opendap_i", 1);
-DODS_URL.add_dods_var(org_opendap_i);
-// -->
-</script>
-<b><input type="checkbox" name="get_org_opendap_i"
-onclick="org_opendap_i.handle_projection_change(get_org_opendap_i) "  onfocus="describe_projection()">
-<font size="+1">i</font></b>: Array of 32 bit Integers [i = 0..1]<br>
-
-i:<input type="text" name="org_opendap_i_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
-<script type="text/javascript">
-<!--
-org_opendap_i.add_dim(2);
-// -->
-</script>
-<br>
-
-<textarea name="i_attr" rows="5" cols="70">
-attr1: 1
-attr2: 1, 2, 3, 4
-i_1.attr3_1: 17
-i_1.attr3_2: 19, 23, 27
-</textarea>
-
-
-<p><p>
-
-<tr><td><td>
-
-<script type="text/javascript">
-<!--
-org_opendap_j = new dods_var("j", "org_opendap_j", 1);
-DODS_URL.add_dods_var(org_opendap_j);
-// -->
-</script>
-<b><input type="checkbox" name="get_org_opendap_j"
-onclick="org_opendap_j.handle_projection_change(get_org_opendap_j) "  onfocus="describe_projection()">
-<font size="+1">j</font></b>: Array of 32 bit Reals [j = 0..2]<br>
-
-j:<input type="text" name="org_opendap_j_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
-<script type="text/javascript">
-<!--
-org_opendap_j.add_dim(3);
-// -->
-</script>
-<br>
-
 
 <p><p>
 

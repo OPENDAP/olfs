@@ -143,7 +143,7 @@ public class FileDispatchHandler implements DispatchHandler {
         boolean isFileResponse = false;
 
         if (dsi.sourceExists()) {
-            if (!dsi.isCollection()) {
+            if (!dsi.isNode()) {
                 isFileResponse = true;
                 if (sendResponse) {
                     if(dsi.sourceIsAccesible()){

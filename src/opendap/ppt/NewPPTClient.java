@@ -243,7 +243,7 @@ public class NewPPTClient {
 
         try {
             if (strm == null)
-                throw new PPTException("Cannot write response to \"null\" " +
+                throw new PPTException("Cannot write response to a \"null\" " +
                         "OutputStream. ");
 
             return _in.readChunkedMessage(strm,errorStream);
@@ -251,7 +251,7 @@ public class NewPPTClient {
         }
         catch (IOException e) {
             closeConnection(true);
-            throw new PPTException("Cannot read response to designated " +
+            throw new PPTException("Cannot read response from designated " +
                     "stream. ", e);
         }
     }

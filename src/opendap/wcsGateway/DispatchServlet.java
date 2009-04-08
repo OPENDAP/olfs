@@ -240,9 +240,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendDDS() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -290,9 +288,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendDAS() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -339,9 +335,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendDDX() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -387,9 +381,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendDAP2Data() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -433,9 +425,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendASCII() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -479,9 +469,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendINFO() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -526,9 +514,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_form");
 
 

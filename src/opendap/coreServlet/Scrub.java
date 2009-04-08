@@ -66,6 +66,30 @@ public class Scrub {
 
 
 
+    /*
+
+    // These two regex are missing the "[" and the "]" charcaters. I don't know
+    // to make them work with those included in the character class.
+    private static String  uriInclusionRegex   = "[-a-zA-Z0-9/:?#@!$&'()*+,;=]*";
+    private static String  uriExclusionRegex   = "[^-a-zA-Z0-9/:?#@!$&'()*+,;=]*";
+    private static Pattern uriInclusionPattern = Pattern.compile(uriInclusionRegex);
+    public static String URI(String uri){
+        if(uri==null)
+            return null;
+        Matcher m = uriInclusionPattern.matcher(uri);
+
+        log.debug("URL() - Scrubbing file Name: "+uri+"   white list pattern: "+ uriInclusionRegex +"    matches: "+m.matches());
+        if(m.matches()){
+            return uri;
+        }
+        else {
+            return uri.replaceAll(uriExclusionRegex,"#");
+        }
+
+    }
+
+            
+     */
 
 
 

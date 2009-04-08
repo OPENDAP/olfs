@@ -29,6 +29,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
+import opendap.coreServlet.Scrub;
+
 /**
  * User: ndp
  * Date: Aug 18, 2008

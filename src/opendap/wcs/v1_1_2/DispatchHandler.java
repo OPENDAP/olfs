@@ -28,6 +28,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.bes.BesXmlAPI;
+import opendap.namespaces.BES;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
@@ -468,7 +469,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         page += wcsRequest.toString().replaceAll("<","&lt;").replaceAll(">","&gt;");
         page += "    </pre>";
 
-        Element besRequest = new Element ("request",BesXmlAPI.BES_NS);
+        Element besRequest = new Element ("request",BES.BES_NS);
         besRequest.setAttribute("reqID","###");
 
         besRequest.addContent(wcsRequest.getRequestElement());
@@ -531,7 +532,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         page += "    </pre>";
 
 
-        Element besRequest = new Element ("request",BesXmlAPI.BES_NS);
+        Element besRequest = new Element ("request",BES.BES_NS);
         besRequest.setAttribute("reqID","###");
 
         besRequest.addContent(wcsRequest.getRequestElement());
@@ -592,7 +593,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         page += "    </pre>";
 
 
-        Element besRequest = new Element ("request",BesXmlAPI.BES_NS);
+        Element besRequest = new Element ("request",BES.BES_NS);
         besRequest.setAttribute("reqID","###");
 
         besRequest.addContent(wcsRequest.getRequestElement());

@@ -141,9 +141,9 @@ public class PersistentContentHandler {
        out = new BufferedOutputStream( new FileOutputStream( fileOutName));
        copy( in, out);
      } finally {
-       if (null != in) in.close();
-       if (null != out) out.close();
-     }
+         if (null != out) out.close();
+         if (null != in) in.close();
+      }
    }
 
     /**

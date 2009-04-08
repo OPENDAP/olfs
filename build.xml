@@ -379,11 +379,15 @@
            - into the XSLT code that is hanging off of the docs tree.
            -
            -->
-        <copy todir="${build.doc}" filtering="true" >
+        <copy todir="${build.doc}" filtering="false" >
             <fileset dir="${doc.dir}">
                 <exclude name="javadoc/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="_notes/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="xsl/**"/> <!-- Exclude the _notes directory in the ${doc.dir} dir -->
             </fileset>
+        </copy>
+        <copy todir="${build.doc}/xsl" filtering="true" >
+            <fileset dir="${doc.dir}/xsl" />
         </copy>
     </target>
 

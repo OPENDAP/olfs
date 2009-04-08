@@ -326,7 +326,7 @@ public class CatalogManager {
 
         Document catalog = new Document(new Element(THREDDS.CATALOG));
         catalogRoot = catalog.getRootElement();
-        catalogRoot.setNamespace(Namespace.getNamespace(THREDDS.NAMESPACE_STRING));
+        catalogRoot.setNamespace(Namespace.getNamespace(THREDDS.BES_NAMESPACE_STRING));
         catalogRoot.addNamespaceDeclaration(XLINK.NS);
         catalogRoot.setAttribute(THREDDS.NAME, "HyraxThreddsHandler");
 

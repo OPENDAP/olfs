@@ -97,12 +97,15 @@ public class StaticCatalogDispatch implements DispatchHandler {
             relativeURL = relativeURL.substring(1, relativeURL.length());
 
 
+        // Are we browsing a remote catalog? a remote dataset?
         if (query != null && query.startsWith("browseCatalog=")) {
-            browseRemoteCatalog(response, query);
+            // browseRemoteCatalog(response, query);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
 
         else if (query != null && query.startsWith("browseDataset=")) {
-            browseRemoteDataset(response, query);
+            // browseRemoteDataset(response, query);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
 
         // Is the request for a presentation view (HTML version) of the catalog?
@@ -290,6 +293,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
+        	catDocIs.close();
             datasetToHtmlTransformLock.unlock();
         }
 
@@ -407,7 +411,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
-            catalogToHtmlTransformLock.unlock();
+        	catDocIs.close();
+        	catalogToHtmlTransformLock.unlock();
         }
 
 

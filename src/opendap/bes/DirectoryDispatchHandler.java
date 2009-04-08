@@ -48,7 +48,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     private Logger log;
     private boolean initialized;
-    private boolean useDefaultOpendapDirectoryView;
+
     private DispatchServlet dispatchServlet;
 
 
@@ -166,7 +166,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         } else {
             DataSourceInfo dsi = new BESDataSource(dsName);
             if (dsi.sourceExists() &&
-                    dsi.isCollection() ) {
+                    dsi.isNode() ) {
                     isDirectoryResponse = true;
             }
 

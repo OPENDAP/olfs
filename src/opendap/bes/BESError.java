@@ -29,6 +29,7 @@ import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ServletUtil;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
@@ -50,6 +51,8 @@ import java.io.*;
  *
  */
 public class BESError extends OPeNDAPException {
+
+    private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
     public static final String BES_ERROR = "BESError";
@@ -193,23 +196,27 @@ public class BESError extends OPeNDAPException {
         msg += "[";
         msg += "[BESError]";
 
-        e1 = besErrorElement.getChild("Type");
+        e1 = besErrorElement.getChild("Type",BES_NS);
         if(e1!=null)
             msg += "[Type: " + e1.getTextTrim() + "]";
 
 
-        e1 = besErrorElement.getChild("Message");
+        e1 = besErrorElement.getChild("Message",BES_NS);
         if(e1!=null)
             msg += "[Message: " + e1.getTextTrim() + "]";
 
-        e1 = besErrorElement.getChild("Location");
+        e1 = besErrorElement.getChild("Administrator",BES_NS);
+        if(e1!=null)
+            msg += "[Administrator: " + e1.getTextTrim() + "]";
+
+        e1 = besErrorElement.getChild("Location",BES_NS);
         if(e1!=null){
             msg += "[Location: ";
-            e2 = e1.getChild("File");
+            e2 = e1.getChild("File",BES_NS);
             if(e2!=null)
                 msg += e2.getTextTrim();
 
-            e2 = e1.getChild("Line");
+            e2 = e1.getChild("Line",BES_NS);
             if(e2!=null)
                 msg += " line " + e2.getTextTrim();
 
@@ -223,7 +230,7 @@ public class BESError extends OPeNDAPException {
 
     private void processError(Element error){
         try {
-            Element e = error.getChild("Type");
+            Element e = error.getChild("Type",BES_NS);
             if(e!=null){
                 String s = e.getTextTrim();
                 setErrorCode(Integer.valueOf(s));

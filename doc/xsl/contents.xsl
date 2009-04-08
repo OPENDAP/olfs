@@ -29,13 +29,14 @@
 ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
     <xsl:import href="version.xsl"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
 
 
-    <xsl:template match="showCatalog">
+    <xsl:template match="bes:response">
         <html>
             <xsl:apply-templates />
         </html>
@@ -43,11 +44,11 @@
 
 
 
-    <xsl:template match="response">
+    <xsl:template match="bes:showCatalog">
             <head>
                 <link rel='stylesheet' href='/opendap/docs/css/contents.css'
                       type='text/css'/>
-                <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="dataset/name"/></title>
+                <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="bes:dataset/@name"/></title>
             </head>
             <body>
 
@@ -58,16 +59,16 @@
 
                 <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
                 <h1>Contents of
-                    <xsl:if test="dataset/@prefix!='/'" >
-                        <xsl:if test="dataset/name='/'" >
-                            <xsl:value-of select="dataset/@prefix"/>
+                    <xsl:if test="bes:dataset/@prefix!='/'" >
+                        <xsl:if test="bes:dataset/@name='/'" >
+                            <xsl:value-of select="bes:dataset/@prefix"/>
                         </xsl:if>
-                        <xsl:if test="dataset/name!='/'" >
-                            <xsl:value-of select="dataset/@prefix"/><xsl:value-of select="dataset/name"/>
+                        <xsl:if test="bes:dataset/@name!='/'" >
+                            <xsl:value-of select="bes:dataset/@prefix"/><xsl:value-of select="bes:dataset/@name"/>
                         </xsl:if>
                     </xsl:if>
-                    <xsl:if test="dataset/@prefix='/'" >
-                        <xsl:value-of select="dataset/name"/>
+                    <xsl:if test="bes:dataset/@prefix='/'" >
+                        <xsl:value-of select="bes:dataset/@name"/>
                     </xsl:if>
                 </h1>
                 <hr size="1" noshade="noshade"/>
@@ -86,86 +87,37 @@
                         </tr>
                         <tr>
                             <td>
-                                <xsl:if test="/dataset/name!='/'" >
+                                <xsl:if test="bes:dataset/@name!='/'" >
                                     <a href="..">Parent Directory/</a>
                                 </xsl:if>
-                                <xsl:if test="/dataset/@prefix!='/'" >
-                                    <xsl:if test="/dataset/name='/'" >
+                                <xsl:if test="bes:dataset/@prefix!='/'" >
+                                    <xsl:if test="bes:dataset/@name='/'" >
                                         <a href="..">Parent Directory/</a>
                                     </xsl:if>
                                 </xsl:if>
                             </td>
                         </tr>
-                        <xsl:for-each select="dataset/dataset">
+                        <xsl:for-each select="bes:dataset/bes:dataset">
 
                             <!-- Process a collection. -->
-                            <xsl:if test="@thredds_collection='true'">
+                            <xsl:if test="@node='true'">
                                 <tr>
-                                    <td align="left">
-                                        <a href="{name}/contents.html">
-                                        <xsl:value-of select="name"/>/</a>
-                                    </td>
-
-                                    <td align="center">
-                                        <xsl:value-of
-                                                select="lastmodified/date"/>
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        <xsl:value-of
-                                                select="lastmodified/time"/>
-                                    </td>
-
-                                    <td align="right">-</td>
-                                    <td align="center">
-                                        &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
-                                    </td>
+                                    <xsl:call-template name="NodeLinks" />
                                 </tr>
                             </xsl:if>
 
                             <!-- Process a data set -->
-                            <xsl:if test="@thredds_collection='false'">
+                            <xsl:if test="@node='false'">
                                 <tr>
-                                    <xsl:if test="@isData='false'">
-                                        <td align="left">
-                                            <a href="{name}">
-                                                <xsl:value-of select="name"/>
-                                            </a>
-                                        </td>
-                                    </xsl:if>
-                                    <xsl:if test="@isData='true'">
-                                        <td align="left">
-                                            <a href="{name}.html">
-                                                <xsl:value-of select="name"/>
-                                            </a>
-                                        </td>
-                                    </xsl:if>
-                                    <td align="center">
-                                        <xsl:value-of
-                                                select="lastmodified/date"/>
-                                        <xsl:text disable-output-escaping="yes">
-                                            &amp;nbsp;
-                                        </xsl:text>
-                                        <xsl:value-of
-                                                select="lastmodified/time"/>
-                                    </td>
+                                <xsl:choose>
+                                    <xsl:when test="bes:serviceRef">
+                                        <xsl:apply-templates />
+                                    </xsl:when>
 
-                                    <td align="right">
-                                        <xsl:value-of select="size"/>
-                                    </td>
-                                    <td align="center">
-                                        <xsl:if test="@isData='true'">
-                                            <a href="{name}.rdf">rdf</a>
-                                            <a href="{name}.ddx">ddx</a>
-                                            <a href="{name}.dds">dds</a>
-                                            <a href="{name}.das">das</a>
-                                            <a href="{name}.info">info</a>
-                                            <a href="{name}.html">html</a>
-                                        </xsl:if>
-                                        <xsl:if test="@isData='false'">
-                                            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
-                                        </xsl:if>
-                                    </td>
+                                    <xsl:otherwise>
+                                        <xsl:call-template name="FileServiceLinks" />
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 </tr>
                             </xsl:if>
 
@@ -183,7 +135,7 @@
                         <td>
                             <div class="small" align="left">
                                 THREDDS Catalog
-                                <a href="/opendap{/showCatalog/response/dataset/name[.!='/']}/catalog.xml">
+                                <a href="/opendap{bes:dataset/@name[.!='/']}/catalog.xml">
                                     XML
                                 </a>
                             </div>
@@ -206,9 +158,7 @@
                 <!--                                                        -->
                 <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
 
-                    <xsl:if test="/dataset/name='/'">
-                        <xsl:text disable-output-escaping="yes">&amp;nbsp;
-                        </xsl:text>
+                    <xsl:if test="bes:dataset/@name='/'">
                         <span class="uuid">
                             ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
                         </span>
@@ -220,6 +170,112 @@
 
             </body>
     </xsl:template>
+
+
+    <xsl:template name="NodeLinks" >
+        <td align="left">
+            <a href="{@name}/contents.html">
+            <xsl:value-of select="@name"/>/</a>
+        </td>
+
+        <td align="center">
+            <xsl:value-of select="@lastModified"/>
+        </td>
+
+        <td align="right">-</td>
+        <xsl:call-template name="NoServiceLinks" />
+    </xsl:template>
+
+
+
+
+    <xsl:template match="bes:serviceRef" >
+        <xsl:choose>
+            <xsl:when test=".='dap'">
+                <xsl:call-template name="DapServiceLinks" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="UnkownServiceLinks" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    
+
+    <xsl:template name="DapServiceLinks" >
+        <td align="left">
+            <b><a href="{../@name}.html">
+                <xsl:value-of select="../@name"/>
+            </a>
+            </b>
+        </td>
+
+        <td align="center">
+            <xsl:value-of select="../@lastModified" />
+        </td>
+
+        <td align="right">
+            <xsl:value-of select="../@size"/>
+        </td>
+
+        <td align="center">
+            <!-- <a href="{../@name}.rdf">rdf</a> -->
+            <a href="{../@name}.ddx">ddx</a>
+            <a href="{../@name}.dds">dds</a>
+            <a href="{../@name}.das">das</a>
+            <a href="{../@name}.info">info</a>
+            <a href="{../@name}.html">html</a>
+        </td>
+    </xsl:template>
+
+
+
+
+    <xsl:template name="UnkownServiceLinks" >
+        <td align="left">
+            <a href="{../@name}">
+                <xsl:value-of select="../@name"/>
+            </a>
+        </td>
+        <td align="center">
+            <xsl:value-of
+                    select="../@lastmodified" />
+        </td>
+
+        <td align="right">
+            <xsl:value-of select="../@size"/>
+        </td>
+        <td align="center">
+            Unkown Service Type: <xsl:value-of select="." />
+        </td>
+    </xsl:template>
+
+
+
+    <xsl:template name="FileServiceLinks" >
+        <td align="left">
+            <a href="{@name}">
+                <xsl:value-of select="@name"/>
+            </a>
+        </td>
+        <td align="center">
+            <xsl:value-of
+                    select="@lastModified" />
+        </td>
+
+        <td align="right">
+            <xsl:value-of select="@size"/>
+        </td>
+        <xsl:call-template name="NoServiceLinks" />
+    </xsl:template>
+
+    <xsl:template name="NoServiceLinks">
+        <td align="center">
+            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
+        </td>
+    </xsl:template>
+
+
 
 
 </xsl:stylesheet>

@@ -300,12 +300,11 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        log.debug("sendDAS() for dataset: " + dataSource);
+        log.debug("sendDAS() for dataset: " + dataSource+
+                "    CE: '" + constraintExpression + "'");
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -361,12 +360,11 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        log.debug("sendDDS() for dataset: " + dataSource);
+        log.debug("sendDDS() for dataset: " + dataSource+
+                "    CE: '" + constraintExpression + "'");
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -422,12 +420,11 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
 
-        log.debug("sendDDX() for dataset: " + dataSource);
+        log.debug("sendDDX() for dataset: " + dataSource+
+                "    CE: '" + constraintExpression + "'");
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_ddx");
 
         // This hedaer indicates to the client that the content of this response
@@ -492,12 +489,11 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getDataSource(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        log.debug("sendDAP2Data() For: " + dataSource);
+        log.debug("sendDAP2Data() For: " + dataSource+
+                "    CE: '" + constraintExpression + "'");
 
         response.setContentType("application/octet-stream");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_data");
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -521,7 +517,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         }
 
         os.flush();
-        log.info("Sent DAP2 dta response.");
+        log.info("Sent DAP2 data response.");
 
     }
 
@@ -538,9 +534,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_ascii");
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -549,7 +543,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         log.debug("sendASCII(): Data For: " + dataSource +
-                    "    CE: '" + request.getQueryString() + "'");
+                    "    CE: '" + constraintExpression + "'");
 
 
 
@@ -590,11 +584,10 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         String dataSource = ReqInfo.getDataSource(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_form");
 
 
@@ -604,7 +597,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         log.debug("sendHTMLRequestForm(): Sending HTML Data Request Form For: "
                 + dataSource +
-                "    CE: '" + request.getQueryString() + "'");
+                "    CE: '" + constraintExpression + "'");
 
 
         OutputStream os = response.getOutputStream();
@@ -649,9 +642,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getDataSource(request);
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_description");
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -717,9 +708,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log.debug("sendDDX2RDF() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "text/xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -807,9 +796,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         response.setContentType("application/octet-stream");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        Version.setOpendapMimeHeaders(request,response);
 
         response.setStatus(HttpServletResponse.SC_OK);
 

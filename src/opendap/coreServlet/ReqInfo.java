@@ -101,6 +101,7 @@ public class ReqInfo {
      * @return The OPeNDAP constraint expression.
      */
     public static  String getConstraintExpression(HttpServletRequest req) {
+
         String CE = req.getQueryString();
 
         if (CE == null) {

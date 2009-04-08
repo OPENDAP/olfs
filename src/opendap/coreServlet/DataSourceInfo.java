@@ -35,13 +35,11 @@ public interface DataSourceInfo {
 
     public  boolean sourceIsAccesible();
 
-    public  boolean isCollection();
+    public  boolean isNode();
 
     public  boolean isDataset();
 
     public  long    lastModified();
-
-
 
 
 }

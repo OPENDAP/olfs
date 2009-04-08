@@ -412,36 +412,43 @@ public class DispatchServlet extends HttpServlet {
 
 
         try {
-            RequestCache.startRequestIfNeeded();
+            try {
+                RequestCache.startRequestIfNeeded();
 
-            int reqno = reqNumber.incrementAndGet();
-            PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+                int reqno = reqNumber.incrementAndGet();
+                PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
 
-            log.debug(Util.showRequest(request, reqno));
+                log.debug(Util.showRequest(request, reqno));
 
-            if(redirectForContextOnlyRequest(request,response))
-                return;
-
-
-            log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
-                    "' suffix: '" + ReqInfo.getRequestSuffix(request) +
-                    "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
+                if(redirectForContextOnlyRequest(request,response))
+                    return;
 
 
+                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
+                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
-            if (Debug.isSet("probeRequest"))
-                log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
 
-            DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
-            if (dh != null) {
-                log.debug("Request being handled by: " + dh.getClass().getName());
-                dh.handleRequest(request, response);
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+                if (Debug.isSet("probeRequest"))
+                    log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
 
-            } else {
-                send404(request,response);
+
+                DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
+                if (dh != null) {
+                    log.debug("Request being handled by: " + dh.getClass().getName());
+                    dh.handleRequest(request, response);
+                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+    
+                } else {
+                    send404(request,response);
+                }
             }
+            finally {
+                RequestCache.endRequest();
+                log.info("doGet(): Response completed.\n");
+            }
+
 
         }
         catch (Throwable t) {
@@ -450,16 +457,16 @@ public class DispatchServlet extends HttpServlet {
             }
             catch(Throwable t2) {
             	try {
-            		log.error("BAD THINGS HAPPENED!", t2);
+            		log.error("\n########################################################\n" +
+                                "Request proccessing failed.\n" +
+                                "Normal Exception handling failed.\n" +
+                                "This is the last error log attempt for this request.\n" +
+                                "########################################################\n", t2);
             	}
             	catch(Throwable t3){
                     // It's boned now.. Leave it be.
             	}
             }
-        }
-        finally {
-            RequestCache.endRequest();
-            log.info("doGet(): Response completed.\n");
         }
 
 

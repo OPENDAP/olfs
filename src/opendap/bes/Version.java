@@ -27,16 +27,26 @@ package opendap.bes;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.Document;
+import org.jdom.Namespace;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import opendap.coreServlet.ReqInfo;
 
+import java.util.List;
+import java.util.Iterator;
+
 /**
  * Contains the Version and UUID information for Hyrax Server.
  */
 public class Version  {
+
+    private static Logger log = org.slf4j.LoggerFactory.getLogger(Version.class);
+
+    private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
+
 
 
     private static String olfsVersion  = "1.5.0";
@@ -120,20 +130,6 @@ public class Version  {
     }
 
 
-    /**
-     * Get's the version string that we add to the base of the THREDDS
-     * generated catalog.html pages.
-     *
-     * @return A String containing a snippett of HTML that contains the
-     * Hyrax version and ServerUUID .
-     */
-    public static String getVersionStringForTHREDDSCatalog() {
-        return "OPeNDAP Hyrax (" + Version.getHyraxVersionString() + ")" +
-                "<font size='-5' color='#7A849E'> " +
-                "ServerUUID=" + Version.getServerUUID() + "-catalog" +
-                "</font><br />";
-
-    }
 
 
 
@@ -155,29 +151,44 @@ public class Version  {
     public static String getXDODSServerVersion(HttpServletRequest request)
             throws Exception {
 
-        if (getVersionDocument(ReqInfo.getDataSource(request)) != null) {
 
-            Element e1;
-            String thisVer, highestVer;
+
+        Document versionDoc = getVersionDocument(ReqInfo.getDataSource(request));
+
+        if (versionDoc != null) {
+
+            Element bes = versionDoc.getRootElement();
+            List services = bes.getChildren("serviceVersion",BES_NS);
+
+            if(services.isEmpty())
+                log.error("The BES with prefix='"+bes.getAttributeValue("prefix")+"' has no defined services! " +
+                        "(bes:serviceRef elements are missing");
+
+            Element srvc;
+            Element v;
+            String ver;
+            String highestVer="0.0";
             int result;
+            Iterator i = services.iterator();
+            while(i.hasNext()){
+                srvc = (Element) i.next();
 
-            e1 = getVersionDocument(ReqInfo.getDataSource(request)).getRootElement();
-            e1 = e1.getChild("Handlers");
-            e1 = e1.getChild("DAP");
+                if(srvc.getAttributeValue("name").equalsIgnoreCase("dap")){
+                    for (Object o : srvc.getChildren("version",BES_NS)) {
+                        v = (Element) o;
+                        ver = v.getTextTrim();
+                        result = ver.compareToIgnoreCase(highestVer);
 
-            highestVer="0.0";
-            for (Object o1 : e1.getChildren("version")) {
-                e1 = (Element) o1;
-                thisVer = e1.getTextTrim();
+                        if(result>0){
+                            highestVer = ver;
+                        }
 
-                result = thisVer.compareToIgnoreCase(highestVer);
+                    }
 
-                if(result>0){
-                    highestVer = thisVer;
+
                 }
 
             }
-
             return ("dods/" + highestVer);
         }
 
@@ -196,13 +207,65 @@ public class Version  {
     public static String getXOPeNDAPServerVersion(HttpServletRequest request)
             throws Exception {
 
-        if (getVersionDocument(ReqInfo.getDataSource(request)) != null) {
+        Document versionDoc = getVersionDocument(ReqInfo.getDataSource(request));
+
+        if (versionDoc != null) {
+
+
+            Element bes = versionDoc.getRootElement();
+            List libraries = bes.getChildren("library",BES_NS);
+            List modules = bes.getChildren("module",BES_NS);
+
+            if(libraries.isEmpty())
+                log.error("The BES with prefix='"+bes.getAttributeValue("prefix")+"' is running without code libraries! " +
+                        "(bes:library elements are missing");
+
+            if(modules.isEmpty())
+                log.error("The BES with prefix='"+bes.getAttributeValue("prefix")+"' is running without modules! " +
+                        "(bes:module elements are missing");
 
             String opsrv = "";
+            Element lib, module;
+            Element v;
+            String ver;
+            String highestVer="0.0";
+            int result;
+            boolean first = true;
+            Iterator i = libraries.iterator();
+            while(i.hasNext()){
+                lib = (Element) i.next();
 
-            for (Object o : getVersionDocument(ReqInfo.getDataSource(request)).getRootElement().getChildren()) {
+                if (!first)
+                    opsrv += ",";
+                else
+                    first = false;
+
+                opsrv += " " + lib.getAttributeValue("name") + "/" + lib.getTextTrim();
+            }
+
+
+            i = modules.iterator();
+            while(i.hasNext()){
+                module = (Element) i.next();
+
+                if (!first)
+                    opsrv += ",";
+                else
+                    first = false;
+
+                opsrv += " " + module.getAttributeValue("name") + "/" + module.getTextTrim();
+            }
+
+
+
+
+                                      /*
+
+
+
+            for (Object o : versionDoc.getRootElement().getChildren()) {
                 Element pkg = (Element) o;
-                boolean first = true;
+                 first = true;
                 for (Object o1 : pkg.getChildren("lib")) {
                     Element lib = (Element) o1;
                     if (!first)
@@ -211,6 +274,9 @@ public class Version  {
                     first = false;
                 }
             }
+            */
+
+            
             return (opsrv);
         }
         return ("Server-Version-Unknown");
@@ -236,13 +302,56 @@ public class Version  {
         if (request != null)
             clientDapVer = request.getHeader("XDAP");
 
+        Document versionDoc = getVersionDocument(ReqInfo.getDataSource(request));
 
 
-        if (getVersionDocument(ReqInfo.getDataSource(request)) != null) {
+        if (versionDoc != null) {
+
+
+            Element bes = versionDoc.getRootElement();
+
+
+            List services = bes.getChildren("serviceVersion",BES_NS);
+
+            if(services.isEmpty())
+                log.error("The BES with prefix='"+bes.getAttributeValue("prefix")+"' has no defined services! " +
+                        "(bes:serviceRef elements are missing");
 
             String responseDAP = null;
+            Element srvc;
+            Element v;
+            String ver;
+            double vval;
+            Iterator i = services.iterator();
+            while(i.hasNext()){
+                srvc = (Element) i.next();
 
-            for (Object o : getVersionDocument(ReqInfo.getDataSource(request)).getRootElement().getChild("Handlers").getChild("DAP").getChildren("version")) {
+                if(srvc.getAttributeValue("name").equalsIgnoreCase("dap")){
+                    for (Object o : srvc.getChildren("version",BES_NS)) {
+                        v = (Element) o;
+                        ver = v.getTextTrim();
+                        vval = Double.parseDouble(ver);
+                        if (hval < vval) {
+                            hval = vval;
+                            hver = ver;
+                        }
+
+                        if (clientDapVer != null && clientDapVer.equals(ver))
+                            responseDAP = ver;
+                    }
+                    
+
+                }
+
+            }
+            if (responseDAP == null)
+                return (hver);
+            return (responseDAP);
+
+
+               /*
+
+            for (Object o : getVersionDocument(ReqInfo.getDataSource(request)).getRootElement().getChild("serviceVersion").getChild("DAP").getChildren("version")) {
                 Element v = (Element) o;
                 String ver = v.getTextTrim();
                 double vval = Double.parseDouble(ver);
@@ -257,6 +366,8 @@ public class Version  {
             if (responseDAP == null)
                 return (hver);
             return (responseDAP);
+
+            */
         }
 
         return ("DAP-Version-Unknown");

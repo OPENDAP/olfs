@@ -27,9 +27,12 @@ package opendap.bes;
 import opendap.coreServlet.DataSourceInfo;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.slf4j.Logger;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.text.SimpleDateFormat;
 
 
@@ -40,20 +43,23 @@ import java.text.SimpleDateFormat;
  */
 public class BESDataSource implements DataSourceInfo {
 
-    private String BESDateFormat = "yyyy-MM-dd HH:mm:ss";
+    private String BESDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
     private boolean exists;
     private boolean accessible;
-    private boolean collection;
+    private boolean node;
     private boolean data;
 
     private String name;
     private long size;
     private Date lastModified;
 
+    private String[] serviceRefs;
+
     private String requestedDataSource;
 
 
+    private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
     BESDataSource(String dataSourceName) throws Exception {
@@ -64,7 +70,7 @@ public class BESDataSource implements DataSourceInfo {
         requestedDataSource = dataSourceName;
         exists              = false;
         accessible          = false;
-        collection          = false;
+        node = false;
         data                = false;
         name                = null;
         size                = -1;
@@ -80,24 +86,39 @@ public class BESDataSource implements DataSourceInfo {
             exists      = true;
             accessible  = true;
            
-            Element dataset = info.getRootElement().getChild("response").getChild("dataset");
+            Element dataset = info.getRootElement().getChild("showInfo",BES_NS).getChild("dataset",BES_NS);
 
-            String isCollection = dataset.getAttributeValue("thredds_collection");
-            collection = isCollection == null || isCollection.equalsIgnoreCase("true");
-            String isData = dataset.getAttributeValue("isData");
-            data = isData == null || isData.equalsIgnoreCase("true");
-
-
-            name = dataset.getChildText("name");
-            String s = dataset.getChildText("size");
+            name = dataset.getAttributeValue("name");
+            String s = dataset.getAttributeValue("size");
             size = Long.valueOf(s);
 
             SimpleDateFormat sdf = new SimpleDateFormat(BESDateFormat);
+            lastModified = sdf.parse(dataset.getAttributeValue("lastModified"));
+
+            String isNode = dataset.getAttributeValue("node");
+            node = isNode == null || isNode.equalsIgnoreCase("true");
 
 
-            lastModified = sdf.parse(dataset.getChild("lastmodified").getChildTextTrim("date") + " " +
-                                     dataset.getChild("lastmodified").getChildTextTrim("time"));
 
+            Element e;
+            List srvcList = dataset.getChildren("serviceRef",BES_NS);
+
+            if(!srvcList.isEmpty()){
+                serviceRefs = new String[srvcList.size()];
+                int i = 0;
+                Iterator iterator = srvcList.iterator();
+                while(iterator.hasNext()){
+                    e = (Element) iterator.next();
+                    serviceRefs[i++] = e.getTextTrim();
+                }
+                data = true;
+
+
+            }
+            else {
+                data = false;
+            }
+            
         }
         else {
 
@@ -105,7 +126,7 @@ public class BESDataSource implements DataSourceInfo {
 
             exists        = !err.notFound();
             accessible    = !err.forbidden();
-            collection    = false;
+            node = false;
             data          = false;
             name          = null;
             size          = -1;
@@ -129,8 +150,8 @@ public class BESDataSource implements DataSourceInfo {
     }
 
 
-    public  boolean isCollection(){
-        return collection;
+    public  boolean isNode(){
+        return node;
     }
 
     public  boolean isDataset(){
@@ -157,6 +178,10 @@ public class BESDataSource implements DataSourceInfo {
         return requestedDataSource;
     }
 
+    public String[] getServiceRefs(){
+        return serviceRefs;
+    }
+
 
     public String toString(){
         String s = "BESDataSource("+requestedDataSource+"):\n";
@@ -164,14 +189,13 @@ public class BESDataSource implements DataSourceInfo {
         s += "    exists:        "+exists+"\n";
         if(exists){
             s += "    name:          " + name         + "\n";
-            s += "    isCollection:  " + collection   + "\n";
+            s += "    isCollection:  " + node + "\n";
             s += "    isDataset:     " + data         + "\n";
             s += "    size:          " + size         + "\n";
             s += "    lastModified:  " + lastModified + "\n";
         }
         return s;
     }
-
 
 
 }

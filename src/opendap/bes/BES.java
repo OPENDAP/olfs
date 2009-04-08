@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.jdom.JDOMException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * User: ndp
@@ -63,6 +64,8 @@ public class BES {
     private ReentrantLock _clientCheckoutLock;
 
     private int clientMaxCommands;
+
+    private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
     private DevNull devNull = new DevNull();
@@ -152,6 +155,19 @@ public class BES {
     }
 
 
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws JDOMException
+     * @throws BESError
+     */
     private void cacheServerVersionDocument() throws IOException,
             PPTException,
             BadConfigurationException,
@@ -165,25 +181,18 @@ public class BES {
         if(BesXmlAPI.getVersion(getPrefix(),version)){
 
 
-            Element ver = version.getRootElement().getChild("response");
+            Element ver = version.getRootElement().getChild("showVersion",BES_NS);
 
-            // Disconnect it from it's parent and then rename it.
+
+            // Disconnect it from it's parent.
             ver.detach();
-            ver.setName("BES-Version");
+
+            ver.setName("BES");
+            ver.setAttribute("prefix",getPrefix());
 
             version.detachRootElement();
             version.setRootElement(ver);
             
-            Element bes = ver.getChild("BES");
-
-            List guts = bes.removeContent();
-
-            // Add the prefix as the first item in the BES
-            // section of the version.
-            Element prefix = new Element("prefix");
-            prefix.addContent(getPrefix());
-            bes.addContent(prefix);
-            bes.addContent(guts);
 
             _serverVersionDocument = version;
         }
