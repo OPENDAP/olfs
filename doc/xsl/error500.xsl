@@ -29,10 +29,11 @@
 ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
         >
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
-    <xsl:template match="/BESError">
+    <xsl:template match="/bes:BESError">
         <html>
             <head>
                 <meta http-equiv="Content-Type"
@@ -69,7 +70,7 @@
                             <blockquote>
                                 <p align="center">
                                     <strong>
-                                        <xsl:value-of select="Message"/>
+                                        <xsl:value-of select="bes:Message"/>
                                     </strong>
                                 </p>
                             </blockquote>
@@ -79,8 +80,8 @@
                                 broken (that the URL you submitted should have
                                 worked), then please contact the user
                                 support coordinator for this server at:
-                                <a href="mailto:{Administrator}">
-                                    <xsl:value-of select="Administrator"/>
+                                <a href="mailto:{bes:Administrator}">
+                                    <xsl:value-of select="bes:Administrator"/>
                                 </a>
                             </p>
 
