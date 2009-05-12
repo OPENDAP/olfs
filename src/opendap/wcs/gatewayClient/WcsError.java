@@ -189,13 +189,15 @@ public class WcsError extends OPeNDAPException {
                 xmlo.output(errorPage, response.getOutputStream());
             }
             else {
-                response.reset();
+                if(!response.isCommitted())
+                    response.reset();
                 response.sendError(errorVal,getMessage());
             }
 
         }
         catch(Exception e){
-            response.reset();
+            if(!response.isCommitted())
+                response.reset();
             response.sendError(errorVal,getMessage());
         }
 

@@ -320,6 +320,10 @@ public class BESError extends OPeNDAPException {
             if(xsltFile.exists()){
                 XSLTransformer transformer = new XSLTransformer(xsltDoc);
                 Document errorPage = transformer.transform(besError);
+
+                if(!response.isCommitted())
+                    response.reset();
+
                 response.setContentType("text/html");
                 response.setStatus(errorVal);
                 xmlo.output(errorPage, response.getOutputStream());
@@ -327,13 +331,15 @@ public class BESError extends OPeNDAPException {
                 xmlo.output(besError, System.out);
             }
             else {
-                response.reset();
+                if(!response.isCommitted())
+                    response.reset();
                 response.sendError(errorVal,getMessage());
             }
 
         }
         catch(Exception e){
-            response.reset();
+            if(!response.isCommitted())
+                response.reset();
             response.sendError(errorVal,getMessage());
         }
 
