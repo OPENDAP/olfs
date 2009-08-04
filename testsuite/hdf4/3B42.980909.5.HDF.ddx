@@ -12,76 +12,76 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RangeBeginningDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;1998/09/09&quot;</value>
+                <value>1998/09/09</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RangeBeginningTime" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;00:00:00&quot;</value>
+                <value>00:00:00</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RangeEndingDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;1998/09/10&quot;</value>
+                <value>1998/09/10</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RangeEndingTime" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;00:00:00&quot;</value>
+                <value>00:00:00</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="GranulePointer" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;3B42.980909.5.HDF&quot;</value>
+                <value>3B42.980909.5.HDF</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ShortName" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;Surface Rain from Geostationary Satellites C&quot;</value>
+                <value>Surface Rain from Geostationary Satellites C</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SizeMBECSDataGranule" type="Container">
@@ -89,10 +89,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>0.220007</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LongitudeOfMaximumLatitude" type="Container">
@@ -100,32 +100,32 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SpatialCoverageType" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;Horizontal&quot;</value>
+                <value>Horizontal</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EllipsoidName" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EquatorialRadius" type="Container">
@@ -133,10 +133,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DenominatorFlatteningRatio" type="Container">
@@ -144,21 +144,21 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitalModelName" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SemiMajorAxis" type="Container">
@@ -166,10 +166,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MeanAnomaly" type="Container">
@@ -177,10 +177,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RightAscensionNode" type="Container">
@@ -188,10 +188,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ArgumentOfPerigee" type="Container">
@@ -199,10 +199,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="Eccentricity" type="Container">
@@ -210,10 +210,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="Inclination" type="Container">
@@ -221,32 +221,32 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EpochTime" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;99:99:99&quot;</value>
+                <value>99:99:99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EpochDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;9999/99/99&quot;</value>
+                <value>9999/99/99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EpochMillisec" type="Container">
@@ -254,10 +254,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="WestBoundingCoordinate" type="Container">
@@ -265,10 +265,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-180</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EastBoundingCoordinate" type="Container">
@@ -276,10 +276,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>180</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="NorthBoundingCoordinate" type="Container">
@@ -287,10 +287,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>40</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SouthBoundingCoordinate" type="Container">
@@ -298,10 +298,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-40</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="CenterLatitude" type="Container">
@@ -309,10 +309,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="CenterLongitude" type="Container">
@@ -320,10 +320,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadiusValue" type="Container">
@@ -331,109 +331,109 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LatitudeResolution" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;1deg&quot;</value>
+                <value>1deg</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LongitudeResolution" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;1deg&quot;</value>
+                <value>1deg</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="GeographicCoordinateUnits" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;Decimal Degrees&quot;</value>
+                <value>Decimal Degrees</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="TemporalRangeType" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;Continuous Range&quot;</value>
+                <value>Continuous Range</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="QualityAssuranceParameterName" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;ScienceQualityFlag&quot;</value>
+                <value>ScienceQualityFlag</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="QualityAssuranceParameterValue" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NOT BEING INVESTIGATED&quot;</value>
+                <value>NOT BEING INVESTIGATED</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ReprocessingActual" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="BrowsePointer" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;3B42_BR.980909.5.BRO&quot;</value>
+                <value>3B42_BR.980909.5.BRO</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ScienceContact" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;George Huffman&quot;</value>
+                <value>George Huffman</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MeanMotion" type="Container">
@@ -441,10 +441,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitAdjustFlag" type="Container">
@@ -452,10 +452,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="AttitudeModeFlag" type="Container">
@@ -463,10 +463,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SolarBetaAngleAtBeginningOfGranule" type="Container">
@@ -474,10 +474,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SolarBetaAngleAtEndOfGranule" type="Container">
@@ -485,65 +485,65 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SensorAlignment" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SensorAlignmentChannelOffsets" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ScanPathModel" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ScanPathModelParam" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="EphemerisFileID" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
     </Attribute>
@@ -553,10 +553,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="NumberOfDataGaps" type="Container">
@@ -564,21 +564,21 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="AlgorithmVersion" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;4.51&quot;</value>
+                <value>4.51</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ProductVersion" type="Container">
@@ -586,21 +586,21 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>5</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="ToolkitVersion" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;5.6&quot;</value>
+                <value>5.6</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="CalibrationCoefficientVersion" type="Container">
@@ -608,10 +608,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MissingData" type="Container">
@@ -619,54 +619,54 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="PercentOfBadOrMissingPixels" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MaximumValidValueofChannel" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MinimumValidValueofChannel" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MinMaxUnits" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitSize" type="Container">
@@ -674,10 +674,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarWavelength" type="Container">
@@ -685,10 +685,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="MinimumReflectivityThreshold" type="Container">
@@ -696,76 +696,76 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="AlgorithmID" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;3B42m2&quot;</value>
+                <value>3B42m2</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DataAccuracy" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="InputFiles" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DateOfGenerationOfInputFiles" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DataCenterSourceOfInputFiles" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="GenerationDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;2000-02-09T11:00:04.000Z&quot;</value>
+                <value>2000-02-09T11:00:04.000Z</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DayNight" type="Container">
@@ -773,54 +773,54 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SolarChannelGains" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;(-9999.9,-9999.9,-9999.9,-9999.9)&quot;</value>
+                <value>(-9999.9,-9999.9,-9999.9,-9999.9)</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="TMIRolloverCoef" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;(-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9)&quot;</value>
+                <value>(-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9)</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitFirstScanUTCDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;9999/99/99&quot;</value>
+                <value>9999/99/99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitFirstScanUTCTime" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;99:99:99&quot;</value>
+                <value>99:99:99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitFirstScanUTCMilliseconds" type="Container">
@@ -828,10 +828,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitFirstSCSecs" type="Container">
@@ -839,10 +839,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitFirstSCSubsecs" type="Container">
@@ -850,32 +850,32 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitLastScanUTCDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;9999/99/99&quot;</value>
+                <value>9999/99/99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitLastScanUTCTime" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;99:99:99&quot;</value>
+                <value>99:99:99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitLastScanUTCmilliseconds" type="Container">
@@ -883,10 +883,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitLastSCSecs" type="Container">
@@ -894,10 +894,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="OrbitLastSCSubsecs" type="Container">
@@ -905,10 +905,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="UTCFSeconds" type="Container">
@@ -916,10 +916,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="UTCFSubseconds" type="Container">
@@ -927,10 +927,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="UTCFflag" type="Container">
@@ -938,67 +938,67 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LeapSecondsFlag" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;Data_Location&quot;</value>
-                <value>&quot;Error processing EOS attributes&quot;</value>
-                <value>&quot;Error processing EOS attributes&quot;</value>
+                <value>Data_Location</value>
+                <value>Error processing EOS attributes</value>
+                <value>Error processing EOS attributes</value>
             </Attribute>
             <Attribute name="PGE" type="String">
-                <value>&quot;Error processing EOS attributes&quot;</value>
+                <value>Error processing EOS attributes</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarSiteName" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarCity" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarState" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarCountry" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="NumberOfVOS" type="Container">
@@ -1006,10 +1006,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridOriginLatitude" type="Container">
@@ -1017,10 +1017,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridOriginLongitude" type="Container">
@@ -1028,10 +1028,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridOriginAltitude" type="Container">
@@ -1039,10 +1039,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridSpacingX" type="Container">
@@ -1050,10 +1050,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridSpacingY" type="Container">
@@ -1061,10 +1061,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridSpacingZ" type="Container">
@@ -1072,10 +1072,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridSizeX" type="Container">
@@ -1083,10 +1083,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridSizeY" type="Container">
@@ -1094,10 +1094,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RadarGridSizeZ" type="Container">
@@ -1105,10 +1105,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DZCal" type="Container">
@@ -1116,10 +1116,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="GVL1C_Scale" type="Container">
@@ -1127,10 +1127,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="Alpha" type="Container">
@@ -1138,32 +1138,32 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="RuntimeOptions" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="AnomalyFlag" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NOT EMPTY&quot;</value>
+                <value>NOT EMPTY</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="SoftwareVersion" type="Container">
@@ -1171,10 +1171,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="DatabaseVersion" type="Container">
@@ -1182,21 +1182,21 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="TotalQualityCode" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;NULL&quot;</value>
+                <value>NULL</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LongitudeOnEquator" type="Container">
@@ -1204,32 +1204,32 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="UTCDateOnEquator" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;9999/99/99&quot;</value>
+                <value>9999/99/99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="UTCTimeOnEquator" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;99:99:99&quot;</value>
+                <value>99:99:99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="UTCMillisecsOnEquator" type="Container">
@@ -1237,32 +1237,32 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="CenterScanUTCDate" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;9999/99/99&quot;</value>
+                <value>9999/99/99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="CenterScanUTCTime" type="Container">
             <Attribute name="Value" type="String">
-                <value>&quot;99:99:99&quot;</value>
+                <value>99:99:99</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="CenterScanUTCMillisec" type="Container">
@@ -1270,10 +1270,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="FirstScanLat" type="Container">
@@ -1281,10 +1281,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="FirstScanLon" type="Container">
@@ -1292,10 +1292,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LastScanLat" type="Container">
@@ -1303,10 +1303,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="LastScanLon" type="Container">
@@ -1314,10 +1314,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999.9</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
         <Attribute name="NumberOfRainScans" type="Container">
@@ -1325,10 +1325,10 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>-9999</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
-                <value>&quot;PGE&quot;</value>
+                <value>PGE</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
-                <value>&quot;FALSE&quot;</value>
+                <value>FALSE</value>
             </Attribute>
         </Attribute>
     </Attribute>
@@ -1338,17 +1338,17 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <Array name="percipitate">
                 <Attribute name="dim_0" type="Container">
                     <Attribute name="name" type="String">
-                        <value>&quot;scan&quot;</value>
+                        <value>scan</value>
                     </Attribute>
                 </Attribute>
                 <Attribute name="dim_1" type="Container">
                     <Attribute name="name" type="String">
-                        <value>&quot;longitude&quot;</value>
+                        <value>longitude</value>
                     </Attribute>
                 </Attribute>
                 <Attribute name="dim_2" type="Container">
                     <Attribute name="name" type="String">
-                        <value>&quot;latitude&quot;</value>
+                        <value>latitude</value>
                     </Attribute>
                 </Attribute>
                 <Float32/>
@@ -1359,17 +1359,17 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <Array name="relError">
                 <Attribute name="dim_0" type="Container">
                     <Attribute name="name" type="String">
-                        <value>&quot;scan&quot;</value>
+                        <value>scan</value>
                     </Attribute>
                 </Attribute>
                 <Attribute name="dim_1" type="Container">
                     <Attribute name="name" type="String">
-                        <value>&quot;longitude&quot;</value>
+                        <value>longitude</value>
                     </Attribute>
                 </Attribute>
                 <Attribute name="dim_2" type="Container">
                     <Attribute name="name" type="String">
-                        <value>&quot;latitude&quot;</value>
+                        <value>latitude</value>
                     </Attribute>
                 </Attribute>
                 <Float32/>
