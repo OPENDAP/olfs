@@ -51,6 +51,7 @@ public class BesXmlAPI {
     public static String DDS        = "dds";
     public static String DAS        = "das";
     public static String DDX        = "ddx";
+    public static String DataDDX    = "dataddx";
     public static String DAP2       = "dods";
     public static String STREAM     = "stream";
     public static String ASCII      = "ascii";
@@ -122,7 +123,7 @@ public class BesXmlAPI {
     }
 
 
-    /**
+/**
      * Writes an OPeNDAP DDX for the dataSource to the passed stream.
      *
      * @param dataSource           The requested DataSource
@@ -153,6 +154,45 @@ public class BesXmlAPI {
                 os,
                 err);
     }
+
+    /**
+         * Writes an OPeNDAP DDX for the dataSource to the passed stream.
+         *
+         * @param dataSource           The requested DataSource
+         * @param constraintExpression The constraintElement expression to be applied to
+         *                             the request..
+         * @param xdap_accept The version of the DAP to use in building the response.
+         * @param xmlBase The request URL.
+         * @param os                   The Stream to which to write the response.
+         * @param err                  The Stream to which to errors returned by
+         *                             the BES..
+         * @return False if the BES returns an error, true otherwise.
+         * @throws BadConfigurationException .
+         * @throws BESError              .
+         * @throws java.io.IOException               .
+         * @throws opendap.ppt.PPTException              .
+         */
+        public static boolean writeDataDDX(String dataSource,
+                                    String constraintExpression,
+                                    String xdap_accept,
+                                    String xmlBase,
+                                    String contentID,
+                                    String mimeBoundary,
+                                    OutputStream os,
+                                    OutputStream err)
+                throws BadConfigurationException, BESError, IOException, PPTException {
+
+            return besTransaction(
+                    dataSource,
+                    getDataDDXRequest(dataSource,
+                            constraintExpression,
+                            xdap_accept,
+                            xmlBase,
+                            contentID,
+                            mimeBoundary),
+                    os,
+                    err);
+        }
 
 
     public static boolean getDDXDocument(String dataSource,
@@ -993,7 +1033,89 @@ public class BesXmlAPI {
                                          String xmlBase)
             throws BadConfigurationException {
 
-        return getRequestDocument(DDX,dataSource,ce,xdap_accept,xmlBase,null,null,DAP2_ERRORS);
+        return getRequestDocument(DDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
+
+    }
+
+    /**
+     *  Returns the DDX request document for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDX is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the dap that should be used to build the
+     * response.
+     * @param xmlBase The request URL.
+     * @return The DDX request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public static Document getDataDDXRequest(String dataSource,
+                                         String ce,
+                                         String xdap_accept,
+                                         String xmlBase,
+                                         String contentID,
+                                         String mimeBoundary)
+            throws BadConfigurationException {
+
+
+        /*
+        String errorContext= XML_ERRORS;
+
+        String besDataSource = getBES(dataSource).trimPrefix(dataSource);
+
+        Element e, request = new Element("request", BES_NS);
+
+        String reqID = "["+Thread.currentThread().getName()+":"+
+                Thread.currentThread().getId()+":bes_request]";
+
+        request.setAttribute("reqID",reqID);
+
+
+        if(xdap_accept!=null)
+            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
+        else
+            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
+
+        request.addContent(setContextElement(EXPICIT_CONTAINERS_CONTEXT,"no"));
+
+        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
+
+        if(xmlBase!=null)
+            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
+
+
+        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,DataDDX));
+
+        Element def = defineElement("d1","default");
+        e = (containerElement("catalogContainer"));
+
+        if(ce!=null && !ce.equals(""))
+            e.addContent(constraintElement(ce));
+
+        def.addContent(e);
+
+        request.addContent(def);
+
+        Element getReq = getElement(DataDDX,"d1",null,null);
+
+*/
+        Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
+
+        Element req = reqDoc.getRootElement();
+
+        Element getReq = req.getChild("get",BES_NS);
+
+        Element e = new Element("contentStartId",BES_NS);
+        e.setText(contentID);
+        getReq.addContent(e);
+
+
+        e = new Element("mimeBoundary",BES_NS);
+        e.setText(mimeBoundary);
+        getReq.addContent(e);
+
+
+        return reqDoc;
 
     }
 
@@ -1095,7 +1217,7 @@ public class BesXmlAPI {
 
         String reqID = "["+Thread.currentThread().getName()+":"+
                 Thread.currentThread().getId()+":bes_request]";
-;
+
         request.setAttribute("reqID",reqID);
 
 
