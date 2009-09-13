@@ -45,8 +45,8 @@ public class Scrub {
 
     // The C++ coe uses this regex: Regex name("[-0-9A-z_./]+");
 
-    private static String fileNameInclusionRegex = "[-a-zA-Z0-9/.%_ ]*";
-    private static String fileNameExclusionRegex = "[^-a-zA-Z0-9/.%_ ]";
+    private static String fileNameInclusionRegex = "[-a-zA-Z0-9/.%_ :]*";
+    private static String fileNameExclusionRegex = "[^-a-zA-Z0-9/.%_ :]";
     private static Pattern fileNameInclusionPattern = Pattern.compile(fileNameInclusionRegex);
 
     public static String fileName(String fileName){

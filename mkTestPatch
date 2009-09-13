@@ -2,4 +2,4 @@
 
 
 
-./make-check | grep FAIL  | awk '{print "curl ", $5, "  > ",  $9;}' - | sed -e "s/)/\\)/g" -e "s/(/\\(/g" -e "s/\?/\\\?/g" -e "s/</\\\</g" | tee testPatch | awk '{print $1, $2, " | diff - ", $4}' > testDiff
+./make-check | grep FAIL  | awk '{print "curl ", $5, "  > ",  $9;}' - | sed -e "s/)/\\\)/g" -e "s/(/\\\(/g" -e "s/\?/\\\?/g" -e "s/</\\\</g" | tee testPatch | awk '{print $1, $2, " | diff - ", $4}' > testDiff
