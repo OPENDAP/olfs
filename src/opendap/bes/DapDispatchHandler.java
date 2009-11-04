@@ -426,6 +426,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         response.setContentType("text/plain");
         Version.setOpendapMimeHeaders(request,response);
+        // This will need to be dependent on the DAP version with 3.2 and
+        // earlier using dods_ddx and 3.3 or later using dap4_ddx.
         response.setHeader("Content-Description", "dods_ddx");
 
         // This hedaer indicates to the client that the content of this response
@@ -505,7 +507,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
         Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dap_data_ddx");
+        response.setHeader("Content-Description", "dap4_data_ddx");
 
         // This hedaer indicates to the client that the content of this response
         // is dependant on the HTTP request header XDAP-Accept
