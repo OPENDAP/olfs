@@ -295,6 +295,8 @@
             <src path="${src.dir}"/>
             <include name="opendap/**/*.java"/>
             <exclude name="opendap/experiments/**/*.java"/>
+            <exclude name="opendap/xml/Transformer.java"/>
+            <exclude name="opendap/xml/Validator.java"/>
 
         </javac>
 
@@ -678,7 +680,8 @@
                         scan="true"
                         resultsfile="${build.dir}/issues.fpr"
                         rules="${rules.dir}/OlfsRulePack.xml"
-                />
+                >   
+        </sourceanalyzer>
     </target>
 
 
