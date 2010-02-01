@@ -829,10 +829,17 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             ddx.getRootElement().setAttribute("dataset_id",dataSource);
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            String currentDir = System.getProperty("user.dir");
+            String xslDir = ServletUtil.getSystemPath(_servlet, "/docs/xsl");
+            log.debug("Cached working directory: "+currentDir);
 
-            String xsltDocName = ServletUtil.getPath(_servlet, "/docs/xsl/dap_3.2_ddxToRdfTriples.xsl");
+            log.debug("Changing working directory to "+ xslDir);
+            System.setProperty("user.dir",xslDir);
+
+            String xsltDocName = "dap_3.2_ddxToRdfTriples.xsl";
             SAXBuilder sb = new SAXBuilder();
             Document xsltDoc = sb.build(xsltDocName);
+
 
 
             //xsltDoc.getRootElement().addNamespaceDeclaration(Namespace.getNamespace("att",xmlBase+"/att#"));
@@ -846,6 +853,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             os.flush();
             log.info("Sent RDF version of DDX.");
+            log.debug("Restoring working directory to "+ currentDir);
+            System.setProperty("user.dir",currentDir);
         }
 
     }
@@ -882,7 +891,18 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                     constraintExpression);
 
 
+        String downloadFileName = dataSource.substring(dataSource.lastIndexOf("/")+1,dataSource.length());
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        log.debug("sendNetcdfFileOut() downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=" +downloadFileName;
+
         response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition",contentDisposition);
+
         Version.setOpendapMimeHeaders(request,response);
 
         response.setStatus(HttpServletResponse.SC_OK);

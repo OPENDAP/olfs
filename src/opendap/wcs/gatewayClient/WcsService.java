@@ -35,6 +35,7 @@ import org.apache.commons.httpclient.HttpClient;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.io.InputStream;
+import java.io.IOException;
 
 
 /**
@@ -344,7 +345,13 @@ public class WcsService {
                 return doc;
            }
             finally {
-            	is.close();
+                try{
+                    is.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to InputStream for "+requestURI+" Error MEssage: "+e.getMessage());
+                }
+
             }
 
 
@@ -477,7 +484,12 @@ public class WcsService {
                     return doc;
                 }
                 finally {
-                	is.close();
+                    try{
+                        is.close();
+                    }
+                    catch(IOException e){
+                        log.error("Failed to InputStream for "+requestURI+" Error MEssage: "+e.getMessage());
+                    }
                 }
 
 

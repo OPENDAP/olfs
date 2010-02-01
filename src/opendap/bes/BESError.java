@@ -312,7 +312,7 @@ public class BESError extends OPeNDAPException {
 
 
         try {
-            String xsltDoc = ServletUtil.getPath(dispatchServlet,
+            String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,
                                                  "/docs/xsl/error"+errorVal+".xsl");
 
             File xsltFile = new File(xsltDoc);

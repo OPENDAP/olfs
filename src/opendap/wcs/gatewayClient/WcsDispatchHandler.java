@@ -419,7 +419,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
@@ -488,7 +488,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
@@ -561,7 +561,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
@@ -629,7 +629,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
         ReentrantReadWriteLock.ReadLock lock = service.getReadLock();
@@ -718,7 +718,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
                 Document pageContent = null;
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-                String xsltDoc = ServletUtil.getPath(dispatchServlet, "/docs/xsl/wcs_coveragePage.xsl");
+                String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/wcs_coveragePage.xsl");
                 XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
                 if(coverage.hasTemporalDomain()){

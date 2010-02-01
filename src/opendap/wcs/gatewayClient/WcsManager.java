@@ -92,7 +92,14 @@ public class WcsManager {
             config  = sb.build(fis);
         }
         finally {
-            fis.close();
+
+            try{
+                fis.close();
+            }
+            catch(IOException e){
+                log.error("Failed to close file "+fname+" Error MEssage: "+e.getMessage());
+            }
+            
         }
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

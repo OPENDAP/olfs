@@ -150,7 +150,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         if (BesXmlAPI.getCatalog(collectionName, showCatalogDoc)) {
 
-            String xsltDoc = ServletUtil.getPath(servlet, "/docs/xsl/catalog.xsl");
+            String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
 
             XSLTransformer transformer = new XSLTransformer(xsltDoc);
 

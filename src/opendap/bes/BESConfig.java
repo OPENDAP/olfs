@@ -30,6 +30,7 @@ import org.jdom.Attribute;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.slf4j.Logger;
 
 import java.io.*;
 
@@ -44,6 +45,8 @@ import opendap.coreServlet.Scrub;
  */
 public class BESConfig  {
 
+    private  Logger log;
+
     private  String    _BESHost;
     private  int       _BESPort;
     private  int       _BESMaxClients;
@@ -53,6 +56,8 @@ public class BESConfig  {
 
 
     BESConfig() {
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
         _BESHost = "HostNameIsNotSet!";
         _BESPort = -1;
         _BESMaxClients = 10;
@@ -113,8 +118,13 @@ public class BESConfig  {
             Document doc  = sb.build(fis);
             configure(doc);
         }
-        finally { fis.close(); }
-
+        finally {
+            try {fis.close(); }
+            catch(IOException e){
+                log.error("Failed to close BES configuration file: "+filename+
+                "Error Message: "+e.getLocalizedMessage());
+            }
+        }
 
     }
 
@@ -201,7 +211,14 @@ public class BESConfig  {
     public void writeConfiguration(String filename) throws IOException {
         OutputStream os = new FileOutputStream(filename);
         try {  writeConfiguration(os); }
-        finally { os.close(); }
+        finally {
+            try {os.close(); }
+            catch(IOException e){
+                log.error("Failed to close BES configuration file: "+filename+
+                "Error Message: "+e.getLocalizedMessage());
+            }
+
+        }
     }
 
 

@@ -297,6 +297,7 @@
             <exclude name="opendap/experiments/**/*.java"/>
             <exclude name="opendap/xml/Transformer.java"/>
             <exclude name="opendap/xml/Validator.java"/>
+            <exclude name="opendap/wcs/v1_1_2/**/*.java"/>
 
         </javac>
 
@@ -665,7 +666,8 @@
 
         <!-- capture all configuration files in the WEB-INF directory -->
         <echo>sourceanalyzer ${WebInfResources.dir}</echo>
-        <sourceanalyzer buildid="${sourceanalyzer.buildid}" >
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                       >
             <fileset dir="${WebInfResources.dir}">
                 <include name="**/*.properties"/>
                 <include name="**/*.xml"/>

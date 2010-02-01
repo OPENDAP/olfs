@@ -36,6 +36,10 @@ import org.slf4j.Logger;
  */
 public class PersistentContentHandler {
 
+    private static Logger log;
+    static{
+        log = org.slf4j.LoggerFactory.getLogger(PersistentContentHandler.class);
+    }
 
     /**
      * Checks to see if the persistent content directory exists, if it doesn't it is created and populated
@@ -141,8 +145,23 @@ public class PersistentContentHandler {
        out = new BufferedOutputStream( new FileOutputStream( fileOutName));
        copy( in, out);
      } finally {
-         if (null != out) out.close();
-         if (null != in) in.close();
+         if (out != null){
+             try{
+        	    out.close();
+             }
+             catch(IOException e){
+                 log.error("Failed to close file: "+fileOutName+" Error Message: "+e.getMessage());
+             }
+         }
+
+         if (in != null) {
+             try{
+        	    in.close();
+             }
+             catch(IOException e){
+                 log.error("Failed to close file: "+fileInName+" Error Message: "+e.getMessage());
+             }
+         }
       }
    }
 

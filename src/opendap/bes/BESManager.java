@@ -29,17 +29,12 @@ import org.jdom.Element;
 
 import java.util.Vector;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
 
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
-import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
 
 
 /**
@@ -152,11 +147,11 @@ public class BESManager implements DispatchHandler {
     }
 
 
-    public static void configure(OLFSConfig olfsConfig) throws Exception {
+    //public static void configure(OLFSConfig olfsConfig) throws Exception {
 
-        configure(olfsConfig.getBESConfig());
+    //    configure(olfsConfig.getBESConfig());
 
-    }
+    //}
 
 
     public static boolean isConfigured(){

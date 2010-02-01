@@ -116,11 +116,11 @@ public class BesXmlAPI {
         return BESManager.getCombinedVersionDocument();
     }
 
-    public static void configure(OLFSConfig olfsConfig) throws Exception {
+    //public static void configure(OLFSConfig olfsConfig) throws Exception {
 
-        BESManager.configure(olfsConfig.getBESConfig());
+    //    BESManager.configure(olfsConfig.getBESConfig());
 
-    }
+    //}
 
 
 /**

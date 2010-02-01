@@ -209,7 +209,15 @@ public class LocalFileCatalog implements Catalog {
                 }
             }
             finally {
-                fis.close();
+                try{
+                    fis.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close THREDDS catalog file: "+fname+
+                            " Error MEssage: "+e.getMessage());
+
+                }
+
             }
             _cacheTime = new Date();
 
@@ -281,7 +289,14 @@ public class LocalFileCatalog implements Catalog {
                     }
                 }
                 finally {
-                    fis.close();
+                    try{
+                        fis.close();
+                    }
+                    catch(IOException e){
+                        log.error("Failed to close THREDDS catalog file: "+fname+
+                        " Error MEssage: "+e.getMessage());
+                    }
+
                 }
 
             }
@@ -318,8 +333,15 @@ public class LocalFileCatalog implements Catalog {
             return  sb.build(is);
         }
         finally {
-            if(is!=null)
-                is.close();
+            if(is!=null){
+                try {
+                    is.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close InputStream. Error Message: "+e.getMessage());
+                }
+
+            }
             lock.unlock();
         }
 
@@ -357,8 +379,15 @@ public class LocalFileCatalog implements Catalog {
             catalog = builder.build(new StreamSource(is));
         }
         finally {
-            if (is != null)
-                is.close();
+            if(is!=null){
+                try {
+                    is.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close InputStream. Error Message: "+e.getMessage());
+                }
+
+            }
             lock.unlock();
         }
         return catalog;
@@ -392,8 +421,15 @@ public class LocalFileCatalog implements Catalog {
             catalog = builder.build(new StreamSource(is));
         }
         finally {
-            if (is != null)
-                is.close();
+            if(is!=null){
+                try {
+                    is.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close InputStream. Error Message: "+e.getMessage());
+                }
+
+            }
             lock.unlock();
         }
         return catalog;

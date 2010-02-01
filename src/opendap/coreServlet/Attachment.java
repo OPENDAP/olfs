@@ -24,6 +24,8 @@
 
 package opendap.coreServlet;
 
+import org.slf4j.Logger;
+
 import javax.servlet.ServletOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -38,6 +40,8 @@ import java.io.IOException;
  * Time: 12:13:19 PM
  */
 public class Attachment {
+
+    private Logger log;
     String contentTransferEncoding = "binary";
     String contentId;
     String contentType;
@@ -50,6 +54,7 @@ public class Attachment {
      * @param is A stream containing the content for this attachment.
      */
     Attachment(String ctype, String cid, InputStream is){
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
         contentType = ctype;
         contentId = cid;
         istream = is;
@@ -85,7 +90,16 @@ public class Attachment {
             sos.println();
         }
         finally {
-            istream.close();
+            if(istream!=null){
+                try {
+                    istream.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close content source InputStream. " +
+                            "Error Message: "+e.getMessage());
+
+                }
+            }
         }
 
     }

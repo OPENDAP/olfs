@@ -293,7 +293,14 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
-        	catDocIs.close();
+            if(catDocIs != null){
+        	    try {
+                    catDocIs.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close InputStream for "+remoteCatalog+" Error Message: "+e.getMessage());
+                }
+            }
             datasetToHtmlTransformLock.unlock();
         }
 
@@ -411,7 +418,14 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
-        	catDocIs.close();
+            if(catDocIs != null){
+        	    try {
+                    catDocIs.close();
+                }
+                catch(IOException e){
+                    log.error("Failed to close InputStream for "+remoteCatalog+" Error Message: "+e.getMessage());
+                }
+            }
         	catalogToHtmlTransformLock.unlock();
         }
 
@@ -731,7 +745,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             // ---------------------
             // Get XSLT document name
-            String catalogToHtmlXslt = ServletUtil.getPath(dispatchServlet, catalogToHtmlTransformFile);
+            String catalogToHtmlXslt = ServletUtil.getSystemPath(dispatchServlet, catalogToHtmlTransformFile);
 
             // Build an cache an XSLT transformer for the XSLT document.
             catalogToHtmlTransform = new Transformer(catalogToHtmlXslt);
@@ -754,7 +768,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             // ---------------------
             // Get XSLT document name
-            String datasetToHtmlXslt = ServletUtil.getPath(dispatchServlet, datasetToHtmlTransformFile);
+            String datasetToHtmlXslt = ServletUtil.getSystemPath(dispatchServlet, datasetToHtmlTransformFile);
 
             // Build an cache an XSLT transformer for the XSLT document.
             datasetToHtmlTransform = new Transformer(datasetToHtmlXslt);

@@ -261,7 +261,7 @@ public class SOAPRequestDispatcher implements DispatchHandler {
             log.error("Something Bad Happened while processing a SOAP request (reqID :" + reqID+")");
             ByteArrayOutputStream baos =new ByteArrayOutputStream();
             PrintStream ps = new PrintStream( baos);
-            e.printStackTrace(ps);
+            //e.printStackTrace(ps);
             log.debug(baos.toString());
 
             mpr.addSoapBodyPart(ExceptionElementUtil.makeExceptionElement(e));

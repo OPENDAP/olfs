@@ -152,15 +152,12 @@ public class HeaderInputStream extends FilterInputStream {
 
         // We've read one byte successfully, let's try for more
         int i = 1;
-        try {
-            for (; i < len; i++) {
-                c = read();
-                if (c == -1) {
-                    break;
-                }
-                b[off + i] = (byte) c;
+        for (; i < len; i++) {
+            c = read();
+            if (c == -1) {
+                break;
             }
-        } catch (IOException e) {
+            b[off + i] = (byte) c;
         }
         return i;
     }
