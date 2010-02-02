@@ -272,7 +272,7 @@
 
     <xsl:template name="NoServiceLinks">
         <td align="center">
-            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
+            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
         </td>
     </xsl:template>
 
