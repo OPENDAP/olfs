@@ -225,6 +225,7 @@
             <a href="{../@name}.das">das</a>
             <a href="{../@name}.info">info</a>
             <a href="{../@name}.html">html</a>
+            <a href="{../@name}.rdf">rdf</a>
         </td>
     </xsl:template>
 
@@ -271,7 +272,7 @@
 
     <xsl:template name="NoServiceLinks">
         <td align="center">
-            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
+            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
         </td>
     </xsl:template>
 
