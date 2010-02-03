@@ -62,7 +62,7 @@ public class BESDataSource implements DataSourceInfo {
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
-    BESDataSource(String dataSourceName) throws Exception {
+    public BESDataSource(String dataSourceName) throws Exception {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 

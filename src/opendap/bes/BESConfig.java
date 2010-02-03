@@ -55,7 +55,7 @@ public class BESConfig  {
     //private  Document  _OLFSConfigurationDoc;
 
 
-    BESConfig() {
+    private BESConfig() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         _BESHost = "HostNameIsNotSet!";
@@ -64,14 +64,14 @@ public class BESConfig  {
         _BESPrefix = "/";
     }
 
-    BESConfig(Document besConfiguration) throws Exception{
+    public BESConfig(Document besConfiguration) throws Exception{
 
         this();
         configure(besConfiguration);
 
     }
 
-    BESConfig(Element besConfiguration) throws Exception{
+    public BESConfig(Element besConfiguration) throws Exception{
         this();
 
         configure(besConfiguration);
@@ -97,7 +97,7 @@ public class BESConfig  {
      * @param filename The name of the confguration file
      * @throws Exception When bad things happen.
      */
-    BESConfig(String filename) throws Exception {
+    public BESConfig(String filename) throws Exception {
         this();
 
         File confFile = new File(filename);
