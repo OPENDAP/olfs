@@ -49,8 +49,8 @@ public class Version  {
 
 
 
-    private static String olfsVersion  = "1.5.3";
-    private static String hyraxVersion = "1.5.2";
+    private static String olfsVersion  = "1.6.0";
+    private static String hyraxVersion = "1.6.0";
 
 
 
