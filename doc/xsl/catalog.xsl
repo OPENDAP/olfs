@@ -48,6 +48,7 @@
     <xsl:template match="bes:showCatalog">
         <thredds:catalog>
             <thredds:service name="dap" serviceType="OPeNDAP" base="/opendap/hyrax/"/>
+            <thredds:service name="file" serviceType="HTTPServer" base="/opendap/hyrax/"/>
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -92,35 +93,45 @@
             </xsl:if >
 
             <xsl:if test="not(@node='true')">
-
-                <xsl:if test="bes:serviceRef">
-
-
-                    <thredds:dataset name="{@name}"  >
-                        <xsl:attribute name="urlPath">
-                            <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                        </xsl:attribute>
-                        <xsl:attribute name="ID">
-                            <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                        </xsl:attribute>
-                        <thredds:dataSize units="bytes">
-                            <xsl:value-of select="@size" />
-                        </thredds:dataSize>
-                        <thredds:date type="modified">
-                            <xsl:value-of select="@lastModified" />
-                        </thredds:date>
-
-                        <xsl:call-template name="ServiceNames"/>
-                    </thredds:dataset>
-
-                </xsl:if>
+                <thredds:dataset name="{@name}"  >
+                    <xsl:attribute name="ID">
+                        <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                    </xsl:attribute>
+                    <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
+                    <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
+                    <xsl:call-template name="DatasetAccess"/>
+                </thredds:dataset>
             </xsl:if >
         </xsl:if>
 
     </xsl:template>
 
-    <xsl:template name="ServiceNames">
-        <thredds:serviceName><xsl:value-of select="bes:serviceRef"/></thredds:serviceName>
+    <xsl:template name="DatasetAccess">
+
+
+
+        <thredds:access>
+
+
+
+
+
+        <xsl:choose>
+            <xsl:when test="bes:serviceRef">
+                <xsl:attribute name="serviceName"><xsl:value-of select="bes:serviceRef"/></xsl:attribute>
+                <xsl:attribute name="urlPath">
+                    <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:attribute name="serviceName">file</xsl:attribute>
+                <xsl:attribute name="urlPath">
+                    <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                </xsl:attribute>
+            </xsl:otherwise>
+        </xsl:choose>
+        </thredds:access>
+
     </xsl:template>
 
 
