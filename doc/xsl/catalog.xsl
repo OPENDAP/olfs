@@ -73,11 +73,6 @@
 
         <xsl:if test="bes:dataset">
             <thredds:dataset name="{@name}" ID="{@name}">
-                <thredds:metadata inherited="true">
-                    <thredds:authority>opendap.org</thredds:authority>
-                    <thredds:dataType>unknown</thredds:dataType>
-                    <thredds:dataFormat>unknown</thredds:dataFormat>
-                </thredds:metadata>
                 <xsl:apply-templates />
             </thredds:dataset>
         </xsl:if>
