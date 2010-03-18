@@ -424,7 +424,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log.debug("sendDDX() for dataset: " + dataSource+
                 "    CE: '" + constraintExpression + "'");
 
-        response.setContentType("text/plain");
+        response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
         // This will need to be dependent on the DAP version with 3.2 and
         // earlier using dods_ddx and 3.3 or later using dap4_ddx.
@@ -794,7 +794,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         log.debug("sendDDX2RDF() for dataset: " + dataSource);
 
-        response.setContentType("text/plain");
+        response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "text/xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
