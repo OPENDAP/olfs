@@ -884,14 +884,14 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception {
 
         String dataSource = ReqInfo.getDataSource(request);
+        String fullSourceName = ReqInfo.getFullSourceName(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
 
         log.debug("sendNetcdfFileOut() for dataset: " + dataSource + "?" +
                     constraintExpression);
 
-
-        String downloadFileName = dataSource.substring(dataSource.lastIndexOf("/")+1,dataSource.length());
+        String downloadFileName = fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length());
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;

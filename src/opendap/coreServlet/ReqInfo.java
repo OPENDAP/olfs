@@ -395,6 +395,25 @@ public class ReqInfo {
     }
 
 
+    
+    public static String toString(HttpServletRequest request){
+        String s = "";
+        
+        s += "getDataSource(): "+ ReqInfo.getDataSource(request) + "\n";
+        s += "getBaseURI(): "+ ReqInfo.getBaseURI(request) + "\n";
+        s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
+        s += "getConstraintExpression(): "+ ReqInfo.getConstraintExpression(request) + "\n";
+        s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
+        s += "getDataSource(): "+ ReqInfo.getDataSource(request) + "\n";
+        s += "getFullSourceName(): "+ ReqInfo.getFullSourceName(request) + "\n";
+        s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
+        s += "getRequestURL(): "+ ReqInfo.getRequestURL(request) + "\n";
+        s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
+        s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
+
+        return s;
+        
+    }
 
 
 
