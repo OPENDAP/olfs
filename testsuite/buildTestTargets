@@ -43,13 +43,6 @@
 ./buildTestTarget "ff/1998-6-avhrr.dat" "DODS_URL&date_time(\"1998/160:17:45:00\")"                          "ssfunc/1998-6-avhrr.dat.DateTimeConstraint_01"
 ./buildTestTarget "ff/1998-6-avhrr.dat" "DODS_URL&date_time(\"1998/160\:17\:45\:00\",\"1998/165:17:45:00\")" "ssfunc/1998-6-avhrr.dat.DateTimeRange_01"
 
-./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST)"                                 "ssfunc/coads_climatology.nc.geoarray().BadArgs"
-./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,135,-45,225,90,0,-90,359)"     "ssfunc/coads_climatology.nc.geoarray().Basic"
-./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,-45,-45,45,90,0,-90,359)"      "ssfunc/coads_climatology.nc.geoarray().MixedNotations_01"
-./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,135,-45,225,90,-180,-90,179)"  "ssfunc/coads_climatology.nc.geoarray().MixedNotations_02"
-./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,45,-45,-45,45,90,-180,-90,179)"   "ssfunc/coads_climatology.nc.geoarray().NegativeNotations"
-./buildTestTarget "nc/coads_climatology.nc"   "geoarray(SST.SST,90,0,-90,359,90,0,-90,359)"       "ssfunc/coads_climatology.nc.geoarray().WholeArray"
-
 ./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST)"                               "ssfunc/coads_climatology.nc.geogrid().BadArgs"
 ./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST,61,-82,38,-19)"                 "ssfunc/coads_climatology.nc.geogrid().Basic"
 ./buildTestTarget "nc/coads_climatology.nc"   "geogrid(SST,-82,61,-19,38)"                 "ssfunc/coads_climatology.nc.geogrid().SwapCoords"

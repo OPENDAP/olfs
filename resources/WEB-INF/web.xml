@@ -43,9 +43,7 @@
     <servlet>
         <servlet-name>docs</servlet-name>
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
     </servlet>
-
 
 
     <servlet-mapping>

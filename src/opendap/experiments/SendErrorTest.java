@@ -22,7 +22,7 @@ public class SendErrorTest extends HttpServlet {
                       HttpServletResponse response) {
         try {
 
-            String name = "wcs<imbedd>assbite";
+            String name = "moo<imbedd>spoo";
 
             javax.xml.namespace.QName n2 = new javax.xml.namespace.QName(name);
             System.out.println("QNAME: "+n2);

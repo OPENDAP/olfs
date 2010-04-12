@@ -25,22 +25,21 @@
 /////////////////////////////////////////////////////////////////////////////
 -->
 <!DOCTYPE xsl:stylesheet [
-        <!ENTITY DAPOBJ  "http://iridl.ldeo.columbia.edu/ontologies/opendap.owl#" >
+        <!ENTITY DAPOBJ  "http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#" >
         <!ENTITY DAP     "http://xml.opendap.org/ns/DAP/3.3#" >
         <!ENTITY XSD     "http://www.w3.org/2001/XMLSchema#" >
         ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:cf="http://iridl.ldeo.columbia.edu/ontologies/cf-att.owl#"
                 xmlns:dapObj="&DAPOBJ;"
                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                 xmlns:owl="http://www.w3.org/2002/07/owl#"
                 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
                 xmlns:dap="&DAP;"
                 xmlns:xml="http://www.w3.org/XML/1998/namespace"
-
         >
+    
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="AttributeNames" match="dap:Attribute" use="@name"/>
 
@@ -66,9 +65,9 @@
             <owl:Ontology
                     rdf:about="{$LocalOntology}">
                 <owl:imports
-                        rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/opendap.owl"/>
+                        rdf:resource="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl"/>
                 <owl:imports
-                        rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/NetcdfConventionRegistry.owl"/>
+                        rdf:resource="http://xml.opendap.org/ontologies/NetcdfConventionRegistry.owl"/>
             </owl:Ontology>
 
             <!-- The empty rdf:about defaults to the value of @xml:base -->

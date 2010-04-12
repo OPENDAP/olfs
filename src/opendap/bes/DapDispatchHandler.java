@@ -424,7 +424,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log.debug("sendDDX() for dataset: " + dataSource+
                 "    CE: '" + constraintExpression + "'");
 
-        response.setContentType("text/plain");
+        response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
         // This will need to be dependent on the DAP version with 3.2 and
         // earlier using dods_ddx and 3.3 or later using dap4_ddx.
@@ -794,7 +794,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         log.debug("sendDDX2RDF() for dataset: " + dataSource);
 
-        response.setContentType("text/plain");
+        response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "text/xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -884,14 +884,14 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception {
 
         String dataSource = ReqInfo.getDataSource(request);
+        String fullSourceName = ReqInfo.getFullSourceName(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
 
         log.debug("sendNetcdfFileOut() for dataset: " + dataSource + "?" +
                     constraintExpression);
 
-
-        String downloadFileName = dataSource.substring(dataSource.lastIndexOf("/")+1,dataSource.length());
+        String downloadFileName = fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length());
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;

@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 
 /**
- * This mini servlet provides access to distributed or, if it exisits, persistent documentation in the
+ * This mini servlet provides access to distributed or, if it exists, persistent documentation in the
  * content directory.
  */
 public class DocServlet extends HttpServlet {
