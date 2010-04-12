@@ -6,7 +6,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
 
     <Attribute name="NC_GLOBAL" type="Container">
         <Attribute name="history" type="String">
-            <value>This is an example of a multi-line global&#x0a;attribute.  It could be used for representing the&#x0a;processing history of the data, for example.</value>
+            <value>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.</value>
         </Attribute>
     </Attribute>
     <Attribute name="DODS_EXTRA" type="Container">
@@ -17,7 +17,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
 
     <Grid name="bears">
         <Attribute name="act" type="String">
-            <value>text string&#x0a;&#x09;123</value>
+            <value>text string\\012\\011123</value>
         </Attribute>
         <Attribute name="acs" type="Int16">
             <value>-40</value>
