@@ -24,6 +24,15 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.slf4j.Logger;
+
+import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.io.*;
 
 /**
  * User: ndp
@@ -32,22 +41,264 @@ import org.jdom.Element;
  */
 public class CoverageDescription {
 
+    private Element myCD;
 
-    CoverageDescription(Element cd){
+    private Logger log;
+
+    private BoundingBox _bbox;
+
+    private long lastModified;
+
+    private File myFile;
+
+
+    public CoverageDescription(Element cd, long lastModified) throws WcsException{
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+
+
+
+
+
+
+        WCS.checkCoverageDescription(cd);
+        myCD = cd;
+
+
+
+
+        myFile = null;
+        this.lastModified = lastModified;
+    }
+
+    public CoverageDescription(File cdFile) throws IOException, JDOMException, WcsException {
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        myCD = ingestCoverageDescription(cdFile);
+        myFile = cdFile;
+        lastModified = cdFile.lastModified();
+    }
+
+    private Element ingestCoverageDescription(File cdFile) throws IOException, JDOMException, WcsException{
+        String msg;
+        if(!cdFile.canRead()){
+            msg = "Cannot read file: "+ cdFile.getName();
+            log.error(msg);
+            throw new IOException(msg);
+        }
+        if(!cdFile.isFile()){
+            msg = "CoverageDescription file '"+ cdFile.getName() +"' is not a regular file.";
+            log.error(msg);
+            throw new IOException(msg);
+        }
+
+        SAXBuilder sb = new SAXBuilder();
+        Document cdDoc = sb.build(cdFile);
+
+        Element cd = cdDoc.getRootElement();
+
+
+        WCS.checkCoverageDescription(cd);
+
+        return cd;
 
     }
 
-    Element getCoverageOfferingBrief() {
-        return null;
+
+    public long lastModified() {
+
+        try {
+            if (myFile != null && lastModified < myFile.lastModified()) {
+                myCD = ingestCoverageDescription(myFile);
+                ;
+                lastModified = myFile.lastModified();
+            }
+        }
+        catch (Exception e) {
+            log.error("Failed to update CoverageDescription from file " +
+                    myFile.getAbsoluteFile());
+        }
+        finally {
+            return lastModified;
+
+        }
+
     }
 
-    public long getLastModified() {
-        return -1;
+
+    public boolean hasField(String fieldID){
+        Element range =  myCD.getChild("Range",WCS.WCS_NS);
+
+        boolean foundIt = false;
+        Element field;
+        Element id;
+        Iterator i = range.getChildren("Field",WCS.WCS_NS).iterator();
+
+        while(i.hasNext()){
+            field = (Element)i.next();
+            id = field.getChild("Identifier",WCS.WCS_NS);
+            if(id!=null && fieldID.equals(id.getTextTrim()))
+                foundIt = true;
+
+        }
+
+        return foundIt;
     }
 
 
-    public String getID(){
-        return null;
+
+
+
+
+    public List getTitles(){
+        return cloneElementList(myCD.getChildren("Title",WCS.OWS_NS));
+    }
+
+    public List getAbstracts(){
+        return cloneElementList(myCD.getChildren("Abstract",WCS.OWS_NS));
+    }
+
+    public List getKeywords(){
+        return cloneElementList(myCD.getChildren("KeyWords",WCS.OWS_NS));
+    }
+
+    public String getIdentifier(){
+        Element wcsIdentifier =  myCD.getChild("Identifier",WCS.WCS_NS);
+        return wcsIdentifier.getText();
+    }
+    public Element getIdentifierElement(){
+        return (Element) myCD.getChild("Identifier",WCS.WCS_NS).clone();
+    }
+
+    public BoundingBox getBoundingBox() throws WcsException {
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        Element boundingBox =  spatialDomain.getChild("BoundingBox",WCS.OWS_NS);
+        return new BoundingBox(boundingBox);
+    }
+
+    public Element getBoundingBoxElement() throws WcsException {
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        return  (Element) spatialDomain.getChild("BoundingBox",WCS.OWS_NS).clone();
+    }
+
+    public GridCRS getGridCRS() throws WcsException {
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        Element gridCRS =  spatialDomain.getChild("GridCRS",WCS.WCS_NS);
+        if(gridCRS==null)
+            return null;
+        return new GridCRS(gridCRS);
+    }
+
+    public Element getGridCRSElement() throws WcsException {
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        return  (Element) spatialDomain.getChild("GridCRS",WCS.WCS_NS).clone();
+    }
+
+    public Element get_CoordinateOperationElement(){
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        return  (Element) spatialDomain.getChild("_CoordinateOperation",WCS.GML_NS).clone();
+    }
+
+    public Element getImageCRSElement() throws WcsException {
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        return  (Element) spatialDomain.getChild("ImageCRS",WCS.WCS_NS).clone();
+    }
+
+
+    public List getPolygonElements() throws WcsException {
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
+        return  cloneElementList(spatialDomain.getChildren("Polygon",WCS.GML_NS));
+    }
+
+    public Element getTemporalDomainElement(){
+        Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
+        return  (Element) domain.getChild("TemporalDomain",WCS.WCS_NS).clone();
+    }
+
+    public Element getRangeElement(){
+        return  (Element) myCD.getChild("Range",WCS.WCS_NS).clone();
+    }
+
+    public List getSupportedCrsElements(){
+        return  cloneElementList(myCD.getChildren("SupportedCRS",WCS.WCS_NS));
+    }
+
+    public List<Element> getSupportedFormatElements(){
+
+        return  cloneElementList(myCD.getChildren("SupportedFormat",WCS.WCS_NS));
+    }
+
+    private List<Element> cloneElementList(List<Element> list){
+        ArrayList newList = new ArrayList<Element>();
+
+        Iterator i = list.iterator();
+        Element e;
+
+        while(i.hasNext()){
+            e = (Element)i.next();
+            newList.add((Element)e.clone());
+        }
+
+        return newList;
+    }
+
+
+
+
+    public Element getCoverageSummary() throws WcsException {
+
+        Element e;
+        Element cob = new Element("CoverageSummary",WCS.WCS_NS);
+
+        // ows:Description type
+
+        Iterator i = getTitles().iterator();
+        while(i.hasNext()){
+            e = (Element)i.next();
+            cob.addContent((Element)e.clone());
+        }
+
+        i = getAbstracts().iterator();
+        while(i.hasNext()){
+            e = (Element)i.next();
+            cob.addContent((Element)e.clone());
+        }
+
+        i = getTitles().iterator();
+        while(i.hasNext()){
+            e = (Element)i.next();
+            cob.addContent((Element)e.clone());
+        }
+
+        // wcs:CoverageDescriptionType
+        cob.addContent(getBoundingBox().getWgs84BoundingBoxElement());
+
+        i = getSupportedCrsElements().iterator();
+        while(i.hasNext()){
+            e = (Element)i.next();
+            cob.addContent((Element)e.clone());
+        }
+
+        i = getSupportedFormatElements().iterator();
+        while(i.hasNext()){
+            e = (Element)i.next();
+            cob.addContent((Element)e.clone());
+        }
+
+        cob.addContent((Element)getIdentifierElement().clone());
+
+        return cob;
+    }
+
+
+    public Element getElement(){
+        return (Element) myCD.clone();
     }
 
 

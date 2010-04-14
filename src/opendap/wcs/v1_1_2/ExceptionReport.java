@@ -45,7 +45,7 @@ public class ExceptionReport {
 
 
 
-    private Document report;
+    private final Document report;
 
     public ExceptionReport(){
         Element root = new Element("ExceptionReport", _nameSpace);
@@ -73,6 +73,10 @@ public class ExceptionReport {
     public String toString() {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         return xmlo.outputString(report);
+    }
+
+    public Document getReport(){
+        return report;
     }
 
 

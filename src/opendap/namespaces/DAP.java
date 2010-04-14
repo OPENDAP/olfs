@@ -14,7 +14,7 @@ public class DAP {
     public static final Namespace DAPv32_NS = Namespace.getNamespace("dap",DAPv32_NAMESPACE_STRING);
     public static final String    DAPv32_SCHEMA_LOCATION= "http://xml.opendap.org/dap/dap3.2.xsd";
     
-    public static final String    DAPv40_NAMESPACE_STRING = "http://xml.opendap.org/ns/DAP.0";
+    public static final String    DAPv40_NAMESPACE_STRING = "http://xml.opendap.org/ns/DAP4.0";
     public static final Namespace DAPv40_NS = Namespace.getNamespace("dap",DAPv40_NAMESPACE_STRING);
     public static final String    DAPv40_SCHEMA_LOCATION= "http://xml.opendap.org/dap/dap4.0.xsd";
 

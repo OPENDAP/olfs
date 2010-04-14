@@ -1,0 +1,29 @@
+
+URLs into servers that we should index for the ocean use case:
+
+http://data.nodc.noaa.gov/opendap/ghrsst/
+http://satdat1.gso.uri.edu/thredds/dodsC/NWPacificDec_1km
+http://satdat1.gso.uri.edu/thredds/dodsC/NEPacificDec_1km
+http://satdat1.gso.uri.edu/thredds/dodsC/NWAtlanticDec_1km
+    
+Other URLs:
+
+This is a set of hand written catalogs that contain gnarly loops
+http://test.opendap.org:8090/opendap/loop/catalog.xml
+
+This URL tests how the crawler deals with catalog references that
+fail (the server returns a 404 response when they are dereferenced)
+http://test.opendap.org:8090/opendap/codar/radials_measpatts/bisl/2006/mar/catalog.xml
+
+A smaller collection of datasets on test.opendap.org
+http://test.opendap.org:8090/opendap/data/catalog.html
+    
+Everything on test.opendap.org
+http://test.opendap.org:8090/opendap/catalog.xml
+
+----------------------------------------------------------------------------
+
+DDX URLs into the NODC GHRSST Server:
+
+http://data.nodc.noaa.gov/opendap/ghrsst/L4/AUS/ABOM/RAMSSA_09km/2008/092/20080401-ABOM-L4HRfnd-AUS-v01-fv02_0-RAMSSA_09km.nc.bz2.ddx
+http://data.nodc.noaa.gov/opendap/ghrsst/L4/GAL/EUR/ODYSSEA/2008/023/20080123-EUR-L4UHRfnd-GAL-v01-fv01-ODYSSEA.nc.bz2.ddx

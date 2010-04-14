@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import opendap.namespaces.THREDDS;
+
 
 /**
  * User: ndp
@@ -121,7 +123,7 @@ public class CatalogManager {
 
         Element catRef;
         String href, catFname, thisUrlPrefix, thisPathPrefix;
-        Iterator i=  catDoc.getRootElement().getDescendants(new ElementFilter(THREDDS.CATALOG_REF,THREDDS.NS));
+        Iterator i=  catDoc.getRootElement().getDescendants(new ElementFilter(THREDDS.CATALOG_REF, opendap.namespaces.THREDDS.NS));
 
         while(i.hasNext()){
 

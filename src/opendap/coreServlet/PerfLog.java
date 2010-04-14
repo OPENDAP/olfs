@@ -24,9 +24,9 @@
 
 package opendap.coreServlet;
 
-import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.log4j.MDC;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +34,11 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.ServletContext;
 import javax.xml.parsers.FactoryConfigurationError;
 import java.io.File;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 
 
 /**
@@ -79,27 +84,71 @@ public class PerfLog {
             }
         }
 
-        // read in Log4J config file
+        
+        // read in Logback config file
         System.setProperty("logdir", logPath); // variable substitution
         try {
-            String log4Jconfig = servletContext.getInitParameter("log4j-init-file");
-            if (log4Jconfig == null){
-                log4Jconfig = ServletUtil.getContentPath(servlet) + "log4j.xml";
-                File f = new File(log4Jconfig);
+
+            String logbackConfig = servletContext.getInitParameter("logbackConfig");
+            if (logbackConfig == null){
+                logbackConfig = ServletUtil.getContentPath(servlet) + "logback-test.xml";
+                File f = new File(logbackConfig);
                 if (!f.exists()) {
-                    log4Jconfig = ServletUtil.getRootPath(servlet) + "WEB-INF/log4j.xml";
+                    logbackConfig = ServletUtil.getContentPath(servlet) + "logback.xml";
+                    f = new File(logbackConfig);
+                    if (!f.exists()) {
+                        logbackConfig = ServletUtil.getRootPath(servlet) + "WEB-INF/logback.xml";
+                        f = new File(logbackConfig);
+                        if (!f.exists())
+                            logbackConfig = null;
+                    }
+
                 }
             }
-            System.out.println("+++PerfLog.initLogging() - Log4j configuration using: "+log4Jconfig);
-            DOMConfigurator.configure(log4Jconfig);
-            System.out.println("+++PerfLog.initLogging() - Log4j configured.");
-        } catch (FactoryConfigurationError t) {
+
+            if(logbackConfig != null){
+                System.out.println("+++PerfLog.initLogging() - Logback configuration using: "+ logbackConfig);
+
+                LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+                try {
+                  JoranConfigurator configurator = new JoranConfigurator();
+                  configurator.setContext(lc);
+                  // the context was probably already configured by default configuration
+                  // rules
+                  lc.reset();
+                  configurator.doConfigure(logbackConfig);
+                } catch (JoranException je) {
+                   je.printStackTrace();
+                }
+                StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+
+            }
+            else {
+                System.out.println("+++PerfLog.initLogging() - Logback configuration using logback " +
+                        "default configuration mechanism");
+            }
+
+            System.out.println("+++PerfLog.initLogging() - Logback configured.");
+
+        } catch (Exception t) {
             t.printStackTrace();
         }
 
-        log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+
+        try {
+            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+        }
+        catch(NoClassDefFoundError e) {
+            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            throw e;
+        }
+
+        System.out.println("Done.");
 
         isLogInit = true;
+
+
     }
 
 
@@ -135,16 +184,56 @@ public class PerfLog {
 
         // read in Log4J config file
         System.setProperty("logdir", logPath); // variable substitution
-        try {
-            String log4Jconfig = path + "log4j.xml";
-            System.out.println("+++PerfLog.initLogging() - Log4j configuration using: "+log4Jconfig);
-            DOMConfigurator.configure(log4Jconfig);
-            System.out.println("+++PerfLog.initLogging() - Log4j configured.");
-        } catch (FactoryConfigurationError t) {
-            t.printStackTrace();
+
+
+            String logbackConfig = path + "logback-test.xml";
+            File f = new File(logbackConfig);
+            if (!f.exists()) {
+                logbackConfig = path + "logback.xml";
+                f = new File(logbackConfig);
+                if (!f.exists()) {
+                        logbackConfig = null;
+                }
+
+            }
+
+
+        if(logbackConfig != null){
+            System.out.println("+++PerfLog.initLogging() - Logback configuration using: "+ logbackConfig);
+
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            try {
+              JoranConfigurator configurator = new JoranConfigurator();
+              configurator.setContext(lc);
+              // the context was probably already configured by default configuration
+              // rules
+              lc.reset();
+              configurator.doConfigure(logbackConfig);
+            } catch (JoranException je) {
+               je.printStackTrace();
+            }
+            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+
+        }
+        else {
+            System.out.println("+++PerfLog.initLogging() - Logback configuration using logback " +
+                    "default configuration mechanism");
         }
 
-        log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+        System.out.println("+++PerfLog.initLogging() - Logback configured.");
+
+
+        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+
+        try {
+            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+        }
+        catch(NoClassDefFoundError e) {
+            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            throw e;
+        }
+
+        System.out.println("Done.");
 
         isLogInit = true;
     }
@@ -174,7 +263,7 @@ public class PerfLog {
             MDC.put("ID", "Server Startup");
             MDC.put("SOURCE", source);
         }
-        MDC.put("startTime", System.currentTimeMillis());
+        MDC.put("startTime", System.currentTimeMillis() + "");
         log.info("Logging started.");
     }
 
@@ -202,7 +291,7 @@ public class PerfLog {
             MDC.put("ID", "Server Startup");
             MDC.put("SOURCE", source);
         }
-        MDC.put("startTime", System.currentTimeMillis());
+        MDC.put("startTime", System.currentTimeMillis() + "");
         log.info("Logging started.");
     }
 
@@ -245,7 +334,7 @@ public class PerfLog {
         MDC.put("host", req.getRemoteHost());
         MDC.put("ident", (session == null) ? "-" : session.getId());
         MDC.put("userid", req.getRemoteUser() != null ? req.getRemoteUser() : "-");
-        MDC.put("startTime", System.currentTimeMillis());
+        MDC.put("startTime", System.currentTimeMillis() + "");
         String query = req.getQueryString();
         query = (query != null) ? "?" + query : "";
         StringBuffer request = new StringBuffer();
@@ -274,7 +363,9 @@ public class PerfLog {
                                           String logName) {
 
         long endTime = System.currentTimeMillis();
-        long startTime = (Long) MDC.get("startTime");
+
+        String sTime = MDC.get("startTime");
+        long startTime = Long.valueOf(sTime);
         long duration = endTime - startTime;
 
 

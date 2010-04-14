@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ************************************************************ -->
+<!-- * SERVICE PROVIDER SECTION                                 * -->
+<!-- ************************************************************ -->
+<ows:ServiceProvider  xmlns="http://www.opengis.net/wcs/1.1"
+xmlns:ows="http://www.opengis.net/ows/1.1"
+xmlns:xlink="http://www.w3.org/1999/xlink">
+  <ows:ProviderName>OPeNDAP Inc.</ows:ProviderName>
+  <ows:ProviderSite xlink:href="http://www.opendap.org"/>
+  <ows:ServiceContact>
+     <ows:IndividualName>Anonymous Smith</ows:IndividualName>
+     <ows:PositionName>Sys. Admin.</ows:PositionName>
+     <ows:ContactInfo>
+        <ows:Phone>
+           <ows:Voice>123-456-7890</ows:Voice>
+           <ows:Facsimile>234-567-8901</ows:Facsimile>
+        </ows:Phone>
+        <ows:Address>
+           <ows:DeliveryPoint>165 Fictitious Dr.</ows:DeliveryPoint>
+           <ows:City>AnywhereButHere</ows:City>
+           <ows:AdministrativeArea>Rhode Island</ows:AdministrativeArea>
+           <ows:PostalCode>02882</ows:PostalCode>
+           <ows:Country>USA</ows:Country>
+           <ows:ElectronicMailAddress>support[a.t]opendap[d.o.t]org</ows:ElectronicMailAddress>
+        </ows:Address>
+        <ows:OnlineResource xlink:href="http://your.domain.org/"/>
+        <ows:HoursOfService>24x7x365</ows:HoursOfService>
+        <ows:ContactInstructions>email</ows:ContactInstructions>
+     </ows:ContactInfo>
+     <ows:Role>Developer</ows:Role>
+  </ows:ServiceContact>
+</ows:ServiceProvider>

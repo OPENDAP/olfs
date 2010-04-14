@@ -546,7 +546,7 @@ public class WcsService {
             log.info("Exiting");
         }
 
-        public long getCacheAge(){
+        public long getCatalogAge(){
             Date now = new Date();
             return now.getTime() - coverageDescriptionDocumentTimeAcquired.getTime();
         }
@@ -557,13 +557,13 @@ public class WcsService {
 
             log.debug("Attempting to update cached " +
                     "coverage description document. force="+force);
-            if(force || cacheTime<getCacheAge()){
+            if(force || cacheTime<getCatalogAge()){
 
                 coverageDescDocLock.writeLock().lock();
                 log.debug("WriteLock Acquired.");
 
                 try {
-                    if(force || cacheTime<getCacheAge()){
+                    if(force || cacheTime<getCatalogAge()){
                         log.debug("Updating Coverage Description Document.");
                         Document doc = httpDescribeCoverage(null);
                         ingestCoverageDesription(doc);

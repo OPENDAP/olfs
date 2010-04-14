@@ -21,68 +21,26 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.wcs.v1_1_2;
+package opendap.namespaces;
 
-import org.jdom.Element;
-
-import java.util.HashMap;
+import org.jdom.Namespace;
 
 /**
  * User: ndp
- * Date: Aug 18, 2008
- * Time: 1:11:15 PM
+ * Date: Apr 18, 2008
+ * Time: 7:06:27 PM
  */
-public class TimeSequence {
+public class THREDDS {
 
 
-    private TimeSequenceItem _items[];
+    public static final String NAMESPACE_STRING = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
+    public static final String NAMESPACE_PREFIX = "thredds";
 
-    private TimeSequence(){
-        _items = null;
-    }
+    public static final Namespace NS =  Namespace.getNamespace(NAMESPACE_STRING);
 
-
-    public static TimeSequence fromKVP(HashMap<String,String> kvp) throws WcsException {
-
-        String s = kvp.get("TimeSequence");
-
-        if(s==null)
-            return null;
-
-        TimeSequence ts = new TimeSequence();
-
-        String tmp[];
-
-
-        // Time Sequences can be a comma separated list of time instances
-        // and time ranges.
-        tmp = s.split(",");
-
-        ts._items = new TimeSequenceItem[tmp.length];
-
-        for(int i=0; i<tmp.length ;i++){
-            ts._items[i] = new TimeSequenceItem(tmp[i]);
-        }
-        return ts;
-
-
-
-    }
-
-
-
-
-
-
-    public Element getTemporalSubsetElement() throws WcsException {
-        Element ts = new Element("TemporalSubset",WCS.WCS_NS);
-
-        for(TimeSequenceItem tsi: _items){
-            ts.addContent(tsi.getXMLElementRepresentation());
-        }
-
-        return ts;
-    }
-
-
+    public static final String SERVICE = "service";
+    public static final String CATALOG_REF = "catalogRef";
+    public static final String CATALOG = "catalog";
+    public static final String DATASET = "dataset";
+    public static final String NAME = "name";
 }

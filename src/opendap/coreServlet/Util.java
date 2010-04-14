@@ -140,11 +140,20 @@ public class Util {
 
 
     public static void printMemoryReport(PrintWriter pw){
+
+        pw.print(getMemoryReport());
+
+    }
+
+    public static String getMemoryReport(){
+        String msg;
         Runtime rt = Runtime.getRuntime();
-        pw.println("JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)");
-        pw.println("JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)");
-        pw.println("JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)");
-        pw.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)");
+        msg =  "Memory Usage:\n"    ;
+        msg += " JVM Max Memory:   " + (rt.maxMemory() / 1024) / 1000. + " MB (JVM Maximum Allowable Heap)\n";
+        msg += " JVM Total Memory: " + (rt.totalMemory() / 1024) / 1000. + " MB (JVM Heap size)\n";
+        msg += " JVM Free Memory:  " + (rt.freeMemory() / 1024) / 1000. + " MB (Unused part of heap)\n";
+        msg += " JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024) / 1000. + " MB (Currently active memory)\n";
+        return msg;
 
     }
 

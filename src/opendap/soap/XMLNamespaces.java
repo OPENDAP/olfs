@@ -24,6 +24,8 @@
 
 package opendap.soap;
 
+import org.jdom.Namespace;
+
 /**
  * Class wrapper for various Namespace names.
  *
@@ -33,7 +35,9 @@ package opendap.soap;
  */
 public class XMLNamespaces {
 
-
+    public static final String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
+    public static final Namespace WCS_NS = Namespace.getNamespace(WCS_NAMESPACE_STRING);
+    public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1/";
     /**
      * OPeNDAP SOAP Interface Namespace
      */

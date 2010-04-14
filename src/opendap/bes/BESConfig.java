@@ -208,7 +208,7 @@ public class BESConfig  {
 
 
 
-    public void writeConfiguration(String filename) throws IOException {
+    private  void writeConfiguration(String filename) throws IOException {
         OutputStream os = new FileOutputStream(filename);
         try {  writeConfiguration(os); }
         finally {

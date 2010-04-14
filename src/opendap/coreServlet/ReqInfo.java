@@ -350,8 +350,6 @@ public class ReqInfo {
         return up;
     }
 
-
-
     /**
      * Evaluates the request and returns TRUE if it is determined that the request is for an OPeNDAP directory view.
      * @param req The client request.
@@ -372,6 +370,7 @@ public class ReqInfo {
 
         return test;
     }
+
 
     /**
      * Evaluates the request and returns TRUE if it is determined that the request is for an THREDDS directory view.

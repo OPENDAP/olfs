@@ -94,24 +94,93 @@ import java.text.SimpleDateFormat;
  */
 public class TimeSequenceItem {
 
-    private static final SimpleDateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    static {
-        // Makes the date parser strictly enforce the pattern.
-        outputFormatter.setLenient(false);
-        outputFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+    private final SimpleDateFormat outputFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+
+    private Date _beginPosition;
+    public void setBeginPosition(Date beginPos){
+        _beginPosition  = beginPos;
+    }
+    public Date getBeginPosition(){
+        return _beginPosition;
     }
 
 
-    Date _beginPosition;
-    Date _endPosition;
-    String _period;
-    boolean _isRange = false;
+    private Date _endPosition;
+    public void setEndPosition(Date beginPos){
+        _endPosition  = beginPos;
+    }
+    public Date getEndPosition(){
+        return _endPosition;
+    }
+
+    private String _timeResolution;
+    public void setTimeResolution(String timeRes){
+        _timeResolution = timeRes;
+    }
+    public String getTimeResolution(){
+        return _timeResolution;
+    }
+
+
+    boolean _isTimePeriod;
+    public void setIsTimePeriod(boolean val){
+        _isTimePosition = !val;
+        _isTimePeriod = val;
+    }
+    public boolean getIsTimePeriod(){
+        return _isTimePeriod;
+    }
+    public boolean isTimePeriod(){
+        return _isTimePeriod;
+    }
+
 
     Date _timePosition;
-    boolean _isPosition = false;
+    public void setTimePosition(Date tPos){
+        _timePosition  = tPos;
+    }
+    public Date getTimePosition(){
+        return _timePosition;
+    }
+
+
+    boolean _isTimePosition;
+    public void setIsTimePosition(boolean val){
+        _isTimePosition = val;
+        _isTimePeriod = !val;
+    }
+    public boolean getIsTimePosition(){
+        return _isTimePosition;
+    }
+    public boolean isTimePosition(){
+        return _isTimePosition;
+    }
+
+
+
+
+
+
+    private void init(){
+        // Makes the date parser strictly enforce the pattern.
+        outputFormatter.setLenient(false);
+        outputFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        _beginPosition = null;
+        _endPosition = null;
+        _timeResolution = null;
+        _isTimePeriod = false;
+
+        _timePosition = null;
+        _isTimePosition = false;
+
+
+    }
 
 
     TimeSequenceItem(String s) throws WcsException{
+        init();
         String tmp[];
         // Is this time sequence a time range (with a possible time
         // period?
@@ -127,26 +196,75 @@ public class TimeSequenceItem {
                         "of ISO 8601 as described in section 9.3.2.4 of OGC " +
                         "document 07-067r5",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "TimeSequence");
+                        "wcs:TemporalSubset");
 
             _beginPosition = parseWCSTimePosition(tmp[0]);
             _endPosition   = parseWCSTimePosition(tmp[1]);
-            _period = tmp[2];
-            _isRange = true;
+            _timeResolution = tmp[2];
+            _isTimePeriod = true;
         }
         else {
             // It's not a range so it's a "time position"
             _timePosition = parseWCSTimePosition(s);
-            _isPosition = true;
+            _isTimePosition = true;
 
         }
 
     }
 
+
+    TimeSequenceItem(Element tsi) throws WcsException{
+        init();
+
+        if(tsi.getName().equals("TimePeriod")  &&  tsi.getNamespace().equals(WCS.WCS_NS)){
+
+
+            Element e = tsi.getChild("BeginPosition",WCS.WCS_NS);
+            if(e==null) {
+                throw new WcsException("The wcs:TimePeriod element must contain a wcs:BeginPosition element. ",
+                        WcsException.MISSING_PARAMETER_VALUE,
+                        "wcs:TimePeriod");
+            }
+            _beginPosition = parseWCSTimePosition(e.getTextNormalize());
+
+            e = tsi.getChild("EndPosition",WCS.WCS_NS);
+            if(e==null) {
+                throw new WcsException("The wcs:TimePeriod element must contain a wcs:EndPosition element. ",
+                        WcsException.MISSING_PARAMETER_VALUE,
+                        "wcs:EndPosition");
+            }
+            _endPosition = parseWCSTimePosition(e.getTextNormalize());
+
+            e = tsi.getChild("TimeResolution",WCS.WCS_NS);
+            if(e!=null)
+                _timeResolution = e.getTextNormalize();
+
+            _isTimePeriod = true;
+
+        }
+        else if(tsi.getName().equals("timePosition")  &&  tsi.getNamespace().equals(WCS.GML_NS)){
+            // It's na GML gml:timePosition
+            _timePosition = parseWCSTimePosition(tsi.getTextNormalize());
+            _isTimePosition = true;
+
+        }
+        else {
+            throw new WcsException("The wcs:TemporalSubset element may only contain wcs:TimePeriod or " +
+                    "gml:timePosition elements as children. I got a "+tsi.getNamespaceURI()+tsi.getName(),
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "wcs:TemporalSubset");
+
+        }
+
+
+
+    }
+
+
     public Element getXMLElementRepresentation() throws WcsException {
         Element item, e;
 
-        if(_isRange){
+        if(_isTimePeriod){
             item = new Element("TimePeriod",WCS.WCS_NS);
 
             e = new Element("BeginPosition",WCS.WCS_NS);
@@ -158,13 +276,13 @@ public class TimeSequenceItem {
             item.addContent(e);
 
             e = new Element("TimeResolution",WCS.WCS_NS);
-            e.setText(_period);
+            e.setText(_timeResolution);
             item.addContent(e);
 
         }
         else {
-            if(!_isPosition)
-                throw new WcsException("The TimeSequence specified in the " +
+            if(!_isTimePosition)
+                throw new WcsException("The TemporalSubset specified in the " +
                         "key value pairs is malformed and has caused the " +
                         "service to be unable to correctly interpret it's " +
                         "meaning. Pervious quality checks should have " +
@@ -172,7 +290,7 @@ public class TimeSequenceItem {
                         "the fact that you are seeing this message means " +
                         "that BAD THINGS HAVE HAPPENED.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "TimeSequence");
+                        "TemporalSubset");
 
             item = new Element("timePosition",WCS.GML_NS);
             item.setText(outputFormatter.format(_timePosition));
@@ -185,7 +303,7 @@ public class TimeSequenceItem {
 
     /**
      * From the Web Coverage Service (WCS) Implementation Standard version
-     * 1.2.2 (document: OGC 07-067r5):
+     * 1.1.2 (document: OGC 07-067r5):
      * <p>
      * 9.3.2.4 Summary of ISO 8601 syntax for time positions and time periods
      * The [ISO 8601:2000] syntax for dates and times may be summarized by the
@@ -297,11 +415,11 @@ public class TimeSequenceItem {
                 if(tmp2.length>3){
                     throw new WcsException("It appears you have attempted to " +
                             "specify a simple date ("+tmp1[0]+") as part of a " +
-                            "TimeSequence. There appear to be more than 3 " +
+                            "TemporalSubset. There appear to be more than 3 " +
                             "fields separated by '-' signs. That's just not " +
                             "going to work. Sorry.",
                             WcsException.INVALID_PARAMETER_VALUE,
-                            "TimeSequence");
+                            "TemporalSubset");
                 }
 
                 parseFormat = new SimpleDateFormat(parseFormatString);
@@ -332,11 +450,11 @@ public class TimeSequenceItem {
                 if(tmp2.length>3) {
                     throw new WcsException("It appears you have attempted to " +
                             "specify a time ("+time+") as part of a " +
-                            "TimeSequence. There appear to be more than 3 " +
+                            "TemporalSubset. There appear to be more than 3 " +
                             "fields separated by ':' signs. That's just not " +
                             "going to work. Sorry.",
                             WcsException.INVALID_PARAMETER_VALUE,
-                            "TimeSequence");
+                            "TemporalSubset");
                 }
 
                 parseFormat = new SimpleDateFormat(parseFormatString);
@@ -351,7 +469,7 @@ public class TimeSequenceItem {
         catch (ParseException e) {
             throw new WcsException(e.getMessage(),
                     WcsException.INVALID_PARAMETER_VALUE,
-                    "TimeSequence");
+                    "TemporalSubset");
         }
 
         return d;

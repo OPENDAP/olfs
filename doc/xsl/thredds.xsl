@@ -32,6 +32,7 @@
                 xmlns:wcs="http://www.opengis.net/wcs"
                 xmlns:gml="http://www.opengis.net/gml"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+                xmlns:ncml="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
                 >
@@ -286,6 +287,68 @@
         </tr>
     </xsl:template>
 
+    <!--***********************************************
+       -
+       -
+       -
+       -
+       - <datasetScan location="/bes/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
+       -
+
+
+
+
+
+
+      <netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+        <aggregation dimName="time" type="joinExisting" recheckEvery="720 min">
+          <variableAgg name="MHchla" />
+          <scan location="/u00/satellite/MH/chla/8day/" suffix=".nc" />
+        </aggregation>
+      </netcdf>
+
+       -
+     -->
+    <xsl:template match="ncml:netcdf" >
+        <xsl:param name="indent" />
+        <tr>
+            <td align="left">
+                <xsl:value-of select="$indent"/>NcML
+                <xsl:apply-templates >
+                    <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                </xsl:apply-templates>
+            </td>
+
+            <xsl:call-template name="NoSizeNoTime" />
+
+        </tr>
+    </xsl:template>
+
+
+    <xsl:template match="ncml:aggregation" >
+        <xsl:param name="indent" />
+                - Aggregation<br/>
+                <xsl:value-of select="$indent"/>Dimension:  <xsl:value-of select="@dimName"/><br/>
+                <xsl:value-of select="$indent"/>Type:<xsl:value-of select="@type"/><br/>
+                <xsl:value-of select="$indent"/>Rescan Interval: <xsl:value-of select="@recheckEvery"/><br/>
+        <xsl:apply-templates >
+            <xsl:with-param name="indent"><xsl:value-of select="$indent" /></xsl:with-param>
+        </xsl:apply-templates>
+
+    </xsl:template>
+
+    <xsl:template match="ncml:variableAgg" >
+        <xsl:param name="indent" />
+                <xsl:value-of select="$indent"/>Aggregation Variable: <xsl:value-of select="@name"/><br/>
+    </xsl:template>
+
+
+    <xsl:template match="ncml:scan" >
+        <xsl:param name="indent" />
+                <xsl:value-of select="$indent"/>Scan Location: <xsl:value-of select="@location"/><br/>
+                <xsl:value-of select="$indent"/>Scan File Suffix: <xsl:value-of select="@suffix"/><br/>
+    </xsl:template>
+
 
     <!--***********************************************
        -
@@ -335,67 +398,75 @@
         <xsl:param name="indent" />
         <xsl:param name="inheritedMetadata" />
 
-        <xsl:if test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
-            <tr>
-                <td  class="dark" align="left">
-                    <xsl:value-of select="$indent"/>
-                    <a>
-                        <xsl:if test="$remoteCatalog">
-                            <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="not($remoteCatalog)">
-                            <xsl:attribute name="href">?dataset=<xsl:value-of select="preceding::*/last()"/></xsl:attribute>
-                        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="boolean(thredds:dataset) or boolean(thredds:catalogRef) or boolean(thredds:datasetScan)">
+                <tr>
+                    <td  class="dark" align="left">
+                        <xsl:value-of select="$indent"/>
+                        <a>
+                            <xsl:if test="$remoteCatalog">
+                                <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test="not($remoteCatalog)">
+                                <xsl:attribute name="href">?dataset=<xsl:value-of select="preceding::*/last()"/></xsl:attribute>
+                            </xsl:if>
 
-                        <xsl:choose>
-                            <xsl:when test="@name='/'">
-                                Catalog of /
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="@name"/>/
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </a>
-                </td>
-                <xsl:call-template name="NoSizeNoTime" />
-            </tr>
-            <xsl:apply-templates>
-                <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
-                <!--
-                  -   Note that the followiing parameter uses an XPath that
-                  -   accumulates inherited thredds:metadata elements as it descends the
-                  -   hierarchy.
-                  -->
-                <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]" />
-            </xsl:apply-templates>
-         </xsl:if >
+                            <xsl:choose>
+                                <xsl:when test="@name='/'">
+                                    Catalog of /
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="@name"/>/
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </a>
+                    </td>
+                    <xsl:call-template name="NoSizeNoTime" />
+                </tr>
+                <xsl:apply-templates>
+                    <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                    <!--
+                      -   Note that the followiing parameter uses an XPath that
+                      -   accumulates inherited thredds:metadata elements as it descends the
+                      -   hierarchy.
+                      -->
+                    <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]" />
+                </xsl:apply-templates>
 
-        <xsl:if test="not(thredds:dataset) and not(thredds:catalogRef)">
-            <tr>
-                <td class="dark">
 
-                    <xsl:value-of select="$indent"/>
-                    <a>
-                        <xsl:if test="$remoteCatalog">
-                            <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
-                        </xsl:if>
-                        <xsl:if test="not($remoteCatalog)">
-                            <xsl:attribute name="href">
-                                ?dataset=<xsl:value-of select="preceding::*/last()"/>
-                            </xsl:attribute>
-                        </xsl:if>
+            </xsl:when>
+            <xsl:otherwise>
+                <tr>
+                    <td class="dark">
 
-                        <xsl:value-of select="@name"/>
-                    </a>
+                        <xsl:value-of select="$indent"/>
+                        <a>
+                            <xsl:if test="$remoteCatalog">
+                                <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
+                            </xsl:if>
+                            <xsl:if test="not($remoteCatalog)">
+                                <xsl:attribute name="href">
+                                    ?dataset=<xsl:value-of select="preceding::*/last()"/>
+                                </xsl:attribute>
+                            </xsl:if>
 
-                </td>
-                <xsl:call-template name="SizeAndTime" >
-                    <xsl:with-param name="currentDataset" select="." />
-                    <xsl:with-param name="metadata" select="thredds:metadata" />
-                    <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata[boolean($inheritedMetadata)]" />
-                </xsl:call-template>
-            </tr>
-        </xsl:if>
+                            <xsl:value-of select="@name"/>
+                        </a>
+
+                    </td>
+                    <xsl:call-template name="SizeAndTime" >
+                        <xsl:with-param name="currentDataset" select="." />
+                        <xsl:with-param name="metadata" select="thredds:metadata" />
+                        <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata[boolean($inheritedMetadata)]" />
+                    </xsl:call-template>
+                </tr>
+                <xsl:apply-templates>
+                    <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
+                </xsl:apply-templates>                
+
+
+            </xsl:otherwise>
+        </xsl:choose>
 
     </xsl:template>
 

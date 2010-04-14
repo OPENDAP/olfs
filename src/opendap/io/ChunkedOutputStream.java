@@ -356,9 +356,9 @@ public class ChunkedOutputStream  extends OutputStream {
 
         /*
 
-        // This was a viable test when we used 4 bytes to encode the chunk size.
+        // This was a viable crawlTest when we used 4 bytes to encode the chunk size.
         // That meant that the MAX_SIZE was only 2^16. Now that it's 2^28 it's
-        // not feasible to test the boundary condition of a chunk larger than 
+        // not feasible to crawlTest the boundary condition of a chunk larger than
         // the maximum chunk size.
         baos.reset();
 

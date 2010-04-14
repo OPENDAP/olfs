@@ -165,7 +165,7 @@ public class Chunk {
     }
 
 
-    public static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException{
+    static int readFully(InputStream is, byte[] buf, int off, int len) throws IOException{
 
 
         if(     buf!=null &&         // Make sure the buffer is not null

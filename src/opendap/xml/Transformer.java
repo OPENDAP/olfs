@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 
 import java.net.URI;
 import java.io.*;
+import java.util.Date;
 
 /**
  * User: ndp
@@ -54,29 +56,130 @@ public class Transformer {
         log = org.slf4j.LoggerFactory.getLogger(Transformer.class);
     }
 
-    private Transformer(){
+    private Processor proc;
+    private Serializer out;
+    private XsltTransformer transform;
+    private Date cacheTime;
+    private String xsltDoc;
+    private DocumentBuilder builder;
+
+
+    public Transformer(String xsltDocument) throws SaxonApiException {
+
+
+        init(xsltDocument);
+
+    }
+
+
+    private void init(String xsltDocument) throws SaxonApiException {
+
+        xsltDoc = xsltDocument;
+
+        // Get an XSLT processor and serializer
+        proc = new Processor(false);
+        out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        builder = getDocumentBuilder();
+
+        loadTransform();
+
+    }
+
+    public XdmNode build(java.io.File file ) throws SaxonApiException {
+        return builder.build(file);
+    }
+
+    public XdmNode build(javax.xml.transform.Source source) throws SaxonApiException {
+        return builder.build(source);
+    }
+
+    public DocumentBuilder getDocumentBuilder() {
+        DocumentBuilder builder = proc.newDocumentBuilder();
+        builder.setLineNumbering(true);
+        return builder;
+
+    }
+
+
+    public void reloadTransformIfRequired() throws SaxonApiException {
+        File f = new File(xsltDoc);
+        if(f.lastModified()>cacheTime.getTime()){
+            loadTransform();
+        }
+
+    }
+
+
+    private void loadTransform() throws SaxonApiException{
+        // Get an XSLT compiler with our transform in it.
+        XsltCompiler comp = proc.newXsltCompiler();
+        XsltExecutable exp = comp.compile(new StreamSource(xsltDoc));
+        transform = exp.load(); // loads the transform file.
+        cacheTime = new Date();
+
+    }
+
+    public Processor getProcessor(){
+        return proc;
+    }
+
+    public XPathCompiler newXPathCompiler(){
+        return proc.newXPathCompiler();
+    }
+
+    public void transform(XdmNode doc, OutputStream os) throws SaxonApiException {
+        out.setOutputStream(os);
+        transform.setInitialContextNode(doc);
+        transform.setDestination(out);
+        transform.transform();
+    }
+
+
+    public void setParameter(QName name,
+                             XdmValue value){
+        transform.setParameter(name,value);
+    }
+
+
+    public void clearParameter(String name) throws SaxonApiException {
+        setParameter(new QName(name), null);
+
+    }
+
+    public void setParameter(String name, String value) throws SaxonApiException {
+        // Build the remoteHost parameter to pass into the XSLT
+        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<"+name+">" + value + "</"+name+">";
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+        XdmNode valueNode = build(new StreamSource(reader));
+        // Pass the remoteHost parameter
+        setParameter(new QName(name), valueNode);
+
     }
 
 
 
-    public void printUsage(PrintStream ps) {
+
+
+    public static void printUsage(PrintStream ps) {
         ps.println("\n");
         ps.println("Usage:");
-        ps.println("    "+getClass().getName()+"   SourceXmlURI  XSLTransformURI");
+        ps.println("    "+Transformer.class.getName()+"   SourceXmlURI  XSLTransformURI");
         ps.println("\n");
     }
 
-    public static void main(String args[]){
+    public static void main(String args[]) {
 
-        Transformer  t = new Transformer();
 
-         if(args.length!=2){
-            t.printUsage(System.err);
-            System.exit(-1);
-        }
         try {
-            jdomXsltTransfom(args[0],args[1],System.out);
-            saxonXsltTransform(args[0],args[1],System.out);
+            if (args.length != 2) {
+                Transformer.printUsage(System.err);
+                System.exit(-1);
+            }
+            jdomXsltTransfom(args[0], args[1], System.out);
+            saxonXsltTransform(args[0], args[1], System.out);
 
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -88,16 +191,23 @@ public class Transformer {
 
     public static void jdomXsltTransfom(String srcDocUri, String xslDocUri, OutputStream os) throws Exception {
 
-
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+        Element e = new Element("test");
+        char c = 0x18;
+        e.setText("Here is that bad thing: "+c);
+        System.out.println(xmlo.outputString(e));
+
 
         Document sourceDoc, xsltDoc;
 
+        log.debug("Loading source document "+srcDocUri);
         sourceDoc = getXMLDoc(srcDocUri);
         log.debug("Got and parsed XML document: "+srcDocUri);
         log.debug(xmlo.outputString(sourceDoc));
 
+        log.debug("Loading transform document "+srcDocUri);
         xsltDoc = getXMLDoc(xslDocUri);
         log.debug("Got and parsed XSL document: "+xslDocUri);
         log.debug(xmlo.outputString(xsltDoc));
@@ -184,7 +294,7 @@ public class Transformer {
 
 
 
-    public static String getXSLTImpl(){
+    private static String getXSLTImpl(){
 
         String str = "SystemProperty javax.xml.transform.TransformerFactory: \n";
 

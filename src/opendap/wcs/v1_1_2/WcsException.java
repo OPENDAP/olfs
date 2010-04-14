@@ -79,7 +79,7 @@ import org.jdom.Element;
  * Date: Aug 13, 2008
  * Time: 4:18:20 PM
  */
-public class WcsException extends Throwable {
+public class WcsException extends Exception {
 
 
 
@@ -129,7 +129,7 @@ public class WcsException extends Throwable {
      */
     public static final int NO_APPLICABLE_CODE          = 5;
 
-    private static String[] _exceptionCodeName =
+    private static final String[] _exceptionCodeName =
             { "OperationNotSupported",
               "MissingParameterValue",
               "InvalidParameterValue",
@@ -138,8 +138,8 @@ public class WcsException extends Throwable {
               "NoApplicableCode" };
 
 
-    private int _exceptionCode;
-    private String _locator;
+    private final int _exceptionCode;
+    private final String _locator;
 
     public WcsException(String s, int exceptionCode, String locator) {
         super(s);
@@ -172,6 +172,18 @@ public class WcsException extends Throwable {
         return exp;
     }
 
+
+    public String getMessage(){
+        String msg = super.getMessage();
+
+        if(_locator!=null)
+            msg = _locator + ": "+msg;
+
+        msg += " (code: "+ _exceptionCodeName[_exceptionCode]+")";
+
+        return msg;
+
+    }
 
 
 }

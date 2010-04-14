@@ -39,7 +39,7 @@
                 xmlns:dap="&DAP;"
                 xmlns:xml="http://www.w3.org/XML/1998/namespace"
         >
-    
+
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="AttributeNames" match="dap:Attribute" use="@name"/>
 
@@ -257,9 +257,9 @@
     <xsl:template match="@*|text()" mode="anyXMLToRDF"/>
     <xsl:template match="*" mode="anyXMLToRDF">
 
-        <rdf:type>
+        <owl:sameAs>
             <xsl:apply-templates select="." mode="anyXMLToRDFWorker"/>
-        </rdf:type>
+        </owl:sameAs>
 
     </xsl:template>
 
@@ -734,4 +734,3 @@
 
 
 </xsl:stylesheet>
-

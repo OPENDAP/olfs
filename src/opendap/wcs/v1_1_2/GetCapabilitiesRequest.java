@@ -28,10 +28,11 @@ import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import opendap.coreServlet.Scrub;
 
 /**
  * User: ndp
@@ -42,22 +43,167 @@ public class GetCapabilitiesRequest {
 
 
 
-    private String   _service = "WCS";
-    private String   _request = "GetCapabilities";
-    private String[] _Sections = null;
-    private String   _updateSequence = null;
-    private String[] _AcceptFormats = null;
-    private String[] _AcceptVersions = null;
+    private static final String   _request = "GetCapabilities";
+
+    private String          updateSequence = null;
+    private String[]        AcceptVersions = null;
+    private HashSet<String> Sections = new HashSet<String>();
+    private boolean hasSectionsElement;
+
+    private String[]        AcceptFormats = null;
 
 
-    private static final HashSet<String> sectionNames = new HashSet<String>();
+    public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
+    public static String SERVICE_PROVIDER = "ServiceProvider";
+    public static String OPERATIONS_METADATA = "OperationsMetadata";
+    public static String CONTENTS = "Contents";
+    public static String ALL = "All";
+
+
+    public static final HashSet<String> sectionNames = new HashSet<String>();
     static {
-        sectionNames.add("ServiceIdentification");
-        sectionNames.add("ServiceProvider");
-        sectionNames.add("OperationsMetadata");
-        sectionNames.add("Contents");
-        sectionNames.add("All");
+        sectionNames.add(SERVICE_IDENTIFICATION);
+        sectionNames.add(SERVICE_PROVIDER);
+        sectionNames.add(OPERATIONS_METADATA);
+        sectionNames.add(CONTENTS);
+        sectionNames.add(ALL);
     }
+
+
+    
+
+
+    public String getUpdateSequence() {
+        return updateSequence;
+    }
+
+    public void setUpdateSequence(String updateSequence) {
+        this.updateSequence = updateSequence;
+    }
+
+    public String[] getAcceptVersions() {
+        return AcceptVersions;
+    }
+
+    public void setAcceptVersions(String[] acceptVersions) {
+        AcceptVersions = acceptVersions;
+    }
+
+    public Iterator<String> getSections() {
+        return Sections.iterator();
+    }
+
+    public boolean hasSection(String s) {
+        return Sections.contains(s);
+    }
+
+    public boolean sectionsIsEmtpty() {
+        return Sections.isEmpty();
+    }
+
+    public boolean hasSectionsElement() {
+        return hasSectionsElement;
+    }
+
+
+    public String[] getAcceptFormats() {
+        return AcceptFormats;
+    }
+
+    public void setAcceptFormats(String[] acceptFormats) {
+        AcceptFormats = acceptFormats;
+    }
+
+    public GetCapabilitiesRequest(Element getCRElem) throws WcsException{
+
+        Element e;
+        String s;
+        Iterator i;
+        int index;
+
+
+        // Make sure we got the correct request object.
+        WCS.checkNamespace(getCRElem,_request,WCS.WCS_NS);
+
+        // Make sure the client is looking for a WCS service....
+        WCS.checkService(getCRElem.getAttributeValue("service"));
+
+
+        s=getCRElem.getAttributeValue("updateSequence");
+        if(s!=null)
+            updateSequence =s;
+
+        // Get the clients accepted versions.
+        e = getCRElem.getChild("AcceptVersions",WCS.OWS_NS);
+        if(e!=null ){
+            List vlist = e.getChildren("Version",WCS.OWS_NS);
+            if(vlist.size()==0){
+                throw new WcsException("The ows:AcceptVersions element is required " +
+                        "to have one or more ows:Version child elements.",
+                        WcsException.MISSING_PARAMETER_VALUE,
+                        "ows:Version");
+            }
+            AcceptVersions =  new String[vlist.size()];
+            i = vlist.iterator();
+            index = 0;
+            while(i.hasNext()){
+                e = (Element) i.next();
+                AcceptVersions[index++] = e.getTextNormalize();
+
+            }
+
+        }
+
+        // Get the sections the client wants.
+        e = getCRElem.getChild("Sections",WCS.OWS_NS);
+        if(e!=null ){
+
+            hasSectionsElement = true;
+
+            List vlist = e.getChildren("Section",WCS.OWS_NS);
+
+            i = vlist.iterator();
+            index = 0;
+            while(i.hasNext()){
+                e = (Element) i.next();
+                s = e.getTextNormalize();
+                if(!sectionNames.contains(s))
+                    throw new WcsException("Client requested unsupported " +
+                            "section name: "+ Scrub.simpleString(s),
+                            WcsException.INVALID_PARAMETER_VALUE,"ows:Section");
+                Sections.add(e.getTextNormalize());
+            }
+
+        }
+
+
+
+        // Get the formats the client wants.
+        e = getCRElem.getChild("AcceptFormats",WCS.OWS_NS);
+        if(e!=null ){
+            List vlist = e.getChildren("OutputFormat",WCS.OWS_NS);
+            if(vlist.size()==0){
+                throw new WcsException("The ows:AcceptFormats element is required to have " +
+                        "one or more ows:OutputFormat child elements.",
+                        WcsException.MISSING_PARAMETER_VALUE,
+                        "ows:OutputFormat");
+            }
+
+            AcceptFormats =  new String[vlist.size()];
+            i = vlist.iterator();
+            index = 0;
+            while(i.hasNext()){
+                e = (Element) i.next();
+                AcceptFormats[index++] = e.getTextNormalize();
+
+            }
+
+        }
+    }
+
+
+
+
 
 
 
@@ -68,38 +214,7 @@ public class GetCapabilitiesRequest {
 
 
         // Make sure the client is looking for a WCS service....
-        s = kvp.get("service");
-        if(s==null || !s.equals(_service))
-            throw new WcsException("Only the WCS service (version "+
-                    WCS.VERSIONS+") is supported.",
-                    WcsException.OPERATION_NOT_SUPPORTED,s);
-
-
-
-        // Make sure the client can accept the correct WCS version...
-        boolean compatible = false;
-        s = kvp.get("AcceptVersions");
-        if(s!=null){
-            tmp = s.split(",");
-            for(String ver:tmp){
-                if(WCS.VERSIONS.contains(ver)){
-                    compatible=true;
-                }
-            }
-            if(!compatible)
-                throw new WcsException("Client requested unsupported WCS " +
-                        "version(s): ["+s+"]\nThis WCS supports version(s) "+WCS.VERSIONS,
-                        WcsException.VERSION_NEGOTIATION_FAILED,null);
-
-            _AcceptVersions = tmp;
-        }
-
-
-
-
-
-
-
+        WCS.checkService(kvp.get("service"));
 
         // Make sure the client is acutally asking for this operation
         s = kvp.get("request");
@@ -117,6 +232,25 @@ public class GetCapabilitiesRequest {
         }
 
 
+        // Make sure the client can accept the correct WCS version...
+        boolean compatible = false;
+        s = kvp.get("AcceptVersions");
+        if(s!=null){
+            tmp = s.split(",");
+            for(String ver:tmp){
+                if(WCS.CURRENT_VERSION.equals(ver)){
+                    compatible=true;
+                }
+            }
+            if(!compatible)
+                throw new WcsException("Client requested unsupported WCS " +
+                        "version(s): ["+s+"]\nThis WCS supports version(s) "+WCS.CURRENT_VERSION,
+                        WcsException.VERSION_NEGOTIATION_FAILED,null);
+
+            AcceptVersions = tmp;
+        }
+
+
 
 
 
@@ -125,20 +259,23 @@ public class GetCapabilitiesRequest {
         // that partof the request regardless.
         s = kvp.get("Sections");
         if(s!=null){
+            hasSectionsElement = true;
+
             tmp = s.split(",");
             for(String section:tmp){
-                if(!sectionNames.contains(section))
+                if(!sectionNames.contains(section)){
                     throw new WcsException("Client requested unsupported " +
-                            "section name: "+section+"\n This WCS may support the following section names "+sectionNames,
+                            "section name: "+ Scrub.simpleString(section),
                             WcsException.INVALID_PARAMETER_VALUE,"Sections");
+                }
+                Sections.add(section);
             }
-            _Sections = tmp;
 
         }
 
         // Store the updatSequence information in the event that the server
         // supports it at some point...
-        _updateSequence = kvp.get("updateSequence");
+        updateSequence = kvp.get("updateSequence");
 
 
         // Store the AccptedFormats offered by the client in the event that the
@@ -146,7 +283,7 @@ public class GetCapabilitiesRequest {
         s = kvp.get("AcceptFormats");
         if(s!=null){
             tmp = s.split(",");
-            _AcceptFormats = tmp;
+            AcceptFormats = tmp;
 
         }
 
@@ -169,17 +306,17 @@ public class GetCapabilitiesRequest {
         requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
 
 
-        requestElement.setAttribute("service",_service);
+        requestElement.setAttribute("service", WCS.SERVICE);
 
-        if(_updateSequence!=null)
-            requestElement.setAttribute("updateSequence",_updateSequence);
+        if(updateSequence !=null)
+            requestElement.setAttribute("updateSequence", updateSequence);
 
 
 
-        if(_AcceptVersions != null){
+        if(AcceptVersions != null){
             Element av = new Element("AcceptVersions",WCS.OWCS_NS);
             Element ver;
-            for(String v: _AcceptVersions){
+            for(String v: AcceptVersions){
                 ver = new Element("Version",WCS.OWCS_NS);
                 ver.setText(v);
                 av.addContent(ver);
@@ -187,10 +324,10 @@ public class GetCapabilitiesRequest {
             requestElement.addContent(av);
         }
 
-        if(_Sections != null){
+        if(!Sections.isEmpty()){
             Element sections = new Element("Sections",WCS.OWCS_NS);
             Element sec;
-            for(String sv : _Sections){
+            for(String sv : Sections){
                 sec = new Element("Section",WCS.OWCS_NS);
                 sec.setText(sv);
                 sections.addContent(sec);
@@ -198,10 +335,10 @@ public class GetCapabilitiesRequest {
             requestElement.addContent(sections);
         }
 
-        if(_AcceptFormats != null){
+        if(AcceptFormats != null){
             Element af = new Element("AcceptFormats",WCS.OWCS_NS);
             Element fe;
-            for(String f : _AcceptFormats){
+            for(String f : AcceptFormats){
                 fe = new Element("OutputFormat",WCS.OWCS_NS);
                 fe.setText(f);
                 af.addContent(fe);

@@ -24,6 +24,7 @@
 package opendap.threddsHandler;
 
 import opendap.coreServlet.*;
+import opendap.xml.Transformer;
 import org.slf4j.Logger;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -238,31 +239,14 @@ public class StaticCatalogDispatch implements DispatchHandler {
             XdmNode catDoc = datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
 
-            // Build the targetDataset parameter to pass into the XSLT
-            String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<targetDataset>" + targetDataset + "</targetDataset>";
-            ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode targetDatasetNode = datasetToHtmlTransform.build(new StreamSource(reader));
             // Pass the targetDataset parameter to the transform
-            datasetToHtmlTransform.setParameter(new QName("targetDataset"), targetDatasetNode);
+            datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
 
-
-            // Build the remoteCatalog parameter to pass into the XSLT
-            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
-            reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode remoteCatalogNode = datasetToHtmlTransform.build(new StreamSource(reader));
             // Pass the remoteRelativeURL parameter to the transform
-            datasetToHtmlTransform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
+            datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
 
-
-            // Build the remoteHost parameter to pass into the XSLT
-            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
-            reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode remoteHostNode = datasetToHtmlTransform.build(new StreamSource(reader));
             // Pass the remoteRelativeURL parameter to the transform
-            datasetToHtmlTransform.setParameter(new QName("remoteHost"), remoteHostNode);
+            datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
 
 
             // Set up the Http headers.
@@ -270,15 +254,12 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
-            // Send the transformed documet.
+            // Send the transformed document.
             datasetToHtmlTransform.transform(catDoc,response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
 
-            datasetToHtmlTransform.setParameter(new QName("targetDataset"), null);
-            datasetToHtmlTransform.setParameter(new QName("remoteCatalog"), null);
-            datasetToHtmlTransform.setParameter(new QName("remoteHost"), null);
         }
         catch(SaxonApiException sapie){
             if(response.isCommitted()){
@@ -293,6 +274,10 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
+            datasetToHtmlTransform.clearParameter("targetDataset");
+            datasetToHtmlTransform.clearParameter("remoteCatalog");
+            datasetToHtmlTransform.clearParameter("remoteHost");
+
             if(catDocIs != null){
         	    try {
                     catDocIs.close();
@@ -363,32 +348,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Build the catalog document as an XdmNode.
             XdmNode catDoc = catalogToHtmlTransform.build(new StreamSource(catDocIs));
 
-
-            // Build the remoteHost parameter to pass into the XSLT
-            String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<remoteHost>" + remoteHost + "</remoteHost>";
-            ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode remoteHostNode = catalogToHtmlTransform.build(new StreamSource(reader));
-            // Pass the remoteHost parameter
-            catalogToHtmlTransform.setParameter(new QName("remoteHost"), remoteHostNode);
-
-
-            // Build the remoteRelativeURL parameter to pass into the XSLT
-            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<remoteRelativeURL>" + remoteRelativeURL + "</remoteRelativeURL>";
-            reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode remoteRelativeURLNode = catalogToHtmlTransform.build(new StreamSource(reader));
-            // Pass the remoteRelativeURL parameter
-            catalogToHtmlTransform.setParameter(new QName("remoteRelativeURL"), remoteRelativeURLNode);
-
-
-            // Build the remoteRelativeURL parameter to pass into the XSLT
-            nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<remoteCatalog>" + remoteCatalog + "</remoteCatalog>";
-            reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode remoteCatalogNode = catalogToHtmlTransform.build(new StreamSource(reader));
-            // Pass the remoteCatalog parameter
-            catalogToHtmlTransform.setParameter(new QName("remoteCatalog"), remoteCatalogNode);
+            catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
+            catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
+            catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
 
             // Set up the Http headers.
             response.setContentType("text/html");
@@ -400,10 +362,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
-            // Clean up the transform before releasing it.
-            catalogToHtmlTransform.setParameter(new QName("remoteHost"), null);
-            catalogToHtmlTransform.setParameter(new QName("remoteRelativeURL"), null);
-            catalogToHtmlTransform.setParameter(new QName("remoteCatalog"), null);
         }
         catch(SaxonApiException sapie){
             if(response.isCommitted()){
@@ -418,6 +376,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
+            // Clean up the transform before releasing it.
+            catalogToHtmlTransform.clearParameter("remoteHost");
+            catalogToHtmlTransform.clearParameter("remoteRelativeURL");
+            catalogToHtmlTransform.clearParameter("remoteCatalog");
+
             if(catDocIs != null){
         	    try {
                     catDocIs.close();
@@ -500,13 +463,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             log.debug("targetDataset: " + targetDataset);
 
-            // Build a parameter to pass into the XSLT
-            String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-            nodeString += "<targetDataset>" + targetDataset + "</targetDataset>";
-            ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-            XdmNode targetDatasetNode = datasetToHtmlTransform.build(new StreamSource(reader));
             // Pass the query string as a parameter
-            datasetToHtmlTransform.setParameter(new QName("targetDataset"), targetDatasetNode);
+            datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
 
 
             // Set up the http headers.
@@ -520,10 +478,10 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
-            datasetToHtmlTransform.setParameter(new QName("targetDataset"), null);
 
         }
         finally {
+            datasetToHtmlTransform.clearParameter("targetDataset");
             datasetToHtmlTransformLock.unlock();
 
         }

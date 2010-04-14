@@ -254,6 +254,9 @@ public class BES {
         try {
             _clientCheckoutLock.lock();
 
+            // Aquiring this semaphore is what limits the number
+            // of clients that will be in the pool. The number of
+            // semaphores available is set to MaxClients.
             _checkOutFlag.acquire();
 
             if (_clientQueue.size() == 0) {

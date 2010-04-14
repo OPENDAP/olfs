@@ -64,66 +64,6 @@
                     <owcs:DefaultMethod>nearest</owcs:DefaultMethod>
                 </owcs:InterpolationMethods>
             </Field>
-            <Field>
-                <ows:Title>Contributing radar site latitudes</ows:Title>
-                <ows:Abstract>Contributing radar site latitudes</ows:Abstract>
-                <Identifier>site_lat</Identifier>
-                <Definition>
-                    <ows:AnyValue/>
-                </Definition>
-                <NullValue>-32768</NullValue>
-                <owcs:InterpolationMethods>
-                    <owcs:DefaultMethod>nearest</owcs:DefaultMethod>
-                </owcs:InterpolationMethods>
-            </Field>
-            <Field>
-                <ows:Title>Contributing radar site longitudes</ows:Title>
-                <ows:Abstract>Contributing radar site longitudes.</ows:Abstract>
-                <Identifier>site_lon</Identifier>
-                <Definition>
-                    <ows:AnyValue/>
-                </Definition>
-                <NullValue>-32768</NullValue>
-                <owcs:InterpolationMethods>
-                    <owcs:DefaultMethod>nearest</owcs:DefaultMethod>
-                </owcs:InterpolationMethods>
-            </Field>
-            <Field>
-                <ows:Title>Contributing radar site code.</ows:Title>
-                <ows:Abstract>Contributing radar site code.</ows:Abstract>
-                <Identifier>site_code</Identifier>
-                <Definition>
-                    <ows:AnyValue/>
-                </Definition>
-                <NullValue>-32768</NullValue>
-                <owcs:InterpolationMethods>
-                    <owcs:DefaultMethod>nearest</owcs:DefaultMethod>
-                </owcs:InterpolationMethods>
-            </Field>
-            <Field>
-                <ows:Title>Contributing radar site network affiliation code.</ows:Title>
-                <ows:Abstract>Contributing radar site network affiliation code.</ows:Abstract>
-                <Identifier>site_netCode</Identifier>
-                <Definition>
-                    <ows:AnyValue/>
-                </Definition>
-                <NullValue>-32768</NullValue>
-                <owcs:InterpolationMethods>
-                    <owcs:DefaultMethod>nearest</owcs:DefaultMethod>
-                </owcs:InterpolationMethods>
-            </Field>
-            <Field>
-                <ows:Title>RTV processing parameters</ows:Title>
-                <ows:Abstract>Contributing radar site network affiliation code.</ows:Abstract>
-                <Identifier>procParams</Identifier>
-                <Definition>
-                    <ows:AnyValue/>
-                </Definition>
-                <NullValue>-32768</NullValue>
-                <owcs:InterpolationMethods>
-                    <owcs:DefaultMethod>nearest</owcs:DefaultMethod>
-                </owcs:InterpolationMethods>
-            </Field>
         </Range>
         <SupportedCRS>urn:ogc:def:crs:EPSG::4326</SupportedCRS>
         <SupportedFormat>netcdf-cf1.0</SupportedFormat>

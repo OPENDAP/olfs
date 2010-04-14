@@ -146,9 +146,6 @@ public class DispatchServlet extends HttpServlet {
 
     }
 
-    public String getDocsPath() {
-        return "docs/";
-    }
 
 
     /**
@@ -353,27 +350,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    /**
-     * ************************************************************************
-     * <p/>
-     * In this (default) implementation of the getServerName() method we just get
-     * the name of the servlet and pass it back. If something different is
-     * required, override this method when implementing the writeDDS() and
-     * getXDODSServerVersion() methods.
-     * <p/>
-     * This is typically used by the getINFO() method to figure out if there is
-     * information specific to this server residing in the info directory that
-     * needs to be returned to the client as part of the .info response.
-     *
-     * @return A string containing the name of the servlet class that is running.
-     */
-    public String getServerName() {
-
-        // Ascertain the name of this server.
-        String servletName = this.getClass().getName();
-
-        return (servletName);
-    }
 
 
     /**
@@ -410,6 +386,7 @@ public class DispatchServlet extends HttpServlet {
 
 
 
+        log.error("Error log crawlTest");
 
         try {
             try {

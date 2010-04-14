@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <property name="logdir" value="DapIngest"/>
+    
+    <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
+    <property name="InfoFormat" value="%m%n" />
+    
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${FORMAT}</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="InfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/info.log</File>
+        <Append>False</Append>
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>20MB</MaxFileSize>
+        </triggeringPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${InfoFormat}</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="DebugLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/debug.log</File>
+        <Append>False</Append>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>20MB</MaxFileSize>
+        </triggeringPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${FORMAT}</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/error.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${FORMAT}</Pattern>
+        </layout>
+    </appender>
+    
+    <logger name="opendap.metacat.DapIngest" level="all">
+        <appender-ref ref="InfoLog"/>
+    </logger>
+<!--    
+    <logger name="opendap.metacat.DapIngest" level="debug">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
+    <logger name="opendap.metacat.DapIngest" level="info">
+        <appender-ref ref="InfoLog"/>
+    </logger>
+-->    
+    
+
+</configuration>

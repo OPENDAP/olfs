@@ -107,6 +107,11 @@ public class LocalFileCatalog implements Catalog {
             log.error(msg);
             throw new IOException(msg);
         }
+        if(!catalogFile.isFile()){
+            msg = "THREDDS Catalog "+ fname +" is not a regular file.";
+            log.error(msg);
+            throw new IOException(msg);
+        }
 
         if(_useMemoryCache){
             cacheCatalogFileContent();

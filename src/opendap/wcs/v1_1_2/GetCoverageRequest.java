@@ -31,8 +31,6 @@ import org.jdom.output.Format;
 import java.util.HashMap;
 import java.io.OutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * User: ndp
@@ -43,25 +41,75 @@ public class GetCoverageRequest {
 
 
 
-    private String   _service  = "WCS";
-    private String   _version  = "1.1.2";
-    private String   _request  = "GetCoverage";
-    private String        _id  = null;
-    private BoundingBox _bbox  = null;
-    private String     _format = null;
-    private TimeSequence _tseq = null;
-    private RangeSubset    _rs = null;
-
-    private boolean _store = false;
+    private static final String _request = "GetCoverage";
 
 
-    private URI _gridBaseCRS       = null;
-    private URI _gridType          = null;
-    private URI _gridCS            = null;
-    private double[] _gridOrigin   = null;
-    private double[] _gridOffsets  = null;
 
-    private boolean hasUserGridCRS = false;
+    private String          coverageID = null;
+    private BoundingBox     bbox = null;
+    private String          format = null;
+    private GridCRS         gridCRS = null;
+    private TemporalSubset  tseq = null;
+    private RangeSubset     rangeSubset = null;
+    private boolean         store = false;
+
+    public String getCoverageID() {
+        return coverageID;
+    }
+
+    public void setCoverageID(String coverageID) {
+        this.coverageID = coverageID;
+    }
+
+    public BoundingBox getBbox() {
+        return bbox;
+    }
+
+    public void setBbox(BoundingBox bbox) {
+        this.bbox = bbox;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public GridCRS getGridCRS() {
+        return gridCRS;
+    }
+
+    public void setGridCRS(GridCRS gridCRS) {
+        this.gridCRS = gridCRS;
+    }
+
+    public TemporalSubset getTseq() {
+        return tseq;
+    }
+
+    public void setTseq(TemporalSubset tseq) {
+        this.tseq = tseq;
+    }
+
+    public RangeSubset getRangeSubset() {
+        return rangeSubset;
+    }
+
+    public void setRangeSubset(RangeSubset rangeSubset) {
+        this.rangeSubset = rangeSubset;
+    }
+
+    public boolean isStore() {
+        return store;
+    }
+
+    public void setStore(boolean store) {
+        this.store = store;
+    }
+
+
 
 
     public GetCoverageRequest(HashMap<String,String> kvp)
@@ -69,29 +117,11 @@ public class GetCoverageRequest {
 
         String s;
 
-
         // Make sure the client is looking for a WCS service....
-        s = kvp.get("service");
-        if(s==null || !s.equals(_service))
-            throw new WcsException("Only the WCS service (version "+
-                    WCS.VERSIONS+") is supported.",
-                    WcsException.OPERATION_NOT_SUPPORTED,s);
-
-
+        WCS.checkService(kvp.get("service"));
 
         // Make sure the client can accept a supported WCS version...
-        boolean compatible = false;
-        s = kvp.get("version");
-        if(s!=null){
-            if(WCS.VERSIONS.contains(s)){
-                compatible=true;
-                _version = s;
-            }
-        }
-        if(!compatible)
-            throw new WcsException("Client requested unsupported WCS " +
-                    "version(s): "+s,
-                    WcsException.VERSION_NEGOTIATION_FAILED,null);
+        WCS.checkVersion(kvp.get("version"));
 
 
         // Make sure the client is acutally asking for this operation
@@ -113,60 +143,138 @@ public class GetCoverageRequest {
 
         // Get the identifier for the coverage.
         s = kvp.get("identifier");
-        if(s!=null){
-            _id = s;
-        }
-        else {
+        if(s==null){
             throw new WcsException("Request is missing required " +
                     "Coverage 'identifier'.",
                     WcsException.MISSING_PARAMETER_VALUE,
                     "identifier");
-
         }
+        coverageID = s;
 
 
         // Get the BoundingBox for the coverage.
-        _bbox = BoundingBox.fromKVP(kvp);
-        if(_bbox==null){
-            throw new WcsException("Request is missing required " +
-                    "BoundingBox key value pairs. This is used to identify " +
-                    "what data will be returned.",
-                    WcsException.MISSING_PARAMETER_VALUE,
-                    "BoundingBox");
-
-        }
+        bbox = new BoundingBox(kvp);
 
         // Get the format.
         s = kvp.get("format");
-        if(s!=null){
-            _format = s;
-        }
-        else {
+        if(s==null){
             throw new WcsException("Request is missing required " +
                     "format key. This is used to specify what the " +
                     "retuned format of the data response should be.",
                     WcsException.MISSING_PARAMETER_VALUE,
                     "format");
-
         }
+        format = s;
 
 
-        // Get the optional TimeSequence selection
-        _tseq = TimeSequence.fromKVP(kvp);
+        // Get the optional TemporalSubset selection
+        if(kvp.containsKey("TimeSequence"))
+            tseq = new TemporalSubset(kvp);
 
 
-        // Get the optional store imperative
-        _rs = RangeSubset.fromKVP(kvp);
+        // Get the optional RangeSubset subset
+        rangeSubset = new RangeSubset(kvp);
 
 
         // Get the optional store imperative
         s = kvp.get("store");
         if(s!=null){
-            _store = Boolean.parseBoolean(s);
+            store = Boolean.parseBoolean(s);
         }
 
 
-        ingestUserCRS(kvp);
+        if(GridCRS.hasGridCRS(kvp))
+            gridCRS = new GridCRS(kvp);
+
+
+    }
+
+
+    public GetCoverageRequest(Element getCoverageRequestElem)
+            throws WcsException {
+
+
+        Element e;
+        String s;
+
+
+        // Make sure we got the correct request object.
+        WCS.checkNamespace(getCoverageRequestElem,"GetCoverage",WCS.WCS_NS);
+
+        // Make sure the client is looking for a WCS service....
+        WCS.checkService(getCoverageRequestElem.getAttributeValue("service"));
+
+        // Make sure the client can accept a supported WCS version...
+        WCS.checkVersion(getCoverageRequestElem.getAttributeValue("version"));
+
+
+
+        // Get the identifier for the coverage.
+        e = getCoverageRequestElem.getChild("Identifier",WCS.OWS_NS);
+        if(e==null ){
+            throw new WcsException("Missing required ows:Identifier element. ",
+                    WcsException.MISSING_PARAMETER_VALUE,
+                    "ows:Identifier");
+        }
+        coverageID =e.getText();
+
+        ingestDomainSubset(getCoverageRequestElem.getChild("DomainSubset",WCS.WCS_NS));
+
+        
+        e = getCoverageRequestElem.getChild("RangeSubset",WCS.WCS_NS);
+        if(e!=null)
+            rangeSubset = new RangeSubset(e);
+
+
+
+        // Get the Output for the coverage.
+        Element output  = getCoverageRequestElem.getChild("Output",WCS.WCS_NS);
+        if(output==null ){
+            throw new WcsException("Missing required ows:Output element. ",
+                    WcsException.MISSING_PARAMETER_VALUE,
+                    "wcs:Output");
+        }
+        s=output.getAttributeValue("format");
+        if(s==null){
+            throw new WcsException("The wcs:Output element is missing the required " +
+                    "format attribute. This is used to specify what the " +
+                    "returned format of the data response should be.",
+                    WcsException.MISSING_PARAMETER_VALUE,
+                    "wcs:Ouput@format");
+        }
+        format = s;
+
+
+        e = output.getChild("GridCRS",WCS.WCS_NS);
+        if(e!=null ){
+            gridCRS = new GridCRS(e);
+
+        }
+
+
+        s=output.getAttributeValue("store");
+        store = false;
+        if(s!=null){
+
+            if(s.equalsIgnoreCase("true")){
+                store =true;
+            }
+            else if(s.equalsIgnoreCase("false")){
+                store = false;
+            }
+            else {
+                throw new WcsException("The wcs:Output@store attribute has an incorrect value. " +
+                        "It may be 'true' or 'false'. " ,
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "wcs:Ouput@store");
+            }
+
+        }
+
+
+
+
+
 
 
     }
@@ -174,103 +282,26 @@ public class GetCoverageRequest {
 
 
 
-    public void ingestUserCRS(HashMap<String,String> kvp) throws WcsException{
-
-        String s, tmp[];
+    public void ingestDomainSubset(Element domainSubset) throws WcsException {
 
 
-        // Get the optional GridBaseCRS
-        s = kvp.get("GridBaseCRS");
-        if(s!=null){
+        WCS.checkNamespace(domainSubset,"DomainSubset", WCS.WCS_NS);
 
-            try {
-                _gridBaseCRS = new URI(s);
-                hasUserGridCRS = true;
-            }
-            catch(URISyntaxException e){
-                throw new WcsException(e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "GridBaseCRS");
-            }
-
-        }
-
-        // Get the optional GridType
-        s = kvp.get("GridType");
-        if(s!=null){
-            try {
-                _gridType = new URI(s);
-                hasUserGridCRS = true;
-            }
-            catch(URISyntaxException e){
-                throw new WcsException(e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "GridType");
-            }
-        }
+        // Get the BoundingBox for the coverage.
+        Element e = domainSubset.getChild("BoundingBox",WCS.OWS_NS);
+        bbox = new BoundingBox(e);
 
 
-        // Get the optional GridCS
-        s = kvp.get("GridCS");
-        if(s!=null){
-            try {
-                _gridCS = new URI(s);
-                hasUserGridCRS = true;
-            }
-            catch(URISyntaxException e){
-                throw new WcsException(e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "GridCS");
-            }
-        }
-
-
-        // Get the optional GridOrigin
-        s = kvp.get("GridOrigin");
-        if(s!=null){
-
-            tmp = s.split(",");
-
-            _gridOrigin = new double[tmp.length];
-
-            try {
-                for(int i=0; i<tmp.length; i++){
-                    _gridOrigin[i] = Double.parseDouble(tmp[i]);
-                }
-                hasUserGridCRS = true;
-            }
-            catch(NumberFormatException e){
-                throw new WcsException(e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "GridOrigin");
-            }
-
-
-        }
-
-
-        // Get the optional GridOffsets
-        s = kvp.get("GridOffsets");
-        if(s!=null){
-            tmp = s.split(",");
-
-            _gridOffsets = new double[tmp.length];
-
-            try {
-                for(int i=0; i<tmp.length; i++){
-                    _gridOffsets[i] = Double.parseDouble(tmp[i]);
-                }
-                hasUserGridCRS = true;
-            }
-            catch(NumberFormatException e){
-                throw new WcsException(e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "GridOffsets");
-            }
-
-        }
+        // Get the optional TemporalSubset selection
+        // Get the BoundingBox for the coverage.
+        e = domainSubset.getChild("TemporalSubset",WCS.OWS_NS);
+        if(e!=null)
+            tseq = new TemporalSubset(e);
+                  
 
     }
+
+
 
 
 
@@ -329,20 +360,20 @@ public class GetCoverageRequest {
         requestElement.setAttribute("schemaLocation", schemaLocation,WCS.XSI_NS);
 
 
-        requestElement.setAttribute("service",_service);
-        requestElement.setAttribute("version",_version);
+        requestElement.setAttribute("service",WCS.SERVICE);
+        requestElement.setAttribute("version",WCS.CURRENT_VERSION);
 
         Element e = new Element("Identifier",WCS.WCS_NS);
-        e.setText(_id);
+        e.setText(coverageID);
         requestElement.addContent(e);
 
         requestElement.addContent(getDomainSubsetElement());
 
-        if(_rs!=null){
-            requestElement.addContent(_rs.getRangeSubsetElement());
+        if(rangeSubset !=null){
+            requestElement.addContent(rangeSubset.getElement());
         }
 
-        requestElement.addContent(getOutputTypeElement());
+        requestElement.addContent(getOutputElement());
 
         return requestElement;
 
@@ -355,12 +386,12 @@ public class GetCoverageRequest {
 
         Element domainSubset = new Element("DomainSubset",WCS.WCS_NS);
 
-        Element e = _bbox.getBoundingBoxElement();
+        Element e = bbox.getBoundingBoxElement();
 
         domainSubset.addContent(e);
 
-        if(_tseq!=null){
-            e = _tseq.getTemporalSubsetElement();
+        if(tseq !=null){
+            e = tseq.getTemporalSubsetElement();
             domainSubset.addContent(e);
         }
 
@@ -371,94 +402,19 @@ public class GetCoverageRequest {
 
 
 
-    public Element getOutputTypeElement(){
-        Element ot = new Element("OutputType",WCS.WCS_NS);
-        ot.setAttribute("format",_format);
+    public Element getOutputElement(){
+        Element ot = new Element("Output",WCS.WCS_NS);
+        ot.setAttribute("format", format);
 
-        if(_store)
-            ot.setAttribute("store",_store+"");
+        if(store)
+            ot.setAttribute("store", store +"");
 
-        if(hasUserGridCRS)
-            ot.addContent(getGridCRSElement());
+        if(gridCRS != null)
+            ot.addContent(gridCRS.getElement());
 
 
         return ot;
     }
-
-
-
-
-
-
-    public Element getGridCRSElement(){
-
-
-        if(!hasUserGridCRS)
-            return null;
-
-        Element crs = new Element("GridCRS",WCS.WCS_NS);
-        Element e;
-
-        if(_gridBaseCRS!=null){
-            e = new Element("GridBaseCRS",WCS.WCS_NS);
-            e.setText(_gridBaseCRS.toString());
-            crs.addContent(e);
-        }
-
-
-        if(_gridType!=null){
-            e = new Element("GridType",WCS.WCS_NS);
-            e.setText(_gridType.toString());
-            crs.addContent(e);
-        }
-
-
-        if(_gridOrigin!=null){
-            e = new Element("GridOrigin",WCS.WCS_NS);
-            String txt  = "";
-
-            for (double originCoordinate : _gridOrigin) {
-                txt += originCoordinate + "  ";
-            }
-
-            e.setText(txt);
-            crs.addContent(e);
-
-        }
-
-
-        if(_gridOffsets!=null){
-            e = new Element("GridOffsets",WCS.WCS_NS);
-            String txt  = "";
-
-            for (double offsetCoordinate : _gridOffsets) {
-                txt += offsetCoordinate + "  ";
-            }
-
-            e.setText(txt);
-            crs.addContent(e);
-
-        }
-
-
-
-        if(_gridCS!=null){
-            e = new Element("GridCS",WCS.WCS_NS);
-            e.setText(_gridCS.toString());
-            crs.addContent(e);
-        }
-
-
-
-        return crs;
-
-    }
-
-
-
-
-
-
 
 
 }
