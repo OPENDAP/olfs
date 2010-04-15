@@ -96,8 +96,6 @@
     -->
     <property name="build.sysclasspath" value="ignore"/>
 
-
-
     <!-- ********************************************* -->
 
     <!-- Target to create the build directories -->
@@ -107,7 +105,6 @@
     <target name="noop" description="Do Nothing Target">
         <echo level="info" message="no-op target in ${ant.file}"/>
     </target>
-
 
     <target name="show" description="Show build settings.">
 
@@ -144,8 +141,6 @@
     <!-- ################################################################# -->
     <!--                      Project Settings                             -->
     <!-- ................................................................. -->
-
-
 
     <!-- Project directories -->
     <property name="src.dir" location="src"/>
@@ -517,7 +512,7 @@
         
     </target>
     
-    <target name="BuildEMLRetreiver"
+    <target name="BuildEMLRetriever"
         depends="clean,compileEMLRetriever"
         description="">
         
