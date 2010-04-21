@@ -1028,7 +1028,7 @@ public class IRISailRepository extends SailRepository {
                 toAdd.add(st);
                 Added.add(st);
                 con.add(st, context);// add st with incremented number
-                log.debug("Increment added new tatement stToAdd= "
+                //log.debug("Increment added new tatement stToAdd= "
                         + st.toString());
 
             } else {
@@ -1036,7 +1036,7 @@ public class IRISailRepository extends SailRepository {
                 Added.add(st);
                 con.add(st, context);// add st without increment (not a
                                         // number)
-                log.debug("Increment added original tatement st= "
+                //log.debug("Increment added original tatement st= "
                         + st.toString());
             }
 
