@@ -1029,7 +1029,7 @@ public class IRISailRepository extends SailRepository {
                 Added.add(st);
                 con.add(st, context);// add st with incremented number
                 //log.debug("Increment added new tatement stToAdd= "
-                        + st.toString());
+                //        + st.toString());
 
             } else {
                 toAdd.add(st);
@@ -1037,7 +1037,7 @@ public class IRISailRepository extends SailRepository {
                 con.add(st, context);// add st without increment (not a
                                         // number)
                 //log.debug("Increment added original tatement st= "
-                        + st.toString());
+                //        + st.toString());
             }
 
         } // while (graphResult.hasNext())
