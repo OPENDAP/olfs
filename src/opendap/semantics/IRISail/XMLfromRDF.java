@@ -93,10 +93,10 @@ public class XMLfromRDF {
 			result0 = tupleQuery.evaluate();
 			//log.debug("Qresult: "+result0.hasNext());
 			List<String> bindingNames = result0.getBindingNames();
-			//log.debug(bindingNames.toString());
+			//log.debug(bindingNames.probeServletContext());
 			while ( result0.hasNext()) {
 				BindingSet bindingSet = (BindingSet) result0.next();
-				//log.debug(bindingSet.toString());
+				//log.debug(bindingSet.probeServletContext());
 										
 				if (bindingSet.getValue("topnameprop") !=null && bindingSet.getValue("obj") != null 
 						&& bindingSet.getValue("valueclass") != null){
@@ -169,10 +169,10 @@ public class XMLfromRDF {
             result0 = tupleQuery.evaluate();
             //log.debug("Qresult: "+result0.hasNext());
             List<String> bindingNames = result0.getBindingNames();
-            //log.debug(bindingNames.toString());
+            //log.debug(bindingNames.probeServletContext());
             while ( result0.hasNext()) {
                 BindingSet bindingSet = (BindingSet) result0.next();
-                //log.debug(bindingSet.toString());
+                //log.debug(bindingSet.probeServletContext());
                                         
                 if (bindingSet.getValue("obj") != null 
                         && bindingSet.getValue("valueclass") != null){
@@ -213,7 +213,7 @@ public class XMLfromRDF {
                     }
                                 
                     Element chd1 = new Element(parent,ns); //duplicated as the root
-                    //chd1.setText(valueOfobj.toString());
+                    //chd1.setText(valueOfobj.probeServletContext());
                     root.addContent(chd1);
                     this.addChildren(queryString1, chd1, con,doc);
                 } //if (bindingSet.getValue("topnameprop") 
@@ -246,13 +246,13 @@ public class XMLfromRDF {
 			result = tupleQuery.evaluate();
 			//log.debug("Qresult: "+result.hasNext());
 			List<String> bindingNames = result.getBindingNames();
-			//log.debug(bindingNames.toString());
+			//log.debug(bindingNames.probeServletContext());
 			
 			SortedMap<String,BindingSet >   mapOrderObj   =   new TreeMap<String, BindingSet>();
 			
 			while ( result.hasNext()) {
 				BindingSet bindingSet = (BindingSet) result.next();
-				//log.debug("In try: "+bindingSet.toString());
+				//log.debug("In try: "+bindingSet.probeServletContext());
 				Value valueOfnameprop;
 				Value valueOfobj;
 				Value valueOfvalueclass;
@@ -292,7 +292,7 @@ public class XMLfromRDF {
 						if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
 							
 							int pl = valueOfnameprop.toString().lastIndexOf("#");
-							//log.debug("H4valueOfobjtype!=null valueOfnameprop3= "+valueOfnameprop.toString());
+							//log.debug("H4valueOfobjtype!=null valueOfnameprop3= "+valueOfnameprop.probeServletContext());
 							//log.debug("H4valueOfobjtype!=null pl= "+pl);
 							ns = valueOfnameprop.toString().substring(0,pl);
 							parent = valueOfnameprop.toString().substring(pl+1);
@@ -316,7 +316,7 @@ public class XMLfromRDF {
 							if(formtype.getLocalName().equalsIgnoreCase("qualified")){
 							
 							Namespace attributeNS = Namespace.getNamespace("attributeNS",urinameprop.getNamespace());
-							//log.debug(formtype.toString());
+							//log.debug(formtype.probeServletContext());
 							
 							prt.setAttribute(urinameprop.getLocalName(),valueOfobj.stringValue(),attributeNS);
 							}
@@ -333,7 +333,7 @@ public class XMLfromRDF {
 							//log.debug(valueOfobjtype.stringValue());
 							Element chd; 
 							if (valueOforder != null){//order matters
-								//String mapkey = valueOforder.stringValue()+"-"+valueOfobj.toString(); //key=0001-http
+								//String mapkey = valueOforder.stringValue()+"-"+valueOfobj.probeServletContext(); //key=0001-http
 								
 								String mapkeydigit = null;
                                 if (valueOforder.stringValue().length() == 1) mapkeydigit = "00" +valueOforder.stringValue();
@@ -371,7 +371,7 @@ public class XMLfromRDF {
 						if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
 							
 							int pl = valueOfnameprop.toString().lastIndexOf("#");
-							//log.debug("H4valueOfobjtype=null valueOfnameprop3= "+valueOfnameprop.toString());
+							//log.debug("H4valueOfobjtype=null valueOfnameprop3= "+valueOfnameprop.probeServletContext());
 							//log.debug("H4valueOfobjtype=null pl= "+pl);
 							ns = valueOfnameprop.toString().substring(0,pl);
 							parent = valueOfnameprop.toString().substring(pl+1);

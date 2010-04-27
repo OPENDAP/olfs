@@ -1087,10 +1087,10 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         result = tupleQuery.evaluate();
         log.debug("Qresult: " + result.hasNext());
         List<String> bindingNames = result.getBindingNames();
-        //log.debug(bindingNames.toString());
+        //log.debug(bindingNames.probeServletContext());
         while (result.hasNext()) {
             BindingSet bindingSet = (BindingSet) result.next();
-            // log.debug(bindingSet.toString());
+            // log.debug(bindingSet.probeServletContext());
             Vector<String> coverageURL = new Vector<String>();
 
             if (bindingSet.getValue("coverageid") != null && bindingSet.getValue("coverageurl") != null) {
