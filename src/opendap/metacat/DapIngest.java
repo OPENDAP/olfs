@@ -25,7 +25,7 @@ package opendap.metacat;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
-import java.util.Date;
+//import java.util.Date;
 import java.util.Vector;
 import java.util.Enumeration;
 
@@ -63,7 +63,7 @@ public class DapIngest {
     /* private ConcurrentHashMap<String, Integer> catalogsVisited;*/
     private int catalogsVisited;
     private int DDXsVisited;
-    private Date date;
+    /*private Date date;*/
     
     private boolean verbose = false;
     
@@ -96,14 +96,14 @@ public class DapIngest {
 
     	catalogsVisited = 0;
     	DDXsVisited = 0;
-    	date = new Date();
+    	/*date = new Date();*/
     	
     	try {
-    		DDXSource = new DDXRetriever(log, useDDXCache, useDDXCache, cacheNamePrefix);
+    		DDXSource = new DDXRetriever(/*log,*/ useDDXCache, useDDXCache, cacheNamePrefix);
     		
 			/*transformer = new Transformer(ddx2emlPath);*/
 			
-    		EMLSource = new EMLRetriever(log, useEMLCache, useEMLCache, cacheNamePrefix);
+    		EMLSource = new EMLRetriever(/*log,*/ useEMLCache, useEMLCache, cacheNamePrefix);
     		
     		/*
 			if (useEMLCache)

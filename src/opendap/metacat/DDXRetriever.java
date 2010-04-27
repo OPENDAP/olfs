@@ -40,8 +40,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /** This class handles the task of getting a DDX given its URL. It will
  *  test the returned document to see if it is well-formed and it will
@@ -60,18 +60,18 @@ public class DDXRetriever {
     // The DDXCache that holds both the DDXs LMT and the XML/text
     private ResponseCache DDXCache;
     
-    private static Logger log;
+    /*private static Logger log;*/
 
 	public DDXRetriever() throws Exception {
-		this(LoggerFactory.getLogger(DapIngest.class), true, true, "");
+		this(/*LoggerFactory.getLogger(DapIngest.class),*/ true, true, "");
 	}
-	
+	/*
 	public DDXRetriever(boolean useDDXsVisited, boolean saveDDXs, String namePrefix) throws Exception {
 		this(LoggerFactory.getLogger(DapIngest.class), useDDXsVisited, saveDDXs, namePrefix);
 	}
-
-	public DDXRetriever(Logger log, boolean useDDXsVisited, boolean saveDDXs, String namePrefix) throws Exception {
-		DDXRetriever.log = log;
+	*/
+	public DDXRetriever(/*Logger log,*/ boolean useDDXsVisited, boolean saveDDXs, String namePrefix) throws Exception {
+		/*DDXRetriever.log = log;*/
 		this.useDDXsVisited = useDDXsVisited;
 		this.saveDDXs = saveDDXs;
 		
@@ -186,7 +186,7 @@ public class DDXRetriever {
 			org.jdom.Document ddxDoc = sb.build(new ByteArrayInputStream(ddxString.getBytes()));
 		} 
 		catch (Exception e) {
-			log.error("Exception while testing DDX: " + e.getLocalizedMessage());
+			/*log.error("Exception while testing DDX: " + e.getLocalizedMessage());*/
 			return false;
 		}
 		return true;
@@ -230,69 +230,62 @@ public class DDXRetriever {
 	 *  @see getCache()
 	 * @param DDXURL Get the DDX referenced by this URL
 	 * @return The DDX document, in a String
+	 * @throws Exception 
 	 */
-	public String getDDXDoc(String DDXURL) {
+	public String getDDXDoc(String DDXURL) throws Exception {
 		String ddx = null;
-		try {
-			URL url = new URL(DDXURL);
-			URLConnection connection = url.openConnection();
 
-			if (useDDXsVisited)
-				connection.setIfModifiedSince(DDXCache.getLastVisited(DDXURL));
-			
-			// Here's where we'd poke in a header to ask for the DAP3.2 DDX
-			
-			connection.connect();
+		URL url = new URL(DDXURL);
+		URLConnection connection = url.openConnection();
 
-			// Cast to a HttpURLConnection
-			if (connection instanceof HttpURLConnection) {
-				HttpURLConnection httpConnection = (HttpURLConnection) connection;
-				int code = httpConnection.getResponseCode();
+		if (useDDXsVisited)
+			connection.setIfModifiedSince(DDXCache.getLastVisited(DDXURL));
 
-				// If we have something, process. Since a conditional get was
-				// used, the response might be empty (code == 304) and nothing
-				// should be done in that case
-				switch (code) {
-				case 200:
-					ddx = convertStreamToString(httpConnection.getInputStream());
-					// Update the last visited and document caches 
-					if (saveDDXs) {
-						Date date = new Date();
-						DDXCache.setLastVisited(DDXURL, date.getTime());
-						DDXCache.setCachedResponse(DDXURL, ddx);
-						log.debug("Adding/Updating entry for " + DDXURL);
-					}
-					break;
-					
-				case 304:
-					if (useDDXsVisited)
-						ddx = DDXCache.getCachedResponse(DDXURL);
-					// Update the last visited cache to now
-					if (saveDDXs) {
-						Date date = new Date();
-						DDXCache.setLastVisited(DDXURL, date.getTime());
-						log.debug("Updating last visited entry for " + DDXURL);
-					}
-					break;
-					
-				default:
-					throw new IOException("Expected a 200 or 304 HTTP return code. Got: " + new Integer(code).toString());
+		// Here's where we'd poke in a header to ask for the DAP3.2 DDX
+
+		connection.connect();
+
+		// Cast to a HttpURLConnection
+		if (connection instanceof HttpURLConnection) {
+			HttpURLConnection httpConnection = (HttpURLConnection) connection;
+			int code = httpConnection.getResponseCode();
+
+			// If we have something, process. Since a conditional get was
+			// used, the response might be empty (code == 304) and nothing
+			// should be done in that case
+			switch (code) {
+			case 200:
+				ddx = convertStreamToString(httpConnection.getInputStream());
+				// Update the last visited and document caches
+				if (saveDDXs) {
+					Date date = new Date();
+					DDXCache.setLastVisited(DDXURL, date.getTime());
+					DDXCache.setCachedResponse(DDXURL, ddx);
+					/* log.debug("Adding/Updating entry for " + DDXURL); */
 				}
-			} 
-			else {
-				throw new MalformedURLException("Expected a HTTP URL ("
-						+ DDXURL + ").");
+				break;
+
+			case 304:
+				if (useDDXsVisited)
+					ddx = DDXCache.getCachedResponse(DDXURL);
+				// Update the last visited cache to now
+				if (saveDDXs) {
+					Date date = new Date();
+					DDXCache.setLastVisited(DDXURL, date.getTime());
+					/* log.debug("Updating last visited entry for " + DDXURL); */
+				}
+				break;
+
+			default:
+				throw new IOException(
+						"Expected a 200 or 304 HTTP return code. Got: "
+								+ new Integer(code).toString());
 			}
+		} else {
+			throw new MalformedURLException("Expected a HTTP URL (" + DDXURL
+					+ ").");
 		}
-		catch (MalformedURLException e) {
-			log.error("Problem with XML Document URL: " + DDXURL
-					+ " Caught a MalformedURLException.  Message: "
-					+ e.getMessage());
-		} catch (IOException e) {
-			log.error("Problem retrieving XML Document: " + DDXURL
-					+ " Caught a IOException.  Message: " + e.getMessage());
-		}
-		
+
 		return ddx;
 	}
 	

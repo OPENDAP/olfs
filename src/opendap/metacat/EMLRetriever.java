@@ -28,7 +28,7 @@ import java.io.ByteArrayOutputStream;
 /*import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;*/
-import java.io.UnsupportedEncodingException;
+//import java.io.UnsupportedEncodingException;
 /*import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,7 +38,7 @@ import java.util.Enumeration;
 
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.s9api.SaxonApiException;
+//import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import opendap.xml.Transformer;
@@ -49,8 +49,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the task of getting an EML given a DDX document. It can
@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EMLRetriever {
 
-	final static String ddx2emlPath = "ddx2eml-2.0.xsl";
+	final static String ddx2emlPath = "ddx2eml-2.1.1.xsl";
 	
 	// The EMLCache that holds both the DDXs LMT and the EML XML/text
 	private ResponseCache EMLCache;
@@ -70,21 +70,24 @@ public class EMLRetriever {
     // This is the transformer that takes the DDX and returns EML
     private Transformer transformer;
 
-    private static Logger log;
+    private boolean verbose = false;
+    
+    /*private static Logger log;*/
 
 	public EMLRetriever() throws Exception {
-		this(LoggerFactory.getLogger(DapIngest.class), true, true, "");
+		this(/*LoggerFactory.getLogger(DapIngest.class), */true, true, "");
 	}
 
+	/*
 	public EMLRetriever(boolean useCache, boolean saveCache,
 			String namePrefix) throws Exception {
 		this(LoggerFactory.getLogger(DapIngest.class), useCache,
 				saveCache, namePrefix);
 	}
-
-	public EMLRetriever(Logger log, boolean useCache, boolean saveCache,
+	 */
+	public EMLRetriever(/*Logger log, */boolean useCache, boolean saveCache,
 			String namePrefix) throws Exception {
-		EMLRetriever.log = log;
+		/*EMLRetriever.log = log;*/
 
 		transformer = new Transformer(ddx2emlPath);
 		
@@ -122,6 +125,7 @@ public class EMLRetriever {
 		options.addOption("r", "read-cache", false, "Read EML from the cache");
 		options.addOption("n", "no-cache", false, "Do not cache EMLs. Ignored with -r or -p");
 		options.addOption("p", "print-cached", false, "Print all of the cached EMLs");
+		options.addOption("v", "verbose", false, "Wordy output");
 
 		options.addOption(OptionBuilder.withLongOpt("cache-name")
 						.withDescription( "Use this to set a prefix for the cache name.")
@@ -141,25 +145,49 @@ public class EMLRetriever {
 			CommandLine line = parser.parse(options, args);
 
 			String ddxURL = line.getOptionValue("ddx-url");
-			System.out.println("DDX URL: " + ddxURL);
 
 			boolean useCache = !line.hasOption("n");
 			String cacheNamePrefix = line.getOptionValue("cache-name");
 
 			retriever = new EMLRetriever(useCache, useCache, cacheNamePrefix);
 
+			retriever.verbose = line.hasOption("v");
+			if (retriever.verbose) {
+				System.out.println("DDX URL: " + ddxURL);
+			}
+			
 			if (line.hasOption("r")) {
-				System.out.println("EML: " + retriever.getCachedEMLDoc(ddxURL));
+				if (retriever.verbose) {
+					System.out.println("EML: "
+							+ retriever.getCachedEMLDoc(ddxURL));
+				} else {
+					System.out.println(retriever.getCachedEMLDoc(ddxURL));
+				}
 			} else if (line.hasOption("p")) {
-				Enumeration<String> emls = retriever.EMLCache.getLastVisitedKeys();
+				Enumeration<String> emls = retriever.EMLCache
+						.getLastVisitedKeys();
 				while (emls.hasMoreElements()) {
 					ddxURL = emls.nextElement();
-					System.out.println("DDX URL: " + ddxURL);
-					System.out.println("EML: " + retriever.EMLCache.getCachedResponse(ddxURL));
+					if (retriever.verbose) {
+						System.out.println("DDX URL: " + ddxURL);
+						System.out.println("EML: "
+								+ retriever.EMLCache.getCachedResponse(ddxURL));
+					} else {
+						System.out.println(retriever.EMLCache
+								.getCachedResponse(ddxURL));
+					}
 				}
 			} else {
-				DDXRetriever ddxSource = new DDXRetriever(true, true, cacheNamePrefix);
-				System.out.println("EML: " + retriever.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
+				DDXRetriever ddxSource = new DDXRetriever(true, true,
+						cacheNamePrefix);
+				if (retriever.verbose) {
+					System.out.println("EML: "
+							+ retriever.getEML(ddxURL, ddxSource
+									.getDDXDoc(ddxURL)));
+				} else {
+					System.out.println(retriever.getEML(ddxURL, ddxSource
+							.getDDXDoc(ddxURL)));
+				}
 			}
 
 			// save the cache if neither the 'no-cache' nor read-cache options
@@ -208,7 +236,7 @@ public class EMLRetriever {
 			org.jdom.Document emlDoc = sb.build(new ByteArrayInputStream(emlString.getBytes()));
 		}
 		catch (Exception e) {
-			log.error("Exception while testing EML: " + e.getLocalizedMessage());
+			/*log.error("Exception while testing EML: " + e.getLocalizedMessage());*/
 			return false;
 		}
 		return true;
@@ -222,34 +250,46 @@ public class EMLRetriever {
 	 * @param DDXURL Use this as the key when caching the EML
 	 * @param ddxString Build EML from this document
 	 * @return
-	 * @throws SaxonApiException If the DDX could not be transformed into EML
-	 * using the XSLT transform
-	 * @throws UnsupportedEncodingException Some issue building the Xdm Node
-	 * object needed for the transform.
+	 * @throws Exception 
 	 */
-	public String getEML(String DDXURL, String ddxString) throws SaxonApiException, UnsupportedEncodingException {
+	public String getEML(String DDXURL, String ddxString) throws Exception {
 		// Get the EML document
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		XdmNode ddxXdm = null;
 		try {
 			ddxXdm = transformer.build(new StreamSource(new ByteArrayInputStream(ddxString.getBytes("UTF-8"))));
-		}
-		catch (SaxonApiException e) {
-			log.error("Problem building XdmNode. Message: " + e.getMessage());
-			throw e;
-		} catch (UnsupportedEncodingException e) {
-			log.error("Problem building XdmNode. Message: " + e.getMessage());
-			throw e;
-		}
-		
-		try {
+			
+			// '.' finds the start of the '.ddx. extension
+			String dataset_url = DDXURL.substring(0, DDXURL.lastIndexOf('.'));
+			// '/' + 1 finds the start of the filename
+			String filename = dataset_url.substring(DDXURL.lastIndexOf('/') + 1);
+				
+			// Set parameters
+			transformer.setParameter("filename", filename);
+			transformer.setParameter("dataset_url", dataset_url);
+
 			transformer.transform(ddxXdm, os);
 		} 
+		/*
 		catch (SaxonApiException e) {
 			log.error("Problem with XSLT transform. Message: " + e.getMessage());
 			throw e;
 		}
-
+		catch (UnsupportedEncodingException e) {
+			log.error("Problem building XdmNode. Message: " + e.getMessage());
+			throw e;
+		}
+		*/
+		catch (Exception e) {
+			/*log.error("Problem with the URL: " + e.getMessage());*/
+			throw e;
+		}
+		finally {
+			// Clear parameters
+			transformer.clearParameter("filename");
+			transformer.clearParameter("dataset_url");			
+		}
+		
 		String eml = os.toString();
 		
 		if (EMLCache != null)
