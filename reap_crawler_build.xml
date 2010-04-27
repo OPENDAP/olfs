@@ -146,6 +146,7 @@
     <property name="src.dir" location="src"/>
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
+	
     <property name="resources.dir" location="resources"/>
     <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
     <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
@@ -154,7 +155,6 @@
     <property name="THREDDSResources.dir" location="${resources.dir}/THREDDS"/>
     <property name="WCS.dir" location="${resources.dir}/WCS"/>
 
-
     <!-- Build Directories -->
     <property name="build.dir" location="build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
@@ -162,14 +162,13 @@
     <property name="build.dist" location="${build.dir}/dist"/>
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
-
+    <property name="build.libexec" location="${build.dir}/libexec"/>
 
     <!-- Libraries -->
     <property name="junit.lib"   value="junit-4.4.jar"/>
     <property name="jdom.lib"    value="jdom-1.1.jar"/>
     <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
     <property name="echo.lib"    value="echosoap.jar"/>
-
 
     <property name="slf4j.lib"            value="slf4j-api-1.5.8.jar"/>
     <property name="logback-core.lib"     value="logback-core-0.9.16.jar"/>
@@ -235,7 +234,8 @@
         <mkdir dir="${build.doc}"/>
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.lib}"/>
-        <mkdir dir="${build.run}"/>
+    	<mkdir dir="${build.run}"/>
+    	<mkdir dir="${build.libexec}"/>
 
         <filter token="HyraxVersion" value="${VERSION}"/>
 
@@ -500,7 +500,7 @@
     <target  name="runEMLRetriever" depends="compileEMLRetriever">
         
         <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-        <copy file="${resources.dir}/metacat/ddx2eml-2.0.xsl" tofile="${build.run}/ddx2eml-2.0.xsl"/>
+        <copy file="${resources.dir}/metacat/ddx2eml-2.1.1.xsl" tofile="${build.run}/ddx2eml-2.1.1.xsl"/>
         
         <java classname="opendap.metacat.EMLRetriever"
             fork="true"
@@ -513,17 +513,30 @@
     </target>
     
     <target name="BuildEMLRetriever"
-        depends="clean,compileEMLRetriever"
+        depends="compileEMLRetriever"
         description="">
         
-        <jar destfile="${build.dist}/EMLRetreiver.jar"
+        <jar destfile="${build.libexec}/EMLRetriever.jar"
             manifest="${resources.dir}/META-INF/EMLRetriever.MANIFEST.MF">
             <fileset dir="${build.classes}">
                 <include name="opendap/**/*.class"/>
-                <!-- <include name="opendap/namespaces/*.class"/>
-                <include name="opendap/semantics/ResponseCache.class"/> -->
             </fileset>
         </jar>
+    	
+        <copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.libexec}/"/>
+        <copy file="${resources.dir}/metacat/ddx2eml-2.1.1.xsl" todir="${build.run}/"/>
+        <copy file="${resources.dir}/metacat/eml_retriever.sh" todir="${build.run}/"/>
+
+    	<copy file="${lib.dir}/slf4j-api-1.5.8.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/logback-classic-0.9.16.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/logback-core-0.9.16.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/apache-commons-cli-1.0.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/apache-commons-httpclient-3.1.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/jdom-1.1.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/saxon-9.1.0.5-jdom.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/saxon-9.1.0.5-s9api.jar" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/saxon-9.1.0.5.jar" todir="${build.lib}/"/>
+ 
     </target>
    
 </project>
