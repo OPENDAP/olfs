@@ -291,7 +291,11 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         _configurationForm   = _prefix + "/config";
         _xmlEchoPath = _prefix + "/echoXML";
         _coveragesPath = _prefix + _coveragesTerminus;
-        _describeCoveragePath = _prefix + "/describeCoverage";
+
+        if(_prefix.equals(""))
+            _describeCoveragePath = "describeCoverage";
+        else
+            _describeCoveragePath = _prefix + "/describeCoverage";
 
         log.info("Initialized. prefix="+ _prefix);
 
@@ -451,6 +455,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     public void sendDescribeCoveragePage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/coverageDescription.xsl");
+        log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -469,9 +474,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         Document coverageDescriptionPage = transformer.transform(coverageDescription);
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
         response.setHeader("Content-Description", "HTML wcs:DescribeCoverage");
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -482,7 +484,10 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     public void sendCapabilitesPresentationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/capabilities.xsl");
+        log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
+
         String serviceUrl = getServiceUrlString(request,_prefix);
+        log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -493,9 +498,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         Document capabilitiesPage = transformer.transform(capabilitiesDoc);
 
         response.setContentType("text/html");
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
         response.setStatus(HttpServletResponse.SC_OK);
 

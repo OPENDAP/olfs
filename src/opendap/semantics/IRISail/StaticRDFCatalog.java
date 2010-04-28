@@ -788,7 +788,12 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             lock.lock();
             log.debug("_catalogLock ReadLock Acquired.");
 
-            return coverages.get(id).getElement();
+            CoverageDescription cd = coverages.get(id);
+
+            if(cd==null)
+                return null;
+
+            return cd.getElement();
         }
         finally {
             lock.unlock();

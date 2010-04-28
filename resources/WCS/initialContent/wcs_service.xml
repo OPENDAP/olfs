@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WcsService>
     <WcsCatalog className="opendap.semantics.IRISail.StaticRDFCatalog">
-        <useUpdateCatalogThread updateInterval="1200" />
+        <useUpdateCatalogThread updateInterval="1200"/>
 
 
         <!--

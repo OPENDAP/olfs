@@ -33,7 +33,7 @@
                 xmlns:ows="http://www.opengis.net/ows/1.1"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
-    <xsl:import href="../../docs/xsl/version.xsl"/>
+    <xsl:import href="../docs/xsl/version.xsl"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
@@ -44,7 +44,7 @@
     <xsl:template match="/wcs:CoverageDescription">
         <html>
             <head>
-                <link rel='stylesheet' href='/opendap/docs/css/contents.css'
+                <link rel='stylesheet' href='../docs/css/contents.css'
                       type='text/css'/>
                 <xsl:choose>
                     <xsl:when test="ows:Title">
@@ -64,7 +64,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='../docs/images/logo.gif'/>
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <h2>
