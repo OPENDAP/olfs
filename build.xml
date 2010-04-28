@@ -175,7 +175,7 @@
     <!-- Libraries -->
     <property name="junit.lib"   value="junit-4.4.jar"/>
     <property name="jdom.lib"    value="jdom-1.1.jar"/>
-    <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-2.5.jar"/>
     <property name="echo.lib"    value="echosoap.jar"/>
 
 
@@ -216,7 +216,7 @@
     <path id="olfs.compile.classpath">
         <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
-            <include name="${servlet.lib}"/>
+            <include name="${servlet-api.lib}"/>
             <include name="${jdom.lib}"/>
             <include name="${junit.lib}"/>
             <include name="${commons-cli.lib}"/>
