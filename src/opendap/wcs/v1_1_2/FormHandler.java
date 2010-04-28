@@ -6,6 +6,7 @@ import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
@@ -33,7 +34,7 @@ public class FormHandler extends XmlRequestHandler  {
 
     }
 
-    public void init(DispatchServlet servlet, Element config) throws Exception {
+    public void init(HttpServlet servlet, Element config) throws Exception {
         super.init(servlet,config);
     }
 

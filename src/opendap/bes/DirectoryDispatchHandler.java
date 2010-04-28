@@ -26,6 +26,7 @@ package opendap.bes;
 
 import opendap.coreServlet.*;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,7 +50,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private Logger log;
     private boolean initialized;
 
-    private DispatchServlet dispatchServlet;
+    private HttpServlet dispatchServlet;
 
 
     public DirectoryDispatchHandler() {
@@ -63,7 +64,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
-    public void init(DispatchServlet s, Element config) throws Exception {
+    public void init(HttpServlet s, Element config) throws Exception {
 
         if(initialized) return;
 

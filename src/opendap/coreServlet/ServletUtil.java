@@ -1,10 +1,13 @@
 package opendap.coreServlet;
 
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Enumeration;
 
 public class ServletUtil {
 
@@ -105,6 +108,7 @@ public class ServletUtil {
      * @return
      */
     public static String getContextPath( HttpServlet servlet ) {
+/*
       if ( contextPath == null ) {
         ServletContext servletContext = servlet.getServletContext();
         String tmpContextPath = servletContext.getInitParameter( "ContextPath" );
@@ -115,7 +119,8 @@ public class ServletUtil {
           contextPath = "/"+tmpContextPath;
       }
       return contextPath;
-
+*/
+      return servlet.getServletContext().getContextPath();
     }
 
     public static String getSystemPath(HttpServlet servlet, String path) {
@@ -131,6 +136,139 @@ public class ServletUtil {
       String rootPath = sc.getRealPath("/");
       rootPath = rootPath.replace('\\','/');
       return rootPath;
+    }
+
+
+
+    public static String toString(HttpServlet servlet){
+        String s = "ServletUtil:\n";
+
+        s+= "    getContentPath(): "+ getContentPath(servlet) + "\n";
+        s+= "    getContextPath(): "+ getContextPath(servlet) + "\n";
+        s+= "    getRootPath(): "+ getRootPath(servlet) + "\n";
+        s+= "    getSystemPath(): "+ getSystemPath(servlet,"/") + "\n";
+
+
+        s += probeServlet(servlet);
+
+        return s;
+    }
+
+
+    public static String probeServlet(HttpServlet servlet){
+
+        String pName;
+        String pVal;
+
+        String s = "HttpServlet:\n";
+
+        s+= "    getServletInfo(): "+ servlet.getServletInfo() + "\n";
+        s+= "    getServletName(): "+ servlet.getServletName() + "\n";
+
+        Enumeration e  = servlet.getInitParameterNames();
+        s += "    Servlet Parameters:\n";
+        if(e.hasMoreElements()){
+            while(e.hasMoreElements()){
+                pName = (String) e.nextElement();
+                pVal = servlet.getInitParameter(pName);
+                s +=  "        name: "+pName+" value: "+pVal+"\n";
+            }
+        }
+        else
+            s +=  "        No Servlet Parameters Found.\n";
+        
+
+
+        ServletConfig scfg = servlet.getServletConfig();
+        ServletContext scntxt = servlet.getServletContext();
+
+
+        s += "    HttpServlet.getServletConfig(): "+scfg+"\n";
+        s += probeServletConfig(scfg);
+        s += "    HttpServlet.ServletContext(): "+scntxt+"\n";
+        s += probeServletContext(scntxt);
+
+
+        return s;
+
+    }
+
+    public static String probeServletConfig(ServletConfig scfg){
+        String s ="";
+        Enumeration e;
+        String pName, pVal;
+
+        s += "    ServletConfig:\n";
+        s += "       getServletName():"+scfg.getServletName()+"\n";
+        e  = scfg.getInitParameterNames();
+        s += "       Servlet Parameters:\n";
+        if(e.hasMoreElements()){
+            while(e.hasMoreElements()){
+                pName = (String) e.nextElement();
+                pVal = scfg.getInitParameter(pName);
+                s +=  "            name: "+pName+" value: "+pVal+"\n";
+            }
+        }
+        else
+            s +=  "            No Servlet Parameters Found.\n";
+        ServletContext scntxt = scfg.getServletContext();
+        s += "       ServletConfig.getServletContext(): "+scntxt+"\n";
+        s += probeServletContext(scntxt);
+
+        return s;
+
+    }
+
+    public static String probeServletContext(ServletContext sc){
+        String s = "";
+        String pVal, pName;
+        Enumeration e;
+
+        s += "    ServletContext:\n";
+
+        s += "       getServletContextName():"+sc.getServletContextName()+"\n";
+        s += "       getContextPath():"+sc.getContextPath()+"\n";
+       
+        e = sc.getAttributeNames();
+        s += "       ServletContext Attributes:\n";
+        if(e.hasMoreElements()){
+            while(e.hasMoreElements()){
+                pName = (String) e.nextElement();
+                s +=  "            name: "+pName+"\n";
+            }
+
+        }
+        else
+            s +=  "        No Servlet Context Attributes Found.\n";
+
+
+        e  = sc.getInitParameterNames();
+        s += "       ServletContext Parameters:\n";
+        if(e.hasMoreElements()){
+            while(e.hasMoreElements()){
+                pName = (String) e.nextElement();
+                pVal = sc.getInitParameter(pName);
+                s +=  "           name: "+pName+" value: "+pVal+"\n";
+            }
+        }
+        else
+            s +=  "           No ServletContext Parameters Found.\n";
+
+
+        try {
+            s+= "       getResource(\"/\"): "+sc.getResource("/")+"\n";
+        }
+        catch (MalformedURLException e1) {
+            log.error("Could not perform ServletCOntext.getREsource \"/\". Error Message: "+e1.getMessage());
+        }
+
+
+        s += "       getMajorVersion(): "+sc.getMajorVersion()+"\n";
+        s += "       getMinorVersion(): "+sc.getMinorVersion()+"\n";
+        s += "       getServerInfo(): "+sc.getServerInfo()+"\n";
+
+        return s;
+
     }
 
 

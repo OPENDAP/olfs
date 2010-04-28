@@ -26,6 +26,7 @@ package opendap.bes;
 
 import opendap.coreServlet.*;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
@@ -57,7 +58,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
 
-    public void init(DispatchServlet servlet,Element config) throws Exception {
+    public void init(HttpServlet servlet,Element config) throws Exception {
 
         if(initialized) return;
 

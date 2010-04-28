@@ -26,6 +26,7 @@ package opendap.coreServlet;
 
 import org.jdom.Element;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -45,7 +46,7 @@ import java.io.OutputStreamWriter;
 public class SpecialRequestDispatchHandler implements DispatchHandler {
 
     private org.slf4j.Logger log;
-    private DispatchServlet servlet;
+    private HttpServlet servlet;
     private boolean initialized;
 
     public SpecialRequestDispatchHandler() {
@@ -57,7 +58,7 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
     }
 
 
-    public void init(DispatchServlet s, Element config) throws Exception {
+    public void init(HttpServlet s, Element config) throws Exception {
 
         if(initialized) return;
 

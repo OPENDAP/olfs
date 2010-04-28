@@ -35,6 +35,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
@@ -52,7 +53,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     private final Logger log;
     private boolean _initialized;
-    private opendap.coreServlet.DispatchServlet dispatchServlet;
+    private HttpServlet dispatchServlet;
     private String _prefix;
 
     private Element _config;
@@ -87,7 +88,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
 
-    public void init(DispatchServlet servlet, Element config) throws Exception {
+    public void init(HttpServlet servlet, Element config) throws Exception {
         if (_initialized) return;
 
         String msg;
@@ -103,9 +104,13 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         log.debug("_resourcePath: "+_resourcePath);
 
-        _serviceContentPath = ServletUtil.getContentPath(dispatchServlet) + _prefix + "/";
+        _serviceContentPath = ServletUtil.getContentPath(dispatchServlet);
         if(!_serviceContentPath.endsWith("/"))
             _serviceContentPath += "/";
+        
+        if(!_prefix.equals(""))
+            _serviceContentPath += _prefix + "/";
+
         log.debug("_serviceContentPath: "+_serviceContentPath);
 
 
@@ -252,9 +257,14 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         String msg;
 
         Element e = _config.getChild("prefix");
-        if(e!=null)
-            _prefix = e.getTextTrim();
+        if(e==null)
+            throw new Exception("In the configuration file, the <Handler> Element that " +
+                    "utilizes "+this.getClass().getName()+" must contain a <prefix> element.");
 
+
+        _prefix = e.getTextTrim();
+
+/*   
         if(_prefix.equals("/")){
             msg = "Bad Configuration. The <Handler> " +
                     "element that declares " + this.getClass().getName() +
@@ -264,6 +274,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             throw new Exception(msg);
         }
 
+*/
 
         //if(!_prefix.startsWith("/"))
         //    _prefix = "/" + _prefix;

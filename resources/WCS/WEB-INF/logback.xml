@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+
+
+
+    <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
+
+
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${FORMAT}</Pattern>
+        </layout>
+    </appender>
+
+
+    <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/error.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${FORMAT}</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/HyraxAccess.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] [%X{SOURCE}]  %X{request} %m%n</Pattern>
+        </layout>
+    </appender>
+
+
+    <appender name="BESCommands" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/BESCommands.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%d{dd/MMM/yyyy:HH:mm:ss}] [request %X{ID}]      %m</Pattern>
+        </layout>
+    </appender>
+
+
+
+
+    <!-- OPeNDAP Hyrax Logging -->
+    <logger name="opendap" level="error" >
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+
+
+    <!-- Access/Performance Logging -->
+    <logger name="HyraxAccess" level="all">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="DocServletAccess" level="all">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+
+
+    <!--
+    <root level="error">
+     <appender-ref ref="ErrorLog"/>
+   </root>
+   -->
+
+</configuration>

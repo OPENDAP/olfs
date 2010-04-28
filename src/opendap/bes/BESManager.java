@@ -33,6 +33,7 @@ import java.util.List;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.DispatchServlet;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -63,7 +64,7 @@ public class BESManager implements DispatchHandler {
 
     }
 
-    public void init(DispatchServlet servlet, Element config) throws Exception{
+    public void init(HttpServlet servlet, Element config) throws Exception{
 
         if(initialized) return;
 

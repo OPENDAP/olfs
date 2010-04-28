@@ -27,6 +27,7 @@ package opendap.bes;
 
 import opendap.coreServlet.*;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
@@ -51,7 +52,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     private Logger log;
     private boolean initialized;
-    private DispatchServlet _servlet;
+    private HttpServlet _servlet;
 
 
     public DapDispatchHandler() {
@@ -73,7 +74,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
      * ************************************************************************
      * Intitializes any state needed for the handler.
      */
-    public void init(DispatchServlet ds, Element config) throws Exception {
+    public void init(HttpServlet ds, Element config) throws Exception {
 
         if(initialized) return;
 

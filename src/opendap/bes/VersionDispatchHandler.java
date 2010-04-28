@@ -57,7 +57,7 @@ public class VersionDispatchHandler implements DispatchHandler {
 
     }
 
-    public void init(DispatchServlet s, Element config) throws Exception {
+    public void init(HttpServlet s, Element config) throws Exception {
 
         if (initialized) return;
 

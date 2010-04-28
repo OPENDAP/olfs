@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpClient;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
@@ -59,7 +60,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     private Element config;
     private boolean initialized;
-    private DispatchServlet dispatchServlet;
+    private HttpServlet dispatchServlet;
     private String _prefix;
     boolean useMemoryCache = false;
 
@@ -612,7 +613,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    public void init(DispatchServlet servlet, Element configuration) throws Exception {
+    public void init(HttpServlet servlet, Element configuration) throws Exception {
 
 
         String s;

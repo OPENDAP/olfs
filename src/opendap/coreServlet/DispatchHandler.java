@@ -26,6 +26,7 @@ package opendap.coreServlet;
 
 import org.jdom.Element;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.regex.Pattern;
@@ -66,7 +67,7 @@ public interface DispatchHandler {
      * @throws Exception When the bad things happen.
      * @see DispatchServlet
      */
-    public void init(DispatchServlet servlet, Element config) throws Exception;
+    public void init(HttpServlet servlet, Element config) throws Exception;
 
 
 

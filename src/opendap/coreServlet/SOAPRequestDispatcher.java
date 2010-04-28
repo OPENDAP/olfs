@@ -29,6 +29,7 @@ import org.jdom.*;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -48,7 +49,7 @@ public class SOAPRequestDispatcher implements DispatchHandler {
 
 
     private org.slf4j.Logger log;
-    private DispatchServlet servlet;
+    private HttpServlet servlet;
     private boolean initialized;
     private OpendapSoapDispatchHandler sdh;
 
@@ -60,7 +61,7 @@ public class SOAPRequestDispatcher implements DispatchHandler {
 
     }
 
-    public void init(DispatchServlet s, Element config) throws Exception {
+    public void init(HttpServlet s, Element config) throws Exception {
 
         if (initialized) return;
 

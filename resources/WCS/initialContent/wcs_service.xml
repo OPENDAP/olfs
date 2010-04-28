@@ -3,14 +3,15 @@
     <WcsCatalog className="opendap.semantics.IRISail.StaticRDFCatalog">
         <useUpdateCatalogThread updateInterval="1200" />
 
-
+        <CacheDirectory>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/content/WCS/StaticRDFCatalog/</CacheDirectory>
+        <ResourcePath>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/webapps/opendap/WCS/</ResourcePath> 
         <RdfImport>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</RdfImport>
         <ThreddsCatalog>http://test.opendap.org:8090/opendap/ioos/catalog.xml</ThreddsCatalog>
 
         <!--
-        <Coverage>http://localhost:8080/opendap/data/nc/examples/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc.ddx</Coverage>
-        <Coverage>http://localhost:8080/opendap/data/nc/examples/ECMWF_ERA-40_subset.nc</Coverage>
-        <Coverage>http://localhost:8080/opendap/data/nc/examples/ECMWF_ERA-40_subset.nc.rdf</Coverage>
+        <dataset>http://localhost:8080/opendap/data/nc/examples/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc.ddx</dataset>
+        <dataset>http://localhost:8080/opendap/data/nc/examples/ECMWF_ERA-40_subset.nc</dataset>
+        <dataset>http://localhost:8080/opendap/data/nc/examples/ECMWF_ERA-40_subset.nc.rdf</dataset>
         <RdfImport>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</RdfImport>
         -->
 

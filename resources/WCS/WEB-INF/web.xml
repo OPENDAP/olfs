@@ -11,50 +11,39 @@
 
 
 
-    <display-name>Hyrax</display-name>
-    <description>OPeNDAP Hyrax Server</description>
-
-
+    <display-name>Web Coverage Service</display-name>
+    <description>OPeNDAP WCS Service</description>
 
     <servlet>
-        <servlet-name>hyrax</servlet-name>
+        <servlet-name>wcs</servlet-name>
 
-        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
-
-        <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value> </param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>OLFSConfigFileName</param-name>
-            <param-value>olfs.xml</param-value>
-        </init-param>
+        <servlet-class>opendap.wcs.v1_1_2.WcsServlet</servlet-class>
 
         <load-on-startup>1</load-on-startup>
 
     </servlet>
-
-
 
     <servlet>
         <servlet-name>docs</servlet-name>
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
     </servlet>
 
+    
+
+
 
     <servlet-mapping>
-        <servlet-name>hyrax</servlet-name>
-        <url-pattern>/hyrax</url-pattern>
+        <servlet-name>wcs</servlet-name>
+        <url-pattern>/WCS</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>hyrax</servlet-name>
-        <url-pattern>/hyrax/*</url-pattern>
+        <servlet-name>wcs</servlet-name>
+        <url-pattern>/WCS/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>hyrax</servlet-name>
+        <servlet-name>wcs</servlet-name>
         <url-pattern>*</url-pattern>
     </servlet-mapping>
 
@@ -74,7 +63,8 @@
         <session-timeout>20</session-timeout>
     </session-config>
 
-             
+
+
 
     <!-- Default Error Page Definitions -->
     <error-page>

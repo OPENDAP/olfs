@@ -32,6 +32,7 @@ import opendap.bes.Version;
 import opendap.bes.BESError;
 import opendap.wcs.gatewayClient.BesAPI;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
@@ -52,7 +53,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private Logger log;
     private boolean _initialized;
-    private opendap.coreServlet.DispatchServlet dispatchServlet;
+    private HttpServlet dispatchServlet;
     private String _prefix = "wcsGateway/";
 
     private Element _config;
@@ -176,7 +177,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
 
 
-    public void init(DispatchServlet servlet, Element config) throws Exception {
+    public void init(HttpServlet servlet, Element config) throws Exception {
         if (_initialized) return;
 
         String msg;

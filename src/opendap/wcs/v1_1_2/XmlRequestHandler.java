@@ -5,6 +5,7 @@ import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -21,7 +22,7 @@ import opendap.coreServlet.ReqInfo;
  */
 public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, WcsResponder {
     protected Logger log;
-    protected opendap.coreServlet.DispatchServlet dispatchServlet;
+    protected HttpServlet dispatchServlet;
 
     protected boolean _initialized;
     protected String _prefix;
@@ -34,7 +35,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
         log = org.slf4j.LoggerFactory.getLogger(getClass());
     }
 
-    public void init(DispatchServlet servlet, Element config) throws Exception {
+    public void init(HttpServlet servlet, Element config) throws Exception {
         if (_initialized) return;
 
         dispatchServlet = servlet;
@@ -53,7 +54,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
         Element e = _config.getChild("prefix");
         if(e!=null)
             _prefix = e.getTextTrim();
-
+/*
         if(_prefix.equals("/")){
             msg = "Bad Configuration. The <Handler> " +
                     "element that declares " + this.getClass().getName() +
@@ -62,7 +63,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
             log.error(msg);
             throw new Exception(msg);
         }
-
+*/
 
         //if(!_prefix.startsWith("/"))
         //    _prefix = "/" + _prefix;

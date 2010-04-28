@@ -333,10 +333,15 @@ public class DapIngest {
 			throw e;
 		}
 
-		return os.toString();
+		return os.probeServletContext();
 	}
     */
-	
+    
+
+    /**
+     *
+     * @param emlString
+     */
     void insertEML(String emlString) {
 		// For now, just print it...
 		//log.info("Built EML Document:\n" + emlString);

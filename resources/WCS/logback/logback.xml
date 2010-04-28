@@ -37,7 +37,12 @@
     </logger>
 
     <logger name="org.openrdf">
-        <level value="INFO"/>
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="com.ontotext">
+        <level value="DEBUG"/>
         <appender-ref ref="stdout"/>
     </logger>
 

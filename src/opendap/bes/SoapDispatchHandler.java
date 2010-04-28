@@ -29,6 +29,7 @@ import opendap.coreServlet.MultipartResponse;
 import opendap.coreServlet.DispatchServlet;
 import opendap.soap.XMLNamespaces;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -57,7 +58,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
      * @param ds  The Servlet that is calling init().
      * @throws ServletException When things go wrong.
      */
-    public void init(DispatchServlet ds) throws ServletException {
+    public void init(HttpServlet ds) throws ServletException {
 
         //_dataRootHandler = ds.getThreddsDispatchHandler().getDataRootHandler();
 

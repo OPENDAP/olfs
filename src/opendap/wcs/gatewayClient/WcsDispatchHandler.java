@@ -34,6 +34,7 @@ import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -53,7 +54,7 @@ import java.io.ByteArrayInputStream;
 public class WcsDispatchHandler implements DispatchHandler {
     private Logger log;
     private boolean initialized;
-    private DispatchServlet dispatchServlet;
+    private HttpServlet dispatchServlet;
     private String prefix = "/wcs";
 
     public WcsDispatchHandler() {
@@ -228,7 +229,7 @@ public class WcsDispatchHandler implements DispatchHandler {
     }
 
 
-    public void init(DispatchServlet servlet, Element config) throws Exception {
+    public void init(HttpServlet servlet, Element config) throws Exception {
         if (initialized) return;
 
 

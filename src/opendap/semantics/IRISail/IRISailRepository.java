@@ -83,6 +83,12 @@ public class IRISailRepository extends SailRepository {
 
     private ProcessingTypes postProcessFlag;
 
+
+    public void initialize() throws org.openrdf.repository.RepositoryException {
+        super.initialize();
+    }
+
+
     public Boolean hasContext(URI uriContext, RepositoryConnection con)
             throws RepositoryException {
         Boolean existContext = false;
@@ -114,12 +120,9 @@ public class IRISailRepository extends SailRepository {
 
     public void runConstruct() throws RepositoryException {
 
-        log
-                .debug("-----------------------------------------------------------------");
-        log
-                .debug("------------------- Entering runConstruct() ---------------------");
-        log
-                .debug("-----------------------------------------------------------------");
+        log.debug("-----------------------------------------------------------------");
+        log.debug("------------------- Entering runConstruct() ---------------------");
+        log.debug("-----------------------------------------------------------------");
 
         GraphQueryResult graphResult = null;
         RepositoryConnection con = null;

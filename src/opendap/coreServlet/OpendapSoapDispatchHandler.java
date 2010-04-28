@@ -26,6 +26,7 @@ package opendap.coreServlet;
 
 import org.jdom.Element;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.ServletException;
 
@@ -36,7 +37,7 @@ import javax.servlet.ServletException;
  */
 public interface OpendapSoapDispatchHandler extends OpendapMimeHeaders {
 
-    public void init(DispatchServlet ds) throws ServletException;
+    public void init(HttpServlet ds) throws ServletException;
 
 
 

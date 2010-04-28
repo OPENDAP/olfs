@@ -36,6 +36,7 @@ import org.jdom.transform.XSLTransformer;
 import org.jdom.input.SAXBuilder;
 import org.jdom.filter.ElementFilter;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Iterator;
 import java.io.*;
@@ -274,7 +275,7 @@ public class BESError extends OPeNDAPException {
      * @return The HTTP status code returned to client.
      * @throws IOException
      */
-    public int sendErrorResponse(DispatchServlet dispatchServlet, HttpServletResponse response)
+    public int sendErrorResponse(HttpServlet dispatchServlet, HttpServletResponse response)
             throws IOException{
 
 

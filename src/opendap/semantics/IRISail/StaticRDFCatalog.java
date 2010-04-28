@@ -608,7 +608,10 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             log.info("Shutting Down Semantic Repository.");
 
 
-            owlse2.shutDown();
+            //owlse2.shutDown();
+            if(false)
+                throw new RepositoryException("");
+            
             log.info("Semantic Repository Has Been Shutdown.");
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");
