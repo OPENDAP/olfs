@@ -66,18 +66,12 @@
         </layout>
     </appender>
     
-    <logger name="opendap.metacat.DapIngest" level="all">
-        <appender-ref ref="InfoLog"/>
+    <logger name="opendap.metacat" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
     </logger>
-<!--    
-    <logger name="opendap.metacat.DapIngest" level="debug">
-        <appender-ref ref="DebugLog"/>
-    </logger>
-
-    <logger name="opendap.metacat.DapIngest" level="info">
-        <appender-ref ref="InfoLog"/>
-    </logger>
--->    
     
+    <logger name="opendap" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
 
 </configuration>
