@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -599,12 +600,13 @@ public class IRISailRepository extends SailRepository {
 
         boolean joinStrIsURL = false;
         String targetObj = "";
-        if (RDFList.get(0).startsWith("http://")) {
+        
+
+       // targetObj = RDFList.get(0); // rdf list has only one element
+        targetObj = getWcsIdString(RDFList.get(0));
+        if (targetObj.startsWith("http://")) {
             joinStrIsURL = true;
         }
-
-        targetObj = RDFList.get(0); // rdf list has only one element
-
         Value stObjStr = null;
         if (joinStrIsURL) {
             stObjStr = createValue.createURI(targetObj);
@@ -615,6 +617,91 @@ public class IRISailRepository extends SailRepository {
         return stToAdd;
     }
 
+
+    /**
+     * Build a wcs:Identifier for the coverage dataset described by the datasetUrl.
+     *
+     * @param datasetUrl
+     * @return A valid and unique to this service wcs:Identifier String for the coverage dataset
+     */
+    public String getWcsIdString(String datasetUrl)  {
+
+        String wcsID="FAILED_TO_BUILD_WCS_ID";
+
+        try {
+            int i;
+            String serverURL, serverPrefix;
+            URL dsu = new URL(datasetUrl);
+
+
+            serverURL = getServerUrlString(dsu);
+
+
+            if(serviceIDs.containsKey(serverURL)){
+                // get server prefix
+                serverPrefix = serviceIDs.get(serverURL);
+            }
+            else {
+                serverPrefix = "S"+ (serviceIDs.size()+1) + "";
+                // Generate service prefix
+                // Store service prefix.
+                serviceIDs.put(serverURL,serverPrefix);
+            }
+
+
+            // Build wcsID
+
+            wcsID = serverPrefix + datasetUrl.substring(serverURL.length(),datasetUrl.length());
+            log.debug("wcsID: "+wcsID);
+
+
+
+            if(!wcsIDs.containsKey(datasetUrl)){
+                // add wcs:Identifier to MAP
+                wcsIDs.put(datasetUrl,wcsID);
+
+            }
+
+        } catch (MalformedURLException e) {
+            log.error("Cannot Build wcs:Identifier from URL "+datasetUrl+" error msg: "+e.getMessage());
+        }
+
+
+        return wcsID;
+    }  
+
+    private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
+    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
+    
+
+    private String getServerUrlString(URL url) {
+
+        String baseURL = null;
+
+        String protocol = url.getProtocol();
+
+        if (protocol.equalsIgnoreCase("file")) {
+            log.debug("Protocol is FILE.");
+
+        } else if (protocol.equalsIgnoreCase("http")) {
+            log.debug("Protcol is HTTP.");
+
+            String host = url.getHost();
+            String path = url.getPath();
+            int port = url.getPort();
+
+            baseURL = protocol + "://" + host;
+
+            if (port != -1)
+                baseURL += ":" + port;
+        }
+
+        log.debug("ServerURL: " + baseURL);
+
+        return baseURL;
+
+    }  
+    
     public enum FunctionTypes {
         None, getWcsID, Subtract, Join
     }
