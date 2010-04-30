@@ -186,6 +186,10 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         setupRepository();
+
+        //extractCoverageDescrptionsFromRepository();
+        //updateCatalogCache();
+        
         if (backgroundUpdates) {
             catalogUpdateThread = new Thread(this);
             catalogUpdateThread.start();
@@ -995,17 +999,14 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
+    public void updateCatalogCache()  throws InterruptedException{
 
-
-    public void updateCatalog()  throws InterruptedException{
-
-        boolean repositoryUpdateSuccessful = updateRepository();
         Thread thread = Thread.currentThread();
 
 
         int biffCount = 0;
 
-        if (!stopWorking && repositoryUpdateSuccessful && !thread.isInterrupted() ) {
+        if (!stopWorking && !thread.isInterrupted() ) {
 
             ReentrantReadWriteLock.WriteLock catlock = _catalogLock.writeLock();
             ReentrantReadWriteLock.ReadLock repLock = _repositoryLock.readLock();
@@ -1068,6 +1069,16 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             log.warn("updateCatalog(): WARNING! Thread "+thread.getName()+" was interrupted!");
             throw new InterruptedException();
         }
+
+    }
+
+
+
+
+    public void updateCatalog()  throws InterruptedException{
+
+      if(updateRepository())
+          updateCatalogCache();
 
     }
 
@@ -1186,6 +1197,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         log.warn("updateRepository(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
+
 
                     log.debug("Extracting CoverageDescriptions from the Repository.");
                     extractCoverageDescrptionsFromRepository(con);

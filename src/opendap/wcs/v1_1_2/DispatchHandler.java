@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
+import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BesXmlAPI;
@@ -40,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletException;
+import javax.xml.transform.stream.StreamSource;
 import java.util.HashMap;
 import java.io.*;
 
@@ -286,16 +288,32 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             _prefix = _prefix.substring(0,_prefix.length()-2);
         }
 
+        /*
+
         _testPath    = _prefix + "/test";
         _form        = _prefix + "/form";
         _configurationForm   = _prefix + "/config";
         _xmlEchoPath = _prefix + "/echoXML";
         _coveragesPath = _prefix + _coveragesTerminus;
 
-        if(_prefix.equals(""))
-            _describeCoveragePath = "describeCoverage";
-        else
-            _describeCoveragePath = _prefix + "/describeCoverage";
+         */
+
+        _testPath              = "test";
+        _form                  = "form";
+        _configurationForm     = "config";
+        _xmlEchoPath           = "echoXML";
+        _coveragesPath         = _coveragesTerminus;
+        _describeCoveragePath  = "describeCoverage";
+
+        if(!_prefix.equals("")){
+            _testPath              = _prefix + "/"+ _testPath;
+            _form                  = _prefix + "/"+ _form;
+            _configurationForm     = _prefix + "/"+ _configurationForm;
+            _xmlEchoPath           = _prefix + "/"+ _xmlEchoPath;
+            _coveragesPath         = _prefix + _coveragesPath;
+            _describeCoveragePath   = _prefix + "/"+ _describeCoveragePath;
+        }
+
 
         log.info("Initialized. prefix="+ _prefix);
 
@@ -375,10 +393,12 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
                         echoWcsRequest(request, response);
                         log.info("Returning KVP request as XML docuemtn.");
                     }
+                    /*
                     else if(relativeURL.startsWith(_coveragesPath)){
                         sendNetcdfFileOut(request, response);
                         log.info("Returning NetcdfData.");
                     }
+                    */
                     else if(relativeURL.startsWith(_describeCoveragePath)){
                         sendDescribeCoveragePage(request, response);
                         log.info("Returning WCS Describe Coverage Page.");
@@ -454,34 +474,56 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     public void sendDescribeCoveragePage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/coverageDescription.xsl");
         log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
 
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
+        String serviceUrl = getServiceUrlString(request,_prefix);
+        log.debug("sendDescribeCoveragePage()  serviceUrl: "+serviceUrl);
 
         String id = request.getQueryString();
-
         Element cde = CatalogWrapper.getCoverageDescriptionElement(id);
         if(cde==null)
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
-
-
         Document  coverageDescription = new Document(cde);
-
-
-        Document coverageDescriptionPage = transformer.transform(coverageDescription);
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:DescribeCoverage");
+
+
+
+
+        /*
+
+        XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+        Document coverageDescriptionPage = transformer.transform(coverageDescription);
+
         response.setStatus(HttpServletResponse.SC_OK);
 
         xmlo.output(coverageDescriptionPage, response.getWriter());
 
+        */
+
+        opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
+        t.setParameter("ServicePrefix",serviceUrl);
+
+        XdmNode descCover = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes())));
+
+        t.transform(descCover,response.getOutputStream());
+
+
+
+
+
+
     }
 
     public void sendCapabilitesPresentationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/capabilities.xsl");
         log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
@@ -489,19 +531,33 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         String serviceUrl = getServiceUrlString(request,_prefix);
         log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
 
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-
         Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl);
-        Document capabilitiesPage = transformer.transform(capabilitiesDoc);
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
+        
+
+
+/*
+
+        XSLTransformer transformer = new XSLTransformer(xsltDoc);
+
+        Document capabilitiesPage = transformer.transform(capabilitiesDoc);
+
         response.setStatus(HttpServletResponse.SC_OK);
 
         xmlo.output(capabilitiesPage, response.getWriter());
+*/
+
+
+        opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
+        t.setParameter("ServicePrefix",serviceUrl);
+
+        XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
+
+        t.transform(capDoc,response.getOutputStream());
+
+
 
     }
 
@@ -600,11 +656,11 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         String page = "<html>";
         page += "    <head>";
-        page += "        <link rel='stylesheet' href='/opendap/docs/css/contents.css' type='text/css' >";
+        page += "        <link rel='stylesheet' href='"+serviceUrl+"/docs/css/contents.css' type='text/css' >";
         page += "        <title>OPeNDAP Hyrax WCS Test</title>";
         page += "    </head>";
         page += "    <body>";
-        page += "    <img alt=\"OPeNDAP Logo\" src='/opendap/docs/images/logo.gif'/>";
+        page += "    <img alt=\"OPeNDAP Logo\" src='"+serviceUrl+"/docs/images/logo.gif'/>";
         page += "    <h2>OPeNDAP WCS Test Harness</h2>";
         page += "    How Nice! You sent a WCS request.";
         page += "    <h3>KVP request: </h3>";
@@ -749,7 +805,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
      * @param request  The client's <code> HttpServletRequest</code> request object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @throws Exception When the bad things be happening
+     * @throws IOException When the bad things be happening
      * @see ReqInfo
      */
     private void sendNetcdfFileOut(HttpServletRequest request,
@@ -825,20 +881,21 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     public static String getServiceUrlString(HttpServletRequest request, String prefix){
         String serviceURL = ReqInfo.getBaseURI(request);
 
-        if(!serviceURL.endsWith("/"))    {
-            if(prefix.startsWith("/"))
-                serviceURL += prefix;
-            else
-                serviceURL += "/" + prefix;
-        }
-        else {
-            if(prefix.startsWith("/"))
-                serviceURL += serviceURL.substring(0,serviceURL.length()-1)+prefix;
-            else
-                serviceURL += prefix;
+        if (!prefix.equals("")) {
+            if (!serviceURL.endsWith("/")) {
+                if (prefix.startsWith("/"))
+                    serviceURL += prefix;
+                else
+                    serviceURL += "/" + prefix;
 
-        }
+            } else {
+                if (prefix.startsWith("/"))
+                    serviceURL += serviceURL.substring(0, serviceURL.length() - 1) + prefix;
+                else
+                    serviceURL += prefix;
 
+            }
+        }
         return serviceURL;
 
     }

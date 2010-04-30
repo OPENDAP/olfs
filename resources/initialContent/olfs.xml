@@ -59,9 +59,12 @@
                 </WcsCatalog>
             </Handler -->
 
-            <Handler className="opendap.wcs.v1_1_2.DispatchHandler">
+
+
+
+            <!-- Handler className="opendap.wcs.v1_1_2.DispatchHandler">
                 <prefix>WCS</prefix>
-            </Handler>
+            </Handler -->
 
             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
                 <prefix>thredds</prefix>

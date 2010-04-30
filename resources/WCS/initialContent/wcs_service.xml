@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WcsService>
     <WcsCatalog className="opendap.semantics.IRISail.StaticRDFCatalog">
-        <useUpdateCatalogThread updateInterval="1200"/>
-
+        <useUpdateCatalogThread updateInterval="1200" firstUpdateDelay="10"/>
 
         <!--
         <CacheDirectory>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/content/WCS/StaticRDFCatalog/</CacheDirectory>

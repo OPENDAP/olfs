@@ -33,19 +33,29 @@
                 xmlns:ows="http://www.opengis.net/ows/1.1"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
-    <xsl:import href="../docs/xsl/version.xsl"/>
-    <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
+    <xsl:import href="../docs/xsl/version.xsl" />
+    <xsl:param name="ServicePrefix" />
+    <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
-
-    <xsl:variable name="PREFIX">WCS</xsl:variable>
 
 
     <xsl:template match="/wcs:Capabilities">
         <html>
             <head>
-                <link rel='stylesheet' href='docs/css/contents.css'
-                      type='text/css'/>
+
+
+
+
+                <xsl:element name="link">
+                    <xsl:attribute name="rel">stylesheet</xsl:attribute>
+                    <xsl:attribute name="type">text/css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                </xsl:element>
+
+
+                <!-- link rel='stylesheet' href='$ServicePrefix/docs/css/contents.css'
+                      type='text/css'/ -->
                 <xsl:choose>
                     <xsl:when test="ows:ServiceIdentification/ows:Title">
                         <title>
@@ -64,7 +74,13 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='docs/images/logo.gif'/>
+                <!-- img alt="OPeNDAP Logo" src='../docs/images/logo.gif'/ -->
+
+                <xsl:element name="img">
+                    <xsl:attribute name="alt">OPeNDAP Logo</xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$ServicePrefix"/>/docs/images/logo.gif</xsl:attribute>
+                </xsl:element>
+
                 <xsl:choose>
                     <xsl:when test="ows:ServiceIdentification/ows:Title">
                         <h1>
@@ -96,13 +112,13 @@
                 <div class= "medium">
                 <ul>
                     <li>
-                        <a href="{$PREFIX}/test">KVP Test Page</a>
+                        <a href="{$ServicePrefix}/test">KVP Test Page</a>
                         - Parses a KVP request and returns a page
                         reporting any problems.
                     </li>
                     <br/>
                     <li>
-                        <a href="{$PREFIX}/echoXML">Return KVP as XML</a>
+                        <a href="{$ServicePrefix}/echoXML">Return KVP as XML</a>
                         - Translates a KVP encoded request into
                         an XML encoded version of the request.
                     </li>
@@ -112,9 +128,7 @@
                 <ul>
                     <li>
                         <xsl:element name="a">
-                            <xsl:attribute name="href">
-                            <![CDATA[?service=WCS&version=1.1.2&request=GetCapabilities]]>
-                            </xsl:attribute >
+                            <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>?service=WCS&amp;version=1.1.2&amp;request=GetCapabilities</xsl:attribute >
                             Capabilities
                         </xsl:element>
                         - The GetCapabilities response.
@@ -128,7 +142,7 @@
                 <br/>
                 A WCS response will be returned.
 
-                <form action="{$PREFIX}/form" method="post">
+                <form action="{$ServicePrefix}/form" method="post">
                     <p>
                         <textarea name="WCS_QUERY" rows="20" cols="80">Insert your WCS query here...</textarea>
                     </p>
@@ -151,8 +165,7 @@
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
                 <h3>OPeNDAP Hyrax -
-                    <xsl:value-of select="$HyraxVersion"/>
-                    (WCS Prototype)
+                    <xsl:value-of select="$HyraxVersion"/> (WCS Prototype)
                     <span class="uuid">
                         ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
                     </span>
@@ -260,7 +273,7 @@
             <td align="left">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="$PREFIX"/>/describeCoverage?<xsl:value-of select="wcs:Identifier"/>
+                        <xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcs:Identifier"/>
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="ows:Title">

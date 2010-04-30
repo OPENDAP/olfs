@@ -34,18 +34,21 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:import href="../docs/xsl/version.xsl"/>
+    <xsl:param name="ServicePrefix" />
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
 
-    <xsl:variable name="PREFIX">WCS</xsl:variable>
 
 
     <xsl:template match="/wcs:CoverageDescription">
         <html>
             <head>
-                <link rel='stylesheet' href='../docs/css/contents.css'
-                      type='text/css'/>
+                <xsl:element name="link">
+                    <xsl:attribute name="rel">stylesheet</xsl:attribute>
+                    <xsl:attribute name="type">text/css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                </xsl:element>
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <title>
@@ -64,7 +67,10 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='../docs/images/logo.gif'/>
+                <xsl:element name="img">
+                    <xsl:attribute name="alt">OPeNDAP Logo</xsl:attribute>
+                    <xsl:attribute name="src"><xsl:value-of select="$ServicePrefix"/>/docs/images/logo.gif</xsl:attribute>
+                </xsl:element>
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <h2>
