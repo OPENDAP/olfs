@@ -22,23 +22,12 @@
 
 package opendap.metacat;
 
-//import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-/*import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;*/
-//import java.io.UnsupportedEncodingException;
-/*import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Date;*/
 import java.util.Enumeration;
 
 import javax.xml.transform.stream.StreamSource;
 
-//import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import opendap.xml.Transformer;
@@ -49,8 +38,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the task of getting an EML given a DDX document. It can
@@ -65,29 +52,19 @@ public class EMLRetriever {
 	final static String ddx2emlPath = "ddx2eml-2.1.1.xsl";
 	
 	// The EMLCache that holds both the DDXs LMT and the EML XML/text
-	private ResponseCache EMLCache;
+	private ResponseCache EMLCache = null;
 
     // This is the transformer that takes the DDX and returns EML
     private Transformer transformer;
 
     private boolean verbose = false;
     
-    /*private static Logger log;*/
-
 	public EMLRetriever() throws Exception {
-		this(/*LoggerFactory.getLogger(DapIngest.class), */true, true, "");
+		this(true, true, "");
 	}
 
-	/*
 	public EMLRetriever(boolean useCache, boolean saveCache,
 			String namePrefix) throws Exception {
-		this(LoggerFactory.getLogger(DapIngest.class), useCache,
-				saveCache, namePrefix);
-	}
-	 */
-	public EMLRetriever(/*Logger log, */boolean useCache, boolean saveCache,
-			String namePrefix) throws Exception {
-		/*EMLRetriever.log = log;*/
 
 		transformer = new Transformer(ddx2emlPath);
 		
@@ -96,8 +73,6 @@ public class EMLRetriever {
 		// the DDXCache instance is collected.
 		if (useCache)
 			EMLCache = new ResponseCache(namePrefix + "EML", useCache, saveCache);
-		else
-			EMLCache = null;
 	}
 
 	/**
@@ -236,7 +211,6 @@ public class EMLRetriever {
 			org.jdom.Document emlDoc = sb.build(new ByteArrayInputStream(emlString.getBytes()));
 		}
 		catch (Exception e) {
-			/*log.error("Exception while testing EML: " + e.getLocalizedMessage());*/
 			return false;
 		}
 		return true;
@@ -270,18 +244,7 @@ public class EMLRetriever {
 
 			transformer.transform(ddxXdm, os);
 		} 
-		/*
-		catch (SaxonApiException e) {
-			log.error("Problem with XSLT transform. Message: " + e.getMessage());
-			throw e;
-		}
-		catch (UnsupportedEncodingException e) {
-			log.error("Problem building XdmNode. Message: " + e.getMessage());
-			throw e;
-		}
-		*/
 		catch (Exception e) {
-			/*log.error("Problem with the URL: " + e.getMessage());*/
 			throw e;
 		}
 		finally {

@@ -103,11 +103,19 @@ public class ThreddsCrawler {
 		    	if (crawler.verbose)
 		    		System.out.println("Caching is off");
 		    	crawler.crawlCatalog(catalogURL, false, System.out);
+		    	if (crawler.verbose) {
+		    		Integer cv = crawler.catalogsVisited;
+		    		System.out.println("Found " + cv.toString() + " catalogs.");
+		    	}
 		    }
 		    else if (line.hasOption( "r")) {
 		    	if (crawler.verbose)
 		    		System.out.println("Reading from cache, no network accesses");
 		    	crawler.crawlCatalogCache(System.out, line.hasOption( "p"));
+		    	if (crawler.verbose) {
+		    		Integer cv = crawler.catalogsVisited;
+		    		System.out.println("Read " + cv.toString() + " catalogs.");
+		    	}
 		    }
 		    else if (line.hasOption( "p")) {
 		    	throw new Exception("The Print Catalog option (-p) can only be used when reading from the cache (-r).");
@@ -117,7 +125,12 @@ public class ThreddsCrawler {
 		    		System.out.println("Caching is on");
 		    	crawler.crawlCatalog(catalogURL, true, System.out);
 		    	crawler.tcc.saveCatalogCache();
+		    	if (crawler.verbose) {
+		    		Integer cv = crawler.catalogsVisited;
+		    		System.out.println("Found " + cv.toString() + " catalogs.");
+		    	}
 		    }
+		    
 		}
 		catch( ParseException exp ) {
 		    System.err.println( "Unexpected exception:" + exp.getMessage() );
@@ -134,9 +147,12 @@ public class ThreddsCrawler {
 	}
 	
 	public void crawlCatalog(String catalogURL, boolean useCache, PrintStream ps) throws Exception {		
-		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix);
+		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, useCache);
 		
-    	Enumeration<String> catalogs = tcc.getCatalogURLs(catalogURL, useCache);
+		// The ThreddsCatalogUtil caches by default, so each catalog URL
+		// is recorded (but not the catalog itself) every time nextElement()
+		// is called.
+    	Enumeration<String> catalogs = tcc.getCatalogEnumeration(catalogURL);
 
     	if (verbose)
     		ps.println("Root catalog: " + catalogURL);
@@ -153,7 +169,7 @@ public class ThreddsCrawler {
 	public void crawlCatalogCache(PrintStream ps, boolean printCatalog) throws Exception {
 		tcc = new ThreddsCatalogUtil(true, cacheNamePrefix);
 
-		Enumeration<String> catalogs = tcc.getCachedCatalogURLs();
+		Enumeration<String> catalogs = tcc.getCachedCatalogEnumeration();
    	
     	while (catalogs.hasMoreElements()) {
     		String childURL = catalogs.nextElement();

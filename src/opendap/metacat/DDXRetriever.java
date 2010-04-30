@@ -40,8 +40,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 /** This class handles the task of getting a DDX given its URL. It will
  *  test the returned document to see if it is well-formed and it will
@@ -58,20 +56,13 @@ public class DDXRetriever {
 	private boolean saveDDXs;
 	
     // The DDXCache that holds both the DDXs LMT and the XML/text
-    private ResponseCache DDXCache;
+    private ResponseCache DDXCache = null;
     
-    /*private static Logger log;*/
-
 	public DDXRetriever() throws Exception {
-		this(/*LoggerFactory.getLogger(DapIngest.class),*/ true, true, "");
+		this(true, true, "");
 	}
-	/*
+
 	public DDXRetriever(boolean useDDXsVisited, boolean saveDDXs, String namePrefix) throws Exception {
-		this(LoggerFactory.getLogger(DapIngest.class), useDDXsVisited, saveDDXs, namePrefix);
-	}
-	*/
-	public DDXRetriever(/*Logger log,*/ boolean useDDXsVisited, boolean saveDDXs, String namePrefix) throws Exception {
-		/*DDXRetriever.log = log;*/
 		this.useDDXsVisited = useDDXsVisited;
 		this.saveDDXs = saveDDXs;
 		
@@ -80,8 +71,6 @@ public class DDXRetriever {
 		// the DDXCache instance is collected.
 		if (useDDXsVisited || saveDDXs)
 			DDXCache = new ResponseCache(namePrefix + "DDX", useDDXsVisited, saveDDXs);
-		else
-			DDXCache = null;
 	}
 	
 	/**
@@ -186,7 +175,6 @@ public class DDXRetriever {
 			org.jdom.Document ddxDoc = sb.build(new ByteArrayInputStream(ddxString.getBytes()));
 		} 
 		catch (Exception e) {
-			/*log.error("Exception while testing DDX: " + e.getLocalizedMessage());*/
 			return false;
 		}
 		return true;
@@ -261,7 +249,6 @@ public class DDXRetriever {
 					Date date = new Date();
 					DDXCache.setLastVisited(DDXURL, date.getTime());
 					DDXCache.setCachedResponse(DDXURL, ddx);
-					/* log.debug("Adding/Updating entry for " + DDXURL); */
 				}
 				break;
 
@@ -272,7 +259,6 @@ public class DDXRetriever {
 				if (saveDDXs) {
 					Date date = new Date();
 					DDXCache.setLastVisited(DDXURL, date.getTime());
-					/* log.debug("Updating last visited entry for " + DDXURL); */
 				}
 				break;
 

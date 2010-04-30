@@ -200,7 +200,7 @@ public class DapIngest {
 
     void recordStats() {
     	log.info("THREDDS Catalog URLs Visited: " + catalogsVisited);
-    	Enumeration<String> e = tcc.getCachedCatalogURLs();
+    	Enumeration<String> e = tcc.getCachedCatalogEnumeration();
     	while (e.hasMoreElements()) {
     		String key = e.nextElement();
     		log.info(key + ": 1");
@@ -215,7 +215,7 @@ public class DapIngest {
     }
     
     void crawlCatalog(String catalogURL, boolean EMLGeneration) throws Exception {
-    	Enumeration<String> catalogs = tcc.getCatalogURLs(catalogURL);
+    	Enumeration<String> catalogs = tcc.getCatalogEnumeration(catalogURL);
     	
     	// First get references to any DDX objects at the top level
     	log.info("About to get DDX URLS from: " + catalogURL);

@@ -49,6 +49,12 @@ import java.util.concurrent.ConcurrentHashMap;
  *       was no difference bewteen the time associated with saving the DDXs and
  *       LMT in the cache and not (so caching had no discernable overhead in
  *       this example)
+ *       
+ * @note More performance information (4/28/10): Memory use. I retrieved ~43K
+ *       THREDDS catalogs and the space required was approximately 1GB. The 
+ *       catalogs were generally uniform and about 1.2K each, so 43,000 should
+ *       have used about 53MB of storage space.
+ *       
  * @author jimg
  * 
  */
@@ -153,6 +159,10 @@ public class ResponseCache {
 		}
     }
     	
+    /**
+     * This won't be called when an out of memory exception is thrown.
+     */
+    @Override
     protected void finalize() throws Exception {
     	if (saveMyState)
     		saveState();

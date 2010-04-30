@@ -34,6 +34,9 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// import ch.qos.logback.classic.LoggerContext;
+// import ch.qos.logback.core.util.StatusPrinter;
+
 import java.io.PrintStream;
 import java.io.IOException;
 
@@ -58,34 +61,62 @@ import opendap.namespaces.XLINK;
 public class ThreddsCatalogUtil {
 
 	private boolean useCache = false;
+	private boolean useDocumentCache = false;
 	private XMLOutputter xmlo = null;
 	private ResponseCache TCCache = null;
 	
 	private Logger log = LoggerFactory.getLogger(ThreddsCatalogUtil.class);
 
 	/**
-	 * Default ctor; build an instance that uses the catalog cache.
+	 * Default ctor; build an instance that does not use the catalog cache.
 	 * @throws Exception 
 	 * 
 	 * @throws Exception Thrown if the catalog cache cannot be initialized.
 	 */
 	public ThreddsCatalogUtil() throws Exception {
-		this(false, "");
+		this(false, "", false);
 	}
 	
 	/**
-	 * Constructor
+	 * Constructor. Build an instance that uses the cache to eliminate looping
+	 * but do not cache the actual responses.
 	 * 
 	 * @param useCache True if the cache should be used, false if not
 	 * @throws Exception Thrown if the cache cannot be initialized.
 	 */
 	public ThreddsCatalogUtil(boolean useCache, String namePrefix) throws Exception {
+		this(useCache, namePrefix, false);
+	}
+	
+	/** 
+	 * Constructor. This constructor gives the finest control over the caching 
+	 * operations performed. Because some sites use lots of catalogs, it might
+	 * require lots of space to cache the entire catalog. However, it would
+	 * still be nice to know about (or avoid) loops!
+	 * 
+	 * @param useCache True if caching should be used
+	 * @param namePrefix The name of the cache files
+	 * @param useDocumentCache True if the response documents should be cached
+	 * @throws Exception
+	 */
+	public ThreddsCatalogUtil(boolean useCache, String namePrefix, boolean useDocumentCache) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 		if (useCache) {
 			this.useCache = useCache;
-			TCCache = new ResponseCache(namePrefix + "TC", useCache, useCache);
+			this.useDocumentCache = useDocumentCache;
+			
+			// The second and third arguments to ResponseCache control 
+			// if the existing saved-state files are used to restore the cache
+			// and if the resulting cache is saved at the end of the run.
+			TCCache = new ResponseCache(namePrefix + "TC", true, true);
 		}
+		
+	    // print internal logging state
+	    /*
+	    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+	    StatusPrinter.print(lc);
+	    */
 	}
 	
 	/**
@@ -111,14 +142,17 @@ public class ThreddsCatalogUtil {
 		private Stack<String> childURLs;
 
 		threddsCrawlerEnumeration(String catalogURL) throws Exception {
-			this(catalogURL, true);
+			childURLs = new Stack<String>();
+	    	childURLs.push(catalogURL);
 		}
 		
+		/*
 		threddsCrawlerEnumeration(String catalogURL, boolean useCache) throws Exception {
 			childURLs = new Stack<String>();
 	    	childURLs.push(catalogURL);
 		}
-
+        */
+		
 		private void recur(String catalogURL) {
 			Vector<String> URLs = getCatalogRefURLs(catalogURL, false);
 			if (URLs != null) {
@@ -517,7 +551,7 @@ public class ThreddsCatalogUtil {
 	 *         that tree
 	 * @throws Exception Thrown if the cache cannot be configured
 	 */
-	public Enumeration<String> getCatalogURLs(String topCatalog) throws Exception {
+	public Enumeration<String> getCatalogEnumeration(String topCatalog) throws Exception {
 		return new threddsCrawlerEnumeration(topCatalog);
 	}
 
@@ -534,9 +568,11 @@ public class ThreddsCatalogUtil {
 	 * @throws Exception
 	 *             Thrown if the cache cannot be configured
 	 */
+	/*
 	public Enumeration<String> getCatalogURLs(String topCatalog, boolean useCache) throws Exception {
 		return new threddsCrawlerEnumeration(topCatalog, useCache);
 	}
+	*/
 	
 	/**
 	 * Get access to all of the THREDDS Catalogs in the cache. Note that these
@@ -545,7 +581,7 @@ public class ThreddsCatalogUtil {
 	 * 
 	 * @return An Enumeration of the THREDDS Catalog URLs crawled so far.
 	 */
-	public Enumeration<String> getCachedCatalogURLs() {
+	public Enumeration<String> getCachedCatalogEnumeration() {
 		return TCCache.getLastVisitedKeys();
 	}
 
@@ -692,7 +728,7 @@ public class ThreddsCatalogUtil {
 	 *            elements) in search of data access URLs.
 	 * @return The vector of data access URLs.
 	 */
-
+	/*
 	private Vector<String> getDataAccessURLs(String catalogUrlString,
 			Document catalogDoc, SERVICE service, boolean recurse) {
 
@@ -707,7 +743,8 @@ public class ThreddsCatalogUtil {
 
 		// log.warn("Thredds Catalog ingest not yet supported.");
 	}
-
+	*/
+	
 	/**
 	 * Returns a vector of data access URIs from The THREDDS catalog located at
 	 * the URL contained in the passed parameter String
@@ -767,6 +804,9 @@ public class ThreddsCatalogUtil {
 	 * Returns the Document object for the XML document located at the URL
 	 * contained in the passed parameter String <code>docUrlString</code>.
 	 * 
+	 * @note This is the point in the class where a response is (possibly)
+	 * cached.
+	 * 
 	 * @param docUrlString
 	 *            The URL of the document to retrieve.
 	 * @return The Document
@@ -784,7 +824,7 @@ public class ThreddsCatalogUtil {
 
 			doc = sb.build(docUrl);
 			log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
-			if (useCache) {
+			if (useDocumentCache) {
 				TCCache.setCachedResponse(docUrlString, xmlo.outputString(doc));
 			}
 
@@ -853,7 +893,7 @@ public class ThreddsCatalogUtil {
 
 		// If they aren't asking for everything...
 		if (s != SERVICE.ALL) {
-			boolean done = false;
+			/* boolean done = false; */
 			Element service;
 
 			Vector<String> taggedForRemoval = new Vector<String>();
@@ -889,7 +929,7 @@ public class ThreddsCatalogUtil {
 		String serviceName;
 		String s;
 		Element metadata, dset, access;
-		Iterator i;
+		/* Iterator i; */
 
 		log.debug("inheritedServiceName: " + inheritedServiceName);
 
@@ -932,7 +972,7 @@ public class ThreddsCatalogUtil {
 			}
 		}
 
-		i = dataset.getChildren("access", THREDDS.NS).iterator();
+		Iterator i = dataset.getChildren("access", THREDDS.NS).iterator();
 		while (i.hasNext()) {
 			access = (Element) i.next();
 			datasetURLs.addAll(getAccessURLs(access, services, baseServerURL));
@@ -962,7 +1002,7 @@ public class ThreddsCatalogUtil {
 
 		Vector<String> accessURLs = new Vector<String>();
 		String access, base, serviceType, sname;
-		Iterator i;
+		/* Iterator i; */
 		Element srvc;
 
 		Element service = services.get(serviceName);
@@ -971,7 +1011,7 @@ public class ThreddsCatalogUtil {
 			serviceType = service.getAttributeValue("serviceType");
 
 			if (serviceType.equalsIgnoreCase("Compound")) {
-				i = service.getChildren("service", THREDDS.NS).iterator();
+				Iterator i = service.getChildren("service", THREDDS.NS).iterator();
 				while (i.hasNext()) {
 					srvc = (Element) i.next();
 					sname = srvc.getAttributeValue("name");
