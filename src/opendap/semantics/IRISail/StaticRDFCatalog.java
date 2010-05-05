@@ -77,7 +77,11 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     private String cacheDirectory;
     private String resourcePath;
     private boolean backgroundUpdates;
-    private HashMap<String, Vector<String> >  coverageIDServer; 
+    private HashMap<String, Vector<String> >  coverageIDServer;
+    private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
+    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
+
+    
 
     private boolean intitialized;
 
@@ -1418,9 +1422,6 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         return wcsID;
     }
 
-    private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
-    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
-    
 
     private String getServerUrlString(URL url) {
 
@@ -1432,7 +1433,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             log.debug("Protocol is FILE.");
 
         } else if (protocol.equalsIgnoreCase("http")) {
-            log.debug("Protcol is HTTP.");
+            log.debug("Protocol is HTTP.");
 
             String host = url.getHost();
             String path = url.getPath();
