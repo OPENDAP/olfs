@@ -238,7 +238,7 @@ public class XMLfromRDF {
 	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc){
 		TupleQueryResult result = null;
 		boolean objisURI = false; //true if ojb is a URI/URL
-		log.debug("Sesame2Builder "+qString);
+		//log.debug("Sesame2Builder "+qString);
 		
 		try{
 			TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);

@@ -478,7 +478,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
             NTriplesWriter myNTRiplesWriter = new NTriplesWriter(myFileOutputStream);
 
-            log.info("Dumping explicit statements (as Ntriples) to: " + outrps.getAbsoluteFile());
+            //log.info("Dumping explicit statements (as Ntriples) to: " + outrps.getAbsoluteFile());
 
             myNTRiplesWriter.startRDF();
             myNTRiplesWriter.endRDF();
@@ -1124,7 +1124,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                 //log.debug("coverageid:");
                 //log.debug(valueOfcoverageid.stringValue());
                 //log.debug("coverageurl:");
-                //log.debug(valueOfcoverageurl.stringValue());
+                log.debug(valueOfcoverageurl.stringValue());
                 if (coverageIDServer.containsKey(valueOfcoverageid.stringValue()))
                     coverageIDServer.get(valueOfcoverageid.stringValue()).addElement(valueOfcoverageurl.stringValue());
                 else
@@ -1194,14 +1194,14 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         log.warn("updateRepository(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
-
+                    /*
                     log.debug("updateRepository(): Processing Contexts...");
                     processContexts(con);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
-
+                     */
 
                     log.debug("Extracting CoverageDescriptions from the Repository.");
                     extractCoverageDescrptionsFromRepository(con);
