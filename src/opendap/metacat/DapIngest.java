@@ -23,9 +23,6 @@
 package opendap.metacat;
 
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-
-//import java.util.Date;
 import java.util.Vector;
 import java.util.Enumeration;
 
@@ -37,6 +34,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +58,8 @@ public class DapIngest {
 
     // This hash map is used to ensure that catalogs are not crawled more
     // than once (preventing loops, etc.)
-    /* private ConcurrentHashMap<String, Integer> catalogsVisited;*/
     private int catalogsVisited;
     private int DDXsVisited;
-    /*private Date date;*/
     
     private boolean verbose = false;
     
@@ -73,12 +69,6 @@ public class DapIngest {
     // Caching EML access
     private EMLRetriever EMLSource;
     
-    // Cache EML here
-    /*private ResponseCache EMLCache;*/
-    
-    // This is the transformer that takes the DDX and returns EML
-    /*private Transformer transformer;*/
-
     // This provides a way to get catalogs, iterate over their child URLs and
     // access DDX urls to datasets in the catalog
     private ThreddsCatalogUtil tcc;
@@ -96,23 +86,12 @@ public class DapIngest {
 
     	catalogsVisited = 0;
     	DDXsVisited = 0;
-    	/*date = new Date();*/
     	
     	try {
     		DDXSource = new DDXRetriever(/*log,*/ useDDXCache, useDDXCache, cacheNamePrefix);
-    		
-			/*transformer = new Transformer(ddx2emlPath);*/
 			
     		EMLSource = new EMLRetriever(/*log,*/ useEMLCache, useEMLCache, cacheNamePrefix);
-    		
-    		/*
-			if (useEMLCache)
-				EMLCache = new ResponseCache(cacheNamePrefix + "EML", useEMLCache, useEMLCache);
-			else
-				EMLCache = null;
-			*/
-
-		} 
+ 		} 
     	catch (SaxonApiException e) {
 			log.debug("Transform returned an SaxonApiException: " + e.getLocalizedMessage());
 			throw e;
@@ -288,55 +267,10 @@ public class DapIngest {
 			if (eml == null) {
 				throw new Exception("No EML returned from: " + DDXURL);
 			}
-			/*
-			if (useEMLCache != null) {
-				if (verbose)
-					log.info("Caching the EML doc: " + eml);
 
-				EMLCache.setLastVisited(DDXURL, date.getTime());
-				EMLCache.setCachedResponse(DDXURL, eml);
-			}
-			*/
 			insertEML(eml);
 		}
 	}
-    
-    /** Given a DDX in a string, transform it to EML. This method is used with
-     *  other methods that work with the DDX, such as the test for 
-     *  wellformedness or the DDX caching.
-     *  
-     *  @param ddxString The DDX document to transform
-     *  @returns The EML result, in a String
-     *  @throws UnsupportedEncodingException 
-     */
-	/*
-	String getEML(String ddxString) throws SaxonApiException, UnsupportedEncodingException {
-		// Get the EML document
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		XdmNode ddxXdm = null;
-		try {
-			ddxXdm = transformer.build(new StreamSource(new ByteArrayInputStream(ddxString.getBytes("UTF-8"))));
-		}
-		catch (SaxonApiException e) {
-			log.error("Problem building XdmNode. Message: " + e.getMessage());
-			throw e;
-		} catch (UnsupportedEncodingException e) {
-			log.error("Problem building XdmNode. Message: " + e.getMessage());
-			throw e;
-		}
-		
-		try {
-			transformer.transform(ddxXdm, os);
-		} 
-		catch (SaxonApiException e) {
-			log.error("Problem with XSLT transform. Message: " + e.getMessage());
-			throw e;
-		}
-
-		return os.probeServletContext();
-	}
-    */
-    
 
     /**
      *

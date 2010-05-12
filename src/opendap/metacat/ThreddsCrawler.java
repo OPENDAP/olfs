@@ -25,6 +25,8 @@ package opendap.metacat;
 import java.io.PrintStream;
 import java.util.Enumeration;
 
+import javax.servlet.http.HttpServlet;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.OptionBuilder;
@@ -54,6 +56,9 @@ public class ThreddsCrawler {
     private int catalogsVisited = 0;
     private boolean verbose = false;
     private String cacheNamePrefix = "";
+    private String metacatUrl = "http://localhost:8080/knb/metacat";
+    private String username = "uid=jimg,o=unaffiliated,dc=ecoinformatics,dc=org";
+    private String password = "p7th0n";
     
 	/**
 	 * @param args
@@ -147,7 +152,8 @@ public class ThreddsCrawler {
 	}
 	
 	public void crawlCatalog(String catalogURL, boolean useCache, PrintStream ps) throws Exception {		
-		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, useCache);
+		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, useCache,
+				metacatUrl, username, password);
 		
 		// The ThreddsCatalogUtil caches by default, so each catalog URL
 		// is recorded (but not the catalog itself) every time nextElement()
