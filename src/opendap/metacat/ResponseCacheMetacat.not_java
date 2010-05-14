@@ -26,23 +26,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 //import java.io.FileReader;
-//import java.io.IOException;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 //import java.io.Reader;
-//import java.io.StringReader;
+import java.io.StringReader;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.jcs.JCS;
-import org.apache.jcs.access.exception.CacheException;
-
-import java.sql.*;
-
-//import edu.ucsb.nceas.metacat.client.*;
+import edu.ucsb.nceas.metacat.client.*;
 
 /**
  * Provide a cache for XML/HTTP response objects. This can hold both the DDX
@@ -80,12 +75,8 @@ public class ResponseCache {
     	private Enumeration<String> e;
  
     	ResponseCacheKeysEnumeration() {
-    		if (useJCS) {
-    			log.debug("Returning an enumeration of keys from JCS.");
-    			e = null;		// *** fix me
-    		}
-    		else if (usePostgres) {
-    			log.debug("Returning an enumeration of keys from Postgres.");
+    		if (useMetacat) {
+    			log.debug("Returning an enumeration of keys from Metacat.");
     			e = null;		// *** fix me
     		}
     		else
@@ -124,6 +115,9 @@ public class ResponseCache {
 	final static String VisitedName = "Visited.save";
     final static String CacheName = "Cache.save";
     
+    private String docidPrefix = "THREDDS.";
+    /*private String docidSchema = "InvCatalog.1.0.1.xsd";*/
+    
     private String cacheBaseName;
     
     // This hash map is used to prevent reading Responses when a previous crawl
@@ -138,18 +132,13 @@ public class ResponseCache {
     
     private boolean saveMyState;
     
-    // False by default, this controls whether the document cache uses 
-    // JCS (if true) or a ConcurrentHashMap (if false, the default)
-    private boolean useJCS = false;
-    private String JCSConfigFilename = "/jcs.cache.ccf";
-    private static final String cacheRegionName = "default";
-    private JCS jcsCache = null;
-
-    private boolean usePostgres = false;
-    private String pgUrl = "jdbc:postgresql://localhost:5432/crawl_cache:";
-    private String pgUsername = "metacat";
-    private String pgPassword = "metacat";
-    private Connection pgCache = null;
+    // False by default, this controlls whether the document cache uses 
+    // metacat (if true) or a ConcurrentHashMap (if false, the default)
+    private boolean useMetacat = false;
+    
+    /*private String metacatSessionId = "";*/
+    
+    private Metacat metacat = null;
     
     /** Build an instance of the ResponseCache and by default restore the saved
      *  LMT and Response information and, when the cache is no longer needed,
@@ -163,7 +152,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String name) throws Exception {
-    	this(name, true, true, false, false);
+    	this(name, true, true, "", "", "");
     }
     
     /** Build an instance of the ResponseCache. Always save the exit state.
@@ -176,7 +165,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState) throws Exception {
-    	this(cacheName, restoreState, true, false, false);
+    	this(cacheName, restoreState, true, "", "", "");
     }
 
     /** Build an instance of ResponseCache. The parameters provide  a way to 
@@ -192,7 +181,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState, boolean saveState) throws Exception {
-    	this(cacheName, restoreState, saveState, false, false);
+    	this(cacheName, restoreState, saveState, "", "", "");
     }
     
     /** Build an instance of ResponseCache. The parameters provide  a way to 
@@ -211,43 +200,42 @@ public class ResponseCache {
      * @param restoreState True if the saved state should be used.
      * @param saveState True if the state of the cache should be saved when
      * it is removed (i.e., when finalize() is called)
-     * @param useJCS True if the Java Cache System should be used; false by
-     * default.
+     * @param metacatURL instead of using a ConcurrentHashMap, use the
+     * referenced instance of Metacat to cache documents. 
+     * @param username Metacata DB username
+     * @param password Metacata DB password
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState, boolean saveState, 
-    		boolean useJCS, boolean usePostgres) throws Exception {
+    		String metacatUrl, String username, String password) throws Exception {
 
     	cacheBaseName = cacheName;
     	
     	responsesVisited = new ConcurrentHashMap<String, Long>();
     	
-    	if (useJCS) {
-    		log.debug("Using JCS for cache.");
-    		this.useJCS = useJCS;
-			// in your constructor you might do this
-            try {
-            	JCS.setConfigFilename(JCSConfigFilename);
-                jcsCache = JCS.getInstance(cacheRegionName);
-            }
-            catch ( CacheException e ) {
-                log.error( "Problem initializing cache for region name ["
-                  + cacheRegionName + "].", e );
-            }
-    	}
-    	else if (usePostgres) {
-    		log.debug("Configuring the Postgres data base as cache");
-    		try {
-    			Class.forName("org.postgresql.Driver");
-    			pgCache = DriverManager.getConnection(pgUrl, pgUsername, pgPassword);
-    			this.usePostgres = usePostgres;
-    		}
-    		catch (ClassNotFoundException e) {
-    			log.error("Could not load Postgres JDBC driver: " + e.getMessage());
-    		}
-    		catch (SQLException e) {
-    			log.error("SQLException: " + e.getMessage());
-    		}
+    	if (metacatUrl != "") {
+    		log.debug("Building metacat cache connection.");
+    		useMetacat = true;
+			try {
+				log.debug("Test Metacat: " + metacatUrl);
+				metacat = MetacatFactory.createMetacatConnection(metacatUrl);
+
+                log.debug("username: " + username + ", password: " + password);
+                String response = metacat.login(username, password);
+                
+                log.debug("login(): response=" + response);
+                /*metacatSessionId = metacat.getSessionId();*/
+                
+                log.debug("login(): Session ID=" + this.metacat.getSessionId());
+            } 
+            catch (MetacatAuthException mae) {
+            	log.debug("Authorization failed:\n" + mae.getMessage());
+            	throw new Exception("Metacat authorization failed:\n" + mae.getMessage());
+            } 
+            catch (MetacatInaccessibleException mie) {
+            	log.debug("Metacat Inaccessible:\n" + mie.getMessage());
+            	throw new Exception("Metacat inaccessible:\n" + mie.getMessage());
+            } 
     	}
     	else {
     		log.debug("Building ConcurrentHashMap cache data structure.");
@@ -259,7 +247,7 @@ public class ResponseCache {
     	try {
     		if (restoreState) {
     			restoreVisitedState();
-    			if (!this.useJCS && !this.usePostgres)
+    			if (!useMetacat)
     				restoreCacheState();
     		}
     	}
@@ -275,10 +263,6 @@ public class ResponseCache {
     protected void finalize() throws Exception {
     	if (saveMyState)
     		saveState();
-    	if (usePostgres && pgCache != null) {
-    		pgCache.close();
-    		pgCache = null;
-    	}
     }
     
     /** For the cache to save its state now. 
@@ -288,14 +272,8 @@ public class ResponseCache {
      */
     public void saveState() throws Exception {
     	saveVisitedState();
-    	// Not appropriate for JCS
-    	if (!this.useJCS && !this.usePostgres)
+    	if (!useMetacat)
     		saveCacheState();
-    	
-    	if (usePostgres && pgCache != null) {
-    		pgCache.close();
-    		pgCache = null;
-    	}
     }
     
     @SuppressWarnings("unchecked")
@@ -455,32 +433,80 @@ public class ResponseCache {
     	}
     }
     
+    /**
+     * To use a URL as a DocID in metacat, any dots (.) in the URL must be
+     * escaped. This function repalces dots with %2e
+     * @param URL
+     * @return The esacped URL
+     */
+    private String escapedURL(String URL) {
+    	return URL.replaceAll("\\.", "%2e");
+    }
+    
+    /**
+     * Given a URL, return the corresponding document id. A metacat docuement 
+     * id must be of the form <string>.<string>.<digit> Where the dots are 
+     * literal and <string> must not contain any dots. Furthermore, only the
+     * last two parts; the first <string> is ignored. This method returns a
+     * document id by combining the value of the class' docidPrefix with
+     * an escaped URL and a '1'. 
+     * @param URL
+     * @return A docuement id string suitable for use with metacat
+     */
+    public String getDocid(String URL) {
+    	return docidPrefix + escapedURL(URL) + ".1";
+    }
+    
+    /**
+     * Get the current value of the document id prefix - used when metacat
+     * is used to cache responses.
+     * @return The current value of the docid prefix.
+     */
+    public String getDocidPrefix() {
+    	return docidPrefix;
+    }
+    
+    /**
+     * Set the value of the document id prefix used when forming docuement ids
+     * for metacat.
+     * @param d
+     */
+    public void setDocidPrefix(String d) {
+    	docidPrefix = d;
+    }
+    
     /** Add a Response document to the cache using its URL as a key.
      * 
      * @param URL The URL
      * @param doc The Docuemnt
      */
     public void setCachedResponse(String URL, String doc) {
-    	if (useJCS) {
-            try {
-                // if it isn't null, insert it
-                if ( doc != null ) {
-                	log.debug("Caching " + URL + " in JCS.");
-                    jcsCache.put( URL, doc );
-                }
-            }
-            catch ( CacheException e ) {
-                 log.error( "Problem putting 'doc' in the cache, for key: " + URL, e );
-            }
+    	if (useMetacat) {
+    		String docid = getDocid(URL);
+    		log.debug("Caching " + URL + "(docid:" + docid + ") in metacat.");
+    		// metacat.insert(String docid, Reader xmlDocument, Reader schema)
+    		try {
+    			//FileReader fr = new FileReader(docidSchema);
+    			metacat.insert(docid, new StringReader(doc), null);
+    		}
+    		catch (FileNotFoundException e) {
+    			log.error("Could not open the file: " + docidSchema);
+    		}
+    		catch (InsufficientKarmaException e) {
+    			log.error("Error caching the response: Insufficent rights for the operation: " + e.getMessage());
+    		}
+    		catch (MetacatException e) {
+    			log.error("Error caching the response: " + e.getMessage());
+    		}
+    		catch (IOException e) {
+    			log.error("Error caching the response: Unknown error: " + e.getMessage());
+    		}
+    		catch (MetacatInaccessibleException e) {
+    			log.error("Error caching the response: Error reading the xml document: " + e.getMessage());
+    		}
     	}
-    	else if (usePostgres) {
-    		log.debug("Caching " + URL + " in postgres.");
-    		// *** fix me
-    	}
-    	else {
-    		log.debug("Caching " + URL + " in a local hash map.");
+    	else
     		responseCache.put(URL, doc);
-    	}
     }
     
     /** Retrieve a Response document from the cache.
@@ -489,19 +515,12 @@ public class ResponseCache {
      * @return The document
      */
     public String getCachedResponse(String URL) {
-    	if (useJCS) {
-    		log.debug("Reading " + URL + " from JCS.");
-            return (String) jcsCache.get( URL );
-    	}
-    	else if (usePostgres) {
-    		log.debug("Reading " + URL + " from postgres.");
-    		// *** fix me
+    	if (useMetacat) {
+    		log.debug("Reading " + URL + " from metacat.");
     		return "";
     	}
-    	else {
-    		log.debug("Reading " + URL + " from the local hash map cache.");
-    		return responseCache.get(URL);
-    	}
+    	else
+    		return responseCache.get(URL);    	
     }
     
     /** Get all of the keys in the Response document cache.

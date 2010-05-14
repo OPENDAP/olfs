@@ -38,7 +38,7 @@ import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import opendap.semantics.IRISail.ThreddsCatalogUtil;
+import opendap.metacat.ThreddsCatalogUtil;
 
 /** Crawl a THREDDS catalog and read all of the DDX objects for the data
  * sources it references. Process those so that they are transformed into EML
