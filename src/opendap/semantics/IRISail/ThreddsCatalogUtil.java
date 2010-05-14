@@ -505,8 +505,6 @@ public class ThreddsCatalogUtil {
 	 * 
 	 * @param topCatalog
 	 *            The THREDDS Catalog to serve as the root node
-	 * @param useCache
-	 *            True if the cache should be used.
 	 * @return An Enumeration
 	 * @throws Exception
 	 *             Thrown if the cache cannot be configured
