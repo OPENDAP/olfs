@@ -435,8 +435,8 @@
         
         <java classname="opendap.semantics.IRISail.ThreddsCatalogUtil"
             fork="true"
-            dir="${build.run}"
-            >
+            dir="${build.run}">
+        	<!--arg line="-r"/-->
             <classpath refid="threddsCatalogCrawler.compile.classpath"/>        
         </java>
         
