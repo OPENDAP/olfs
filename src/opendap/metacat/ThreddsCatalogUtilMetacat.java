@@ -23,7 +23,6 @@
 
 package opendap.metacat;
 
-import opendap.semantics.IRISail.ThreddsCatalogUtil;
 import org.apache.commons.cli.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
@@ -51,7 +50,6 @@ import java.util.Iterator;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import opendap.metacat.ResponseCache;
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 
@@ -70,7 +68,7 @@ public class ThreddsCatalogUtilMetacat {
 	private XMLOutputter xmlo = null;
 	private ResponseCache TCCache = null;
 	
-	private Logger log = LoggerFactory.getLogger(ThreddsCatalogUtil.class);
+	private Logger log = LoggerFactory.getLogger(ThreddsCatalogUtilMetacat.class);
 
 	/**
 	 * Default ctor; build an instance that does not use the catalog cache.
@@ -310,7 +308,7 @@ public class ThreddsCatalogUtilMetacat {
 			CommandLineParser parser = new PosixParser();
 			CommandLine cmd = parser.parse(options, args);
 
-			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil(false, "");
+			ThreddsCatalogUtilMetacat tcc = new ThreddsCatalogUtilMetacat(false, "");
 
 			//tcc.testGetCatalogURLs("http://test.opendap.org:8090/opendap/data/catalog.xml");
 			
