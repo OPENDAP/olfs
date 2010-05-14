@@ -101,40 +101,37 @@ public class ThreddsCatalogUtil {
 		this(useCache, namePrefix, useDocumentCache, false);
 	}
 	
-		/** 
-		 * Constructor. This constructor gives the finest control over the caching 
-		 * operations performed. Because some sites use lots of catalogs, it might
-		 * require lots of space to cache the entire catalog. However, it would
-		 * still be nice to know about (or avoid) loops!
-		 * 
-		 * @param useCache True if caching should be used
-		 * @param namePrefix The name of the cache files
-		 * @param useDocumentCache True if the response documents should be cached
-		 * @throws Exception
-		 */
-		public ThreddsCatalogUtil(boolean useCache, String namePrefix, boolean useDocumentCache,
-				boolean useJCS) throws Exception {
+	/**
+	 * Constructor. This constructor gives the finest control over the caching
+	 * operations performed. Because some sites use lots of catalogs, it might
+	 * require lots of space to cache the entire catalog. However, it would
+	 * still be nice to know about (or avoid) loops!
+	 * 
+	 * @param useCache
+	 *            True if caching should be used
+	 * @param namePrefix
+	 *            The name of the cache files
+	 * @param useDocumentCache
+	 *            True if the response documents should be cached
+	 * @throws Exception
+	 */
+	public ThreddsCatalogUtil(boolean useCache, String namePrefix,
+			boolean useDocumentCache, boolean usePostgres) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 		if (useCache) {
 			this.useCache = useCache;
 			this.useDocumentCache = useDocumentCache;
-			
-			// The second and third arguments to ResponseCache control 
+
+			// The second and third arguments to ResponseCache control
 			// if the existing saved-state files are used to restore the cache
 			// and if the resulting cache is saved at the end of the run.
-			// The fourth argument controls the use of JCS for response
-			// caching. Using this overrides the second and third arguments 
-			// to some degree.
-			TCCache = new ResponseCache(namePrefix + "TC", useCache, useCache, 
-					false, true);
+			// The fourth argument controls the use of Postgres for response
+			// caching. Using this overrides the second and third arguments
+			// to some degree, bescause postgres is a database and does not
+			// need to have its state saved.
+			TCCache = new ResponseCache(namePrefix + "TC", useCache, useCache, usePostgres);
 		}
-		
-	    // print internal logging state
-	    /*
-	    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-	    StatusPrinter.print(lc);
-	    */
 	}
 	
 	/**

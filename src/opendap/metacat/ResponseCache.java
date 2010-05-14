@@ -77,30 +77,79 @@ public class ResponseCache {
     private static Logger log = LoggerFactory.getLogger(ResponseCache.class);
 
     public class ResponseCacheKeysEnumeration implements Enumeration<String> {
-    	private Enumeration<String> e;
- 
+    	private Enumeration<String> e = null;
+    	ResultSet rs = null;
+    	PreparedStatement ps = null;
+    	
     	ResponseCacheKeysEnumeration() {
+        	log.debug("Returning the ResponseCacheKeysEnumeration; usePostges is "
+        			+ new Boolean(usePostgres).toString() + ".");
+    		
     		if (useJCS) {
     			log.debug("Returning an enumeration of keys from JCS.");
-    			e = null;		// *** fix me
     		}
     		else if (usePostgres) {
     			log.debug("Returning an enumeration of keys from Postgres.");
-    			e = null;		// *** fix me
-    		}
-    		else
+    			try {
+					ps = pgCache.prepareStatement("SELECT URL FROM thredds_responses");
+					rs = ps.executeQuery();
+				}
+				catch (SQLException e) {
+					log.error("Could not build result set for ResponseCacheKeysEnumeration.", e);
+				}
+			}
+    		else {
     			e = responseCache.keys();
+    		}
     	}
     	
 		@Override
 		public boolean hasMoreElements() {
-			return e.hasMoreElements();
+			if (e != null)
+				return e.hasMoreElements();
+			else if (usePostgres){
+				try {
+					return rs.next();
+				}
+				catch (SQLException e1) {
+					log.error("Could not get next row in the result set for a ResponseCacheKeysEnumeration.", e);
+					return false;
+				}
+			}
+			
+			return false;
 		}
 
 		@Override
 		public String nextElement() {
-			return e.nextElement();
+			if (e != null)
+				return e.nextElement();
+			else if (usePostgres) {
+				try {
+					return rs.getString(1);
+				}
+				catch (SQLException e1) {
+					log.error("Could not get a string from the result set for a ResponseCacheKeysEnumeration.", e);
+					return "";
+				}
+			}
+			
+			return "";
 		}
+		
+		protected void finalize() {
+			log.debug("Running finalize() in ResponseCacheKeysEnumeration.");
+			if (usePostgres) {
+				try {
+					rs.close();
+					ps.close();
+				}
+				catch (SQLException e1) {
+					log.error("Could not get a string from the result set for a ResponseCacheKeysEnumeration.", e);
+				}
+			}
+		}
+			
 	}
 
     public class ResponseVisitedKeysEnumeration implements Enumeration<String> {
@@ -163,7 +212,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String name) throws Exception {
-    	this(name, true, true, false, false);
+    	this(name, true, true, false);
     }
     
     /** Build an instance of the ResponseCache. Always save the exit state.
@@ -176,7 +225,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState) throws Exception {
-    	this(cacheName, restoreState, true, false, false);
+    	this(cacheName, restoreState, true, false);
     }
 
     /** Build an instance of ResponseCache. The parameters provide  a way to 
@@ -192,7 +241,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState, boolean saveState) throws Exception {
-    	this(cacheName, restoreState, saveState, false, false);
+    	this(cacheName, restoreState, saveState, false);
     }
     
     /** Build an instance of ResponseCache. The parameters provide  a way to 
@@ -216,7 +265,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState, boolean saveState, 
-    		boolean useJCS, boolean usePostgres) throws Exception {
+    		boolean usePostgres) throws Exception {
 
     	cacheBaseName = cacheName;
     	
@@ -224,7 +273,7 @@ public class ResponseCache {
     	
     	if (useJCS) {
     		log.debug("Using JCS for cache.");
-    		this.useJCS = useJCS;
+    		// this.useJCS = useJCS;
 			// in your constructor you might do this
             try {
             	JCS.setConfigFilename(JCSConfigFilename);
@@ -475,7 +524,43 @@ public class ResponseCache {
     	}
     	else if (usePostgres) {
     		log.debug("Caching " + URL + " in postgres.");
-    		// *** fix me
+    		
+    		PreparedStatement ps = null;
+    		ResultSet rs = null;
+			try {
+				ps = pgCache
+					.prepareStatement("SELECT doc FROM thredds_responses WHERE URL = ?");
+				ps.setString(1, URL);
+				log.debug("About to send: " + ps.toString() + " to the database.");
+				rs = ps.executeQuery();
+				if (rs != null && rs.next()) {
+					ps = pgCache
+							.prepareStatement("UPDATE thredds_responses SET doc=? WHERE URL=?");
+					ps.setString(1, doc);
+					ps.setString(2, URL);
+				} else {
+					ps = pgCache
+							.prepareStatement("INSERT INTO thredds_responses (URL, doc) VALUES (?, ?)");
+					ps.setString(1, URL);
+					ps.setString(2, doc);
+
+				}
+				log.debug("About to send: " + ps.toString() + " to the database.");
+				
+				ps.executeUpdate();
+			}
+			catch (SQLException e) {
+				log.error("Caching: Could not access the database/cache.", e);
+			}
+			finally {
+				try {
+					rs.close();
+					ps.close();
+				}
+				catch (SQLException e) {
+					log.error("Cache read: Could not close the prepared statement.", e);
+				}
+			}
     	}
     	else {
     		log.debug("Caching " + URL + " in a local hash map.");
@@ -489,19 +574,60 @@ public class ResponseCache {
      * @return The document
      */
     public String getCachedResponse(String URL) {
+    	String doc = null;
     	if (useJCS) {
     		log.debug("Reading " + URL + " from JCS.");
-            return (String) jcsCache.get( URL );
+            doc = (String) jcsCache.get( URL );
     	}
     	else if (usePostgres) {
     		log.debug("Reading " + URL + " from postgres.");
-    		// *** fix me
-    		return "";
+    		PreparedStatement ps = null;
+    		ResultSet rs = null;
+			try {
+				ps = pgCache
+						.prepareStatement("SELECT doc FROM thredds_responses WHERE URL = ?");
+				ps.setString(1, URL);
+				
+				log.debug("About to send: " + ps.toString() + " to the database.");
+				rs = ps.executeQuery();
+				if (rs != null) {
+					int count = 0;
+					while (rs.next()) {
+						++count;
+						doc = rs.getString(1);
+					}
+					rs.close();
+					if (count != 1) {
+						String countString = new Integer(count).toString();
+						throw new Exception("While accessing the entry for [" 
+								+ URL + "] the cache found " 
+								+ countString
+								+ " entries.");
+					}
+				}
+			}
+			catch (SQLException e) {
+				log.error("Cache read: Could not access the database/cache.", e);
+			}
+			catch (Exception e) {
+				log.error("Cache access error.", e);
+			}
+			finally {
+				try {
+					rs.close();
+					ps.close();
+				}
+				catch (SQLException e) {
+					log.error("Cache read: Could not close the prepared statement.", e);
+				}
+			}
     	}
     	else {
     		log.debug("Reading " + URL + " from the local hash map cache.");
-    		return responseCache.get(URL);
+    		doc = responseCache.get(URL);
     	}
+    	
+    	return doc;
     }
     
     /** Get all of the keys in the Response document cache.

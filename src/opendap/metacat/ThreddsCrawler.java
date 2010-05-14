@@ -25,8 +25,6 @@ package opendap.metacat;
 import java.io.PrintStream;
 import java.util.Enumeration;
 
-//import javax.servlet.http.HttpServlet;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.OptionBuilder;
@@ -108,19 +106,15 @@ public class ThreddsCrawler {
 		    	if (crawler.verbose)
 		    		System.out.println("Caching is off");
 		    	crawler.crawlCatalog(catalogURL, false, System.out);
-		    	if (crawler.verbose) {
-		    		Integer cv = crawler.catalogsVisited;
-		    		System.out.println("Found " + cv.toString() + " catalogs.");
-		    	}
+		    	if (crawler.verbose)
+		    		System.out.println("Found " +  new Integer(crawler.catalogsVisited).toString() + " catalogs.");
 		    }
 		    else if (line.hasOption( "r")) {
 		    	if (crawler.verbose)
 		    		System.out.println("Reading from cache, no network accesses");
 		    	crawler.crawlCatalogCache(System.out, line.hasOption( "p"));
-		    	if (crawler.verbose) {
-		    		Integer cv = crawler.catalogsVisited;
-		    		System.out.println("Read " + cv.toString() + " catalogs.");
-		    	}
+		    	if (crawler.verbose)
+		    		System.out.println("Read " + new Integer(crawler.catalogsVisited).toString() + " catalogs.");
 		    }
 		    else if (line.hasOption( "p")) {
 		    	throw new Exception("The Print Catalog option (-p) can only be used when reading from the cache (-r).");
@@ -130,10 +124,8 @@ public class ThreddsCrawler {
 		    		System.out.println("Caching is on");
 		    	crawler.crawlCatalog(catalogURL, true, System.out);
 		    	crawler.tcc.saveCatalogCache();
-		    	if (crawler.verbose) {
-		    		Integer cv = crawler.catalogsVisited;
-		    		System.out.println("Found " + cv.toString() + " catalogs.");
-		    	}
+		    	if (crawler.verbose)
+		    		System.out.println("Found " +  new Integer(crawler.catalogsVisited).toString() + " catalogs.");
 		    }
 		    
 		}
@@ -152,7 +144,7 @@ public class ThreddsCrawler {
 	}
 	
 	public void crawlCatalog(String catalogURL, boolean useCache, PrintStream ps) throws Exception {		
-		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, useCache, true);
+		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, useCache, useCache);
 		
 		// The ThreddsCatalogUtil caches by default, so each catalog URL
 		// is recorded (but not the catalog itself) every time nextElement()
@@ -172,7 +164,7 @@ public class ThreddsCrawler {
     }
 	
 	public void crawlCatalogCache(PrintStream ps, boolean printCatalog) throws Exception {
-		tcc = new ThreddsCatalogUtil(true, cacheNamePrefix);
+		tcc = new ThreddsCatalogUtil(true, cacheNamePrefix, true, true);
 
 		Enumeration<String> catalogs = tcc.getCachedCatalogEnumeration();
    	
