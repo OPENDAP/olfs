@@ -35,9 +35,6 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// import ch.qos.logback.classic.LoggerContext;
-// import ch.qos.logback.core.util.StatusPrinter;
-
 import java.io.PrintStream;
 import java.io.IOException;
 
@@ -51,7 +48,6 @@ import java.util.Iterator;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import opendap.metacat.ResponseCache;
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 
@@ -61,63 +57,17 @@ import opendap.namespaces.XLINK;
  */
 public class ThreddsCatalogUtil {
 
-	private boolean useCache = false;
-	private boolean useDocumentCache = false;
 	private XMLOutputter xmlo = null;
-	private ResponseCache TCCache = null;
 	
 	private Logger log = LoggerFactory.getLogger(ThreddsCatalogUtil.class);
 
 	/**
-	 * Default ctor; build an instance that does not use the catalog cache.
-	 * @throws Exception 
+	 * Constructor.
 	 * 
-	 * @throws Exception Thrown if the catalog cache cannot be initialized.
-	 */
-	public ThreddsCatalogUtil() throws Exception {
-		this(false, "", false);
-	}
-	
-	/**
-	 * Constructor. Build an instance that uses the cache to eliminate looping
-	 * but do not cache the actual responses.
-	 * 
-	 * @param useCache True if the cache should be used, false if not
-	 * @throws Exception Thrown if the cache cannot be initialized.
-	 */
-	public ThreddsCatalogUtil(boolean useCache, String namePrefix) throws Exception {
-		this(useCache, namePrefix, false);
-	}
-	
-	/** 
-	 * Constructor. This constructor gives the finest control over the caching 
-	 * operations performed. Because some sites use lots of catalogs, it might
-	 * require lots of space to cache the entire catalog. However, it would
-	 * still be nice to know about (or avoid) loops!
-	 * 
-	 * @param useCache True if caching should be used
-	 * @param namePrefix The name of the cache files
-	 * @param useDocumentCache True if the response documents should be cached
 	 * @throws Exception
 	 */
-	public ThreddsCatalogUtil(boolean useCache, String namePrefix, boolean useDocumentCache) throws Exception {
+	public ThreddsCatalogUtil() throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-		if (useCache) {
-			this.useCache = useCache;
-			this.useDocumentCache = useDocumentCache;
-			
-			// The second and third arguments to ResponseCache control 
-			// if the existing saved-state files are used to restore the cache
-			// and if the resulting cache is saved at the end of the run.
-			TCCache = new ResponseCache(namePrefix + "TC", true, true);
-		}
-		
-	    // print internal logging state
-	    /*
-	    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-	    StatusPrinter.print(lc);
-	    */
 	}
 	
 	/**
@@ -147,24 +97,11 @@ public class ThreddsCatalogUtil {
 	    	childURLs.push(catalogURL);
 		}
 		
-		/*
-		threddsCrawlerEnumeration(String catalogURL, boolean useCache) throws Exception {
-			childURLs = new Stack<String>();
-	    	childURLs.push(catalogURL);
-		}
-        */
-		
 		private void recur(String catalogURL) {
 			Vector<String> URLs = getCatalogRefURLs(catalogURL, false);
 			if (URLs != null) {
 				for (String URL : URLs) {
-					if (useCache && !TCCache.isVisited(URL)) {
-						TCCache.setLastVisited(URL, 1);
-						childURLs.push(URL);
-					}
-					else {	
-						childURLs.push(URL);
-					}
+					childURLs.push(URL);
 				}
 			}
 		}
@@ -279,6 +216,7 @@ public class ThreddsCatalogUtil {
 		}
 	}
 	
+	
 	public static void main(String[] args) {
 
 		try {
@@ -287,10 +225,10 @@ public class ThreddsCatalogUtil {
 			CommandLineParser parser = new PosixParser();
 			CommandLine cmd = parser.parse(options, args);
 
-			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil(false, "");
+			ThreddsCatalogUtil tcc = new ThreddsCatalogUtil();
 
-			//tcc.testGetCatalogURLs("http://test.opendap.org:8090/opendap/data/catalog.xml");
-			
+			// tcc.testGetCatalogURLs("http://test.opendap.org:8090/opendap/data/catalog.xml");
+
 			// tcc.getDataAccessURLs("http://crawlTest.opendap.org:8080/opendap/coverage/catalog.xml",datasetURLs);
 			// tcc.getDataAccessURLs("http://motherlode.ucar.edu:8080/thredds/idd/satellite.xml",datasetURLs);
 
@@ -303,11 +241,13 @@ public class ThreddsCatalogUtil {
 			// tcc.getDataAccessURLs("http://crawlTest.opendap.org:8080/opendap/catalog.xml",datasetURLs);
 			// tcc.getDataAccessURLs("http://crawlTest.opendap.org:8080/opendap/data/catalog.xml",datasetURLs);
 			// tcc.getDataAccessURLs("http://oceanwatch.pfeg.noaa.gov/thredds/catalog.xml",datasetURLs);
-			/*
+
 			tcc.crawlTest(System.out,
-					"http://blackburn.whoi.edu:8081/thredds/bathy_catalog.xml",
-					false);
-			*/
+					"http://test.opendap.org:8080/opendap/data/catalog.xml",
+					cmd.hasOption("r"));
+			
+			// tcc.crawlTest(System.out, "http://blackburn.whoi.edu:8081/thredds/bathy_catalog.xml", cmd.hasOption("r"));
+
 			// tcc.crawlTest(System.out,"http://motherlode.ucar.edu:8080/thredds/idd/satellite.xml",false);
 		}
 		catch (ParseException e) {
@@ -318,7 +258,6 @@ public class ThreddsCatalogUtil {
 			System.err.println("Error : " + e.getMessage());
 			e.printStackTrace();
 		}
-
 	}
 
 	private static Options createCmdLineOptions() {
@@ -338,10 +277,13 @@ public class ThreddsCatalogUtil {
 		options.addOption("t", false,
 				"runs internal tests and produces output on stdout.");
 
+		options.addOption("r", false,
+				"recursively descend nested THREDDS catalogs.");
+
 		return options;
 
 	}
-
+	
 	public void crawlTest(PrintStream ps, String catalogURLString,
 			boolean recurse) {
 		Vector<String> datasetURLs;
@@ -569,37 +511,10 @@ public class ThreddsCatalogUtil {
 	 * @throws Exception
 	 *             Thrown if the cache cannot be configured
 	 */
-	/*
-	public Enumeration<String> getCatalogURLs(String topCatalog, boolean useCache) throws Exception {
-		return new threddsCrawlerEnumeration(topCatalog, useCache);
-	}
-	*/
-	
-	/**
-	 * Get access to all of the THREDDS Catalogs in the cache. Note that these
-	 * URLs are returned in a random order, not the order in which they were
-	 * added to the cache.
-	 * 
-	 * @return An Enumeration of the THREDDS Catalog URLs crawled so far.
-	 */
-	public Enumeration<String> getCachedCatalogEnumeration() {
-		return TCCache.getLastVisitedKeys();
-	}
-
-	/**
-	 * Return the THREDDS catalog associated with the given URL from the 
-	 * local cache.
-	 * @param url Find this THREDDS catalog
-	 * @return The THREDDS catalog
-	 */
-	public String getCachedCatalog(String url) {
-		return TCCache.getCachedResponse(url);
+	public Enumeration<String> getCatalogURLs(String topCatalog) throws Exception {
+		return new threddsCrawlerEnumeration(topCatalog);
 	}
 	
-	public void saveCatalogCache() throws Exception {
-		TCCache.saveState();
-	}
-		
 	public static String getUrlInfo(URL url) {
 		String info = "URL:\n";
 
@@ -630,7 +545,7 @@ public class ThreddsCatalogUtil {
 			log.debug("Protcol is HTTP.");
 
 			String host = url.getHost();
-			String path = url.getPath();
+			/* String path = url.getPath(); */
 			int port = url.getPort();
 
 			baseURL = protocol + "://" + host;
@@ -709,8 +624,6 @@ public class ThreddsCatalogUtil {
 		}
 
 		return serviceURLs;
-
-		// log.warn("Thredds Catalog ingest not yet supported.");
 	}
 
 	/**
@@ -776,9 +689,6 @@ public class ThreddsCatalogUtil {
 					recurse);
 
 		return serviceURLs;
-
-		// log.warn("Thredds Catalog ingest not yet supported.");
-
 	}
 
 	/**
@@ -798,7 +708,6 @@ public class ThreddsCatalogUtil {
 			docRoot = doc.getRootElement();
 		}
 		return docRoot;
-
 	}
 
 	/**
@@ -825,10 +734,6 @@ public class ThreddsCatalogUtil {
 
 			doc = sb.build(docUrl);
 			log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
-			if (useDocumentCache) {
-				TCCache.setCachedResponse(docUrlString, xmlo.outputString(doc));
-			}
-
 		}
 		catch (MalformedURLException e) {
 			log.error("Problem with XML Document URL: " + docUrlString
@@ -1031,7 +936,5 @@ public class ThreddsCatalogUtil {
 		}
 
 		return accessURLs;
-
 	}
-
 }
