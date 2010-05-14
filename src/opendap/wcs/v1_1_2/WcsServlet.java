@@ -43,11 +43,11 @@ public class WcsServlet extends HttpServlet {
 
 
     private Logger log;
-    private DispatchHandler wcsService = null;
+    private DispatchHandler httpService = null;
 
-    private FormHandler form = null;
-    private PostHandler post = null;
-    private SoapHandler soap = null;
+    private FormHandler formService = null;
+    private PostHandler postService = null;
+    private SoapHandler soapService = null;
 
     //private Document configDoc;
 
@@ -58,33 +58,32 @@ public class WcsServlet extends HttpServlet {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        
-        wcsService = new DispatchHandler();
-        form = new FormHandler();
-        post = new PostHandler();
-        soap = new SoapHandler();
 
+        // Build Handler Objects
+        httpService = new DispatchHandler();
+        formService = new FormHandler();
+        postService = new PostHandler();
+        soapService = new SoapHandler();
 
+        // Build configuration elements
         Element config  = new Element("config");
-        Element prefix = new Element("prefix");
+        Element prefix  = new Element("prefix");
 
 //        System.out.println(ServletUtil.probeServlet(this));
 
-        ServletContext sc = this.getServletContext();
-
-        
-        prefix.setText(sc.getContextPath());
+        // ServletContext sc = this.getServletContext();
+        // prefix.setText(sc.getContextPath());
         config.addContent(prefix);
 
         try {
             prefix.setText("/");
-            wcsService.init(this,config);
+            httpService.init(this,config);
             prefix.setText("/form");
-            form.init(this,config);
+            formService.init(this,config);
             prefix.setText("/post");
-            post.init(this,config);
+            postService.init(this,config);
             prefix.setText("/soap");
-            soap.init(this,config);
+            soapService.init(this,config);
            
         } catch (Exception e) {
             throw new ServletException(e);
@@ -95,7 +94,7 @@ public class WcsServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp){
         try {
-            wcsService.handleRequest(req, resp);
+            httpService.handleRequest(req, resp);
         }
         catch (Throwable t) {
             try {
@@ -123,14 +122,14 @@ public class WcsServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         try {
 
-            if(post.requestCanBeHandled(req)){
-                post.handleRequest(req,resp);
+            if(postService.requestCanBeHandled(req)){
+                postService.handleRequest(req,resp);
             }
-            else if(soap.requestCanBeHandled(req)){
-                soap.handleRequest(req,resp);
+            else if(soapService.requestCanBeHandled(req)){
+                soapService.handleRequest(req,resp);
             }
-            else if(form.requestCanBeHandled(req)){
-                form.handleRequest(req,resp);
+            else if(formService.requestCanBeHandled(req)){
+                formService.handleRequest(req,resp);
             }
             else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);

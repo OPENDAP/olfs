@@ -83,7 +83,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
     
 
-    private boolean intitialized;
+    private boolean initialized;
 
 
     public StaticRDFCatalog() {
@@ -111,7 +111,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         cacheDirectory = null;
         resourcePath = null;
 
-        intitialized = false;
+        initialized = false;
     }
 
 
@@ -128,7 +128,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         try {
 
 
-
+            Map<String,String> env = System.getenv();
             catalog.resourcePath = ".";
             catalog.cacheDirectory = ".";
 
@@ -148,6 +148,8 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             boolean done = false;
 
             catalog.setupRepository();
+            catalog.extractCoverageDescrptionsFromRepository();
+            catalog.updateCatalogCache();
 
             for(int i=0; i<1 ;i++){
                 startTime = new Date().getTime();
@@ -177,7 +179,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
     public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
 
-        if (intitialized)
+        if (initialized)
             return;
 
 
@@ -191,8 +193,8 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         setupRepository();
 
-        //extractCoverageDescrptionsFromRepository();
-        //updateCatalogCache();
+        extractCoverageDescrptionsFromRepository();
+        updateCatalogCache();
         
         if (backgroundUpdates) {
             catalogUpdateThread = new Thread(this);
@@ -203,7 +205,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-        intitialized = true;
+        initialized = true;
     }
 
 

@@ -21,8 +21,9 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.semantics.IRISail;
+package opendap.metacat;
 
+import opendap.semantics.IRISail.ThreddsCatalogUtil;
 import org.apache.commons.cli.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
@@ -62,7 +63,7 @@ import opendap.namespaces.XLINK;
  * as a cache. That never really panned out but I'm saving this in case it
  * proves useful... 
  */
-public class ThreddsCatalogUtil {
+public class ThreddsCatalogUtilMetacat {
 
 	private boolean useCache = false;
 	private boolean useDocumentCache = false;
@@ -77,7 +78,7 @@ public class ThreddsCatalogUtil {
 	 * 
 	 * @throws Exception Thrown if the catalog cache cannot be initialized.
 	 */
-	public ThreddsCatalogUtil() throws Exception {
+	public ThreddsCatalogUtilMetacat() throws Exception {
 		this(false, "", false, "", "", "");
 	}
 	
@@ -88,7 +89,7 @@ public class ThreddsCatalogUtil {
 	 * @param useCache True if the cache should be used, false if not
 	 * @throws Exception Thrown if the cache cannot be initialized.
 	 */
-	public ThreddsCatalogUtil(boolean useCache, String namePrefix) throws Exception {
+	public ThreddsCatalogUtilMetacat(boolean useCache, String namePrefix) throws Exception {
 		this(useCache, namePrefix, false, "", "", "");
 	}
 	
@@ -103,7 +104,7 @@ public class ThreddsCatalogUtil {
 	 * @param useDocumentCache True if the response documents should be cached
 	 * @throws Exception
 	 */
-	public ThreddsCatalogUtil(boolean useCache, String namePrefix, boolean useDocumentCache) throws Exception {
+	public ThreddsCatalogUtilMetacat(boolean useCache, String namePrefix, boolean useDocumentCache) throws Exception {
 		this(useCache, namePrefix, useDocumentCache, "", "", "");
 	}
 	
@@ -118,7 +119,7 @@ public class ThreddsCatalogUtil {
 		 * @param useDocumentCache True if the response documents should be cached
 		 * @throws Exception
 		 */
-		public ThreddsCatalogUtil(boolean useCache, String namePrefix, boolean useDocumentCache,
+		public ThreddsCatalogUtilMetacat(boolean useCache, String namePrefix, boolean useDocumentCache,
 				String metacatUrl, String username, String password) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
