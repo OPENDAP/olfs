@@ -69,6 +69,14 @@ import java.sql.*;
  *       catalogs were generally uniform and about 1.2K each, so 43,000 should
  *       have used about 53MB of storage space.
  *       
+ * @note Switched to Postgres for the cache (which is really a misnomer, its 
+ * 	     not a true cache but a persistent record of the crawl). 42K catalogs
+ *       read and stored in ~5 hours. I'm still using the ConcurrentHashMap
+ *       to store the 'visited' information. I've also tried the Java caching
+ *       system (JCS) but that seems to be designed as a true cache where it's
+ *       not possible to be sure a previously cached item is still in the cache.
+ *       (5/14/10)
+ *       
  * @author jimg
  * 
  */
