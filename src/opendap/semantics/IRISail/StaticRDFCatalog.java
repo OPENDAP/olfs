@@ -74,7 +74,10 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     private boolean stopWorking = false;
 
     private Element _config;
-    private String cacheDirectory;
+
+
+    private String catalogCacheDirectory;
+    private String owlim_storage_folder;
     private String resourcePath;
     private boolean backgroundUpdates;
     private HashMap<String, Vector<String> >  coverageIDServer;
@@ -108,7 +111,8 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         buildDoc = null;
         _lastModified = -1;
         _config = null;
-        cacheDirectory = null;
+        catalogCacheDirectory = null;
+        owlim_storage_folder ="owlim-storage";
         resourcePath = null;
 
         initialized = false;
@@ -130,7 +134,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
             Map<String,String> env = System.getenv();
             catalog.resourcePath = ".";
-            catalog.cacheDirectory = ".";
+            catalog.catalogCacheDirectory = ".";
 
             String configFileName;
 
@@ -143,13 +147,14 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
 
             catalog._config = (Element)olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
-            catalog.processConfig(catalog._config, catalog.cacheDirectory, catalog.resourcePath);
+            catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
 
             boolean done = false;
 
             catalog.setupRepository();
             catalog.extractCoverageDescrptionsFromRepository();
             catalog.updateCatalogCache();
+            catalog.shutdownRepository();
 
             for(int i=0; i<1 ;i++){
                 startTime = new Date().getTime();
@@ -195,7 +200,9 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         extractCoverageDescrptionsFromRepository();
         updateCatalogCache();
-        
+
+        shutdownRepository();
+
         if (backgroundUpdates) {
             catalogUpdateThread = new Thread(this);
             catalogUpdateThread.start();
@@ -217,20 +224,20 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         /** ########################################################
          * Process configuration.
          */
-        cacheDirectory = defaultCacheDirectory;
+        catalogCacheDirectory = defaultCacheDirectory;
         e = config.getChild("CacheDirectory");
         if (e != null)
-            cacheDirectory = e.getTextTrim();
-        if (cacheDirectory != null &&
-                cacheDirectory.length() > 0 &&
-                !cacheDirectory.endsWith("/"))
-            cacheDirectory += "/";
+            catalogCacheDirectory = e.getTextTrim();
+        if (catalogCacheDirectory != null &&
+                catalogCacheDirectory.length() > 0 &&
+                !catalogCacheDirectory.endsWith("/"))
+            catalogCacheDirectory += "/";
 
-        file = new File(cacheDirectory);
+        file = new File(catalogCacheDirectory);
         if (!file.exists()) {
             if (!file.mkdirs()) {
-                log.error("Unable to create cache directory: " + cacheDirectory);
-                if(!cacheDirectory.equals(defaultCacheDirectory)){
+                log.error("Unable to create cache directory: " + catalogCacheDirectory);
+                if(!catalogCacheDirectory.equals(defaultCacheDirectory)){
                     file = new File(defaultCacheDirectory);
                     if (!file.exists()) {
                         if (!file.mkdirs()) {
@@ -245,7 +252,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
             }
         }
-        log.info("Using cacheDirectory: "+ cacheDirectory);
+        log.info("Using catalogCacheDirectory: "+ catalogCacheDirectory);
 
         resourcePath = defaultResourcePath;
         e = config.getChild("ResourcePath");
@@ -290,30 +297,45 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     }
-
+    private void shutdownRepository() throws RepositoryException, InterruptedException {
+        log.debug("Shutting down Repository...");
+        owlse2.shutDown();
+        log.debug("Repository shutdown complete.");
+    }
 
     private void setupRepository() throws RepositoryException, InterruptedException {
 
 
-        log.info("Building Semantic Repository.");
+        log.info("Setting up Semantic Repository.");
 
         //OWLIM Sail Repository (inferencing makes this somewhat slow)
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
-        owlse2 = new IRISailRepository(owlimSail, resourcePath, cacheDirectory); //owlim inferencing
+        owlse2 = new IRISailRepository(owlimSail, resourcePath, catalogCacheDirectory); //owlim inferencing
+
 
         //owlse2 = new IRISailRepository(new MemoryStore()); //memory store
 
         log.info("Configuring Semantic Repository.");
-        File storageDir = new File(cacheDirectory); //define local copy of repository
+        File storageDir = new File(catalogCacheDirectory); //define local copy of repository
         owlimSail.setDataDir(storageDir);
+        log.debug("Semantic Repository Data directory set to: "+ catalogCacheDirectory);
         // prepare config
-        owlimSail.setParameter("storage-folder", "owlim-storage");
+        owlimSail.setParameter("storage-folder", owlim_storage_folder);
+        log.debug("Semantic Repository 'storage-folder' set to: "+owlim_storage_folder);
 
         // Choose the operational ruleset
-        owlimSail.setParameter("ruleset", "owl-horst");
+        String ruleset;
+        ruleset = "owl-horst";
+        //ruleset = "owl-max";
+
+        owlimSail.setParameter("ruleset", ruleset);
         //owlimSail.setParameter("ruleset", "owl-max");
         //owlimSail.setParameter("partialRDFs", "false");
+        log.debug("Semantic Repository 'ruleset' set to: "+ ruleset);
+
+
         log.info("Intializing Semantic Repository.");
+
         // Initialize repository
         owlse2.initialize(); //needed
         log.info("Semantic Repository Ready.");
@@ -764,12 +786,22 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    public void ingestCoverageDescription(Element cde, long lastModified) throws Exception {
+    public void ingestCoverageDescription(Element cde, long lastModified)  {
 
         CoverageDescription cd;
+        try {
         cd = new CoverageDescription(cde, lastModified);
         coverages.put(cd.getIdentifier(), cd);
         log.info("Ingested CoverageDescription: " + cd.getIdentifier());
+        } catch (WcsException e) {
+            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            String wcseElem = xmlo.outputString(e.getExceptionElement());
+            String cvgDesc = xmlo.outputString(cde);
+            log.error("Failed to ingest CoverageDescription!\n" +
+                    "WcsException: \n"+wcseElem+"\n"+
+                    "Bad CoverageDescription:\n"+cvgDesc
+            );
+        }
     }
 
     public boolean hasCoverage(String id) {
@@ -1079,11 +1111,16 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    public void updateCatalog()  throws InterruptedException{
+    public void updateCatalog()  throws RepositoryException, InterruptedException{
 
-      if(updateRepository())
-          updateCatalogCache();
-
+        setupRepository();
+        try {
+            if (updateRepository())
+                updateCatalogCache();
+        }
+        finally {
+            shutdownRepository();
+        }
     }
 
 
@@ -1187,7 +1224,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
 
-                    String filename = cacheDirectory + "daprepository2";
+                    String filename = catalogCacheDirectory + "daprepository2";
                     log.debug("updateRepository(): Dumping Semantic Repository to: "+filename);
                     dumpRepository(con, filename);
                     if(thread.isInterrupted() || stopWorking){
@@ -1210,7 +1247,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
 
-                    filename = cacheDirectory + "coverageXMLfromRDF.xml";
+                    filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
                     log.debug("updateRepository(): Dumping CoverageDescriptions Document to: "+filename);
                     dumpCoverageDescriptionsDocument(filename);
                     if(thread.isInterrupted() || stopWorking){
@@ -1260,48 +1297,56 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
-
     public void run() {
-        log.info("************* STARTING CATALOG UPDATE THREAD.");
+
         try {
-            log.info("************* CATALOG UPDATE THREAD sleeping for "+ firstUpdateDelay /1000.0 +" seconds.");
-            Thread.sleep(firstUpdateDelay);
-
-        } catch (InterruptedException e) {
-            log.warn("Caught Interrupted Exception.");
-            stopWorking = true;
-        }
-
-        int updateCounter = 0;
-        long startTime, endTime;
-        long elapsedTime, sleepTime;
-        stopWorking = false;
-        Thread thread = Thread.currentThread();
-
-        while (!stopWorking) {
-
+            log.info("************* STARTING CATALOG UPDATE THREAD.");
             try {
-
-                startTime = new Date().getTime();
-                updateCatalog();
-                endTime = new Date().getTime();
-                elapsedTime = (endTime - startTime);
-                updateCounter++;
-                log.debug("Completed catalog update "+ updateCounter + " in "+ elapsedTime/1000.0 + " seconds.");
-
-                sleepTime =   catalogUpdateInterval - elapsedTime;
-                stopWorking = thread.isInterrupted();
-                if(!stopWorking && sleepTime >0) {
-                    log.debug("Catalog Update thread sleeping for "+ sleepTime/1000.0 + " seconds.");
-                    Thread.sleep(sleepTime);
-                }
+                log.info("************* CATALOG UPDATE THREAD sleeping for " + firstUpdateDelay / 1000.0 + " seconds.");
+                Thread.sleep(firstUpdateDelay);
 
             } catch (InterruptedException e) {
                 log.warn("Caught Interrupted Exception.");
                 stopWorking = true;
-
             }
+
+            int updateCounter = 0;
+            long startTime, endTime;
+            long elapsedTime, sleepTime;
+            stopWorking = false;
+            Thread thread = Thread.currentThread();
+
+            while (!stopWorking) {
+
+                try {
+
+                    startTime = new Date().getTime();
+                    try {
+                        updateCatalog();
+                    } catch (RepositoryException e) {
+                        log.error("Problem using Repository! msg: "+e.getMessage());
+                    }
+                    endTime = new Date().getTime();
+                    elapsedTime = (endTime - startTime);
+                    updateCounter++;
+                    log.debug("Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
+
+                    sleepTime = catalogUpdateInterval - elapsedTime;
+                    stopWorking = thread.isInterrupted();
+                    if (!stopWorking && sleepTime > 0) {
+                        log.debug("Catalog Update thread sleeping for " + sleepTime / 1000.0 + " seconds.");
+                        Thread.sleep(sleepTime);
+                    }
+
+                } catch (InterruptedException e) {
+                    log.warn("Caught Interrupted Exception.");
+                    stopWorking = true;
+
+                }
+            }
+        }
+        finally {
+            destroy();
         }
         log.info("************* EXITING CATALOG UPDATE THREAD.");
 
