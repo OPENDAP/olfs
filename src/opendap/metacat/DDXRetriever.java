@@ -41,9 +41,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-/** This class handles the task of getting a DDX given its URL. It will
- *  test the returned document to see if it is well-formed and it will
- *  cache the document. 
+/** 
+ * This class handles the task of getting a DDX given its URL. It will
+ * test the returned document to see if it is well-formed and it will
+ * cache the document. 
  *  
  * @author jimg
  *
@@ -59,10 +60,12 @@ public class DDXRetriever {
     private ResponseCache DDXCache = null;
     
 	public DDXRetriever() throws Exception {
-		this(true, true, "");
+		this(true, "", true, false, "");
 	}
 
-	public DDXRetriever(boolean useDDXsVisited, boolean saveDDXs, String namePrefix) throws Exception {
+	public DDXRetriever(boolean useDDXsVisited, String namePrefix, boolean saveDDXs, 
+			boolean usePostgres, String tableName) throws Exception {
+		
 		this.useDDXsVisited = useDDXsVisited;
 		this.saveDDXs = saveDDXs;
 		
@@ -70,7 +73,8 @@ public class DDXRetriever {
 		// persistent form and will cause the cache to be written when 
 		// the DDXCache instance is collected.
 		if (useDDXsVisited || saveDDXs)
-			DDXCache = new ResponseCache(namePrefix + "DDX", useDDXsVisited, saveDDXs);
+			DDXCache = new ResponseCache(namePrefix + "DDX", useDDXsVisited, saveDDXs,
+					usePostgres, tableName);
 	}
 	
 	/**
@@ -114,7 +118,7 @@ public class DDXRetriever {
 		    boolean useCache = !line.hasOption( "n");
 		    String cacheNamePrefix = line.getOptionValue("cache-name");
 		    
-		    retriever = new DDXRetriever(useCache, useCache, cacheNamePrefix);
+		    retriever = new DDXRetriever(useCache, cacheNamePrefix, useCache, useCache, "ddx_responses");
 
 		    if (line.hasOption( "r")) {
 		    	System.out.println("DDX: " + retriever.getCachedDDXDoc(ddxURL));

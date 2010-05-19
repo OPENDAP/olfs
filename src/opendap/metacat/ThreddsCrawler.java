@@ -54,10 +54,7 @@ public class ThreddsCrawler {
     private int catalogsVisited = 0;
     private boolean verbose = false;
     private String cacheNamePrefix = "";
-   /* private String metacatUrl = "http://localhost:8080/knb/metacat";
-    private String username = "uid=jimg,o=unaffiliated,dc=ecoinformatics,dc=org";
-    private String password = "p7th0n";*/
-    
+     
 	/**
 	 * @param args
 	 */
@@ -167,7 +164,7 @@ public class ThreddsCrawler {
 		tcc = new ThreddsCatalogUtil(true, cacheNamePrefix, true, true);
 
 		Enumeration<String> catalogs = tcc.getCachedCatalogEnumeration();
-   	
+    	   	
     	while (catalogs.hasMoreElements()) {
     		String childURL = catalogs.nextElement();
     		ps.println("catalog: " + childURL);

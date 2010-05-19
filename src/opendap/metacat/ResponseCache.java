@@ -99,7 +99,7 @@ public class ResponseCache {
     		else if (usePostgres) {
     			log.debug("Returning an enumeration of keys from Postgres.");
     			try {
-					ps = pgCache.prepareStatement("SELECT URL FROM thredds_responses");
+					ps = pgCache.prepareStatement("SELECT URL FROM " + pgTable);
 					rs = ps.executeQuery();
 				}
 				catch (SQLException e) {
@@ -204,6 +204,7 @@ public class ResponseCache {
 
     private boolean usePostgres = false;
     private String pgUrl = "jdbc:postgresql://localhost:5432/crawl_cache:";
+    private String pgTable;
     private String pgUsername = "metacat";
     private String pgPassword = "metacat";
     private Connection pgCache = null;
@@ -220,7 +221,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String name) throws Exception {
-    	this(name, true, true, false);
+    	this(name, true, true, false, "");
     }
     
     /** Build an instance of the ResponseCache. Always save the exit state.
@@ -233,7 +234,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState) throws Exception {
-    	this(cacheName, restoreState, true, false);
+    	this(cacheName, restoreState, true, false, "");
     }
 
     /** Build an instance of ResponseCache. The parameters provide  a way to 
@@ -249,7 +250,12 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState, boolean saveState) throws Exception {
-    	this(cacheName, restoreState, saveState, false);
+    	this(cacheName, restoreState, saveState, false, "");
+    }
+    
+    public ResponseCache(String cacheName, boolean restoreState, boolean saveState,
+    		boolean usePostgres) throws Exception {
+    	this(cacheName, restoreState, saveState, false, "thredds_responses");
     }
     
     /** Build an instance of ResponseCache. The parameters provide  a way to 
@@ -273,7 +279,7 @@ public class ResponseCache {
      * @throws Exception
      */
     public ResponseCache(String cacheName, boolean restoreState, boolean saveState, 
-    		boolean usePostgres) throws Exception {
+    		boolean usePostgres, String tableName) throws Exception {
 
     	cacheBaseName = cacheName;
     	
@@ -298,6 +304,8 @@ public class ResponseCache {
     			Class.forName("org.postgresql.Driver");
     			pgCache = DriverManager.getConnection(pgUrl, pgUsername, pgPassword);
     			this.usePostgres = usePostgres;
+    			
+    			this.pgTable = tableName;
     		}
     		catch (ClassNotFoundException e) {
     			log.error("Could not load Postgres JDBC driver: " + e.getMessage());
@@ -536,19 +544,19 @@ public class ResponseCache {
     		PreparedStatement ps = null;
     		ResultSet rs = null;
 			try {
-				ps = pgCache
-					.prepareStatement("SELECT doc FROM thredds_responses WHERE URL = ?");
+				String select = "SELECT doc FROM " + pgTable + " WHERE URL = ?";
+				ps = pgCache.prepareStatement(select);
 				ps.setString(1, URL);
 				log.debug("About to send: " + ps.toString() + " to the database.");
 				rs = ps.executeQuery();
 				if (rs != null && rs.next()) {
-					ps = pgCache
-							.prepareStatement("UPDATE thredds_responses SET doc=? WHERE URL=?");
+					String update = "UPDATE " + pgTable + " SET doc=? WHERE URL=?";
+					ps = pgCache.prepareStatement(update);
 					ps.setString(1, doc);
 					ps.setString(2, URL);
 				} else {
-					ps = pgCache
-							.prepareStatement("INSERT INTO thredds_responses (URL, doc) VALUES (?, ?)");
+					String insert = "INSERT INTO " + pgTable + " (URL, doc) VALUES (?, ?)";
+					ps = pgCache.prepareStatement(insert);
 					ps.setString(1, URL);
 					ps.setString(2, doc);
 
@@ -592,8 +600,8 @@ public class ResponseCache {
     		PreparedStatement ps = null;
     		ResultSet rs = null;
 			try {
-				ps = pgCache
-						.prepareStatement("SELECT doc FROM thredds_responses WHERE URL = ?");
+				String select = "SELECT doc FROM " + pgTable + " WHERE URL = ?";
+				ps = pgCache.prepareStatement(select);
 				ps.setString(1, URL);
 				
 				log.debug("About to send: " + ps.toString() + " to the database.");
