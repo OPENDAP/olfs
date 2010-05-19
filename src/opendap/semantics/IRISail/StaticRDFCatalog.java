@@ -119,7 +119,6 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
     public static void main(String[] args) {
 
         long startTime, endTime;
@@ -132,21 +131,21 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         try {
 
 
-            Map<String,String> env = System.getenv();
+            Map<String, String> env = System.getenv();
             catalog.resourcePath = ".";
             catalog.catalogCacheDirectory = ".";
 
             String configFileName;
 
             configFileName = "file:///data/haibo/workspace/ioos/wcs_service.xml";
-            if(args.length>0)
+            if (args.length > 0)
                 configFileName = args[0];
 
 
-            catalog.log.debug("main() using config file: "+configFileName);
+            catalog.log.debug("main() using config file: " + configFileName);
             Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
 
-            catalog._config = (Element)olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
+            catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
             catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
 
             boolean done = false;
@@ -154,16 +153,41 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             catalog.setupRepository();
             catalog.extractCoverageDescrptionsFromRepository();
             catalog.updateCatalogCache();
+            HashMap<String, Vector<String>> serverIDs = catalog.getCoverageIDServerURL();
             catalog.shutdownRepository();
 
-            for(int i=0; i<1 ;i++){
+            String serverUrl, prefix, localId;
+
+            for (String coverageID : serverIDs.keySet()) {
+                System.out.println("CoverageID: " + coverageID);
+                Vector<String> datasetUrls = serverIDs.get(coverageID);
+                for (String url : datasetUrls) {
+
+                    System.out.println("    datasetUrls: " + url);
+
+                    serverUrl = catalog.getServerUrlString(new URL(url));
+                    System.out.println("    serverUrl:   " + serverUrl);
+
+                    localId = url.substring(serverUrl.length(),url.length());
+                    System.out.println("    localID:     "+localId);
+
+                    
+
+
+
+
+                }
+            }
+
+
+            for (int i = 0; i < 1; i++) {
                 startTime = new Date().getTime();
                 //catalog.setupRepository();
                 catalog.updateCatalog();
                 //catalog.destroy();
                 endTime = new Date().getTime();
-                elapsedTime = (endTime - startTime)/1000.0;
-                catalog.log.debug("Completed catalog update in "+elapsedTime+ " seconds.");
+                elapsedTime = (endTime - startTime) / 1000.0;
+                catalog.log.debug("Completed catalog update in " + elapsedTime + " seconds.");
                 catalog.log.debug("########################################################################################");
                 catalog.log.debug("########################################################################################");
                 catalog.log.debug("########################################################################################");
@@ -179,7 +203,6 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
     }
-
 
 
     public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
