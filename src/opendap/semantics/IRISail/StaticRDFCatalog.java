@@ -159,23 +159,22 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             String serverUrl, prefix, localId;
 
             for (String coverageID : serverIDs.keySet()) {
-                System.out.println("CoverageID: " + coverageID);
+                catalog.log.debug("CoverageID: " + coverageID);
                 Vector<String> datasetUrls = serverIDs.get(coverageID);
                 for (String url : datasetUrls) {
 
-                    System.out.println("    datasetUrls: " + url);
+                    catalog.log.debug("    datasetUrls: " + url);
 
                     serverUrl = catalog.getServerUrlString(new URL(url));
-                    System.out.println("    serverUrl:   " + serverUrl);
+                    catalog.log.debug("    serverUrl:   " + serverUrl);
 
                     localId = url.substring(serverUrl.length(),url.length());
-                    System.out.println("    localID:     "+localId);
+                    catalog.log.debug("    localID:     "+localId);
 
-                    
+                    prefix = coverageID.substring(0,coverageID.indexOf(localId));
+                    catalog.log.debug("    prefix:      "+prefix);
 
-
-
-
+                    catalog.serviceIDs.put(serverUrl,prefix);
                 }
             }
 
