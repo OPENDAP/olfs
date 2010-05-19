@@ -179,6 +179,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             }
 
 
+            catalog.log.debug("State update complete.");
             for (int i = 0; i < 1; i++) {
                 startTime = new Date().getTime();
                 //catalog.setupRepository();
@@ -198,7 +199,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             e.printStackTrace();
         }
         finally {
-            catalog.destroy();
+            //catalog.destroy();
 
         }
     }
@@ -663,7 +664,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
             owlse2.shutDown();
-            
+
             log.info("Semantic Repository Has Been Shutdown.");
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");
