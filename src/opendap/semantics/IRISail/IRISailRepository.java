@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,6 +77,8 @@ public class IRISailRepository extends SailRepository {
     // constructor
     private Logger log;
 
+    
+
     private String resourceDir;
     private String contentDir;
 
@@ -84,20 +87,20 @@ public class IRISailRepository extends SailRepository {
 
     private ProcessingTypes postProcessFlag;
 
-    private boolean isRepositoryDown;
+    private AtomicBoolean isRepositoryDown;
     
     public void initialize() throws org.openrdf.repository.RepositoryException {
         super.initialize();
-        isRepositoryDown= false;
+        isRepositoryDown.set(false);
         setRepositoryDown (true);
     }
     public void setRepositoryDown(Boolean repositoryOn) throws org.openrdf.repository.RepositoryException {
         
-        isRepositoryDown= repositoryOn;
+        isRepositoryDown.set(repositoryOn);
     }
     public Boolean isRepositoryDown() throws org.openrdf.repository.RepositoryException {
        
-        return isRepositoryDown;
+        return isRepositoryDown.get();
     }
 
     public Boolean hasContext(URI uriContext, RepositoryConnection con)

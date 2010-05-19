@@ -159,17 +159,17 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             String serverUrl, prefix, localId;
 
             for (String coverageID : serverIDs.keySet()) {
-                System.out.println("CoverageID: " + coverageID);
+                catalog.log.debug("CoverageID: " + coverageID);
                 Vector<String> datasetUrls = serverIDs.get(coverageID);
                 for (String url : datasetUrls) {
 
-                    System.out.println("    datasetUrls: " + url);
+                    catalog.log.debug("    datasetUrls: " + url);
 
                     serverUrl = catalog.getServerUrlString(new URL(url));
-                    System.out.println("    serverUrl:   " + serverUrl);
+                    catalog.log.debug("    serverUrl:   " + serverUrl);
 
                     localId = url.substring(serverUrl.length(),url.length());
-                    System.out.println("    localID:     "+localId);
+                    catalog.log.debug("    localID:     "+localId);
 
                     
 
@@ -709,15 +709,16 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             log.debug("destroy(): WriteLocks Aquired.");
             setStopFlag(true);
             if(catalogUpdateThread!=null){
-                log.debug("Current thread '"+Thread.currentThread().getName()+"' Interrupting thread '"+catalogUpdateThread+"'");
+                log.debug("destroy() Current thread '"+Thread.currentThread().getName()+"' Interrupting catalogUpdateThread '"+catalogUpdateThread+"'");
                 catalogUpdateThread.interrupt();
+                log.debug("destroy(): catalogUpdateThread '"+catalogUpdateThread+"' interrupt() called.");
             }
-            log.info("Shutting Down Semantic Repository.");
+            log.info("destroy() Shutting Down Semantic Repository.");
 
-if (!owlse2.isRepositoryDown()){
-            owlse2.shutDown();
-}
-            log.info("Semantic Repository Has Been Shutdown.");
+            if (!owlse2.isRepositoryDown()){
+                        owlse2.shutDown();
+            }
+            log.info("destroy: Semantic Repository Has Been Shutdown.");
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");
         }
@@ -725,6 +726,7 @@ if (!owlse2.isRepositoryDown()){
             catLock.unlock();
             reposLock.unlock();
             log.debug("destroy(): Released WriteLock for _catalogLock and _repositoryLock.");
+            log.debug("destroy(): Complete.");
         }
 
     }
