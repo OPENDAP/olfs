@@ -91,6 +91,7 @@ public class IRISailRepository extends SailRepository {
     
     public void initialize() throws org.openrdf.repository.RepositoryException {
         super.initialize();
+
         isRepositoryDown.set(false);
         setRepositoryDown (true);
     }
@@ -123,7 +124,7 @@ public class IRISailRepository extends SailRepository {
         downService = new HashMap<String, Boolean>();
         this.resourceDir = resourceDir;
         this.contentDir = contentDir;
-
+        isRepositoryDown = new AtomicBoolean();
         constructQuery = new Vector<String>();
         constructContext = new HashMap<String, String>();
     }
