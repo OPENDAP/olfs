@@ -242,10 +242,18 @@ public class ThreddsCatalogUtil {
 			// tcc.getDataAccessURLs("http://crawlTest.opendap.org:8080/opendap/data/catalog.xml",datasetURLs);
 			// tcc.getDataAccessURLs("http://oceanwatch.pfeg.noaa.gov/thredds/catalog.xml",datasetURLs);
 
-			tcc.crawlTest(System.out,
-					"http://test.opendap.org:8080/opendap/data/catalog.xml",
-					cmd.hasOption("r"));
-			
+
+
+
+            Vector<String> urls = tcc.getDDXUrls("http://localhost:8080/opendap/catalog.xml",true);
+
+            for(String url: urls){
+                System.out.println(url);
+            }
+
+
+            // tcc.crawlTest(System.out,"http://localhost:8080/opendap/catalog.xml",cmd.hasOption("r"));
+
 			// tcc.crawlTest(System.out, "http://blackburn.whoi.edu:8081/thredds/bathy_catalog.xml", cmd.hasOption("r"));
 
 			// tcc.crawlTest(System.out,"http://motherlode.ucar.edu:8080/thredds/idd/satellite.xml",false);
