@@ -63,6 +63,8 @@ public class CoverageRequestProcessor {
                     WcsException.INVALID_PARAMETER_VALUE,"wcs:Identifier");
 
 
+
+        
         String dataAccessURL = getNetcdfDataAccessURL(req,urlBase);
         String metadataAccessURL = getMetadataAccessURL(req,urlBase);
 

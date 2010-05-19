@@ -148,37 +148,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
             catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
 
-            boolean done = false;
-
-            catalog.setupRepository();
-            catalog.extractCoverageDescrptionsFromRepository();
-            catalog.updateCatalogCache();
-            HashMap<String, Vector<String>> serverIDs = catalog.getCoverageIDServerURL();
-            catalog.shutdownRepository();
-
-            String serverUrl, prefix, localId;
-
-            for (String coverageID : serverIDs.keySet()) {
-                catalog.log.debug("CoverageID: " + coverageID);
-                Vector<String> datasetUrls = serverIDs.get(coverageID);
-                for (String url : datasetUrls) {
-
-                    catalog.log.debug("    datasetUrls: " + url);
-
-                    serverUrl = catalog.getServerUrlString(new URL(url));
-                    catalog.log.debug("    serverUrl:   " + serverUrl);
-
-                    localId = url.substring(serverUrl.length(),url.length());
-                    catalog.log.debug("    localID:     "+localId);
-
-                    
-
-
-
-
-                }
-            }
-
+            catalog.loadWcsCatalogFromRepository();
 
             for (int i = 0; i < 1; i++) {
                 startTime = new Date().getTime();
@@ -204,6 +174,24 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         }
     }
 
+    public void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
+        log.info("#############################################");
+        log.info("#############################################");
+        log.info("Loading WCS Catalog from Semantic Repository.");
+        setupRepository();
+        extractCoverageDescrptionsFromRepository();
+        updateCatalogCache();
+        shutdownRepository();
+        log.info("WCS Catalog loading from the Semantic Repository complete.");
+        log.info("#############################################");
+        log.info("#############################################");
+    }
+
+    public String getDataAccessUrl(String coverageID){
+
+        return coverageIDServer.get(coverageID).firstElement();
+
+    }
 
     public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
 
@@ -218,13 +206,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         processConfig(_config,defaultCacheDirectory, defaultResourcePath );
 
-
-        setupRepository();
-
-        extractCoverageDescrptionsFromRepository();
-        updateCatalogCache();
-
-        shutdownRepository();
+        loadWcsCatalogFromRepository();
 
         if (backgroundUpdates) {
             catalogUpdateThread = new Thread(this);
@@ -713,12 +695,12 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                 catalogUpdateThread.interrupt();
                 log.debug("destroy(): catalogUpdateThread '"+catalogUpdateThread+"' interrupt() called.");
             }
-            log.info("destroy() Shutting Down Semantic Repository.");
+            log.info("destroy(): Shutting Down Semantic Repository.");
 
             if (!owlse2.isRepositoryDown()){
                         owlse2.shutDown();
             }
-            log.info("destroy: Semantic Repository Has Been Shutdown.");
+            log.info("destroy(): Semantic Repository Has Been Shutdown.");
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");
         }
@@ -1135,13 +1117,74 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                     log.debug("Updating Catalog Cache.");
                     try {
                         coverageIDServer = getCoverageIDServerURL();
-                       // for (String covID :coverageIDServer.keySet()){ //print all coverageID and server
-                       //     log.info("CoverageID: " +covID);
-                       //     Vector <String> covURLs=coverageIDServer.get(covID);
-                       //     for (int i =0; i <covURLs.size(); i++) {
-                       //         log.info("CoverageURL ("+i+"): " +covURLs.get(i));
-                       //     }
-                       //     }
+                        String serverUrl, serviceID, localId;
+
+                        for (String coverageID : coverageIDServer.keySet()) {
+                            log.debug("CoverageID: " + coverageID);
+                            Vector<String> datasetUrls = coverageIDServer.get(coverageID);
+                            for (String datasetUrl : datasetUrls) {
+
+                                log.debug("    datasetUrl: " + datasetUrl);
+
+                                serverUrl = getServerUrlString(new URL(datasetUrl));
+                                log.debug("    serverUrl:  " + serverUrl);
+
+                                localId = datasetUrl.substring(serverUrl.length(),datasetUrl.length());
+                                log.debug("    localID:    "+localId);
+
+                                serviceID = coverageID.substring(0,coverageID.indexOf(localId));
+                                log.debug("    serviceID:     "+serviceID);
+
+                                if(!serviceIDs.containsKey(serverUrl)){
+                                    log.debug("Adding to ServiceIDs");
+                                    serviceIDs.put(serverUrl,serviceID);
+                                }
+                                else if(serviceID.equals(serviceIDs.get(serverUrl))){
+                                    log.info("The serverURL: "+serverUrl+" is already mapped to " +
+                                            "the serviceID: "+serviceID+" No action taken.");
+                                }
+                                else {
+                                    String msg = "\nOUCH! The semantic repository contains multiple serviceID strings " +
+                                            "for the same serverURL. This may lead to one of the serviceID's being " +
+                                            "reassigned. This would lead to resources being attributed to the " +
+                                            "wrong server/service.\n";
+                                    msg += "serverUrl: "+serverUrl+"\n";
+                                    msg += "  serviceID(repository) : "+serviceID+"\n";
+                                    msg += "  serviceID(in-memory):   "+serviceIDs.get(serverUrl)+"\n";
+
+                                    log.error(msg);
+
+                                }
+
+
+                                if(!wcsIDs.containsKey(datasetUrl)){
+                                    log.debug("Adding to datasetUrl/coverageID to Map");
+                                    wcsIDs.put(datasetUrl,coverageID);
+                                }
+                                else if(coverageID.equals(wcsIDs.get(datasetUrl))){
+                                    log.info("The datasetUrl: "+datasetUrl+" is already mapped to " +
+                                            "the coverageID: "+coverageID+" No action taken.");
+                                }
+                                else {
+                                    String msg = "\nOUCH! The semantic repository contains multiple coverageID strings " +
+                                            "for the same datasetUrl. This may lead to one of the coverageID's being " +
+                                            "reassigned. This would lead to resources being attributed to the " +
+                                            "wrong server/service.\n";
+
+                                    msg += "datasetUrl: "+datasetUrl+"\n";
+                                    msg += "  coverageID(repository) : "+coverageID+"\n";
+                                    msg += "  coverageID(in-memory):   "+wcsIDs.get(datasetUrl)+"\n";
+
+                                    log.error(msg);
+                                }
+
+                                //private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
+                                //private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
+
+
+                            }
+                        }
+
                     } catch (RepositoryException e) {
 
                         log.error("Caught RepositoryException in getCoverageIDServerURL: "
