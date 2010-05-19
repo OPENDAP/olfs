@@ -159,27 +159,27 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             String serverUrl, prefix, localId;
 
             for (String coverageID : serverIDs.keySet()) {
-                catalog.log.debug("CoverageID: " + coverageID);
+                System.out.println("CoverageID: " + coverageID);
                 Vector<String> datasetUrls = serverIDs.get(coverageID);
                 for (String url : datasetUrls) {
 
-                    catalog.log.debug("    datasetUrls: " + url);
+                    System.out.println("    datasetUrls: " + url);
 
                     serverUrl = catalog.getServerUrlString(new URL(url));
-                    catalog.log.debug("    serverUrl:   " + serverUrl);
+                    System.out.println("    serverUrl:   " + serverUrl);
 
                     localId = url.substring(serverUrl.length(),url.length());
-                    catalog.log.debug("    localID:     "+localId);
+                    System.out.println("    localID:     "+localId);
 
-                    prefix = coverageID.substring(0,coverageID.indexOf(localId));
-                    catalog.log.debug("    prefix:      "+prefix);
+                    
 
-                    catalog.serviceIDs.put(serverUrl,prefix);
+
+
+
                 }
             }
 
 
-            catalog.log.debug("State update complete.");
             for (int i = 0; i < 1; i++) {
                 startTime = new Date().getTime();
                 //catalog.setupRepository();
@@ -199,7 +199,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             e.printStackTrace();
         }
         finally {
-            //catalog.destroy();
+            catalog.destroy();
 
         }
     }
@@ -375,7 +375,8 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         URI uriaddress;
         URL inUrl;
         Thread thread = Thread.currentThread();
-
+        Vector<String> import2Update = new Vector<String>(); //separate import and delete 
+        
         Date startTime = new Date();
         log.info("Evaluating importURLs for updateCatalog... ");
 
@@ -398,8 +399,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         log.info("Finished removing URL: " + importURL);
 
                         if (thread.isInterrupted()) {
-                            log
-                                    .warn("updateSemanticRepository(): WARNING! Thread "
+                            log.warn("updateSemanticRepository(): WARNING! Thread "
                                             + thread.getName()
                                             + " was interrupted!");
                             return;
@@ -408,35 +408,34 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         log.info("Removing last_modified_time of URL: "
                                 + importURL);
                         owlse2.deleteLTMODContext(importURL, con);
+                        import2Update.add(importURL); // collect deleted
+                        
                         // deleteIsContainedBy(importURL, CollectionURL); //need
                         // some work here!!!
-                        log
-                                .info("Finished removing last_modified_time of URL: "
+                        log.info("Finished removing last_modified_time of URL: "
                                         + importURL);
                         if (thread.isInterrupted()) {
-                            log
-                                    .warn("updateSemanticRepository(): WARNING! Thread "
+                            log.warn("updateSemanticRepository(): WARNING! Thread "
                                             + thread.getName()
                                             + " was interrupted!");
                             return;
                         }
                     }
-                    log.info("Importing URL: " + inUrl);
-                    con.add(inUrl, importURL, RDFFormat.RDFXML,
-                            (Resource) uriaddress);
-                    log.info("Finished Importing URL: " + inUrl);
+                    //log.info("Importing URL: " + inUrl);
+                    //con.add(inUrl, importURL, RDFFormat.RDFXML,(Resource) uriaddress);
+                    //log.info("Finished Importing URL: " + inUrl);
                     if (thread.isInterrupted()) {
                         log.warn("updateSemanticRepository(): WARNING! Thread "
                                 + thread.getName() + " was interrupted!");
                         return;
                     }
 
-                    log.info("Setting last modified time for context: "
-                                    + inUrl);
-                    owlse2.setLTMODContext(importURL, con); // set last modified
+                    //log.info("Setting last modified time for context: "
+                    //                + inUrl);
+                    //owlse2.setLTMODContext(importURL, con); // set last modified
                                                             // time for the
                                                             // context
-                    log.info("Finished setting last modified time for context: " + inUrl);
+                    //log.info("Finished setting last modified time for context: " + inUrl);
                     if (thread.isInterrupted()) {
                         log.warn("updateSemanticRepository(): WARNING! Thread "
                                 + thread.getName() + " was interrupted!");
@@ -469,15 +468,68 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             } catch (IOException e) {
                 log.error("Failed to import " + importURL
                         + "  IOException message: " + e.getMessage());
+            } 
+            //catch (RDFParseException e) {
+            //    log.error("Failed to import " + importURL
+            //            + "  RDFParseException message: " + e.getMessage());
+            //} 
+            //catch (RepositoryException e) {
+            //    log.error("Failed to import " + importURL
+            //            + "  RepositoryException message: " + e.getMessage());
+            //}
+
+        }
+        
+        for (String importURL : import2Update) {
+            try {
+                inUrl = new URL(importURL);
+                uriaddress = new URIImpl(importURL);
+                log.info("Importing URL: " + inUrl);
+                con.add(inUrl, importURL, RDFFormat.RDFXML,
+                        (Resource) uriaddress);
+                log.info("Finished Importing URL: " + inUrl);
+                if (thread.isInterrupted()) {
+                    log.warn("updateSemanticRepository(): WARNING! Thread "
+                            + thread.getName() + " was interrupted!");
+                    return;
+                }
+
+                log.info("Setting last modified time for context: " + inUrl);
+                owlse2.setLTMODContext(importURL, con); // set last modified
+                                                        // time for the context
+                log.info("Finished setting last modified time for context: "
+                        + inUrl);
+                if (thread.isInterrupted()) {
+                    log.warn("updateSemanticRepository(): WARNING! Thread "
+                            + thread.getName() + " was interrupted!");
+                    return;
+                }
+
+                // setIsContainedBy(importURL, CollectionURL); //need some work
+                // here!!!
+                log.info("Adding last_modified_time of URL: " + importURL);
+                owlse2.imports.add(importURL); // track what is added in the
+                                                // repository
+                log.info("Finished Adding last_modified_time of URL: "
+                        + importURL);
+                if (thread.isInterrupted()) {
+                    log.warn("updateSemanticRepository(): WARNING! Thread "
+                            + thread.getName() + " was interrupted!");
+                    return;
+                }
             } catch (RDFParseException e) {
                 log.error("Failed to import " + importURL
                         + "  RDFParseException message: " + e.getMessage());
-            } catch (RepositoryException e) {
+            } catch (MalformedURLException e) {
                 log.error("Failed to import " + importURL
-                        + "  RepositoryException message: " + e.getMessage());
+                        + "  MalformedURLException message: " + e.getMessage());
+            } catch (IOException e) {
+                log.error("Failed to import " + importURL
+                        + "  IOException message: " + e.getMessage());
             }
-
         }
+        
+        
         long elapsedTime = new Date().getTime() - startTime.getTime();
         log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
 
@@ -662,9 +714,9 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             }
             log.info("Shutting Down Semantic Repository.");
 
-
+if (!owlse2.isRepositoryDown()){
             owlse2.shutDown();
-
+}
             log.info("Semantic Repository Has Been Shutdown.");
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");

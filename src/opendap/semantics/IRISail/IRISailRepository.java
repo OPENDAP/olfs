@@ -84,11 +84,21 @@ public class IRISailRepository extends SailRepository {
 
     private ProcessingTypes postProcessFlag;
 
-
+    private boolean isRepositoryDown;
+    
     public void initialize() throws org.openrdf.repository.RepositoryException {
         super.initialize();
+        isRepositoryDown= false;
+        setRepositoryDown (true);
     }
-
+    public void setRepositoryDown(Boolean repositoryOn) throws org.openrdf.repository.RepositoryException {
+        
+        isRepositoryDown= repositoryOn;
+    }
+    public Boolean isRepositoryDown() throws org.openrdf.repository.RepositoryException {
+       
+        return isRepositoryDown;
+    }
 
     public Boolean hasContext(URI uriContext, RepositoryConnection con)
             throws RepositoryException {
