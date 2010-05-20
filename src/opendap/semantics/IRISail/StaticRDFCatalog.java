@@ -390,8 +390,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         log.info("Removing last_modified_time of URL: "
                                 + importURL);
                         owlse2.deleteLTMODContext(importURL, con);
-                        import2Update.add(importURL); // collect deleted
-                        
+                                                
                         // deleteIsContainedBy(importURL, CollectionURL); //need
                         // some work here!!!
                         log.info("Finished removing last_modified_time of URL: "
@@ -406,6 +405,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                     //log.info("Importing URL: " + inUrl);
                     //con.add(inUrl, importURL, RDFFormat.RDFXML,(Resource) uriaddress);
                     //log.info("Finished Importing URL: " + inUrl);
+                    import2Update.add(importURL); // collect deleted
                     if (thread.isInterrupted()) {
                         log.warn("updateSemanticRepository(): WARNING! Thread "
                                 + thread.getName() + " was interrupted!");
