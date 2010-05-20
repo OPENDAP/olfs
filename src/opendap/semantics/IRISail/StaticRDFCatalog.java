@@ -845,21 +845,20 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    public void ingestCoverageDescription(Element cde, long lastModified)  {
+    public void ingestCoverageDescription(Element cde, long lastModified) {
 
         CoverageDescription cd;
         try {
-        cd = new CoverageDescription(cde, lastModified);
-        coverages.put(cd.getIdentifier(), cd);
-        log.info("Ingested CoverageDescription: " + cd.getIdentifier());
+            cd = new CoverageDescription(cde, lastModified);
+            coverages.put(cd.getIdentifier(), cd);
+            log.info("Ingested CoverageDescription: " + cd.getIdentifier());
         } catch (WcsException e) {
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+            XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
             String wcseElem = xmlo.outputString(e.getExceptionElement());
             String cvgDesc = xmlo.outputString(cde);
-            log.error("Failed to ingest CoverageDescription!\n" +
-                    "WcsException: \n"+wcseElem+"\n"+
-                    "Bad CoverageDescription:\n"+cvgDesc
-            );
+            log.error("ingestCoverageDescription(): Failed to ingest CoverageDescription!");
+            log.error("ingestCoverageDescription(): WcsException: " + wcseElem + "");
+            log.error("ingestCoverageDescription(): Here is the XML element that failed to ingest: " + cvgDesc);
         }
     }
 
