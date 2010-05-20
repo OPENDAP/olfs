@@ -162,7 +162,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                 catalog.log.debug("########################################################################################");
                 catalog.log.debug("########################################################################################");
                 catalog.setStopFlag(false);
-                Thread.sleep(5000);
+                //Thread.sleep(5000);
             }
 
         } catch (Exception e) {

@@ -110,7 +110,7 @@ public class IRISailRepository extends SailRepository {
         RepositoryResult<Resource> contextIDs = con.getContextIDs();
         while (contextIDs.hasNext()) {
             Resource contID = contextIDs.next();
-            if (contID.equals(uriContext))
+            if (contID!=null && contID.equals(uriContext))
                 existContext = true;
         }
         contextIDs.close();
