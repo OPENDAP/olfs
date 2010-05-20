@@ -119,7 +119,7 @@ public class ThreddsCatalogUtil {
 		}
 		
 		private void recur(String catalogURL) {
-			Vector<String> URLs = getCatalogRefURLs(catalogURL/*, false*/);
+			Vector<String> URLs = getCatalogRefURLs(catalogURL);
 			if (URLs != null) {
 				for (String URL : URLs) {
 					if (writeToCache && !TCCache.isVisited(URL)) {
@@ -241,59 +241,20 @@ public class ThreddsCatalogUtil {
 				return "Compound";
 			}
 		}
-	}	
-
-	/*
-	public void printDDXDocuments(PrintStream ps, String catalogUrlString,
-			boolean recurse) {
-
-		Vector<Document> ddxDocs = getDDXDocuments(catalogUrlString, recurse);
-
-		for (Document doc : ddxDocs) {
-			try {
-				xmlo.output(doc, ps);
-			}
-			catch (IOException e) {
-				ps.println(e.getMessage());
-			}
-			ps.println("\n");
-		}
-
 	}
-
-	public Vector<Element> getDDXRootElements(String catalogUrlString,
-			boolean recurse) {
-
-		Vector<Element> ddxRootElements = new Vector<Element>();
-		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
-
-		for (String url : ddxUrls) {
-			ddxRootElements.add(getDocumentRoot(url));
-		}
-
-		return ddxRootElements;
-
-	}
-
-	public Vector<Document> getDDXDocuments(String catalogUrlString,
-			boolean recurse) {
-
-		Vector<Document> ddxDocs = new Vector<Document>();
-		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
-
-		for (String url : ddxUrls) {
-			ddxDocs.add(getDocument(url));
-		}
-
-		return ddxDocs;
-
-	}
-	*/
 	
-	public Vector<String> getDDXUrls(String catalogUrlString/*, boolean recurse*/) {
+	/**
+	 * Return all of the DDX urls to data sources referenced by the given
+	 * thredds catalog. The thredds catalog is referenced using a URL which
+	 * either be accessed or read from a the cache, depending on how the
+	 * instance of TCU was built.
+	 * 
+	 * @param catalogUrlString The THREDDS catalog to access
+	 * @return A Vector of strings, each element a DDX URL.
+	 */
+	public Vector<String> getDDXUrls(String catalogUrlString) {
 
-		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString,
-				SERVICE.OPeNDAP/*, recurse*/);
+		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString,SERVICE.OPeNDAP);
 		String url;
 
 		for (int i = 0; i < datasetUrls.size(); i++) {
@@ -314,15 +275,10 @@ public class ThreddsCatalogUtil {
 	 * @param catalog
 	 *            The root element (the catalog element) in a THREDDS catalog
 	 *            document.
-	 * @param recurse
-	 *            If true the code will recursively descend into all of the
-	 *            child catalogs and return all the contained catalog URLs. Be
-	 *            Careful!
 	 * @return A vector of fully qualified URL Strings each of which points to a
 	 *         THREDDS catalog document.
 	 */
-	private Vector<String> getCatalogRefURLs(String catalogUrlString,
-			Element catalog/*, boolean recurse*/) {
+	private Vector<String> getCatalogRefURLs(String catalogUrlString, Element catalog) {
 
 		Vector<String> catalogURLs = new Vector<String>();
 
@@ -330,6 +286,7 @@ public class ThreddsCatalogUtil {
 			String href;
 			String newCatalogURL;
 			Element catalogRef;
+
 			Iterator i = catalog.getDescendants(new ElementFilter("catalogRef", THREDDS.NS));
 			while (i.hasNext()) {
 				catalogRef = (Element) i.next();
@@ -338,11 +295,6 @@ public class ThreddsCatalogUtil {
 				newCatalogURL = getCatalogURL(catalogUrlString, href);
 
 				catalogURLs.add(newCatalogURL);
-				/*
-				if (recurse)
-					catalogURLs.addAll(getCatalogRefURLs(newCatalogURL, recurse));
-					*/
-
 			}
 
 		}
@@ -361,28 +313,22 @@ public class ThreddsCatalogUtil {
      *
      * @param catalogUrlString
      *            The URL from where the catalog was retrieved.
-     * @param recurse
-     *            If true the code will recursively descend into all of the
-     *            child catalogs and return all the contained catalog URLs. Be
-     *            Careful!
      * @return A vector of fully qualified URL Strings each of which points to a
      *         THREDDS catalog document. If the catalog returned by
      *         dereferencing <code>catalogUrlString</code> is 'bad' (e.g., the
      *         server returns a 404 response), then the Vector<Sting> result
      *         will be empty.
      */
-    public Vector<String> getCatalogRefURLs(String catalogUrlString/*,
-            boolean recurse*/) {
+    public Vector<String> getCatalogRefURLs(String catalogUrlString) {
 
         Vector<String> catalogURLs = new Vector<String>();
 
         Element catalog = getDocumentRoot(catalogUrlString);
         if (catalog != null)
-            catalogURLs = getCatalogRefURLs(catalogUrlString, catalog/*, recurse*/);
+            catalogURLs = getCatalogRefURLs(catalogUrlString, catalog);
 
         return catalogURLs;
     }
-
 
 	/**
 	 * Crawl a thredds catalog. This implements a modified depth-first traversal
@@ -395,14 +341,12 @@ public class ThreddsCatalogUtil {
 	 * crawled so that subsequent calls return the children of 'C'. A real
 	 * depth-first traversal would descend all the way to the leaf nodes -
 	 * thredds catalogs that contain only references to data set and not other
-	 * catalogs. In addition to cutting down on HTTP-induced latency (by capping
-	 * the number of calls per invocation of nextElement()), this also ensures
-	 * that the client of the Enumeration will see all of the catalogs,
-	 * including 'interior' ones.
+	 * catalogs.
 	 * 
-	 * @note By default, this uses the THREDDS Catalog cache. If you want to
-	 * crawl catalogs using an Enumeration and not cache the result, use the
-	 * other version of this method and pass false for the writeToCache parameter.
+	 * @note If this instance of TCU is built with readFromCache true, then 
+	 * the Enumeration will read catalogs from the cache and not the network.
+	 * If a referenced catalog is not in the cache, then an attempt will be
+	 * made to read it from the network.
 	 * 
 	 * @param topCatalog
 	 *            The THREDDS catalog that will serve as the root node
@@ -417,7 +361,10 @@ public class ThreddsCatalogUtil {
 	/**
 	 * Get access to all of the THREDDS Catalogs in the cache. Note that these
 	 * URLs are returned in a random order, not the order in which they were
-	 * added to the cache.
+	 * added to the cache. Also note that they are not the actual URLs in the
+	 * Postgres cache, but instead those URLs saved in the 'Visited' cache
+	 * which is a separate collection of URLs maintained to eliminate looping
+	 * during a crawl.
 	 * 
 	 * @return An Enumeration of the THREDDS Catalog URLs crawled so far.
 	 */
@@ -428,6 +375,7 @@ public class ThreddsCatalogUtil {
 	/**
 	 * Return the THREDDS catalog associated with the given URL from the 
 	 * local cache.
+	 * 
 	 * @param url Find this THREDDS catalog
 	 * @return The THREDDS catalog
 	 */
@@ -435,6 +383,12 @@ public class ThreddsCatalogUtil {
 		return TCCache.getCachedResponse(url);
 	}
 	
+	/**
+	 * Save the 'visited' cache. This is actually a ConcurrentHashMap and 
+	 * holds the URL and the last time the URL was accesses\d.
+	 * 
+	 * @throws Exception
+	 */
 	public void saveCatalogCache() throws Exception {
 		TCCache.saveState();
 	}
@@ -475,7 +429,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private Vector<String> getDataAccessURLs(String catalogUrlString,
-			Element catalog, SERVICE service/*, boolean recurse*/) {
+			Element catalog, SERVICE service) {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
@@ -483,20 +437,12 @@ public class ThreddsCatalogUtil {
 
 			URL catalogURL = new URL(catalogUrlString);
 			String serverURL = getServerUrlString(catalogURL);
-			String msg;
 
 			HashMap<String, Element> services = collectServices(catalog,
 					service);
-			/*
-			msg = "#### collectServices Found services:\n";
-			for (String srvcName : services.keySet())
-				msg += "####     Service Name: " + srvcName + "\n"
-						+ xmlo.outputString(services.get(srvcName)) + "\n";
-			log.debug(msg);
-			*/
+
 			Element dataset;
-			Iterator i = catalog.getChildren(THREDDS.DATASET, THREDDS.NS)
-					.iterator();
+			Iterator i = catalog.getChildren(THREDDS.DATASET, THREDDS.NS).iterator();
 			while (i.hasNext()) {
 				dataset = (Element) i.next();
 				collectDatasetAccessUrls(dataset, services, null, serverURL,
@@ -505,25 +451,6 @@ public class ThreddsCatalogUtil {
 
 			log.debug("#### Accumulated " + serviceURLs.size()
 					+ " access URLs.");
-			/*
-			if (serverURL != null && recurse) {
-
-				String href;
-				Element catalogRef;
-				String newCatalogURL;
-				i = catalog.getDescendants(new ElementFilter("catalogRef",
-						THREDDS.NS));
-				while (i.hasNext()) {
-					catalogRef = (Element) i.next();
-					href = catalogRef.getAttributeValue("href", XLINK.NS);
-					newCatalogURL = getCatalogURL(catalogUrlString, href);
-					serviceURLs.addAll(getDataAccessURLs(newCatalogURL,
-							service, recurse));
-
-				}
-			}
-			*/
-
 		}
 		catch (Exception e) {
 			log.error("Unable to load THREDDS catalog: " + catalogUrlString
@@ -533,37 +460,6 @@ public class ThreddsCatalogUtil {
 
 		return serviceURLs;
 	}
-
-	/**
-	 * Returns a vector of data access URIs from The THREDDS catalog located at
-	 * the URL contained in the passed parameter String
-	 * <code>catalogUrlString</code>.
-	 * 
-	 * @param catalogUrlString
-	 *            The THREDDS catalog to crawl.
-	 * @param catalogDoc
-	 * @param service
-	 *            The SERVICE whose data access URLs you wish to get.
-	 * @param recurse
-	 *            Controls recursion. A value of True will cause the software to
-	 *            recursively traverse the catalog (via thredds:catalogRef
-	 *            elements) in search of data access URLs.
-	 * @return The vector of data access URLs.
-	 */
-	/*
-	private Vector<String> getDataAccessURLs(String catalogUrlString,
-			Document catalogDoc, SERVICE service, boolean recurse) {
-
-		Vector<String> serviceURLs;
-
-		Element catalog = catalogDoc.getRootElement();
-
-		serviceURLs = getDataAccessURLs(catalogUrlString, catalog, service,
-				recurse);
-
-		return serviceURLs;
-	}
-	*/
 	
 	/**
 	 * Returns a vector of data access URIs from The THREDDS catalog located at
@@ -574,25 +470,19 @@ public class ThreddsCatalogUtil {
 	 *            The THREDDS catalog to crawl.
 	 * @param service
 	 *            The SERVICE whose data access URLs you wish to get.
-	 * @param recurse
-	 *            Controls recursion. A value of True will cause the software to
-	 *            recursively traverse the catalog (via thredds:catalogRef
-	 *            elements) in search of data access URLs.
 	 * @return The vector of data access URLs. If the catalog returned by
 	 *         dereferencing <code>catalogUrlString</code> is 'bad' (e.g., the
 	 *         server returns a 404 response), then the Vector<Sting> result
 	 *         will be empty.
 	 */
 	
-	public Vector<String> getDataAccessURLs(String catalogUrlString,
-			SERVICE service/*, boolean recurse*/) {
+	public Vector<String> getDataAccessURLs(String catalogUrlString, SERVICE service) {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
 		Element catalog = getDocumentRoot(catalogUrlString);
 		if (catalog != null)
-			serviceURLs = getDataAccessURLs(catalogUrlString, catalog, service/*,
-					recurse*/);
+			serviceURLs = getDataAccessURLs(catalogUrlString, catalog, service);
 
 		return serviceURLs;
 	}
@@ -622,7 +512,7 @@ public class ThreddsCatalogUtil {
 	 * contained in the passed parameter String <code>docUrlString</code>.
 	 * 
 	 * @note This is the point in the class where a response is (possibly)
-	 * cached.
+	 * cached or read from a cache.
 	 * 
 	 * @param docUrlString
 	 *            The URL of the document to retrieve.
@@ -674,21 +564,16 @@ public class ThreddsCatalogUtil {
 
 		if (href.startsWith("/")) {
 			href = getServerUrlString(catalogUrlString) + href;
-		} else if (!href.startsWith("http://")) {
-
-			log.debug("catalogUrlString: " + catalogUrlString);
-			log.debug("href: " + href);
-			String s;
-			s = catalogUrlString
-					.substring(0, catalogUrlString.lastIndexOf("/"));
+		} 
+		else if (!href.startsWith("http://")) {
+			String s = catalogUrlString.substring(0, catalogUrlString.lastIndexOf("/"));
 			if (!s.endsWith("/"))
 				s += "/";
-			log.debug("s: " + s);
 			href = s + href;
 		}
+		
 		log.debug("Built THREDDS catalog  URL:'" + href + "'");
 		return href;
-
 	}
 
 	private HashMap<String, Element> collectServices(Element threddsCatalog) {
@@ -714,9 +599,7 @@ public class ThreddsCatalogUtil {
 
 		// If they aren't asking for everything...
 		if (s != SERVICE.ALL) {
-			/* boolean done = false; */
 			Element service;
-
 			Vector<String> taggedForRemoval = new Vector<String>();
 
 			for (String serviceName : services.keySet()) {
@@ -739,7 +622,6 @@ public class ThreddsCatalogUtil {
 			}
 		}
 		return services;
-
 	}
 
 	private void collectDatasetAccessUrls(Element dataset,
@@ -750,7 +632,6 @@ public class ThreddsCatalogUtil {
 		String serviceName;
 		String s;
 		Element metadata, dset, access;
-		/* Iterator i; */
 
 		log.debug("inheritedServiceName: " + inheritedServiceName);
 
@@ -775,13 +656,11 @@ public class ThreddsCatalogUtil {
 			log.debug("<dataset> has urlPath atttribute: " + urlPath);
 
 			if (serviceName == null) {
-				log
-						.debug("<dataset> missing serviceName atttribute. Checking for child element...");
+				log.debug("<dataset> missing serviceName atttribute. Checking for child element...");
 				serviceName = dataset.getChildText("serviceName", THREDDS.NS);
 			}
 			if (serviceName == null) {
-				log
-						.debug("<dataset> missing serviceName childElement. Checking for inherited serviceName...");
+				log.debug("<dataset> missing serviceName childElement. Checking for inherited serviceName...");
 				serviceName = inheritedServiceName;
 			}
 
@@ -823,7 +702,6 @@ public class ThreddsCatalogUtil {
 
 		Vector<String> accessURLs = new Vector<String>();
 		String access, base, serviceType, sname;
-		/* Iterator i; */
 		Element srvc;
 
 		Element service = services.get(serviceName);
@@ -851,7 +729,5 @@ public class ThreddsCatalogUtil {
 		}
 
 		return accessURLs;
-
 	}
-
 }
