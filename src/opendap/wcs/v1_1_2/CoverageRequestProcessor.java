@@ -65,8 +65,8 @@ public class CoverageRequestProcessor {
 
 
         
-        String dataAccessURL = getNetcdfDataAccessURL(req,urlBase);
-        String metadataAccessURL = getMetadataAccessURL(req,urlBase);
+        String dataAccessURL = getNetcdfDataAccessURL(req);
+        String metadataAccessURL = getMetadataAccessURL(req);
 
 
 
@@ -96,7 +96,7 @@ public class CoverageRequestProcessor {
 
 
 
-    public static String getDapDataAccessURL(GetCoverageRequest req, String urlBase) throws WcsException {
+    public static String getDapDataAccessURL(GetCoverageRequest req) throws WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
@@ -111,7 +111,7 @@ public class CoverageRequestProcessor {
 
 
 
-    public static String getNetcdfDataAccessURL(GetCoverageRequest req, String urlBase) throws WcsException {
+    public static String getNetcdfDataAccessURL(GetCoverageRequest req) throws WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
 
@@ -125,7 +125,7 @@ public class CoverageRequestProcessor {
 
 
 
-    public static String getMetadataAccessURL(GetCoverageRequest req, String urlBase) throws WcsException {
+    public static String getMetadataAccessURL(GetCoverageRequest req) throws WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
 
@@ -182,11 +182,6 @@ public class CoverageRequestProcessor {
                 if(!CatalogWrapper.getCoverageDescription(coverageID).hasField(fieldID))
                     throw new WcsException("No such wcs:Field: "+ Scrub.fileName(fieldID),
                             WcsException.INVALID_PARAMETER_VALUE,"ows:Identifier");
-
-
-
-
-
 
                 if(proj!=null)
                     proj += ",";
