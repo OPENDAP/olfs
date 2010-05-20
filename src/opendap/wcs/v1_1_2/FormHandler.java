@@ -104,7 +104,7 @@ public class FormHandler extends XmlRequestHandler  {
             if(reqDoc.startsWith(formTag)) {
                 reqDoc = reqDoc.substring(formTag.length());
             }
-
+            log.debug("XML to Parse: " +reqDoc);
 
             ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes());
 

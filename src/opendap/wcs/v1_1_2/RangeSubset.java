@@ -102,19 +102,19 @@ public class RangeSubset {
     }
 
 
-    public Element getElement(){
-        Element range = new Element("RangeSubset",WCS.WCS_NS);
+    public Element getElement() {
 
-        for(FieldSubset fs: fieldSubsets){
-            range.addContent(fs.getElement());
+        if (fieldSubsets.length > 0) {
+            Element range = new Element("RangeSubset", WCS.WCS_NS);
+
+            for (FieldSubset fs : fieldSubsets) {
+                range.addContent(fs.getElement());
+            }
+            return range;
         }
-        return range;
+        else
+            return null;
     }
-
-
-
-
-
 
 
     class FieldSubset{

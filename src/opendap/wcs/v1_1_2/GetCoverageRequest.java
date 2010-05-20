@@ -363,14 +363,16 @@ public class GetCoverageRequest {
         requestElement.setAttribute("service",WCS.SERVICE);
         requestElement.setAttribute("version",WCS.CURRENT_VERSION);
 
-        Element e = new Element("Identifier",WCS.WCS_NS);
+        Element e = new Element("Identifier",WCS.OWS_NS);
         e.setText(coverageID);
         requestElement.addContent(e);
 
         requestElement.addContent(getDomainSubsetElement());
 
         if(rangeSubset !=null){
-            requestElement.addContent(rangeSubset.getElement());
+            Element rs = rangeSubset.getElement();
+            if(rs!=null)
+                requestElement.addContent(rs    );
         }
 
         requestElement.addContent(getOutputElement());
@@ -394,7 +396,6 @@ public class GetCoverageRequest {
             e = tseq.getTemporalSubsetElement();
             domainSubset.addContent(e);
         }
-
 
 
         return domainSubset;

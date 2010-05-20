@@ -771,14 +771,14 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     public String getCoverageTestPage(HttpServletRequest req, HashMap<String,String> keyValuePairs) throws WcsException {
 
-        GetCoverageRequest wcsRequest = new GetCoverageRequest(keyValuePairs);
+        GetCoverageRequest getCoverageRequest = new GetCoverageRequest(keyValuePairs);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String page = "";
 
 
         page += "    <h3>XML request: </h3>";
         page += "    <pre>";
-        page += wcsRequest.toString().replaceAll("<","&lt;").replaceAll(">","&gt;");
+        page += getCoverageRequest.toString().replaceAll("<","&lt;").replaceAll(">","&gt;");
         page += "    </pre>";
 
         page += "    <h3>The WCS response: </h3>";
