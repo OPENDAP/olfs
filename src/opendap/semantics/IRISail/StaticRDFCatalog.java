@@ -81,7 +81,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     private String resourcePath;
     private boolean backgroundUpdates;
     private HashMap<String, Vector<String> >  coverageIDServer;
-    private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
+    private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
     private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
 
     
@@ -1142,11 +1142,11 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                                 serviceID = coverageID.substring(0,coverageID.indexOf(localId));
                                 log.debug("    serviceID:     "+serviceID);
 
-                                if(!serviceIDs.containsKey(serverUrl)){
+                                if(!serverIDs.containsKey(serverUrl)){
                                     log.debug("Adding to ServiceIDs");
-                                    serviceIDs.put(serverUrl,serviceID);
+                                    serverIDs.put(serverUrl,serviceID);
                                 }
-                                else if(serviceID.equals(serviceIDs.get(serverUrl))){
+                                else if(serviceID.equals(serverIDs.get(serverUrl))){
                                     log.info("The serverURL: "+serverUrl+" is already mapped to " +
                                             "the serviceID: "+serviceID+" No action taken.");
                                 }
@@ -1157,7 +1157,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                                             "wrong server/service.\n";
                                     msg += "serverUrl: "+serverUrl+"\n";
                                     msg += "  serviceID(repository) : "+serviceID+"\n";
-                                    msg += "  serviceID(in-memory):   "+serviceIDs.get(serverUrl)+"\n";
+                                    msg += "  serviceID(in-memory):   "+ serverIDs.get(serverUrl)+"\n";
 
                                     log.error(msg);
 
@@ -1185,7 +1185,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                                     log.error(msg);
                                 }
 
-                                //private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
+                                //private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
                                 //private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
 
 
@@ -1554,36 +1554,41 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         try {
             int i;
-            String serverURL, serverPrefix;
+            String serverURL, serverID;
             URL dsu = new URL(datasetUrl);
 
 
             serverURL = getServerUrlString(dsu);
 
+            log.debug("getWcsIdString(): serverURl is "+serverURL);
 
-            if(serviceIDs.containsKey(serverURL)){
+            if(serverIDs.containsKey(serverURL)){
                 // get server prefix
-                serverPrefix = serviceIDs.get(serverURL);
+                serverID = serverIDs.get(serverURL);
+                log.debug("getWcsIdString(): serverURL already in use, will reuse serverID '"+serverID+"'");
             }
             else {
-                serverPrefix = "S"+ (serviceIDs.size()+1) + "";
+                serverID = "S"+ (serverIDs.size()+1) + "";
                 // Generate service prefix
                 // Store service prefix.
-                serviceIDs.put(serverURL,serverPrefix);
+                serverIDs.put(serverURL,serverID);
+                log.debug("getWcsIdString(): New serverURL! Created new serverID '"+serverID+"'");
+
             }
 
 
             // Build wcsID
-
-            wcsID = serverPrefix + datasetUrl.substring(serverURL.length(),datasetUrl.length());
-            log.debug("wcsID: "+wcsID);
-
-
-
             if(!wcsIDs.containsKey(datasetUrl)){
                 // add wcs:Identifier to MAP
+                wcsID = serverID + datasetUrl.substring(serverURL.length(),datasetUrl.length());
+                log.debug("getWcsIdString(): Dataset had no existing wcsID, adding wcsID: "+wcsID+
+                        " for dataset: "+datasetUrl);
                 wcsIDs.put(datasetUrl,wcsID);
-
+            }
+            else {
+                wcsID = wcsIDs.get(datasetUrl);
+                log.debug("getWcsIdString(): Dataset already has a wcsID, returning wcsID: "+wcsID+
+                        " for dataset: "+datasetUrl);
             }
 
         } catch (MalformedURLException e) {
