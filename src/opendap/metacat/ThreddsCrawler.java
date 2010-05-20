@@ -141,7 +141,7 @@ public class ThreddsCrawler {
 	}
 	
 	public void crawlCatalog(String catalogURL, boolean useCache, PrintStream ps) throws Exception {		
-		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, useCache, useCache);
+		tcc = new ThreddsCatalogUtil(useCache, cacheNamePrefix, false);
 		
 		// The ThreddsCatalogUtil caches by default, so each catalog URL
 		// is recorded (but not the catalog itself) every time nextElement()
@@ -161,7 +161,7 @@ public class ThreddsCrawler {
     }
 	
 	public void crawlCatalogCache(PrintStream ps, boolean printCatalog) throws Exception {
-		tcc = new ThreddsCatalogUtil(true, cacheNamePrefix, true, true);
+		tcc = new ThreddsCatalogUtil(true, cacheNamePrefix, true);
 
 		Enumeration<String> catalogs = tcc.getCachedCatalogEnumeration();
     	   	

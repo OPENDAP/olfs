@@ -28,6 +28,7 @@ import java.util.Enumeration;
 
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 
 import opendap.xml.Transformer;
@@ -38,6 +39,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the task of getting an EML given a DDX document. It can
@@ -50,9 +53,11 @@ import org.apache.commons.cli.PosixParser;
 public class EMLRetriever {
 
 	final static String ddx2emlPath = "ddx2eml-2.1.1.xsl";
-	
+
+	private static Logger log = LoggerFactory.getLogger(EMLRetriever.class);
+
 	// The EMLCache that holds both the DDXs LMT and the EML XML/text
-	private ResponseCache EMLCache = null;
+	private ResponseCachePostgres EMLCache = null;
 
     // This is the transformer that takes the DDX and returns EML
     private Transformer transformer;
@@ -60,19 +65,24 @@ public class EMLRetriever {
     private boolean verbose = false;
     
 	public EMLRetriever() throws Exception {
-		this(true, true, "");
+		this(false, "");
 	}
 
-	public EMLRetriever(boolean useCache, boolean saveCache,
-			String namePrefix) throws Exception {
+	public EMLRetriever(boolean useCache, String namePrefix) throws Exception{
 
-		transformer = new Transformer(ddx2emlPath);
+		try {
+			transformer = new Transformer(ddx2emlPath);
+		}
+		catch (SaxonApiException e) {
+			log.error("Could not build the XSL transformer object: ", e);
+			throw new Exception(e);
+		}
 		
 		// The first parameter to EMLCache() restores the cache from its
 		// persistent form and will cause the cache to be written when
 		// the DDXCache instance is collected.
 		if (useCache)
-			EMLCache = new ResponseCache(namePrefix + "EML", useCache, saveCache);
+			EMLCache = new ResponseCachePostgres(namePrefix + "EML", "eml_responses");
 	}
 
 	/**
@@ -124,7 +134,7 @@ public class EMLRetriever {
 			boolean useCache = !line.hasOption("n");
 			String cacheNamePrefix = line.getOptionValue("cache-name");
 
-			retriever = new EMLRetriever(useCache, useCache, cacheNamePrefix);
+			retriever = new EMLRetriever(useCache, cacheNamePrefix);
 
 			retriever.verbose = line.hasOption("v");
 			if (retriever.verbose) {
@@ -153,8 +163,7 @@ public class EMLRetriever {
 					}
 				}
 			} else {
-				DDXRetriever ddxSource = new DDXRetriever(true, true,
-						cacheNamePrefix);
+				DDXRetriever ddxSource = new DDXRetriever(true, cacheNamePrefix);
 				if (retriever.verbose) {
 					System.out.println("EML: "
 							+ retriever.getEML(ddxURL, ddxSource
@@ -182,13 +191,13 @@ public class EMLRetriever {
 	}
 
 	/**
-	 * Get the cache. Use the methods in ResponseCache to get information from
+	 * Get the cache. Use the methods in ResponseCachePostgres to get information from
 	 * the cache. For this class the cache holds the LMTs and DDX for each URL
 	 * (the URLs are the keys).
 	 * 
 	 * @return The EML cache.
 	 */
-	public ResponseCache getCache() {
+	public ResponseCachePostgres getCache() {
 		return EMLCache;
 	}
 

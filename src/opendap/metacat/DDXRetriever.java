@@ -40,6 +40,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * This class handles the task of getting a DDX given its URL. It will
@@ -50,31 +52,30 @@ import org.apache.commons.cli.PosixParser;
  *
  */
 public class DDXRetriever {
-	/// Use DDXsVisted cache. If true, visited DDX won't be revisited.
-	private boolean useDDXsVisited;
+	
+    private static Logger log = LoggerFactory.getLogger(DDXRetriever.class);
 
-	/// Cache the DDX responses
-	private boolean saveDDXs;
+	/// Use the cache.
+	private boolean useCache;
+	//private String namePrefix;
 	
     // The DDXCache that holds both the DDXs LMT and the XML/text
-    private ResponseCache DDXCache = null;
+    private ResponseCachePostgres DDXCache = null;
     
 	public DDXRetriever() throws Exception {
-		this(true, "", true, false, "");
+		this(false, "");
 	}
 
-	public DDXRetriever(boolean useDDXsVisited, String namePrefix, boolean saveDDXs, 
-			boolean usePostgres, String tableName) throws Exception {
+	public DDXRetriever(boolean useCache, String namePrefix) {
 		
-		this.useDDXsVisited = useDDXsVisited;
-		this.saveDDXs = saveDDXs;
+		this.useCache = useCache;
+		//this.namePrefix = namePrefix;
 		
 		// The first parameter to DDXCache() restores the cache from its
 		// persistent form and will cause the cache to be written when 
 		// the DDXCache instance is collected.
-		if (useDDXsVisited || saveDDXs)
-			DDXCache = new ResponseCache(namePrefix + "DDX", useDDXsVisited, saveDDXs,
-					usePostgres, tableName);
+		if (useCache)
+			DDXCache = new ResponseCachePostgres(namePrefix + "DDX", "ddx_responses");
 	}
 	
 	/**
@@ -115,10 +116,8 @@ public class DDXRetriever {
 		    String ddxURL = line.getOptionValue("ddx-url");
 		    System.out.println("DDX URL: " + ddxURL);
 
-		    boolean useCache = !line.hasOption( "n");
-		    String cacheNamePrefix = line.getOptionValue("cache-name");
-		    
-		    retriever = new DDXRetriever(useCache, cacheNamePrefix, useCache, useCache, "ddx_responses");
+		    // This sets the useCache and namePrefix fields of the class
+		    retriever = new DDXRetriever(!line.hasOption( "n"), line.getOptionValue("cache-name"));
 
 		    if (line.hasOption( "r")) {
 		    	System.out.println("DDX: " + retriever.getCachedDDXDoc(ddxURL));
@@ -153,12 +152,12 @@ public class DDXRetriever {
 	}
 	
 	/**
-	 * Get the cache. Use the methods in ResponseCache to get information
+	 * Get the cache. Use the methods in ResponseCachePostgres to get information
 	 * from the cache. For this class the cache holds the LMTs and DDX for
 	 * each URL (the URLs are the keys).
 	 * @return The DDX cache.
 	 */
-	public ResponseCache getCache() {
+	public ResponseCachePostgres getCache() {
 		return DDXCache;
 	}
 
@@ -196,12 +195,12 @@ public class DDXRetriever {
 			String line;
 
 			try {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(is, "UTF-8"));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 				while ((line = reader.readLine()) != null) {
 					sb.append(line).append("\n");
 				}
-			} finally {
+			} 
+			finally {
 				is.close();
 			}
 			return sb.toString();
@@ -230,7 +229,7 @@ public class DDXRetriever {
 		URL url = new URL(DDXURL);
 		URLConnection connection = url.openConnection();
 
-		if (useDDXsVisited)
+		if (useCache)
 			connection.setIfModifiedSince(DDXCache.getLastVisited(DDXURL));
 
 		// Here's where we'd poke in a header to ask for the DAP3.2 DDX
@@ -249,7 +248,7 @@ public class DDXRetriever {
 			case 200:
 				ddx = convertStreamToString(httpConnection.getInputStream());
 				// Update the last visited and document caches
-				if (saveDDXs) {
+				if (useCache) {
 					Date date = new Date();
 					DDXCache.setLastVisited(DDXURL, date.getTime());
 					DDXCache.setCachedResponse(DDXURL, ddx);
@@ -257,42 +256,41 @@ public class DDXRetriever {
 				break;
 
 			case 304:
-				if (useDDXsVisited)
+				if (useCache) {
 					ddx = DDXCache.getCachedResponse(DDXURL);
-				// Update the last visited cache to now
-				if (saveDDXs) {
+					// Update the last visited cache to now
+			
 					Date date = new Date();
 					DDXCache.setLastVisited(DDXURL, date.getTime());
 				}
 				break;
 
 			default:
-				throw new IOException(
-						"Expected a 200 or 304 HTTP return code. Got: "
+				log.error("Expected a 200 or 304 HTTP return code. Got: "
 								+ new Integer(code).toString());
 			}
-		} else {
-			throw new MalformedURLException("Expected a HTTP URL (" + DDXURL
-					+ ").");
+		}
+		else {
+			throw new MalformedURLException("Expected a HTTP URL (" + DDXURL + ").");
 		}
 
 		return ddx;
 	}
 	
 	public String getCachedDDXDoc(String DDXURL) throws Exception {
-		if (!useDDXsVisited || DDXCache == null)
+		if (DDXCache == null)
 			throw new Exception("Caching is off but I was asked to read from the cache.");
 		return DDXCache.getCachedResponse(DDXURL);
 	}
 	
 	public long getCachedDDXLMT(String DDXURL) throws Exception {
-		if (!useDDXsVisited || DDXCache == null)
+		if (DDXCache == null)
 			throw new Exception("Caching is off but I was asked to read from the cache.");
 		return DDXCache.getLastVisited(DDXURL);
 	}
 	
 	public void saveDDXCache() throws Exception {
-		if (!useDDXsVisited || DDXCache == null)
+		if (DDXCache == null)
 			throw new Exception("Caching is off but I was asked to save the cache.");
 		DDXCache.saveState();
 	}
