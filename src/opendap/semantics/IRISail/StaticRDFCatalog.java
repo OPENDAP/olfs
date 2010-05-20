@@ -408,15 +408,15 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         }
                     }
                     log.info("Importing URL: " + inUrl);
-                    con.add(inUrl, importURL, RDFFormat.RDFXML,(Resource) uriaddress);
+                    //con.add(inUrl, importURL, RDFFormat.RDFXML,(Resource) uriaddress);
                     log.info("Finished Importing URL: " + inUrl);
-                    import2Update.add(importURL); // collect deleted
+                    import2Update.add(importURL); // import need to update
                     if (thread.isInterrupted()) {
                         log.warn("updateSemanticRepository(): WARNING! Thread "
                                 + thread.getName() + " was interrupted!");
                         return;
                     }
-
+                    /*
                     log.info("Setting last modified time for context: "
                                     + inUrl);
                     owlse2.setLTMODContext(importURL, con); // set last modified
@@ -429,7 +429,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                         return;
                     }
 
-                    // setIsContainedBy(importURL, CollectionURL); //need some work here!!!
+                     setIsContainedBy(importURL, CollectionURL); //need some work here!!!
                     log.info("Adding last_modified_time of URL: " + importURL);
                     owlse2.imports.add(importURL); // track what is added in
                                                     // the repository
@@ -440,7 +440,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                                 + thread.getName() + " was interrupted!");
                         return;
                     }
-
+                   */
                 } else {
                     if (!owlse2.imports.contains(importURL)) {
                         owlse2.imports.add(importURL); // track what is added
@@ -452,21 +452,22 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             } catch (MalformedURLException e) {
                 log.error("Failed to import " + importURL
                         + "  MalformedURLException message: " + e.getMessage());
-            } catch (IOException e) {
-                log.error("Failed to import " + importURL
-                        + "  IOException message: " + e.getMessage());
             } 
-            catch (RDFParseException e) {
-                log.error("Failed to import " + importURL
-                        + "  RDFParseException message: " + e.getMessage());
-            } 
+            //catch (IOException e) {
+            //    log.error("Failed to import " + importURL
+            //            + "  IOException message: " + e.getMessage());
+            //} 
+           // catch (RDFParseException e) {
+           //     log.error("Failed to import " + importURL
+           //             + "  RDFParseException message: " + e.getMessage());
+           // } 
             catch (RepositoryException e) {
                 log.error("Failed to import " + importURL
                         + "  RepositoryException message: " + e.getMessage());
             }
 
         }
- /*       
+        
         for (String importURL : import2Update) {
             try {
                 inUrl = new URL(importURL);
@@ -516,7 +517,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             }
         }
         
- */       
+        
         long elapsedTime = new Date().getTime() - startTime.getTime();
         log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
 
