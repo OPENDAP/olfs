@@ -175,14 +175,19 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     public void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
+        long startTime, endTime;
+        double elapsedTime;
         log.info("#############################################");
         log.info("#############################################");
         log.info("Loading WCS Catalog from Semantic Repository.");
+        startTime = new Date().getTime();
         setupRepository();
         extractCoverageDescrptionsFromRepository();
         updateCatalogCache();
         shutdownRepository();
-        log.info("WCS Catalog loading from the Semantic Repository complete.");
+        endTime = new Date().getTime();
+        elapsedTime = (endTime - startTime) / 1000.0;
+        log.info("WCS Catalog loaded from the Semantic Repository. Loaded in "+ elapsedTime + " seconds.");
         log.info("#############################################");
         log.info("#############################################");
     }
@@ -698,9 +703,12 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             log.info("destroy(): Shutting Down Semantic Repository.");
 
             if (!owlse2.isRepositoryDown()){
-                        owlse2.shutDown();
+                owlse2.shutDown();
+                log.info("destroy(): Semantic Repository Has Been Shutdown.");
+            }else {
+                log.info("destroy(): Semantic Repository was already down.");
+
             }
-            log.info("destroy(): Semantic Repository Has Been Shutdown.");
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");
         }
