@@ -295,6 +295,13 @@ public interface WcsCatalog {
     public String getTimeCoordinateDapId(String coverageId);
 
 
+    /**
+     * Returns the base data access URL for this coverage. Null otherwise.
+     * @param coverageID
+     * @return  The base data access URL for this coverage. Null otherwise.
+     */
+    public String getDataAccessUrl(String coverageID);
+
 
 
     /**

@@ -98,7 +98,7 @@ public class CoverageRequestProcessor {
 
     public static String getDapDataAccessURL(GetCoverageRequest req, String urlBase) throws WcsException {
 
-        String requestURL = urlBase;
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
 
         if( !req.getCoverageID().startsWith("/") )
@@ -113,7 +113,7 @@ public class CoverageRequestProcessor {
 
     public static String getNetcdfDataAccessURL(GetCoverageRequest req, String urlBase) throws WcsException {
 
-        String requestURL = urlBase;
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
 
         if( !req.getCoverageID().startsWith("/") )
             requestURL += "/";
@@ -127,7 +127,7 @@ public class CoverageRequestProcessor {
 
     public static String getMetadataAccessURL(GetCoverageRequest req, String urlBase) throws WcsException {
 
-        String requestURL = urlBase;
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
 
         if( !req.getCoverageID().startsWith("/") )
             requestURL += "/";

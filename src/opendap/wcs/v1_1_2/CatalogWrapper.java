@@ -88,6 +88,10 @@ public class CatalogWrapper {
 
 
 
+    public static String getDataAccessUrl(String coverageID){
+        return _catalogImpl.getDataAccessUrl(coverageID);
+    }
+
 
     public static boolean hasCoverage(String id) {
         return _catalogImpl.hasCoverage(id);

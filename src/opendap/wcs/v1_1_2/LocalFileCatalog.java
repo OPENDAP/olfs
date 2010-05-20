@@ -63,6 +63,10 @@ public class LocalFileCatalog implements WcsCatalog {
     private  ReentrantReadWriteLock _catalogLock;
 
 
+    public String getDataAccessUrl(String coverageID){
+        return coverageID;
+    }
+
     public LocalFileCatalog(){
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         _catalogLock = new ReentrantReadWriteLock();

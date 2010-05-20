@@ -632,6 +632,9 @@ public class IRISailRepository extends SailRepository {
     }
 
 
+
+
+
     /**
      * Build a wcs:Identifier for the coverage dataset described by the datasetUrl.
      *
@@ -644,36 +647,41 @@ public class IRISailRepository extends SailRepository {
 
         try {
             int i;
-            String serverURL, serverPrefix;
+            String serverURL, serverID;
             URL dsu = new URL(datasetUrl);
 
 
             serverURL = getServerUrlString(dsu);
 
+            log.debug("getWcsIdString(): serverURl is "+serverURL);
 
-            if(serviceIDs.containsKey(serverURL)){
+            if(serverIDs.containsKey(serverURL)){
                 // get server prefix
-                serverPrefix = serviceIDs.get(serverURL);
+                serverID = serverIDs.get(serverURL);
+                log.debug("getWcsIdString(): serverURL already in use, will reuse serverID '"+serverID+"'");
             }
             else {
-                serverPrefix = "S"+ (serviceIDs.size()+1) + "";
+                serverID = "S"+ (serverIDs.size()+1) + "";
                 // Generate service prefix
                 // Store service prefix.
-                serviceIDs.put(serverURL,serverPrefix);
+                serverIDs.put(serverURL,serverID);
+                log.debug("getWcsIdString(): New serverURL! Created new serverID '"+serverID+"'");
+
             }
 
 
             // Build wcsID
-
-            wcsID = serverPrefix + datasetUrl.substring(serverURL.length(),datasetUrl.length());
-            log.debug("wcsID: "+wcsID);
-
-
-
             if(!wcsIDs.containsKey(datasetUrl)){
                 // add wcs:Identifier to MAP
+                wcsID = serverID + datasetUrl.substring(serverURL.length(),datasetUrl.length());
+                log.debug("getWcsIdString(): Dataset had no existing wcsID, adding wcsID: "+wcsID+
+                        " for dataset: "+datasetUrl);
                 wcsIDs.put(datasetUrl,wcsID);
-
+            }
+            else {
+                wcsID = wcsIDs.get(datasetUrl);
+                log.debug("getWcsIdString(): Dataset already has a wcsID, returning wcsID: "+wcsID+
+                        " for dataset: "+datasetUrl);
             }
 
         } catch (MalformedURLException e) {
@@ -682,9 +690,9 @@ public class IRISailRepository extends SailRepository {
 
 
         return wcsID;
-    }  
+    }
 
-    private ConcurrentHashMap<String, String> serviceIDs = new ConcurrentHashMap<String,String>();
+    private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
     private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
     
 
@@ -2162,4 +2170,151 @@ public class IRISailRepository extends SailRepository {
 
         return update;
     } // public Boolean updateFromFile
+
+
+
+
+
+    /**
+     *
+     * @return
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException
+     */
+    public HashMap<String, Vector<String>> getCoverageIDServerURL() throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        TupleQueryResult result = null;
+        HashMap<String, Vector<String>> coverageIDServer = new HashMap<String, Vector<String>>();
+
+        String queryString = "SELECT coverageurl,coverageid " +
+                "FROM " +
+                "{} wcs:CoverageDescription {coverageurl} wcs:Identifier {coverageid} " +
+                "USING NAMESPACE " +
+                "wcs = <http://www.opengis.net/wcs/1.1#>";
+        RepositoryConnection con = getConnection();
+        log.debug("query coverage ID and server URL: \n" + queryString);
+        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
+
+        result = tupleQuery.evaluate();
+        log.debug("Qresult: " + result.hasNext());
+        List<String> bindingNames = result.getBindingNames();
+        //log.debug(bindingNames.probeServletContext());
+        while (result.hasNext()) {
+            BindingSet bindingSet = (BindingSet) result.next();
+            // log.debug(bindingSet.probeServletContext());
+            Vector<String> coverageURL = new Vector<String>();
+
+            if (bindingSet.getValue("coverageid") != null && bindingSet.getValue("coverageurl") != null) {
+
+                Value valueOfcoverageid = (Value) bindingSet.getValue("coverageid");
+                Value valueOfcoverageurl = (Value) bindingSet.getValue("coverageurl");
+                coverageURL.addElement(valueOfcoverageurl.stringValue());
+                //log.debug("coverageid:");
+                //log.debug(valueOfcoverageid.stringValue());
+                //log.debug("coverageurl:");
+                log.debug(valueOfcoverageurl.stringValue());
+                if (coverageIDServer.containsKey(valueOfcoverageid.stringValue()))
+                    coverageIDServer.get(valueOfcoverageid.stringValue()).addElement(valueOfcoverageurl.stringValue());
+                else
+                    coverageIDServer.put(valueOfcoverageid.stringValue(), coverageURL);
+
+            }
+        }
+        con.close();
+        return coverageIDServer;
+
+    }
+
+
+    private HashMap<String, Vector<String>> coverageIDServer;
+
+    public void updateIdCaches(){
+        log.debug("Updating datasetUrl/wcsID and datasetUrl/serverID HashMap objects.");
+        try {
+            coverageIDServer = getCoverageIDServerURL();
+            String serverUrl, serviceID, localId;
+
+            for (String coverageID : coverageIDServer.keySet()) {
+                log.debug("CoverageID: " + coverageID);
+                Vector<String> datasetUrls = coverageIDServer.get(coverageID);
+                for (String datasetUrl : datasetUrls) {
+
+                    log.debug("    datasetUrl: " + datasetUrl);
+
+                    serverUrl = getServerUrlString(new URL(datasetUrl));
+                    log.debug("    serverUrl:  " + serverUrl);
+
+                    localId = datasetUrl.substring(serverUrl.length(),datasetUrl.length());
+                    log.debug("    localID:    "+localId);
+
+                    serviceID = coverageID.substring(0,coverageID.indexOf(localId));
+                    log.debug("    serviceID:     "+serviceID);
+
+                    if(!serverIDs.containsKey(serverUrl)){
+                        log.debug("Adding to ServiceIDs");
+                        serverIDs.put(serverUrl,serviceID);
+                    }
+                    else if(serviceID.equals(serverIDs.get(serverUrl))){
+                        log.info("The serverURL: "+serverUrl+" is already mapped to " +
+                                "the serviceID: "+serviceID+" No action taken.");
+                    }
+                    else {
+                        String msg = "\nOUCH! The semantic repository contains multiple serviceID strings " +
+                                "for the same serverURL. This may lead to one of the serviceID's being " +
+                                "reassigned. This would lead to resources being attributed to the " +
+                                "wrong server/service.\n";
+                        msg += "serverUrl: "+serverUrl+"\n";
+                        msg += "  serviceID(repository) : "+serviceID+"\n";
+                        msg += "  serviceID(in-memory):   "+ serverIDs.get(serverUrl)+"\n";
+
+                        log.error(msg);
+
+                    }
+
+
+                    if(!wcsIDs.containsKey(datasetUrl)){
+                        log.debug("Adding to datasetUrl/coverageID to Map");
+                        wcsIDs.put(datasetUrl,coverageID);
+                    }
+                    else if(coverageID.equals(wcsIDs.get(datasetUrl))){
+                        log.info("The datasetUrl: "+datasetUrl+" is already mapped to " +
+                                "the coverageID: "+coverageID+" No action taken.");
+                    }
+                    else {
+                        String msg = "\nOUCH! The semantic repository contains multiple coverageID strings " +
+                                "for the same datasetUrl. This may lead to one of the coverageID's being " +
+                                "reassigned. This would lead to resources being attributed to the " +
+                                "wrong server/service.\n";
+
+                        msg += "datasetUrl: "+datasetUrl+"\n";
+                        msg += "  coverageID(repository) : "+coverageID+"\n";
+                        msg += "  coverageID(in-memory):   "+wcsIDs.get(datasetUrl)+"\n";
+
+                        log.error(msg);
+                    }
+
+                    //private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
+                    //private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
+
+
+                }
+            }
+
+        } catch (RepositoryException e) {
+
+            log.error("getCoverageIDServerURL(): Caught RepositoryException. msg: "
+                    + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("getCoverageIDServerURL(): Caught MalformedQueryException. msg: "
+                    + e.getMessage());
+        } catch (QueryEvaluationException e) {
+            log.error("getCoverageIDServerURL(): Caught QueryEvaluationException. msg: "
+                    + e.getMessage());
+        } catch (MalformedURLException e) {
+            log.error("getCoverageIDServerURL(): Caught MalformedURLException. msg: "
+                    +e.getMessage());
+        }
+
+    }
+
 }
