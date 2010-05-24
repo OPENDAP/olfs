@@ -289,6 +289,12 @@ public class ChunkedInputStream  {
                 if(status.equalsIgnoreCase(Chunk.ERROR_STATUS)){
                     //log.error("status: error");
                     isError =  true;
+                    if(status.equalsIgnoreCase(Chunk.EMERGENCY_EXIT_STATUS)){
+                        log.error("Stream source requested an emergency exit! Closing connection immediately.");
+                        isClosed = true;
+                        is.close();
+                    }
+
                 }
                 // Is the status a mandatory exit?
                 else if(status.equalsIgnoreCase(Chunk.EXIT_STATUS)){

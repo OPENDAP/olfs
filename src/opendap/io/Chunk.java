@@ -79,6 +79,7 @@ public class Chunk {
 
     public static final String STATUS_EXTENSION = "status=";
     public static final String ERROR_STATUS = "error";
+    public static final String EMERGENCY_EXIT_STATUS = "exit";
     public static final String EXIT_STATUS = "PPT_EXIT_NOW";
 
     public static final String COUNT_EXTENSION = "count=";
