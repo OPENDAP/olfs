@@ -51,18 +51,33 @@ public class RangeSubset {
      */
     public RangeSubset(HashMap<String,String> kvp) throws WcsException{
 
-        //@todo IMPLEMENT KVP INVOCATION OF RANGE SUBSETTING
 
         String s = kvp.get("RangeSubset");
 
-        if(s != null)
-            throw new WcsException("RangeSubsetting is not yet implmented for KVP requests.",
-                    WcsException.OPERATION_NOT_SUPPORTED,
-                    "RangeSubset");
+        if(s!=null){
+        String[] fieldSubsetStrings = s.split(";",0);
 
-        log.info("Todo: Range sub-setting is not yet supported for kvp requests.");
+        if(fieldSubsetStrings.length < 1)
+            throw new WcsException("The RangeSubset is required to have one or more FieldSubsets.",
+                    WcsException.MISSING_PARAMETER_VALUE,
+                    "FieldSubset");
 
-        fieldSubsets = new FieldSubset[0];
+        fieldSubsets = new FieldSubset[fieldSubsetStrings.length];
+
+        int i = 0;
+        for(String fs : fieldSubsetStrings){
+
+            fieldSubsets[i++] = new FieldSubset(fs);
+
+
+        }
+        }
+        else {
+            fieldSubsets = new FieldSubset[0];
+        }
+
+
+
     }
 
 
@@ -72,11 +87,11 @@ public class RangeSubset {
         Element e;
         Iterator i;
         int index;
+        String s;
 
         WCS.checkNamespace(rangeSubset,"RangeSubset",WCS.WCS_NS);
 
         List rsl = rangeSubset.getChildren("FieldSubset",WCS.WCS_NS);
-        log.error("ERROR - range sub-setting is not supported for kvp requests.");
 
         if(rsl.size()==0){
             throw new WcsException("The wcs:RangeSubset element is required to have one or more wcs:FieldSubset child elements.",
@@ -130,6 +145,44 @@ public class RangeSubset {
             _axisSubsets = null;
         }
 
+        FieldSubset(String fieldSubsetString) throws WcsException{
+
+            _interpolationType = null;
+            String fieldName;
+
+
+            _axisSubsets = new AxisSubset[0];
+            if(fieldSubsetString.indexOf("[")>=0){
+                    throw new WcsException("Axis subsetting is not supported by this service..",
+                            WcsException.OPERATION_NOT_SUPPORTED,
+                            "KVP Axis subset");
+            }
+            else {
+                fieldName = fieldSubsetString;
+            }
+
+            if(fieldName.contains(":")) {
+                if (fieldName.endsWith(":")) {
+                    throw new WcsException("The name of the interpolation method must be provided after " +
+                            "the ':' character in the request URL.",
+                            WcsException.MISSING_PARAMETER_VALUE,
+                            "KVP Interpolation Method.");
+
+                }
+                
+                _interpolationType = fieldName.substring(fieldName.lastIndexOf(":") + 1, fieldName.length());
+                fieldName = fieldName.substring(0, fieldName.lastIndexOf(":"));
+
+
+            }
+
+            _id = fieldName;
+
+        }
+
+
+
+
         FieldSubset(Element fs) throws WcsException{
             init() ;
 
@@ -160,12 +213,29 @@ public class RangeSubset {
             }
 
 
-            e = fs.getChild("InterpolationType",WCS.WCS_NS);
-            if(e!=null){
+            e = fs.getChild("InterpolationType", WCS.WCS_NS);
+            if (e != null) {
                 _interpolationType = e.getText();
+                if (_interpolationType.isEmpty())
+                    throw new WcsException("The wcs:InterpolationType element is required to have content!",
+                            WcsException.MISSING_PARAMETER_VALUE,
+                            "wcs:InterpolationType");
+
             }
 
             List asl = fs.getChildren("AxisSubset",WCS.WCS_NS);
+
+
+            // STOP PROCESSING! DO NOT PROCESS AXIS SUB_SETTING ELEMENTS!
+            _axisSubsets = new AxisSubset[0];
+            if(asl.size()>0)
+                throw new WcsException("Axis sub-setting is not supported by this service..",
+                        WcsException.OPERATION_NOT_SUPPORTED,
+                        "wcs:AxisSubset");
+
+
+            // The following code is blocked from procesing by the previous exception. This is intentional as this
+            // Is the logical place to detect a request for the unsupported Axis sub-setting activity.
             _axisSubsets = new AxisSubset[asl.size()];
             Iterator i = asl.iterator();
             int index = 0;
@@ -196,15 +266,19 @@ public class RangeSubset {
         Element getElement(){
             Element fieldSubset = new Element("FieldSubset",WCS.WCS_NS);
 
-            Element e = new Element("Identifier",WCS.OWS_NS);
+            Element fieldId = new Element("Identifier",WCS.OWS_NS);
+            fieldId.setText(_id);
+
+            
             if(_codeType!=null)
-                e.setAttribute("codeType",_codeType.toASCIIString());
-            fieldSubset.addContent(e);
+                fieldId.setAttribute("codeType",_codeType.toASCIIString());
+            fieldSubset.addContent(fieldId);
+
 
             if(_interpolationType!=null) {
-                e = new Element("InterpolationType",WCS.WCS_NS);
-                e.setText(_interpolationType);
-                fieldSubset.addContent(e);
+                fieldId = new Element("InterpolationType",WCS.WCS_NS);
+                fieldId.setText(_interpolationType);
+                fieldSubset.addContent(fieldId);
             }
 
 

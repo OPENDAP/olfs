@@ -176,6 +176,21 @@ public class CoverageRequestProcessor {
 
         if(rs!=null){
             RangeSubset.FieldSubset[] fields = req.getRangeSubset().getFieldSubsets();
+
+
+            String dataAccessUrl = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
+
+            if(fields.length>1){
+                throw new WcsException("You may explicitly select only a single wcs:Field. " +
+                        "You may implicitly select all of the wcs:Fields in the data set by " +
+                        "removing the RangeSubset clause from the request",
+                        WcsException.OPERATION_NOT_SUPPORTED,
+                        "ows:Field");
+
+            }
+
+            
+
             for(RangeSubset.FieldSubset fs :fields){
 
                 fieldID = fs.getID();
@@ -187,12 +202,16 @@ public class CoverageRequestProcessor {
                     proj += ",";
                 if(proj==null)
                     proj = "";
+
+                
                 proj += "geogrid("+fs.getID()+","+subsetBB.getDapGeoGridFunctionBoundingBox() +")";
 
+                //String gridConstraint = geoIndex(dataAccessUrl,fieldID, subsetBB.getDapGeoGridFunctionBoundingBox());
 
-                //##########
-                break; //@todo REMOVE THIS (break;) LINE TO ENABLE MULTIPLE FIELDS IN A RESPONSE
-                //###########
+                //proj += fieldID + gridConstraint;
+
+                
+
             }
         }
         return proj==null?"":proj;
@@ -200,6 +219,11 @@ public class CoverageRequestProcessor {
 
 
 
+    public static String geoIndex(String datasetUrl, String gridID, String dapBoundingBox){
+
+        return "[0:1:1000][0:1:1000]";
+
+    }
 
 
 
