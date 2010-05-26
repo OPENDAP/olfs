@@ -82,15 +82,15 @@ public class DapIngest {
     		String cacheNamePrefix)
     		throws SaxonApiException, Exception {
 
-    	tcc = new ThreddsCatalogUtil(useThreddsCache, cacheNamePrefix);
+    	tcc = new ThreddsCatalogUtil(useThreddsCache, cacheNamePrefix, useThreddsCache);
 
     	catalogsVisited = 0;
     	DDXsVisited = 0;
     	
     	try {
-    		DDXSource = new DDXRetriever(/*log,*/ useDDXCache, useDDXCache, cacheNamePrefix);
+    		DDXSource = new DDXRetriever(useDDXCache, cacheNamePrefix);
 			
-    		EMLSource = new EMLRetriever(/*log,*/ useEMLCache, useEMLCache, cacheNamePrefix);
+    		EMLSource = new EMLRetriever(useEMLCache, cacheNamePrefix);
  		} 
     	catch (SaxonApiException e) {
 			log.debug("Transform returned an SaxonApiException: " + e.getLocalizedMessage());
@@ -199,7 +199,7 @@ public class DapIngest {
     	// First get references to any DDX objects at the top level
     	log.info("About to get DDX URLS from: " + catalogURL);
     	++catalogsVisited;
-    	Vector<String> DDXURLs = tcc.getDDXUrls(catalogURL, false);
+    	Vector<String> DDXURLs = tcc.getDDXUrls(catalogURL);
     	for (String DDXURL: DDXURLs) {
     		++DDXsVisited;
     		examineDDX(DDXURL, EMLGeneration);
@@ -209,7 +209,7 @@ public class DapIngest {
     		String catalog = catalogs.nextElement();
         	log.info("About to get DDX URLS from: " + catalog);
         	++catalogsVisited;
-        	DDXURLs = tcc.getDDXUrls(catalog, false);
+        	DDXURLs = tcc.getDDXUrls(catalog);
         	for (String DDXURL: DDXURLs) {
         		++DDXsVisited;
         		examineDDX(DDXURL, EMLGeneration);

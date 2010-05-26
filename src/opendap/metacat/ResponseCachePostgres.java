@@ -37,8 +37,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.jcs.JCS;
-import org.apache.jcs.access.exception.CacheException;
+//import org.apache.jcs.JCS;
+//import org.apache.jcs.access.exception.CacheException;
 
 import java.sql.*;
 
@@ -212,10 +212,6 @@ public class ResponseCachePostgres {
     @Override
     protected void finalize() throws Exception {
     	saveState();
-    	if (pgCache != null) {
-    		pgCache.close();
-    		pgCache = null;
-    	}
     }
     
     /** For the cache to save its state now. 
@@ -243,7 +239,7 @@ public class ResponseCachePostgres {
     		responsesVisited = (ConcurrentHashMap<String, Long>)ois.readObject();
     	}
     	catch (FileNotFoundException e) {
-    		//log.error("Could not open the Responses Visited cache - file not found.");
+    		log.error("Could not open the Responses Visited cache - file not found.");
     	}
 		catch (ClassNotFoundException e) {
 			throw new Exception(

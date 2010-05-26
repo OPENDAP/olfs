@@ -35,7 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //import java.io.PrintStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.StringReader;
 
 import java.util.EmptyStackException;
@@ -44,6 +49,7 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.Iterator;
+//import java.util.concurrent.ConcurrentHashMap;
 
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -61,6 +67,8 @@ public class ThreddsCatalogUtil {
 	private boolean writeToCache = false;
 	private boolean readFromCache = false;
 	
+	private boolean restoreCrawlState = false;
+	
 	private XMLOutputter xmlo = null;
 	
 	private ResponseCachePostgres TCCache = null;
@@ -77,10 +85,18 @@ public class ThreddsCatalogUtil {
 	 *            True if caching should be used
 	 * @param namePrefix
 	 *            The name of the cache files
+	 * @param readFromCache Arrange for the TCU class to read Thredds catalogs
+	 * from the postgres cache.
 	 */
-	public ThreddsCatalogUtil(boolean  writeToCache, String namePrefix, boolean readFromCache) {
+	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) {
+		this(writeToCache, namePrefix, readFromCache, false);
+	}
+
+	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache, boolean restoreCrawlState) {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
+		this.restoreCrawlState = restoreCrawlState;
+		
 		if (writeToCache || readFromCache) {
 			log.debug("Configuring caching in ThreddsCatalogUtil.");
 			
@@ -112,10 +128,23 @@ public class ThreddsCatalogUtil {
 
 		// This holds catalogs not yet seen by the user of the Enumeration
 		private Stack<String> childURLs;
+		
+		// Name for the saved stack - see saveState() below.
+		private String savedStateName = "TCU.Stack";
 
 		threddsCrawlerEnumeration(String catalogURL) throws Exception {
 			childURLs = new Stack<String>();
-	    	childURLs.push(catalogURL);
+			childURLs.push(catalogURL);
+		}
+		
+		threddsCrawlerEnumeration() throws Exception {
+			childURLs = new Stack<String>();
+			restoreState();
+			/*
+			Enumeration<String> urls = childURLs.elements();
+			while (urls.hasMoreElements())
+				log.debug("childURLs: " + urls.nextElement());
+			*/
 		}
 		
 		private void recur(String catalogURL) {
@@ -142,14 +171,73 @@ public class ThreddsCatalogUtil {
 		public String nextElement() {
 			try {
 				String child = childURLs.pop();
+				log.debug("Read child: [" + child + "].");
 				recur(child);
 				return child;
 			}
 			catch (EmptyStackException e) {
 				return null;
-			}
-			
+			}	
 		}
+		
+		public void saveState() throws Exception {
+			FileOutputStream fos;
+			ObjectOutputStream oos = null;
+	    	try {
+	    		fos = new FileOutputStream(savedStateName);
+	    		oos = new ObjectOutputStream(fos);
+
+	    		oos.writeObject(childURLs);
+	    	}
+	    	catch (FileNotFoundException e) {
+				throw new Exception("threddsCrawlerEnumeration.saveState: File not found", e);
+	    	}
+	    	catch (SecurityException e) {
+				throw new Exception("threddsCrawlerEnumeration.saveState: Security", e);
+	    	}	
+	    	catch (java.io.IOException e) {
+				throw new Exception("threddsCrawlerEnumeration.saveState: I/O", e);
+	    	}
+	    	finally {
+	    		if (oos != null)
+	    			oos.close();
+	    	}
+		}
+		
+		@SuppressWarnings("unchecked")
+		private void restoreState() throws Exception {
+			FileInputStream fis;
+			ObjectInputStream ois = null;
+			try {
+				fis = new FileInputStream(savedStateName);
+				ois = new ObjectInputStream(fis);
+				
+	    		childURLs = (Stack<String>)ois.readObject();
+	    	}
+	    	catch (FileNotFoundException e) {
+	    		log.error("Could not open the Responses Visited cache - file not found.");
+	    	}
+			catch (ClassNotFoundException e) {
+				throw new Exception(
+						"threddsCrawlerEnumeration.restoreState: "
+								+ "Could not find the class when reading the Stack<String> object."
+								+ e.getMessage());
+			}
+			catch (ClassCastException e) {
+				throw new Exception(
+						"threddsCrawlerEnumeration.restoreState: "
+								+ "Could not cast the persistent store to a Stack<String> object."
+								+ e.getMessage());
+			}
+			catch (java.io.IOException e) {
+				throw new Exception("threddsCrawlerEnumeration.restoreState: " + "Generic Java I/O Exception."
+						+ e.getMessage());
+			}    	
+			finally {
+	    		if (ois != null)
+	    			ois.close();
+	    	}
+	    }
 	}
 
 	public static enum SERVICE {
@@ -351,11 +439,21 @@ public class ThreddsCatalogUtil {
 	 * @param topCatalog
 	 *            The THREDDS catalog that will serve as the root node
 	 * @return An Enumeration of Strings that will visit all of the catalogs in
-	 *         that tree
+	 *         that tree, bound up in a threddsCrawlerEnumeration.
 	 * @throws Exception Thrown if the cache cannot be configured
 	 */
 	public Enumeration<String> getCatalogEnumeration(String topCatalog) throws Exception {
 		return new threddsCrawlerEnumeration(topCatalog);
+	}
+	
+	/**
+	 * Resume an interupted crawl.
+	 * @return An enumberation of Strings, bound up in a 
+	 * threddsCrawlerEnumeration object. 
+	 * @throws Exception Thrown if the cache cannot be configured
+	 */
+	public Enumeration<String> getCatalogEnumeration() throws Exception {
+		return new threddsCrawlerEnumeration();
 	}
 
 	/**
