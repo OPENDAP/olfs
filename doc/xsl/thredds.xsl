@@ -40,7 +40,7 @@
     <xsl:param name="remoteHost" />
     <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteCatalog" />
-    <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
+    <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
@@ -280,7 +280,7 @@
         <xsl:param name="indent" />
         <tr>
             <td align="left">
-                <xsl:value-of select="$indent"/><a href="{key('service-by-name', @serviceName)/@base}{@path}/catalog.html"><xsl:value-of select="@name" /></a>/
+                <xsl:value-of select="$indent"/><a href="{key('service-by-name', @serviceName)/@base}{@location}/catalog.html"><xsl:value-of select="@name" /></a>/
             </td>
 
             <xsl:call-template name="NoSizeNoTime" />
