@@ -306,10 +306,16 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     }
-    private void shutdownRepository() throws RepositoryException, InterruptedException {
-        log.debug("Shutting down Repository...");
-        owlse2.shutDown();
-        log.debug("Repository shutdown complete.");
+    private void shutdownRepository() throws RepositoryException {
+
+        log.debug("shutdownRepository)(): Shutting down Repository...");
+        if (!owlse2.isRepositoryDown()){
+            owlse2.shutDown();
+            log.info("shutdownRepository(): Semantic Repository Has Been Shutdown.");
+        }else {
+            log.info("shutdownRepository(): Semantic Repository was already down.");
+        }
+        log.debug("shutdownRepository(): Repository shutdown complete.");
     }
 
     private void setupRepository() throws RepositoryException, InterruptedException {
@@ -700,15 +706,10 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                 catalogUpdateThread.interrupt();
                 log.debug("destroy(): catalogUpdateThread '"+catalogUpdateThread+"' interrupt() called.");
             }
-            log.info("destroy(): Shutting Down Semantic Repository.");
+            log.info("destroy(): Attempting to shutdown Semantic Repository.");
+            shutdownRepository();
+            log.info("destroy(): Semantic Repository Has been shutdown.");
 
-            if (!owlse2.isRepositoryDown()){
-                owlse2.shutDown();
-                log.info("destroy(): Semantic Repository Has Been Shutdown.");
-            }else {
-                log.info("destroy(): Semantic Repository was already down.");
-
-            }
         } catch (RepositoryException e) {
             log.error("destroy(): Failed to shutdown Semantic Repository.");
         }
