@@ -25,18 +25,31 @@ package opendap.xml;
 
 
 
-import net.sf.saxon.s9api.*;
 import javax.xml.transform.stream.StreamSource;
+
+import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.XsltTransformer;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XsltCompiler;
+import net.sf.saxon.s9api.XsltExecutable;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.XdmValue;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.input.SAXBuilder;
+
 import org.slf4j.Logger;
 
 import java.net.URI;
