@@ -26,7 +26,7 @@
 -->
 <!DOCTYPE xsl:stylesheet [
 ]>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
                 xmlns:wcs="http://www.opengis.net/wcs"
@@ -280,12 +280,76 @@
         <xsl:param name="indent" />
         <tr>
             <td align="left">
-                <xsl:value-of select="$indent"/><a href="{key('service-by-name', @serviceName)/@base}{@location}/catalog.html"><xsl:value-of select="@name" /></a>/
+                <xsl:comment>
+                ######################## DATSET SCAN ######################
+                </xsl:comment>
+                <!--
+                ..........................................................
+                Input XML:
+                <xsl:copy-of select="." />
+                ..........................................................
+
+                thredds:metadata/thredds:serviceName: <xsl:value-of select="thredds:metadata/thredds:serviceName" />
+                -->
+
+                <xsl:variable name="serviceName" select="thredds:metadata/thredds:serviceName"/>
+                <!-- serviceName: <xsl:value-of select="$serviceName" /> -->
+
+                <xsl:variable name="datasetScanLocation" select="@location"/>
+                <xsl:variable name="datasetScanName" select="@name"/>
+
+                <!-- Get the service definition form the key (a hash map) -->
+                <xsl:variable name="serviceElement" select="key('service-by-name', $serviceName)" />
+
+
+                <!--
+                service-by-name:
+                <xsl:copy-of select="$serviceElement" />
+                -->
+
+                <!-- Get the service definition form the key (a hash map) -->
+                <!--xsl:variable name="dapServices" select="$serviceElement/thredds:service[@serviceType='OPENDAP']"/-->
+                <xsl:variable name="dapServices" select="$serviceElement[@serviceType='OPENDAP'] | $serviceElement/thredds:service[@serviceType='OPENDAP'] "/>
+
+                <xsl:for-each select="$dapServices">
+                    <xsl:copy-of select="."/>
+                    <xsl:variable name="base" select="@base" />
+                    <xsl:variable name="baseLastChar" select="substring($base,string-length($base))" />
+                    <xsl:variable name="catalogURL">
+                        <xsl:choose>
+
+                            <xsl:when test="$baseLastChar='/' and starts-with($datasetScanLocation,'/')">
+                                <xsl:variable name="location" select="substring($datasetScanLocation,2,string-length($datasetScanLocation))" />
+                                <xsl:variable name="targetURL" select="concat($base,$location)" />
+                                <xsl:value-of select="$targetURL"/>
+                            </xsl:when>
+
+                            <xsl:when test="$baseLastChar!='/' and not(starts-with($datasetScanLocation,'/'))">
+                                <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation)" />
+                                <xsl:value-of select="$targetURL"/>
+                            </xsl:when>
+
+                            <xsl:otherwise>
+                                <xsl:variable name="targetURL" select="concat($base,$datasetScanLocation)" />
+                                <xsl:value-of select="$targetURL"/>
+                            </xsl:otherwise>
+
+                        </xsl:choose>
+
+                    </xsl:variable>
+
+                    <xsl:value-of select="$indent"/><a href="{$catalogURL}/catalog.html"><xsl:value-of select="$datasetScanName" /> (via <xsl:value-of select="@name" />)</a>/<br/>
+
+                </xsl:for-each>
+
+
             </td>
 
             <xsl:call-template name="NoSizeNoTime" />
         </tr>
     </xsl:template>
+    
+
 
     <!--***********************************************
        -
