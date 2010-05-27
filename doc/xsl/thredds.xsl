@@ -281,7 +281,7 @@
         <tr>
             <td align="left">
                 <xsl:comment>
-                ######################## DATSET SCAN ######################
+                ######################## DATASET SCAN ######################
                 </xsl:comment>
                 <!--
                 ..........................................................
@@ -296,6 +296,8 @@
                 <!-- serviceName: <xsl:value-of select="$serviceName" /> -->
 
                 <xsl:variable name="datasetScanLocation" select="@location"/>
+                <!-- datasetScanLocation = '<xsl:value-of select="$datasetScanLocation"/>'-->
+
                 <xsl:variable name="datasetScanName" select="@name"/>
 
                 <!-- Get the service definition form the key (a hash map) -->
@@ -312,19 +314,23 @@
                 <xsl:variable name="dapServices" select="$serviceElement[@serviceType='OPENDAP'] | $serviceElement/thredds:service[@serviceType='OPENDAP'] "/>
 
                 <xsl:for-each select="$dapServices">
-                    <xsl:copy-of select="."/>
+
                     <xsl:variable name="base" select="@base" />
-                    <xsl:variable name="baseLastChar" select="substring($base,string-length($base))" />
+                    <!-- base = '<xsl:value-of select="$base"/>' -->
+
+                    <xsl:variable name="lastCharOfBase" select="substring($base,string-length($base))" />
+                    <!-- lastCharOfBase = '<xsl:value-of select="$lastCharOfBase"/>' -->
+
                     <xsl:variable name="catalogURL">
                         <xsl:choose>
 
-                            <xsl:when test="$baseLastChar='/' and starts-with($datasetScanLocation,'/')">
+                            <xsl:when test="$lastCharOfBase='/' and starts-with($datasetScanLocation,'/')">
                                 <xsl:variable name="location" select="substring($datasetScanLocation,2,string-length($datasetScanLocation))" />
                                 <xsl:variable name="targetURL" select="concat($base,$location)" />
                                 <xsl:value-of select="$targetURL"/>
                             </xsl:when>
 
-                            <xsl:when test="$baseLastChar!='/' and not(starts-with($datasetScanLocation,'/'))">
+                            <xsl:when test="$lastCharOfBase!='/' and not(starts-with($datasetScanLocation,'/'))">
                                 <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation)" />
                                 <xsl:value-of select="$targetURL"/>
                             </xsl:when>
@@ -338,7 +344,13 @@
 
                     </xsl:variable>
 
-                    <xsl:value-of select="$indent"/><a href="{$catalogURL}/catalog.html"><xsl:value-of select="$datasetScanName" /> (via <xsl:value-of select="@name" />)</a>/<br/>
+                    <xsl:value-of select="$indent"/><a href="{$catalogURL}/catalog.html">
+                    <xsl:value-of select="$datasetScanName" />
+                    <xsl:if test="count($dapServices)>1">
+                        (via <xsl:value-of select="@name" />)
+                    </xsl:if>
+                    </a>/<br/>
+
 
                 </xsl:for-each>
 
