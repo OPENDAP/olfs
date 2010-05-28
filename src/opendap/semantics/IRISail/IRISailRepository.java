@@ -89,20 +89,37 @@ public class IRISailRepository extends SailRepository {
 
     private AtomicBoolean isRepositoryDown;
     
-    public void initialize() throws org.openrdf.repository.RepositoryException {
+    public void startup() throws org.openrdf.repository.RepositoryException {
         super.initialize();
+        setRepositoryDown(false);
+    }
 
-        isRepositoryDown.set(false);
-        setRepositoryDown (true);
+    private void setRepositoryDown(Boolean repositoryState) throws org.openrdf.repository.RepositoryException {
+        isRepositoryDown.set(repositoryState);
     }
-    public void setRepositoryDown(Boolean repositoryOn) throws org.openrdf.repository.RepositoryException {
-        
-        isRepositoryDown.set(repositoryOn);
-    }
+
     public Boolean isRepositoryDown() throws org.openrdf.repository.RepositoryException {
-       
         return isRepositoryDown.get();
     }
+
+    /**
+     *  Does a repository shutdown, but only if the repository is running!.
+     * @throws RepositoryException
+     */
+    @Override
+    public void shutDown() throws RepositoryException {
+
+        log.debug("shutDown)(): Shutting down Repository...");
+        if (!isRepositoryDown()){
+            super.shutDown();
+            setRepositoryDown(true);
+            log.info("shutDown(): Semantic Repository Has Been Shutdown.");
+        }else {
+            log.info("shutDown(): Semantic Repository was already down.");
+        }
+        log.debug("shutDown(): Repository shutdown complete.");
+    }
+
 
     public Boolean hasContext(URI uriContext, RepositoryConnection con)
             throws RepositoryException {

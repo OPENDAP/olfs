@@ -309,12 +309,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     private void shutdownRepository() throws RepositoryException {
 
         log.debug("shutdownRepository)(): Shutting down Repository...");
-        if (!owlse2.isRepositoryDown()){
             owlse2.shutDown();
-            log.info("shutdownRepository(): Semantic Repository Has Been Shutdown.");
-        }else {
-            log.info("shutdownRepository(): Semantic Repository was already down.");
-        }
         log.debug("shutdownRepository(): Repository shutdown complete.");
     }
 
@@ -352,7 +347,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("Intializing Semantic Repository.");
 
         // Initialize repository
-        owlse2.initialize(); //needed
+        owlse2.startup(); //needed
         log.info("Semantic Repository Ready.");
 
         if(Thread.currentThread().isInterrupted())
