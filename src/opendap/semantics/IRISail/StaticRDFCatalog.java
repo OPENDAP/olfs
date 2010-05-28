@@ -181,7 +181,6 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         startTime = new Date().getTime();
         setupRepository();
         extractCoverageDescrptionsFromRepository();
-        owlse2.updateIdCaches();
         updateCatalogCache();
         shutdownRepository();
         endTime = new Date().getTime();
@@ -649,6 +648,11 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         buildDoc = new XMLfromRDF(con, "CoverageDescriptions", "http://www.opengis.net/wcs/1.1#CoverageDescription");
         buildDoc.getXMLfromRDF("http://www.opengis.net/wcs/1.1#CoverageDescription"); //build a JDOM doc by querying against the RDF store
 
+        // Next we update the Repositories cached maps of of datasetUrl/serverIDs datasetUrl/wcsID
+        // This bothers me: Before we moved these HashMaps int the IRISailRepository it was a general purpose class for
+        // twiddling with Semantics - no it's a specialization of that general class for WCS. 
+        owlse2.updateIdCaches();
+        
 
     }
 
@@ -1155,6 +1159,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     public void updateCatalog()  throws RepositoryException, InterruptedException{
 
         setupRepository();
+        extractCoverageDescrptionsFromRepository();
         try {
             if (updateRepository())
                 updateCatalogCache();

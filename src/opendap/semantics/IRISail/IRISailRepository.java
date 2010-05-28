@@ -88,6 +88,10 @@ public class IRISailRepository extends SailRepository {
     private ProcessingTypes postProcessFlag;
 
     private AtomicBoolean isRepositoryDown;
+
+    private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
+    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
+
     
     public void startup() throws org.openrdf.repository.RepositoryException {
         super.initialize();
@@ -709,9 +713,7 @@ public class IRISailRepository extends SailRepository {
         return wcsID;
     }
 
-    private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
-    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
-    
+
 
     private String getServerUrlString(URL url) {
 
@@ -2243,12 +2245,17 @@ public class IRISailRepository extends SailRepository {
     }
 
 
-    private HashMap<String, Vector<String>> coverageIDServer;
 
     public void updateIdCaches(){
+
+        HashMap<String, Vector<String>> coverageIDServer;
+
+
         log.debug("Updating datasetUrl/wcsID and datasetUrl/serverID HashMap objects.");
         try {
+
             coverageIDServer = getCoverageIDServerURL();
+
             String serverUrl, serviceID, localId;
 
             for (String coverageID : coverageIDServer.keySet()) {
