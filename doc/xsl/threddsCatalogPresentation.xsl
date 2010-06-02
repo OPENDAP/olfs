@@ -280,79 +280,10 @@
         <xsl:param name="indent" />
         <tr>
             <td align="left">
-                <xsl:comment>
-                ######################## DATASET SCAN ######################
-                </xsl:comment>
-                <!--
-                ..........................................................
-                Input XML:
-                <xsl:copy-of select="." />
-                ..........................................................
 
-                thredds:metadata/thredds:serviceName: <xsl:value-of select="thredds:metadata/thredds:serviceName" />
-                -->
-
-                <xsl:variable name="serviceName" select="thredds:metadata/thredds:serviceName"/>
-                <!-- serviceName: <xsl:value-of select="$serviceName" /> -->
-
-                <xsl:variable name="datasetScanLocation" select="@location"/>
-                <!-- datasetScanLocation = '<xsl:value-of select="$datasetScanLocation"/>'-->
-
-                <xsl:variable name="datasetScanName" select="@name"/>
-
-                <!-- Get the service definition form the key (a hash map) -->
-                <xsl:variable name="serviceElement" select="key('service-by-name', $serviceName)" />
-
-
-                <!--
-                service-by-name:
-                <xsl:copy-of select="$serviceElement" />
-                -->
-
-                <!-- Get the service definition form the key (a hash map) -->
-                <!--xsl:variable name="dapServices" select="$serviceElement/thredds:service[@serviceType='OPENDAP']"/-->
-                <xsl:variable name="dapServices" select="$serviceElement[@serviceType='OPENDAP'] | $serviceElement/thredds:service[@serviceType='OPENDAP'] "/>
-
-                <xsl:for-each select="$dapServices">
-
-                    <xsl:variable name="base" select="@base" />
-                    <!-- base = '<xsl:value-of select="$base"/>' -->
-
-                    <xsl:variable name="lastCharOfBase" select="substring($base,string-length($base))" />
-                    <!-- lastCharOfBase = '<xsl:value-of select="$lastCharOfBase"/>' -->
-
-                    <xsl:variable name="catalogURL">
-                        <xsl:choose>
-
-                            <xsl:when test="$lastCharOfBase='/' and starts-with($datasetScanLocation,'/')">
-                                <xsl:variable name="location" select="substring($datasetScanLocation,2,string-length($datasetScanLocation))" />
-                                <xsl:variable name="targetURL" select="concat($base,$location)" />
-                                <xsl:value-of select="$targetURL"/>
-                            </xsl:when>
-
-                            <xsl:when test="$lastCharOfBase!='/' and not(starts-with($datasetScanLocation,'/'))">
-                                <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation)" />
-                                <xsl:value-of select="$targetURL"/>
-                            </xsl:when>
-
-                            <xsl:otherwise>
-                                <xsl:variable name="targetURL" select="concat($base,$datasetScanLocation)" />
-                                <xsl:value-of select="$targetURL"/>
-                            </xsl:otherwise>
-
-                        </xsl:choose>
-
-                    </xsl:variable>
-
-                    <xsl:value-of select="$indent"/><a href="{$catalogURL}/catalog.html">
-                    <xsl:value-of select="$datasetScanName" />
-                    <xsl:if test="count($dapServices)>1">
-                        (via <xsl:value-of select="@name" />)
-                    </xsl:if>
-                    </a>/<br/>
-
-
-                </xsl:for-each>
+                ERROR! thredds:datasetScan element should not be reaching this style sheet!!<br />
+                Offending Element (view Source):<br />
+                    <xsl:copy-of select="."/>
 
 
             </td>

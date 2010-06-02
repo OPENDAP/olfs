@@ -64,7 +64,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private String _prefix;
     boolean useMemoryCache = false;
 
-    String catalogToHtmlTransformFile = "/docs/xsl/thredds.xsl";
+    String catalogToHtmlTransformFile = "/docs/xsl/threddsCatalogPresentation.xsl";
     Transformer catalogToHtmlTransform = null;
     ReentrantLock catalogToHtmlTransformLock;
 

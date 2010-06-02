@@ -25,6 +25,7 @@ package opendap.xml;
 
 
 
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.saxon.s9api.DocumentBuilder;
@@ -55,6 +56,8 @@ import org.slf4j.Logger;
 import java.net.URI;
 import java.io.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * User: ndp
@@ -79,18 +82,27 @@ public class Transformer {
 
     public Transformer(String xsltDocument) throws SaxonApiException {
 
+        proc = new Processor(false);
 
-        init(xsltDocument);
+        init(proc, xsltDocument);
+
+    }
+
+    public Transformer(Processor proc, String xsltDocument) throws SaxonApiException {
+
+
+        init(proc, xsltDocument);
 
     }
 
 
-    private void init(String xsltDocument) throws SaxonApiException {
+
+    private void init(Processor processor,String xsltDocument) throws SaxonApiException {
 
         xsltDoc = xsltDocument;
+        proc = processor;
 
         // Get an XSLT processor and serializer
-        proc = new Processor(false);
         out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -99,6 +111,7 @@ public class Transformer {
         loadTransform();
 
     }
+
 
     public XdmNode build(java.io.File file ) throws SaxonApiException {
         return builder.build(file);
@@ -149,18 +162,44 @@ public class Transformer {
         transform.transform();
     }
 
+    public void transform(Source s, OutputStream os) throws SaxonApiException {
+        out.setOutputStream(os);
+        transform.setSource(s);
+        transform.setDestination(out);
+        transform.transform();
+    }
 
+
+
+    private HashMap currentParameters = new HashMap<QName,XdmValue>();
 
     public void setParameter(QName name,
                              XdmValue value){
+
+        currentParameters.put(name,value);
         transform.setParameter(name,value);
     }
 
 
     public void clearParameter(String name) throws SaxonApiException {
-        setParameter(new QName(name), null);
+        QName qname = new QName(name);
+        setParameter(qname, null);
+        currentParameters.remove(qname);
 
     }
+    public void clearAllParameters() throws SaxonApiException {
+
+        QName qname;
+        Iterator i = currentParameters.keySet().iterator();
+
+        while(i.hasNext()){
+            qname = (QName) i.next();
+            setParameter(qname, null);
+        }
+        currentParameters.clear();
+
+    }
+
 
     public void setParameter(String name, String value) throws SaxonApiException {
         // Build the remoteHost parameter to pass into the XSLT
@@ -456,6 +495,7 @@ public class Transformer {
                 else {
                 	is = request.getResponseBodyAsStream();
                     source = proc.newDocumentBuilder().build(new StreamSource(is));
+
                 }
 
                 return source;
@@ -489,6 +529,9 @@ public class Transformer {
 
 
 
+    public XsltTransformer  getCurrentTransform(){
+        return transform;
+    }
 
 
     public static XsltTransformer getXsltTransformer(Processor proc, String xslTransformUri) throws IOException, SaxonApiException {

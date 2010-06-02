@@ -44,20 +44,19 @@
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
-    <xsl:template match="thredds:catalog">
 
+
+    <!-- This is the identity transform template. If this were the only template
+       - then the output would be identical to the source document.
+     -->
+    <xsl:template match="node() | @*">
         <xsl:copy>
-            <xsl:apply-templates />
-            
+            <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>
-
     </xsl:template>
 
-    <xsl:template match="thredds:*">
 
-        <xsl:copy-of select="." />
 
-    </xsl:template>
 
 
     <!--***********************************************
@@ -70,8 +69,7 @@
        -
      -->
     <xsl:template match="thredds:datasetScan" >
-        <xsl:param name="indent" />
-                <xsl:comment>######################## DATASET SCAN ######################</xsl:comment>
+                <xsl:comment>########## thredds:catalogRef generated from thredds:datasetScan ##########</xsl:comment>
                 <!--
                 ..........................................................
                 Input XML:
@@ -84,7 +82,17 @@
                 <xsl:variable name="serviceName" select="thredds:metadata/thredds:serviceName"/>
                 <!-- serviceName: <xsl:value-of select="$serviceName" /> -->
 
-                <xsl:variable name="datasetScanLocation" select="@location"/>
+                <xsl:variable name="datasetScanLocation" >
+                    <xsl:choose>
+                        <xsl:when test="substring(@location,string-length(@location))='/'">
+                            <xsl:value-of select="@location"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="concat(@location,'/')"/>
+                        </xsl:otherwise>
+
+                    </xsl:choose>
+                </xsl:variable>
                 <!-- datasetScanLocation = '<xsl:value-of select="$datasetScanLocation"/>'-->
 
                 <xsl:variable name="datasetScanName" select="@name"/>
@@ -110,22 +118,25 @@
                     <xsl:variable name="lastCharOfBase" select="substring($base,string-length($base))" />
                     <!-- lastCharOfBase = '<xsl:value-of select="$lastCharOfBase"/>' -->
 
+
+
+
                     <xsl:variable name="catalogURL">
                         <xsl:choose>
 
                             <xsl:when test="$lastCharOfBase='/' and starts-with($datasetScanLocation,'/')">
                                 <xsl:variable name="location" select="substring($datasetScanLocation,2,string-length($datasetScanLocation))" />
-                                <xsl:variable name="targetURL" select="concat($base,$location)" />
+                                <xsl:variable name="targetURL" select="concat($base,$location,'catalog.xml')" />
                                 <xsl:value-of select="$targetURL"/>
                             </xsl:when>
 
                             <xsl:when test="$lastCharOfBase!='/' and not(starts-with($datasetScanLocation,'/'))">
-                                <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation)" />
+                                <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation,'catalog.xml')" />
                                 <xsl:value-of select="$targetURL"/>
                             </xsl:when>
 
                             <xsl:otherwise>
-                                <xsl:variable name="targetURL" select="concat($base,$datasetScanLocation)" />
+                                <xsl:variable name="targetURL" select="concat($base,$datasetScanLocation,'catalog.xml')" />
                                 <xsl:value-of select="$targetURL"/>
                             </xsl:otherwise>
 
@@ -143,7 +154,6 @@
 
 
                 </xsl:for-each>
-
 
     </xsl:template>
 

@@ -384,10 +384,6 @@ public class DispatchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
-
-
-        log.error("Error log crawlTest");
-
         try {
             try {
                 RequestCache.startRequestIfNeeded();
