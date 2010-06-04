@@ -391,6 +391,8 @@ public class DispatchServlet extends HttpServlet {
                 int reqno = reqNumber.incrementAndGet();
                 PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
 
+                log.debug(Util.getMemoryReport());
+
                 log.debug(Util.showRequest(request, reqno));
 
                 if(redirectForContextOnlyRequest(request,response))

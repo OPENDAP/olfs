@@ -68,7 +68,7 @@ public class BES {
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
-    private DevNull devNull = new DevNull();
+    //private DevNull devNull = new DevNull();
 
 
     public BES(BESConfig config) throws Exception {
@@ -292,8 +292,11 @@ public class BES {
 
         }
         catch (Exception e) {
-            log.error("ERROR encountered.");
-            discardClient(odc);
+            log.error("ERROR encountered: "+e.getMessage());
+            if(odc!=null){
+                log.error("Attempting to discard OPeNDAPClient (id:"+odc.getID()+")");
+                discardClient(odc);
+            }
             throw new PPTException(e);
         }
         finally{
