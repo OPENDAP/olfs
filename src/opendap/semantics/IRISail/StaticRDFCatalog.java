@@ -1071,19 +1071,19 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         return supportedCRSs;
     }
 
-    public String getLatitudeCoordinateDapId(String coverageId) {
+    public String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
         return null;
     }
 
-    public String getLongitudeCoordinateDapId(String coverageId) {
+    public String getLongitudeCoordinateDapId(String coverageId, String fieldId) {
         return null;
     }
 
-    public String getElevationCoordinateDapId(String coverageId) {
+    public String getElevationCoordinateDapId(String coverageId, String fieldId) {
         return null;
     }
 
-    public String getTimeCoordinateDapId(String coverageId) {
+    public String getTimeCoordinateDapId(String coverageId, String fieldId) {
         return null;
     }
 

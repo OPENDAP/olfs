@@ -248,7 +248,7 @@ public interface WcsCatalog {
      * represents the latitude coordinate. Returns null if information is not
      * known.
      */
-    public String getLatitudeCoordinateDapId(String coverageId);
+    public String getLatitudeCoordinateDapId(String coverageId, String fieldId);
 
 
 
@@ -262,7 +262,7 @@ public interface WcsCatalog {
      * @return The name of the DAP variable in the target dataset that
      * represents the longitude coordinate.
      */
-    public String getLongitudeCoordinateDapId(String coverageId);
+    public String getLongitudeCoordinateDapId(String coverageId, String fieldId);
 
 
 
@@ -277,7 +277,7 @@ public interface WcsCatalog {
      * represents the elevation coordinate. Returns null if information is not
      * known.
      */
-    public String getElevationCoordinateDapId(String coverageId);
+    public String getElevationCoordinateDapId(String coverageId, String fieldId);
 
 
 
@@ -292,7 +292,7 @@ public interface WcsCatalog {
      * represents the time coordinate. Returns null if information is not
      * known.
      */
-    public String getTimeCoordinateDapId(String coverageId);
+    public String getTimeCoordinateDapId(String coverageId, String fieldId);
 
 
     /**

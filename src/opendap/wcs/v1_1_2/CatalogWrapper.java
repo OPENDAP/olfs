@@ -124,20 +124,20 @@ public class CatalogWrapper {
         return _catalogImpl.getSupportedCrsElements();
     }
 
-    public static String getLatitudeCoordinateDapId(String coverageId) {
-        return _catalogImpl.getLatitudeCoordinateDapId(coverageId);
+    public static String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
+        return _catalogImpl.getLatitudeCoordinateDapId(coverageId, fieldId);
     }
 
-    public static String getLongitudeCoordinateDapId(String coverageId) {
-        return _catalogImpl.getLongitudeCoordinateDapId(coverageId);
+    public static String getLongitudeCoordinateDapId(String coverageId, String fieldId) {
+        return _catalogImpl.getLongitudeCoordinateDapId(coverageId, fieldId);
     }
 
-    public static String getElevationCoordinateDapId(String coverageId) {
-        return _catalogImpl.getElevationCoordinateDapId(coverageId);
+    public static String getElevationCoordinateDapId(String coverageId, String fieldId) {
+        return _catalogImpl.getElevationCoordinateDapId(coverageId, fieldId);
     }
 
-    public static String getTimeCoordinateDapId(String coverageId) {
-        return _catalogImpl.getTimeCoordinateDapId(coverageId);
+    public static String getTimeCoordinateDapId(String coverageId, String fieldId) {
+        return _catalogImpl.getTimeCoordinateDapId(coverageId, fieldId);
     }
 
 
