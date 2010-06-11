@@ -43,20 +43,15 @@ import net.sf.saxon.s9api.DocumentBuilder;
 public interface Catalog {
     void destroy();
 
-    void addChild(LocalFileCatalog c);
-
-    Enumeration<Catalog> getChildren();
-
     boolean usesMemoryCache();
 
     boolean needsRefresh();
 
     void writeCatalogXML(OutputStream os) throws Exception;
 
-    Document getCatalogDocument() throws IOException, JDOMException;
+    Document getCatalogDocument() throws IOException, JDOMException, SaxonApiException;
 
     XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException;
-    XdmNode getCatalogAsXdmNode(DocumentBuilder builder) throws IOException, SaxonApiException;
 
     String getName();
 
@@ -65,6 +60,8 @@ public interface Catalog {
     String getUrlPrefix();
 
     String getFileName();
+
+    String getIngestTransformFilename();
 
     long getLastModified();
 }

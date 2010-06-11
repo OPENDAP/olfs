@@ -31,6 +31,8 @@ import org.jdom.filter.ElementFilter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Enumeration;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import opendap.namespaces.THREDDS;
@@ -44,46 +46,38 @@ import opendap.namespaces.THREDDS;
 public class CatalogManager {
 
 
-    private static Logger log;
-    private static String contentPath;
+    private static Logger _log;
+    private static String _contentPath;
+    private static String _catalogIngestTransformFilename;
 
 
+    private static ConcurrentHashMap<String, Catalog> _catalogs = new ConcurrentHashMap<String, Catalog>();
+    private static ConcurrentHashMap<String, String[]> _children = new ConcurrentHashMap<String, String[]>();
+    private static boolean _isIntialized = false;
 
 
-    private static HashMap<String, Catalog> catalogs = new HashMap<String, Catalog>();
-    private static ReentrantReadWriteLock _catalogsLock;
-    private static boolean isIntialized=false;
+    public static void init(String contentPath, String catalogIngestTransformFilename) {
 
-    private static ReentrantReadWriteLock _myLock;
+        _log = org.slf4j.LoggerFactory.getLogger(CatalogManager.class);
 
+        _log.debug("Configuring...");
 
-    public static ReentrantReadWriteLock getRWLock(){
-        return _myLock;
-    }
-
-
-
-    public static void init(String contentPath){
-
-        if(isIntialized) return;
-
-
-        log = org.slf4j.LoggerFactory.getLogger(CatalogManager.class);
-
-        log.debug("Configuring...");
-
-        if(isIntialized){
-            log.error(" Configuration has already been done. isInitialized(): "+isIntialized);
+        if (_isIntialized) {
+            _log.error(" Configuration has already been done. isInitialized(): " + _isIntialized);
             return;
         }
 
-        _myLock = new ReentrantReadWriteLock();
-        _catalogsLock = new ReentrantReadWriteLock();
-        CatalogManager.contentPath = contentPath;
-
-        isIntialized = true;
+        _contentPath = contentPath;
+        _catalogIngestTransformFilename = catalogIngestTransformFilename;
+        _isIntialized = true;
     }
 
+
+    private static String getMapIndex(Catalog c) {
+        String index = c.getUrlPrefix() + c.getFileName();
+        return index;
+
+    }
 
 
     public static void addCatalog(String pathPrefix,
@@ -92,30 +86,33 @@ public class CatalogManager {
                                   boolean cacheCatalogFileContent)
             throws Exception {
 
-        LocalFileCatalog catalog = new LocalFileCatalog(pathPrefix,urlPrefix,fname,cacheCatalogFileContent);
-
-        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
-        try {
-            lock.lock();
-            addCatalog(catalog,cacheCatalogFileContent);
-        }
-        finally {
-            lock.unlock();
-        }
+        LocalFileCatalog catalog = new LocalFileCatalog(pathPrefix, urlPrefix, fname, _catalogIngestTransformFilename, cacheCatalogFileContent);
+        addCatalog(catalog, cacheCatalogFileContent);
 
     }
 
 
     private static void addCatalog(Catalog catalog,
-                                  boolean cacheCatalogFileContent)
+                                   boolean cacheCatalogFileContent)
             throws Exception {
 
 
         String index;
 
-        index = catalog.getUrlPrefix()+catalog.getFileName();
+        index = getMapIndex(catalog);
 
-        catalogs.put(index,catalog);
+        // If if this catalog has already been added,  then don't mess with it.
+        if (_catalogs.containsKey(index))
+            return;
+
+
+        if (_children.containsKey(index)) {
+            String msg = "addCatalog() Invalid State! Although the list of catalogs does not contain a " +
+                    "reference to the catalog '" + index + "' the list of children does!!!";
+            _log.error(msg);
+            throw new Exception(msg);
+        }
+
 
         Document catDoc = catalog.getCatalogDocument();
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -123,23 +120,28 @@ public class CatalogManager {
 
         Element catRef;
         String href, catFname, thisUrlPrefix, thisPathPrefix;
-        Iterator i=  catDoc.getRootElement().getDescendants(new ElementFilter(THREDDS.CATALOG_REF, opendap.namespaces.THREDDS.NS));
 
-        while(i.hasNext()){
 
+        // Get all of the catalogRef elements in the  catalog document.
+        Iterator i = catDoc.getRootElement().getDescendants(new ElementFilter(THREDDS.CATALOG_REF, opendap.namespaces.THREDDS.NS));
+
+        Vector<String> catalogChildren = new Vector<String>();
+        while (i.hasNext()) {
+
+            // For each one of them...
             catRef = (Element) i.next();
 
-            href = catRef.getAttributeValue(XLINK.HREF,XLINK.NS);
+            // get the URL of the catalog.
+            href = catRef.getAttributeValue(XLINK.HREF, XLINK.NS);
 
-            if(href.startsWith("http://")){
-                log.info("Found catalogRef that references an external " +
-                        "catalog. Target catalog not processed. The catalogRef element " +
+            if (href.startsWith("http://")) {
+                _log.info("Found catalogRef that references an external " +
+                        "catalog: '"+href+"' Target catalog not processed. The catalogRef element " +
                         "will remain in the catalog and will not be cached.");
                 // @todo Add remote catalog caching support?
-            }
-            else if(href.startsWith("/")) {
-                log.info("Found thredds:catalogRef whose xlink:href attribute " +
-                        "begins with a \"/\" character. " +
+            } else if (href.startsWith("/")) {
+                _log.info("Found thredds:catalogRef whose xlink:href attribute " +
+                        "begins with a \"/\" character: '" + href +"' "+
                         "This may mean that the catalog is pointing " +
                         "to another catalog service. Also, it is not an href " +
                         "expressed in terms of the relative content path. " +
@@ -149,144 +151,162 @@ public class CatalogManager {
                         "appear correctly in thredds catalog output. But it's contents " +
                         "will not be cached.");
                 // @todo Add support for catalog caching within the local server? Mabye not.
-            }
-            else {
+            } else {
 
+                // Since it's not a remote catalog, and an absolute path (starting with '/') then
+                // we will conclude that it is a static THREDDS catalog file. Let's slurp it up into
+                // a LocalFileCatalog object.
 
-                thisUrlPrefix = catalog.getUrlPrefix() + href.substring(0,href.length() - Util.basename(href).length());
+                thisUrlPrefix = catalog.getUrlPrefix() + href.substring(0, href.length() - Util.basename(href).length());
 
                 thisPathPrefix = catalog.getPathPrefix() + href;
                 catFname = Util.basename(thisPathPrefix);
-                thisPathPrefix = thisPathPrefix.substring(0,thisPathPrefix.lastIndexOf(catFname));
+                thisPathPrefix = thisPathPrefix.substring(0, thisPathPrefix.lastIndexOf(catFname));
 
-                LocalFileCatalog thisCatalog = new LocalFileCatalog(thisPathPrefix,thisUrlPrefix,catFname,cacheCatalogFileContent);
-                addCatalog(thisCatalog,cacheCatalogFileContent);
-                catalog.addChild(thisCatalog);
+                LocalFileCatalog thisCatalog = new LocalFileCatalog(thisPathPrefix,
+                        thisUrlPrefix,
+                        catFname,
+                        _catalogIngestTransformFilename,
+                        cacheCatalogFileContent);
+
+                addCatalog(thisCatalog, cacheCatalogFileContent);
+                String thisCatalogIndex = getMapIndex(thisCatalog);
+                catalogChildren.add(thisCatalogIndex);
+
             }
         }
+
+        if (!catalogChildren.isEmpty()) {
+            String[] s = new String[catalogChildren.size()];
+            _children.put(index, catalogChildren.toArray(s));
+        }
+        _catalogs.put(index, catalog);
+
+
     }
 
 
-    public static Catalog getCatalog(String name){
+    public static Catalog getCatalog(String name) {
 
-        Catalog cat = null;
-
-        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
-        try {
-            lock.lock();
-            cat =  catalogs.get(name);
-        }
-        finally {
-            lock.unlock();
-        }
+        Catalog cat = _catalogs.get(name);
         cat = updateCatalogIfRequired(cat);
 
         return cat;
 
     }
 
-    public static long getLastModified(String name){
+    public static long getLastModified(String name) {
 
         Catalog cat;
 
-        ReentrantReadWriteLock.ReadLock lock = _catalogsLock.readLock();
-        try {
-            lock.lock();
-            cat =  catalogs.get(name);
-            if(cat!=null)
-                return cat.getLastModified();
-        }
-        finally {
-            lock.unlock();
-        }
+        cat = _catalogs.get(name);
+        if (cat != null)
+            return cat.getLastModified();
 
         return -1;
     }
 
 
+    private static Catalog updateCatalogIfRequired(Catalog c) {
 
-    public static Catalog updateCatalogIfRequired(Catalog c){
 
-        ReentrantReadWriteLock.WriteLock lock = _catalogsLock.writeLock();
-        try {
-            lock.lock();
+        String index = getMapIndex(c);
+        if (c != null && c.needsRefresh()) {
 
-            if(c!=null && c.needsRefresh()){
-                LocalFileCatalog newCat;
-                try {
-                    newCat = new LocalFileCatalog(c.getPathPrefix(),c.getUrlPrefix(),c.getFileName(),c.usesMemoryCache());
+            _log.debug("updateCatalogIfRequired(): Catalog '" + index + "' needs to be updated.");
 
-                    /*
-                    if(rootCatalogs.contains(c)){
-                        log.debug("Removing "+c.getName()+" from rootCatalogs collection.");
-                        rootCatalogs.remove(c);
-                        log.debug("Adding new "+newCat.getName()+" to rootCatalogs collection.");
-                        rootCatalogs.add(newCat);
-                    }
-                    */
+            LocalFileCatalog newCat;
+            try {
+                newCat = new LocalFileCatalog(c.getPathPrefix(), c.getUrlPrefix(), c.getFileName(), c.getIngestTransformFilename(), c.usesMemoryCache());
 
-                    log.debug("Purging "+c.getName());
-                    purgeCatalog(c);
-                    log.debug("Adding new catalog "+newCat.getName()+" to catalogs collection.");
-                    addCatalog(newCat, newCat.usesMemoryCache());
-                    return newCat;
-                }
-                catch(Exception e){
-                    log.error("Could not update Catalog: "+c.getName());
-                    return null;
-                }
+
+                _log.debug("updateCatalogIfRequired(): Purging catalog '" + index + "' and it's children from catalog collection.");
+                purgeCatalog(c);
+
+
+                index = getMapIndex(newCat);
+                _log.debug("updateCatalogIfRequired: Adding new catalog " + index + " to _catalogs collection.");
+                addCatalog(newCat, newCat.usesMemoryCache());
+                return newCat;
             }
-            else {
-                return c;
-
+            catch (Exception e) {
+                _log.error("updateCatalogIfRequired: Could not update Catalog: " + c.getName());
+                return null;
             }
+        } else {
+            return c;
 
-        }
-        finally {
-            lock.unlock();
         }
 
 
-
-    }
-    private static void purgeCatalog(Catalog c){
-         String index;
-         Catalog child;
-         Enumeration children;
-
-         children = c.getChildren();
-
-         while(children.hasMoreElements()){
-             child = (Catalog) children.nextElement();
-             purgeCatalog(child);
-         }
-
-        index = c.getUrlPrefix()+c.getFileName();
-        catalogs.remove(index);
-        c.destroy();
-        log.debug("Purged Catalog: "+index);
-
     }
 
 
+    /**
+     * Starting at the passed catalog purges the  THREDDS catalog connected graph from the system.
+     *
+     * @param c
+     */
+    private static void purgeCatalog(Catalog c) {
+        Catalog child;
+        String children[];
 
 
+        if (c != null) {
+
+            String index = getMapIndex(c);
+            _log.debug("purgeCatalog(): Removing catalog: " + index);
+
+            if (_catalogs.remove(index) == null) {
+                _log.warn("purgeCatalog(): Catalog '" + index + "' not in catalog collection!!");
+            }
+
+            children = _children.get(index);
+            if (children != null) {
+
+                _log.debug("purgeCatalog(): Purging the children of catalog: " + index);
+
+                for (String childIndex : children) {
+                    child = _catalogs.get(childIndex);
+                    purgeCatalog(child);
+
+                }
+
+                _children.remove(index);
+            } else {
+                _log.info("purgeCatalog(): Catalog '" + index + "' has no children.");
+            }
 
 
-    public static void destroy(){
+            // c.destroy();
+            _log.debug("purgeCatalog(): Purged catalog: " + index);
 
-        log.debug("Destroyed");
+
+        }
+
 
     }
 
 
-    public String toString(){
+    public static void destroy() {
+
+        for (Catalog c : _catalogs.values()) {
+            c.destroy();
+        }
+        _catalogs.clear();
+        _children.clear();
+        _log.debug("Destroyed");
+
+    }
+
+
+    public String toString() {
         String s = "THREDDS Catalog Manager:\n";
 
-        s += "    ContentPath: " + contentPath + "\n";
+        s += "    ContentPath: " + _contentPath + "\n";
 
-        for(Catalog c: catalogs.values()){
-            s += "    Catalog Name: "+c.getName() + "\n";
+        for (Catalog c : _catalogs.values()) {
+            s += "    Catalog Name: " + c.getName() + "\n";
             s += "        file:        " + c.getFileName() + "\n";
             s += "        pathPrefix:  " + c.getPathPrefix() + "\n";
             s += "        urlPrefix:   " + c.getUrlPrefix() + "\n";
@@ -333,7 +353,7 @@ public class CatalogManager {
         catalogRoot.setAttribute(THREDDS.NAME, "HyraxThreddsHandler");
 
         // We only need a read lock here because we are NOT going to reread
-        // our configuration. So - All of these top level catalogs can't change.
+        // our configuration. So - All of these top level _catalogs can't change.
         // Their content can change, but we can't add or remove from the list.
         // If one of them has a change, then that will get loaded when the
         // changed catalog gets accessed.
@@ -377,7 +397,7 @@ public class CatalogManager {
         byte[] buffer = xmlo.outputString(tlcat).getBytes();
 
         is = new ByteArrayInputStream(buffer);
-        log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+        _log.debug("getCatalogDocument(): Reading catalog from memory cache.");
 
         source = proc.newDocumentBuilder().build(new StreamSource(is));
 

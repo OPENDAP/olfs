@@ -42,7 +42,6 @@ import java.util.concurrent.locks.Lock;
 import java.io.*;
 
 
-
 import net.sf.saxon.s9api.*;
 
 /**
@@ -103,9 +102,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         if (query != null && query.startsWith("browseCatalog=")) {
             // browseRemoteCatalog(response, query);
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-
-        else if (query != null && query.startsWith("browseDataset=")) {
+        } else if (query != null && query.startsWith("browseDataset=")) {
             // browseRemoteDataset(response, query);
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -150,7 +147,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
 
         // Redirect _prefix only requests to catalog.html
-        if (relativeURL.equals(_prefix) && req.getQueryString()==null) {
+        if (relativeURL.equals(_prefix) && req.getQueryString() == null) {
             redirect = true;
         }
 
@@ -179,10 +176,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-
     private void browseRemoteDataset(HttpServletResponse response,
                                      String query) throws IOException, SaxonApiException {
-
 
 
         String http = "http://";
@@ -190,8 +185,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
         // Sanitize the incoming query.
         query = Scrub.completeURL(query);
         log.debug("Processing query string: " + query);
-        
-        if(!query.startsWith("browseDataset=")){
+
+        if (!query.startsWith("browseDataset=")) {
             log.error("Not a browseDataset request: " + Scrub.completeURL(query));
             throw new IOException("Not a browseDataset request!");
         }
@@ -199,9 +194,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         query = query.substring("browseDataset=".length(), query.length());
 
-        String targetDataset = query.substring(0,query.indexOf('&'));
+        String targetDataset = query.substring(0, query.indexOf('&'));
 
-        String remoteCatalog = query.substring(query.indexOf('&')+1,query.length());
+        String remoteCatalog = query.substring(query.indexOf('&') + 1, query.length());
 
 
         if (!remoteCatalog.startsWith(http)) {
@@ -231,7 +226,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
         InputStream catDocIs = request.getResponseBodyAsStream();
 
 
-
         try {
             datasetToHtmlTransformLock.lock();
             datasetToHtmlTransform.reloadTransformIfRequired();
@@ -256,14 +250,14 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.setStatus(HttpServletResponse.SC_OK);
 
             // Send the transformed document.
-            datasetToHtmlTransform.transform(catDoc,response.getOutputStream());
+            datasetToHtmlTransform.transform(catDoc, response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
 
         }
-        catch(SaxonApiException sapie){
-            if(response.isCommitted()){
+        catch (SaxonApiException sapie) {
+            if (response.isCommitted()) {
                 return;
             }
             // Set up the Http headers.
@@ -279,20 +273,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
             datasetToHtmlTransform.clearParameter("remoteCatalog");
             datasetToHtmlTransform.clearParameter("remoteHost");
 
-            if(catDocIs != null){
-        	    try {
+            if (catDocIs != null) {
+                try {
                     catDocIs.close();
                 }
-                catch(IOException e){
-                    log.error("Failed to close InputStream for "+remoteCatalog+" Error Message: "+e.getMessage());
+                catch (IOException e) {
+                    log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
                 }
             }
             datasetToHtmlTransformLock.unlock();
         }
-
-
-
-
 
 
     }
@@ -302,10 +292,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                                      String query) throws IOException, SaxonApiException {
 
 
-
-
         String http = "http://";
-
 
 
         // Sanitize the incoming query.
@@ -321,7 +308,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         // Build URL for remote system:
 
         String remoteHost = remoteCatalog.substring(0, remoteCatalog.indexOf('/', http.length()) + 1);
-        String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/')+1);
+        String remoteRelativeURL = remoteCatalog.substring(0, remoteCatalog.lastIndexOf('/') + 1);
 
 
         log.debug("Remote Catalog: " + remoteCatalog);
@@ -359,13 +346,13 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.setStatus(HttpServletResponse.SC_OK);
 
             // Send the transformed documet.
-            catalogToHtmlTransform.transform(catDoc,response.getOutputStream());
+            catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
         }
-        catch(SaxonApiException sapie){
-            if(response.isCommitted()){
+        catch (SaxonApiException sapie) {
+            if (response.isCommitted()) {
                 return;
             }
             // Set up the Http headers.
@@ -382,18 +369,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
             catalogToHtmlTransform.clearParameter("remoteRelativeURL");
             catalogToHtmlTransform.clearParameter("remoteCatalog");
 
-            if(catDocIs != null){
-        	    try {
+            if (catDocIs != null) {
+                try {
                     catDocIs.close();
                 }
-                catch(IOException e){
-                    log.error("Failed to close InputStream for "+remoteCatalog+" Error Message: "+e.getMessage());
+                catch (IOException e) {
+                    log.error("Failed to close InputStream for " + remoteCatalog + " Error Message: " + e.getMessage());
                 }
             }
-        	catalogToHtmlTransformLock.unlock();
+            catalogToHtmlTransformLock.unlock();
         }
-
-
 
 
     }
@@ -431,32 +416,22 @@ public class StaticCatalogDispatch implements DispatchHandler {
             if (relativeURL.startsWith(_prefix))
                 relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
-            Lock catLock = CatalogManager.getRWLock().readLock();
 
-            try {
-                catLock.lock();
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
 
-
-                Catalog cat = CatalogManager.getCatalog(relativeURL);
-
-                if (cat != null) {
-                    log.debug("\nFound catalog: " + relativeURL + "   " +
-                            "    prefix: " + _prefix
-                    );
-                    catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
-                    log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
-                } else {
-                    log.error("Can't find catalog: " + relativeURL + "   " +
-                            "    prefix: " + _prefix
-                    );
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
-                    return;
-                }
+            if (cat != null) {
+                log.debug("\nFound catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
+                catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
+                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+            } else {
+                log.error("Can't find catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
+                return;
             }
-            finally {
-                catLock.unlock();
-            }
-
 
             String targetDataset = query.substring("dataset=".length(), query.length());
 
@@ -475,7 +450,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
             // Send the transformed documet.
-            datasetToHtmlTransform.transform(catDoc,response.getOutputStream());
+            datasetToHtmlTransform.transform(catDoc, response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
@@ -486,8 +461,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
             datasetToHtmlTransformLock.unlock();
 
         }
-
-
 
 
     }
@@ -520,28 +493,21 @@ public class StaticCatalogDispatch implements DispatchHandler {
             catalogToHtmlTransform.reloadTransformIfRequired();
 
             XdmNode catDoc;
-            Lock catLock = CatalogManager.getRWLock().readLock();
-            try {
-                catLock.lock();
 
-                Catalog cat = CatalogManager.getCatalog(relativeURL);
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
 
-                if (cat != null) {
-                    log.debug("\nFound catalog: " + relativeURL + "   " +
-                            "    prefix: " + _prefix
-                    );
-                    catDoc = cat.getCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-                    log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
-                } else {
-                    log.error("Can't find catalog: " + relativeURL + "   " +
-                            "    prefix: " + _prefix
-                    );
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
-                    return;
-                }
-            }
-            finally {
-                catLock.unlock();
+            if (cat != null) {
+                log.debug("\nFound catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
+                catDoc = cat.getCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
+                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+            } else {
+                log.error("Can't find catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
+                return;
             }
 
 
@@ -578,36 +544,31 @@ public class StaticCatalogDispatch implements DispatchHandler {
             if (relativeURL.startsWith(_prefix))
                 relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
-            Lock catLock = CatalogManager.getRWLock().readLock();
 
-            try {
-                catLock.lock();
-                Catalog cat = CatalogManager.getCatalog(relativeURL);
+            Catalog cat = CatalogManager.getCatalog(relativeURL);
 
-                if (cat != null) {
-                    log.debug("\nFound catalog: " + relativeURL + "   " +
-                            "    prefix: " + _prefix
-                    );
+            if (cat != null) {
+                log.debug("\nFound catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
 
-                    // Send the XML catalog.
-                    response.setContentType("text/xml");
-                    response.setHeader("Content-Description", "dods_directory");
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    cat.writeCatalogXML(response.getOutputStream());
-                    log.debug("Sent THREDDS catalog (raw XML).");
+                // Send the XML catalog.
+                response.setContentType("text/xml");
+                response.setHeader("Content-Description", "dods_directory");
+                response.setStatus(HttpServletResponse.SC_OK);
+                cat.writeCatalogXML(response.getOutputStream());
+                log.debug("Sent THREDDS catalog XML.");
 
-                } else {
-                    log.error("Can't find catalog: " + relativeURL + "   " +
-                            "    prefix: " + _prefix
-                    );
+            } else {
+                log.error("Can't find catalog: " + relativeURL + "   " +
+                        "    prefix: " + _prefix
+                );
 
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
-                            "find catalog: " + Scrub.urlContent(relativeURL));
-                }
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
+                        "find catalog: " + Scrub.urlContent(relativeURL));
             }
-            finally{
-                catLock.unlock();
-            }
+
+
         }
 
     }
@@ -655,13 +616,25 @@ public class StaticCatalogDispatch implements DispatchHandler {
             }
         }
 
+        String ingestTransformFile = null;
+        e = config.getChild("ingestTransformFile");
+        if (e != null) {
+            ingestTransformFile = e.getTextTrim();
+        }
+
         log.debug("Configuration file processing complete.");
 
+
+        if (ingestTransformFile == null) {
+            ingestTransformFile = ServletUtil.getSystemPath(servlet, "/docs/xsl/threddsCatalogIngest.xsl");
+        }
+
+        log.debug("Using ingest transform file: " + ingestTransformFile);
 
         log.debug("Processing THREDDS catalog.xml file...");
 
         String contentPath = ServletUtil.getContentPath(servlet);
-        CatalogManager.init(contentPath);
+        CatalogManager.init(contentPath, ingestTransformFile);
 
 
         String fileName, pathPrefix, thisUrlPrefix;
@@ -820,6 +793,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
     public void destroy() {
+
+        CatalogManager.destroy();
         log.info("Destroy Complete");
 
 

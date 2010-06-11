@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
+import opendap.xml.Transformer;
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -48,44 +49,47 @@ import javax.xml.transform.stream.StreamSource;
 public class LocalFileCatalog implements Catalog {
 
 
-
-    private  Logger log;
-    private  String _name;
-    private  String _pathPrefix;
-    private  String _urlPrefix;
-    private  String _fileName;
-    private  byte[] _buffer;
+    private Logger log;
+    private String _name;
+    private String _pathPrefix;
+    private String _urlPrefix;
+    private String _fileName;
     private boolean _useMemoryCache;
-    private Vector<Catalog> _children;
     private Date _cacheTime;
-    private static ReentrantReadWriteLock _catalogLock;
 
-    public LocalFileCatalog( String pathPrefix,
-                    String urlPrefix,
-                    String fname,
-                    boolean useMemoryCache) throws Exception{
+
+    private ReentrantReadWriteLock _catalogLock;
+    private byte[] _rawCatalogBuffer;
+
+
+    private Transformer _ingestTransformer;
+    private String _transformOnIngestFilename;
+    private byte[] _clientResponseCatalogBuffer;
+
+
+    public LocalFileCatalog(String pathPrefix,
+                            String urlPrefix,
+                            String fname,
+                            String transformOnIngestFilename,
+                            boolean useMemoryCache) throws Exception {
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        log.debug("Configuring new "+getClass().getName());
+        log.debug("-------------------------------------------------------");
+        log.debug("Configuring new " + getClass().getName());
 
         _catalogLock = new ReentrantReadWriteLock();
 
-       
 
-
-
+        _transformOnIngestFilename = transformOnIngestFilename;
         _fileName = fname;
         _pathPrefix = pathPrefix;
         _urlPrefix = urlPrefix;
 
         _useMemoryCache = useMemoryCache;
-        _children = new Vector<Catalog>();
 
         log.debug("pathPrefix: " + _pathPrefix);
         log.debug("urlPrefix:  " + _urlPrefix);
         log.debug("fileName:   " + _fileName);
-
-
 
 
         String msg;
@@ -96,45 +100,91 @@ public class LocalFileCatalog implements Catalog {
 
         File catalogFile = new File(fname);
 
-        if(!catalogFile.exists()){
-            msg = "Cannot find file: "+ fname;
+        if (!catalogFile.exists()) {
+            msg = "Cannot find catalog file: " + fname;
             log.error(msg);
             throw new IOException(msg);
         }
 
-        if(!catalogFile.canRead()){
-            msg = "Cannot read file: "+ fname;
+        if (!catalogFile.canRead()) {
+            msg = "Cannot read catalog file: " + fname;
             log.error(msg);
             throw new IOException(msg);
         }
-        if(!catalogFile.isFile()){
-            msg = "THREDDS Catalog "+ fname +" is not a regular file.";
+        if (!catalogFile.isFile()) {
+            msg = "THREDDS Catalog " + fname + " is not a regular file.";
             log.error(msg);
             throw new IOException(msg);
         }
 
-        if(_useMemoryCache){
+
+        _clientResponseCatalogBuffer = null;
+        _rawCatalogBuffer = null;
+
+        if (_useMemoryCache) {
             cacheCatalogFileContent();
-        }
-        else{
-            _buffer = null;
+        } else {
             _cacheTime = new Date(catalogFile.lastModified());
         }
 
 
+        if (_transformOnIngestFilename != null) {
 
-        Document catalog  = getCatalogDocument();
 
-        Element ce = catalog.getRootElement();
+            log.debug("_transformOnIngestFilename: " + _transformOnIngestFilename);
 
-        _name = ce.getAttributeValue("name");
+            File ingestTransformFile = new File(_transformOnIngestFilename);
 
-        if(_name ==null){
-            msg = "THREDDS ERROR: <catalog> element missing \"name\" attribute.";
-            log.error(msg);
-            throw new Exception(msg);
+            if (!ingestTransformFile.exists()) {
+                msg = "Cannot find the ingest XSL transformation file: " + _transformOnIngestFilename;
+                log.error(msg);
+                throw new IOException(msg);
+            }
+
+            if (!ingestTransformFile.canRead()) {
+                msg = "Cannot the ingest XSL transformation file: " + fname;
+                log.error(msg);
+                throw new IOException(msg);
+            }
+            if (!ingestTransformFile.isFile()) {
+                msg = "XSLT file '" + fname + "' is not a regular file.";
+                log.error(msg);
+                throw new IOException(msg);
+            }
+            _ingestTransformer = new Transformer(_transformOnIngestFilename);
+
+
+            if (_useMemoryCache) {
+                log.debug("Caching (in memory) a copy of transformed catalog.");
+                cacheIngestTransformedCatalog();
+                log.info("PASSED Catalog Ingest: Cached catalog file via ingest Transform.");
+            } else {
+                XdmNode node = getCatalogAsXdmNode(_ingestTransformer.getProcessor());
+                if (node != null)
+                    log.info("PASSED Catalog Ingest: Loaded/parsed catalog file via ingest Transform.");
+            }
+
+
+        } else {
+
+            Document catalog = getCatalogDocument();
+
+            Element ce = catalog.getRootElement();
+
+            _name = ce.getAttributeValue("name");
+
+            if (_name == null) {
+                msg = "THREDDS ERROR: <catalog> element missing \"name\" attribute.";
+                log.error(msg);
+                throw new Exception(msg);
+            }
+            log.debug("Loaded/parsed catalog as a JDOM document.");
+
+
         }
 
+
+        log.debug("-------------------------------------------------------");
 
         //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         //xmlo.output(catalog, System.out);
@@ -142,91 +192,100 @@ public class LocalFileCatalog implements Catalog {
 
     }
 
-    public void destroy(){
-        _children.clear();
-        _name        = null;
-        _pathPrefix  = null;
-        _urlPrefix   = null;
-        _fileName    = null;
-        _buffer      = null;
+    public void destroy() {
+
+
+        _name = null;
+        _pathPrefix = null;
+        _urlPrefix = null;
+        _fileName = null;
+        _rawCatalogBuffer = null;
         _useMemoryCache = false;
-        _cacheTime   = null;
+        _cacheTime = null;
     }
 
 
-    public void addChild(LocalFileCatalog c){
-
-        Lock lock =  _catalogLock.writeLock();
-        try {
-            lock.lock();
-            _children.add(c);
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
-    public Enumeration<Catalog> getChildren(){
-        Lock lock =  _catalogLock.readLock();
-        try {
-            lock.lock();
-            return _children.elements();
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
-
-
-    public boolean usesMemoryCache(){
+    public boolean usesMemoryCache() {
         return _useMemoryCache;
     }
 
     /**
      * CAREFUL! Only call this function if you have acquired a WriteLock for
      * the catalog!!
+     *
+     * @throws Exception When it can't read the file.
+     */
+    private void cacheIngestTransformedCatalog() throws Exception {
+
+        Lock lock = _catalogLock.writeLock();
+        try {
+            lock.lock();
+            if (_ingestTransformer != null) {
+                log.debug("cacheIngestTransformedCatalog(): Applying catalog ingestTransform.");
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                XdmNode catalog = getRawCatalogAsXdmNode(_ingestTransformer.getProcessor());
+                _ingestTransformer.transform(catalog, baos);
+                log.debug("cacheIngestTransformedCatalog(): Caching ingestTransform result. Size= " + baos.size() + " bytes");
+                _clientResponseCatalogBuffer = baos.toByteArray();
+            } else {
+                log.error("cacheIngestTransformedCatalog(): Cannot cache ingest transformed catalog! Ingest transformation is a null value.");
+                _clientResponseCatalogBuffer = null;
+            }
+
+        }
+        finally {
+            lock.unlock();
+        }
+
+
+    }
+
+
+    /**
+     * CAREFUL! Only call this function if you have acquired a WriteLock for
+     * the catalog!!
+     *
      * @throws Exception When it can't read the file.
      */
     private void cacheCatalogFileContent() throws Exception {
 
-        Lock lock =  _catalogLock.writeLock();
+        Lock lock = _catalogLock.writeLock();
         try {
             lock.lock();
             String fname = _pathPrefix + _fileName;
 
             File catalogFile = new File(fname);
-            _buffer  = new byte[(int)catalogFile.length()];
+            _rawCatalogBuffer = new byte[(int) catalogFile.length()];
 
-            log.debug("Loading THREDDS catalog file: "+ fname);
+            log.debug("Loading THREDDS catalog file: " + fname);
 
             FileInputStream fis = new FileInputStream(fname);
 
             try {
                 int count = 0, ret;
-                while(count<catalogFile.length()){
-                    ret = fis.read(_buffer);
-                    if(ret<0){
-                        log.error("Premature end of file reached. file: "+ fname);
+                while (count < catalogFile.length()) {
+                    ret = fis.read(_rawCatalogBuffer);
+                    if (ret < 0) {
+                        log.error("Premature end of file reached. file: " + fname);
                         throw new Exception("Premature end of file reached.");
                     }
                     count += ret;
                 }
             }
             finally {
-                try{
+                try {
                     fis.close();
                 }
-                catch(IOException e){
-                    log.error("Failed to close THREDDS catalog file: "+fname+
-                            " Error MEssage: "+e.getMessage());
+                catch (IOException e) {
+                    log.error("Failed to close THREDDS catalog file: " + fname +
+                            " Error MEssage: " + e.getMessage());
 
                 }
 
             }
             _cacheTime = new Date();
 
-            log.info("Using memory cache for: "+fname);
+            log.info("Using memory cache for: " + fname);
         }
         finally {
             lock.unlock();
@@ -235,71 +294,111 @@ public class LocalFileCatalog implements Catalog {
 
     }
 
-    public boolean needsRefresh(){
+    /**
+     * CAREFUL! Only call this function if you have acquired a WriteLock for
+     * the catalog!!
+     *
+     * @throws Exception When it can't read the file.
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   <p/>
+     *                   InputStream catDocIs = request.getResponseBodyAsStream();
+     *                   <p/>
+     *                   <p/>
+     *                   try {
+     *                   catalogToHtmlTransformLock.lock();
+     *                   catalogToHtmlTransform.reloadTransformIfRequired();
+     *                   <p/>
+     *                   // Build the catalog document as an XdmNode.
+     *                   XdmNode catDoc = catalogToHtmlTransform.build(new StreamSource(catDocIs));
+     *                   <p/>
+     *                   catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
+     *                   catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
+     *                   catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
+     *                   <p/>
+     *                   // Set up the Http headers.
+     *                   response.setContentType("text/html");
+     *                   response.setHeader("Content-Description", "thredds_catalog");
+     *                   response.setStatus(HttpServletResponse.SC_OK);
+     *                   <p/>
+     *                   // Send the transformed documet.
+     *                   catalogToHtmlTransform.transform(catDoc,response.getOutputStream());
+     *                   <p/>
+     *                   log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+     */
 
-        Lock lock =  _catalogLock.readLock();
+    public boolean needsRefresh() {
+
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             String fname = _pathPrefix + _fileName;
             File catalogFile = new File(fname);
             if (catalogFile.lastModified() > _cacheTime.getTime()) {
 
-                log.debug("THREDDS Catalog file: "+fname+" needs to re-ingested");
+                log.debug("THREDDS Catalog file: " + fname + " needs to re-ingested");
 
                 return true;
             }
 
             return false;
         }
-        finally{
+        finally {
             lock.unlock();
         }
     }
 
 
+    public void writeRawCatalogXML(OutputStream os) throws Exception {
 
-
-    public void writeCatalogXML(OutputStream os) throws Exception {
-
-        Lock lock =  _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
-            String fname = _pathPrefix+_fileName;
+            String fname = _pathPrefix + _fileName;
 
-            if(_buffer!=null){
-                os.write(_buffer);
-            }
-            else {
+            if (_rawCatalogBuffer != null) {
+                log.debug("writeRawCatalogXML(): Sending cached raw catalog.");
+                os.write(_rawCatalogBuffer);
+            } else {
 
                 File catalogFile = new File(fname);
 
-                log.debug("Loading THREDDS catalog file: "+ fname);
+                log.debug("writeRawCatalogXML(): Loading THREDDS catalog file: " + fname);
 
-                byte[] buf  = new byte[2048];
+                byte[] buf = new byte[2048];
 
                 FileInputStream fis = new FileInputStream(fname);
 
                 try {
                     int count = 0, ret;
 
-                    while(count<catalogFile.length()){
+                    while (count < catalogFile.length()) {
                         ret = fis.read(buf);
-                        if(ret<0){
-                            log.error("Premature end of file reached. file: "+ fname);
+                        if (ret < 0) {
+                            log.error("writeRawCatalogXML(): Premature end of file reached. file: " + fname);
                             throw new Exception("Premature end of file reached.");
                         }
 
-                        os.write(buf,0,ret);
+                        os.write(buf, 0, ret);
                         count += ret;
                     }
                 }
                 finally {
-                    try{
+                    try {
                         fis.close();
                     }
-                    catch(IOException e){
-                        log.error("Failed to close THREDDS catalog file: "+fname+
-                        " Error MEssage: "+e.getMessage());
+                    catch (IOException e) {
+                        log.error("writeRawCatalogXML(): Failed to close THREDDS catalog file: " + fname +
+                                " Error MEssage: " + e.getMessage());
                     }
 
                 }
@@ -311,69 +410,184 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
+    public void writeCatalogXML(OutputStream os) throws Exception {
+
+        Lock lock = _catalogLock.readLock();
+        try {
+            lock.lock();
+            String fname = _pathPrefix + _fileName;
+
+            if (_clientResponseCatalogBuffer != null) {
+                os.write(_clientResponseCatalogBuffer);
+                log.debug("writeCatalogXML(): Sending cached ingetTransform processed catalog.");
+
+            } else if (_rawCatalogBuffer != null) {
+                os.write(_rawCatalogBuffer);
+                log.debug("writeCatalogXML(): Sending cached raw catalog.");
+
+            } else {
+
+
+                log.debug("writeCatalogXML(): Loading THREDDS catalog file: " + fname);
+
+
+                if (_ingestTransformer != null) {
+                    log.debug("writeCatalogXML(): Applying catalog ingestTransform.");
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    XdmNode catalog = getRawCatalogAsXdmNode(_ingestTransformer.getProcessor());
+                    _ingestTransformer.transform(catalog, baos);
+                    log.debug("writeCatalogXML(): Sending ingestTransform result. Writing " + baos.size() + " bytes");
+                    os.write(baos.toByteArray());
+                } else {
+                    File catalogFile = new File(fname);
+                    InputStream fis = new FileInputStream(catalogFile);
+                    byte[] buf = new byte[2048];
+                    try {
+                        int count = 0, ret;
+
+                        while (count < catalogFile.length()) {
+                            ret = fis.read(buf);
+                            if (ret < 0) {
+                                log.error("writeCatalogXML() Premature end of file reached. file: " + fname);
+                                throw new Exception("Premature end of file reached.");
+                            }
+
+                            os.write(buf, 0, ret);
+                            count += ret;
+                        }
+                    }
+                    finally {
+                        try {
+                            fis.close();
+                        }
+                        catch (IOException e) {
+                            log.error("writeCatalogXML(): Failed to close THREDDS catalog file: " + fname +
+                                    " Error MEssage: " + e.getMessage());
+                        }
+
+                    }
+                }
+
+            }
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
 
     /**
-     *
      * @return The catalog parsed into a JDOM Document.
-     * @throws IOException When things can't be read.
+     * @throws IOException   When things can't be read.
      * @throws JDOMException When things can't be parsed.
      */
     //@todo Consider optimizing this to cache the document after parsing.
-    public Document getCatalogDocument() throws IOException, JDOMException {
+    public Document getRawCatalogDocument() throws IOException, JDOMException {
 
         InputStream is = null;
 
-        Lock lock =  _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             SAXBuilder sb = new SAXBuilder();
-            if(_buffer!=null){
-                is = new ByteArrayInputStream(_buffer);
-                log.debug("getCatalogDocument(): Reading catalog from memory cache.");
-            }
-            else {
-                is = new FileInputStream(_pathPrefix+_fileName);
-                log.debug("getCatalogDocument(): Reading catalog from file.");
-            }
-            return  sb.build(is);
-        }
-        finally {
-            if(is!=null){
-                try {
-                    is.close();
-                }
-                catch(IOException e){
-                    log.error("Failed to close InputStream. Error Message: "+e.getMessage());
-                }
-
-            }
-            lock.unlock();
-        }
-
-    }
-
-    /**
-     *
-     * @param proc XSLT processor that will be used to transform document.
-     * @return The catalog parsed into an XdmNode
-     * @throws IOException When things can't be read.
-     * @throws SaxonApiException When things can't be parsed.
-     */
-     //@todo Consider optimizing this to cache the document after parsing.
-    public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
-
-        XdmNode catalog;
-        InputStream is = null;
-
-        Lock lock =  _catalogLock.readLock();
-        try {
-            lock.lock();
-            if (_buffer != null) {
-                is = new ByteArrayInputStream(_buffer);
+            if (_rawCatalogBuffer != null) {
+                is = new ByteArrayInputStream(_rawCatalogBuffer);
                 log.debug("getCatalogDocument(): Reading catalog from memory cache.");
             } else {
                 is = new FileInputStream(_pathPrefix + _fileName);
                 log.debug("getCatalogDocument(): Reading catalog from file.");
+            }
+            return sb.build(is);
+        }
+        finally {
+            if (is != null) {
+                try {
+                    is.close();
+                }
+                catch (IOException e) {
+                    log.error("Failed to close InputStream. Error Message: " + e.getMessage());
+                }
+
+            }
+            lock.unlock();
+        }
+
+    }
+
+    /**
+     * @return The catalog parsed into a JDOM Document.
+     * @throws IOException   When things can't be read.
+     * @throws JDOMException When things can't be parsed.
+     */
+    //@todo Consider optimizing this to cache the document after parsing.
+    public Document getCatalogDocument() throws IOException, JDOMException, SaxonApiException {
+
+        InputStream is = null;
+        Document catDoc = null;
+
+        Lock lock = _catalogLock.readLock();
+        try {
+            lock.lock();
+            SAXBuilder sb = new SAXBuilder();
+
+            if (_clientResponseCatalogBuffer != null) {
+                is = new ByteArrayInputStream(_clientResponseCatalogBuffer);
+            } else if (_rawCatalogBuffer != null) {
+                is = new ByteArrayInputStream(_rawCatalogBuffer);
+                log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+            } else {
+                is = new FileInputStream(_pathPrefix + _fileName);
+
+                if (_ingestTransformer != null) {
+                    log.debug("getCatalogDocument(): Applying catalog ingestTransform.");
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    XdmNode catalog = getRawCatalogAsXdmNode(_ingestTransformer.getProcessor());
+                    _ingestTransformer.transform(catalog, baos);
+
+                    is = new ByteArrayInputStream(baos.toByteArray());
+                }
+
+            }
+            catDoc = sb.build(is);
+        }
+        finally {
+            if (is != null) {
+                try {
+                    is.close();
+                }
+                catch (IOException e) {
+                    log.error("getCatalogDocument(): Failed to close InputStream. Error Message: " + e.getMessage());
+                }
+
+            }
+            lock.unlock();
+        }
+        return catDoc;
+
+    }
+
+    /**
+     * @param proc XSLT processor that will be used to transform document.
+     * @return The catalog parsed into an XdmNode
+     * @throws IOException       When things can't be read.
+     * @throws SaxonApiException When things can't be parsed.
+     */
+    //@todo Consider optimizing this to cache the document after parsing.
+    public XdmNode getRawCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
+
+        XdmNode catalog;
+        InputStream is = null;
+
+        Lock lock = _catalogLock.readLock();
+        try {
+            lock.lock();
+            if (_rawCatalogBuffer != null) {
+                is = new ByteArrayInputStream(_rawCatalogBuffer);
+                log.debug("getRawCatalogAsXdmNode(): Reading catalog from memory cache.");
+            } else {
+                String fname = _pathPrefix + _fileName;
+                is = new FileInputStream(fname);
+                log.debug("getRawCatalogAsXdmNode(): Reading catalog from file: " + fname);
             }
 
 
@@ -384,12 +598,12 @@ public class LocalFileCatalog implements Catalog {
             catalog = builder.build(new StreamSource(is));
         }
         finally {
-            if(is!=null){
+            if (is != null) {
                 try {
                     is.close();
                 }
-                catch(IOException e){
-                    log.error("Failed to close InputStream. Error Message: "+e.getMessage());
+                catch (IOException e) {
+                    log.error("getRawCatalogAsXdmNode(): Failed to close InputStream. Error Message: " + e.getMessage());
                 }
 
             }
@@ -399,39 +613,54 @@ public class LocalFileCatalog implements Catalog {
     }
 
     /**
-     *
-     * @param builder The DocumentBuilder used to build the document.
+     * @param proc XSLT processor that will be used to transform document.
      * @return The catalog parsed into an XdmNode
-     * @throws IOException When things can't be read.
+     * @throws IOException       When things can't be read.
      * @throws SaxonApiException When things can't be parsed.
      */
-     //@todo Consider optimizing this to cache the document after parsing.
-    public XdmNode getCatalogAsXdmNode(DocumentBuilder builder) throws IOException, SaxonApiException {
+    //@todo Consider optimizing this to cache the document after parsing.
+    public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
 
         XdmNode catalog;
         InputStream is = null;
 
-        Lock lock =  _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
-            if (_buffer != null) {
-                is = new ByteArrayInputStream(_buffer);
-                log.debug("getCatalogDocument(): Reading catalog from memory cache.");
+            if (_clientResponseCatalogBuffer != null) {
+                is = new ByteArrayInputStream(_clientResponseCatalogBuffer);
+                log.debug("getCatalogAsXdmNode(): Reading ingestTramsform processed catalog from memory cache.");
+            } else if (_rawCatalogBuffer != null) {
+                is = new ByteArrayInputStream(_rawCatalogBuffer);
+                log.debug("getCatalogAsXdmNode(): Reading raw catalog from memory cache.");
             } else {
                 is = new FileInputStream(_pathPrefix + _fileName);
-                log.debug("getCatalogDocument(): Reading catalog from file.");
+                log.debug("getCatalogAsXdmNode(): Reading catalog from file.");
+
+                if (_ingestTransformer != null) {
+                    log.debug("getCatalogAsXdmNode(): Applying catalog ingestTransform.");
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    catalog = getRawCatalogAsXdmNode(_ingestTransformer.getProcessor());
+                    _ingestTransformer.transform(catalog, baos);
+
+                    is = new ByteArrayInputStream(baos.toByteArray());
+                }
             }
+
+
+            DocumentBuilder builder = proc.newDocumentBuilder();
+            builder.setLineNumbering(true);
             //builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
 
             catalog = builder.build(new StreamSource(is));
         }
         finally {
-            if(is!=null){
+            if (is != null) {
                 try {
                     is.close();
                 }
-                catch(IOException e){
-                    log.error("Failed to close InputStream. Error Message: "+e.getMessage());
+                catch (IOException e) {
+                    log.error("Failed to close InputStream. Error Message: " + e.getMessage());
                 }
 
             }
@@ -441,9 +670,9 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
-    public String getName(){
+    public String getName() {
 
-        Lock lock =  _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             return _name;
@@ -453,8 +682,8 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
-    public String getPathPrefix(){
-        Lock lock =  _catalogLock.readLock();
+    public String getPathPrefix() {
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             return _pathPrefix;
@@ -464,8 +693,8 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
-    public String getUrlPrefix(){
-        Lock lock =  _catalogLock.readLock();
+    public String getUrlPrefix() {
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             return _urlPrefix;
@@ -475,8 +704,8 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
-    public String getFileName(){
-        Lock lock =  _catalogLock.readLock();
+    public String getFileName() {
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             return _fileName;
@@ -487,8 +716,8 @@ public class LocalFileCatalog implements Catalog {
     }
 
 
-    public long getLastModified(){
-        Lock lock =  _catalogLock.readLock();
+    public long getLastModified() {
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             String fname = _pathPrefix + _fileName;
@@ -498,6 +727,14 @@ public class LocalFileCatalog implements Catalog {
         finally {
             lock.unlock();
         }
+    }
+
+    public String getIngestTransformFilename() {
+        return _transformOnIngestFilename;
+    }
+
+    public Transformer getIngestTransformer() {
+        return _ingestTransformer;
     }
 
 

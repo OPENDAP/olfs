@@ -55,7 +55,6 @@ public class RemoteHttpCatalog implements Catalog {
     private  String _fileName;
     private  byte[] _buffer;
     private boolean _useMemoryCache;
-    private Vector<Catalog> _children;
     private Date _cacheTime;
 
 
@@ -75,7 +74,6 @@ public class RemoteHttpCatalog implements Catalog {
         _urlPrefix = urlPrefix;
 
         _useMemoryCache = useMemoryCache;
-        _children = new Vector<Catalog>();
 
         log.debug("pathPrefix: " + _pathPrefix);
         log.debug("urlPrefix:  " + _urlPrefix);
@@ -131,7 +129,6 @@ public class RemoteHttpCatalog implements Catalog {
 
 
     public void destroy() {
-        _children.clear();
         _name        = null;
         _pathPrefix  = null;
         _urlPrefix   = null;
@@ -142,16 +139,6 @@ public class RemoteHttpCatalog implements Catalog {
     }
 
     private void cacheCatalogFileContent(){log.debug("cacheCatalogFileContent(): WARNING STUB FIRING!");}
-
-
-
-    public void addChild(LocalFileCatalog c) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public Enumeration<Catalog> getChildren() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     public boolean usesMemoryCache() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
@@ -173,10 +160,6 @@ public class RemoteHttpCatalog implements Catalog {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public XdmNode getCatalogAsXdmNode(DocumentBuilder builder) throws IOException, SaxonApiException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     public String getName() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -195,4 +178,9 @@ public class RemoteHttpCatalog implements Catalog {
     public long getLastModified() {
         return -1;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public String getIngestTransformFilename(){
+        return null;
+    }
+
 }
