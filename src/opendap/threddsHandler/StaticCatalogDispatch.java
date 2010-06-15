@@ -762,9 +762,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     public long getLastModified(HttpServletRequest req) {
+        String relativeURL = ReqInfo.getFullSourceName(req);
         try {
             if (requestCanBeHandled(req)) {
-                String relativeURL = ReqInfo.getFullSourceName(req);
 
                 // Make sure it's a relative URL
                 while (relativeURL.startsWith("/"))
@@ -787,7 +787,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             }
         }
         catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Failed to get a last modified time for '"+relativeURL+"'  msg: "+e.getMessage());
         }
         return -1;
     }

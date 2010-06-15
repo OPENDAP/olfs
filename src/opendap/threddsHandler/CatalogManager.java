@@ -28,12 +28,10 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Enumeration;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import opendap.namespaces.THREDDS;
 
@@ -51,9 +49,15 @@ public class CatalogManager {
     private static String _catalogIngestTransformFilename;
 
 
-    private static ConcurrentHashMap<String, Catalog> _catalogs = new ConcurrentHashMap<String, Catalog>();
-    private static ConcurrentHashMap<String, String[]> _children = new ConcurrentHashMap<String, String[]>();
-    private static boolean _isIntialized = false;
+    private static ConcurrentHashMap<String, Catalog>   _catalogs = new ConcurrentHashMap<String, Catalog>();
+    private static ConcurrentHashMap<String, String[]>  _children = new ConcurrentHashMap<String, String[]>();
+
+    private static ReentrantLock _catalogLock  = new ReentrantLock();
+
+
+    private static boolean _isInitialized = false;
+
+    
 
 
     public static void init(String contentPath, String catalogIngestTransformFilename) {
@@ -62,20 +66,23 @@ public class CatalogManager {
 
         _log.debug("Configuring...");
 
-        if (_isIntialized) {
-            _log.error(" Configuration has already been done. isInitialized(): " + _isIntialized);
+        if (_isInitialized) {
+            _log.error(" Configuration has already been done. isInitialized(): " + _isInitialized);
             return;
         }
 
         _contentPath = contentPath;
         _catalogIngestTransformFilename = catalogIngestTransformFilename;
-        _isIntialized = true;
+        _isInitialized = true;
     }
 
 
     private static String getMapIndex(Catalog c) {
-        String index = c.getUrlPrefix() + c.getFileName();
-        return index;
+        if(c!=null){
+            String index = c.getUrlPrefix() + c.getFileName();
+            return index;
+        }
+        return null;
 
     }
 
@@ -87,7 +94,17 @@ public class CatalogManager {
             throws Exception {
 
         LocalFileCatalog catalog = new LocalFileCatalog(pathPrefix, urlPrefix, fname, _catalogIngestTransformFilename, cacheCatalogFileContent);
-        addCatalog(catalog, cacheCatalogFileContent);
+        try{
+            _catalogLock.lock();
+            _log.debug("addCatalog(): Catalog locked.");
+
+            addCatalog(catalog, cacheCatalogFileContent);
+        }
+        finally {
+            _catalogLock.unlock();
+            _log.debug("addCatalog(): Catalog unlocked.");
+
+        }
 
     }
 
@@ -101,9 +118,12 @@ public class CatalogManager {
 
         index = getMapIndex(catalog);
 
-        // If if this catalog has already been added,  then don't mess with it.
-        if (_catalogs.containsKey(index))
+        // If this catalog has already been added,  then don't mess with it.
+        if (_catalogs.containsKey(index)){
+            _log.warn("The catalog '"+index+"' is already in the collection. It must be removed (purgeCatalog()) " +
+                    "before it can be added again.");
             return;
+        }
 
 
         if (_children.containsKey(index)) {
@@ -187,10 +207,7 @@ public class CatalogManager {
 
 
     public static Catalog getCatalog(String name) {
-
-        Catalog cat = _catalogs.get(name);
-        cat = updateCatalogIfRequired(cat);
-
+        Catalog cat = getCatalogAndUpdateIfRequired(name);
         return cat;
 
     }
@@ -199,7 +216,7 @@ public class CatalogManager {
 
         Catalog cat;
 
-        cat = _catalogs.get(name);
+        cat = getCatalog(name);
         if (cat != null)
             return cat.getLastModified();
 
@@ -207,39 +224,58 @@ public class CatalogManager {
     }
 
 
-    private static Catalog updateCatalogIfRequired(Catalog c) {
+    private static Catalog getCatalogAndUpdateIfRequired(String catalogName) {
 
 
-        String index = getMapIndex(c);
-        if (c != null && c.needsRefresh()) {
+        if (catalogName == null)
+            return null;
 
-            _log.debug("updateCatalogIfRequired(): Catalog '" + index + "' needs to be updated.");
+        try {
+            _catalogLock.lock();
+            _log.debug("getCatalogAndUpdateIfRequired(): Catalog locked.");
 
-            LocalFileCatalog newCat;
-            try {
-                newCat = new LocalFileCatalog(c.getPathPrefix(), c.getUrlPrefix(), c.getFileName(), c.getIngestTransformFilename(), c.usesMemoryCache());
-
-
-                _log.debug("updateCatalogIfRequired(): Purging catalog '" + index + "' and it's children from catalog collection.");
-                purgeCatalog(c);
-
-
-                index = getMapIndex(newCat);
-                _log.debug("updateCatalogIfRequired: Adding new catalog " + index + " to _catalogs collection.");
-                addCatalog(newCat, newCat.usesMemoryCache());
-                return newCat;
-            }
-            catch (Exception e) {
-                _log.error("updateCatalogIfRequired: Could not update Catalog: " + c.getName());
+            Catalog c = _catalogs.get(catalogName);
+            if (c == null)
                 return null;
-            }
-        } else {
-            return c;
 
+            if (c.needsRefresh()) {
+
+
+                _log.debug("getCatalogAndUpdateIfRequired(): Catalog '" + catalogName + "' needs to be updated.");
+
+                LocalFileCatalog newCat;
+                try {
+                    newCat = new LocalFileCatalog(c.getPathPrefix(), c.getUrlPrefix(), c.getFileName(), c.getIngestTransformFilename(), c.usesMemoryCache());
+
+                    //Thread.sleep(10000);
+
+                    _log.debug("getCatalogAndUpdateIfRequired(): Purging catalog '" + catalogName + "' and it's children from catalog collection.");
+                    purgeCatalog(c);
+
+
+                    String index = getMapIndex(newCat);
+                    _log.debug("getCatalogAndUpdateIfRequired(): Adding new catalog " + index + " to _catalogs collection.");
+                    addCatalog(newCat, newCat.usesMemoryCache());
+                    return newCat;
+                }
+                catch (Exception e) {
+                    _log.error("getCatalogAndUpdateIfRequired(): Could not update Catalog: " + c.getName());
+                    return null;
+                }
+            } else {
+                _log.debug("getCatalogAndUpdateIfRequired(): Catalog '" + catalogName + "' does NOT need updated.");
+                return c;
+
+            }
+        }
+        finally {
+            _catalogLock.unlock();
+            _log.debug("getCatalogAndUpdateIfRequired(): Catalog unlocked.");
         }
 
 
     }
+
 
 
     /**

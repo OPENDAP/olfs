@@ -629,7 +629,7 @@ public class LocalFileCatalog implements Catalog {
             lock.lock();
             if (_clientResponseCatalogBuffer != null) {
                 is = new ByteArrayInputStream(_clientResponseCatalogBuffer);
-                log.debug("getCatalogAsXdmNode(): Reading ingestTramsform processed catalog from memory cache.");
+                log.debug("getCatalogAsXdmNode(): Reading ingestTransform processed catalog from memory cache.");
             } else if (_rawCatalogBuffer != null) {
                 is = new ByteArrayInputStream(_rawCatalogBuffer);
                 log.debug("getCatalogAsXdmNode(): Reading raw catalog from memory cache.");
