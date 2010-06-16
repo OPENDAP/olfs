@@ -442,277 +442,6 @@ public class IRISailRepository extends SailRepository {
 
     }
 
-    public enum ProcessingTypes {
-        NONE, xsString, DropQuotes, RetypeTo, Increment, Function
-    }
-
-    /***************************************************************************
-     * process fn created statements
-     * 
-     * @param graphResult
-     * @param creatValue
-     * @param Added
-     * @param toAdd
-     * @param con
-     * @param context
-     * @throws QueryEvaluationException
-     * @throws RepositoryException
-     */
-    private void process_fn(GraphQueryResult graphResult,
-            ValueFactory creatValue, Vector<Statement> Added,
-            Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
-            RepositoryException {
-
-        log.debug("Processing fn statements.");
-
-        Pattern http = Pattern.compile("^http://");
-        Pattern bnode = Pattern.compile("^_:");
-        Pattern endlist = Pattern.compile("#nil");
-
-        FunctionTypes functionTypeFlag = FunctionTypes.None;
-
-        while (graphResult.hasNext()) {
-            Statement st = graphResult.next();
-
-            // log.debug("Current statement: " + st);
-
-            Value obj = st.getObject();
-
-            URI prd = st.getPredicate();
-            Resource sbj = st.getSubject();
-
-            URI objUri = null;
-            URI targetPrd = prd;
-            URI sbjUri = null;
-
-            Matcher mobjhttp = http.matcher(obj.stringValue());
-            if (mobjhttp.find()) {
-                objUri = new URIImpl(obj.toString());
-
-            }
-            Matcher msbjhttp = http.matcher(sbj.stringValue());
-            if (msbjhttp.find()) {
-                sbjUri = new URIImpl(sbj.toString());
-
-            }
-
-            Matcher mbnode = bnode.matcher(sbj.toString());
-            Resource targetSbj = null;
-            Boolean isSbjBn = false;
-            isSbjBn = mbnode.find();
-            Boolean isObjBn = false;
-            Matcher objbnode = bnode.matcher(obj.toString());
-            isObjBn = objbnode.find();
-
-            if (!isSbjBn && isObjBn) {
-
-                targetSbj = sbj;
-
-                String fnName = null; // function name
-
-                Matcher mendlist = endlist.matcher(obj.stringValue());
-                Boolean isEndList = false;
-                isEndList = mendlist.find();
-                List<String> rdfList = new ArrayList<String>();
-                int statementNbr = 1;
-                while (graphResult.hasNext() && !isEndList) {
-                    st = graphResult.next();
-                    statementNbr++;
-                    // log.debug("Current statement " + statementNbr + ": " +
-                    // st);
-                    obj = st.getObject();
-                    prd = st.getPredicate();
-                    sbj = st.getSubject();
-                    mbnode = bnode.matcher(sbj.toString());
-
-                    isSbjBn = mbnode.find();
-                    // log.debug("prd = " + prd.stringValue() );
-
-                    if (prd.getLocalName().equals("myfn") && isSbjBn) {
-                        int i = obj.stringValue().lastIndexOf("#");
-
-                        fnName = obj.stringValue().substring(i + 1);
-                        if (fnName.equals("join")) {
-                            functionTypeFlag = FunctionTypes.Join;
-                        }
-                        if (fnName.equals("getWcsId")) {
-                            functionTypeFlag = FunctionTypes.getWcsID;
-                        }
-                    }
-
-                    if (isSbjBn && prd.getLocalName().equals("first")) {
-                        String elementValue = obj.stringValue();
-
-                        rdfList.add(elementValue);
-
-                    }
-
-                    mendlist = endlist.matcher(obj.stringValue());
-                    isEndList = mendlist.find();
-
-                }
-                Statement stToAdd = null;
-                switch (functionTypeFlag) {
-
-                case Join:
-                    log.debug("Doing join ...");
-                    stToAdd = join(rdfList, targetSbj, targetPrd, creatValue);
-                    st = stToAdd;
-                    log.debug("Finished join");
-                    break;
-                case getWcsID:
-                    log.debug("Doing getWcsID ...");
-                    stToAdd = getWcsID(rdfList, targetSbj, targetPrd,
-                            creatValue);
-                    st = stToAdd;
-                    log.debug("Finished getWcsID");
-                    break;
-                case None:
-                    log.debug("No function find");
-                }
-
-            } else if (!isSbjBn && !isObjBn) {
-                targetSbj = sbj;
-                // log.debug("original st in Join = " + st.toString());
-            }
-            // log.debug("st to add = " + st.toString());
-            toAdd.add(st);
-            Added.add(st);
-            con.add(st, context); // add fn created st
-        } // while (graphResult.hasNext())
-        log.debug("After processing fn: " + toAdd.size()
-                + " statements are added.\n ");
-    }
-
-    /***************************************************************************
-     * function join to concatenate strings
-     * 
-     * @param RDFList
-     * @param targetSbj
-     * @param targetPrd
-     * @param createValue
-     * @return
-     */
-    Statement join(List<String> RDFList, Resource targetSbj, URI targetPrd,
-            ValueFactory createValue) {
-        int i = 0;
-        boolean joinStrIsURL = false;
-        String targetObj = "";
-        if (RDFList.get(1).startsWith("http://")) {
-            joinStrIsURL = true;
-        }
-        for (i = 1; i < RDFList.size() - 1; i++) {
-            targetObj += RDFList.get(i) + RDFList.get(0); // rdfList.get(0) +
-            // separator
-            // log.debug("Component("+i+")= " + RDFList.get(i));
-        }
-
-        targetObj += RDFList.get(i); // last component no separator
-
-        Value stObjStr = null;
-        if (joinStrIsURL) {
-            stObjStr = createValue.createURI(targetObj);
-        } else {
-            stObjStr = createValue.createLiteral(targetObj);
-        }
-
-        Statement stToAdd = new StatementImpl(targetSbj, targetPrd, stObjStr);
-        return stToAdd;
-    }
-
-    /***************************************************************************
-     * function getWcsID
-     * 
-     * @param RDFList
-     * @param targetSbj
-     * @param targetPrd
-     * @param createValue
-     * @return
-     */
-    Statement getWcsID(List<String> RDFList, Resource targetSbj, URI targetPrd,
-            ValueFactory createValue) {
-
-        boolean joinStrIsURL = false;
-        String targetObj = "";
-        
-
-       // targetObj = RDFList.get(0); // rdf list has only one element
-        targetObj = getWcsIdString(RDFList.get(0));
-        if (targetObj.startsWith("http://")) {
-            joinStrIsURL = true;
-        }
-        Value stObjStr = null;
-        if (joinStrIsURL) {
-            stObjStr = createValue.createURI(targetObj);
-        } else {
-            stObjStr = createValue.createLiteral(targetObj);
-        }
-        Statement stToAdd = new StatementImpl(targetSbj, targetPrd, stObjStr);
-        return stToAdd;
-    }
-
-
-
-
-
-    /**
-     * Build a wcs:Identifier for the coverage dataset described by the datasetUrl.
-     *
-     * @param datasetUrl
-     * @return A valid and unique to this service wcs:Identifier String for the coverage dataset
-     */
-    public String getWcsIdString(String datasetUrl)  {
-
-        String wcsID="FAILED_TO_BUILD_WCS_ID";
-
-        try {
-            int i;
-            String serverURL, serverID;
-            URL dsu = new URL(datasetUrl);
-
-
-            serverURL = getServerUrlString(dsu);
-
-            log.debug("getWcsIdString(): serverURl is "+serverURL);
-
-            if(serverIDs.containsKey(serverURL)){
-                // get server prefix
-                serverID = serverIDs.get(serverURL);
-                log.debug("getWcsIdString(): serverURL already in use, will reuse serverID '"+serverID+"'");
-            }
-            else {
-                serverID = "S"+ (serverIDs.size()+1) + "";
-                // Generate service prefix
-                // Store service prefix.
-                serverIDs.put(serverURL,serverID);
-                log.debug("getWcsIdString(): New serverURL! Created new serverID '"+serverID+"'");
-
-            }
-
-
-            // Build wcsID
-            if(!wcsIDs.containsKey(datasetUrl)){
-                // add wcs:Identifier to MAP
-                wcsID = serverID + datasetUrl.substring(serverURL.length(),datasetUrl.length());
-                log.debug("getWcsIdString(): Dataset had no existing wcsID, adding wcsID: "+wcsID+
-                        " for dataset: "+datasetUrl);
-                wcsIDs.put(datasetUrl,wcsID);
-            }
-            else {
-                wcsID = wcsIDs.get(datasetUrl);
-                log.debug("getWcsIdString(): Dataset already has a wcsID, returning wcsID: "+wcsID+
-                        " for dataset: "+datasetUrl);
-            }
-
-        } catch (MalformedURLException e) {
-            log.error("Cannot Build wcs:Identifier from URL "+datasetUrl+" error msg: "+e.getMessage());
-        }
-
-
-        return wcsID;
-    }
-
 
 
     private String getServerUrlString(URL url) {
@@ -2340,5 +2069,321 @@ public class IRISailRepository extends SailRepository {
         }
 
     }
+
+
+
+
+
+    /***************************************************************************
+     **************************************************************************
+     **************************************************************************
+     **************************************************************************
+     **************************************************************************
+     ************************************************************************** 
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+    */
+
+
+
+
+
+
+
+
+
+
+    public enum ProcessingTypes {
+        NONE, xsString, DropQuotes, RetypeTo, Increment, Function
+    }
+
+    /***************************************************************************
+     * process fn created statements
+     *
+     * @param graphResult
+     * @param creatValue
+     * @param Added
+     * @param toAdd
+     * @param con
+     * @param context
+     * @throws QueryEvaluationException
+     * @throws RepositoryException
+     */
+    private void process_fn(GraphQueryResult graphResult,
+            ValueFactory creatValue, Vector<Statement> Added,
+            Vector<Statement> toAdd, RepositoryConnection con,
+            Resource[] context) throws QueryEvaluationException,
+            RepositoryException {
+
+        log.debug("Processing fn statements.");
+
+        Pattern http = Pattern.compile("^http://");
+        Pattern bnode = Pattern.compile("^_:");
+        Pattern endlist = Pattern.compile("#nil");
+
+        FunctionTypes functionTypeFlag = FunctionTypes.None;
+
+        while (graphResult.hasNext()) {
+            Statement st = graphResult.next();
+
+            // log.debug("Current statement: " + st);
+
+            Value obj = st.getObject();
+
+            URI prd = st.getPredicate();
+            Resource sbj = st.getSubject();
+
+            URI objUri = null;
+            URI targetPrd = prd;
+            URI sbjUri = null;
+
+            Matcher mobjhttp = http.matcher(obj.stringValue());
+            if (mobjhttp.find()) {
+                objUri = new URIImpl(obj.toString());
+
+            }
+            Matcher msbjhttp = http.matcher(sbj.stringValue());
+            if (msbjhttp.find()) {
+                sbjUri = new URIImpl(sbj.toString());
+
+            }
+
+            Matcher mbnode = bnode.matcher(sbj.toString());
+            Resource targetSbj = null;
+            Boolean isSbjBn = false;
+            isSbjBn = mbnode.find();
+            Boolean isObjBn = false;
+            Matcher objbnode = bnode.matcher(obj.toString());
+            isObjBn = objbnode.find();
+
+            if (!isSbjBn && isObjBn) {
+
+                targetSbj = sbj;
+
+                String fnName = null; // function name
+
+                Matcher mendlist = endlist.matcher(obj.stringValue());
+                Boolean isEndList = false;
+                isEndList = mendlist.find();
+                List<String> rdfList = new ArrayList<String>();
+                int statementNbr = 1;
+                while (graphResult.hasNext() && !isEndList) {
+                    st = graphResult.next();
+                    statementNbr++;
+                    // log.debug("Current statement " + statementNbr + ": " +
+                    // st);
+                    obj = st.getObject();
+                    prd = st.getPredicate();
+                    sbj = st.getSubject();
+                    mbnode = bnode.matcher(sbj.toString());
+
+                    isSbjBn = mbnode.find();
+                    // log.debug("prd = " + prd.stringValue() );
+
+                    if (prd.getLocalName().equals("myfn") && isSbjBn) {
+                        int i = obj.stringValue().lastIndexOf("#");
+
+                        fnName = obj.stringValue().substring(i + 1);
+                        if (fnName.equals("join")) {
+                            functionTypeFlag = FunctionTypes.Join;
+                        }
+                        if (fnName.equals("getWcsId")) {
+                            functionTypeFlag = FunctionTypes.getWcsID;
+                        }
+                    }
+
+                    if (isSbjBn && prd.getLocalName().equals("first")) {
+                        String elementValue = obj.stringValue();
+
+                        rdfList.add(elementValue);
+
+                    }
+
+                    mendlist = endlist.matcher(obj.stringValue());
+                    isEndList = mendlist.find();
+
+                }
+                Statement stToAdd = null;
+                switch (functionTypeFlag) {
+
+                case Join:
+                    log.debug("Doing join ...");
+                    stToAdd = join(rdfList, targetSbj, targetPrd, creatValue);
+                    st = stToAdd;
+                    log.debug("Finished join");
+                    break;
+                case getWcsID:
+                    log.debug("Doing getWcsID ...");
+                    stToAdd = getWcsID(rdfList, targetSbj, targetPrd,
+                            creatValue);
+                    st = stToAdd;
+                    log.debug("Finished getWcsID");
+                    break;
+                case None:
+                    log.debug("No function find");
+                }
+
+            } else if (!isSbjBn && !isObjBn) {
+                targetSbj = sbj;
+                // log.debug("original st in Join = " + st.toString());
+            }
+            // log.debug("st to add = " + st.toString());
+            toAdd.add(st);
+            Added.add(st);
+            con.add(st, context); // add fn created st
+        } // while (graphResult.hasNext())
+        log.debug("After processing fn: " + toAdd.size()
+                + " statements are added.\n ");
+    }
+
+    /***************************************************************************
+     * function join to concatenate strings
+     *
+     * @param RDFList
+     * @param targetSbj
+     * @param targetPrd
+     * @param createValue
+     * @return
+     */
+    Statement join(List<String> RDFList, Resource targetSbj, URI targetPrd,
+            ValueFactory createValue) {
+        int i = 0;
+        boolean joinStrIsURL = false;
+        String targetObj = "";
+        if (RDFList.get(1).startsWith("http://")) {
+            joinStrIsURL = true;
+        }
+        for (i = 1; i < RDFList.size() - 1; i++) {
+            targetObj += RDFList.get(i) + RDFList.get(0); // rdfList.get(0) +
+            // separator
+            // log.debug("Component("+i+")= " + RDFList.get(i));
+        }
+
+        targetObj += RDFList.get(i); // last component no separator
+
+        Value stObjStr = null;
+        if (joinStrIsURL) {
+            stObjStr = createValue.createURI(targetObj);
+        } else {
+            stObjStr = createValue.createLiteral(targetObj);
+        }
+
+        Statement stToAdd = new StatementImpl(targetSbj, targetPrd, stObjStr);
+        return stToAdd;
+    }
+
+    /***************************************************************************
+     * function getWcsID
+     *
+     * @param RDFList
+     * @param targetSbj
+     * @param targetPrd
+     * @param createValue
+     * @return
+     */
+    Statement getWcsID(List<String> RDFList, Resource targetSbj, URI targetPrd,
+            ValueFactory createValue) {
+
+        boolean joinStrIsURL = false;
+        String targetObj = "";
+
+
+       // targetObj = RDFList.get(0); // rdf list has only one element
+        targetObj = getWcsIdString(RDFList.get(0));
+        if (targetObj.startsWith("http://")) {
+            joinStrIsURL = true;
+        }
+        Value stObjStr = null;
+        if (joinStrIsURL) {
+            stObjStr = createValue.createURI(targetObj);
+        } else {
+            stObjStr = createValue.createLiteral(targetObj);
+        }
+        Statement stToAdd = new StatementImpl(targetSbj, targetPrd, stObjStr);
+        return stToAdd;
+    }
+
+
+
+
+
+    /**
+     * Build a wcs:Identifier for the coverage dataset described by the datasetUrl.
+     *
+     * @param datasetUrl
+     * @return A valid and unique to this service wcs:Identifier String for the coverage dataset
+     */
+    public String getWcsIdString(String datasetUrl)  {
+
+        String wcsID="FAILED_TO_BUILD_WCS_ID";
+
+        try {
+            int i;
+            String serverURL, serverID;
+            URL dsu = new URL(datasetUrl);
+
+
+            serverURL = getServerUrlString(dsu);
+
+            log.debug("getWcsIdString(): serverURl is "+serverURL);
+
+            if(serverIDs.containsKey(serverURL)){
+                // get server prefix
+                serverID = serverIDs.get(serverURL);
+                log.debug("getWcsIdString(): serverURL already in use, will reuse serverID '"+serverID+"'");
+            }
+            else {
+                serverID = "S"+ (serverIDs.size()+1) + "";
+                // Generate service prefix
+                // Store service prefix.
+                serverIDs.put(serverURL,serverID);
+                log.debug("getWcsIdString(): New serverURL! Created new serverID '"+serverID+"'");
+
+            }
+
+
+            // Build wcsID
+            if(!wcsIDs.containsKey(datasetUrl)){
+                // add wcs:Identifier to MAP
+                wcsID = serverID + datasetUrl.substring(serverURL.length(),datasetUrl.length());
+                log.debug("getWcsIdString(): Dataset had no existing wcsID, adding wcsID: "+wcsID+
+                        " for dataset: "+datasetUrl);
+                wcsIDs.put(datasetUrl,wcsID);
+            }
+            else {
+                wcsID = wcsIDs.get(datasetUrl);
+                log.debug("getWcsIdString(): Dataset already has a wcsID, returning wcsID: "+wcsID+
+                        " for dataset: "+datasetUrl);
+            }
+
+        } catch (MalformedURLException e) {
+            log.error("Cannot Build wcs:Identifier from URL "+datasetUrl+" error msg: "+e.getMessage());
+        }
+
+
+        return wcsID;
+    }
+
+
 
 }
