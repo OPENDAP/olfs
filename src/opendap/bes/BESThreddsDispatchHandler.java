@@ -28,14 +28,20 @@ package opendap.bes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.*;
+import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.regex.Pattern;
 
 /**
@@ -151,20 +157,23 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if (BesXmlAPI.getCatalog(collectionName, showCatalogDoc)) {
 
             String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
+            Transformer _ingestTransformer = new Transformer(xsltDoc);
+            DocumentBuilder builder = _ingestTransformer.getProcessor().newDocumentBuilder();
+            builder.setLineNumbering(true);
+            //builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
 
-            XSLTransformer transformer = new XSLTransformer(xsltDoc);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            xmlo.output(showCatalogDoc,baos);
+            XdmNode catalog =  builder.build(new StreamSource(new ByteArrayInputStream(baos.toByteArray())));
 
-            Document threddsCatalogDoc = transformer.transform(showCatalogDoc);
-
-            response.setContentType("text/plain");
+            response.setContentType("text/xml");
             Version.setOpendapMimeHeaders(request,response);
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
-            xmlo.output(threddsCatalogDoc, response.getWriter());
+            _ingestTransformer.transform(catalog, response.getOutputStream());
 
-            //xmlo.output(showCatalogDoc, System.out);
-            //xmlo.output(threddsCatalogDoc, System.out);
+
 
         } else {
             BESError besError = new BESError(showCatalogDoc);
