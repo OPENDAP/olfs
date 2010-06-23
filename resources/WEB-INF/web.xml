@@ -14,7 +14,11 @@
     <display-name>Hyrax</display-name>
     <description>OPeNDAP Hyrax Server</description>
 
-
+    <context-param>
+        <param-name>ContextPath</param-name>
+        <param-value>opendap</param-value>
+    </context-param>
+    
 
     <servlet>
         <servlet-name>hyrax</servlet-name>

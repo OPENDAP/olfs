@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,7 +41,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.GraphQueryResult;
@@ -148,6 +148,11 @@ public class IRISailRepository extends SailRepository {
         isRepositoryDown = new AtomicBoolean();
         constructQuery = new Vector<String>();
         constructContext = new HashMap<String, String>();
+
+
+
+
+
     }
 
     /*
@@ -267,8 +272,7 @@ public class IRISailRepository extends SailRepository {
 
                         case Function:
 
-                            process_fn(graphResult, creatValue, Added, toAdd,
-                                    con, context);// postpocessing Join,
+                            process_fn(graphResult, creatValue, Added, toAdd, con, context);// postpocessing Join,
                                                     // subtract, getWcsID
                             break;
                         case NONE:
@@ -328,8 +332,7 @@ public class IRISailRepository extends SailRepository {
                         try {
                             graphResult.close();
                         } catch (QueryEvaluationException e) {
-                            log
-                                    .error("Caught a QueryEvaluationException! Msg: "
+                            log.error("Caught a QueryEvaluationException! Msg: "
                                             + e.getMessage());
                         }
                     }
@@ -2176,6 +2179,8 @@ public class IRISailRepository extends SailRepository {
             Matcher objbnode = bnode.matcher(obj.toString());
             isObjBn = objbnode.find();
 
+            Method func = null;
+
             if (!isSbjBn && isObjBn) {
 
                 targetSbj = sbj;
@@ -2204,44 +2209,41 @@ public class IRISailRepository extends SailRepository {
                         int i = obj.stringValue().lastIndexOf("#");
 
                         fnName = obj.stringValue().substring(i + 1);
-                        if (fnName.equals("join")) {
-                            functionTypeFlag = FunctionTypes.Join;
-                        }
-                        if (fnName.equals("getWcsId")) {
-                            functionTypeFlag = FunctionTypes.getWcsID;
+
+                        try {
+                            func = this.getClass().getMethod(fnName, List.class, ValueFactory.class);
+                            log.debug("Located processing function: "+ getProcessingMethodDescription(func));
+                        } catch (NoSuchMethodException e) {
+                            log.error("Unable to locate processing function "+fnName+"'  msg: "+e.getMessage());
+                            func = null;
                         }
                     }
 
                     if (isSbjBn && prd.getLocalName().equals("first")) {
                         String elementValue = obj.stringValue();
-
                         rdfList.add(elementValue);
-
                     }
 
                     mendlist = endlist.matcher(obj.stringValue());
                     isEndList = mendlist.find();
 
                 }
-                Statement stToAdd = null;
-                switch (functionTypeFlag) {
 
-                case Join:
-                    log.debug("Doing join ...");
-                    stToAdd = join(rdfList, targetSbj, targetPrd, creatValue);
-                    st = stToAdd;
-                    log.debug("Finished join");
-                    break;
-                case getWcsID:
-                    log.debug("Doing getWcsID ...");
-                    stToAdd = getWcsID(rdfList, targetSbj, targetPrd,
-                            creatValue);
-                    st = stToAdd;
-                    log.debug("Finished getWcsID");
-                    break;
-                case None:
-                    log.debug("No function find");
+                if(func!=null){
+                    Value stObj = null;
+                    try {
+                        stObj = (Value) func.invoke(this,rdfList,creatValue);
+                        st = new StatementImpl(targetSbj, targetPrd, stObj);
+                    } catch (IllegalAccessException e) {
+                        log.error("Unable to invoke processing function "+func.getName()+"' Caught IllegalAccessException, msg: "+e.getMessage());
+                    } catch (InvocationTargetException e) {
+                        log.error("Unable to invoke processing function "+func.getName()+"' Caught InvocationTargetException, msg: "+e.getMessage()); 
+                    }
                 }
+                else{
+                    log.warn("Process Function failed: No processing function found.");
+                }
+
 
             } else if (!isSbjBn && !isObjBn) {
                 targetSbj = sbj;
@@ -2256,17 +2258,15 @@ public class IRISailRepository extends SailRepository {
                 + " statements are added.\n ");
     }
 
+
     /***************************************************************************
      * function join to concatenate strings
      *
      * @param RDFList
-     * @param targetSbj
-     * @param targetPrd
      * @param createValue
      * @return
      */
-    Statement join(List<String> RDFList, Resource targetSbj, URI targetPrd,
-            ValueFactory createValue) {
+    public Value join(List<String> RDFList, ValueFactory createValue) {
         int i = 0;
         boolean joinStrIsURL = false;
         String targetObj = "";
@@ -2281,46 +2281,33 @@ public class IRISailRepository extends SailRepository {
 
         targetObj += RDFList.get(i); // last component no separator
 
-        Value stObjStr = null;
+        Value stObjStr;
         if (joinStrIsURL) {
             stObjStr = createValue.createURI(targetObj);
         } else {
             stObjStr = createValue.createLiteral(targetObj);
         }
 
-        Statement stToAdd = new StatementImpl(targetSbj, targetPrd, stObjStr);
-        return stToAdd;
+        return stObjStr;
     }
+
 
     /***************************************************************************
      * function getWcsID
      *
      * @param RDFList
-     * @param targetSbj
-     * @param targetPrd
      * @param createValue
      * @return
      */
-    Statement getWcsID(List<String> RDFList, Resource targetSbj, URI targetPrd,
-            ValueFactory createValue) {
+     public Value getWcsId(List<String> RDFList,  ValueFactory createValue) {
 
-        boolean joinStrIsURL = false;
         String targetObj = "";
 
-
-       // targetObj = RDFList.get(0); // rdf list has only one element
-        targetObj = getWcsIdString(RDFList.get(0));
-        if (targetObj.startsWith("http://")) {
-            joinStrIsURL = true;
-        }
-        Value stObjStr = null;
-        if (joinStrIsURL) {
-            stObjStr = createValue.createURI(targetObj);
-        } else {
-            stObjStr = createValue.createLiteral(targetObj);
-        }
-        Statement stToAdd = new StatementImpl(targetSbj, targetPrd, stObjStr);
-        return stToAdd;
+        targetObj = RDFList.get(0); // rdf list has only one element
+        targetObj = getWcsIdString(targetObj);
+        Value stObjStr;
+        stObjStr = createValue.createLiteral(targetObj);
+        return stObjStr;
     }
 
 
@@ -2382,6 +2369,35 @@ public class IRISailRepository extends SailRepository {
 
 
         return wcsID;
+    }
+
+    String getProcessingMethodDescription(Method m){
+
+
+        String msg = "";
+
+        msg += m.getReturnType().getName() + " ";
+        msg += m.getName();
+
+        String params = "";
+        for( Class c : m.getParameterTypes()){
+            if(!params.equals(""))
+                params += ", ";
+            params += c.getName();
+        }
+        msg += "("+params+")";
+
+        String exceptions = "";
+        for(Class c : m.getExceptionTypes()){
+            if(!exceptions.equals(""))
+                exceptions += ", ";
+            exceptions += c.getName();
+        }
+        msg += " "+exceptions+";";
+
+
+        return msg;
+
     }
 
 

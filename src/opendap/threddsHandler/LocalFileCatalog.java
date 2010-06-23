@@ -32,8 +32,6 @@ import org.jdom.input.SAXBuilder;
 
 import java.io.*;
 import java.util.Date;
-import java.util.Vector;
-import java.util.Enumeration;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 
@@ -122,7 +120,7 @@ public class LocalFileCatalog implements Catalog {
         _rawCatalogBuffer = null;
 
         if (_useMemoryCache) {
-            cacheCatalogFileContent();
+            cacheRawCatalogFileContent();
         } else {
             _cacheTime = new Date(catalogFile.lastModified());
         }
@@ -210,8 +208,6 @@ public class LocalFileCatalog implements Catalog {
     }
 
     /**
-     * CAREFUL! Only call this function if you have acquired a WriteLock for
-     * the catalog!!
      *
      * @throws Exception When it can't read the file.
      */
@@ -227,6 +223,8 @@ public class LocalFileCatalog implements Catalog {
                 _ingestTransformer.transform(catalog, baos);
                 log.debug("cacheIngestTransformedCatalog(): Caching ingestTransform result. Size= " + baos.size() + " bytes");
                 _clientResponseCatalogBuffer = baos.toByteArray();
+                if(_cacheTime==null)
+                    _cacheTime = new Date();
             } else {
                 log.error("cacheIngestTransformedCatalog(): Cannot cache ingest transformed catalog! Ingest transformation is a null value.");
                 _clientResponseCatalogBuffer = null;
@@ -242,12 +240,10 @@ public class LocalFileCatalog implements Catalog {
 
 
     /**
-     * CAREFUL! Only call this function if you have acquired a WriteLock for
-     * the catalog!!
      *
      * @throws Exception When it can't read the file.
      */
-    private void cacheCatalogFileContent() throws Exception {
+    private void cacheRawCatalogFileContent() throws Exception {
 
         Lock lock = _catalogLock.writeLock();
         try {

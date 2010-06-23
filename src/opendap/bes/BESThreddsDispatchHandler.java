@@ -36,7 +36,6 @@ import opendap.coreServlet.*;
 import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
