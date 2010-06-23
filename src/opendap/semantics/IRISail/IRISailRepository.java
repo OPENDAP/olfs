@@ -489,13 +489,13 @@ public class IRISailRepository extends SailRepository {
 
         postProcessFlag = ProcessingTypes.NONE;
 
-        Pattern p12 = Pattern.compile("xs:string\\(([^)]+)\\)");
+        Pattern stringPattern = Pattern.compile("xs:string\\(([^)]+)\\)");
 
-        Pattern p22 = Pattern.compile("iridl:dropquotes\\(([^)]+)\\)");
-        Pattern p23 = Pattern.compile("MINUS.*( using)?");
+        Pattern dropquotesPattern = Pattern.compile("iridl:dropquotes\\(([^)]+)\\)");
+        Pattern minusPattern = Pattern.compile("MINUS.*( using)?");
 
-        Pattern p3 = Pattern.compile("rdfcache:retypeTo");
-        Pattern p42 = Pattern.compile("xsd2owl:increment\\(([^)]+)\\)");
+        Pattern rdfCachePattern = Pattern.compile("rdfcache:retypeTo");
+        Pattern xsd2owlPattern = Pattern.compile("xsd2owl:increment\\(([^)]+)\\)");
 
         String pproces4sub2 = "\\{\\s*\\{(\\w+)\\s*\\}\\s*(.+)\\{(\\w+)\\s*\\}\\s*\\}";
         Pattern rproces4psub2 = Pattern.compile(pproces4sub2);
@@ -520,50 +520,52 @@ public class IRISailRepository extends SailRepository {
             // log.info("query string has reified statements = " + hasReified);
         }
 
-        Matcher m12 = p12.matcher(processedQueryString); // xs:string
+        Matcher stringMatcher = stringPattern.matcher(processedQueryString); // xs:string
 
-        Matcher m22 = p22.matcher(processedQueryString); // iridl:dropquotes
+        Matcher dropquotesMatcher = dropquotesPattern.matcher(processedQueryString); // iridl:dropquotes
 
-        Matcher m3 = p3.matcher(processedQueryString); // rdfcache:retypeTo
+        Matcher rdfcacheMatcher = rdfCachePattern.matcher(processedQueryString); // rdfcache:retypeTo
 
-        Matcher m42 = p42.matcher(processedQueryString); // xsd2owl:increment
-        // Pattern p_fn = Pattern.compile("(fn:(join)\\(([^)]+)\\))"); //fn:join
-        Pattern p_fn = Pattern.compile("(fn:([A-Za-z]+)\\(([^)]+)\\))"); // fn:join
+        Matcher xsd2owlMatcher = xsd2owlPattern.matcher(processedQueryString); // xsd2owl:increment
+        // Pattern processFunctionPattern = Pattern.compile("(fn:(join)\\(([^)]+)\\))"); //fn:join
+        Pattern processFunctionPattern = Pattern.compile("(fn:([A-Za-z]+)\\(([^)]+)\\))"); // fn:join
         Pattern comma = Pattern.compile(",");
 
-        Matcher m_fn = p_fn.matcher(processedQueryString);
+        Matcher processFunctionMatcher = processFunctionPattern.matcher(processedQueryString);
         String expand = "";
-        if (m12.find()) {
+        if (stringMatcher.find()) {
             postProcessFlag = ProcessingTypes.xsString;
-            String vname = m12.group(1);
-            processedQueryString = m12.replaceAll(vname);
+            String vname = stringMatcher.group(1);
+            processedQueryString = stringMatcher.replaceAll(vname);
             log.info("Will postprocess xs:string(" + vname + ")");
 
-        } else if (m22.find()) {
+        } else if (dropquotesMatcher.find()) {
             postProcessFlag = ProcessingTypes.DropQuotes;
-            String vname = m22.group(1);
-            processedQueryString = m22.replaceAll(vname);
-            Matcher m23 = p23.matcher(processedQueryString);
+            String vname = dropquotesMatcher.group(1);
+            processedQueryString = dropquotesMatcher.replaceAll(vname);
+            Matcher m23 = minusPattern.matcher(processedQueryString);
             String vname2 = m23.group(1);
             processedQueryString = m23.replaceFirst(vname2);
             log.info("Will postprocess iridl:dropquotes(" + vname + ")");
 
-        } else if (m3.find()) {
+        } else if (rdfcacheMatcher.find()) {
             postProcessFlag = ProcessingTypes.RetypeTo;
             log.info("Will postprocess rdfcache:retypeTo");
 
-        } else if (m42.find()) {
+        } else if (xsd2owlMatcher.find()) {
             postProcessFlag = ProcessingTypes.Increment;
-            String vname = m42.group(1);
+            String vname = xsd2owlMatcher.group(1);
 
-            processedQueryString = m42.replaceAll(vname);
+            processedQueryString = xsd2owlMatcher.replaceAll(vname);
 
             // log.info("processedQueryString = " + processedQueryString);
 
-        } else if (m_fn.find()) {
+        } else if (processFunctionMatcher.find()) {
 
-            String m_fn_name = m_fn.group(2);
+            String m_fn_name = processFunctionMatcher.group(2);
             log.info("matched_function_name = " + m_fn_name);
+
+
             if (m_fn_name.equals("join")) {
 
                 postProcessFlag = ProcessingTypes.Function;
@@ -574,9 +576,12 @@ public class IRISailRepository extends SailRepository {
                 postProcessFlag = ProcessingTypes.Function;
 
             }
-            String[] splittedStr = comma.split(m_fn.group(3));
+
+
+
+            String[] splittedStr = comma.split(processFunctionMatcher.group(3));
             int i = 0;
-            expand += "} fn:myfn {fn:" + m_fn.group(2)
+            expand += "} fn:myfn {fn:" + processFunctionMatcher.group(2)
                     + "} ; fn:mylist {} rdf:first {";
             for (String element : splittedStr) {
                 i++;
@@ -587,17 +592,17 @@ public class IRISailRepository extends SailRepository {
                     expand += element + "} ; rdf:rest {rdf:nil";
                     // log.info("element " + i + " = " + element);
                 }
-                log.info("Will postprocess fn:" + m_fn.group(2));
+                log.info("Will postprocess fn:" + processFunctionMatcher.group(2));
             }
             // log.info("expand = " + expand);
-            // processedQueryString = m_fn.replaceFirst(expand);
-            processedQueryString = m_fn.replaceFirst(expand);
-            m_fn = p_fn.matcher(processedQueryString);
-            if (m_fn.find()) {
-                splittedStr = comma.split(m_fn.group(3));
+            // processedQueryString = processFunctionMatcher.replaceFirst(expand);
+            processedQueryString = processFunctionMatcher.replaceFirst(expand);
+            processFunctionMatcher = processFunctionPattern.matcher(processedQueryString);
+            if (processFunctionMatcher.find()) {
+                splittedStr = comma.split(processFunctionMatcher.group(3));
                 int j = 0;
                 expand = "";
-                expand += "} fn:myfn {fn:" + m_fn.group(2)
+                expand += "} fn:myfn {fn:" + processFunctionMatcher.group(2)
                         + "} ; fn:mylist {} rdf:first {";
                 for (String element : splittedStr) {
                     j++;
@@ -609,9 +614,9 @@ public class IRISailRepository extends SailRepository {
                         // log.info("element " + j + " = " + element);
                     }
                 }
-                processedQueryString = m_fn.replaceFirst(expand);
+                processedQueryString = processFunctionMatcher.replaceFirst(expand);
             }
-            // log.info("Will postprocess fn:" +m_fn.group(2));
+            // log.info("Will postprocess fn:" +processFunctionMatcher.group(2));
         }
 
         // log.info("processedQueryString = " + processedQueryString);
@@ -2370,6 +2375,13 @@ public class IRISailRepository extends SailRepository {
 
         return wcsID;
     }
+
+
+
+
+    
+
+
 
     String getProcessingMethodDescription(Method m){
 
