@@ -452,6 +452,9 @@
                 <!-- Exclude the build directory -->
                 <exclude name="build/**"/>
 
+                <!-- Exclude the fortify directory -->
+                <exclude name="fortify/**"/>
+
                 <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="doc/javadoc/**"/>
 
