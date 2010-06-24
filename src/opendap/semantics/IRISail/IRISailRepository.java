@@ -527,11 +527,13 @@ public class IRISailRepository extends SailRepository {
         Matcher rdfcacheMatcher = rdfCachePattern.matcher(processedQueryString); // rdfcache:retypeTo
 
         Matcher xsd2owlMatcher = xsd2owlPattern.matcher(processedQueryString); // xsd2owl:increment
-        // Pattern processFunctionPattern = Pattern.compile("(fn:(join)\\(([^)]+)\\))"); //fn:join
-        Pattern processFunctionPattern = Pattern.compile("(fn:([A-Za-z]+)\\(([^)]+)\\))"); // fn:join
+        // Pattern functionPattern = Pattern.compile("(fn:(join)\\(([^)]+)\\))"); //fn:join
+        Pattern functionPattern = Pattern.compile("(fn:([A-Za-z]+)\\(([^)]+)\\))"); // fn:join
         Pattern comma = Pattern.compile(",");
 
-        Matcher processFunctionMatcher = processFunctionPattern.matcher(processedQueryString);
+        Matcher functionMatcher = functionPattern.matcher(processedQueryString);
+
+
         String expand = "";
         if (stringMatcher.find()) {
             postProcessFlag = ProcessingTypes.xsString;
@@ -560,28 +562,22 @@ public class IRISailRepository extends SailRepository {
 
             // log.info("processedQueryString = " + processedQueryString);
 
-        } else if (processFunctionMatcher.find()) {
+        } else if (functionMatcher.find()) {
 
-            String m_fn_name = processFunctionMatcher.group(2);
+            String m_fn_name = functionMatcher.group(2);
             log.info("matched_function_name = " + m_fn_name);
 
+            Method myFunction = getMethodForFunction(this,m_fn_name);
 
-            if (m_fn_name.equals("join")) {
-
+            if(myFunction!=null){
                 postProcessFlag = ProcessingTypes.Function;
-
-            }
-            if (m_fn_name.equals("getWcsId")) {
-
-                postProcessFlag = ProcessingTypes.Function;
-
             }
 
 
 
-            String[] splittedStr = comma.split(processFunctionMatcher.group(3));
+            String[] splittedStr = comma.split(functionMatcher.group(3));
             int i = 0;
-            expand += "} fn:myfn {fn:" + processFunctionMatcher.group(2)
+            expand += "} fn:myfn {fn:" + functionMatcher.group(2)
                     + "} ; fn:mylist {} rdf:first {";
             for (String element : splittedStr) {
                 i++;
@@ -592,17 +588,17 @@ public class IRISailRepository extends SailRepository {
                     expand += element + "} ; rdf:rest {rdf:nil";
                     // log.info("element " + i + " = " + element);
                 }
-                log.info("Will postprocess fn:" + processFunctionMatcher.group(2));
+                log.info("Will postprocess fn:" + functionMatcher.group(2));
             }
             // log.info("expand = " + expand);
-            // processedQueryString = processFunctionMatcher.replaceFirst(expand);
-            processedQueryString = processFunctionMatcher.replaceFirst(expand);
-            processFunctionMatcher = processFunctionPattern.matcher(processedQueryString);
-            if (processFunctionMatcher.find()) {
-                splittedStr = comma.split(processFunctionMatcher.group(3));
+            // processedQueryString = functionMatcher.replaceFirst(expand);
+            processedQueryString = functionMatcher.replaceFirst(expand);
+            functionMatcher = functionPattern.matcher(processedQueryString);
+            if (functionMatcher.find()) {
+                splittedStr = comma.split(functionMatcher.group(3));
                 int j = 0;
                 expand = "";
-                expand += "} fn:myfn {fn:" + processFunctionMatcher.group(2)
+                expand += "} fn:myfn {fn:" + functionMatcher.group(2)
                         + "} ; fn:mylist {} rdf:first {";
                 for (String element : splittedStr) {
                     j++;
@@ -614,9 +610,9 @@ public class IRISailRepository extends SailRepository {
                         // log.info("element " + j + " = " + element);
                     }
                 }
-                processedQueryString = processFunctionMatcher.replaceFirst(expand);
+                processedQueryString = functionMatcher.replaceFirst(expand);
             }
-            // log.info("Will postprocess fn:" +processFunctionMatcher.group(2));
+            // log.info("Will postprocess fn:" +functionMatcher.group(2));
         }
 
         // log.info("processedQueryString = " + processedQueryString);
@@ -2215,13 +2211,8 @@ public class IRISailRepository extends SailRepository {
 
                         fnName = obj.stringValue().substring(i + 1);
 
-                        try {
-                            func = this.getClass().getMethod(fnName, List.class, ValueFactory.class);
-                            log.debug("Located processing function: "+ getProcessingMethodDescription(func));
-                        } catch (NoSuchMethodException e) {
-                            log.error("Unable to locate processing function "+fnName+"'  msg: "+e.getMessage());
-                            func = null;
-                        }
+                        func = getMethodForFunction(this,fnName);
+
                     }
 
                     if (isSbjBn && prd.getLocalName().equals("first")) {
@@ -2271,7 +2262,7 @@ public class IRISailRepository extends SailRepository {
      * @param createValue
      * @return
      */
-    public Value join(List<String> RDFList, ValueFactory createValue) {
+    public static Value join(List<String> RDFList, ValueFactory createValue) {
         int i = 0;
         boolean joinStrIsURL = false;
         String targetObj = "";
@@ -2379,11 +2370,89 @@ public class IRISailRepository extends SailRepository {
 
 
 
-    
+    public static Method getMethodForFunction(String className, String methodName){
+
+
+        Method method;
+
+        Logger log = org.slf4j.LoggerFactory.getLogger(IRISailRepository.class);
+
+
+        try {
+            Class methodContext = Class.forName(className);
+            log.debug("getMethodForFunction() - Located java class: "+ className);
+
+            try {
+                method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
+
+                if(Modifier.isStatic(method.getModifiers())){
+                    log.debug("getMethodForFunction() - Located static java method: "+ getProcessingMethodDescription(method));
+                    return method;
+                }
+
+                /*
+
+                for(Constructor c : methodContext.getConstructors()){
+                    if(c.getGenericParameterTypes().length==0){
+                        log.debug("getMethodForFunction() - Located java class '"+className+"' with a no element " +
+                                "constructor and the method "+getProcessingMethodDescription(method));
+                        return method;
+                    }
+                }
+                */
+
+
+            }
+            catch (NoSuchMethodException e) {
+                log.error("getMethodForFunction() - The class '"+className+"' does not contain a method called '"+methodName+"'");
+            }
+
+        } catch (ClassNotFoundException e) {
+            log.error("getMethodForFunction() - Unable to locate java class: "+ className);
+        }
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. " +
+                "class: '"+ className+"'   method: '"+methodName+"'");
+        return null;
+
+
+    }
+
+
+    public static Method getMethodForFunction(Object classInstance, String methodName){
+
+
+        Method method;
+
+        Class methodContext = classInstance.getClass();
+        String className = methodContext.getName();
+
+        Logger log = org.slf4j.LoggerFactory.getLogger(IRISailRepository.class);
+
+        try {
+            method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
+            log.debug("getMethodForFunction() - Located the java method: "+ getProcessingMethodDescription(method)+
+                    " in an instance of the class '"+className+"'");
+            return method;
+
+        }
+        catch (NoSuchMethodException e) {
+            log.error("getMethodForFunction() - The class '"+className+"' does not contain a method called '"+methodName+"'");
+        }
+
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. " +
+                "class: '"+ className+"'   method: '"+methodName+"'");
+        return null;
+
+
+    }
 
 
 
-    String getProcessingMethodDescription(Method m){
+
+
+    public static String getProcessingMethodDescription(Method m){
 
 
         String msg = "";
