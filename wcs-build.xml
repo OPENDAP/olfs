@@ -213,7 +213,7 @@
 
 
     <!-- Library (class)paths -->
-    <path id="olfs.compile.classpath">
+    <path id="compile.classpath">
         <pathelement path="${build.classes}"/>
         <fileset dir="${lib.dir}">
             <include name="${servlet-api.lib}"/>
@@ -240,21 +240,6 @@
         </fileset>
     </path>
 
-    <path id="semanticWeb.compile.classpath">
-        <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
-            <include name="${owlim.lib}"/>
-            <include name="${trree.lib}"/>
-            <include name="${openrdf-sesame.lib}"/>
-            <include name="${slf4j.lib}"/>
-            <include name="${logback-core.lib}"/>
-            <include name="${logback-classic.lib}"/>
-            <include name="${saxon-jdom.lib}"/>
-            <include name="${saxon-s9api.lib}"/>
-            <include name="${saxon.lib}"/>
-            <include name="${jdom.lib}"/>
-        </fileset>
-    </path>
 
 
 
@@ -303,7 +288,7 @@
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}">
 
-            <classpath refid="olfs.compile.classpath"/>
+            <classpath refid="compile.classpath"/>
 
             <src path="${src.dir}"/>
             <include name="opendap/**/*.java"/>
@@ -313,6 +298,10 @@
         </javac>
 
     </target>
+
+
+
+
 
 
 
@@ -433,6 +422,55 @@
         <delete file="${build.dist}/index.html"/>
 
     </target>
+
+
+
+
+    <!-- *******************************************************
+
+            Semantic Web targets
+
+    -->
+    <target
+            name="compileSW"
+            depends="init"
+            description="Compiles the semanticWeb."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/semantics/**/*.java"/>
+
+        </javac>
+
+    </target>
+
+    <target  name="sw" depends="compileSW">
+
+        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
+        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
+        <copy file="${resources.dir}/WEB-INF/logback.xml" tofile="${build.classes}/logback.xml"/>
+
+        <java classname="opendap.semantics.IRISail.GettingStarted"
+              fork="true"
+              dir="${build.run}"
+                >
+            <classpath refid="compile.classpath"/>
+        </java>
+
+    </target>
+
+    <!-- *******************************************************  -->
 
 
     <target name="fortify" if="fortify.present">

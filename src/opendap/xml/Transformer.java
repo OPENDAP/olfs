@@ -171,7 +171,7 @@ public class Transformer {
 
 
 
-    private HashMap currentParameters = new HashMap<QName,XdmValue>();
+    private HashMap<QName,XdmValue> currentParameters = new HashMap<QName,XdmValue>();
 
     public void setParameter(QName name,
                              XdmValue value){
@@ -190,10 +190,9 @@ public class Transformer {
     public void clearAllParameters() throws SaxonApiException {
 
         QName qname;
-        Iterator i = currentParameters.keySet().iterator();
 
-        while(i.hasNext()){
-            qname = (QName) i.next();
+        for (QName qName : currentParameters.keySet()) {
+            qname = qName;
             setParameter(qname, null);
         }
         currentParameters.clear();

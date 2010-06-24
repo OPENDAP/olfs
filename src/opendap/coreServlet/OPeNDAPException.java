@@ -320,7 +320,7 @@ public class OPeNDAPException extends Exception {
      *
      * @param errorCode
      * @param errorMessage
-     * @return
+     * @return Return a Document containing a Dap version 3.2 error object.
      */
     public static Document getDAP32Error(int errorCode, String errorMessage) {
 

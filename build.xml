@@ -232,31 +232,9 @@
             <include name="${logback-core.lib}"/>
             <include name="${logback-classic.lib}"/>
 
-	        <include name="${owlim.lib}"/>
-            <include name="${trree.lib}"/>
-            <include name="${openrdf-sesame.lib}"/>
-
             
         </fileset>
     </path>
-
-    <path id="semanticWeb.compile.classpath">
-        <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
-            <include name="${owlim.lib}"/>
-            <include name="${trree.lib}"/>
-            <include name="${openrdf-sesame.lib}"/>
-            <include name="${slf4j.lib}"/>
-            <include name="${logback-core.lib}"/>
-            <include name="${logback-classic.lib}"/>
-            <include name="${saxon-jdom.lib}"/>
-            <include name="${saxon-s9api.lib}"/>
-            <include name="${saxon.lib}"/>
-            <include name="${jdom.lib}"/>
-        </fileset>
-    </path>
-
-
 
 
 
@@ -331,6 +309,8 @@
             <include name="opendap/**/*.java"/>
             <exclude name="opendap/experiments/**/*.java"/>
             <exclude name="opendap/metacat/**/*.java"/>
+            <exclude name="opendap/wcs/**/*.java"/>
+            <exclude name="opendap/semantics/**/*.java"/>
 
         </javac>
 
@@ -338,111 +318,7 @@
 
 
 
-    <!-- *******************************************************
 
-            Semantic Web targets
-
-    -->
-    <target
-            name="compileSW"
-            depends="init"
-            description="Compiles the semanticWeb."
-            >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <classpath refid="semanticWeb.compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/semantics/**/*.java"/>
-
-        </javac>
-
-    </target>
-
-    <target  name="sw" depends="compileSW">
-
-        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
-        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
-        <copy file="${resources.dir}/WEB-INF/logback.xml" tofile="${build.classes}/logback.xml"/>
-
-        <java classname="opendap.semantics.IRISail.GettingStarted"
-              fork="true"
-              dir="${build.run}"
-                >
-            <classpath refid="semanticWeb.compile.classpath"/>
-        </java>
-
-    </target>
-
-    <!-- *******************************************************  -->
-
-
-
-    <!-- *******************************************************
-
-            THREDDS Catalog Crawler targets
-
-    -->
-
-    <path id="threddsCatalogCrawler.compile.classpath">
-        <pathelement path="${build.classes}"/>
-        <fileset dir="${lib.dir}">
-            <include name="${slf4j.lib}"/>
-            <include name="${logback-core.lib}"/>
-            <include name="${logback-classic.lib}"/>
-            <include name="${jdom.lib}"/>
-            <include name="${commons-cli.lib}"/>
-        </fileset>
-    </path>
-
-
-
-    <target
-        name="compileTCC"
-        depends="init"
-        description="Compiles the THREDDS Catalog Crawler."
-        >
-        <echo level="info" message="AntFile: ${ant.file} Compiling THREDDS Catalog Crawler"/>
-        <echo level="info"
-            message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-        <javac compiler="${build.compiler}"
-            destdir="${build.classes}"
-            debug="${compile.debug}"
-            debuglevel="${compile.debuglevel}"
-            deprecation="${compile.deprecation}">
-            
-            <classpath refid="threddsCatalogCrawler.compile.classpath"/>
-            
-            <src path="${src.dir}"/>
-            <include name="opendap/semantics/IRISail/ThreddsCatalogUtil.java"/>
-            
-        </javac>
-        
-    </target>
-    
-    <target  name="tcc" depends="compileTCC">
-        
-        <copy file="${resources.dir}/WEB-INF/logback.xml" tofile="${build.classes}/logback.xml"/>
-        
-        <java classname="opendap.semantics.IRISail.ThreddsCatalogUtil"
-            fork="true"
-            dir="${build.run}">
-        	<!--arg line="-r"/-->
-            <classpath refid="threddsCatalogCrawler.compile.classpath"/>        
-        </java>
-        
-    </target>
-
-   <!-- *******************************************************  -->
 
     <target
             name="olfs-experiments"
@@ -506,7 +382,13 @@
                 >
             <classpath refid="olfs.compile.classpath"/>
 
-            <packageset dir="${src.dir}" defaultexcludes="yes" />
+            <packageset dir="${src.dir}" defaultexcludes="yes">
+                <exclude name="opendap/semantics/**"/>
+                <exclude name="opendap/wcs/**"/>
+                <exclude name="opendap/experiments/**"/>
+                <exclude name="opendap/metacat/**"/>
+            </packageset>
+
 
         </javadoc>
 

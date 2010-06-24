@@ -90,7 +90,7 @@ public class ServletUtil {
      * runtime.
      *
      * @param servlet
-     * @return
+     * @return Returns the path to the web applications "context" directory 
      */
     public static String getContextPath( HttpServlet servlet ) {
 /*
