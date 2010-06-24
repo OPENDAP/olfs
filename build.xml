@@ -481,8 +481,8 @@
                 <!-- Exclude the _notes directory in the ${doc.dir} dir -->
                 <exclude name="doc/_notes/**"/>
 
-                <!-- Exclude the IntelliJ IDEA spoor -->
-                <exclude name="out/_notes/**"/>
+                <!-- Exclude the IntelliJ IDEA spore -->
+                <exclude name="out/**"/>
                 <exclude name="**/*.iml"/>
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
