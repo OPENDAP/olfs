@@ -467,8 +467,14 @@
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
 
+                <!-- Exclude the THREDDS jnlp apps -->
+                <exclude name="resources/THREDDS/**"/>
+
+
+
                 <!-- Exclude the WCS and semantics code  -->
                 <exclude name="wcs-build.xml"/>
+                <exclude name="resources/WCS/**"/>
                 <exclude name="src/opendap/wcsGateway/**"/>
                 <exclude name="src/opendap/wcs/**"/>
                 <exclude name="src/opendap/semantics/**"/>
@@ -648,10 +654,6 @@
                 <include name="${logback-core.lib}"/>
                 <include name="${logback-classic.lib}"/>
 
-	            <include name="${owlim.lib}"/>
-                <include name="${trree.lib}"/>
-                <include name="${openrdf-sesame.lib}"/>
-
             </lib>
             <classes dir="${build.classes}"/>
 
@@ -660,7 +662,10 @@
                 <exclude name="_notes"/>
             </zipfileset>
 
+
+            <!--
             <zipfileset dir="${THREDDSResources.dir}/views" prefix="views"/>
+            -->
 
 
             <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>
@@ -682,10 +687,6 @@
             </zipfileset>
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">
-                <include name="**/*"/>
-            </zipfileset>
-
-            <zipfileset dir="${WCS.dir}" prefix="WCS">
                 <include name="**/*"/>
             </zipfileset>
 

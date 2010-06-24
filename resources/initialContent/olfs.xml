@@ -49,22 +49,6 @@
 
             <!-- </Handler>  -->
 
-            <!-- Handler className="opendap.wcs.v1_1_2.DispatchHandler">
-                <prefix>WCS</prefix>
-                <ServiceIdentification>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/ioos/apache-tomcat-6.0.14/content/opendap/WCS/ServiceIdentification.xml</ServiceIdentification>
-                <ServiceProvider>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/ioos/apache-tomcat-6.0.14/content/opendap/WCS/ServiceProvider.xml</ServiceProvider>
-                <OperationsMetadata>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/ioos/apache-tomcat-6.0.14/content/opendap/WCS/OperationsMetadata.xml</OperationsMetadata>
-                <WcsCatalog className="opendap.wcs.v1_1_2.LocalFileCatalog">
-                    <CoveragesDirectory>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/ioos/apache-tomcat-6.0.14/content/opendap/WCS/coverages</CoveragesDirectory>
-                </WcsCatalog>
-            </Handler -->
-
-
-
-
-            <!-- Handler className="opendap.wcs.v1_1_2.DispatchHandler">
-                <prefix>WCS</prefix>
-            </Handler -->
 
             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
                 <prefix>thredds</prefix>
@@ -101,17 +85,6 @@
 
 
         <HttpPostHandlers>
-
-            <Handler className="opendap.wcs.v1_1_2.PostHandler" >
-                <prefix>WCS/post</prefix>
-            </Handler>
-            <Handler className="opendap.wcs.v1_1_2.SoapHandler" >
-                <prefix>WCS/soap</prefix>
-            </Handler>
-            <Handler className="opendap.wcs.v1_1_2.FormHandler" >
-                <prefix>WCS/form</prefix>
-            </Handler>
-
 
             <Handler className="opendap.coreServlet.SOAPRequestDispatcher" >
                 <OpendapSoapDispatchHandler>opendap.bes.SoapDispatchHandler</OpendapSoapDispatchHandler>
