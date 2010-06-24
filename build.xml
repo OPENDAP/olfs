@@ -46,7 +46,8 @@
          line by the distribution build script using
          tag information from CVS.
     -->
-    <property name="VERSION" value="Not.A.Release"/>
+    <property name="HYRAX_VERSION" value="Not.A.Release"/>
+    <property name="OLFS_VERSION"  value="Not.A.Release"/>
 
 
     <!-- Compiler Settings -->
@@ -116,7 +117,8 @@
 
         <echo level="info" message="Project Name:       ${ant.project.name}"/>
         <echo level="info" message="Project File:       ${ant.file}"/>
-        <echo level="info" message="VERSION:            ${VERSION}"/>
+        <echo level="info" message="Hyrax Version:      ${HYRAX_VERSION}"/>
+        <echo level="info" message="Olfs Version:       ${OLFS_VERSION}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="    src.dir:       ${src.dir}"/>
@@ -170,6 +172,7 @@
     <property name="build.dist" location="${build.dir}/dist"/>
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.src" location="${build.dir}/src"/>
 
 
     <!-- Libraries -->
@@ -258,8 +261,10 @@
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.lib}"/>
         <mkdir dir="${build.run}"/>
+        <mkdir dir="${build.src}"/>
 
-        <filter token="HyraxVersion" value="${VERSION}"/>
+        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
+        <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -286,17 +291,51 @@
     </target>
 
 
+    <target  name="PreProcessSourceCode"
+             depends="init"
+             description="Moves selected source code from the development tree into
+             the build/src directory. The code text is filtered to update version numbers.">
+
+        <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=""/>
+
+
+        <copy todir="${build.src}" filtering="true">
+          <fileset dir="${src.dir}">
+
+              <!-- include all the java files -->
+              <include name="opendap/**/*.java"/>
+
+              <!-- Exclude the experimental code  -->
+              <exclude name="opendap/experiments/**/*.java"/>
+
+              <!-- Exclude the Metacat code  -->
+              <exclude name="opendap/metacat/**/*.java"/>
+
+              <!-- Exclude the WCS and semantics code  -->
+              <exclude name="opendap/wcsGateway/**"/>
+              <exclude name="opendap/wcs/**"/>
+              <exclude name="opendap/semantics/**"/>
+
+          </fileset>
+
+        </copy>
+
+
+
+    </target>
 
 
     <target
             name="compile"
-            depends="init"
+            depends="PreProcessSourceCode"
             description="Compiles the OLFS."
             >
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
+
         <javac compiler="${build.compiler}"
                destdir="${build.classes}"
                debug="${compile.debug}"
@@ -305,19 +344,7 @@
 
             <classpath refid="olfs.compile.classpath"/>
 
-            <src path="${src.dir}"/>
-            <include name="opendap/**/*.java"/>
-
-            <!-- Exclude the experimantal code  -->            
-            <exclude name="opendap/experiments/**/*.java"/>
-
-            <!-- Exclude the Metacat code  -->
-            <exclude name="opendap/metacat/**/*.java"/>
-
-            <!-- Exclude the WCS and semantics code  -->
-            <exclude name="opendap/wcsGateway/**"/>
-            <exclude name="opendap/wcs/**"/>
-            <exclude name="opendap/semantics/**"/>
+            <src path="${build.src}"/>
 
         </javac>
 
@@ -336,6 +363,10 @@
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
+
+
+
+
         <javac compiler="${build.compiler}"
                destdir="${build.classes}"
                debug="${compile.debug}"
@@ -355,7 +386,7 @@
 
 
     <target name="olfs-lib" depends="clean,compile">
-        <jar destfile="${build.lib}/olfs-${VERSION}.jar">
+        <jar destfile="${build.lib}/olfs-${OLFS_VERSION}.jar">
             <fileset dir="${build.classes}">
                 <exclude name="hao/**/*.class"/>
             </fileset>
@@ -365,7 +396,7 @@
 
 
     <target name="soap-lib" depends="clean,compile">
-        <jar destfile="${build.lib}/opendap-soap-${VERSION}.jar">
+        <jar destfile="${build.lib}/opendap-soap-${OLFS_VERSION}.jar">
             <fileset dir="${build.classes}">
                 <include name="opendap/soap/**/*.class"/>
             </fileset>
@@ -376,7 +407,7 @@
 
     <target
             name="doc"
-            depends="init,clean,IsJavaDocUpToDate"
+            depends="clean,PreProcessSourceCode,IsJavaDocUpToDate"
             description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
             unless="JavaDocIsUpToDate"
             >
@@ -389,18 +420,7 @@
                 >
             <classpath refid="olfs.compile.classpath"/>
 
-            <packageset dir="${src.dir}" defaultexcludes="yes">
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
-
-                <!-- Exclude the metacat project  -->
-                <exclude name="opendap/metacat/**"/>
-
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcsGateway/**"/>
-                <exclude name="opendap/wcs/**"/>
-                <exclude name="opendap/semantics/**"/>
-            </packageset>
+            <packageset dir="${build.src}" defaultexcludes="yes"/>
 
 
         </javadoc>
@@ -428,10 +448,10 @@
             description="Builds documentation distribution"
             >
 
-        <tar destfile="${build.dist}/olfs-${VERSION}-doc.tgz"
+        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-doc.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.doc}" prefix="olfs-${VERSION}-doc"/>
+            <zipfileset dir="${build.doc}" prefix="olfs-${OLFS_VERSION}-doc"/>
         </tar>
 
     </target>
@@ -439,15 +459,15 @@
 
     <target
             name="src-dist"
-            depends="clean,init"
+            depends="clean,PreProcessSourceCode"
             description="Builds source distribution"
             >
 
-        <tar destfile="${build.dist}/olfs-${VERSION}-src.tgz"
+        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-src.tgz"
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="olfs-${VERSION}-src">
+            <zipfileset dir="." prefix="olfs-${OLFS_VERSION}-src">
 
                 <!-- Exclude the build directory -->
                 <exclude name="build/**"/>
@@ -470,8 +490,6 @@
                 <!-- Exclude the THREDDS jnlp apps -->
                 <exclude name="resources/THREDDS/**"/>
 
-
-
                 <!-- Exclude the WCS and semantics code  -->
                 <exclude name="wcs-build.xml"/>
                 <exclude name="resources/WCS/**"/>
@@ -480,6 +498,7 @@
                 <exclude name="src/opendap/semantics/**"/>
 
             </zipfileset>
+
 
         </tar>
 
@@ -493,10 +512,10 @@
         <copy file="${distributionResources.dir}/WarFileReadMe"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/olfs-${VERSION}-webapp.tgz"
+        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-webapp.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.dist}" prefix="olfs-${VERSION}-webapp">
+            <zipfileset dir="${build.dist}" prefix="olfs-${OLFS_VERSION}-webapp">
                 <include name="opendap.war"/>
                 <include name="README"/>
             </zipfileset>
