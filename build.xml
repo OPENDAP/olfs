@@ -307,10 +307,17 @@
 
             <src path="${src.dir}"/>
             <include name="opendap/**/*.java"/>
+
+            <!-- Exclude the experimantal code  -->            
             <exclude name="opendap/experiments/**/*.java"/>
+
+            <!-- Exclude the Metacat code  -->
             <exclude name="opendap/metacat/**/*.java"/>
-            <exclude name="opendap/wcs/**/*.java"/>
-            <exclude name="opendap/semantics/**/*.java"/>
+
+            <!-- Exclude the WCS and semantics code  -->
+            <exclude name="opendap/wcsGateway/**"/>
+            <exclude name="opendap/wcs/**"/>
+            <exclude name="opendap/semantics/**"/>
 
         </javac>
 
@@ -323,7 +330,7 @@
     <target
             name="olfs-experiments"
             depends="init"
-            description="Compiles the OLFS."
+            description="Compiles the experimental code."
             >
         <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
         <echo level="info"
@@ -383,10 +390,16 @@
             <classpath refid="olfs.compile.classpath"/>
 
             <packageset dir="${src.dir}" defaultexcludes="yes">
-                <exclude name="opendap/semantics/**"/>
-                <exclude name="opendap/wcs/**"/>
+                <!-- Exclude the experimental code  -->
                 <exclude name="opendap/experiments/**"/>
+
+                <!-- Exclude the metacat project  -->
                 <exclude name="opendap/metacat/**"/>
+
+                <!-- Exclude the WCS and semantics code  -->
+                <exclude name="opendap/wcsGateway/**"/>
+                <exclude name="opendap/wcs/**"/>
+                <exclude name="opendap/semantics/**"/>
             </packageset>
 
 
@@ -435,14 +448,28 @@
                 >
 
             <zipfileset dir="." prefix="olfs-${VERSION}-src">
+
+                <!-- Exclude the build directory -->
                 <exclude name="build/**"/>
-                <exclude name="doc/javadoc/**"/>
+
                 <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="doc/_notes/**"/>
+                <exclude name="doc/javadoc/**"/>
+
                 <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="doc/_notes/**"/>
+
+                <!-- Exclude the IntelliJ IDEA spoor -->
+                <exclude name="out/_notes/**"/>
                 <exclude name="**/*.iml"/>
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
+
+                <!-- Exclude the WCS and semantics code  -->
+                <exclude name="wcs-build.xml"/>
+                <exclude name="src/opendap/wcsGateway/**"/>
+                <exclude name="src/opendap/wcs/**"/>
+                <exclude name="src/opendap/semantics/**"/>
+
             </zipfileset>
 
         </tar>

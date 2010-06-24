@@ -25,7 +25,6 @@ package opendap.namespaces;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
-import opendap.wcs.v1_1_2.WcsException;
 
 /**
  * Created by IntelliJ IDEA.

@@ -18,7 +18,7 @@ To install the OLFS:
    for more information on that.
 
 
-2) Get and install Apache Tomcat 5.5 (or newer - your milage may vary) from:
+2) Get and install Apache Tomcat 6.x (or newer - your milage may vary) from:
 
         http://tomcat.apache.org.
 
