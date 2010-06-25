@@ -69,7 +69,6 @@ public class DDXRetriever {
 	public DDXRetriever(boolean useCache, String namePrefix) {
 		
 		this.useCache = useCache;
-		//this.namePrefix = namePrefix;
 		
 		// The first parameter to DDXCache() restores the cache from its
 		// persistent form and will cause the cache to be written when 
@@ -187,8 +186,8 @@ public class DDXRetriever {
 		/*
 		 * To convert the InputStream to String we use the
 		 * BufferedReader.readLine() method. We iterate until the BufferedReader
-		 * return null which means there's no more data to read. Each line will
-		 * appended to a StringBuilder and returned as String.
+		 * returns null which means there's no more data to read. Each line will
+		 * be appended to a StringBuilder and the result returned as a String.
 		 */
 		if (is != null) {
 			StringBuilder sb = new StringBuilder();
@@ -214,11 +213,11 @@ public class DDXRetriever {
 	 * built with caching turned on, this uses a poor man's HTTP/1.1 cache
 	 * based on Last Modified Times. 
 	 * 
-	 *  If caching is on, then calling this on a series of DDX URLs will fill
-	 *  the cache. If the cache is saved and later used again it is possible
-	 *  to re-read the URLs straight from the cache.
+	 * If caching is on, then calling this on a series of DDX URLs will fill
+	 * the cache. If the cache is saved and later used again it is possible
+	 * to re-read the URLs straight from the cache.
 	 *  
-	 *  @see getCache()
+	 * @see getCache()
 	 * @param DDXURL Get the DDX referenced by this URL
 	 * @return The DDX document, in a String
 	 * @throws Exception 

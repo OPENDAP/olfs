@@ -1,6 +1,4 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
-//
 //
 // Copyright (c) 2010 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
@@ -58,16 +56,19 @@ import opendap.metacat.ResponseCachePostgres;
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 
-/**
- * Created by IntelliJ IDEA. User: ndp Date: Dec 1, 2009 Time: 7:37:51 AM To
- * change this template use File | Settings | File Templates.
+/*
+ * A set of utilities that simplify using THREDDS catalogs. This code can be
+ * used to build various kinds of data set crawlers including THREDDS and DDX
+ * response crawlers.
+ * 
+ * @note Based on code written by Nathan Potter. 
  */
 public class ThreddsCatalogUtil {
 
 	private boolean writeToCache = false;
 	private boolean readFromCache = false;
 	
-	private boolean restoreCrawlState = false;
+	/* private boolean restoreCrawlState = false;m */
 	
 	private XMLOutputter xmlo = null;
 	
@@ -88,14 +89,15 @@ public class ThreddsCatalogUtil {
 	 * @param readFromCache Arrange for the TCU class to read Thredds catalogs
 	 * from the postgres cache.
 	 */
+	/*
 	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) {
 		this(writeToCache, namePrefix, readFromCache, false);
 	}
-
-	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache, boolean restoreCrawlState) {
+	*/
+	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache/*, boolean restoreCrawlState*/) {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-		this.restoreCrawlState = restoreCrawlState;
+		/* this.restoreCrawlState = restoreCrawlState; */
 		
 		if (writeToCache || readFromCache) {
 			log.debug("Configuring caching in ThreddsCatalogUtil.");
@@ -140,11 +142,12 @@ public class ThreddsCatalogUtil {
 		threddsCrawlerEnumeration() throws Exception {
 			childURLs = new Stack<String>();
 			restoreState();
-			/*
+
+			// All of this is debug output...
+			log.debug("Statck has " + new Integer(childURLs.size()).toString() + " elements:");
 			Enumeration<String> urls = childURLs.elements();
 			while (urls.hasMoreElements())
 				log.debug("childURLs: " + urls.nextElement());
-			*/
 		}
 		
 		private void recur(String catalogURL) {
@@ -443,16 +446,30 @@ public class ThreddsCatalogUtil {
 	 * @throws Exception Thrown if the cache cannot be configured
 	 */
 	public Enumeration<String> getCatalogEnumeration(String topCatalog) throws Exception {
+		log.debug("Seeding the crawl with [" + topCatalog + "]");
 		return new threddsCrawlerEnumeration(topCatalog);
 	}
 	
 	/**
-	 * Resume an interupted crawl.
-	 * @return An enumberation of Strings, bound up in a 
-	 * threddsCrawlerEnumeration object. 
-	 * @throws Exception Thrown if the cache cannot be configured
+	 * Resume an interrupted crawl. Suppose that the previous crawl ended with
+	 * some elements still on the stack of catalogs to be visited - then that
+	 * stack will be saved and used as a starting point when this method is
+	 * used. This provides some protection in case the network fails during a
+	 * long crawl.
+	 * 
+	 * @note In order to get this method to work, the
+	 *       threddsCrawlerEnumeration.saveState() method must be called first
+	 *       (by a previous run). That means that a crawler needs to trap
+	 *       conditions that will stop a crawl and ake sure that method is
+	 *       called before exiting.
+	 * 
+	 * @return An enumeration of Strings, bound up in a
+	 *         threddsCrawlerEnumeration object.
+	 * @throws Exception
+	 *             Thrown if the cache cannot be configured
 	 */
 	public Enumeration<String> getCatalogEnumeration() throws Exception {
+		log.debug("Restart a crawl from saved catalogs on the stack.");
 		return new threddsCrawlerEnumeration();
 	}
 
