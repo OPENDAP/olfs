@@ -54,7 +54,7 @@ saxon 9. -->
             </xsl:when>
             
             <xsl:otherwise>
-                Title not found. <xsl:value-of select="$ddx2eml_version"/>
+                Institution not found. <xsl:value-of select="$ddx2eml_version"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
@@ -70,7 +70,7 @@ saxon 9. -->
             </xsl:when>
             
             <xsl:otherwise>
-                Title not found. <xsl:value-of select="$ddx2eml_version"/>
+                Contact not found. <xsl:value-of select="$ddx2eml_version"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>

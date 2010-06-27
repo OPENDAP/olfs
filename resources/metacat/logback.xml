@@ -3,9 +3,8 @@
 
     <property name="logdir" value="DapIngest"/>
     
-    <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
-    <property name="DEBUG" value="%date %level [%thread] [%file:%line] %msg%n"/>
+    <property name="DEBUG" value="[%thread] [%file:%line] %msg%n"/>
     <property name="InfoFormat" value="[%file:%line] %msg%n" />
     
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
@@ -67,15 +66,15 @@
         </layout>
     </appender>
     
-    <logger name="opendap.metacat" level="ERROR">
+    <!--logger name="opendap.metacat" level="ERROR">
         <appender-ref ref="ErrorLog"/>
-    </logger>
+    </logger-->
     <!--logger name="opendap.metacat.ThreddsCatalogUtil" level="ERROR">
         <appender-ref ref="ErrorLog"/>
     </logger-->
     
-    <!--logger name="opendap" level="ERROR">
+    <logger name="opendap" level="ERROR">
         <appender-ref ref="ErrorLog"/>
-    </logger-->
+    </logger>
 
 </configuration>
