@@ -171,9 +171,6 @@ saxon 9. -->
                     </southBoundingCoordinate>
                 </boundingCoordinates>
             </geographicCoverage>
-        </coverage>
-
-        <coverage>
             <temporalCoverage>
                 <rangeOfDates>
                     <beginDate>
@@ -194,9 +191,7 @@ saxon 9. -->
                                 select="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='stop_date']"
                             />
                         </calendarDate>
-                        <time>
-                            <xsl:value-of
-                                select="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='stop_time']"
+                        <time><xsl:value-of select="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='stop_time']"
                             />
                         </time>
                     </endDate>
@@ -205,6 +200,7 @@ saxon 9. -->
         </coverage>
 
         <entityType>Online data accessible using DAP 2.0</entityType>
+ 
         </otherEntity>
     </xsl:template>
 
