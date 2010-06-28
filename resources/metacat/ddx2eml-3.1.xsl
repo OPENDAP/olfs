@@ -51,16 +51,10 @@ saxon 9. -->
 
     <xsl:template name="abstract">
         <abstract>
-            <!-- For this information, I'm using a little HTML since XML is
-                nominally devoid of non-element formatting stuff and I want the
-                listishness of this para to be retained no matter what happens
-                during the rendering operation. -->
             <para>This URL contains the following DAP Grid variables:
-                <ul>
-                <xsl:for-each select="dap:Grid">
-                    <li><xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>)</li>
+                 <xsl:for-each select="dap:Grid">
+                    <xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>)
                 </xsl:for-each>
-                </ul>
             </para>
             <xsl:text>
             </xsl:text>
