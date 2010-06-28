@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This stylesheet produces valid EML but it may not be as useful as we
-    want. In version 3.1.0 I'm moving the <coverage> element out of the
-    <otherEntity> element to 'global' scope. Also, the next version might
-    have separate elements (<otherEntity> or <attribute...>) for each Grid. -->
-
 <!-- This stylesheet will not work with Xalan or Saxon 6 but does work with
 saxon 9. -->
 
@@ -15,13 +10,6 @@ saxon 9. -->
     xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:dap="http://xml.opendap.org/ns/DAP2"
     xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_1_0/eml.xsd"
     xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
-
-    <!-- This odd variable definition is how you get a newline in the output
-        which goes a long way toward making the result readable -->
-    <xsl:variable name="newline">
-        <xsl:text>
-</xsl:text>
-    </xsl:variable>
 
     <!-- PackageId should be something that's likely to be unique 
         and also be machine and location independent. I'm going to 
@@ -46,6 +34,9 @@ saxon 9. -->
                 <xsl:value-of select="$filename"/>
             </xsl:attribute>
             <xsl:attribute name="system">DAP</xsl:attribute>
+            
+            <!-- TODO: Here we should test for Conventions == CF-1.0 or 1.1 -->
+            
             <dataset>
                 <xsl:call-template name="title"/>
                 <xsl:call-template name="creator"/>
@@ -60,10 +51,16 @@ saxon 9. -->
 
     <xsl:template name="abstract">
         <abstract>
+            <!-- For this information, I'm using a little HTML since XML is
+                nominally devoid of non-element formatting stuff and I want the
+                listishness of this para to be retained no matter what happens
+                during the rendering operation. -->
             <para>This URL contains the following DAP Grid variables:
+                <ul>
                 <xsl:for-each select="dap:Grid">
-                    <xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>)
+                    <li><xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>)</li>
                 </xsl:for-each>
+                </ul>
             </para>
             <xsl:text>
             </xsl:text>
@@ -150,7 +147,7 @@ saxon 9. -->
     </xsl:template>
 
     <xsl:template name="coverage">
-        <coverage>
+        <coverage id="coverage_dataset">
             <geographicCoverage>
                 <geographicDescription>See 'boundingCoordinates'.</geographicDescription>
                 
@@ -286,7 +283,9 @@ saxon 9. -->
                     </online>
                 </distribution>
             </physical>
-            
+            <coverage>
+                <references>coverage_dataset</references>
+            </coverage>
             <entityType>Online data accessible using DAP 2.0</entityType>
             
         </otherEntity>
