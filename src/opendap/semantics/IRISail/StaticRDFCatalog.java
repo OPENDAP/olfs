@@ -652,7 +652,23 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         // This bothers me: Before we moved these HashMaps int the IRISailRepository it was a general purpose class for
         // twiddling with Semantics - no it's a specialization of that general class for WCS. 
         owlse2.updateIdCaches();
-        
+
+        /*
+
+        try {
+            HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL());
+            CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
+        } catch (RepositoryException e) {
+            log.error("getCoverageIDServerURL(): Caught RepositoryException. msg: "
+                    + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("getCoverageIDServerURL(): Caught MalformedQueryException. msg: "
+                    + e.getMessage());
+        } catch (QueryEvaluationException e) {
+            log.error("getCoverageIDServerURL(): Caught QueryEvaluationException. msg: "
+                    + e.getMessage());
+        }
+        */
 
     }
 
@@ -1186,8 +1202,10 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
                 "{} wcs:CoverageDescription {coverageurl} wcs:Identifier {coverageid} " +
                 "USING NAMESPACE " +
                 "wcs = <http://www.opengis.net/wcs/1.1#>";
+
+
         RepositoryConnection con = owlse2.getConnection();
-        log.debug("query coverage ID and server URL: \n" + queryString);
+        log.debug("QueryString (coverage ID and server URL): \n" + queryString);
         TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
 
         result = tupleQuery.evaluate();
@@ -1457,39 +1475,5 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
-
-
-    private String getServerUrlString(URL url) {
-
-        String baseURL = null;
-
-        String protocol = url.getProtocol();
-
-        if (protocol.equalsIgnoreCase("file")) {
-            log.debug("Protocol is FILE.");
-
-        } else if (protocol.equalsIgnoreCase("http")) {
-            log.debug("Protocol is HTTP.");
-
-            String host = url.getHost();
-            String path = url.getPath();
-            int port = url.getPort();
-
-            baseURL = protocol + "://" + host;
-
-            if (port != -1)
-                baseURL += ":" + port;
-        }
-
-        log.debug("ServerURL: " + baseURL);
-
-        return baseURL;
-
-    }
-
-
-
-              
 
 }
