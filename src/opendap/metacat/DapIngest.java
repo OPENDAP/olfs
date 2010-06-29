@@ -67,7 +67,7 @@ public class DapIngest {
     private DDXRetriever DDXSource;
     
     // Caching EML access
-    private EMLRetriever EMLSource;
+    private EMLBuilder EMLSource;
     
     // This provides a way to get catalogs, iterate over their child URLs and
     // access DDX urls to datasets in the catalog
@@ -90,7 +90,7 @@ public class DapIngest {
     	try {
     		DDXSource = new DDXRetriever(useDDXCache, cacheNamePrefix);
 			
-    		EMLSource = new EMLRetriever(useEMLCache, cacheNamePrefix);
+    		EMLSource = new EMLBuilder(useEMLCache, cacheNamePrefix);
  		} 
     	catch (SaxonApiException e) {
 			log.debug("Transform returned an SaxonApiException: " + e.getLocalizedMessage());

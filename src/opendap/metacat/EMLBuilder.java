@@ -50,11 +50,11 @@ import org.slf4j.LoggerFactory;
  * @author jimg
  * 
  */
-public class EMLRetriever {
+public class EMLBuilder {
 
-	final static String ddx2emlPath = "ddx2eml-2.1.1.xsl";
+	final static String ddx2emlPath = "ddx2eml-3.1.xsl";
 
-	private static Logger log = LoggerFactory.getLogger(EMLRetriever.class);
+	private static Logger log = LoggerFactory.getLogger(EMLBuilder.class);
 
 	// The EMLCache that holds both the DDXs LMT and the EML XML/text
 	private ResponseCachePostgres EMLCache = null;
@@ -64,11 +64,11 @@ public class EMLRetriever {
 
     private boolean verbose = false;
     
-	public EMLRetriever() throws Exception {
+	public EMLBuilder() throws Exception {
 		this(false, "");
 	}
 
-	public EMLRetriever(boolean useCache, String namePrefix) throws Exception{
+	public EMLBuilder(boolean useCache, String namePrefix) throws Exception{
 
 		try {
 			transformer = new Transformer(ddx2emlPath);
@@ -97,7 +97,7 @@ public class EMLRetriever {
 	 */
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
-		EMLRetriever retriever = null;
+		EMLBuilder retriever = null;
 
 		// create the command line parser
 		CommandLineParser parser = new PosixParser();
@@ -134,7 +134,7 @@ public class EMLRetriever {
 			boolean useCache = !line.hasOption("n");
 			String cacheNamePrefix = line.getOptionValue("cache-name");
 
-			retriever = new EMLRetriever(useCache, cacheNamePrefix);
+			retriever = new EMLBuilder(useCache, cacheNamePrefix);
 
 			retriever.verbose = line.hasOption("v");
 			if (retriever.verbose) {
@@ -145,32 +145,33 @@ public class EMLRetriever {
 				if (retriever.verbose) {
 					System.out.println("EML: "
 							+ retriever.getCachedEMLDoc(ddxURL));
-				} else {
+				} 
+				else {
 					System.out.println(retriever.getCachedEMLDoc(ddxURL));
 				}
-			} else if (line.hasOption("p")) {
-				Enumeration<String> emls = retriever.EMLCache
-						.getLastVisitedKeys();
+			} 
+			else if (line.hasOption("p")) {
+				Enumeration<String> emls = retriever.EMLCache.getLastVisitedKeys();
 				while (emls.hasMoreElements()) {
 					ddxURL = emls.nextElement();
 					if (retriever.verbose) {
 						System.out.println("DDX URL: " + ddxURL);
 						System.out.println("EML: "
 								+ retriever.EMLCache.getCachedResponse(ddxURL));
-					} else {
-						System.out.println(retriever.EMLCache
-								.getCachedResponse(ddxURL));
+					} 
+					else {
+						System.out.println(retriever.EMLCache.getCachedResponse(ddxURL));
 					}
 				}
-			} else {
+			} 
+			else {
 				DDXRetriever ddxSource = new DDXRetriever(true, cacheNamePrefix);
 				if (retriever.verbose) {
 					System.out.println("EML: "
-							+ retriever.getEML(ddxURL, ddxSource
-									.getDDXDoc(ddxURL)));
-				} else {
-					System.out.println(retriever.getEML(ddxURL, ddxSource
-							.getDDXDoc(ddxURL)));
+							+ retriever.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
+				} 
+				else {
+					System.out.println(retriever.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
 				}
 			}
 
@@ -226,7 +227,7 @@ public class EMLRetriever {
 	}
 	
 	/**
-	 * Build and cache an EML docuemnt using the given DDX document. Use the 
+	 * Build and cache an EML document using the given DDX document. Use the 
 	 * DDX's URL as the key for the cache entry. If caching is not on, ignore
 	 * the DDX URL and don't use the cache.
 	 * 

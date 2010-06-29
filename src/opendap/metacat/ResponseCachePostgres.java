@@ -52,9 +52,15 @@ import java.sql.*;
  * cache can also be used directly to process a collection of Responses
  * retrieved earlier.
  * 
- * The cache uses Postgres to store the information responses and a 
- * ConcurrentHashMap that it serializes those to disk files for persisteance to
- * store the LMT times of the URLs visited. 
+ * The cache uses Postgres to store the information responses (i.e., documents)
+ * and a ConcurrentHashMap (that it serializes those to disk files for
+ * persistence) to store the LMT times of the URLs visited. In order for
+ * Postgres to be used as the cache, the database must be setup. There must be
+ * a database called 'crawl_cache' and it should have a table whose name will
+ * be passed to the constructor of this class using the 'tableName' parameter.
+ * That table should have columns named: key, url and doc. Make these using
+ * "CREATE TABLE ddx_responses (key SERIAL PRIMARY KEY, url varchar(256), 
+ * doc text);" where 'ddx_responses' is the value of 'tableName'.
  * 
  * This class was modified from a version that could optionally use a hash map
  * to store the responses.
@@ -67,20 +73,20 @@ import java.sql.*;
  *       was no difference bewteen the time associated with saving the DDXs and
  *       LMT in the cache and not (so caching had no discernable overhead in
  *       this example)
- *       
+ * 
  * @note More performance information (4/28/10): Memory use. I retrieved ~43K
- *       THREDDS catalogs and the space required was approximately 1GB. The 
+ *       THREDDS catalogs and the space required was approximately 1GB. The
  *       catalogs were generally uniform and about 1.2K each, so 43,000 should
  *       have used about 53MB of storage space.
- *       
- * @note Switched to Postgres for the cache (which is really a misnomer, its 
- * 	     not a true cache but a persistent record of the crawl). 42K catalogs
- *       read and stored in ~5 hours. I'm still using the ConcurrentHashMap
- *       to store the 'visited' information. I've also tried the Java caching
- *       system (JCS) but that seems to be designed as a true cache where it's
- *       not possible to be sure a previously cached item is still in the cache.
+ * 
+ * @note Switched to Postgres for the cache (which is really a misnomer, its not
+ *       a true cache but a persistent record of the crawl). 42K catalogs read
+ *       and stored in ~5 hours. I'm still using the ConcurrentHashMap to store
+ *       the 'visited' information. I've also tried the Java caching system
+ *       (JCS) but that seems to be designed as a true cache where it's not
+ *       possible to be sure a previously cached item is still in the cache.
  *       (5/14/10)
- *       
+ * 
  * @author jimg
  * 
  */
