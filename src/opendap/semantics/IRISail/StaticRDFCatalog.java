@@ -651,12 +651,12 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         // Next we update the Repositories cached maps of of datasetUrl/serverIDs datasetUrl/wcsID
         // This bothers me: Before we moved these HashMaps int the IRISailRepository it was a general purpose class for
         // twiddling with Semantics - no it's a specialization of that general class for WCS. 
-        owlse2.updateIdCaches();
+        //owlse2.updateIdCaches();
 
-        /*
+
 
         try {
-            HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL());
+            HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL();
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
         } catch (RepositoryException e) {
             log.error("getCoverageIDServerURL(): Caught RepositoryException. msg: "
@@ -668,7 +668,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             log.error("getCoverageIDServerURL(): Caught QueryEvaluationException. msg: "
                     + e.getMessage());
         }
-        */
+
 
     }
 
@@ -769,7 +769,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
             rdfImports.add(datasetURL);
             log.info("Added dataset reference " + datasetURL + " to RDF imports list.");
 
-            log.debug("<wcs:Identifier>"+owlse2.getWcsIdString(datasetURL)+"</wcs:Identifier>");
+            log.debug("<wcs:Identifier>"+CoverageIdGenerator.getWcsIdString(datasetURL)+"</wcs:Identifier>");
         }
 
 
