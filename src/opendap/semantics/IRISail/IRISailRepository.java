@@ -77,8 +77,6 @@ public class IRISailRepository extends SailRepository {
     // constructor
     private Logger log;
 
-    
-
     private String resourceDir;
     private String contentDir;
 
@@ -89,41 +87,42 @@ public class IRISailRepository extends SailRepository {
 
     private AtomicBoolean isRepositoryDown;
 
-    private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
-    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
+    private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String, String>();
+    private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String, String>();
 
-    
     public void startup() throws org.openrdf.repository.RepositoryException {
         super.initialize();
         setRepositoryDown(false);
     }
 
-    private void setRepositoryDown(Boolean repositoryState) throws org.openrdf.repository.RepositoryException {
+    private void setRepositoryDown(Boolean repositoryState)
+            throws org.openrdf.repository.RepositoryException {
         isRepositoryDown.set(repositoryState);
     }
 
-    public Boolean isRepositoryDown() throws org.openrdf.repository.RepositoryException {
+    public Boolean isRepositoryDown()
+            throws org.openrdf.repository.RepositoryException {
         return isRepositoryDown.get();
     }
 
     /**
-     *  Does a repository shutdown, but only if the repository is running!.
+     * Does a repository shutdown, but only if the repository is running!.
+     * 
      * @throws RepositoryException
      */
     @Override
     public void shutDown() throws RepositoryException {
 
         log.debug("shutDown)(): Shutting down Repository...");
-        if (!isRepositoryDown()){
+        if (!isRepositoryDown()) {
             super.shutDown();
             setRepositoryDown(true);
             log.info("shutDown(): Semantic Repository Has Been Shutdown.");
-        }else {
+        } else {
             log.info("shutDown(): Semantic Repository was already down.");
         }
         log.debug("shutDown(): Repository shutdown complete.");
     }
-
 
     public Boolean hasContext(URI uriContext, RepositoryConnection con)
             throws RepositoryException {
@@ -131,7 +130,7 @@ public class IRISailRepository extends SailRepository {
         RepositoryResult<Resource> contextIDs = con.getContextIDs();
         while (contextIDs.hasNext()) {
             Resource contID = contextIDs.next();
-            if (contID!=null && contID.equals(uriContext))
+            if (contID != null && contID.equals(uriContext))
                 existContext = true;
         }
         contextIDs.close();
@@ -149,10 +148,6 @@ public class IRISailRepository extends SailRepository {
         constructQuery = new Vector<String>();
         constructContext = new HashMap<String, String>();
 
-
-
-
-
     }
 
     /*
@@ -161,9 +156,12 @@ public class IRISailRepository extends SailRepository {
 
     public void runConstruct() throws RepositoryException {
 
-        log.debug("-----------------------------------------------------------------");
-        log.debug("------------------- Entering runConstruct() ---------------------");
-        log.debug("-----------------------------------------------------------------");
+        log
+                .debug("-----------------------------------------------------------------");
+        log
+                .debug("------------------- Entering runConstruct() ---------------------");
+        log
+                .debug("-----------------------------------------------------------------");
 
         GraphQueryResult graphResult = null;
         RepositoryConnection con = null;
@@ -223,6 +221,7 @@ public class IRISailRepository extends SailRepository {
                             + " (construct rules pass #" + runNbr + ")");
 
                     graphResult = graphQuery.evaluate();
+                    GraphQueryResult graphResultStCount = graphQuery.evaluate();
                     log.info("Completed querying. ");
 
                     // log.debug("After evaluating construct rules:\n " +
@@ -272,23 +271,29 @@ public class IRISailRepository extends SailRepository {
 
                         case Function:
 
-                            process_fn(graphResult, creatValue, Added, toAdd, con, context);// postpocessing Join,
-                                                    // subtract, getWcsID
+                            process_fn(graphResult, creatValue, Added, toAdd,
+                                    con, context);// postpocessing Join,
+                            // subtract, getWcsID
                             break;
                         case NONE:
                         default:
                             log.info("Adding none-postprocess statements ...");
-                            int nonePostprocessSt = 0;
-                            while (graphResult.hasNext()) {
-                                Statement st = graphResult.next();
 
-                                con.add(st, context);
-                                // log.debug("Added statement = "
-                                // +st.toString());
-                                toAdd.add(st);
-                                Added.add(st);
+                            con.add(graphResult, context);
+                            int nonePostprocessSt = 0;
+                            while (graphResultStCount.hasNext()) {
+                                graphResultStCount.next();
                                 nonePostprocessSt++;
+                                stAdded++;
                             }
+                            /*
+                             * int nonePostprocessSt = 0; while
+                             * (graphResult.hasNext()) { Statement st =
+                             * graphResult.next(); con.add(st, context); //
+                             * log.debug("Added statement = " //
+                             * +st.toString()); toAdd.add(st); Added.add(st);
+                             * nonePostprocessSt++; }
+                             */
                             log.info("Complete adding " + nonePostprocessSt
                                     + " none-postprocess statements");
                             // log.debug("After processing default (NONE)
@@ -332,7 +337,8 @@ public class IRISailRepository extends SailRepository {
                         try {
                             graphResult.close();
                         } catch (QueryEvaluationException e) {
-                            log.error("Caught a QueryEvaluationException! Msg: "
+                            log
+                                    .error("Caught a QueryEvaluationException! Msg: "
                                             + e.getMessage());
                         }
                     }
@@ -445,8 +451,6 @@ public class IRISailRepository extends SailRepository {
 
     }
 
-
-
     private String getServerUrlString(URL url) {
 
         String baseURL = null;
@@ -473,8 +477,8 @@ public class IRISailRepository extends SailRepository {
 
         return baseURL;
 
-    }  
-    
+    }
+
     public enum FunctionTypes {
         None, getWcsID, Subtract, Join
     }
@@ -491,11 +495,13 @@ public class IRISailRepository extends SailRepository {
 
         Pattern stringPattern = Pattern.compile("xs:string\\(([^)]+)\\)");
 
-        Pattern dropquotesPattern = Pattern.compile("iridl:dropquotes\\(([^)]+)\\)");
+        Pattern dropquotesPattern = Pattern
+                .compile("iridl:dropquotes\\(([^)]+)\\)");
         Pattern minusPattern = Pattern.compile("MINUS.*( using)?");
 
         Pattern rdfCachePattern = Pattern.compile("rdfcache:retypeTo");
-        Pattern xsd2owlPattern = Pattern.compile("xsd2owl:increment\\(([^)]+)\\)");
+        Pattern xsd2owlPattern = Pattern
+                .compile("xsd2owl:increment\\(([^)]+)\\)");
 
         String pproces4sub2 = "\\{\\s*\\{(\\w+)\\s*\\}\\s*(.+)\\{(\\w+)\\s*\\}\\s*\\}";
         Pattern rproces4psub2 = Pattern.compile(pproces4sub2);
@@ -522,17 +528,31 @@ public class IRISailRepository extends SailRepository {
 
         Matcher stringMatcher = stringPattern.matcher(processedQueryString); // xs:string
 
-        Matcher dropquotesMatcher = dropquotesPattern.matcher(processedQueryString); // iridl:dropquotes
+        Matcher dropquotesMatcher = dropquotesPattern
+                .matcher(processedQueryString); // iridl:dropquotes
 
         Matcher rdfcacheMatcher = rdfCachePattern.matcher(processedQueryString); // rdfcache:retypeTo
 
         Matcher xsd2owlMatcher = xsd2owlPattern.matcher(processedQueryString); // xsd2owl:increment
-        // Pattern functionPattern = Pattern.compile("(fn:(join)\\(([^)]+)\\))"); //fn:join
-        Pattern functionPattern = Pattern.compile("(fn:([A-Za-z]+)\\(([^)]+)\\))"); // fn:join
+        
+        Pattern functionPattern = Pattern
+                .compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");// fn:name(abc)
         Pattern comma = Pattern.compile(",");
 
         Matcher functionMatcher = functionPattern.matcher(processedQueryString);
+        
+        Pattern p_fn = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");
 
+        Matcher m_fn = p_fn.matcher(processedQueryString);
+
+        
+        Pattern p_fn_className = Pattern
+                .compile(
+                        "(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
+                        Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+                                | Pattern.MULTILINE);
+        String queryStr = processedQueryString;
+        Matcher m_fn_className = p_fn_className.matcher(queryStr);
 
         String expand = "";
         if (stringMatcher.find()) {
@@ -562,57 +582,75 @@ public class IRISailRepository extends SailRepository {
 
             // log.info("processedQueryString = " + processedQueryString);
 
-        } else if (functionMatcher.find()) {
+        } else if (m_fn_className.find()) {
 
-            String m_fn_name = functionMatcher.group(2);
-            log.info("matched_function_name = " + m_fn_name);
+            String functionFullName = null;
 
-            Method myFunction = getMethodForFunction(this,m_fn_name);
+            String rdfFunctionName = m_fn_className.group(3);
+            String rdfClassName = m_fn_className.group(5);
 
-            if(myFunction!=null){
-                postProcessFlag = ProcessingTypes.Function;
-            }
+            functionFullName = rdfClassName + "#" + rdfFunctionName;
 
-
-
-            String[] splittedStr = comma.split(functionMatcher.group(3));
-            int i = 0;
-            expand += "} fn:myfn {fn:" + functionMatcher.group(2)
-                    + "} ; fn:mylist {} rdf:first {";
-            for (String element : splittedStr) {
-                i++;
-                if (i < splittedStr.length) {
-                    expand += element + "} ; rdf:rest {} rdf:first {";
-                    // log.info("element " + i + " = " + element);
-                } else {
-                    expand += element + "} ; rdf:rest {rdf:nil";
-                    // log.info("element " + i + " = " + element);
-                }
-                log.info("Will postprocess fn:" + functionMatcher.group(2));
-            }
-            // log.info("expand = " + expand);
-            // processedQueryString = functionMatcher.replaceFirst(expand);
-            processedQueryString = functionMatcher.replaceFirst(expand);
-            functionMatcher = functionPattern.matcher(processedQueryString);
+            log.debug("full_function_name = " + functionFullName); // full name of the function
+                             
+            log.debug("class_name = " + rdfClassName); // class name of the function
+                                                        
             if (functionMatcher.find()) {
-                splittedStr = comma.split(functionMatcher.group(3));
-                int j = 0;
-                expand = "";
-                expand += "} fn:myfn {fn:" + functionMatcher.group(2)
-                        + "} ; fn:mylist {} rdf:first {";
+
+                String m_fn_name = functionMatcher.group(3);
+                log.info("matched_function_name = " + m_fn_name);
+
+                Method myFunction = getMethodForFunction(this, m_fn_name);
+
+                if (myFunction != null) {
+                    postProcessFlag = ProcessingTypes.Function;
+                }
+
+                String[] splittedStr = comma.split(functionMatcher.group(4));
+                int i = 0;
+                String fn = functionMatcher.group(2);
+                String functionName = functionMatcher.group(3);
+
+                expand += "} " + fn + ":myfn {" + fn + ":" + functionName
+                        + "} ; " + fn + ":mylist {} rdf:first {";
                 for (String element : splittedStr) {
-                    j++;
-                    if (j < splittedStr.length) {
+                    i++;
+                    if (i < splittedStr.length) {
                         expand += element + "} ; rdf:rest {} rdf:first {";
-                        // log.info("element " + j + " = " + element);
+                        // log.info("element " + i + " = " + element);
                     } else {
                         expand += element + "} ; rdf:rest {rdf:nil";
-                        // log.info("element " + j + " = " + element);
+                        // log.info("element " + i + " = " + element);
                     }
+                    log.info("Will postprocess fn:" + functionMatcher.group(3));
                 }
+                // log.info("expand = " + expand);
+                // processedQueryString = functionMatcher.replaceFirst(expand);
                 processedQueryString = functionMatcher.replaceFirst(expand);
+                functionMatcher = functionPattern.matcher(processedQueryString);
+                if (functionMatcher.find()) {
+                    splittedStr = comma.split(functionMatcher.group(4));
+                    int j = 0;
+                    expand = "";
+                    fn = functionMatcher.group(2);
+                    functionName = functionMatcher.group(3);
+
+                    expand += "} " + fn + ":myfn {" + fn + ":" + functionName
+                            + "} ; " + fn + ":mylist {} rdf:first {";
+                    for (String element : splittedStr) {
+                        j++;
+                        if (j < splittedStr.length) {
+                            expand += element + "} ; rdf:rest {} rdf:first {";
+                            // log.info("element " + j + " = " + element);
+                        } else {
+                            expand += element + "} ; rdf:rest {rdf:nil";
+                            // log.info("element " + j + " = " + element);
+                        }
+                    }
+                    processedQueryString = functionMatcher.replaceFirst(expand);
+                }
             }
-            // log.info("Will postprocess fn:" +functionMatcher.group(2));
+
         }
 
         // log.info("processedQueryString = " + processedQueryString);
@@ -892,16 +930,16 @@ public class IRISailRepository extends SailRepository {
                 toAdd.add(st);
                 Added.add(st);
                 con.add(st, context);// add st with incremented number
-                //log.debug("Increment added new tatement stToAdd= "
-                //        + st.toString());
+                // log.debug("Increment added new tatement stToAdd= "
+                // + st.toString());
 
             } else {
                 toAdd.add(st);
                 Added.add(st);
                 con.add(st, context);// add st without increment (not a
-                                        // number)
-                //log.debug("Increment added original tatement st= "
-                //        + st.toString());
+                // number)
+                // log.debug("Increment added original tatement st= "
+                // + st.toString());
             }
 
         } // while (graphResult.hasNext())
@@ -1187,7 +1225,7 @@ public class IRISailRepository extends SailRepository {
 
             while (result.hasNext()) {
                 bindingSet = (BindingSet) result.next();
-                
+
                 valueOfLMT = (Value) bindingSet.getValue("lmt");
                 ltmodstr = valueOfLMT.stringValue();
 
@@ -1382,7 +1420,7 @@ public class IRISailRepository extends SailRepository {
         Boolean oldLMT = false;
 
         String oldltmod = this.chkLTMODContext(importURL); // LMT from http
-                                                            // header
+        // header
 
         // String oldltmod = this.chkLMTContext(importURL); // LMT in owl
         // document
@@ -1407,7 +1445,7 @@ public class IRISailRepository extends SailRepository {
             log.debug("oldlastmodified " + oldltdparseDate.toString());
 
             if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
-                                                                // context
+                // context
 
                 log.info("Import context is newer: " + importURL);
                 oldLMT = true;
@@ -1428,9 +1466,9 @@ public class IRISailRepository extends SailRepository {
         String pred = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified";
 
         if (!this.imports.contains(importURL)) { // not in the repository yet
-            //log.debug(importURL);
+            // log.debug(importURL);
             String ltmod = this.getLTMODContext(importURL);
-            //log.debug("lastmodified " + ltmod);
+            // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
             URI p = f.createURI(pred);
@@ -1439,9 +1477,9 @@ public class IRISailRepository extends SailRepository {
             Literal o = f.createLiteral(ltmod, sxd);
 
             try {
-                
+
                 con.add((Resource) s, p, (Value) o, (Resource) cont);
-                
+
             } catch (RepositoryException e) {
                 log.error("Caught an RepositoryException! Msg: "
                         + e.getMessage());
@@ -1471,9 +1509,9 @@ public class IRISailRepository extends SailRepository {
             Literal o = f.createLiteral(ltmod, sxd);
 
             try {
-              
+
                 con.remove((Resource) s, p, (Value) o, (Resource) cont);
-               
+
             } catch (RepositoryException e) {
                 log.error("Caught an RepositoryException! Msg: "
                         + e.getMessage());
@@ -1635,7 +1673,8 @@ public class IRISailRepository extends SailRepository {
                             && this.downService.get(importURL)) {
                         log.error("Server error, Skip " + importURL);
                     } else if (rsCode == -1) {
-                        log.error("Unable to get an HTTP status code for resource "
+                        log
+                                .error("Unable to get an HTTP status code for resource "
                                         + importURL + " WILL NOT IMPORT!");
                         this.downService.put(importURL, true);
 
@@ -1663,14 +1702,20 @@ public class IRISailRepository extends SailRepository {
                             log.debug("imports has: " + importURL);
 
                             if (olderContext(importURL)) {// if new update
-                                                            // available delete
-                                                            // old one
+                                // available delete
+                                // old one
 
-                                log.info("lastmodified is newer than oldlastmodified, deleting the old context!");
+                                log
+                                        .info("lastmodified is newer than oldlastmodified, deleting the old context!");
                                 URI context2remove = new URIImpl(importURL);
                                 con.clear((Resource) context2remove);
-                                deleteLTMODContext(importURL, con); // delete last modified time of the context
-                                                                    
+                                deleteLTMODContext(importURL, con); // delete
+                                                                    // last
+                                                                    // modified
+                                                                    // time of
+                                                                    // the
+                                                                    // context
+
                                 // deleteIsContainedBy(importURL,
                                 // CollectionURL); //need some work here!!!
                                 log.info("finished deleting " + importURL);
@@ -1688,13 +1733,16 @@ public class IRISailRepository extends SailRepository {
                                  * Importing "+importURL); update = true;
                                  */
                                 importID.add(importURL); // put back into the
-                                                            // add list
+                                // add list
                             } else {
                                 log.info("Skip old URL: " + importURL);
                             }
                         }
-                        if (!this.imports.contains(importURL)) { // not in the import list yet
-                                                                    
+                        if (!this.imports.contains(importURL)) { // not in
+                                                                    // the
+                                                                    // import
+                                                                    // list yet
+
                             if (!importInRepository.contains(importURL)) {
                                 log.debug("Repository does not have: "
                                         + importURL);
@@ -1713,8 +1761,13 @@ public class IRISailRepository extends SailRepository {
                                     log.info("Importing URL " + url);
                                     con.add(url, importURL, RDFFormat.RDFXML,
                                             (Resource) uriaddress);
-                                    setLTMODContext(importURL, con); // set last modified time the context
-                                                                       
+                                    setLTMODContext(importURL, con); // set
+                                                                        // last
+                                                                        // modified
+                                                                        // time
+                                                                        // the
+                                                                        // context
+
                                     // setIsContainedBy(importURL,
                                     // CollectionURL); //need some work here!!!
                                     update = true;
@@ -1739,8 +1792,14 @@ public class IRISailRepository extends SailRepository {
                                         con.add(inStream, importURL,
                                                 RDFFormat.RDFXML,
                                                 (Resource) uriaddress);
-                                        setLTMODContext(importURL, con); // set last modified time for the context
-                                                                            
+                                        setLTMODContext(importURL, con); // set
+                                                                            // last
+                                                                            // modified
+                                                                            // time
+                                                                            // for
+                                                                            // the
+                                                                            // context
+
                                         // setIsContainedBy(importURL,
                                         // CollectionURL); //need some work
                                         // here!!!
@@ -1764,9 +1823,9 @@ public class IRISailRepository extends SailRepository {
                                 log.info("Repository has: " + importURL);
                             }
                             this.imports.add(importURL); // Appends the
-                                                            // import/seeAlso to
-                                                            // the list of
-                                                            // finished
+                            // import/seeAlso to
+                            // the list of
+                            // finished
 
                         } // if (! this.imports.contains(importURL))
                     } // if (this.downService.get(importURL))
@@ -1842,8 +1901,10 @@ public class IRISailRepository extends SailRepository {
                 while (!importID.isEmpty()) {
                     String importURL = importID.remove(0).toString();
 
-                    if (!this.imports.contains(importURL)) { // not in the repository yet
-                                                                
+                    if (!this.imports.contains(importURL)) { // not in the
+                                                                // repository
+                                                                // yet
+
                         String urlsufix = importURL.substring((importURL
                                 .length() - 4), importURL.length());
                         log.debug(importURL);
@@ -1900,7 +1961,7 @@ public class IRISailRepository extends SailRepository {
                             log.warn("Not importing " + importURL);
                         }
                         this.imports.add(importURL); // Appends the specified
-                                                        // element to the end
+                        // element to the end
 
                     }// if (! owlse2.imports
                 }// while (!importID.empty()
@@ -1923,52 +1984,56 @@ public class IRISailRepository extends SailRepository {
         return update;
     } // public Boolean updateFromFile
 
-
-
-
-
     /**
-     *
      * @return
      * @throws RepositoryException
      * @throws MalformedQueryException
      * @throws QueryEvaluationException
      */
-    public HashMap<String, Vector<String>> getCoverageIDServerURL() throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+    public HashMap<String, Vector<String>> getCoverageIDServerURL()
+            throws RepositoryException, MalformedQueryException,
+            QueryEvaluationException {
         TupleQueryResult result = null;
         HashMap<String, Vector<String>> coverageIDServer = new HashMap<String, Vector<String>>();
 
-        String queryString = "SELECT coverageurl,coverageid " +
-                "FROM " +
-                "{} wcs:CoverageDescription {coverageurl} wcs:Identifier {coverageid} " +
-                "USING NAMESPACE " +
-                "wcs = <http://www.opengis.net/wcs/1.1#>";
+        String queryString = "SELECT coverageurl,coverageid "
+                + "FROM "
+                + "{} wcs:CoverageDescription {coverageurl} wcs:Identifier {coverageid} "
+                + "USING NAMESPACE "
+                + "wcs = <http://www.opengis.net/wcs/1.1#>";
         RepositoryConnection con = getConnection();
         log.debug("query coverage ID and server URL: \n" + queryString);
-        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
+        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                queryString);
 
         result = tupleQuery.evaluate();
         log.debug("Qresult: " + result.hasNext());
         List<String> bindingNames = result.getBindingNames();
-        //log.debug(bindingNames.probeServletContext());
+        // log.debug(bindingNames.probeServletContext());
         while (result.hasNext()) {
             BindingSet bindingSet = (BindingSet) result.next();
             // log.debug(bindingSet.probeServletContext());
             Vector<String> coverageURL = new Vector<String>();
 
-            if (bindingSet.getValue("coverageid") != null && bindingSet.getValue("coverageurl") != null) {
+            if (bindingSet.getValue("coverageid") != null
+                    && bindingSet.getValue("coverageurl") != null) {
 
-                Value valueOfcoverageid = (Value) bindingSet.getValue("coverageid");
-                Value valueOfcoverageurl = (Value) bindingSet.getValue("coverageurl");
+                Value valueOfcoverageid = (Value) bindingSet
+                        .getValue("coverageid");
+                Value valueOfcoverageurl = (Value) bindingSet
+                        .getValue("coverageurl");
                 coverageURL.addElement(valueOfcoverageurl.stringValue());
-                //log.debug("coverageid:");
-                //log.debug(valueOfcoverageid.stringValue());
-                //log.debug("coverageurl:");
+                // log.debug("coverageid:");
+                // log.debug(valueOfcoverageid.stringValue());
+                // log.debug("coverageurl:");
                 log.debug(valueOfcoverageurl.stringValue());
-                if (coverageIDServer.containsKey(valueOfcoverageid.stringValue()))
-                    coverageIDServer.get(valueOfcoverageid.stringValue()).addElement(valueOfcoverageurl.stringValue());
+                if (coverageIDServer.containsKey(valueOfcoverageid
+                        .stringValue()))
+                    coverageIDServer.get(valueOfcoverageid.stringValue())
+                            .addElement(valueOfcoverageurl.stringValue());
                 else
-                    coverageIDServer.put(valueOfcoverageid.stringValue(), coverageURL);
+                    coverageIDServer.put(valueOfcoverageid.stringValue(),
+                            coverageURL);
 
             }
         }
@@ -1977,14 +2042,12 @@ public class IRISailRepository extends SailRepository {
 
     }
 
-
-
-    public void updateIdCaches(){
+    public void updateIdCaches() {
 
         HashMap<String, Vector<String>> coverageIDServer;
 
-
-        log.debug("Updating datasetUrl/wcsID and datasetUrl/serverID HashMap objects.");
+        log
+                .debug("Updating datasetUrl/wcsID and datasetUrl/serverID HashMap objects.");
         try {
 
             coverageIDServer = getCoverageIDServerURL();
@@ -2001,121 +2064,93 @@ public class IRISailRepository extends SailRepository {
                     serverUrl = getServerUrlString(new URL(datasetUrl));
                     log.debug("    serverUrl:  " + serverUrl);
 
-                    localId = datasetUrl.substring(serverUrl.length(),datasetUrl.length());
-                    log.debug("    localID:    "+localId);
+                    localId = datasetUrl.substring(serverUrl.length(),
+                            datasetUrl.length());
+                    log.debug("    localID:    " + localId);
 
-                    serviceID = coverageID.substring(0,coverageID.indexOf(localId));
-                    log.debug("    serviceID:     "+serviceID);
+                    serviceID = coverageID.substring(0, coverageID
+                            .indexOf(localId));
+                    log.debug("    serviceID:     " + serviceID);
 
-                    if(!serverIDs.containsKey(serverUrl)){
+                    if (!serverIDs.containsKey(serverUrl)) {
                         log.debug("Adding to ServiceIDs");
-                        serverIDs.put(serverUrl,serviceID);
-                    }
-                    else if(serviceID.equals(serverIDs.get(serverUrl))){
-                        log.info("The serverURL: "+serverUrl+" is already mapped to " +
-                                "the serviceID: "+serviceID+" No action taken.");
-                    }
-                    else {
-                        String msg = "\nOUCH! The semantic repository contains multiple serviceID strings " +
-                                "for the same serverURL. This may lead to one of the serviceID's being " +
-                                "reassigned. This would lead to resources being attributed to the " +
-                                "wrong server/service.\n";
-                        msg += "serverUrl: "+serverUrl+"\n";
-                        msg += "  serviceID(repository) : "+serviceID+"\n";
-                        msg += "  serviceID(in-memory):   "+ serverIDs.get(serverUrl)+"\n";
+                        serverIDs.put(serverUrl, serviceID);
+                    } else if (serviceID.equals(serverIDs.get(serverUrl))) {
+                        log.info("The serverURL: " + serverUrl
+                                + " is already mapped to " + "the serviceID: "
+                                + serviceID + " No action taken.");
+                    } else {
+                        String msg = "\nOUCH! The semantic repository contains multiple serviceID strings "
+                                + "for the same serverURL. This may lead to one of the serviceID's being "
+                                + "reassigned. This would lead to resources being attributed to the "
+                                + "wrong server/service.\n";
+                        msg += "serverUrl: " + serverUrl + "\n";
+                        msg += "  serviceID(repository) : " + serviceID + "\n";
+                        msg += "  serviceID(in-memory):   "
+                                + serverIDs.get(serverUrl) + "\n";
 
                         log.error(msg);
 
                     }
 
-
-                    if(!wcsIDs.containsKey(datasetUrl)){
+                    if (!wcsIDs.containsKey(datasetUrl)) {
                         log.debug("Adding to datasetUrl/coverageID to Map");
-                        wcsIDs.put(datasetUrl,coverageID);
-                    }
-                    else if(coverageID.equals(wcsIDs.get(datasetUrl))){
-                        log.info("The datasetUrl: "+datasetUrl+" is already mapped to " +
-                                "the coverageID: "+coverageID+" No action taken.");
-                    }
-                    else {
-                        String msg = "\nOUCH! The semantic repository contains multiple coverageID strings " +
-                                "for the same datasetUrl. This may lead to one of the coverageID's being " +
-                                "reassigned. This would lead to resources being attributed to the " +
-                                "wrong server/service.\n";
+                        wcsIDs.put(datasetUrl, coverageID);
+                    } else if (coverageID.equals(wcsIDs.get(datasetUrl))) {
+                        log.info("The datasetUrl: " + datasetUrl
+                                + " is already mapped to " + "the coverageID: "
+                                + coverageID + " No action taken.");
+                    } else {
+                        String msg = "\nOUCH! The semantic repository contains multiple coverageID strings "
+                                + "for the same datasetUrl. This may lead to one of the coverageID's being "
+                                + "reassigned. This would lead to resources being attributed to the "
+                                + "wrong server/service.\n";
 
-                        msg += "datasetUrl: "+datasetUrl+"\n";
-                        msg += "  coverageID(repository) : "+coverageID+"\n";
-                        msg += "  coverageID(in-memory):   "+wcsIDs.get(datasetUrl)+"\n";
+                        msg += "datasetUrl: " + datasetUrl + "\n";
+                        msg += "  coverageID(repository) : " + coverageID
+                                + "\n";
+                        msg += "  coverageID(in-memory):   "
+                                + wcsIDs.get(datasetUrl) + "\n";
 
                         log.error(msg);
                     }
 
-                    //private ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
-                    //private ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
-
+                    // private ConcurrentHashMap<String, String> serverIDs = new
+                    // ConcurrentHashMap<String,String>();
+                    // private ConcurrentHashMap<String, String> wcsIDs = new
+                    // ConcurrentHashMap<String,String>();
 
                 }
             }
 
         } catch (RepositoryException e) {
 
-            log.error("getCoverageIDServerURL(): Caught RepositoryException. msg: "
-                    + e.getMessage());
+            log
+                    .error("getCoverageIDServerURL(): Caught RepositoryException. msg: "
+                            + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("getCoverageIDServerURL(): Caught MalformedQueryException. msg: "
-                    + e.getMessage());
+            log
+                    .error("getCoverageIDServerURL(): Caught MalformedQueryException. msg: "
+                            + e.getMessage());
         } catch (QueryEvaluationException e) {
-            log.error("getCoverageIDServerURL(): Caught QueryEvaluationException. msg: "
-                    + e.getMessage());
+            log
+                    .error("getCoverageIDServerURL(): Caught QueryEvaluationException. msg: "
+                            + e.getMessage());
         } catch (MalformedURLException e) {
-            log.error("getCoverageIDServerURL(): Caught MalformedURLException. msg: "
-                    +e.getMessage());
+            log
+                    .error("getCoverageIDServerURL(): Caught MalformedURLException. msg: "
+                            + e.getMessage());
         }
 
     }
 
-
-
-
-
     /***************************************************************************
-     **************************************************************************
-     **************************************************************************
-     **************************************************************************
-     **************************************************************************
-     ************************************************************************** 
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-    */
-
-
-
-
-
-
-
-
-
+     * *************************************************************************
+     * *************************************************************************
+     * *************************************************************************
+     * *************************************************************************
+     * *************************************************************************
+     */
 
     public enum ProcessingTypes {
         NONE, xsString, DropQuotes, RetypeTo, Increment, Function
@@ -2123,7 +2158,7 @@ public class IRISailRepository extends SailRepository {
 
     /***************************************************************************
      * process fn created statements
-     *
+     * 
      * @param graphResult
      * @param creatValue
      * @param Added
@@ -2211,7 +2246,7 @@ public class IRISailRepository extends SailRepository {
 
                         fnName = obj.stringValue().substring(i + 1);
 
-                        func = getMethodForFunction(this,fnName);
+                        func = getMethodForFunction(this, fnName);
 
                     }
 
@@ -2225,21 +2260,26 @@ public class IRISailRepository extends SailRepository {
 
                 }
 
-                if(func!=null){
+                if (func != null) {
                     Value stObj = null;
                     try {
-                        stObj = (Value) func.invoke(this,rdfList,creatValue);
+                        stObj = (Value) func.invoke(this, rdfList, creatValue);
                         st = new StatementImpl(targetSbj, targetPrd, stObj);
                     } catch (IllegalAccessException e) {
-                        log.error("Unable to invoke processing function "+func.getName()+"' Caught IllegalAccessException, msg: "+e.getMessage());
+                        log.error("Unable to invoke processing function "
+                                + func.getName()
+                                + "' Caught IllegalAccessException, msg: "
+                                + e.getMessage());
                     } catch (InvocationTargetException e) {
-                        log.error("Unable to invoke processing function "+func.getName()+"' Caught InvocationTargetException, msg: "+e.getMessage()); 
+                        log.error("Unable to invoke processing function "
+                                + func.getName()
+                                + "' Caught InvocationTargetException, msg: "
+                                + e.getMessage());
                     }
+                } else {
+                    log
+                            .warn("Process Function failed: No processing function found.");
                 }
-                else{
-                    log.warn("Process Function failed: No processing function found.");
-                }
-
 
             } else if (!isSbjBn && !isObjBn) {
                 targetSbj = sbj;
@@ -2254,10 +2294,9 @@ public class IRISailRepository extends SailRepository {
                 + " statements are added.\n ");
     }
 
-
     /***************************************************************************
      * function join to concatenate strings
-     *
+     * 
      * @param RDFList
      * @param createValue
      * @return
@@ -2287,15 +2326,14 @@ public class IRISailRepository extends SailRepository {
         return stObjStr;
     }
 
-
     /***************************************************************************
      * function getWcsID
-     *
+     * 
      * @param RDFList
      * @param createValue
      * @return
      */
-     public Value getWcsId(List<String> RDFList,  ValueFactory createValue) {
+    public Value getWcsId(List<String> RDFList, ValueFactory createValue) {
 
         String targetObj = "";
 
@@ -2306,121 +2344,125 @@ public class IRISailRepository extends SailRepository {
         return stObjStr;
     }
 
-
-
-
-
     /**
-     * Build a wcs:Identifier for the coverage dataset described by the datasetUrl.
-     *
+     * Build a wcs:Identifier for the coverage dataset described by the
+     * datasetUrl.
+     * 
      * @param datasetUrl
-     * @return A valid and unique to this service wcs:Identifier String for the coverage dataset
+     * @return A valid and unique to this service wcs:Identifier String for the
+     *         coverage dataset
      */
-    public String getWcsIdString(String datasetUrl)  {
+    public String getWcsIdString(String datasetUrl) {
 
-        String wcsID="FAILED_TO_BUILD_WCS_ID";
+        String wcsID = "FAILED_TO_BUILD_WCS_ID";
 
         try {
             int i;
             String serverURL, serverID;
             URL dsu = new URL(datasetUrl);
 
-
             serverURL = getServerUrlString(dsu);
 
-            log.debug("getWcsIdString(): serverURl is "+serverURL);
+            log.debug("getWcsIdString(): serverURl is " + serverURL);
 
-            if(serverIDs.containsKey(serverURL)){
+            if (serverIDs.containsKey(serverURL)) {
                 // get server prefix
                 serverID = serverIDs.get(serverURL);
-                log.debug("getWcsIdString(): serverURL already in use, will reuse serverID '"+serverID+"'");
-            }
-            else {
-                serverID = "S"+ (serverIDs.size()+1) + "";
+                log
+                        .debug("getWcsIdString(): serverURL already in use, will reuse serverID '"
+                                + serverID + "'");
+            } else {
+                serverID = "S" + (serverIDs.size() + 1) + "";
                 // Generate service prefix
                 // Store service prefix.
-                serverIDs.put(serverURL,serverID);
-                log.debug("getWcsIdString(): New serverURL! Created new serverID '"+serverID+"'");
+                serverIDs.put(serverURL, serverID);
+                log
+                        .debug("getWcsIdString(): New serverURL! Created new serverID '"
+                                + serverID + "'");
 
             }
-
 
             // Build wcsID
-            if(!wcsIDs.containsKey(datasetUrl)){
+            if (!wcsIDs.containsKey(datasetUrl)) {
                 // add wcs:Identifier to MAP
-                wcsID = serverID + datasetUrl.substring(serverURL.length(),datasetUrl.length());
-                log.debug("getWcsIdString(): Dataset had no existing wcsID, adding wcsID: "+wcsID+
-                        " for dataset: "+datasetUrl);
-                wcsIDs.put(datasetUrl,wcsID);
-            }
-            else {
+                wcsID = serverID
+                        + datasetUrl.substring(serverURL.length(), datasetUrl
+                                .length());
+                log
+                        .debug("getWcsIdString(): Dataset had no existing wcsID, adding wcsID: "
+                                + wcsID + " for dataset: " + datasetUrl);
+                wcsIDs.put(datasetUrl, wcsID);
+            } else {
                 wcsID = wcsIDs.get(datasetUrl);
-                log.debug("getWcsIdString(): Dataset already has a wcsID, returning wcsID: "+wcsID+
-                        " for dataset: "+datasetUrl);
+                log
+                        .debug("getWcsIdString(): Dataset already has a wcsID, returning wcsID: "
+                                + wcsID + " for dataset: " + datasetUrl);
             }
 
         } catch (MalformedURLException e) {
-            log.error("Cannot Build wcs:Identifier from URL "+datasetUrl+" error msg: "+e.getMessage());
+            log.error("Cannot Build wcs:Identifier from URL " + datasetUrl
+                    + " error msg: " + e.getMessage());
         }
-
 
         return wcsID;
     }
 
-
-
-
-    public static Method getMethodForFunction(String className, String methodName){
-
+    public static Method getMethodForFunction(String className,
+            String methodName) {
 
         Method method;
 
         Logger log = org.slf4j.LoggerFactory.getLogger(IRISailRepository.class);
 
-
         try {
             Class methodContext = Class.forName(className);
-            log.debug("getMethodForFunction() - Located java class: "+ className);
+            log.debug("getMethodForFunction() - Located java class: "
+                    + className);
 
             try {
-                method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
+                method = methodContext.getMethod(methodName, List.class,
+                        ValueFactory.class);
 
-                if(Modifier.isStatic(method.getModifiers())){
-                    log.debug("getMethodForFunction() - Located static java method: "+ getProcessingMethodDescription(method));
+                if (Modifier.isStatic(method.getModifiers())) {
+                    log
+                            .debug("getMethodForFunction() - Located static java method: "
+                                    + getProcessingMethodDescription(method));
                     return method;
                 }
 
                 /*
+                 * for(Constructor c : methodContext.getConstructors()){
+                 * if(c.getGenericParameterTypes().length==0){
+                 * log.debug("getMethodForFunction() - Located java class
+                 * '"+className+"' with a no element " + "constructor and the
+                 * method "+getProcessingMethodDescription(method)); return
+                 * method; } }
+                 */
 
-                for(Constructor c : methodContext.getConstructors()){
-                    if(c.getGenericParameterTypes().length==0){
-                        log.debug("getMethodForFunction() - Located java class '"+className+"' with a no element " +
-                                "constructor and the method "+getProcessingMethodDescription(method));
-                        return method;
-                    }
-                }
-                */
-
-
-            }
-            catch (NoSuchMethodException e) {
-                log.error("getMethodForFunction() - The class '"+className+"' does not contain a method called '"+methodName+"'");
+            } catch (NoSuchMethodException e) {
+                log.error("getMethodForFunction() - The class '" + className
+                        + "' does not contain a method called '" + methodName
+                        + "'");
             }
 
         } catch (ClassNotFoundException e) {
-            log.error("getMethodForFunction() - Unable to locate java class: "+ className);
+            log.error("getMethodForFunction() - Unable to locate java class: "
+                    + className);
         }
 
-        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. " +
-                "class: '"+ className+"'   method: '"+methodName+"'");
+        log
+                .error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
         return null;
-
 
     }
 
-
-    public static Method getMethodForFunction(Object classInstance, String methodName){
-
+    public static Method getMethodForFunction(Object classInstance,
+            String methodName) {
 
         Method method;
 
@@ -2430,30 +2472,32 @@ public class IRISailRepository extends SailRepository {
         Logger log = org.slf4j.LoggerFactory.getLogger(IRISailRepository.class);
 
         try {
-            method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
-            log.debug("getMethodForFunction() - Located the java method: "+ getProcessingMethodDescription(method)+
-                    " in an instance of the class '"+className+"'");
+            method = methodContext.getMethod(methodName, List.class,
+                    ValueFactory.class);
+            log.debug("getMethodForFunction() - Located the java method: "
+                    + getProcessingMethodDescription(method)
+                    + " in an instance of the class '" + className + "'");
             return method;
 
-        }
-        catch (NoSuchMethodException e) {
-            log.error("getMethodForFunction() - The class '"+className+"' does not contain a method called '"+methodName+"'");
+        } catch (NoSuchMethodException e) {
+            log
+                    .error("getMethodForFunction() - The class '" + className
+                            + "' does not contain a method called '"
+                            + methodName + "'");
         }
 
-
-        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. " +
-                "class: '"+ className+"'   method: '"+methodName+"'");
+        log
+                .error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
         return null;
-
 
     }
 
-
-
-
-
-    public static String getProcessingMethodDescription(Method m){
-
+    public static String getProcessingMethodDescription(Method m) {
 
         String msg = "";
 
@@ -2461,26 +2505,23 @@ public class IRISailRepository extends SailRepository {
         msg += m.getName();
 
         String params = "";
-        for( Class c : m.getParameterTypes()){
-            if(!params.equals(""))
+        for (Class c : m.getParameterTypes()) {
+            if (!params.equals(""))
                 params += ", ";
             params += c.getName();
         }
-        msg += "("+params+")";
+        msg += "(" + params + ")";
 
         String exceptions = "";
-        for(Class c : m.getExceptionTypes()){
-            if(!exceptions.equals(""))
+        for (Class c : m.getExceptionTypes()) {
+            if (!exceptions.equals(""))
                 exceptions += ", ";
             exceptions += c.getName();
         }
-        msg += " "+exceptions+";";
-
+        msg += " " + exceptions + ";";
 
         return msg;
 
     }
-
-
 
 }
