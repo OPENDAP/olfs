@@ -345,7 +345,6 @@ public class ResponseCachePostgres {
 				log.error("Cache read: Could not close the prepared statement.", e);
 			}
 		}
-
     }
     
     /** Retrieve a Response document from the cache.

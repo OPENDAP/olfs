@@ -58,9 +58,9 @@ public class DDXCrawler {
 
     private static Logger log = LoggerFactory.getLogger(DDXCrawler.class);
 
-    private ThreddsCatalogUtil tcc = null;
+    private ThreddsCatalogUtil threddsCatalogUtil = null;
     
-    private DDXRetriever DDXSource = null;
+    private DDXRetriever ddxRetriever = null;
 
     private int catalogsVisited = 0;
     private int DDXsVisited = 0;
@@ -126,8 +126,8 @@ public class DDXCrawler {
 			// In this program, the ThreddsCatalogUtils _always_ writes to the cache
 			// when it reads a new document. The readFromThreddsCache determines
 			// if a cached catalog is preferred over a network read.
-		    crawler.tcc = new ThreddsCatalogUtil(true, crawler.cacheNamePrefix, readFromThreddsCache);
-		    crawler.DDXSource = new DDXRetriever(useDDXCache, crawler.cacheNamePrefix);
+		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(true, crawler.cacheNamePrefix, readFromThreddsCache);
+		    crawler.ddxRetriever = new DDXRetriever(useDDXCache, crawler.cacheNamePrefix);
 
 			crawler.crawlCatalog(catalogURL, System.out, restoreState);
 			
@@ -151,9 +151,9 @@ public class DDXCrawler {
 		
 		try {
 			if (!restoreState)
-				catalogs = (threddsCrawlerEnumeration) tcc.getCatalogEnumeration(catalogURL);
+				catalogs = (threddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration(catalogURL);
 			else 
-				catalogs = (threddsCrawlerEnumeration) tcc.getCatalogEnumeration();
+				catalogs = (threddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration();
 			
 			Vector<String> DDXURLs = null;
 
@@ -164,10 +164,10 @@ public class DDXCrawler {
 					ps.println("Root catalog: " + catalogURL);
 
 				// First get references to any DDX objects at the top level
-				DDXURLs = tcc.getDDXUrls(catalogURL);
+				DDXURLs = threddsCatalogUtil.getDDXUrls(catalogURL);
 				for (String DDXURL : DDXURLs) {
 					++DDXsVisited;
-					String ddx = DDXSource.getDDXDoc(DDXURL);
+					String ddx = ddxRetriever.getDDXDoc(DDXURL);
 					if (ddx == null)
 						log.error("No DDX returned from: " + DDXURL);
 					else if (verbose) {
@@ -185,10 +185,10 @@ public class DDXCrawler {
 				if (verbose)
 					ps.println("catalog: " + childURL);
 
-				DDXURLs = tcc.getDDXUrls(childURL);
+				DDXURLs = threddsCatalogUtil.getDDXUrls(childURL);
 				for (String DDXURL : DDXURLs) {
 					++DDXsVisited;
-					String ddx = DDXSource.getDDXDoc(DDXURL);
+					String ddx = ddxRetriever.getDDXDoc(DDXURL);
 					if (ddx == null)
 						log.error("No DDX returned from: " + DDXURL);
 					else if (verbose) {
@@ -210,7 +210,8 @@ public class DDXCrawler {
 			throw new Exception(e);
 		}
 		finally {
-			tcc.saveCatalogCache();
+			threddsCatalogUtil.saveCatalogCache();
+			ddxRetriever.saveDDXCache();
 		}
 	}
 }

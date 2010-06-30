@@ -255,7 +255,11 @@ public class EMLBuilder {
 			transformer.transform(ddxXdm, os);
 		} 
 		catch (Exception e) {
-			throw e;
+			log.error("While trying to transform the DDX at " + DDXURL);
+			log.error("I got the following error: " + e.getMessage());
+			log.debug("The DDX value is: " + ddxString);
+			return "";
+			//throw e;
 		}
 		finally {
 			// Clear parameters
