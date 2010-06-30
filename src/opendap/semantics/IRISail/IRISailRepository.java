@@ -584,23 +584,23 @@ public class IRISailRepository extends SailRepository {
 
         } else if (m_fn_className.find()) {
 
-            String functionFullName = null;
+            String fullyQualifiedFunctionName;
 
             String rdfFunctionName = m_fn_className.group(3);
             String rdfClassName = m_fn_className.group(5);
 
-            functionFullName = rdfClassName + "#" + rdfFunctionName;
+            fullyQualifiedFunctionName = rdfClassName + "#" + rdfFunctionName;
 
-            log.debug("full_function_name = " + functionFullName); // full name of the function
-                             
+            log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
             log.debug("class_name = " + rdfClassName); // class name of the function
                                                         
             if (functionMatcher.find()) {
 
-                String m_fn_name = functionMatcher.group(3);
-                log.info("matched_function_name = " + m_fn_name);
 
-                Method myFunction = getMethodForFunction(this, m_fn_name);
+                log.info("Found class name    '" + rdfClassName+"'");
+                log.info("Found function_name '" + rdfFunctionName+"'");
+
+                Method myFunction = getMethodForFunction(rdfClassName, rdfFunctionName);
 
                 if (myFunction != null) {
                     postProcessFlag = ProcessingTypes.Function;
@@ -611,6 +611,8 @@ public class IRISailRepository extends SailRepository {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
+                //@todo  myfn and mylist are in a fixed namespace, say http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn
+                // the following code should be changed to reflect this.
                 expand += "} " + fn + ":myfn {" + fn + ":" + functionName
                         + "} ; " + fn + ":mylist {} rdf:first {";
                 for (String element : splittedStr) {
@@ -2221,7 +2223,8 @@ public class IRISailRepository extends SailRepository {
 
                 targetSbj = sbj;
 
-                String fnName = null; // function name
+                String className; // class name
+                String fnName; // function name
 
                 Matcher mendlist = endlist.matcher(obj.stringValue());
                 Boolean isEndList = false;
@@ -2241,12 +2244,16 @@ public class IRISailRepository extends SailRepository {
                     isSbjBn = mbnode.find();
                     // log.debug("prd = " + prd.stringValue() );
 
+                    // @todo This is supposed to be a full URI match and not a local name match!!!
                     if (prd.getLocalName().equals("myfn") && isSbjBn) {
-                        int i = obj.stringValue().lastIndexOf("#");
+                        String s =  obj.stringValue();
+                        int i = s.lastIndexOf("#");
+                        
+                        className  =  s.substring("import:".length(),s.lastIndexOf("#")-1);
 
                         fnName = obj.stringValue().substring(i + 1);
 
-                        func = getMethodForFunction(this, fnName);
+                        func = getMethodForFunction(className, fnName);
 
                     }
 
@@ -2486,8 +2493,7 @@ public class IRISailRepository extends SailRepository {
                             + methodName + "'");
         }
 
-        log
-                .error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
                         + "class: '"
                         + className
                         + "'   method: '"
