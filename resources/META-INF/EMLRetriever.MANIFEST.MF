@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: opendap.metacat.EMLRetriever
-Class-Path: ../lib/slf4j-api-1.5.8.jar ../lib/logback-core-0.9.16.jar ../lib/logback-classic-0.9.16.jar ../lib/jdom-1.1.jar ../lib/apache-commons-cli-1.0.jar ../lib/apache-commons-httpclient-3.1.jar s../lib/axon-9.1.0.5-jdom.jar ../lib/saxon-9.1.0.5-s9api.jar ../lib/saxon-9.1.0.5.jar
+Class-Path: ../lib/slf4j-api-1.5.8.jar ../lib/logback-core-0.9.16.jar ../lib/logback-classic-0.9.16.jar ../lib/jdom-1.1.1.jar ../lib/apache-commons-cli-1.0.jar ../lib/apache-commons-httpclient-3.1.jar s../lib/axon-9.1.0.5-jdom.jar ../lib/saxon-9.1.0.5-s9api.jar ../lib/saxon-9.1.0.5.jar
 
