@@ -546,11 +546,8 @@ public class IRISailRepository extends SailRepository {
         Matcher m_fn = p_fn.matcher(processedQueryString);
 
         
-        Pattern p_fn_className = Pattern
-                .compile(
-                        "(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
-                        Pattern.CASE_INSENSITIVE | Pattern.DOTALL
-                                | Pattern.MULTILINE);
+        Pattern p_fn_className = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
+                        Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
         String queryStr = processedQueryString;
         Matcher m_fn_className = p_fn_className.matcher(queryStr);
 
@@ -2252,8 +2249,7 @@ public class IRISailRepository extends SailRepository {
                         ValueFactory.class);
 
                 if (Modifier.isStatic(method.getModifiers())) {
-                    log
-                            .debug("getMethodForFunction() - Located static java method: "
+                    log.debug("getMethodForFunction() - Located static java method: "
                                     + getProcessingMethodDescription(method));
                     return method;
                 }
@@ -2278,8 +2274,7 @@ public class IRISailRepository extends SailRepository {
                     + className);
         }
 
-        log
-                .error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
                         + "class: '"
                         + className
                         + "'   method: '"
@@ -2308,8 +2303,7 @@ public class IRISailRepository extends SailRepository {
             return method;
 
         } catch (NoSuchMethodException e) {
-            log
-                    .error("getMethodForFunction() - The class '" + className
+            log.error("getMethodForFunction() - The class '" + className
                             + "' does not contain a method called '"
                             + methodName + "'");
         }
