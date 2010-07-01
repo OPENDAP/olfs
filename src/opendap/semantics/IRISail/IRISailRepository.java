@@ -608,7 +608,7 @@ public class IRISailRepository extends SailRepository {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                //@todo  myfn and mylist are in a fixed namespace, say http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn
+                // @todo  myfn and mylist are in a fixed namespace, say http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn
                 // the following code should be changed to reflect this.
                 expand += "} " + fn + ":myfn {" + fn + ":" + functionName
                         + "} ; " + fn + ":mylist {} rdf:first {";
@@ -2182,8 +2182,7 @@ public class IRISailRepository extends SailRepository {
                                 + e.getMessage());
                     }
                 } else {
-                    log
-                            .warn("Process Function failed: No processing function found.");
+                    log.warn("Process Function failed: No processing function found.");
                 }
 
             } else if (!isSbjBn && !isObjBn) {
@@ -2233,7 +2232,7 @@ public class IRISailRepository extends SailRepository {
 
 
     public static Method getMethodForFunction(String className,
-            String methodName) {
+                                              String methodName) {
 
         Method method;
 
@@ -2245,8 +2244,7 @@ public class IRISailRepository extends SailRepository {
                     + className);
 
             try {
-                method = methodContext.getMethod(methodName, List.class,
-                        ValueFactory.class);
+                method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
 
                 if (Modifier.isStatic(method.getModifiers())) {
                     log.debug("getMethodForFunction() - Located static java method: "
