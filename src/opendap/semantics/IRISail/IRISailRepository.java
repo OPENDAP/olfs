@@ -2147,12 +2147,12 @@ public class IRISailRepository extends SailRepository {
 
                     // @todo This is supposed to be a full URI match and not a local name match!!!
                     if (prd.getLocalName().equals("myfn") && isSbjBn) {
-                        String s =  obj.stringValue();
-                        int i = s.lastIndexOf("#");
-                        
-                        className  =  s.substring("import:".length(),s.lastIndexOf("#")-1);
 
-                        fnName = obj.stringValue().substring(i + 1);
+                        String functionImport =  obj.stringValue();
+                        int indexOfLastPoundSign = functionImport.lastIndexOf("#");
+                        
+                        className  =  functionImport.substring("import:".length(),indexOfLastPoundSign);
+                        fnName = functionImport.substring(indexOfLastPoundSign + 1);
 
                         func = getMethodForFunction(className, fnName);
 
