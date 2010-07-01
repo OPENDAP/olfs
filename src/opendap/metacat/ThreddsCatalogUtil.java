@@ -68,8 +68,6 @@ public class ThreddsCatalogUtil {
 	private boolean writeToCache = false;
 	private boolean readFromCache = false;
 	
-	/* private boolean restoreCrawlState = false;m */
-	
 	private XMLOutputter xmlo = null;
 	
 	private ResponseCachePostgres TCCache = null;
@@ -94,11 +92,9 @@ public class ThreddsCatalogUtil {
 		this(writeToCache, namePrefix, readFromCache, false);
 	}
 	*/
-	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache/*, boolean restoreCrawlState*/) {
+	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-		/* this.restoreCrawlState = restoreCrawlState; */
-		
 		if (writeToCache || readFromCache) {
 			log.debug("Configuring caching in ThreddsCatalogUtil.");
 			

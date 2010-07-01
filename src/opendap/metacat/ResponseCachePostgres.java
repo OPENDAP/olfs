@@ -85,7 +85,8 @@ import java.sql.*;
  *       the 'visited' information. I've also tried the Java caching system
  *       (JCS) but that seems to be designed as a true cache where it's not
  *       possible to be sure a previously cached item is still in the cache.
- *       (5/14/10)
+ *       (5/14/10) And I tried using Metacat as the 'cache', but it's too
+ *       picky about the validity of the XML.
  * 
  * @author jimg
  * 
@@ -162,7 +163,7 @@ public class ResponseCachePostgres {
 		}
 	}
     
-	final static String VisitedName = "Visited.save";
+	final static String VisitedName = "_Visited.save";
     
     private String cacheBaseName;
     
@@ -208,7 +209,7 @@ public class ResponseCachePostgres {
     		restoreVisitedState();
     	}
     	catch (Exception e) {
-    		log.error("Could not read the 'visited' cache from disk. Not an error if the cache file doesn't exist.");
+    		log.error("Could not read the 'visited' cache from disk. It is not an error if the cache file doesn't exist.");
 		}
     }
     	
@@ -396,8 +397,11 @@ public class ResponseCachePostgres {
     	return doc;
     }
     
-    /** Get all of the keys in the Response document cache.
+    /** 
+     * Get all of the keys in the Response document (postgres) cache. It's 
+     * likely that you want to use the keys from the 'visited' cache instead.
      * 
+     * @see getLastVisitedKeys()
      * @return An Enumeration that can be used to access all of the keys in
      * the cache. Use getCachedResponse(key) to get the Response docuements.
      */
@@ -427,7 +431,8 @@ public class ResponseCachePostgres {
     	return responsesVisited.containsKey(URL);
     }
     
-    /** Add or update the entry in Response URL cache. This is used to store Last
+    /** 
+     * Add or update the entry in Response URL cache. This is used to store Last
      * Modified Times for a given URL. The time used is initially the current
      * time. If the Response URL has been previously visited
      *  (see getLastVisited()), then that LMT can be used with a 
@@ -441,7 +446,11 @@ public class ResponseCachePostgres {
     	responsesVisited.put(URL, d);
     }
     
-    /** Get all of the keys in the URL cache.
+    /** 
+     * Get all of the keys in the URL cache named when this class was 
+     * instantiated. This returns all of the keys in Visited cache, not the
+     * Postgres database cache; several 'visited' cached might use a single
+     * table in the crawl_cache postgres database. 
      * 
      * @return An Enumeration that can be used to access all of the keys in
      * the cache. Use getLastVisited(key) to get the response LMT times.

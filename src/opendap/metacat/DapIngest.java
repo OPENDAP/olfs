@@ -70,22 +70,26 @@ public class DapIngest {
     /// If metacat needs an explicit schema for our generated EML, use this.
     final static String docidSchema = "/Users/jimg/src/eml-2.10/eml.xsd";
     
+    private static PrintStream ps = System.out;
+    
     /// Login credentials for metacat.
     private String metacatUsername = "";
     private String metacatPassword = "";
     
-    // This hash map is used to ensure that catalogs are not crawled more
-    // than once (preventing loops, etc.)
-    private int catalogsVisited;
-    private int ddxsVisited;
-    
+    private int catalogsVisited = 0;
+    private int ddxsVisited = 0;
+    private int emlVisited = 0;
+        
+    private boolean readThreddsFromCache = false;
     private boolean readDDXsFromCache = false;
+    private boolean readEMLsFromCache = false;
+    
     private boolean verbose = false;
     
-    // Metacat
+    // Metacat (this might not get built)
     private Metacat metacat = null;
     
-    // Caching DDX access
+    // Caching DDX access (this and EML and Thredds always get built)
     private DDXRetriever ddxRetriever;
     
     // Caching EML access
@@ -94,135 +98,106 @@ public class DapIngest {
     // This provides a way to get catalogs, iterate over their child URLs and
     // access DDX urls to datasets in the catalog
     private ThreddsCatalogUtil threddsCatalogUtil;
-        
-    DapIngest(boolean useThreddsCache, boolean useDDXCache, boolean useEMLCache)
-    		throws SaxonApiException, Exception {
-    	this(useThreddsCache, useDDXCache, useEMLCache, "", false, "");
-    }
     
-    DapIngest(boolean useThreddsCache, boolean useDDXCache, boolean useEMLCache,
-    		String cacheNamePrefix, boolean useMetacat, String metacatUrl)
-    		throws SaxonApiException, Exception {
-
-    	log.debug("Cache name prefix: " + cacheNamePrefix);
-    	
-    	threddsCatalogUtil = new ThreddsCatalogUtil(useThreddsCache, cacheNamePrefix, useThreddsCache);
-
-    	catalogsVisited = 0;
-    	ddxsVisited = 0;
-    	
-    	try {
-    		ddxRetriever = new DDXRetriever(useDDXCache, cacheNamePrefix);
-			
-    		emlBuilder = new EMLBuilder(useEMLCache, cacheNamePrefix);
- 		} 
-    	catch (SaxonApiException e) {
-			log.debug("Transform returned an SaxonApiException: " + e.getLocalizedMessage());
-			throw e;
-		}
-    	catch (Exception e) {
-			log.debug("Exception: " + e.getLocalizedMessage());
-			throw e;
-		}
-    	
-    	if (useMetacat) {
-    		log.debug("Building metacat cache connection.");
-			try {
-				log.debug("Test Metacat: " + metacatUrl);
-				metacat = MetacatFactory.createMetacatConnection(metacatUrl);
-
-                log.debug("username: " + metacatUsername + ", password: " + metacatPassword);
-                String response = metacat.login(metacatUsername, metacatPassword);
-                
-                log.debug("login(): response=" + response);
-                /*metacatSessionId = metacat.getSessionId();*/
-                
-                log.debug("login(): Session ID=" + this.metacat.getSessionId());
-            } 
-            catch (MetacatAuthException mae) {
-            	log.debug("Authorization failed:\n" + mae.getMessage());
-            	throw new Exception("Metacat authorization failed:\n" + mae.getMessage());
-            } 
-            catch (MetacatInaccessibleException mie) {
-            	log.debug("Metacat Inaccessible:\n" + mie.getMessage());
-            	throw new Exception("Metacat inaccessible:\n" + mie.getMessage());
-            } 
-    	}
-
-    }
- 
     public static void main(String[] args) {
     	
-    	DapIngest ingester;
+    	DapIngest ingester = new DapIngest();
     	
 		// create the command line parser
 		CommandLineParser parser = new PosixParser();
 
 		// create the Options
 		Options options = new Options();
-		
-		// Make up a better set of options... Need to control caching for each
-		// of thredds, ddx and eml, both of using the (N-1)th as input to the 
-		// Nth and if results are to be cached in the DB or just looked at (for
-		// trial runs).
-		options.addOption("r", "read-from-ddx-cache", false, "Read ddxs from the cache");
-		options.addOption("n", "no-cache", false, "Do not use caching");
-		options.addOption("s", "save-cache", false, "Save the caches");
+				
+		options.addOption("n", "cache-name", true, "Use this to set a prefix for the cache name.");
+		options.addOption("N", "no-cache", false, "Don't cache whatever is being crawled, retrieved or built.\n"
+				+ "Combined with --verbose, you can try something and see the result printed on stdout.");
 		options.addOption("v", "verbose", false, "Print information about the crawl");
-		options.addOption("e", "build-eml", false, "Build EML from the DDX using XSLT");
-		options.addOption("E", "read-from-eml-cache", false, "Don't get DDXs or process DDXs to make EML, just read EML from the cache.");
-		
-		options.addOption("N", "cache-name", true, "Use this to set a prefix for the cache name. Ignored when not using the cache.");
-		options.addOption("R", "catalog-root", true, "Use this as the root catalog. Ignored when reading from the cache." );
-		options.addOption("i", "insert-eml", true, "Add/Insert teh generated EML into Metacat. You must provide a URL to an instance of Metacat.");
+		options.addOption("h", "help", false, "Get help on this command");
+
+		// These are the main options for controlling behavior.
+		options.addOption("t", "thredds-crawl", true, "Crawl a collection of thredds catalogs starting at the catalog URL given.");
+		options.addOption("T", "thredds-cache", false, "Read thedds catalogs from the cache.");
+		options.addOption("d", "ddx-retrieve", false, "Use thredds catalogs to get ddx responses.");
+		options.addOption("D", "ddx-cache", false, "Read ddx responses from the cache.");
+		options.addOption("e", "eml-build", false, "Build EML from the DDX using XSLT");
+		options.addOption("E", "eml-cache", false, "Read EML from the cache.");
+		options.addOption("m", "metacat", true, "Stuff the EML into metacat; must include  URL to a metacat instance.");
 		
 		try {
 		    // parse the command line arguments
 		    CommandLine line = parser.parse( options, args );
 
-		    boolean insertEML = line.hasOption("i");
-		    String metacatURL = line.getOptionValue("i", "");
+		    // Extract all the stuff
+		    String cacheNamePrefix = line.getOptionValue("cache-name", "");
+		    boolean useCaching = !line.hasOption("no-cache");
 		    
-		    boolean useCache = !line.hasOption( "n");
-		    String cacheNamePrefix = "";
-		    if (line.hasOption("N")) {
-		    	log.debug("Found cache-name");
-		    	cacheNamePrefix = line.getOptionValue("N", "");
+		    String catalogRoot = line.getOptionValue("thredds-crawl", "");
+		    ingester.readThreddsFromCache = line.hasOption("thredds-cache");
+		    
+		    boolean ddxRetrieve = line.hasOption("ddx-retrieve");
+		    ingester.readDDXsFromCache = line.hasOption("ddx-cache");
+		    
+		    boolean emlBuild = line.hasOption("eml-build");
+		    ingester.readEMLsFromCache = line.hasOption("eml-cache");
+		    
+		    boolean emlInsert = false;
+		    String metacatURL = line.getOptionValue("metacat", "");
+		    
+		    // Build our various objects as needed.
+		    
+		    // ThreddsCatalogUtil determines whther to read from the netowrk
+		    // or the cache using its constructor. The other classes use 
+		    // different methods to control reading from the cache.
+	    	ingester.threddsCatalogUtil = new ThreddsCatalogUtil(useCaching, cacheNamePrefix, ingester.readThreddsFromCache);
+		    
+    		ingester.ddxRetriever = new DDXRetriever(useCaching, cacheNamePrefix);
+			
+    		ingester.emlBuilder = new EMLBuilder(useCaching, cacheNamePrefix);
+
+        	if (metacatURL != "") {
+        		log.debug("Building metacat cache connection.");
+    			try {
+    				log.debug("Test Metacat: " + metacatURL);
+    				ingester.metacat = MetacatFactory.createMetacatConnection(metacatURL);
+
+                    log.debug("username: " + ingester.metacatUsername + ", password: " + ingester.metacatPassword);
+                    String response = ingester.metacat.login(ingester.metacatUsername, ingester.metacatPassword);
+                    log.debug("login(): response=" + response);
+                    log.debug("login(): Session ID=" + ingester.metacat.getSessionId());
+                    
+                    emlInsert = true;
+                } 
+                catch (MetacatAuthException mae) {
+                	log.debug("Authorization failed:\n" + mae.getMessage());
+                	throw new Exception("Metacat authorization failed:\n" + mae.getMessage());
+                } 
+                catch (MetacatInaccessibleException mie) {
+                	log.debug("Metacat Inaccessible:\n" + mie.getMessage());
+                	throw new Exception("Metacat inaccessible:\n" + mie.getMessage());
+                } 
+        	}
+        	
+		    if (ingester.verbose) {
+		    	System.out.println("Catalog Root: " + catalogRoot);
+		    	System.out.println("Cache name: " + cacheNamePrefix);
+		    	if (metacatURL != "")
+			    	System.out.println("Metacat URL: " + metacatURL);
 		    }
-
-		    ingester = new DapIngest(useCache, useCache, useCache, cacheNamePrefix, insertEML, metacatURL);
 		    
-		    if (line.hasOption( "v"))
-		    	ingester.verbose = true;
-		    
-		    ingester.readDDXsFromCache = line.hasOption("r");
-		    
-		    boolean emlGeneration = false;
-		    if (line.hasOption( "e"))
-		    	emlGeneration = true;
-		    
-		    String catalogURL = "";
-		    if (line.hasOption("R"))
-		    	catalogURL = line.getOptionValue("R");
-
-		    if (ingester.verbose)
-		    	System.out.println("Catalog Root: " + catalogURL);
-
 		    if (line.hasOption("E"))
 		    	ingester.printEMLFromCache(System.out);
 		    else if (line.hasOption( "r"))
-    			ingester.buildEMLFromCachedDDXs(emlGeneration, insertEML);
+    			ingester.buildEMLFromCachedDDXs(emlGeneration, emlInsert);
     		else
-    			ingester.crawlCatalog(catalogURL, emlGeneration, insertEML);
+    			ingester.crawlCatalog(catalogURL, emlGeneration, emlInsert);
 
 		    if (ingester.verbose)
     			ingester.recordStats();
         
-    		if (line.hasOption( "s")) {
-    			ingester.ddxRetriever.saveDDXCache();
-    			ingester.threddsCatalogUtil.saveCatalogCache();
-    			ingester.emlBuilder.saveEMLCache();
-    		}
+			ingester.threddsCatalogUtil.saveCatalogCache();
+			ingester.ddxRetriever.saveDDXCache();
+			ingester.emlBuilder.saveEMLCache();
     	}
 		catch (ParseException pe) {
     		System.err.print("Command line option parse error: " + pe.getMessage());
@@ -234,7 +209,7 @@ public class DapIngest {
     	}
     }
 
-    void recordStats() {
+    private void recordStats() {
     	log.info("THREDDS Catalog URLs Visited: " + catalogsVisited);
     	Enumeration<String> e = threddsCatalogUtil.getCachedCatalogEnumeration();
     	while (e.hasMoreElements()) {
@@ -250,73 +225,46 @@ public class DapIngest {
     	}
     }
     
-    void crawlCatalog(String catalogURL, boolean EMLGeneration, boolean insertEML) throws Exception {
-    	Enumeration<String> catalogs = threddsCatalogUtil.getCatalogEnumeration(catalogURL);
-    	
-    	// First get references to any DDX objects at the top level
-    	log.info("About to get DDX URLS from: " + catalogURL);
-    	++catalogsVisited;
-    	Vector<String> DDXURLs = threddsCatalogUtil.getDDXUrls(catalogURL);
-    	for (String DDXURL: DDXURLs) {
-    		++ddxsVisited;
-    		examineDDX(DDXURL, EMLGeneration, insertEML);
-    	}
-    	
-    	while (catalogs.hasMoreElements()) {
-    		String catalog = catalogs.nextElement();
-        	log.info("About to get DDX URLS from: " + catalog);
-        	++catalogsVisited;
-        	DDXURLs = threddsCatalogUtil.getDDXUrls(catalog);
-        	for (String DDXURL: DDXURLs) {
-        		++ddxsVisited;
-        		examineDDX(DDXURL, EMLGeneration, insertEML);
-        	}
-    	}
-    }
+	public void crawlTHREDDS(String catalogRoot, boolean ddxRetrieve, boolean emlBuild, boolean emlInsert) throws Exception {
+		// Unlike the DDX and EML classes, ThreddsCatalogUtil determines
+		// whether to read from the network or the cache using a parameter 
+		// passed to its constructor. The other classes use special methods to
+		// read from the cache.
+		Enumeration<String> catalogs = threddsCatalogUtil.getCatalogEnumeration(catalogRoot);
 
-	void buildEMLFromCachedDDXs(boolean EMLGeneration, boolean insertEML) throws Exception {
-		// String emlString = null;
-    	Enumeration<String> keys = ddxRetriever.getCache().getResponseKeys();
-		while (keys.hasMoreElements()) {
-			String DDXURL = (String) keys.nextElement();
-			++ddxsVisited;
-			examineDDX(DDXURL, EMLGeneration, insertEML);
+		// First get references to any DDX objects at the top level
+		log.debug("About to get DDX URLS from: " + catalogRoot);
+		if (verbose)
+			ps.println("Root catalog: " + catalogRoot);
+
+		++catalogsVisited;
+
+		Vector<String> DDXURLs = null;
+
+		if (ddxRetrieve) {
+			DDXURLs = threddsCatalogUtil.getDDXUrls(catalogRoot);
+			for (String DDXURL : DDXURLs) {
+				++ddxsVisited;
+				retrieveDDX(DDXURL, emlBuild, emlInsert);
+			}
 		}
-	}	
 
-	void printEMLFromCache(PrintStream ps) {
-    	Enumeration<String> keys = emlBuilder.getCache().getResponseKeys();
-		while (keys.hasMoreElements()) {
-			String DDXURL = (String) keys.nextElement();
-			++ddxsVisited;
-			String eml = emlBuilder.getCache().getCachedResponse(DDXURL);
-			
-			if (ps != null) {
-				ps.println("DDX: " + DDXURL);
-				ps.println("EML:");
-				ps.println(eml);
+		while (catalogs.hasMoreElements()) {
+			String catalog = catalogs.nextElement();
+			log.debug("About to get DDX URLS from: " + catalog);
+			++catalogsVisited;
+			if (verbose)
+				ps.println("catalog: " + catalog);
+			if (ddxRetrieve) {
+				DDXURLs = threddsCatalogUtil.getDDXUrls(catalog);
+				for (String DDXURL : DDXURLs) {
+					++ddxsVisited;
+					retrieveDDX(DDXURL, emlBuild, emlInsert);
+				}
 			}
-			else {
-				log.info("DDX: " + DDXURL);
-				log.info("EML: " + eml);
-			}
-		}		
-	}
-
-	void insertEMLFromCache() {
-		Enumeration<String> keys = emlBuilder.getCache().getResponseKeys();
-		while (keys.hasMoreElements()) {
-			String ddxUrl = (String) keys.nextElement();
-			++ddxsVisited;
-			String eml = emlBuilder.getCache().getCachedResponse(ddxUrl);
-
-			log.debug("DDX: " + ddxUrl);
-			log.debug("EML: " + eml);
-			insertEML(ddxUrl, eml);
-
 		}
 	}
-	
+
 	/**
 	 * For a given DDX URL, get the DDX and then, if that works get the EML. If
 	 * that works, insert the EML into the data store. Note that the ddxRetriever
@@ -326,24 +274,27 @@ public class DapIngest {
 	 * @param ddxUrl
 	 *            A DDX URL
 	 */
-	void examineDDX(String ddxUrl, boolean emlGeneration, boolean insertEML) throws Exception {
+	void retrieveDDX(String ddxUrl, boolean emlBuild, boolean emlInsert) throws Exception {
 		String ddx = "";
 		if (readDDXsFromCache)
 			ddx = ddxRetriever.getCachedDDXDoc(ddxUrl);
 		else
 			ddx = ddxRetriever.getDDXDoc(ddxUrl);
 		
-		if (ddx == null) {
-			throw new Exception("No DDX returned from: " + ddxUrl);
-		}
+		if (ddx == null)
+			throw new Exception("No DDX for: " + ddxUrl);
 
-		if (emlGeneration) {
-			String eml = emlBuilder.getEML(ddxUrl, ddx);
-			if (eml == null) {
-				throw new Exception("No EML returned from: " + ddxUrl);
-			}
+		if (emlBuild) {
+			String eml = "";
+			if (readEMLsFromCache)
+				eml = emlBuilder.getCachedEMLDoc(ddxUrl);
+			else
+				eml = emlBuilder.getEML(ddxUrl, ddx);
+			
+			if (eml == null)
+				throw new Exception("No EML for: " + ddxUrl);
 
-			if (insertEML)
+			if (emlInsert)
 				insertEML(ddxUrl, eml);
 		}
 	}
