@@ -24,6 +24,7 @@ package opendap.metacat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.Enumeration;
 
 import javax.xml.transform.stream.StreamSource;
@@ -64,6 +65,8 @@ public class EMLBuilder {
 
     private boolean verbose = false;
     
+    private Date date = new Date();
+
 	public EMLBuilder() throws Exception {
 		this(false, "");
 	}
@@ -269,8 +272,10 @@ public class EMLBuilder {
 		
 		String eml = os.toString();
 		
-		if (EMLCache != null)
+		if (EMLCache != null) {
+			EMLCache.setLastVisited(DDXURL, date.getTime());
 			EMLCache.setCachedResponse(DDXURL, eml);
+		}
 		
 		return eml;
 	}

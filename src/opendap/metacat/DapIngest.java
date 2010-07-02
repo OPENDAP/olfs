@@ -33,13 +33,16 @@ import net.sf.saxon.s9api.SaxonApiException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-//import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 
 import edu.ucsb.nceas.metacat.client.InsufficientKarmaException;
 import edu.ucsb.nceas.metacat.client.Metacat;
@@ -49,6 +52,7 @@ import edu.ucsb.nceas.metacat.client.MetacatFactory;
 import edu.ucsb.nceas.metacat.client.MetacatInaccessibleException;
 
 import opendap.metacat.ThreddsCatalogUtil;
+import opendap.metacat.ThreddsCatalogUtil.ThreddsCrawlerEnumeration;
 
 /** Crawl a THREDDS catalog and read all of the DDX objects for the data
  * sources it references. Process those so that they are transformed into EML
@@ -73,8 +77,8 @@ public class DapIngest {
     private static PrintStream ps = System.out;
     
     /// Login credentials for metacat.
-    private String metacatUsername = "";
-    private String metacatPassword = "";
+    private String metacatUsername = "uid=jimg,o=unaffiliated,dc=ecoinformatics,dc=org";
+    private String metacatPassword = "p7th0n";
     
     private int catalogsVisited = 0;
     private int ddxsVisited = 0;
@@ -85,19 +89,20 @@ public class DapIngest {
     private boolean readEMLsFromCache = false;
     
     private boolean verbose = false;
+    private boolean veryVerbose = false;
     
     // Metacat (this might not get built)
     private Metacat metacat = null;
     
     // Caching DDX access (this and EML and Thredds always get built)
-    private DDXRetriever ddxRetriever;
+    private DDXRetriever ddxRetriever = null;
     
     // Caching EML access
-    private EMLBuilder emlBuilder;
+    private EMLBuilder emlBuilder = null;
     
     // This provides a way to get catalogs, iterate over their child URLs and
     // access DDX urls to datasets in the catalog
-    private ThreddsCatalogUtil threddsCatalogUtil;
+    private ThreddsCatalogUtil threddsCatalogUtil = null;
     
     public static void main(String[] args) {
     	
@@ -110,59 +115,102 @@ public class DapIngest {
 		Options options = new Options();
 				
 		options.addOption("n", "cache-name", true, "Use this to set a prefix for the cache name.");
-		options.addOption("N", "no-cache", false, "Don't cache whatever is being crawled, retrieved or built.\n"
-				+ "Combined with --verbose, you can try something and see the result printed on stdout.");
+		
+		options.addOption("N", "no-cache", false, "Don't cache whatever is being crawled, retrieved or built. Combined with --verbose, you can try something and see the result printed on stdout.");
 		options.addOption("v", "verbose", false, "Print information about the crawl");
+		options.addOption("V", "very-verbose", false, "Print resultant documents from the crawl (DDX and EML) in addition to whatever --verbose does.");
 		options.addOption("h", "help", false, "Get help on this command");
 
 		// These are the main options for controlling behavior.
 		options.addOption("t", "thredds-crawl", true, "Crawl a collection of thredds catalogs starting at the catalog URL given.");
-		options.addOption("T", "thredds-cache", false, "Read thedds catalogs from the cache.");
+		options.addOption("T", "thredds-cache", true, "Read thedds catalogs from the cache.");
+		options.addOption("r", "restart-crawl", false, "Restart a crawl");
+		
 		options.addOption("d", "ddx-retrieve", false, "Use thredds catalogs to get ddx responses.");
 		options.addOption("D", "ddx-cache", false, "Read ddx responses from the cache.");
+		
 		options.addOption("e", "eml-build", false, "Build EML from the DDX using XSLT");
 		options.addOption("E", "eml-cache", false, "Read EML from the cache.");
+		options.addOption("P", "eml-print-all-cached", false, "Just look at the EML cache and print the URLs. Use --very-verbose to print the documents, too. Ignore thredds and ddx options; without --cache-name this option returns all of the EML in the postgres cache");
+		options.addOption("I", "eml-insert-all-cached", false, "Just look at the EML cache and insert everything into metacat. Ignore thredds and ddx options; without --cache-name this option inserts all of the EML in the postgres cache.");
+		
 		options.addOption("m", "metacat", true, "Stuff the EML into metacat; must include  URL to a metacat instance.");
 		
 		try {
 		    // parse the command line arguments
 		    CommandLine line = parser.parse( options, args );
 
-		    // Extract all the stuff
+		    // If --help is given, print the help and exit.
+		    if (line.hasOption("help")) {
+		    	HelpFormatter formatter = new HelpFormatter();
+		    	formatter.printHelp( "dap_ingest [options]", options );
+		    	return;
+		    }
+		    	
+		    // Extract all the options stuff here.
 		    String cacheNamePrefix = line.getOptionValue("cache-name", "");
 		    boolean useCaching = !line.hasOption("no-cache");
 		    
+		    ingester.verbose = line.hasOption("verbose");
+		    ingester.veryVerbose = line.hasOption("very-verbose");
+		    if (ingester.veryVerbose)
+		    	ingester.verbose = true;
+		    
 		    String catalogRoot = line.getOptionValue("thredds-crawl", "");
 		    ingester.readThreddsFromCache = line.hasOption("thredds-cache");
+		    if (ingester.readThreddsFromCache)
+		    	catalogRoot = line.getOptionValue("thredds-cache", "");
+		    boolean restart = line.hasOption("restart-crawl");
 		    
-		    boolean ddxRetrieve = line.hasOption("ddx-retrieve");
+		    boolean ddxRetrieve = line.hasOption("ddx-retrieve") || line.hasOption("ddx-cache");
 		    ingester.readDDXsFromCache = line.hasOption("ddx-cache");
 		    
-		    boolean emlBuild = line.hasOption("eml-build");
+		    boolean emlBuild = line.hasOption("eml-build") || line.hasOption("eml-cache");
 		    ingester.readEMLsFromCache = line.hasOption("eml-cache");
 		    
 		    boolean emlInsert = false;
 		    String metacatURL = line.getOptionValue("metacat", "");
+		    if (metacatURL != "")
+		    	emlInsert = true;
+		    boolean eml_print_all_cached = line.hasOption("eml-print-all-cached");
+		    boolean eml_insert_all_cached = line.hasOption("eml-insert-all-cached");
 		    
-		    // Build our various objects as needed.
+		    // Build our various objects as needed. I could optimize this so
+		    // that objects are built only if needed, but that makes it harder
+		    // to sort out different parts.
 		    
-		    // ThreddsCatalogUtil determines whther to read from the netowrk
+		    // ThreddsCatalogUtil determines whether to read from the network
 		    // or the cache using its constructor. The other classes use 
 		    // different methods to control reading from the cache.
 	    	ingester.threddsCatalogUtil = new ThreddsCatalogUtil(useCaching, cacheNamePrefix, ingester.readThreddsFromCache);
 		    
-    		ingester.ddxRetriever = new DDXRetriever(useCaching, cacheNamePrefix);
-			
-    		ingester.emlBuilder = new EMLBuilder(useCaching, cacheNamePrefix);
+	    	// For most operations we will need these.
+			try {
+				ingester.ddxRetriever = new DDXRetriever(useCaching, cacheNamePrefix);
 
-        	if (metacatURL != "") {
+				ingester.emlBuilder = new EMLBuilder(useCaching, cacheNamePrefix);
+			}
+			catch (SaxonApiException e) {
+				log.debug("Transform returned an SaxonApiException: " + e.getLocalizedMessage());
+				throw e;
+			}
+			catch (Exception e) {
+				log.debug("Exception: " + e.getLocalizedMessage());
+				throw e;
+			}
+	    	
+			// Since building the metacat object means connecting to metacat,
+			// only do this when its needed.
+        	if (emlInsert) {
         		log.debug("Building metacat cache connection.");
     			try {
     				log.debug("Test Metacat: " + metacatURL);
     				ingester.metacat = MetacatFactory.createMetacatConnection(metacatURL);
 
                     log.debug("username: " + ingester.metacatUsername + ", password: " + ingester.metacatPassword);
+                    
                     String response = ingester.metacat.login(ingester.metacatUsername, ingester.metacatPassword);
+                    
                     log.debug("login(): response=" + response);
                     log.debug("login(): Session ID=" + ingester.metacat.getSessionId());
                     
@@ -178,38 +226,57 @@ public class DapIngest {
                 } 
         	}
         	
+        	// Now do whatever we've been told to do...
+        		
 		    if (ingester.verbose) {
+		        // print internal state
+		        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		        StatusPrinter.print(lc);
+
 		    	System.out.println("Catalog Root: " + catalogRoot);
 		    	System.out.println("Cache name: " + cacheNamePrefix);
 		    	if (metacatURL != "")
 			    	System.out.println("Metacat URL: " + metacatURL);
 		    }
+        	
+		    if (eml_print_all_cached)
+		    	ingester.printAllEMLFromCache(cacheNamePrefix);
+		    else if (eml_insert_all_cached)
+		    	ingester.insertAllEMLFromCache(cacheNamePrefix);
+		    else
+		    	ingester.crawlTHREDDS(catalogRoot,  restart, ddxRetrieve,  emlBuild,  emlInsert);
 		    
-		    if (line.hasOption("E"))
-		    	ingester.printEMLFromCache(System.out);
-		    else if (line.hasOption( "r"))
-    			ingester.buildEMLFromCachedDDXs(emlGeneration, emlInsert);
-    		else
-    			ingester.crawlCatalog(catalogURL, emlGeneration, emlInsert);
-
 		    if (ingester.verbose)
     			ingester.recordStats();
-        
-			ingester.threddsCatalogUtil.saveCatalogCache();
-			ingester.ddxRetriever.saveDDXCache();
-			ingester.emlBuilder.saveEMLCache();
-    	}
+     	}
 		catch (ParseException pe) {
-    		System.err.print("Command line option parse error: " + pe.getMessage());
+    		System.err.println("Command line option parse error: " + pe.getMessage());
 			
 		}
     	catch (Exception e) {
-    		System.err.print("Error: " + e.getMessage());
+    		System.err.println("Error: " + e.getMessage());
     		e.printStackTrace(System.err);
+    	}
+		finally {
+			try {
+				// Might add code to save the sate of a crawl here and add an
+				// option that enables the restart feature
+				if (ingester.threddsCatalogUtil != null)
+					ingester.threddsCatalogUtil.saveCatalogCache();
+				if (ingester.ddxRetriever != null)
+					ingester.ddxRetriever.saveDDXCache();
+				if (ingester.emlBuilder != null)
+					ingester.emlBuilder.saveEMLCache();
+			}
+			catch (Exception e) {
+				System.err.println("Error saving cache state!");
+				e.printStackTrace();
+			}
     	}
     }
 
     private void recordStats() {
+    	ps.println("THREDDS Catalog URLs Visited: " + catalogsVisited);
     	log.info("THREDDS Catalog URLs Visited: " + catalogsVisited);
     	Enumeration<String> e = threddsCatalogUtil.getCachedCatalogEnumeration();
     	while (e.hasMoreElements()) {
@@ -217,25 +284,39 @@ public class DapIngest {
     		log.info(key + ": 1");
     	}
     	
+    	ps.println("DDX URLs Visited: " + ddxsVisited);
     	log.info("DDX URLs Visited: " + ddxsVisited);
     	e = ddxRetriever.getCache().getLastVisitedKeys();
     	while (e.hasMoreElements()) {
     		String key = e.nextElement();
     		log.info(key + ": " + ddxRetriever.getCache().getLastVisited(key));
     	}
+    	
+    	ps.println("EML Built for DDXs: " + emlVisited);
+    	log.info("EML Built for DDXs: " + emlVisited);
+    	e = emlBuilder.getCache().getLastVisitedKeys();
+    	while (e.hasMoreElements()) {
+    		String key = e.nextElement();
+    		log.info(key + ": " + emlBuilder.getCache().getLastVisited(key));
+    	}
+
     }
     
-	public void crawlTHREDDS(String catalogRoot, boolean ddxRetrieve, boolean emlBuild, boolean emlInsert) throws Exception {
+	private void crawlTHREDDS(String catalogRoot, boolean restart, 
+			boolean ddxRetrieve, boolean emlBuild, boolean emlInsert) throws Exception {
 		// Unlike the DDX and EML classes, ThreddsCatalogUtil determines
 		// whether to read from the network or the cache using a parameter 
 		// passed to its constructor. The other classes use special methods to
 		// read from the cache.
-		Enumeration<String> catalogs = threddsCatalogUtil.getCatalogEnumeration(catalogRoot);
+		ThreddsCrawlerEnumeration catalogs = null; 
+		try {
+		if (restart)
+			catalogs = threddsCatalogUtil.getCatalogEnumeration();
+		else
+			catalogs = threddsCatalogUtil.getCatalogEnumeration(catalogRoot);
 
 		// First get references to any DDX objects at the top level
 		log.debug("About to get DDX URLS from: " + catalogRoot);
-		if (verbose)
-			ps.println("Root catalog: " + catalogRoot);
 
 		++catalogsVisited;
 
@@ -244,7 +325,6 @@ public class DapIngest {
 		if (ddxRetrieve) {
 			DDXURLs = threddsCatalogUtil.getDDXUrls(catalogRoot);
 			for (String DDXURL : DDXURLs) {
-				++ddxsVisited;
 				retrieveDDX(DDXURL, emlBuild, emlInsert);
 			}
 		}
@@ -258,10 +338,21 @@ public class DapIngest {
 			if (ddxRetrieve) {
 				DDXURLs = threddsCatalogUtil.getDDXUrls(catalog);
 				for (String DDXURL : DDXURLs) {
-					++ddxsVisited;
 					retrieveDDX(DDXURL, emlBuild, emlInsert);
 				}
 			}
+		}
+		}
+		catch(Exception e) {
+			ps.println("Error: " + e.getMessage());
+			log.debug("Error: " + e.getMessage());
+		}
+		finally {
+			// If we instantiated a ThreddsCrawlerEnumeration, then no matter
+			// how this code exits, save the crawler's stack in case of a
+			// restart.
+			if (catalogs != null)
+				catalogs.saveState();
 		}
 	}
 
@@ -274,7 +365,7 @@ public class DapIngest {
 	 * @param ddxUrl
 	 *            A DDX URL
 	 */
-	void retrieveDDX(String ddxUrl, boolean emlBuild, boolean emlInsert) throws Exception {
+	private void retrieveDDX(String ddxUrl, boolean emlBuild, boolean emlInsert) throws Exception {
 		String ddx = "";
 		if (readDDXsFromCache)
 			ddx = ddxRetriever.getCachedDDXDoc(ddxUrl);
@@ -283,7 +374,14 @@ public class DapIngest {
 		
 		if (ddx == null)
 			throw new Exception("No DDX for: " + ddxUrl);
-
+		
+		++ddxsVisited;
+		
+		if (verbose)
+			ps.println("DDX: " + ddxUrl);
+		if (veryVerbose)
+			ps.println("DDX Document:\n" + ddx);
+		
 		if (emlBuild) {
 			String eml = "";
 			if (readEMLsFromCache)
@@ -293,6 +391,11 @@ public class DapIngest {
 			
 			if (eml == null)
 				throw new Exception("No EML for: " + ddxUrl);
+
+			++ emlVisited;
+			
+			if (veryVerbose)
+				ps.println("EML Document:\n" + eml);
 
 			if (emlInsert)
 				insertEML(ddxUrl, eml);
@@ -329,30 +432,85 @@ public class DapIngest {
      * 
      * @param emlString
      */
-	void insertEML(String ddxUrl, String emlString) {
+	private void insertEML(String ddxUrl, String emlString) {
 
 		String docid = getDocid(ddxUrl);
-		log.debug("Caching " + ddxUrl + "(docid:" + docid + ") in metacat.");
+		log.debug("Storing " + ddxUrl + "(docid:" + docid + ") in metacat.");
 
 		try {
 			// FileReader schema = new FileReader(docidSchema);
 			// metacat.insert(String docid, Reader xmlDocument, Reader schema);
-			metacat.insert(docid, new StringReader(emlString), null);
+			String response = metacat.insert(docid, new StringReader(emlString), null);
+			if (verbose)
+				ps.println("Metacat's response: " + response);
 		}
 		catch (FileNotFoundException e) {
+			ps.println("Could not open the file: " + docidSchema);
 			log.error("Could not open the file: " + docidSchema);
 		}
 		catch (InsufficientKarmaException e) {
-			log.error("Error caching the response: Insufficent rights for the operation: " + e.getMessage());
+			ps.println("Error storing the response: Insufficent rights for the operation: " + e.getMessage());
+			log.error("Error storing the response: Insufficent rights for the operation: " + e.getMessage());
 		}
 		catch (MetacatException e) {
-			log.error("Error caching the response: " + e.getMessage());
+			ps.println("Error storing the response: " + e.getMessage());
+			log.error("Error storing the response: " + e.getMessage());
 		}
 		catch (IOException e) {
-			log.error("Error caching the response: Unknown error: " + e.getMessage());
+			ps.println("Error storing the response: Unknown error: " + e.getMessage());
+			log.error("Error storing the response: Unknown error: " + e.getMessage());
 		}
 		catch (MetacatInaccessibleException e) {
-			log.error("Error caching the response: Error reading the xml document: " + e.getMessage());
+			ps.println("Error storing the response: Error reading the xml document: " + e.getMessage());
+			log.error("Error storing the response: Error reading the xml document: " + e.getMessage());
+		}
+	}
+	
+	private void printAllEMLFromCache(String cacheNamePrefix) {
+		Enumeration<String> keys;
+		if (cacheNamePrefix != "")
+			keys = emlBuilder.getCache().getLastVisitedKeys();
+		else 
+			keys = emlBuilder.getCache().getResponseKeys();
+		
+		while (keys.hasMoreElements()) {
+			String DDXURL = (String) keys.nextElement();
+			++emlVisited;
+			
+			ps.println("DDX: " + DDXURL);
+
+			if (veryVerbose) {
+				String eml = emlBuilder.getCache().getCachedResponse(DDXURL);
+				ps.println("EML:");
+				ps.println(eml);
+			}
+		}		
+	}
+
+	private void insertAllEMLFromCache(String cacheNamePrefix) {
+		Enumeration<String> keys;
+		if (cacheNamePrefix != "")
+			keys = emlBuilder.getCache().getLastVisitedKeys();
+		else 
+			keys = emlBuilder.getCache().getResponseKeys();
+		
+		while (keys.hasMoreElements()) {
+			String ddxUrl = (String) keys.nextElement();
+			++emlVisited;
+			String eml = emlBuilder.getCache().getCachedResponse(ddxUrl);
+
+			ps.println("DDX: " + ddxUrl);
+			
+			if (eml != null) {
+				if (veryVerbose)
+					ps.println("EML: " + eml);
+				
+				insertEML(ddxUrl, eml);
+			}
+			else {
+				if (veryVerbose)
+					ps.println("EML: <null>");
+			}	
 		}
 	}
 }

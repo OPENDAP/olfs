@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import opendap.metacat.ThreddsCatalogUtil;
-import opendap.metacat.ThreddsCatalogUtil.threddsCrawlerEnumeration;
+import opendap.metacat.ThreddsCatalogUtil.ThreddsCrawlerEnumeration;
 
 /**
  * This class is a simple DDX crawler that uses an Enumeration
@@ -147,13 +147,13 @@ public class DDXCrawler {
 
 	public void crawlCatalog(String catalogURL, PrintStream ps, boolean restoreState) throws Exception {
 
-		threddsCrawlerEnumeration catalogs = null;
+		ThreddsCrawlerEnumeration catalogs = null;
 		
 		try {
 			if (!restoreState)
-				catalogs = (threddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration(catalogURL);
+				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration(catalogURL);
 			else 
-				catalogs = (threddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration();
+				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration();
 			
 			Vector<String> DDXURLs = null;
 

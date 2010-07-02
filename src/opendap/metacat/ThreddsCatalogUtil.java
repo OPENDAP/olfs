@@ -122,7 +122,7 @@ public class ThreddsCatalogUtil {
 	 * @author jimg
 	 * 
 	 */
-	public class threddsCrawlerEnumeration implements Enumeration<String> {
+	public class ThreddsCrawlerEnumeration implements Enumeration<String> {
 
 		// This holds catalogs not yet seen by the user of the Enumeration
 		private Stack<String> childURLs;
@@ -130,12 +130,12 @@ public class ThreddsCatalogUtil {
 		// Name for the saved stack - see saveState() below.
 		private String savedStateName = "TCU.Stack";
 
-		threddsCrawlerEnumeration(String catalogURL) throws Exception {
+		ThreddsCrawlerEnumeration(String catalogURL) throws Exception {
 			childURLs = new Stack<String>();
 			childURLs.push(catalogURL);
 		}
 		
-		threddsCrawlerEnumeration() throws Exception {
+		ThreddsCrawlerEnumeration() throws Exception {
 			childURLs = new Stack<String>();
 			restoreState();
 
@@ -189,13 +189,13 @@ public class ThreddsCatalogUtil {
 	    		oos.writeObject(childURLs);
 	    	}
 	    	catch (FileNotFoundException e) {
-				throw new Exception("threddsCrawlerEnumeration.saveState: File not found", e);
+				throw new Exception("ThreddsCrawlerEnumeration.saveState: File not found", e);
 	    	}
 	    	catch (SecurityException e) {
-				throw new Exception("threddsCrawlerEnumeration.saveState: Security", e);
+				throw new Exception("ThreddsCrawlerEnumeration.saveState: Security", e);
 	    	}	
 	    	catch (java.io.IOException e) {
-				throw new Exception("threddsCrawlerEnumeration.saveState: I/O", e);
+				throw new Exception("ThreddsCrawlerEnumeration.saveState: I/O", e);
 	    	}
 	    	finally {
 	    		if (oos != null)
@@ -218,18 +218,18 @@ public class ThreddsCatalogUtil {
 	    	}
 			catch (ClassNotFoundException e) {
 				throw new Exception(
-						"threddsCrawlerEnumeration.restoreState: "
+						"ThreddsCrawlerEnumeration.restoreState: "
 								+ "Could not find the class when reading the Stack<String> object."
 								+ e.getMessage());
 			}
 			catch (ClassCastException e) {
 				throw new Exception(
-						"threddsCrawlerEnumeration.restoreState: "
+						"ThreddsCrawlerEnumeration.restoreState: "
 								+ "Could not cast the persistent store to a Stack<String> object."
 								+ e.getMessage());
 			}
 			catch (java.io.IOException e) {
-				throw new Exception("threddsCrawlerEnumeration.restoreState: " + "Generic Java I/O Exception."
+				throw new Exception("ThreddsCrawlerEnumeration.restoreState: " + "Generic Java I/O Exception."
 						+ e.getMessage());
 			}    	
 			finally {
@@ -438,12 +438,12 @@ public class ThreddsCatalogUtil {
 	 * @param topCatalog
 	 *            The THREDDS catalog that will serve as the root node
 	 * @return An Enumeration of Strings that will visit all of the catalogs in
-	 *         that tree, bound up in a threddsCrawlerEnumeration.
+	 *         that tree, bound up in a ThreddsCrawlerEnumeration.
 	 * @throws Exception Thrown if the cache cannot be configured
 	 */
-	public Enumeration<String> getCatalogEnumeration(String topCatalog) throws Exception {
+	public ThreddsCrawlerEnumeration getCatalogEnumeration(String topCatalog) throws Exception {
 		log.debug("Seeding the crawl with [" + topCatalog + "]");
-		return new threddsCrawlerEnumeration(topCatalog);
+		return new ThreddsCrawlerEnumeration(topCatalog);
 	}
 	
 	/**
@@ -454,19 +454,19 @@ public class ThreddsCatalogUtil {
 	 * long crawl.
 	 * 
 	 * @note In order to get this method to work, the
-	 *       threddsCrawlerEnumeration.saveState() method must be called first
+	 *       ThreddsCrawlerEnumeration.saveState() method must be called first
 	 *       (by a previous run). That means that a crawler needs to trap
 	 *       conditions that will stop a crawl and ake sure that method is
 	 *       called before exiting.
 	 * 
 	 * @return An enumeration of Strings, bound up in a
-	 *         threddsCrawlerEnumeration object.
+	 *         ThreddsCrawlerEnumeration object.
 	 * @throws Exception
 	 *             Thrown if the cache cannot be configured
 	 */
-	public Enumeration<String> getCatalogEnumeration() throws Exception {
+	public ThreddsCrawlerEnumeration getCatalogEnumeration() throws Exception {
 		log.debug("Restart a crawl from saved catalogs on the stack.");
-		return new threddsCrawlerEnumeration();
+		return new ThreddsCrawlerEnumeration();
 	}
 
 	/**

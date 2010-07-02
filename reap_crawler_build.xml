@@ -176,10 +176,6 @@
 	<property name="servlet-api.lib" value="servlet-api.jar"/>
 	<property name="catalina.lib" value="catalina-6.0.14.jar"/>
 
-	<!-- Java Cache System. Also uses apache commons logging -->
-	<property name="jcs.lib" value="jcs-1.3.jar"/>
-	<property name="concurrent" value="concurrent-1.3.4.jar"/>
-
 	<property name="postgres-jdbc.lib" value="postgresql-8.4-701.jdbc4.jar"/>
 
 	<!-- ******************************************** -->
@@ -203,12 +199,6 @@
 			<include name="${httpclient.lib}" />
 			<include name="${servlet-api.lib}"/>
 			<include name="${catalina.lib}"/>
-
-
-			<!-- used for JCS -->
-			<!--include name="${jcs.lib}"/>
-			<include name="${concurrent}"/>
-			<include name="${commons-logging.lib}"/-->
 
 			<include name="${postgres-jdbc.lib}"/>
 		</fileset>
@@ -264,19 +254,7 @@
         depends="compile"
         description="Build the executable jar file run by the thredds_crawler.sh script">
 
-		<jar destfile="${build.libexec}/ThreddsCrawler.jar"
-		    manifest="${resources.dir}/META-INF/ThreddsCrawler.MANIFEST.MF">
-			<fileset dir="${build.classes}">
-				<include name="opendap/**/*.class"/>
-			</fileset>
-			<!-- This adds the file to the jar at the top level. Using fileset
-			     dir="..." and an <include .../> element adds the directory
-			     structure, too -->
-			<fileset file="resources/metacat/logback.xml"/>
-		</jar>
-
 		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
-		<!-- copy file="${resources.dir}/metacat/ddx2eml-2.1.1.xsl" todir="${build.run}/"/ -->
 		<copy file="${resources.dir}/metacat/thredds_crawler.sh" todir="${build.run}/" />
 
 		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
@@ -296,32 +274,25 @@
 		<copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/"/>
 		<copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/"/>
 
-
-		<!-- used for JCS -->
-		<!--copy file="${lib.dir}/${jcs.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${concurrent}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${commons-logging.lib}" todir="${build.lib}/" /-->
-
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
+
+        <jar destfile="${build.libexec}/ThreddsCrawler.jar"
+            manifest="${resources.dir}/META-INF/ThreddsCrawler.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/**/*.class"/>
+            </fileset>
+            <!-- This adds the file to the jar at the top level. Using fileset
+                 dir="..." and an <include .../> element adds the directory
+                 structure, too -->
+            <fileset file="resources/metacat/logback.xml"/>
+        </jar>
 	</target>
 
 	<target name="BuildDDXCrawler"
         depends="compile"
         description="Build the executable jar file run by the ddx_crawler.sh script">
 
-		<jar destfile="${build.libexec}/DDXCrawler.jar"
-            manifest="${resources.dir}/META-INF/DDXCrawler.MANIFEST.MF">
-			<fileset dir="${build.classes}">
-				<include name="opendap/**/*.class"/>
-			</fileset>
-			<!-- This adds the file to the jar at the top level. Using fileset
-                 dir="..." and an <include .../> element adds the directory
-                 structure, too -->
-			<fileset file="resources/metacat/logback.xml"/>
-		</jar>
-
 		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
-		<!-- copy file="${resources.dir}/metacat/ddx2eml-2.1.1.xsl" todir="${build.run}/"/ -->
 		<copy file="${resources.dir}/metacat/ddx_crawler.sh" todir="${build.run}/" />
 
 		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
@@ -341,16 +312,99 @@
 		<copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/"/>
 		<copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/"/>
 
-		<!-- used for JCS 
-        <copy file="${lib.dir}/${jcs.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${concurrent}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${commons-logging.lib}" todir="${build.lib}/" />
-        -->
-
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
+
+		<jar destfile="${build.libexec}/DDXCrawler.jar"
+            manifest="${resources.dir}/META-INF/DDXCrawler.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/**/*.class"/>
+            </fileset>
+            <!-- This adds the file to the jar at the top level. Using fileset
+                 dir="..." and an <include .../> element adds the directory
+                 structure, too -->
+            <fileset file="resources/metacat/logback.xml"/>
+        </jar>
+
 	</target>
 
-	<target name="CrawlCatlogsTest" depends="compile">
+    <target name="BuildEMLBuilder"
+        depends="compile"
+        description="">
+
+        <copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.libexec}/"/>
+        <copy file="${resources.dir}/metacat/ddx2eml-3.1.xsl" todir="${build.run}/"/>
+        <copy file="${resources.dir}/metacat/eml_builder.sh" todir="${build.run}/"/>
+
+        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+
+        <!-- Used for metacat -->
+        <copy file="${lib.dir}/${metacat.lib}" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/${nceas-utilities.lib}" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/${httpclient.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/"/>
+        <copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/"/>
+
+        <jar destfile="${build.libexec}/EMLBuilder.jar"
+            manifest="${resources.dir}/META-INF/EMLBuilder.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/**/*.class"/>
+            </fileset>
+            <!-- This adds the file to the jar at the top level. Using fileset
+                  dir="..." and an <include .../> element adds the directory
+                  structure, too -->
+            <fileset file="resources/metacat/logback.xml"/>
+        </jar>
+
+    </target>
+
+    <!-- ************************************************************** -->
+
+	<target name="BuildDapIngest" depends="compile" description="">
+
+		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}/" />
+		<copy file="${resources.dir}/metacat/ddx2eml-3.1.xsl" todir="${build.run}/" />
+		<copy file="${resources.dir}/metacat/dap_ingest.sh" todir="${build.run}/" />
+
+		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+
+		<!-- Used for metacat -->
+		<copy file="${lib.dir}/${metacat.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${nceas-utilities.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${httpclient.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/" />
+
+		<jar destfile="${build.libexec}/DapIngest.jar" manifest="${resources.dir}/META-INF/DapIngest.MANIFEST.MF">
+			<fileset dir="${build.classes}">
+				<include name="opendap/**/*.class" />
+			</fileset>
+			<!-- This adds the file to the jar at the top level. Using fileset
+                    dir="..." and an <include .../> element adds the directory
+                    structure, too -->
+			<fileset file="resources/metacat/logback.xml" />
+		</jar>
+
+	</target>
+
+    <!-- ******************************************************* -->
+	
+	<target name="ThreddsCrawlerTest" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
 		<copy file="${resources.dir}/metacat/jcs.cache.ccf" todir="${build.classes}" />
@@ -372,82 +426,7 @@
 
 	</target>
 
-	<target name="CrawlCatlogsNODC" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
-
-		<java classname="opendap.metacat.ThreddsCrawler" fork="true" dir="${build.run}">
-			<arg line="--catalog-root=http://data.nodc.noaa.gov/opendap/ghrsst/catalog.xml"/>
-			<arg line="--cache-name=data.nodc.noaa.gov"/>
-			<arg line="--verbose"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<target  name="CrawlCacheTest" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
-		<!-- copy file="${resources.dir}/metacat/InvCatalog.1.0.1.xsd" todir="${build.run}"/ -->
-
-		<java classname="opendap.metacat.ThreddsCrawler"
-            fork="true"
-            dir="${build.run}">
-			<arg line="-r"/>
-			<arg line="-p"/>
-			<arg line="--cache-name=test.opendap.org"/>
-			<arg line="--verbose"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<target  name="CrawlCacheNODC" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
-
-		<java classname="opendap.metacat.ThreddsCrawler"
-            fork="true"
-            dir="${build.run}">
-			<arg line="-r"/>
-			<arg line="--cache-name=data.nodc.noaa.gov"/>
-			<arg line="--verbose"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<target name="CrawlDDXNODCRestart" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
-
-		<java classname="opendap.metacat.DDXCrawler" fork="true" dir="${build.run}">
-			<arg line="--restore" />
-			<arg line="--cache-name=data.nodc.noaa.gov" />
-			<arg line="--verbose" />
-			<arg line="--ddx-cache" />
-			<classpath refid="classpath" />
-		</java>
-
-	</target>
-
-	<target  name="CrawlCacheAndPrint" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
-
-		<java classname="opendap.metacat.ThreddsCrawler"
-            fork="true"
-            dir="${build.run}">
-			<arg line="-r"/>
-			<arg line="-p"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<!-- ******************************************************* -->
-
-	<target name="CrawlDDXTest" depends="compile">
+	<target name="DDXCrawlerTest" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
 
@@ -462,7 +441,7 @@
 
 	</target>
 
-	<target name="CrawlDDXTestRestart" depends="compile">
+	<target name="DDXCrawlerTestRestart" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
 
@@ -476,8 +455,8 @@
 		</java>
 
 	</target>
+				
 	<!-- ******************************************************* -->
-
 
 	<target  name="runDapIngest" depends="compile">
 
@@ -487,47 +466,35 @@
 		<java classname="opendap.metacat.DapIngest"
             fork="true"
             dir="${build.run}">
-			<arg line="--save-cache"/>
 			<arg line="--verbose"/>
-			<arg line="--eml"/>
-			<arg line="--catalog-root=http://test.opendap.org:8090/opendap/data/catalog.xml"/>
+		    <arg line="--very-verbose"/>
+			<arg line="--thredds-cache=http://test.opendap.org:8090/opendap/data/nc/catalog.xml"/>
+			<arg line="--cache-name=test.opendap.org"/>
+			<arg line="--ddx-cache"/>
+			<arg line="--eml-cache"/>
 			<classpath refid="classpath"/>
 		</java>
 
 	</target>
 
-	<target  name="runDapIngestCached" depends="compile">
+    <target  name="Print_EML_from_cache" depends="compile">
 
-		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-		<copy file="${resources.dir}/metacat/ddx2eml-2.0.xsl" tofile="${build.run}/ddx2eml-2.0.xsl"/>
+        <copy file="${resources.dir}/metacat/logback.xml" tofile="${build.classes}/logback.xml"/>
+        <copy file="${resources.dir}/metacat/ddx2eml-3.1.xsl" tofile="${build.run}/ddx2eml-3.1.xsl"/>
 
-		<java classname="opendap.metacat.DapIngest"
+        <java classname="opendap.metacat.DapIngest"
             fork="true"
             dir="${build.run}">
-			<arg line="-r"/>
-			<arg line="-v"/>
-			<classpath refid="classpath"/>
-		</java>
+            <arg line="--verbose"/>
+            <arg line="--very-verbose"/>
+            <arg line="--cache-name=test.opendap.org"/>
+            <arg line="--eml-print-all-cached"/>
+            <classpath refid="classpath"/>
+        </java>
 
-	</target>
+    </target>
 
-	<target  name="runDapIngestNoCache" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-		<copy file="${resources.dir}/metacat/ddx2eml-2.0.xsl" tofile="${build.run}/ddx2eml-2.0.xsl"/>
-
-		<java classname="opendap.metacat.DapIngest"
-            fork="true"
-            dir="${build.run}">
-			<arg line="-n"/>
-			<arg line="-v"/>
-			<arg line="--catalog-root=http://test.opendap.org:8090/opendap/data/catalog.xml"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<target  name="runDapIngestEMLTest" depends="compile">
+	<target  name="Insert_EML_from_cache" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
 		<copy file="${resources.dir}/metacat/ddx2eml-3.1.xsl" tofile="${build.run}/ddx2eml-3.1.xsl"/>
@@ -535,25 +502,10 @@
 		<java classname="opendap.metacat.DapIngest"
             fork="true"
             dir="${build.run}">
-			<arg line="--read-from-ddx-cache"/>
-			<arg line="--verbose"/>
-			<arg line="--build-eml"/>
-			<arg line="--cache-name=data.nodc.noaa.gov"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<target  name="runDapIngestPrintEML" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-		<copy file="${resources.dir}/metacat/ddx2eml-2.0.xsl" tofile="${build.run}/ddx2eml-2.0.xsl"/>
-
-		<java classname="opendap.metacat.DapIngest"
-            fork="true"
-            dir="${build.run}">
-			<arg line="-R"/>
-			<arg line="-v"/>
+            <arg line="--verbose"/>
+            <arg line="--very-verbose"/>
+			<arg line="--metacat=http://localhost:8080/knb/metacat"/>
+            <arg line="--eml-insert-all-cached"/>
 			<classpath refid="classpath"/>
 		</java>
 
@@ -561,59 +513,7 @@
 
 	<!-- *******************************************************  -->
 
-	<target  name="runEMLRetriever" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-		<copy file="${resources.dir}/metacat/ddx2eml-2.1.1.xsl" tofile="${build.run}/ddx2eml-2.1.1.xsl"/>
-
-		<java classname="opendap.metacat.EMLRetriever"
-            fork="true"
-            dir="${build.run}">
-			<arg line="--cache-name=Test"/>
-			<arg line="--ddx-url=http://data.nodc.noaa.gov/opendap/ghrsst/L4/AUS/ABOM/RAMSSA_09km/2008/092/20080401-ABOM-L4HRfnd-AUS-v01-fv02_0-RAMSSA_09km.nc.bz2.ddx"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-	<target name="BuildEMLRetriever"
-        depends="compile"
-        description="">
-
-		<jar destfile="${build.libexec}/EMLRetriever.jar"
-            manifest="${resources.dir}/META-INF/EMLRetriever.MANIFEST.MF">
-			<fileset dir="${build.classes}">
-				<include name="opendap/**/*.class"/>
-			</fileset>
-		</jar>
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.libexec}/"/>
-		<copy file="${resources.dir}/metacat/ddx2eml-2.1.1.xsl" todir="${build.run}/"/>
-		<copy file="${resources.dir}/metacat/eml_retriever.sh" todir="${build.run}/"/>
-
-        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
-        <copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
-
-		<!-- Used for metacat -->
-		<copy file="${lib.dir}/${metacat.lib}" todir="${build.lib}/"/>
-		<copy file="${lib.dir}/${nceas-utilities.lib}" todir="${build.lib}/"/>
-		<copy file="${lib.dir}/${httpclient.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/" />
-		<copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/" />
-
-	</target>
-
-	<!-- ************************************************************** -->
-
 	<!-- Run the 'Visited' cache builder -->
-
 
 	<target name="runVisitedMaker" depends="compile">
 		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml" />
