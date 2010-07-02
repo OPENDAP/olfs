@@ -79,8 +79,17 @@ public class Transformer {
     private String xsltDoc;
     private DocumentBuilder builder;
 
+    private Transformer(){
+        proc = null;
+        out = null;
+        transform = null;
+        cacheTime = null;
+        xsltDoc = null;
+        builder = null;
+    }
 
     public Transformer(String xsltDocument) throws SaxonApiException {
+        this();
 
         proc = new Processor(false);
 
@@ -89,12 +98,38 @@ public class Transformer {
     }
 
     public Transformer(Processor proc, String xsltDocument) throws SaxonApiException {
+        this();
 
 
         init(proc, xsltDocument);
 
     }
 
+
+    public Transformer(StreamSource xsltDocStream) throws SaxonApiException {
+        this();
+
+        proc = new Processor(false);
+
+        init(proc, xsltDocStream);
+
+    }
+
+
+
+    private void init(Processor processor,StreamSource xsltDocument) throws SaxonApiException {
+
+        proc = processor;
+
+        // Get an XSLT processor and serializer
+        out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        builder = getDocumentBuilder();
+
+        loadTransform(xsltDocument);
+
+    }
 
 
     private void init(Processor processor,String xsltDocument) throws SaxonApiException {
@@ -108,7 +143,7 @@ public class Transformer {
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
         builder = getDocumentBuilder();
 
-        loadTransform();
+        loadTransform(new StreamSource(xsltDoc));
 
     }
 
@@ -130,18 +165,20 @@ public class Transformer {
 
 
     public void reloadTransformIfRequired() throws SaxonApiException {
-        File f = new File(xsltDoc);
-        if(f.lastModified()>cacheTime.getTime()){
-            loadTransform();
+        if(xsltDoc!=null){
+            File f = new File(xsltDoc);
+            if(f.lastModified()>cacheTime.getTime()){
+                loadTransform(new StreamSource(xsltDoc));
+            }
         }
 
     }
 
 
-    private void loadTransform() throws SaxonApiException{
+    private void loadTransform(StreamSource xsltDocStream) throws SaxonApiException{
         // Get an XSLT compiler with our transform in it.
         XsltCompiler comp = proc.newXsltCompiler();
-        XsltExecutable exp = comp.compile(new StreamSource(xsltDoc));
+        XsltExecutable exp = comp.compile(xsltDocStream);
         transform = exp.load(); // loads the transform file.
         cacheTime = new Date();
 
