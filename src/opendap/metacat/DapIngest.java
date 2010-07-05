@@ -22,8 +22,13 @@
 
 package opendap.metacat;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Vector;
@@ -69,12 +74,13 @@ public class DapIngest {
     private static Logger log = LoggerFactory.getLogger(DapIngest.class);
     
     /// This is the prefix for all the document ids made up of DDX URLs
-    final static String docidPrefix = "DDX.";
+    final static String docidScope = "dap.";
     
     /// If metacat needs an explicit schema for our generated EML, use this.
     final static String docidSchema = "/Users/jimg/src/eml-2.10/eml.xsd";
     
-    private static PrintStream ps = System.out;
+    final static PrintStream ps = System.out;
+    final static PrintStream err = System.err;
     
     /// Login credentials for metacat.
     private String metacatUsername = "uid=jimg,o=unaffiliated,dc=ecoinformatics,dc=org";
@@ -83,6 +89,10 @@ public class DapIngest {
     private int catalogsVisited = 0;
     private int ddxsVisited = 0;
     private int emlVisited = 0;
+    // Increment once for each insert
+    private Integer metacatId = 1;
+    // This should change rarely
+    private String metacatRevision = ".1";
         
     private boolean readThreddsFromCache = false;
     private boolean readDDXsFromCache = false;
@@ -133,6 +143,7 @@ public class DapIngest {
 		options.addOption("E", "eml-cache", false, "Read EML from the cache.");
 		options.addOption("P", "eml-print-all-cached", false, "Just look at the EML cache and print the URLs. Use --very-verbose to print the documents, too. Ignore thredds and ddx options; without --cache-name this option returns all of the EML in the postgres cache");
 		options.addOption("I", "eml-insert-all-cached", false, "Just look at the EML cache and insert everything into metacat. Ignore thredds and ddx options; without --cache-name this option inserts all of the EML in the postgres cache.");
+		options.addOption("F", "eml-from-file", true, "Read an eml document from the named file and insert into metacat");
 		
 		options.addOption("m", "metacat", true, "Stuff the EML into metacat; must include  URL to a metacat instance.");
 		
@@ -174,6 +185,8 @@ public class DapIngest {
 		    	emlInsert = true;
 		    boolean eml_print_all_cached = line.hasOption("eml-print-all-cached");
 		    boolean eml_insert_all_cached = line.hasOption("eml-insert-all-cached");
+		    boolean emlFromFile = line.hasOption("eml-from-file");
+		    String emlFilename = line.getOptionValue("eml-from-file", "");    	
 		    
 		    // Build our various objects as needed. I could optimize this so
 		    // that objects are built only if needed, but that makes it harder
@@ -214,6 +227,12 @@ public class DapIngest {
                     log.debug("login(): response=" + response);
                     log.debug("login(): Session ID=" + ingester.metacat.getSessionId());
                     
+                    String id = ingester.metacat.getLastDocid(docidScope);
+                    
+                    // if not null, use the value, else use the default of 1
+                    if (!isEmpty(id))
+                    	ingester.metacatId = Integer.valueOf(id);
+                   
                     emlInsert = true;
                 } 
                 catch (MetacatAuthException mae) {
@@ -239,7 +258,9 @@ public class DapIngest {
 			    	System.out.println("Metacat URL: " + metacatURL);
 		    }
         	
-		    if (eml_print_all_cached)
+		    if (emlFromFile)
+		    	ingester.insertEMLFromLocalFile(emlFilename);
+		    else if (eml_print_all_cached)
 		    	ingester.printAllEMLFromCache(cacheNamePrefix);
 		    else if (eml_insert_all_cached)
 		    	ingester.insertAllEMLFromCache(cacheNamePrefix);
@@ -273,6 +294,10 @@ public class DapIngest {
 				e.printStackTrace();
 			}
     	}
+    }
+    
+    private static boolean isEmpty(String s) {
+    	return (s == null || s.length() == 0 || s.equals("null"));
     }
 
     private void recordStats() {
@@ -418,12 +443,13 @@ public class DapIngest {
      * literal and <string> must not contain any dots. Furthermore, only the
      * last two parts are used when accessing the document id; the first 
      * <string> is ignored. This method returns a document id by combining the 
-     * value of the class' docidPrefix with an escaped URL and a '1'. 
+     * value of the class' docidScope with an escaped URL and a '1'. 
      * @param url
      * @return A docuement id string suitable for use with metacat
      */
     private String getDocid(String url) {
-    	return docidPrefix + escapedURL(url) + ".1";
+		++metacatId;
+    	return docidScope + metacatId.toString() + metacatRevision;
     }
     
     /**
@@ -441,6 +467,7 @@ public class DapIngest {
 			// FileReader schema = new FileReader(docidSchema);
 			// metacat.insert(String docid, Reader xmlDocument, Reader schema);
 			String response = metacat.insert(docid, new StringReader(emlString), null);
+
 			if (verbose)
 				ps.println("Metacat's response: " + response);
 		}
@@ -496,10 +523,11 @@ public class DapIngest {
 		
 		while (keys.hasMoreElements()) {
 			String ddxUrl = (String) keys.nextElement();
+			
+			ps.println("DDX: " + ddxUrl);
+			
 			++emlVisited;
 			String eml = emlBuilder.getCache().getCachedResponse(ddxUrl);
-
-			ps.println("DDX: " + ddxUrl);
 			
 			if (eml != null) {
 				if (veryVerbose)
@@ -508,9 +536,64 @@ public class DapIngest {
 				insertEML(ddxUrl, eml);
 			}
 			else {
-				if (veryVerbose)
+				if (verbose)
 					ps.println("EML: <null>");
 			}	
+		}
+	}
+	
+	private String convertStreamToString(InputStream is) throws IOException {
+		/*
+		 * To convert the InputStream to String we use the
+		 * BufferedReader.readLine() method. We iterate until the BufferedReader
+		 * returns null which means there's no more data to read. Each line will
+		 * be appended to a StringBuilder and the result returned as a String.
+		 */
+		if (is != null) {
+			StringBuilder sb = new StringBuilder();
+			String line;
+
+			try {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+				while ((line = reader.readLine()) != null) {
+					sb.append(line).append("\n");
+				}
+			}
+			finally {
+				is.close();
+			}
+			return sb.toString();
+		}
+		else {
+			return "";
+		}
+	}
+
+	private void insertEMLFromLocalFile(String filename) {
+
+		try {
+			// Open the file
+			FileInputStream fstream = new FileInputStream(filename);
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+
+			String eml = convertStreamToString(in);
+			ps.println("Filename: " + filename);
+
+			if (eml != null) {
+				if (veryVerbose)
+					ps.println("EML: " + eml);
+
+				insertEML(filename, eml);
+			}
+			else {
+				if (veryVerbose)
+					ps.println("EML: <null>");
+			}
+		}
+		catch (IOException e) {
+			ps.println("Error: Could not open the file: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

@@ -448,7 +448,7 @@ public class ResponseCache {
      * id must be of the form <string>.<string>.<digit> Where the dots are 
      * literal and <string> must not contain any dots. Furthermore, only the
      * last two parts; the first <string> is ignored. This method returns a
-     * document id by combining the value of the class' docidPrefix with
+     * document id by combining the value of the class' docidScope with
      * an escaped URL and a '1'. 
      * @param URL
      * @return A docuement id string suitable for use with metacat

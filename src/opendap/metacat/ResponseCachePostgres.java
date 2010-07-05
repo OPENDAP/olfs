@@ -386,8 +386,10 @@ public class ResponseCachePostgres {
 		}
 		finally {
 			try {
-				rs.close();
-				ps.close();
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
 			}
 			catch (SQLException e) {
 				log.error("Cache read: Could not close the prepared statement.", e);
