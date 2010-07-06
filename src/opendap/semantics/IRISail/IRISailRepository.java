@@ -535,22 +535,18 @@ public class IRISailRepository extends SailRepository {
 
         Matcher xsd2owlMatcher = xsd2owlPattern.matcher(processedQueryString); // xsd2owl:increment
         
-        Pattern functionPattern = Pattern
-                .compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");// fn:name(abc)
+        //Pattern functionPattern = Pattern
+        //        .compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");// fn:name(abc)
         Pattern comma = Pattern.compile(",");
 
-        Matcher functionMatcher = functionPattern.matcher(processedQueryString);
-        
-        Pattern p_fn = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");
+                
+        //Pattern p_fn = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");
 
-        Matcher m_fn = p_fn.matcher(processedQueryString);
-
-        
         Pattern p_fn_className = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
                         Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-        String queryStr = processedQueryString;
-        Matcher m_fn_className = p_fn_className.matcher(queryStr);
-
+        
+        Matcher functionMatcher = p_fn_className.matcher(processedQueryString);
+        
         String expand = "";
         if (stringMatcher.find()) {
             postProcessFlag = ProcessingTypes.xsString;
@@ -579,24 +575,20 @@ public class IRISailRepository extends SailRepository {
 
             // log.info("processedQueryString = " + processedQueryString);
 
-        } else if (m_fn_className.find()) {
-
+        } //else if (m_fn_className.find()) {
+        else  {
             String fullyQualifiedFunctionName;
+            while (functionMatcher.find()) {
+            
+                String rdfFunctionName = functionMatcher.group(3);
+                String rdfClassName = functionMatcher.group(5);
+                
+                
+                fullyQualifiedFunctionName = rdfClassName + "#" + rdfFunctionName;
 
-            String rdfFunctionName = m_fn_className.group(3);
-            String rdfClassName = m_fn_className.group(5);
-
-            fullyQualifiedFunctionName = rdfClassName + "#" + rdfFunctionName;
-
-            log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
-            log.debug("class_name = " + rdfClassName); // class name of the function
-                                                        
-            if (functionMatcher.find()) {
-
-
-                log.info("Found class name    '" + rdfClassName+"'");
-                log.info("Found function_name '" + rdfFunctionName+"'");
-
+                log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
+                log.debug("class_name = " + rdfClassName); // class name of the function
+                
                 Method myFunction = getMethodForFunction(rdfClassName, rdfFunctionName);
 
                 if (myFunction != null) {
@@ -608,10 +600,6 @@ public class IRISailRepository extends SailRepository {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                // @todo  myfn and mylist are in a fixed namespace, say http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn
-                // the following code should be changed to reflect this.
-                //expand += "} " + fn + ":myfn {" + fn + ":" + functionName
-                //        + "} ; " + fn + ":mylist {} rdf:first {";
                 expand += "}  <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn> {" + fn + ":" + functionName
                         + "} ; <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist> {} rdf:first {";
                 for (String element : splittedStr) {
@@ -626,37 +614,18 @@ public class IRISailRepository extends SailRepository {
                     log.info("Will postprocess fn:" + functionMatcher.group(3));
                 }
                 // log.info("expand = " + expand);
-                // processedQueryString = functionMatcher.replaceFirst(expand);
-                processedQueryString = functionMatcher.replaceFirst(expand);
-                functionMatcher = functionPattern.matcher(processedQueryString);
-                if (functionMatcher.find()) {
-                    splittedStr = comma.split(functionMatcher.group(4));
-                    int j = 0;
-                    expand = "";
-                    fn = functionMatcher.group(2);
-                    functionName = functionMatcher.group(3);
-
-                    //expand += "} " + fn + ":myfn {" + fn + ":" + functionName
-                    //        + "} ; " + fn + ":mylist {} rdf:first {";
-                    expand += "}  <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn> {" + fn + ":" + functionName
-                    + "} ; <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist> {} rdf:first {";
-                    for (String element : splittedStr) {
-                        j++;
-                        if (j < splittedStr.length) {
-                            expand += element + "} ; rdf:rest {} rdf:first {";
-                            // log.info("element " + j + " = " + element);
-                        } else {
-                            expand += element + "} ; rdf:rest {rdf:nil";
-                            // log.info("element " + j + " = " + element);
-                        }
-                    }
-                    processedQueryString = functionMatcher.replaceFirst(expand);
-                }
+                
+                
+                processedQueryString = processedQueryString.substring(0, functionMatcher.start(1)) + expand + processedQueryString.substring(functionMatcher.end(1));
+                
+                functionMatcher.reset(processedQueryString);
+                
+                
             }
 
         }
 
-        // log.info("processedQueryString = " + processedQueryString);
+         log.info("processedQueryString = " + processedQueryString);
         return processedQueryString;
 
     }
