@@ -575,8 +575,9 @@ public class IRISailRepository extends SailRepository {
 
             // log.info("processedQueryString = " + processedQueryString);
 
-        } //else if (m_fn_className.find()) {
-        else  {
+        } 
+        else if (functionMatcher.find()) {
+            functionMatcher.reset(); //reset the matcher
             String fullyQualifiedFunctionName;
             while (functionMatcher.find()) {
             
