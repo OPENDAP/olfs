@@ -153,7 +153,9 @@ public class Version  {
 
 
 
-        Document versionDoc = getVersionDocument(ReqInfo.getDataSource(request));
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
+        Document versionDoc = getVersionDocument(dataSource);
 
         if (versionDoc != null) {
 
@@ -207,7 +209,9 @@ public class Version  {
     public static String getXOPeNDAPServerVersion(HttpServletRequest request)
             throws Exception {
 
-        Document versionDoc = getVersionDocument(ReqInfo.getDataSource(request));
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
+        Document versionDoc = getVersionDocument(datasource);
 
         if (versionDoc != null) {
 
@@ -302,7 +306,9 @@ public class Version  {
         if (request != null)
             clientDapVer = request.getHeader("XDAP");
 
-        Document versionDoc = getVersionDocument(ReqInfo.getDataSource(request));
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
+        Document versionDoc = getVersionDocument(datasource);
 
 
         if (versionDoc != null) {
@@ -351,7 +357,7 @@ public class Version  {
 
                /*
 
-            for (Object o : getVersionDocument(ReqInfo.getDataSource(request)).getRootElement().getChild("serviceVersion").getChild("DAP").getChildren("version")) {
+            for (Object o : getVersionDocument(ReqInfo.getBesDataSourceID(request)).getRootElement().getChild("serviceVersion").getChild("DAP").getChildren("version")) {
                 Element v = (Element) o;
                 String ver = v.getTextTrim();
                 double vval = Double.parseDouble(ver);

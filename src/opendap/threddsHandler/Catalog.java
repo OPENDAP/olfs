@@ -48,12 +48,17 @@ public interface Catalog {
     boolean needsRefresh();
 
     void writeCatalogXML(OutputStream os) throws Exception;
+    void writeRawCatalogXML(OutputStream os) throws Exception;
 
     Document getCatalogDocument() throws IOException, JDOMException, SaxonApiException;
+    Document getRawCatalogDocument() throws IOException, JDOMException, SaxonApiException;
 
     XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException;
+    XdmNode getRawCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException;
 
     String getName();
+
+    String getCatalogKey();
 
     String getPathPrefix();
 

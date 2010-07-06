@@ -346,8 +346,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
                                        boolean sendResponse)
             throws Exception {
 
-        String dataAccessBase = ReqInfo.getBaseURI(request);
-        String relativeURL = ReqInfo.getFullSourceName(request);
+        String dataAccessBase = ReqInfo.getServiceUrl(request);
+        String relativeURL = ReqInfo.getRelativeUrl(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -784,7 +784,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         page += "    <h3>The WCS response: </h3>";
         page += "    <pre>";
 
-        Document wcsResponse = KvpHandler.getCoverage(keyValuePairs,ReqInfo.getBaseURI(req));
+        Document wcsResponse = KvpHandler.getCoverage(keyValuePairs,ReqInfo.getServiceUrl(req));
 
         page += xmlo.outputString(wcsResponse).replaceAll("<","&lt;").replaceAll(">","&gt;");
         page += "    </pre>";
@@ -816,7 +816,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         boolean success;
         ByteArrayOutputStream erros;
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendNetcdfFileOut() for dataset: " + dataSource + "?" +
@@ -879,7 +880,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
     public static String getServiceUrlString(HttpServletRequest request, String prefix){
-        String serviceURL = ReqInfo.getBaseURI(request);
+        String serviceURL = ReqInfo.getServiceUrl(request);
 
         if (!prefix.equals("")) {
             if (!serviceURL.endsWith("/")) {

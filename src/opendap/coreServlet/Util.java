@@ -55,18 +55,18 @@ public class Util {
         msg += "  Request #" + reqno + "\n";
         msg += "  Client:  " + req.getRemoteHost() + "\n";
         msg += "  Request Info:\n";
-        msg += "    baseURI:                   '" + ReqInfo.getBaseURI(req) + "'\n";
-        msg += "    fullSourceName:            '" + ReqInfo.getFullSourceName(req) + "'\n";
-        msg += "    dataSource:                '" + ReqInfo.getDataSource(req) + "'\n";
+        msg += "    baseURI:                   '" + ReqInfo.getServiceUrl(req) + "'\n";
+        msg += "    fullSourceName:            '" + ReqInfo.getRelativeUrl(req) + "'\n";
+        msg += "    dataSource:                '" + ReqInfo.getBesDataSourceID(ReqInfo.getRelativeUrl(req)) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
         msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
-        msg += "    requestURL:                '" + ReqInfo.getRequestURL(req) + "'\n";
         msg += "-------------------------------------------";
 
         return msg;
 
     }
+
 
 
     /**
@@ -223,14 +223,16 @@ public class Util {
      *
      * @param servlet The Servlet to Probe
      * @param request The <code>HttpServletRequest</code> object to probe.
-     * @param scntxt The Servlet Contexrt to Probe
      * @param scnfg The servlet Config to probe
      * @return A string containing the probe inormation
      */
-    public static String probeRequest(HttpServlet servlet, HttpServletRequest request, ServletContext scntxt, ServletConfig scnfg) {
+    public static String probeRequest(HttpServlet servlet, HttpServletRequest request) {
 
         Enumeration e;
         int i;
+        ServletContext scntxt = servlet.getServletContext();
+        ServletConfig scnfg = servlet.getServletConfig();
+
 
         String probeMsg = "####################### PROBE ##################################\n";
         probeMsg += "\n";

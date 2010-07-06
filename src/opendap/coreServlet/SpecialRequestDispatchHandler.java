@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 /**
  * Performs dispatching for "special" server requests.
@@ -114,7 +113,8 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                                           boolean sendResponse)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 

@@ -24,7 +24,6 @@
 
 package opendap.bes;
 
-import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Element;
@@ -98,8 +97,8 @@ public class VersionDispatchHandler implements DispatchHandler {
                                    HttpServletResponse response,
                                    boolean sendResponse)
             throws Exception {
-
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         boolean versionRequest = false;

@@ -93,7 +93,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getFullSourceName(req);
+        String name = ReqInfo.getRelativeUrl(req);
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
 
@@ -139,7 +139,7 @@ public class FileDispatchHandler implements DispatchHandler {
                                 boolean sendResponse) throws Exception {
 
 
-        DataSourceInfo dsi = new BESDataSource(ReqInfo.getFullSourceName(request));
+        DataSourceInfo dsi = new BESDataSource(ReqInfo.getRelativeUrl(request));
 
         boolean isFileResponse = false;
 
@@ -172,7 +172,7 @@ public class FileDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        String name = req.getPathInfo();
+        String name = ReqInfo.getRelativeUrl(req);
 
 
         log.debug("sendFile(): Sending file \"" + name + "\"");
@@ -210,7 +210,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
 
-        String topLevel = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf(request.getPathInfo()));
+        String serviceUrl = ReqInfo.getServiceUrl(request);
 
         pw.println("<h2>ACCESS DENIED</h2>");
         pw.println("<p>The requested URL references a data source directly. </p>" +
@@ -218,7 +218,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='" + Scrub.completeURL(topLevel) + "'>" + Scrub.completeURL(topLevel) + "</a></p>");
+        pw.println("<p><a href='" + Scrub.completeURL(serviceUrl) + "'>" + Scrub.completeURL(serviceUrl) + "</a></p>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");

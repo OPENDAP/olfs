@@ -91,7 +91,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     public String getWcsRequest(HttpServletRequest req) throws MalformedURLException {
 
 
-        String relativeURL = ReqInfo.getFullSourceName(req);
+        String relativeURL = ReqInfo.getRelativeUrl(req);
         String requestSuffix = ReqInfo.getRequestSuffix(req);
 
         if(relativeURL.startsWith("/"))
@@ -234,7 +234,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDDS() for dataset: " + dataSource);
@@ -282,7 +283,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendDAS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAS() for dataset: " + dataSource);
@@ -328,7 +330,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendDDX(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
 
@@ -375,7 +378,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendDAP2Data(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAP2Data() for dataset: " + dataSource);
@@ -419,7 +423,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendASCII(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendASCII() for dataset: " + dataSource);
@@ -463,7 +468,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendINFO(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendINFO() for dataset: " + dataSource);
@@ -508,7 +514,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private void sendHTMLRequestForm(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);

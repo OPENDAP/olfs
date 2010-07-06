@@ -49,6 +49,10 @@ public class LocalFileCatalog implements Catalog {
 
     private Logger log;
     private String _name;
+
+    /**
+     *  Deinfes where in the system 
+     */
     private String _pathPrefix;
     private String _urlPrefix;
     private String _fileName;
@@ -140,12 +144,12 @@ public class LocalFileCatalog implements Catalog {
             }
 
             if (!ingestTransformFile.canRead()) {
-                msg = "Cannot the ingest XSL transformation file: " + fname;
+                msg = "Cannot the ingest XSL transformation file: " + _transformOnIngestFilename;
                 log.error(msg);
                 throw new IOException(msg);
             }
             if (!ingestTransformFile.isFile()) {
-                msg = "XSLT file '" + fname + "' is not a regular file.";
+                msg = "XSLT file '" + _transformOnIngestFilename + "' is not a regular file.";
                 log.error(msg);
                 throw new IOException(msg);
             }
@@ -163,23 +167,22 @@ public class LocalFileCatalog implements Catalog {
             }
 
 
-        } else {
-
-            Document catalog = getCatalogDocument();
-
-            Element ce = catalog.getRootElement();
-
-            _name = ce.getAttributeValue("name");
-
-            if (_name == null) {
-                msg = "THREDDS ERROR: <catalog> element missing \"name\" attribute.";
-                log.error(msg);
-                throw new Exception(msg);
-            }
-            log.debug("Loaded/parsed catalog as a JDOM document.");
-
-
         }
+
+        Document catalog = getRawCatalogDocument();
+
+        Element ce = catalog.getRootElement();
+
+        _name = ce.getAttributeValue("name");
+
+        if (_name == null) {
+            msg = "THREDDS ERROR: <catalog> element missing \"name\" attribute.";
+            log.error(msg);
+            throw new Exception(msg);
+        }
+
+
+        log.debug("Catalog '"+getName()+"' has been built and parsed.");
 
 
         log.debug("-------------------------------------------------------");
@@ -206,6 +209,10 @@ public class LocalFileCatalog implements Catalog {
     public boolean usesMemoryCache() {
         return _useMemoryCache;
     }
+
+
+
+
 
     /**
      *
@@ -339,9 +346,10 @@ public class LocalFileCatalog implements Catalog {
             lock.lock();
             String fname = _pathPrefix + _fileName;
             File catalogFile = new File(fname);
-            if (catalogFile.lastModified() > _cacheTime.getTime()) {
+            long fileLastModified = catalogFile.lastModified();
+            if (fileLastModified > _cacheTime.getTime()) {
 
-                log.debug("THREDDS Catalog file: " + fname + " needs to re-ingested");
+                log.debug("The THREDDS Catalog file: " + fname + " has changed and needs to re-ingested");
 
                 return true;
             }
@@ -678,6 +686,21 @@ public class LocalFileCatalog implements Catalog {
         }
     }
 
+
+    public String getCatalogKey() {
+        
+        Lock lock = _catalogLock.readLock();
+        try {
+            lock.lock();
+            String index = getUrlPrefix() + getFileName();
+            return index;
+        }
+        finally {
+            lock.unlock();
+        }
+
+    }
+    
     public String getPathPrefix() {
         Lock lock = _catalogLock.readLock();
         try {

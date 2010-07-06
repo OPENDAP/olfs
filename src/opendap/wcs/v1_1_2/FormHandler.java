@@ -36,8 +36,6 @@ import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.net.URLDecoder;
 
-import opendap.coreServlet.DispatchServlet;
-
 /**
  *
  *
@@ -64,7 +62,7 @@ public class FormHandler extends XmlRequestHandler  {
     public void handleWcsRequest(HttpServletRequest request,
                                        HttpServletResponse response) throws IOException {
 
-        String dataAccessBase = ReqInfo.getBaseURI(request);
+        String dataAccessBase = ReqInfo.getServiceUrl(request);
         String serviceUrl = DispatchHandler.getServiceUrlString(request,_prefix);
         BufferedReader  sis = request.getReader();
         ServletOutputStream os = response.getOutputStream();

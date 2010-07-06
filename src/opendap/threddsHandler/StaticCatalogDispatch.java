@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.Lock;
 import java.io.*;
 
 
@@ -83,20 +82,46 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
+    public String getCatalogKeyFromRelativeUrl(String relativeUrl) throws IOException {
+
+
+        String catalogKey = relativeUrl;
+
+        // Make sure it doesn't star with a '/'
+        while (catalogKey.startsWith("/"))
+            catalogKey = catalogKey.substring(1, catalogKey.length());
+
+        if (catalogKey.equals(_prefix)) { // Then we have to make a top level catalog.
+
+            // So we cast it to the default top level catalog.
+            catalogKey += "catalog.xml";
+        }
+
+
+        // Strip the prefix off of the relativeURL)
+        if (catalogKey.startsWith(_prefix))
+            catalogKey = catalogKey.substring(_prefix.length(), catalogKey.length());
+
+        // If it's a request for an HTML view of the catalog, replace the
+        // .html suffix with .xml so we can find the catalog.
+        if (catalogKey.endsWith(".html")) {
+            catalogKey = catalogKey.substring(0,
+                    catalogKey.lastIndexOf(".html")) + ".xml";
+        }
+
+        return catalogKey;
+    }
+
+
     public void sendThreddsCatalogResponse(HttpServletRequest request,
                                            HttpServletResponse response) throws Exception {
 
-        String relativeURL = ReqInfo.getFullSourceName(request);
+        String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getRelativeUrl(request));
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         String query = request.getQueryString();
 
         if (redirectRequest(request, response))
             return;
-
-        /* Make sure the relative URL is really relative */
-        while (relativeURL.startsWith("/"))
-            relativeURL = relativeURL.substring(1, relativeURL.length());
-
 
         // Are we browsing a remote catalog? a remote dataset?
         if (query != null && query.startsWith("browseCatalog=")) {
@@ -112,18 +137,18 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             if (query != null) {
                 if (query.startsWith("dataset=")) {
-                    sendDatasetHtmlPage(response, relativeURL, query);
+                    sendDatasetHtmlPage(response, catalogKey, query);
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Cannot process query: " + Scrub.urlContent(query));
                 }
 
 
             } else {
-                sendCatalogHTML(response, relativeURL);
+                sendCatalogHTML(response, catalogKey);
             }
 
         } else { // Send the the raw catalog XML.
-            sendCatalogXML(response, relativeURL);
+            sendCatalogXML(response, catalogKey);
         }
 
     }
@@ -133,7 +158,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throws IOException {
 
         boolean redirect = false;
-        String relativeURL = ReqInfo.getFullSourceName(req);
+        String relativeURL = ReqInfo.getRelativeUrl(req);
 
         // Make sure it really is a relative URL.
         if (relativeURL.startsWith("/"))
@@ -385,51 +410,32 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     private void sendDatasetHtmlPage(HttpServletResponse response,
-                                     String relativeURL,
+                                     String catalogKey,
                                      String query) throws IOException, JDOMException, SaxonApiException {
 
 
         XdmNode catDoc;
-
-        // Patch up the request URL so we can find the source catalog
-        relativeURL = relativeURL.substring(0,
-                relativeURL.lastIndexOf(".html")) + ".xml";
-
-
-        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
-
-            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-
-            // Disabled this code because code based changed to require a
-            // single top level catalog, catalog.xml. Thus, this clause
-            // should never get excecuted.
-            //
-            throw new IOException("Synthetic top level catalog not supported.");
-        }
 
         try {
             datasetToHtmlTransformLock.lock();
             datasetToHtmlTransform.reloadTransformIfRequired();
 
 
-            // Strip the prefix off of the relativeURL)
-            if (relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
 
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
+            Catalog cat = CatalogManager.getCatalog(catalogKey);
 
             if (cat != null) {
-                log.debug("\nFound catalog: " + relativeURL + "   " +
+                log.debug("\nFound catalog: " + catalogKey + "   " +
                         "    prefix: " + _prefix
                 );
                 catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
-                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+                log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
             } else {
-                log.error("Can't find catalog: " + relativeURL + "   " +
+                log.error("Can't find catalog: " + catalogKey + "   " +
                         "    prefix: " + _prefix
                 );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
                 return;
             }
 
@@ -465,27 +471,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     }
 
-    private void sendCatalogHTML(HttpServletResponse response, String relativeURL) throws SaxonApiException, IOException {
+    private void sendCatalogHTML(HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException {
 
-
-        // Patch up the request URL so we can find the source catalog
-        relativeURL = relativeURL.substring(0,
-                relativeURL.lastIndexOf(".html")) + ".xml";
-
-
-        if (relativeURL.equals(_prefix)) { // Then we have to make a top level catalog.
-
-            // catDoc = CatalogManager.getTopLevelCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-
-            // Disabled this code because code based changed to require a
-            // single top level catalog, catalog.xml. Thus, this clause
-            // should never get excecuted.
-            //
-            throw new IOException("Synthetic top level catalog not supported.");
-        }
-        // Strip the prefix off of the relativeURL)
-        if (relativeURL.startsWith(_prefix))
-            relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
 
         try {
 
@@ -494,19 +481,19 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             XdmNode catDoc;
 
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
+            Catalog cat = CatalogManager.getCatalog(catalogKey);
 
             if (cat != null) {
-                log.debug("\nFound catalog: " + relativeURL + "   " +
+                log.debug("\nFound catalog: " + catalogKey + "   " +
                         "    prefix: " + _prefix
                 );
                 catDoc = cat.getCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
-                log.debug("catDoc.getBaseURI(): " + catDoc.getBaseURI());
+                log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
             } else {
-                log.error("Can't find catalog: " + relativeURL + "   " +
+                log.error("Can't find catalog: " + catalogKey + "   " +
                         "    prefix: " + _prefix
                 );
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(relativeURL));
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
                 return;
             }
 
@@ -530,46 +517,33 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void sendCatalogXML(HttpServletResponse response, String relativeURL) throws Exception {
+    private void sendCatalogXML(HttpServletResponse response, String catalogKey) throws Exception {
 
 
-        if (relativeURL.equals(_prefix)) { // Then we would have to make a top level catalog.
+        Catalog cat = CatalogManager.getCatalog(catalogKey);
 
-            throw new IOException("We should never be attempting to send a " +
-                    "catalog for  just the handlers prefix. The URL should" +
-                    "have been redirected to $prefix/catalog.xml");
+        if (cat != null) {
+            log.debug("\nFound catalog: " + catalogKey + "   " +
+                    "    prefix: " + _prefix
+            );
+
+            // Send the XML catalog.
+            response.setContentType("text/xml");
+            response.setHeader("Content-Description", "dods_directory");
+            response.setStatus(HttpServletResponse.SC_OK);
+            cat.writeCatalogXML(response.getOutputStream());
+            log.debug("Sent THREDDS catalog XML.");
 
         } else {
-            // Strip the prefix off of the relativeURL)
-            if (relativeURL.startsWith(_prefix))
-                relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
+            log.error("Can't find catalog: " + catalogKey + "   " +
+                    "    prefix: " + _prefix
+            );
 
-
-            Catalog cat = CatalogManager.getCatalog(relativeURL);
-
-            if (cat != null) {
-                log.debug("\nFound catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-
-                // Send the XML catalog.
-                response.setContentType("text/xml");
-                response.setHeader("Content-Description", "dods_directory");
-                response.setStatus(HttpServletResponse.SC_OK);
-                cat.writeCatalogXML(response.getOutputStream());
-                log.debug("Sent THREDDS catalog XML.");
-
-            } else {
-                log.error("Can't find catalog: " + relativeURL + "   " +
-                        "    prefix: " + _prefix
-                );
-
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
-                        "find catalog: " + Scrub.urlContent(relativeURL));
-            }
-
-
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't " +
+                    "find catalog: " + Scrub.urlContent(catalogKey));
         }
+
+
 
     }
 
@@ -732,7 +706,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
                                            boolean sendResponse)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         //String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         boolean threddsRequest = false;
@@ -740,7 +715,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         if (dataSource != null) {
 
 
-            // Since we know the _prefix does not begin with slahs, strip any
+            // Since we know the _prefix does not begin with slash, strip any
             // leading slashes from the dataSource name.
             while (dataSource.startsWith("/"))
                 dataSource = dataSource.substring(1, dataSource.length());
@@ -762,32 +737,18 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     public long getLastModified(HttpServletRequest req) {
-        String relativeURL = ReqInfo.getFullSourceName(req);
+
+        String catalogKey = null;
         try {
+            catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getRelativeUrl(req));
             if (requestCanBeHandled(req)) {
-
-                // Make sure it's a relative URL
-                while (relativeURL.startsWith("/"))
-                    relativeURL = relativeURL.substring(1, relativeURL.length());
-
-                // Strip the prefix off of the relativeURL)
-                if (relativeURL.startsWith(_prefix))
-                    relativeURL = relativeURL.substring(_prefix.length(), relativeURL.length());
-
-                // If it's a request for an HTML view of the catalog, replace the
-                // .html suffix with .xml so we can find the catalog.
-                if (relativeURL.endsWith(".html")) {
-                    relativeURL = relativeURL.substring(0,
-                            relativeURL.lastIndexOf(".html")) + ".xml";
-                }
-
-                long lm = CatalogManager.getLastModified(relativeURL);
-                log.debug("lastModified(" + relativeURL + "): " + (lm == -1 ? "unknown" : new Date(lm)));
+                long lm = CatalogManager.getLastModified(catalogKey);
+                log.debug("lastModified(" + catalogKey + "): " + (lm == -1 ? "unknown" : new Date(lm)));
                 return lm;
             }
         }
         catch (Exception e) {
-            log.error("Failed to get a last modified time for '"+relativeURL+"'  msg: "+e.getMessage());
+            log.error("Failed to get a last modified time for '"+catalogKey+"'  msg: "+e.getMessage());
         }
         return -1;
     }
@@ -799,6 +760,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     }
+
+
 
 
 }

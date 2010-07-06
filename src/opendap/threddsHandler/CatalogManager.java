@@ -76,17 +76,6 @@ public class CatalogManager {
         _isInitialized = true;
     }
 
-
-    private static String getMapIndex(Catalog c) {
-        if(c!=null){
-            String index = c.getUrlPrefix() + c.getFileName();
-            return index;
-        }
-        return null;
-
-    }
-
-
     public static void addCatalog(String pathPrefix,
                                   String urlPrefix,
                                   String fname,
@@ -114,21 +103,19 @@ public class CatalogManager {
             throws Exception {
 
 
-        String index;
-
-        index = getMapIndex(catalog);
+        String catalogKey = catalog.getCatalogKey();
 
         // If this catalog has already been added,  then don't mess with it.
-        if (_catalogs.containsKey(index)){
-            _log.warn("The catalog '"+index+"' is already in the collection. It must be removed (purgeCatalog()) " +
+        if (_catalogs.containsKey(catalogKey)){
+            _log.warn("The catalog '"+catalogKey+"' is already in the collection. It must be removed (purgeCatalog()) " +
                     "before it can be added again.");
             return;
         }
 
 
-        if (_children.containsKey(index)) {
+        if (_children.containsKey(catalogKey)) {
             String msg = "addCatalog() Invalid State! Although the list of catalogs does not contain a " +
-                    "reference to the catalog '" + index + "' the list of children does!!!";
+                    "reference to the catalog '" + catalogKey + "' the list of children does!!!";
             _log.error(msg);
             throw new Exception(msg);
         }
@@ -190,7 +177,7 @@ public class CatalogManager {
                         cacheCatalogFileContent);
 
                 addCatalog(thisCatalog, cacheCatalogFileContent);
-                String thisCatalogIndex = getMapIndex(thisCatalog);
+                String thisCatalogIndex = thisCatalog.getCatalogKey();
                 catalogChildren.add(thisCatalogIndex);
 
             }
@@ -198,50 +185,59 @@ public class CatalogManager {
 
         if (!catalogChildren.isEmpty()) {
             String[] s = new String[catalogChildren.size()];
-            _children.put(index, catalogChildren.toArray(s));
+            _children.put(catalogKey, catalogChildren.toArray(s));
         }
-        _catalogs.put(index, catalog);
+
+        _log.debug("Ingesting inherited metadata (if any) for catalog '"+catalog.getName()+"'");
+        InheritedMetadataManager.ingestInheritedMetadata(catalog);
+
+
+        _catalogs.put(catalogKey, catalog);
 
 
     }
 
 
-    public static Catalog getCatalog(String name) {
-        Catalog cat = getCatalogAndUpdateIfRequired(name);
+    public static Catalog getCatalog(String catalogKey) {
+        Catalog cat = getCatalogAndUpdateIfRequired(catalogKey);
         return cat;
 
     }
 
-    public static long getLastModified(String name) {
+    public static long getLastModified(String catalogKey) {
 
         Catalog cat;
 
-        cat = getCatalog(name);
+        cat = getCatalog(catalogKey);
         if (cat != null)
             return cat.getLastModified();
 
         return -1;
     }
 
+    /**
+     *
+     * @param catalogKey   Is the    catalogKeyIntoThe
+     * @return
+     */
+    private static Catalog getCatalogAndUpdateIfRequired(String catalogKey) {
 
-    private static Catalog getCatalogAndUpdateIfRequired(String catalogName) {
 
-
-        if (catalogName == null)
+        if (catalogKey == null)
             return null;
 
         try {
             _catalogLock.lock();
             _log.debug("getCatalogAndUpdateIfRequired(): Catalog locked.");
 
-            Catalog c = _catalogs.get(catalogName);
+            Catalog c = _catalogs.get(catalogKey);
             if (c == null)
                 return null;
 
             if (c.needsRefresh()) {
 
 
-                _log.debug("getCatalogAndUpdateIfRequired(): Catalog '" + catalogName + "' needs to be updated.");
+                _log.debug("getCatalogAndUpdateIfRequired(): Catalog '" + catalogKey + "' needs to be updated.");
 
                 LocalFileCatalog newCat;
                 try {
@@ -249,13 +245,17 @@ public class CatalogManager {
 
                     //Thread.sleep(10000);
 
-                    _log.debug("getCatalogAndUpdateIfRequired(): Purging catalog '" + catalogName + "' and it's children from catalog collection.");
-                    purgeCatalog(c);
+                    _log.debug("getCatalogAndUpdateIfRequired(): Purging catalog '" + catalogKey +
+                            "' and it's children from catalog collection.");
+
+                    purgeCatalog(catalogKey);
 
 
-                    String index = getMapIndex(newCat);
-                    _log.debug("getCatalogAndUpdateIfRequired(): Adding new catalog " + index + " to _catalogs collection.");
+                    _log.debug("getCatalogAndUpdateIfRequired(): Adding new catalog for catalogKey " +
+                            newCat.getCatalogKey() + " to _catalogs collection.");
+
                     addCatalog(newCat, newCat.usesMemoryCache());
+
                     return newCat;
                 }
                 catch (Exception e) {
@@ -263,7 +263,7 @@ public class CatalogManager {
                     return null;
                 }
             } else {
-                _log.debug("getCatalogAndUpdateIfRequired(): Catalog '" + catalogName + "' does NOT need updated.");
+                _log.debug("getCatalogAndUpdateIfRequired(): Catalog '" + catalogKey + "' does NOT need updated.");
                 return c;
 
             }
@@ -279,43 +279,45 @@ public class CatalogManager {
 
 
     /**
-     * Starting at the passed catalog purges the  THREDDS catalog connected graph from the system.
+     * Purges the  THREDDS catalog connected graph from the system, starting at the catalog associated with the
+     * passed catalogKey.
      *
-     * @param c
+     * @param catalogKey
      */
-    private static void purgeCatalog(Catalog c) {
-        Catalog child;
-        String children[];
+    private static void purgeCatalog(String catalogKey) {
+        Catalog c;
+        String childCatalogKeys[];
 
 
-        if (c != null) {
+        if (catalogKey != null) {
 
-            String index = getMapIndex(c);
-            _log.debug("purgeCatalog(): Removing catalog: " + index);
+            _log.debug("purgeCatalog(): Removing catalog: " + catalogKey);
+            c = _catalogs.remove(catalogKey);
 
-            if (_catalogs.remove(index) == null) {
-                _log.warn("purgeCatalog(): Catalog '" + index + "' not in catalog collection!!");
+            if (c == null) {
+                _log.warn("purgeCatalog(): Catalog '" + catalogKey + "' not in catalog collection!!");
             }
 
-            children = _children.get(index);
-            if (children != null) {
+            childCatalogKeys = _children.get(catalogKey);
+            if (childCatalogKeys != null) {
 
-                _log.debug("purgeCatalog(): Purging the children of catalog: " + index);
+                _log.debug("purgeCatalog(): Purging the childCatalogKeys of catalog: " + catalogKey);
 
-                for (String childIndex : children) {
-                    child = _catalogs.get(childIndex);
-                    purgeCatalog(child);
-
+                for (String childCatalogKey : childCatalogKeys) {
+                    purgeCatalog(childCatalogKey);
                 }
 
-                _children.remove(index);
+                _children.remove(catalogKey);
             } else {
-                _log.info("purgeCatalog(): Catalog '" + index + "' has no children.");
+                _log.info("purgeCatalog(): Catalog '" + catalogKey + "' has no childCatalogKeys.");
             }
+
+            _log.debug("purgeCatalog(): Purging inherited metadata (if any) for catalogKey: " +catalogKey);
+            InheritedMetadataManager.purgeInheritedMetadata(catalogKey);
 
 
             // c.destroy();
-            _log.debug("purgeCatalog(): Purged catalog: " + index);
+            _log.debug("purgeCatalog(): Purged catalog: " + catalogKey);
 
 
         }

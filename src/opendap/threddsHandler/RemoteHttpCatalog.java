@@ -138,6 +138,15 @@ public class RemoteHttpCatalog implements Catalog {
         _cacheTime   = null;
     }
 
+
+
+
+
+
+    public String getCatalogKey() {
+        return null;
+
+    }
     private void cacheCatalogFileContent(){log.debug("cacheCatalogFileContent(): WARNING STUB FIRING!");}
 
     public boolean usesMemoryCache() {
@@ -151,12 +160,23 @@ public class RemoteHttpCatalog implements Catalog {
     public void writeCatalogXML(OutputStream os) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+    public void writeRawCatalogXML(OutputStream os) throws Exception {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     public Document getCatalogDocument() throws IOException, JDOMException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public Document getRawCatalogDocument() throws IOException, JDOMException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public XdmNode getCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public XdmNode getRawCatalogAsXdmNode(Processor proc) throws IOException, SaxonApiException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

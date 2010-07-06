@@ -384,6 +384,10 @@ public class DispatchServlet extends HttpServlet {
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
+
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
+
         try {
             try {
                 RequestCache.startRequestIfNeeded();
@@ -399,14 +403,14 @@ public class DispatchServlet extends HttpServlet {
                     return;
 
 
-                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                log.info("Requested dataSource: '" + dataSource +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
 
 
                 if (Debug.isSet("probeRequest"))
-                    log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
+                    log.debug(Util.probeRequest(this, request));
 
 
                 DispatchHandler dh = getDispatchHandler(request, httpGetDispatchHandlers);
@@ -539,6 +543,9 @@ public class DispatchServlet extends HttpServlet {
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) {
 
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
+
         try {
             try {
 
@@ -551,12 +558,12 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.showRequest(request, reqno));
 
 
-                log.info("Requested dataSource: '" + ReqInfo.getDataSource(request) +
+                log.info("Requested dataSource: '" + dataSource +
                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
                 if (Debug.isSet("probeRequest"))
-                    log.debug(Util.probeRequest(this, request, getServletContext(), getServletConfig()));
+                    log.debug(Util.probeRequest(this, request));
 
 
                 DispatchHandler dh = getDispatchHandler(request, httpPostDispatchHandlers);

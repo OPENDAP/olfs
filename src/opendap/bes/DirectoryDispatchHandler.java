@@ -97,7 +97,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getFullSourceName(req);
+        String name = ReqInfo.getRelativeUrl(req);
 
         if(name.endsWith("contents.html"))
             name = name.substring(0,name.lastIndexOf("contents.html"));
@@ -145,7 +145,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         String dataSetName = ReqInfo.getDataSetName(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
-        String dsName = ReqInfo.getFullSourceName(request);
+        String dsName = ReqInfo.getRelativeUrl(request);
 
 
         boolean isDirectoryResponse = false;
@@ -222,7 +222,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
 
-        String collectionName  = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String collectionName  = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));

@@ -107,7 +107,6 @@
                 -->
 
                 <!-- Get the service definition form the key (a hash map) -->
-                <!--xsl:variable name="dapServices" select="$serviceElement/thredds:service[@serviceType='OPENDAP']"/-->
                 <xsl:variable name="dapServices" select="$serviceElement[@serviceType='OPENDAP'] | $serviceElement/thredds:service[@serviceType='OPENDAP'] "/>
 
                 <xsl:for-each select="$dapServices">

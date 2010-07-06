@@ -71,7 +71,8 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 HttpServletResponse response) throws Exception {
 
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         boolean isContentsRequest = false;
 
@@ -293,7 +294,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                        boolean sendResponse)
             throws Exception {
 
-        String relativeURL = ReqInfo.getFullSourceName(request);
+        String relativeURL = ReqInfo.getRelativeUrl(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -383,7 +384,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         long size = 0;
 
 
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(req));
+        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(req));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -444,7 +445,7 @@ public class WcsDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -512,7 +513,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 String projectName,
                                 String siteName)
             throws Exception {
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -586,7 +587,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                  String serviceName)
             throws Exception {
 
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -665,7 +666,7 @@ public class WcsDispatchHandler implements DispatchHandler {
             throws Exception {
 
         /*
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -775,7 +776,8 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 String dateName)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
 
@@ -886,7 +888,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDDS() for dataset: " + dataSource);
@@ -937,7 +940,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDAS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAS() for dataset: " + dataSource);
@@ -983,7 +987,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDDX(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
 
@@ -1029,7 +1034,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDAP2Data(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAP2Data() for dataset: " + dataSource);
@@ -1072,7 +1078,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendASCII(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendASCII() for dataset: " + dataSource);
@@ -1116,7 +1123,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendINFO(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendINFO() for dataset: " + dataSource);
@@ -1159,7 +1167,8 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendHTMLRequestForm(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);

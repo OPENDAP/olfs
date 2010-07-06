@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 
-import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ReqInfo;
 
 /**
@@ -128,7 +127,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
                                        boolean sendResponse)
             throws Exception {
 
-        String relativeURL = ReqInfo.getFullSourceName(request);
+        String relativeURL = ReqInfo.getRelativeUrl(request);
 
         if (relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1, relativeURL.length());

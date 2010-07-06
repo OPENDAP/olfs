@@ -28,19 +28,21 @@ package opendap.bes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
-import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.s9api.DocumentBuilder;
-import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.*;
+import opendap.namespaces.THREDDS;
+import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.transform.JDOMSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 /**
@@ -134,7 +136,10 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         log.debug("Processing THREDDS request.");
 
 
-        String collectionName = Scrub.urlContent(ReqInfo.getFullSourceName(request));
+        String contextName = request.getContextPath();
+        String servletName = servlet.getServletName();
+
+        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if (collectionName.endsWith("/catalog.xml")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("catalog.xml"));
@@ -155,22 +160,53 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         if (BesXmlAPI.getCatalog(collectionName, showCatalogDoc)) {
 
-            String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
-            Transformer _ingestTransformer = new Transformer(xsltDoc);
-            DocumentBuilder builder = _ingestTransformer.getProcessor().newDocumentBuilder();
-            builder.setLineNumbering(true);
-            //builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            xmlo.output(showCatalogDoc,baos);
-            XdmNode catalog =  builder.build(new StreamSource(new ByteArrayInputStream(baos.toByteArray())));
+            log.debug(xmlo.outputString(showCatalogDoc));
+
+            String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
+            Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
+            JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
+
+
+
+
+            String catalogID = contextName +(servletName.startsWith("/")?"":"/") + servletName +
+                    (collectionName.startsWith("/")?"":"/") + collectionName;
+
 
             response.setContentType("text/xml");
             Version.setOpendapMimeHeaders(request,response);
             response.setHeader("Content-Description", "thredds_catalog");
-            response.setStatus(HttpServletResponse.SC_OK);
 
-            _ingestTransformer.transform(catalog, response.getOutputStream());
+
+            if(InheritedMetadataManager.hasInheritedMetadata(catalogID)){
+                log.debug("Found inherited metadata for collection '"+collectionName+"'");
+
+                // Go get the inherited metadata elements.
+                Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(catalogID);
+
+                // Transform the BES  showCatalog response into a thredds catalog
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                showCatalogToThreddsCatalog.transform(besCatalog, baos);
+
+                // Parse the thredds catalog into a JDOM document.
+                SAXBuilder sb = new SAXBuilder();
+                Document threddsCatalog = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+                // Get the top level dataset
+                Element catalog = threddsCatalog.getRootElement();
+                Element topDataset = catalog.getChild("dataset", THREDDS.NS);
+
+                // Add the metadata content to the dataset element.
+                topDataset.addContent(1,metadata);
+
+                // Transmit the catalog.
+                xmlo.output(threddsCatalog,response.getOutputStream());
+            }
+            else {
+                // Transform the BES showCatalog response intp a THREDDS catalog and send it off to the client.
+                showCatalogToThreddsCatalog.transform(besCatalog, response.getOutputStream());
+            }
 
 
 
@@ -198,7 +234,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
      * @return The last time the thing refered to in the request was modified.
      */
     public long getLastModified(HttpServletRequest req){
-        String name = ReqInfo.getFullSourceName(req);
+        String name = ReqInfo.getRelativeUrl(req);
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
                 "collection: " + name );

@@ -27,11 +27,8 @@ package opendap.coreServlet;
 
 
 import org.slf4j.Logger;
-import org.jdom.Document;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.HashMap;
 
 
 /**
@@ -76,21 +73,41 @@ public class ReqInfo {
 
     }
 
+    /**
+     * Get service portion of the URL - everything in the URL before the localID (aka relativeUrl) of the dataset.
+     * @param request The client request.
+     * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
+     * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
+     */
 
-    public static String getBaseURI(HttpServletRequest req){
+    public static String getServiceUrl(HttpServletRequest request){
 
+        String requestUrl = request.getRequestURL().toString();
 
-        int start = req.getContextPath().length() + req.getServletPath().length();
-        String buri = req.getRequestURI().substring(start,req.getRequestURI().length());
+        String serviceUrl = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
-
-        buri  =  req.getRequestURL().substring(0,req.getRequestURL().lastIndexOf(buri));
-
-        return buri;
+        return serviceUrl;
 
     }
 
+    /**
+     * Returns the full source name for this request. This is essentially the same as the value
+     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
+     * is null then the full source name is "/".
+     * @param req The client request.
+     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
+     */
+    public static String getRelativeUrl(HttpServletRequest req){
 
+        String name=req.getPathInfo();
+
+        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
+            name = "/";
+
+        }
+        return name;
+
+    }
 
 
 
@@ -113,57 +130,21 @@ public class ReqInfo {
 
 
 
-    /**
-     *
-     * @param req The client request.
-     * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
-     * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
-     */
-
-    public static String getRequestURL(HttpServletRequest req){
-
-        String requestURL;
-
-        // Figure out the data set name.
-        String requestPath = req.getPathInfo();
-
-        log.debug("getRequestURL() - req.getPathInfo(): " + requestPath);
-
-        // Is it a collection?
-        if (requestPath == null || requestPath.endsWith("/")) {
-            requestURL = req.getRequestURL().toString();
-            log.debug("   requestURL: "+requestURL+" (a collection)");
-        } else {
-            // It appears to be a dataset.
-
-            // Does it have a request suffix?
-            if(requestPath.lastIndexOf("/") < requestPath.lastIndexOf(".")){
-
-                requestURL = req.getRequestURL().substring(0, req.getRequestURL().toString().lastIndexOf("."));
-
-            } else {
-                requestURL = req.getRequestURL().toString();
-            }
-            log.debug("   requestURL: "+requestURL+" (a dataset)");
-        }
-
-        return requestURL;
-
-    }
 
 
     /**
-     * The collection name is the path leading to requestd dataset, if a dataset was requested. If a
+     * The collection name is the path leading to requested dataset, if a dataset was requested. If a
      * collection was requested then that is returned.
      *
      * @param req The client request.
      * @return The name of the collection.
+     * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static String getCollectionName(HttpServletRequest req){
 
         String cName, dSrc, dSetName;
 
-        dSrc = getDataSource(req);
+        dSrc = getBesDataSourceID(getRelativeUrl(req));
         dSetName = getDataSetName(req);
 
         if(dSetName == null)
@@ -187,22 +168,23 @@ public class ReqInfo {
      * @param req The client request.
      * @return The suffix of the request. Basically it looks at the last element in the slash "/" seperated list
      * of stuff in the URL and returns everything after the final "." If there is no final "." then null is returned.
+     * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static String getRequestSuffix(HttpServletRequest req){
 
         String requestSuffix = null;
-        String requestPath = req.getPathInfo();
-        log.debug("getRequestSuffix() - req.getPathInfo(): " + requestPath);
+        String relativeUrl = getRelativeUrl(req);
+        log.debug("getRequestSuffix() - relativeUrl(request): " + relativeUrl);
 
 
         // Is it a dataset and not a collection?
-        if (requestPath!=null && !requestPath.endsWith("/")) {
+        if (relativeUrl!=null && !relativeUrl.endsWith("/")) {
 
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
             // and strip it off the dataSetName
 
-            if(requestPath.lastIndexOf("/") < requestPath.lastIndexOf(".")){
-                requestSuffix = requestPath.substring(requestPath.lastIndexOf('.') + 1);
+            if(relativeUrl.lastIndexOf("/") < relativeUrl.lastIndexOf(".")){
+                requestSuffix = relativeUrl.substring(relativeUrl.lastIndexOf('.') + 1);
             }
 
         }
@@ -222,10 +204,11 @@ public class ReqInfo {
      *
      * @param req The client request.
      * @return The dataset name, null if the request is for a collection.
+     * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static String getDataSetName(HttpServletRequest req){
 
-        String requestPath = req.getPathInfo();
+        String requestPath = getRelativeUrl(req);
         log.debug("getDataSetName()   - req.getPathInfo(): " + requestPath);
 
 
@@ -257,26 +240,6 @@ public class ReqInfo {
     }
 
 
-    /**
-     * Returns the full source name for this request. This is essentially the same as the value
-     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
-     * is null then the full source name is "/".
-     * @param req The client request.
-     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
-     */
-    public static String getFullSourceName(HttpServletRequest req){
-
-        String name=req.getPathInfo();
-
-        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
-            name = "/";
-
-        }
-        return name;
-
-    }
-
-
 
 
 
@@ -304,33 +267,28 @@ public class ReqInfo {
      *
      * @param req The client request.
      * @return The DataSourceName
+     * @deprecated 
      */
-    public static String getDataSource(HttpServletRequest req){
+    public static String getBesDataSourceID(HttpServletRequest req){
 
-        String requestPath = req.getPathInfo();
-        log.debug("getDataSource()    - req.getPathInfo(): " + requestPath);
+        String requestPath = getRelativeUrl(req);
+        log.debug("getBesDataSourceID()    - req.getPathInfo(): " + requestPath);
 
 
         String dataSourceName;
 
         // Is it a dataset and not a collection?
 
-        if(requestPath == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
-            dataSourceName = "/";
+        dataSourceName = requestPath;
 
-        }
-        else {
-            dataSourceName = requestPath;
-
-            if (!dataSourceName.endsWith("/")) { // If it's not a collection then we'll look for a suffix to remove
+        if (!dataSourceName.endsWith("/")) { // If it's not a collection then we'll look for a suffix to remove
 
 
-                // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
-                // and strip it off the dataSourceName
+            // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
+            // and strip it off the dataSourceName
 
-                if(dataSourceName.lastIndexOf("/") < dataSourceName.lastIndexOf(".")){
-                       dataSourceName = dataSourceName.substring(0, dataSourceName.lastIndexOf('.'));
-                }
+            if(dataSourceName.lastIndexOf("/") < dataSourceName.lastIndexOf(".")){
+                   dataSourceName = dataSourceName.substring(0, dataSourceName.lastIndexOf('.'));
             }
         }
         log.debug("  dataSourceName: " + dataSourceName);
@@ -340,20 +298,68 @@ public class ReqInfo {
     }
 
 
-    public static String getUrlPath(HttpServletRequest req){
-        String up = getDataSource(req);
 
-        if(up.startsWith("/")){
-            up = up.substring(1,up.length());
+
+    /**
+     * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+     * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
+     * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+     * <p><b>Examples:</b>
+     * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = fnoc1.nc </li>
+     * <li> dataSourceName = /opendap/nc/fnoc1.nc </li>
+     * <li> requestSuffix = dds </li>
+     * </ul>
+     *
+     * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = null </li>
+     * <li> dataSourceName = /opendap/nc/ </li>
+     * <li> requestSuffix = "" </li>
+     * </ul>
+     * </ul>
+     *
+     * @param relativeUrl The relative URL of the client request. No Constraint expression (i.e. No query section of
+     * the URL - the question mark and everything after it.)
+     * @return The DataSourceName
+     */
+    public static String getBesDataSourceID(String relativeUrl){
+
+        String requestPath = relativeUrl;
+        log.debug("getBesDataSourceID()    - req.getPathInfo(): " + requestPath);
+
+
+        String dataSourceName;
+
+        // Is it a dataset and not a collection?
+
+        dataSourceName = requestPath;
+
+        if (!dataSourceName.endsWith("/")) { // If it's not a collection then we'll look for a suffix to remove
+
+
+            // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
+            // and strip it off the dataSourceName
+
+            if(dataSourceName.lastIndexOf("/") < dataSourceName.lastIndexOf(".")){
+                   dataSourceName = dataSourceName.substring(0, dataSourceName.lastIndexOf('.'));
+            }
         }
+        log.debug("  dataSourceName: " + dataSourceName);
 
-        return up;
+        return dataSourceName;
+
     }
+
 
     /**
      * Evaluates the request and returns TRUE if it is determined that the request is for an OPeNDAP directory view.
      * @param req The client request.
      * @return True if the request is for an OPeNDAP directory view, False otherwise.
+     * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static boolean requestForOpendapContents(HttpServletRequest req){
 
@@ -376,6 +382,7 @@ public class ReqInfo {
      * Evaluates the request and returns TRUE if it is determined that the request is for an THREDDS directory view.
      * @param req The client request.
      * @return True if the request is for an THREDDS directory view, False otherwise.
+     * @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
      */
     public static boolean requestForTHREDDSCatalog(HttpServletRequest req){
         boolean test = false;
@@ -395,18 +402,19 @@ public class ReqInfo {
 
 
     
+    // @todo Replace this method with one that takes a the result of getRelativeURl() as it's parameter
     public static String toString(HttpServletRequest request){
         String s = "";
         
-        s += "getDataSource(): "+ ReqInfo.getDataSource(request) + "\n";
-        s += "getBaseURI(): "+ ReqInfo.getBaseURI(request) + "\n";
+        s += "getRelativeUrl(): "+ getRelativeUrl(request) + "\n";
+        s += "getBesDataSourceID(): "+ getBesDataSourceID(getRelativeUrl(request)) + "\n";
+        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
+        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
         s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
         s += "getConstraintExpression(): "+ ReqInfo.getConstraintExpression(request) + "\n";
         s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
-        s += "getDataSource(): "+ ReqInfo.getDataSource(request) + "\n";
-        s += "getFullSourceName(): "+ ReqInfo.getFullSourceName(request) + "\n";
+        s += "getBesDataSourceID(): "+  getBesDataSourceID(getRelativeUrl(request)) + "\n";
         s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
-        s += "getRequestURL(): "+ ReqInfo.getRequestURL(request) + "\n";
         s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
         s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
 

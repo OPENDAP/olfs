@@ -155,7 +155,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     public long getLastModified(HttpServletRequest req) {
 
 
-        String dataSource = ReqInfo.getDataSource(req);
+        String relativeUrl = ReqInfo.getRelativeUrl(req);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
 
 
         if(!initialized)
@@ -240,8 +241,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                                    HttpServletResponse response,
                                    boolean sendResponse) throws Exception {
 
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         DataSourceInfo dsi;
 
         Method dispatchMethod;
@@ -299,7 +301,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception {
 
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAS() for dataset: " + dataSource+
@@ -359,7 +362,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception {
 
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDDS() for dataset: " + dataSource+
@@ -418,7 +422,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                         HttpServletResponse response)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
 
@@ -489,7 +494,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                         HttpServletResponse response)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
 
@@ -574,7 +580,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                          HttpServletResponse response)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAP2Data() For: " + dataSource+
@@ -618,7 +625,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception {
 
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         response.setContentType("text/plain");
@@ -670,7 +678,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                                     HttpServletResponse response)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -727,7 +736,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             throws Exception {
 
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
 
         response.setContentType("text/html");
         Version.setOpendapMimeHeaders(request,response);
@@ -783,7 +793,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                         HttpServletResponse response)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
@@ -884,8 +895,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                         HttpServletResponse response)
             throws Exception {
 
-        String dataSource = ReqInfo.getDataSource(request);
-        String fullSourceName = ReqInfo.getFullSourceName(request);
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String fullSourceName = ReqInfo.getRelativeUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
 
