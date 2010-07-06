@@ -51,11 +51,14 @@
     <xsl:template match="thredds:dataset">
         <xsl:param name="inheritedMetadata" />
 
+        <xsl:variable name="datasetPositionInDocument">
+            <xsl:value-of select="count(preceding::*)"/>
+        </xsl:variable>
 
         <xsl:choose>
 
             <!-- Is this the dataset that we are supposed to summary? -->
-            <xsl:when test="$targetDataset=preceding::*/last()">
+            <xsl:when test="$targetDataset=$datasetPositionInDocument">
                 <xsl:call-template name="targetDatasetPage">
                 <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]" />
 

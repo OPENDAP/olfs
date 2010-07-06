@@ -275,6 +275,7 @@
        - <datasetScan location="/bes/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
        -
        -
+      -->
 
     <xsl:template match="thredds:datasetScan" >
         <xsl:param name="indent" />
@@ -291,113 +292,7 @@
             <xsl:call-template name="NoSizeNoTime" />
         </tr>
     </xsl:template>
-      -->
 
-
-
-
-    <!--***********************************************
-       -
-       -
-       -
-       -
-       - <datasetScan location="/bes/data" path="data" name="SVN Test Data Archive" serviceName="OPeNDAP-Hyrax">
-       -
-       -
-     -->
-    <xsl:template match="thredds:datasetScan">
-        <xsl:param name="indent"/>
-        <xsl:comment>########## link generated from thredds:datasetScan ##########</xsl:comment>
-        <!--
-        ..........................................................
-        Input XML:
-        <xsl:copy-of select="." />
-        ..........................................................
-
-        thredds:metadata/thredds:serviceName: <xsl:value-of select="thredds:metadata/thredds:serviceName" />
-        -->
-
-        <xsl:variable name="serviceName" select="thredds:metadata/thredds:serviceName"/>
-        <!-- serviceName: <xsl:value-of select="$serviceName" /> -->
-
-        <xsl:variable name="datasetScanLocation">
-            <xsl:choose>
-                <xsl:when test="substring(@location,string-length(@location))='/'">
-                    <xsl:value-of select="@location"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="concat(@location,'/')"/>
-                </xsl:otherwise>
-
-            </xsl:choose>
-        </xsl:variable>
-        <!-- datasetScanLocation = '<xsl:value-of select="$datasetScanLocation"/>'-->
-
-        <xsl:variable name="datasetScanName" select="@name"/>
-
-        <!-- Get the service definition form the key (a hash map) -->
-        <xsl:variable name="serviceElement" select="key('service-by-name', $serviceName)"/>
-
-
-        <!--
-        service-by-name:
-        <xsl:copy-of select="$serviceElement" />
-        -->
-
-        <!-- Get the service definition form the key (a hash map) -->
-        <!--xsl:variable name="dapServices" select="$serviceElement/thredds:service[@serviceType='OPENDAP']"/-->
-        <xsl:variable name="dapServices"
-                      select="$serviceElement[@serviceType='OPENDAP'] | $serviceElement/thredds:service[@serviceType='OPENDAP'] "/>
-
-        <xsl:for-each select="$dapServices">
-
-            <xsl:variable name="base" select="@base"/>
-            <!-- base = '<xsl:value-of select="$base"/>' -->
-
-            <xsl:variable name="lastCharOfBase" select="substring($base,string-length($base))"/>
-            <!-- lastCharOfBase = '<xsl:value-of select="$lastCharOfBase"/>' -->
-
-
-            <xsl:variable name="catalogURL">
-                <xsl:choose>
-
-                    <xsl:when test="$lastCharOfBase='/' and starts-with($datasetScanLocation,'/')">
-                        <xsl:variable name="location"
-                                      select="substring($datasetScanLocation,2,string-length($datasetScanLocation))"/>
-                        <xsl:variable name="targetURL" select="concat($base,$location,'catalog.html')"/>
-                        <xsl:value-of select="$targetURL"/>
-                    </xsl:when>
-
-                    <xsl:when test="$lastCharOfBase!='/' and not(starts-with($datasetScanLocation,'/'))">
-                        <xsl:variable name="targetURL" select="concat($base,'/',$datasetScanLocation,'catalog.html')"/>
-                        <xsl:value-of select="$targetURL"/>
-                    </xsl:when>
-
-                    <xsl:otherwise>
-                        <xsl:variable name="targetURL" select="concat($base,$datasetScanLocation,'catalog.html')"/>
-                        <xsl:value-of select="$targetURL"/>
-                    </xsl:otherwise>
-
-                </xsl:choose>
-
-            </xsl:variable>
-
-
-            <tr>
-                <td align="left">
-                    <xsl:value-of select="$indent"/>
-
-                    <a href="{$catalogURL}">
-                        <xsl:value-of select="$datasetScanName"/> /
-                    </a><div class="small">(Link built from thredds:datasetScan element.)</div>
-
-                </td>
-                <xsl:call-template name="NoSizeNoTime"/>
-            </tr>
-
-        </xsl:for-each>
-
-    </xsl:template>
 
 
     <!--***********************************************
@@ -511,17 +406,28 @@
         <xsl:param name="indent" />
         <xsl:param name="inheritedMetadata" />
 
+
+        <xsl:variable name="datasetPositionInDocument">
+            <xsl:value-of select="count(preceding::*)"/>
+        </xsl:variable>
+
+        <!--
+        <h3>count(preceding::*): <xsl:value-of select="count(preceding::*)"/></h3>
+        <h3>position():  <xsl:value-of select="position()"/></h3>
+        -->
+
+
         <xsl:choose>
-            <xsl:when test="boolean(thredds:dataset) or boolean(thredds:catalogRef) or boolean(thredds:datasetScan)">
+            <xsl:when test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
                 <tr>
                     <td  class="dark" align="left">
                         <xsl:value-of select="$indent"/>
                         <a>
                             <xsl:if test="$remoteCatalog">
-                                <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
+                                <xsl:attribute name="href">?browseDataset=<xsl:value-of select="$datasetPositionInDocument"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
                             </xsl:if>
                             <xsl:if test="not($remoteCatalog)">
-                                <xsl:attribute name="href">?dataset=<xsl:value-of select="preceding::*/last()"/></xsl:attribute>
+                                <xsl:attribute name="href">?dataset=<xsl:value-of select="$datasetPositionInDocument"/></xsl:attribute>
                             </xsl:if>
 
                             <xsl:choose>
@@ -555,11 +461,11 @@
                         <xsl:value-of select="$indent"/>
                         <a>
                             <xsl:if test="$remoteCatalog">
-                                <xsl:attribute name="href">?browseDataset=<xsl:value-of select="preceding::*/last()"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
+                                <xsl:attribute name="href">?browseDataset=<xsl:value-of select="$datasetPositionInDocument"/>&amp;<xsl:value-of select="$remoteCatalog"/></xsl:attribute>
                             </xsl:if>
                             <xsl:if test="not($remoteCatalog)">
                                 <xsl:attribute name="href">
-                                    ?dataset=<xsl:value-of select="preceding::*/last()"/>
+                                    ?dataset=<xsl:value-of select="$datasetPositionInDocument"/>
                                 </xsl:attribute>
                             </xsl:if>
 
