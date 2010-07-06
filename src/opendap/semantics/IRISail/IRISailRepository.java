@@ -610,8 +610,10 @@ public class IRISailRepository extends SailRepository {
 
                 // @todo  myfn and mylist are in a fixed namespace, say http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn
                 // the following code should be changed to reflect this.
-                expand += "} " + fn + ":myfn {" + fn + ":" + functionName
-                        + "} ; " + fn + ":mylist {} rdf:first {";
+                //expand += "} " + fn + ":myfn {" + fn + ":" + functionName
+                //        + "} ; " + fn + ":mylist {} rdf:first {";
+                expand += "}  <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn> {" + fn + ":" + functionName
+                        + "} ; <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist> {} rdf:first {";
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
@@ -634,8 +636,10 @@ public class IRISailRepository extends SailRepository {
                     fn = functionMatcher.group(2);
                     functionName = functionMatcher.group(3);
 
-                    expand += "} " + fn + ":myfn {" + fn + ":" + functionName
-                            + "} ; " + fn + ":mylist {} rdf:first {";
+                    //expand += "} " + fn + ":myfn {" + fn + ":" + functionName
+                    //        + "} ; " + fn + ":mylist {} rdf:first {";
+                    expand += "}  <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn> {" + fn + ":" + functionName
+                    + "} ; <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist> {} rdf:first {";
                     for (String element : splittedStr) {
                         j++;
                         if (j < splittedStr.length) {
@@ -2140,11 +2144,12 @@ public class IRISailRepository extends SailRepository {
                     mbnode = bnode.matcher(sbj.toString());
 
                     isSbjBn = mbnode.find();
-                    // log.debug("prd = " + prd.stringValue() );
-
+                     //log.debug("prd = " + prd.stringValue() );
+                    String myfnFullName = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn";
+                    //log.debug("prdmyfnFullName = " + myfnFullName );
                     // @todo This is supposed to be a full URI match and not a local name match!!!
-                    if (prd.getLocalName().equals("myfn") && isSbjBn) {
-
+                    //if (prd.getLocalName().equals("myfn") && isSbjBn) {
+                    if (prd.stringValue().equals(myfnFullName) && isSbjBn) {
                         String functionImport =  obj.stringValue();
                         int indexOfLastPoundSign = functionImport.lastIndexOf("#");
                         
