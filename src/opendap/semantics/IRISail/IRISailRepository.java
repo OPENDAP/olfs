@@ -179,10 +179,10 @@ public class IRISailRepository extends SailRepository {
 
         findConstruct();
 
-        // log.debug("Before running the construct rules:\n " +
-        // opendap.coreServlet.Util.getMemoryReport());
+         //log.debug("Before running the construct rules:\n " +
+         //opendap.coreServlet.Util.getMemoryReport());
         con = this.getConnection();
-        // con.setAutoCommit(false); //turn off autocommit
+         //con.setAutoCommit(false); //turn off autocommit
         while (modelChanged && runNbr < runNbrMax) {
             // log.debug("AutoCommit is " +con.isAutoCommit()); //check if
             // autocommit
@@ -200,7 +200,8 @@ public class IRISailRepository extends SailRepository {
                 Vector<Statement> toAdd = new Vector<Statement>();
                 String constructURL = this.constructContext.get(qstring);
 
-                URI uriaddress = new URIImpl(constructURL);
+                //URI uriaddress = new URIImpl(constructURL);
+                URI uriaddress = new URIImpl("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#externalInferencing");
                 Resource[] context = new Resource[1];
                 context[0] = uriaddress;
 
@@ -211,8 +212,8 @@ public class IRISailRepository extends SailRepository {
                         + "   Processed Query String: " + processedQueryString);
 
                 try {
-                    // log.debug("Prior to making new repository connection:\n "
-                    // + opendap.coreServlet.Util.getMemoryReport());
+                     log.debug("Prior to making new repository connection:\n "
+                     + opendap.coreServlet.Util.getMemoryReport());
 
                     GraphQuery graphQuery = con.prepareGraphQuery(
                             QueryLanguage.SERQL, processedQueryString);
@@ -224,11 +225,10 @@ public class IRISailRepository extends SailRepository {
                     GraphQueryResult graphResultStCount = graphQuery.evaluate();
                     log.info("Completed querying. ");
 
-                    // log.debug("After evaluating construct rules:\n " +
-                    // opendap.coreServlet.Util.getMemoryReport());
+                     log.debug("After evaluating construct rules:\n " +
+                     opendap.coreServlet.Util.getMemoryReport());
 
-                    log
-                            .info("Post processing query result and adding statements ... ");
+                    log.info("Post processing query result and adding statements ... ");
 
                     if (graphResult.hasNext()) {
                         modelChanged = true;
@@ -337,8 +337,7 @@ public class IRISailRepository extends SailRepository {
                         try {
                             graphResult.close();
                         } catch (QueryEvaluationException e) {
-                            log
-                                    .error("Caught a QueryEvaluationException! Msg: "
+                            log.error("Caught a QueryEvaluationException! Msg: "
                                             + e.getMessage());
                         }
                     }
@@ -451,6 +450,13 @@ public class IRISailRepository extends SailRepository {
 
     }
 
+    public HashMap <String, String> getConstruct() {
+        if (constructContext.isEmpty()){
+            findConstruct();  
+        }
+        return constructContext;
+    }
+    
     private String getServerUrlString(URL url) {
 
         String baseURL = null;
@@ -1166,6 +1172,77 @@ public class IRISailRepository extends SailRepository {
 
         return ltmodstr;
     }
+    /**
+     * Checks and returns last modified time of a context (URI) via querying
+     * against the repository on contexts.
+     * 
+     * @param urlstring
+     */
+    public String getLastModifiedTime(String urlstring) {
+        TupleQueryResult result = null;
+        String ltmodstr = "";
+        URI uriaddress = new URIImpl(urlstring);
+        Resource[] context = new Resource[1];
+        context[0] = (Resource) uriaddress;
+        RepositoryConnection con = null;
+
+        //String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
+        //        + uriaddress
+        //        + "> {x} <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified> {y} "
+        //        + "where x=<" + uriaddress + ">";
+
+        String queryString = "SELECT doc,lastmod FROM CONTEXT "
+                  + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
+                  + "where doc=<" + uriaddress + ">"
+                  + "USING NAMESPACE "
+                  + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+        try {
+            con = this.getConnection();
+
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+            result = tupleQuery.evaluate();
+
+            BindingSet bindingSet;
+            Value valueOfY;
+
+            while (result.hasNext()) { // should have only one value
+                bindingSet = (BindingSet) result.next();
+                Set<String> names = bindingSet.getBindingNames();
+                // for (String name : names) {
+                // log.debug("BindingNames: " + name);
+                // }
+                valueOfY = (Value) bindingSet.getValue("lastmod");
+                ltmodstr = valueOfY.stringValue();
+                // log.debug("Y:" + valueOfY.stringValue());
+
+            }
+
+        } catch (QueryEvaluationException e) {
+            log.error("Caught a QueryEvaluationException! Msg: "
+                    + e.getMessage());
+        } catch (RepositoryException e) {
+            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught a MalformedQueryException! Msg: "
+                    + e.getMessage());
+        } finally {
+            try {
+                result.close();
+
+            } catch (Exception e) {
+                log.error("Caught an Exception! Msg: " + e.getMessage());
+            }
+            try {
+                con.close();
+            } catch (RepositoryException e) {
+                log.error("Caught a RepositoryException! Msg: "
+                        + e.getMessage());
+            }
+        }
+
+        return ltmodstr;
+    }
 
     /**
      * Returns a Hash containing last modified time of a context (URI) from the
@@ -1392,12 +1469,8 @@ public class IRISailRepository extends SailRepository {
     public Boolean olderContext(String importURL) {
         Boolean oldLMT = false;
 
-        String oldltmod = this.chkLTMODContext(importURL); // LMT from http
-        // header
-
-        // String oldltmod = this.chkLMTContext(importURL); // LMT in owl
-        // document
-
+        String oldltmod = this.getLastModifiedTime(importURL); // LMT from repository
+        
         if (oldltmod.isEmpty()) {
             oldLMT = true;
             return oldLMT;
@@ -1412,8 +1485,8 @@ public class IRISailRepository extends SailRepository {
         Date ltdparseDate;
         try {
             ltdparseDate = dateFormat.parse(ltd);
-
-            log.debug("lastmodified " + ltdparseDate.toString());
+            log.debug("URI " + importURL);
+            log.debug("lastmodified    " + ltdparseDate.toString());
             Date oldltdparseDate = dateFormat.parse(oltd);
             log.debug("oldlastmodified " + oldltdparseDate.toString());
 
@@ -1437,7 +1510,7 @@ public class IRISailRepository extends SailRepository {
      */
     public void setLTMODContext(String importURL, RepositoryConnection con) {
         String pred = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified";
-
+        String contURL = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#cachecontext";
         if (!this.imports.contains(importURL)) { // not in the repository yet
             // log.debug(importURL);
             String ltmod = this.getLTMODContext(importURL);
@@ -1445,7 +1518,7 @@ public class IRISailRepository extends SailRepository {
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
             URI p = f.createURI(pred);
-            URI cont = f.createURI(importURL);
+            URI cont = f.createURI(contURL);
             URI sxd = f.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
             Literal o = f.createLiteral(ltmod, sxd);
 
@@ -1493,7 +1566,119 @@ public class IRISailRepository extends SailRepository {
 
         }
     }
+    /**
+     * Set setStartingPoints statement for the importURI in the repository.
+     * 
+     * @param importURL
+     * @param CollectionURL
+     */
+    public void setStartingPoints(RepositoryConnection con, Vector <String> importURLs) {
+        String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
+            ValueFactory f = this.getValueFactory();
+            
+            URI s = null;
+            URI isa = f.createURI(pred);
+            URI cont = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
+            URI o = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
+            URL url;
+            
+            try {
+                               
+                String rdfcache = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+                s = f.createURI(rdfcache);
+                url = new URL(rdfcache);
+                
+                con.add((Resource) s, isa, (Value) o, (Resource) cont);
+                                
+                log.info("Added to the repository <" + s + "> <" + isa
+                        + "> " + "<" + o + "> " + "<" + cont + "> ");
+                for (String importURL : importURLs){
+                
+                url = new URL(importURL);
+                s = f.createURI(importURL);
+                con.add((Resource) s, isa, (Value) o, (Resource) cont);
+                                                               
+                log.info("Added to the repository <" + s + "> <" + isa
+                        + "> " + "<" + o + "> " + "<" + cont + "> ");
+                } 
+                
+                                
+            } catch (RepositoryException e) {
+                log.error("In setStartingPoints, caught an RepositoryException! Msg: "
+                        + e.getMessage());
+
+            } catch (MalformedURLException e) {
+                
+                log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
+                        + e.getMessage());
+            //} catch (RDFParseException e) {
+            //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
+            //            + e.getMessage());
+            } catch (IOException e) {
+                log.error("In setStartingPoints, caught an IOException! Msg: "
+                        + e.getMessage());
+            }
+                   
+    }  
+    /**
+     * Set setStartingPoints statement for the importURI in the repository.
+     * 
+     * @param importURL
+     * @param CollectionURL
+     */
+    public void setStartingPoints(RepositoryConnection con, String importURL, Vector <String> importURLs) {
+        String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+
+            ValueFactory f = this.getValueFactory();
+            URI s = f.createURI(importURL);
+            URI isa = f.createURI(pred);
+            URI cont = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
+            URI o = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
+            URL url;
+
+            
+            try {
+                               
+                String rdfcache = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+                s = f.createURI(rdfcache);
+                url = new URL(rdfcache);
+                
+                con.add((Resource) s, isa, (Value) o, (Resource) cont);
+                
+                
+                log.info("Added to the repository <" + s + "> <" + isa
+                        + "> " + "<" + o + "> " + "<" + cont + "> ");
+                
+                if (importURL.startsWith("http://")) { //make sure an url and read it in
+                url = new URL(importURL);
+                s = f.createURI(importURL);
+                con.add((Resource) s, isa, (Value) o, (Resource) cont);
+                
+                                               
+                log.info("Added to the repository <" + s + "> <" + isa
+                        + "> " + "<" + o + "> " + "<" + cont + "> ");
+                }
+                
+                                
+            } catch (RepositoryException e) {
+                log.error("In setStartingPoints, caught an RepositoryException! Msg: "
+                        + e.getMessage());
+
+            } catch (MalformedURLException e) {
+                
+                log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
+                        + e.getMessage());
+            //} catch (RDFParseException e) {
+            //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
+            //            + e.getMessage());
+            } catch (IOException e) {
+                log.error("In setStartingPoints, caught an IOException! Msg: "
+                        + e.getMessage());
+            }
+
+        
+    }
     /**
      * Set IsContainedBy statement for the importURI in the repository.
      * 
@@ -2168,20 +2353,45 @@ public class IRISailRepository extends SailRepository {
             toAdd.add(st);
             Added.add(st);
             con.add(st, context); // add fn created st
+            log.debug("process_fn add context: " + context);
         } // while (graphResult.hasNext())
         log.debug("After processing fn: " + toAdd.size()
                 + " statements are added.\n ");
     }
 
-
-    /**
-     *  Locates the method 'methodName' in the class 'className'. The method must be a static method and
-     * have a parameter list of 'java.util.List<String> ,org.openrdf.model.ValueFactory'  . If such a method (or the
-     * containing clas cannot be found then a 'null' is returned.
-     * @param className    Name of the class
-     * @param methodName   name of the method
-     * @return The Method requested, or null if the method cannot be located.
+    /***************************************************************************
+     * function join to concatenate strings
+     * 
+     * @param RDFList
+     * @param createValue
+     * @return
      */
+    public static Value join(List<String> RDFList, ValueFactory createValue) {
+        int i = 0;
+        boolean joinStrIsURL = false;
+        String targetObj = "";
+        if (RDFList.get(1).startsWith("http://")) {
+            joinStrIsURL = true;
+        }
+        for (i = 1; i < RDFList.size() - 1; i++) {
+            targetObj += RDFList.get(i) + RDFList.get(0); // rdfList.get(0) +
+            // separator
+            // log.debug("Component("+i+")= " + RDFList.get(i));
+        }
+
+        targetObj += RDFList.get(i); // last component no separator
+
+        Value stObjStr;
+        if (joinStrIsURL) {
+            stObjStr = createValue.createURI(targetObj);
+        } else {
+            stObjStr = createValue.createLiteral(targetObj);
+        }
+
+        return stObjStr;
+    }
+
+
     public static Method getMethodForFunction(String className,
                                               String methodName) {
 
@@ -2221,6 +2431,40 @@ public class IRISailRepository extends SailRepository {
         } catch (ClassNotFoundException e) {
             log.error("getMethodForFunction() - Unable to locate java class: "
                     + className);
+        }
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
+        return null;
+
+    }
+
+    public static Method getMethodForFunction(Object classInstance,
+            String methodName) {
+
+        Method method;
+
+        Class methodContext = classInstance.getClass();
+        String className = methodContext.getName();
+
+        Logger log = org.slf4j.LoggerFactory.getLogger(IRISailRepository.class);
+
+        try {
+            method = methodContext.getMethod(methodName, List.class,
+                    ValueFactory.class);
+            log.debug("getMethodForFunction() - Located the java method: "
+                    + getProcessingMethodDescription(method)
+                    + " in an instance of the class '" + className + "'");
+            return method;
+
+        } catch (NoSuchMethodException e) {
+            log.error("getMethodForFunction() - The class '" + className
+                            + "' does not contain a method called '"
+                            + methodName + "'");
         }
 
         log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
