@@ -129,9 +129,4 @@
 
 
 
-    <xsl:template match="/">
-        <xsl:apply-templates mode="xml2rdf"/>
-    </xsl:template>
-
-
 </xsl:stylesheet>
