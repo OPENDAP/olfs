@@ -92,7 +92,7 @@ public class ThreddsCatalogUtil {
 		this(writeToCache, namePrefix, readFromCache, false);
 	}
 	*/
-	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) {
+	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 		if (writeToCache || readFromCache) {
@@ -146,7 +146,7 @@ public class ThreddsCatalogUtil {
 				log.debug("childURLs: " + urls.nextElement());
 		}
 		
-		private void recur(String catalogURL) {
+		private void recur(String catalogURL) throws Exception {
 			Vector<String> URLs = getCatalogRefURLs(catalogURL);
 			if (URLs != null) {
 				for (String URL : URLs) {
@@ -176,7 +176,11 @@ public class ThreddsCatalogUtil {
 			}
 			catch (EmptyStackException e) {
 				return null;
-			}	
+			}
+			catch (Exception e) {
+				log.error(e.getMessage());
+				return null;
+			}
 		}
 		
 		public void saveState() throws Exception {
@@ -339,7 +343,7 @@ public class ThreddsCatalogUtil {
 	 * @param catalogUrlString The THREDDS catalog to access
 	 * @return A Vector of strings, each element a DDX URL.
 	 */
-	public Vector<String> getDDXUrls(String catalogUrlString) {
+	public Vector<String> getDDXUrls(String catalogUrlString) throws Exception {
 
 		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString,SERVICE.OPeNDAP);
 		String url;
@@ -406,7 +410,7 @@ public class ThreddsCatalogUtil {
      *         server returns a 404 response), then the Vector<Sting> result
      *         will be empty.
      */
-    public Vector<String> getCatalogRefURLs(String catalogUrlString) {
+    public Vector<String> getCatalogRefURLs(String catalogUrlString) throws Exception {
 
         Vector<String> catalogURLs = new Vector<String>();
 
@@ -490,7 +494,7 @@ public class ThreddsCatalogUtil {
 	 * @param url Find this THREDDS catalog
 	 * @return The THREDDS catalog
 	 */
-	public String getCachedCatalog(String url) {
+	public String getCachedCatalog(String url) throws Exception {
 		return TCCache.getCachedResponse(url);
 	}
 	
@@ -587,7 +591,7 @@ public class ThreddsCatalogUtil {
 	 *         will be empty.
 	 */
 	
-	public Vector<String> getDataAccessURLs(String catalogUrlString, SERVICE service) {
+	public Vector<String> getDataAccessURLs(String catalogUrlString, SERVICE service) throws Exception {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
@@ -606,7 +610,7 @@ public class ThreddsCatalogUtil {
 	 *            The URL of the document to retrieve
 	 * @return The Document
 	 */
-	private Element getDocumentRoot(String docUrlString) {
+	private Element getDocumentRoot(String docUrlString) throws Exception {
 
 		Element docRoot = null;
 
@@ -629,7 +633,7 @@ public class ThreddsCatalogUtil {
 	 *            The URL of the document to retrieve.
 	 * @return The Document
 	 */
-	private Document getDocument(String docUrlString) {
+	private Document getDocument(String docUrlString) throws Exception {
 
 		Document doc = null;
 		

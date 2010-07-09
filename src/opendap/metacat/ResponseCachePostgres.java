@@ -100,7 +100,7 @@ public class ResponseCachePostgres {
     	ResultSet rs = null;
     	PreparedStatement ps = null;
     	
-		ResponseCacheKeysEnumeration() {
+		ResponseCacheKeysEnumeration() throws Exception {
 			log.debug("Returning an enumeration of keys from Postgres.");
 			try {
 				ps = pgCache.prepareStatement("SELECT URL FROM " + pgTable);
@@ -108,6 +108,7 @@ public class ResponseCachePostgres {
 			}
 			catch (SQLException e) {
 				log.error("Could not build result set for ResponseCacheKeysEnumeration.", e);
+				throw e;
 			}
 		}
 
@@ -185,7 +186,7 @@ public class ResponseCachePostgres {
      * @param tableName The name for the Postgres table in the 'crawl_cache'
      * database where responses should be stored.
      */
-    public ResponseCachePostgres(String cacheName, String tableName) {
+    public ResponseCachePostgres(String cacheName, String tableName) throws Exception {
 
     	cacheBaseName = cacheName;
     	
@@ -200,16 +201,18 @@ public class ResponseCachePostgres {
 		}
 		catch (ClassNotFoundException e) {
 			log.error("Could not load Postgres JDBC driver: " + e.getMessage());
+			throw new Exception(e.getMessage());
 		}
 		catch (SQLException e) {
 			log.error("SQLException: " + e.getMessage());
+			throw new Exception("SQLException: " + e.getMessage());
 		}
     	
     	try {
     		restoreVisitedState();
     	}
     	catch (Exception e) {
-    		log.error("Could not read the 'visited' cache from disk. It is not an error if the cache file doesn't exist.");
+    		log.info("Could not read the 'visited' cache from disk.");
 		}
     }
     	
@@ -308,7 +311,7 @@ public class ResponseCachePostgres {
      * @param URL The URL
      * @param doc The Docuemnt
      */
-    public void setCachedResponse(String URL, String doc) {
+    public void setCachedResponse(String URL, String doc) throws Exception {
 		log.debug("Caching " + URL + " in postgres.");
 
 		PreparedStatement ps = null;
@@ -337,6 +340,7 @@ public class ResponseCachePostgres {
 		}
 		catch (SQLException e) {
 			log.error("Caching: Could not access the database/cache.", e);
+			throw new Exception("SQLException: " + e.getMessage());
 		} finally {
 			try {
 				rs.close();
@@ -353,7 +357,7 @@ public class ResponseCachePostgres {
      * @param URL Get the document paired with this URL 
      * @return The document
      */
-    public String getCachedResponse(String URL) {
+    public String getCachedResponse(String URL) throws Exception {
     	String doc = null;
 		log.debug("Reading " + URL + " from postgres.");
 		PreparedStatement ps = null;
@@ -379,10 +383,12 @@ public class ResponseCachePostgres {
 			}
 		}
 		catch (SQLException e) {
-			log.error("Cache read: Could not access the database/cache.", e);
+			log.error("Cache read: Could not access the database/cache: " + e.getMessage());
+			throw new Exception("SQLException: " + e.getMessage());
 		}
 		catch (Exception e) {
-			log.error("Cache access error.", e);
+			log.error("Cache access error:  " + e.getMessage());
+			throw e;
 		}
 		finally {
 			try {
@@ -392,7 +398,7 @@ public class ResponseCachePostgres {
 					ps.close();
 			}
 			catch (SQLException e) {
-				log.error("Cache read: Could not close the prepared statement.", e);
+				log.error("Cache read: Could not close the prepared statement: " + e.getMessage());
 			}
 		}
     	
@@ -407,7 +413,7 @@ public class ResponseCachePostgres {
      * @return An Enumeration that can be used to access all of the keys in
      * the cache. Use getCachedResponse(key) to get the Response docuements.
      */
-    public Enumeration<String> getResponseKeys() {
+    public Enumeration<String> getResponseKeys() throws Exception {
     	return new ResponseCacheKeysEnumeration();
     }
 

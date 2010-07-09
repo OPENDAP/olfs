@@ -66,7 +66,7 @@ public class DDXRetriever {
 		this(false, "");
 	}
 
-	public DDXRetriever(boolean useCache, String namePrefix) {
+	public DDXRetriever(boolean useCache, String namePrefix)  throws Exception {
 		
 		this.useCache = useCache;
 		

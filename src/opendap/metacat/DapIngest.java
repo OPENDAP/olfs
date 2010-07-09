@@ -74,7 +74,7 @@ public class DapIngest {
     private static Logger log = LoggerFactory.getLogger(DapIngest.class);
     
     /// This is the prefix for all the document ids made up of DDX URLs
-    final static String docidScope = "dap.";
+    final static String docidScope = "opendap.";
     
     /// If metacat needs an explicit schema for our generated EML, use this.
     final static String docidSchema = "/Users/jimg/src/eml-2.10/eml.xsd";
@@ -92,7 +92,7 @@ public class DapIngest {
     // Increment once for each insert
     private Integer metacatId = 1;
     // This should change rarely
-    private String metacatRevision = ".1";
+    private String metacatRevision = ".2";
         
     private boolean readThreddsFromCache = false;
     private boolean readDDXsFromCache = false;
@@ -227,12 +227,17 @@ public class DapIngest {
                     log.debug("login(): response=" + response);
                     log.debug("login(): Session ID=" + ingester.metacat.getSessionId());
                     
-                    String id = ingester.metacat.getLastDocid(docidScope);
+                    /*
+                    String id = ingester.metacat.getLastDocid(ingester.metacatUsername);
+                    log.debug("getLastDocid(): ID=" + id);
                     
                     // if not null, use the value, else use the default of 1
-                    if (!isEmpty(id))
+                    if (!isEmpty(id)) {
                     	ingester.metacatId = Integer.valueOf(id);
-                   
+                    	++ingester.metacatId;
+                    }
+                    */
+                    
                     emlInsert = true;
                 } 
                 catch (MetacatAuthException mae) {
@@ -247,7 +252,7 @@ public class DapIngest {
         	
         	// Now do whatever we've been told to do...
         		
-		    if (ingester.verbose) {
+		    if (ingester.veryVerbose) {
 		        // print internal state
 		        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		        StatusPrinter.print(lc);
@@ -261,9 +266,9 @@ public class DapIngest {
 		    if (emlFromFile)
 		    	ingester.insertEMLFromLocalFile(emlFilename);
 		    else if (eml_print_all_cached)
-		    	ingester.printAllEMLFromCache(cacheNamePrefix);
+		    	ingester.printEMLFromCache(cacheNamePrefix);
 		    else if (eml_insert_all_cached)
-		    	ingester.insertAllEMLFromCache(cacheNamePrefix);
+		    	ingester.insertEMLFromCache(cacheNamePrefix);
 		    else
 		    	ingester.crawlTHREDDS(catalogRoot,  restart, ddxRetrieve,  emlBuild,  emlInsert);
 		    
@@ -271,12 +276,12 @@ public class DapIngest {
     			ingester.recordStats();
      	}
 		catch (ParseException pe) {
-    		System.err.println("Command line option parse error: " + pe.getMessage());
+    		err.println("Command line option parse error: " + pe.getMessage());
 			
 		}
     	catch (Exception e) {
-    		System.err.println("Error: " + e.getMessage());
-    		e.printStackTrace(System.err);
+    		err.println("Error: " + e.getMessage());
+    		e.printStackTrace(err);
     	}
 		finally {
 			try {
@@ -290,8 +295,8 @@ public class DapIngest {
 					ingester.emlBuilder.saveEMLCache();
 			}
 			catch (Exception e) {
-				System.err.println("Error saving cache state!");
-				e.printStackTrace();
+				err.println("Error saving cache state!");
+				e.printStackTrace(err);
 			}
     	}
     }
@@ -333,43 +338,43 @@ public class DapIngest {
 		// whether to read from the network or the cache using a parameter 
 		// passed to its constructor. The other classes use special methods to
 		// read from the cache.
-		ThreddsCrawlerEnumeration catalogs = null; 
+		ThreddsCrawlerEnumeration catalogs = null;
 		try {
-		if (restart)
-			catalogs = threddsCatalogUtil.getCatalogEnumeration();
-		else
-			catalogs = threddsCatalogUtil.getCatalogEnumeration(catalogRoot);
+			if (restart)
+				catalogs = threddsCatalogUtil.getCatalogEnumeration();
+			else
+				catalogs = threddsCatalogUtil.getCatalogEnumeration(catalogRoot);
 
-		// First get references to any DDX objects at the top level
-		log.debug("About to get DDX URLS from: " + catalogRoot);
+			// First get references to any DDX objects at the top level
+			log.debug("About to get DDX URLS from: " + catalogRoot);
 
-		++catalogsVisited;
-
-		Vector<String> DDXURLs = null;
-
-		if (ddxRetrieve) {
-			DDXURLs = threddsCatalogUtil.getDDXUrls(catalogRoot);
-			for (String DDXURL : DDXURLs) {
-				retrieveDDX(DDXURL, emlBuild, emlInsert);
-			}
-		}
-
-		while (catalogs.hasMoreElements()) {
-			String catalog = catalogs.nextElement();
-			log.debug("About to get DDX URLS from: " + catalog);
 			++catalogsVisited;
-			if (verbose)
-				ps.println("catalog: " + catalog);
+
+			Vector<String> DDXURLs = null;
+
 			if (ddxRetrieve) {
-				DDXURLs = threddsCatalogUtil.getDDXUrls(catalog);
+				DDXURLs = threddsCatalogUtil.getDDXUrls(catalogRoot);
 				for (String DDXURL : DDXURLs) {
 					retrieveDDX(DDXURL, emlBuild, emlInsert);
 				}
 			}
+
+			while (catalogs.hasMoreElements()) {
+				String catalog = catalogs.nextElement();
+				log.debug("About to get DDX URLS from: " + catalog);
+				++catalogsVisited;
+				if (verbose)
+					ps.println("catalog: " + catalog);
+				if (ddxRetrieve) {
+					DDXURLs = threddsCatalogUtil.getDDXUrls(catalog);
+					for (String DDXURL : DDXURLs) {
+						retrieveDDX(DDXURL, emlBuild, emlInsert);
+					}
+				}
+			}
 		}
-		}
-		catch(Exception e) {
-			ps.println("Error: " + e.getMessage());
+		catch (Exception e) {
+			err.println("Error: " + e.getMessage());
 			log.debug("Error: " + e.getMessage());
 		}
 		finally {
@@ -398,7 +403,7 @@ public class DapIngest {
 			ddx = ddxRetriever.getDDXDoc(ddxUrl);
 		
 		if (ddx == null)
-			throw new Exception("No DDX for: " + ddxUrl);
+			throw new Exception("No DDX for [" + ddxUrl +"]");
 		
 		++ddxsVisited;
 		
@@ -415,7 +420,7 @@ public class DapIngest {
 				eml = emlBuilder.getEML(ddxUrl, ddx);
 			
 			if (eml == null)
-				throw new Exception("No EML for: " + ddxUrl);
+				throw new Exception("No EML for DDX [" + ddxUrl + "]");
 
 			++ emlVisited;
 			
@@ -433,9 +438,9 @@ public class DapIngest {
      * @param URL
      * @return The esacped URL
      */
-    private String escapedURL(String URL) {
+    /*private String escapedURL(String URL) {
     	return URL.replaceAll("\\.", "%2e");
-    }
+    }*/
     
     /**
      * Given a URL, return the corresponding document id. A metacat docuement 
@@ -448,7 +453,6 @@ public class DapIngest {
      * @return A docuement id string suitable for use with metacat
      */
     private String getDocid(String url) {
-		++metacatId;
     	return docidScope + metacatId.toString() + metacatRevision;
     }
     
@@ -458,7 +462,7 @@ public class DapIngest {
      * 
      * @param emlString
      */
-	private void insertEML(String ddxUrl, String emlString) {
+	private void insertEML(String ddxUrl, String emlString) throws Exception {
 
 		String docid = getDocid(ddxUrl);
 		log.debug("Storing " + ddxUrl + "(docid:" + docid + ") in metacat.");
@@ -466,34 +470,39 @@ public class DapIngest {
 		try {
 			// FileReader schema = new FileReader(docidSchema);
 			// metacat.insert(String docid, Reader xmlDocument, Reader schema);
+			++metacatId;
 			String response = metacat.insert(docid, new StringReader(emlString), null);
-
+			
 			if (verbose)
 				ps.println("Metacat's response: " + response);
 		}
 		catch (FileNotFoundException e) {
-			ps.println("Could not open the file: " + docidSchema);
+			err.println("Could not open the file: " + docidSchema);
 			log.error("Could not open the file: " + docidSchema);
+			throw new Exception("FileNotFoundException: " + e.getMessage());
 		}
 		catch (InsufficientKarmaException e) {
-			ps.println("Error storing the response: Insufficent rights for the operation: " + e.getMessage());
+			err.println("Error storing the response: Insufficent rights for the operation: " + e.getMessage());
 			log.error("Error storing the response: Insufficent rights for the operation: " + e.getMessage());
-		}
-		catch (MetacatException e) {
-			ps.println("Error storing the response: " + e.getMessage());
-			log.error("Error storing the response: " + e.getMessage());
-		}
-		catch (IOException e) {
-			ps.println("Error storing the response: Unknown error: " + e.getMessage());
-			log.error("Error storing the response: Unknown error: " + e.getMessage());
+			throw new Exception("InsufficientKarmaException: " + e.getMessage());
 		}
 		catch (MetacatInaccessibleException e) {
-			ps.println("Error storing the response: Error reading the xml document: " + e.getMessage());
+			err.println("Error storing the response: Error reading the xml document: " + e.getMessage());
 			log.error("Error storing the response: Error reading the xml document: " + e.getMessage());
+			throw new Exception("MetacatInaccessibleException: " + e.getMessage());
+		}
+		catch (MetacatException e) {
+			err.println("Error storing the response [" + ddxUrl + "]: " + e.getMessage());
+			log.error("Error storing the response [" + ddxUrl + "]: " + e.getMessage());
+			log.error("The EML document: [" + emlString + "]");
+		}
+		catch (IOException e) {
+			err.println("Error storing the response: Unknown error [" + ddxUrl + "]: " + e.getMessage());
+			log.error("Error storing the response: Unknown error [" + ddxUrl + "]: " + e.getMessage());
 		}
 	}
 	
-	private void printAllEMLFromCache(String cacheNamePrefix) {
+	private void printEMLFromCache(String cacheNamePrefix) throws Exception {
 		Enumeration<String> keys;
 		if (cacheNamePrefix != "")
 			keys = emlBuilder.getCache().getLastVisitedKeys();
@@ -514,7 +523,16 @@ public class DapIngest {
 		}		
 	}
 
-	private void insertAllEMLFromCache(String cacheNamePrefix) {
+	private static String trim_space(String arg) {
+		if (isEmpty(arg))
+			return arg;
+		else if (arg.charAt(0) == ' ')
+			return arg.substring(1);
+		else
+			return arg;
+	}
+
+	private void insertEMLFromCache(String cacheNamePrefix) throws Exception {
 		Enumeration<String> keys;
 		if (cacheNamePrefix != "")
 			keys = emlBuilder.getCache().getLastVisitedKeys();
@@ -522,9 +540,9 @@ public class DapIngest {
 			keys = emlBuilder.getCache().getResponseKeys();
 		
 		while (keys.hasMoreElements()) {
-			String ddxUrl = (String) keys.nextElement();
+			String ddxUrl = trim_space((String) keys.nextElement());
 			
-			ps.println("DDX: " + ddxUrl);
+			ps.println("DDX: [" + ddxUrl + "]");
 			
 			++emlVisited;
 			String eml = emlBuilder.getCache().getCachedResponse(ddxUrl);
@@ -569,7 +587,7 @@ public class DapIngest {
 		}
 	}
 
-	private void insertEMLFromLocalFile(String filename) {
+	private void insertEMLFromLocalFile(String filename) throws Exception {
 
 		try {
 			// Open the file
@@ -592,8 +610,8 @@ public class DapIngest {
 			}
 		}
 		catch (IOException e) {
-			ps.println("Error: Could not open the file: " + e.getMessage());
-			e.printStackTrace();
+			err.println("Error: Could not open the file: " + e.getMessage());
+			e.printStackTrace(err);
 		}
 	}
 }
