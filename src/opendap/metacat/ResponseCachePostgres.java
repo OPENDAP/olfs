@@ -387,8 +387,9 @@ public class ResponseCachePostgres {
 			throw new Exception("SQLException: " + e.getMessage());
 		}
 		catch (Exception e) {
-			log.error("Cache access error:  " + e.getMessage());
-			throw e;
+			log.info("Cache access info:  " + e.getMessage());
+			// Allow this kind of exception to just result in an empty return
+			// throw e;
 		}
 		finally {
 			try {
