@@ -46,12 +46,12 @@
                 <!-- That means it's an rdf:Resource -->
                 <xsl:element name="{local-name()}" namespace="{$myElementNamespace}">
                     <rdf:Description>
-                        <xsl:if test="boolean(@rdf:about)">
+                        <xsl:if test="@rdf:about">
                             <xsl:attribute name="rdf:about"><xsl:value-of select="@rdf:about"/></xsl:attribute>
                         </xsl:if>
 
                         <!-- Convert the attributes to elements -->
-                        <xsl:for-each select="@*">
+                        <xsl:for-each select="@*[generate-id(.) != generate-id(../@rdf:about)]">
                             <xsl:variable name="attNamespace"><xsl:call-template name="getConvertedNamespace"/></xsl:variable>
                             <xsl:element name="{local-name()}" namespace="{$attNamespace}"><xsl:value-of select="."/></xsl:element>
                         </xsl:for-each>
@@ -129,6 +129,9 @@
 
 
 
+    <xsl:template match="/">
+        <xsl:apply-templates mode="xml2rdf"/>
+    </xsl:template>
 
 
 </xsl:stylesheet>
