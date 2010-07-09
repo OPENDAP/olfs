@@ -1,4 +1,4 @@
-package opendap.semantics.IRISail;
+package iri.generatentriples;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1566,6 +1566,54 @@ public class IRISailRepository extends SailRepository {
 
         }
     }
+    /**
+     * Set setStartingPoints statement for the importURI in the repository.
+     * 
+     * @param importURL
+     * @param CollectionURL
+     */
+    public void dropStartingPoints(RepositoryConnection con, Vector <String> importURLs) {
+        String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+
+            ValueFactory f = this.getValueFactory();
+            
+            URI s = null;
+            URI isa = f.createURI(pred);
+            URI cont = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
+            URI o = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
+            URL url;
+            
+            try {
+                               
+                
+                for (String importURL : importURLs){
+                
+                url = new URL(importURL);
+                s = f.createURI(importURL);
+                con.remove((Resource) s, isa, (Value) o, (Resource) cont);
+                                                               
+                log.info("Remove from the repository <" + s + "> <" + isa
+                        + "> " + "<" + o + "> " + "<" + cont + "> ");
+                } 
+                
+                                
+            } catch (RepositoryException e) {
+                log.error("In setStartingPoints, caught an RepositoryException! Msg: "
+                        + e.getMessage());
+
+            } catch (MalformedURLException e) {
+                
+                log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
+                        + e.getMessage());
+            //} catch (RDFParseException e) {
+            //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
+            //            + e.getMessage());
+            } catch (IOException e) {
+                log.error("In setStartingPoints, caught an IOException! Msg: "
+                        + e.getMessage());
+            }
+                   
+    }  
     /**
      * Set setStartingPoints statement for the importURI in the repository.
      * 
