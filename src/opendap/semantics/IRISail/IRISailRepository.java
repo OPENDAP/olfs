@@ -1,4 +1,4 @@
-package iri.generatentriples;
+package opendap.semantics.IRISail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
