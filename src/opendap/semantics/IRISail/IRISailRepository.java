@@ -1,4 +1,4 @@
-package opendap.semantics.IRISail;
+package iri.generatentriples;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -113,7 +113,7 @@ public class IRISailRepository extends SailRepository {
     @Override
     public void shutDown() throws RepositoryException {
 
-        log.debug("shutDown)(): Shutting down Repository...");
+        log.debug("shutDown(): Shutting down Repository...");
         if (!isRepositoryDown()) {
             super.shutDown();
             setRepositoryDown(true);
@@ -188,8 +188,8 @@ public class IRISailRepository extends SailRepository {
             // autocommit
             runNbr++;
             modelChanged = false;
-            log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
-                    + " \n" + opendap.coreServlet.Util.getMemoryReport());
+            //log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
+            //        + " \n" + opendap.coreServlet.Util.getMemoryReport());
             int ruleNumber = 0;
             for (String qstring : this.constructQuery) {
                 ruleNumber++;
@@ -207,13 +207,13 @@ public class IRISailRepository extends SailRepository {
 
                 String processedQueryString = convertSWRLQueryToSeasameQuery(qstring);
 
-                log.debug("Source Query String ID: " + constructURL);
-                log.debug("Source Query String: " + qstring
-                        + "   Processed Query String: " + processedQueryString);
+                //log.debug("Source Query String ID: " + constructURL);
+                //log.debug("Source Query String: " + qstring
+                //        + "   Processed Query String: " + processedQueryString);
 
                 try {
-                     log.debug("Prior to making new repository connection:\n "
-                     + opendap.coreServlet.Util.getMemoryReport());
+                     //log.debug("Prior to making new repository connection:\n "
+                     //+ opendap.coreServlet.Util.getMemoryReport());
 
                     GraphQuery graphQuery = con.prepareGraphQuery(
                             QueryLanguage.SERQL, processedQueryString);
@@ -225,8 +225,8 @@ public class IRISailRepository extends SailRepository {
                     GraphQueryResult graphResultStCount = graphQuery.evaluate();
                     log.info("Completed querying. ");
 
-                     log.debug("After evaluating construct rules:\n " +
-                     opendap.coreServlet.Util.getMemoryReport());
+                     //log.debug("After evaluating construct rules:\n " +
+                     //opendap.coreServlet.Util.getMemoryReport());
 
                     log.info("Post processing query result and adding statements ... ");
 
@@ -240,33 +240,33 @@ public class IRISailRepository extends SailRepository {
                         case xsString:
                             process_xsString(graphResult, creatValue, Added,
                                     toAdd, con, context);
-                            log.debug("After processing xs:string:\n "
-                                    + opendap.coreServlet.Util
-                                            .getMemoryReport());
+                            //log.debug("After processing xs:string:\n "
+                            //        + opendap.coreServlet.Util
+                            //                .getMemoryReport());
                             break;
 
                         case DropQuotes:
                             process_DropQuotes(graphResult, creatValue, Added,
                                     toAdd, con, context);
-                            log.debug("After processing DropQuotes:\n "
-                                    + opendap.coreServlet.Util
-                                            .getMemoryReport());
+                            //log.debug("After processing DropQuotes:\n "
+                            //        + opendap.coreServlet.Util
+                            //                .getMemoryReport());
                             break;
 
                         case RetypeTo:
                             process_RetypeTo(graphResult, creatValue, Added,
                                     toAdd, con, context);
-                            log.debug("After processing RetypeTo:\n "
-                                    + opendap.coreServlet.Util
-                                            .getMemoryReport());
+                            //log.debug("After processing RetypeTo:\n "
+                            //        + opendap.coreServlet.Util
+                            //                .getMemoryReport());
                             break;
 
                         case Increment:
                             process_Increment(graphResult, creatValue, Added,
                                     toAdd, con, context);
-                            log.debug("After processing Increment:\n "
-                                    + opendap.coreServlet.Util
-                                            .getMemoryReport());
+                            //log.debug("After processing Increment:\n "
+                            //        + opendap.coreServlet.Util
+                            //                .getMemoryReport());
                             break;
 
                         case Function:
@@ -1485,10 +1485,10 @@ public class IRISailRepository extends SailRepository {
         Date ltdparseDate;
         try {
             ltdparseDate = dateFormat.parse(ltd);
-            log.debug("URI " + importURL);
-            log.debug("lastmodified    " + ltdparseDate.toString());
+            //log.debug("URI " + importURL);
+            //log.debug("lastmodified    " + ltdparseDate.toString());
             Date oldltdparseDate = dateFormat.parse(oltd);
-            log.debug("oldlastmodified " + oldltdparseDate.toString());
+            //log.debug("oldlastmodified " + oldltdparseDate.toString());
 
             if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
                 // context
