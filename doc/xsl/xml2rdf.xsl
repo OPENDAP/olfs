@@ -45,21 +45,27 @@
                 
                 <!-- That means it's an rdf:Resource -->
                 <xsl:element name="{local-name()}" namespace="{$myElementNamespace}">
-                    <xsl:attribute name="rdf:parseType">Resource</xsl:attribute>
+                    <rdf:Description>
+                        <xsl:if test="boolean(@rdf:about)">
+                            <xsl:attribute name="rdf:about"><xsl:value-of select="@rdf:about"/></xsl:attribute>
+                        </xsl:if>
+
+                        <!-- Convert the attributes to elements -->
+                        <xsl:for-each select="@*">
+                            <xsl:variable name="attNamespace"><xsl:call-template name="getConvertedNamespace"/></xsl:variable>
+                            <xsl:element name="{local-name()}" namespace="{$attNamespace}"><xsl:value-of select="."/></xsl:element>
+                        </xsl:for-each>
+
+                        <!-- Process the children -->
+                        <xsl:apply-templates mode="xml2rdf"/>
+
+                        <!-- Add the text content of the node wrapped in an rdf:value element -->
+                        <xsl:if test="$myTextContent!=''">
+                            <xsl:element name="rdf:value"><xsl:value-of select="$myTextContent"/></xsl:element>
+                        </xsl:if>
+
+                    </rdf:Description>
                     
-                    <!-- Convert the attributes to elements -->
-                    <xsl:for-each select="@*">
-                        <xsl:variable name="attNamespace"><xsl:call-template name="getConvertedNamespace"/></xsl:variable>
-                        <xsl:element name="{local-name()}" namespace="{$attNamespace}"><xsl:value-of select="."/></xsl:element>
-                    </xsl:for-each>
-                    
-                    <!-- Process the children -->
-                    <xsl:apply-templates mode="xml2rdf"/>
- 
-                    <!-- Add the text content of the node wrapped in an rdf:value element -->
-                    <xsl:if test="$myTextContent!=''">
-                        <xsl:element name="rdf:value"><xsl:value-of select="$myTextContent"/></xsl:element>
-                    </xsl:if>
                 </xsl:element>
             </xsl:when>
 
