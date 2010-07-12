@@ -183,8 +183,8 @@
     <property name="logback-core.lib"     value="logback-core-0.9.16.jar"/>
     <property name="logback-classic.lib"  value="logback-classic-0.9.16.jar"/>
 
-    <property name="owlim.lib"            value="owlim-3.0.beta9.jar"/>
-    <property name="trree.lib"            value="trree-3.0.beta9.jar"/>
+    <property name="owlim.lib"            value="owlim-3.0.beta12.jar"/>
+    <property name="trree.lib"            value="trree-3.0.beta12.jar"/>
     <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.3.0-onejar.jar" />
 
     <property name="commons-cli.lib"        value="commons-cli-1.2.jar"/>
