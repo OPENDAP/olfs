@@ -513,7 +513,7 @@ public class IRISailRepository extends SailRepository {
         Pattern rproces4psub2 = Pattern.compile(pproces4sub2);
 
         String processedQueryString = queryString;
-        log.info("Construct queryString: " + queryString);
+        //log.info("Construct queryString: " + queryString);
         Matcher mreifStr = rproces4psub2.matcher(processedQueryString);
 
         Boolean hasReified = false;
