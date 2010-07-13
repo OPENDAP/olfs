@@ -347,7 +347,7 @@ public class IRISailRepository extends SailRepository {
                 ruleEndTime = new Date().getTime();
                 double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
                 log.debug("Cnstruct rule " + ruleNumber + " takes " + ruleTime
-                        + " seconds in loop " + runNbr + "added " + stAdded
+                        + " seconds in loop " + runNbr + " added " + stAdded
                         + " statements");
                 totalStAdded = totalStAdded + stAdded;
             } // for(String qstring

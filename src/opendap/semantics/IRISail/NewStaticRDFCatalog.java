@@ -91,7 +91,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private boolean initialized;
     
-    private RepositoryConnection con;
+    //private RepositoryConnection con;
     private Vector<String> repositoryContexts;
     private Vector<String> dropList;
     private Vector<String> startingPoints;
@@ -120,7 +120,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         backgroundUpdates = false;
         
-        con = null;
+        //con = null;
         owlse2 = null;
         buildDoc = null;
         _lastModified = -1;
@@ -198,17 +198,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
     }
-    private void updateSemanticRepository2(RepositoryConnection con,
-            Vector<String> importURLs) throws InterruptedException,
+    //private void updateSemanticRepository2(RepositoryConnection con,
+    private void updateSemanticRepository2(
+    Vector<String> importURLs) throws InterruptedException,
             RepositoryException {
-        URI uriaddress;
-        URL inUrl;
-        Thread thread = Thread.currentThread();
-        Vector<String> import2Update = new Vector<String>(); //separate import and delete 
-        
+                
         Date startTime = new Date();
         log.info("Evaluating importURLs for updateCatalog... ");
-
+        RepositoryConnection con;
         try {
 
             
@@ -235,24 +232,30 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             
             if (!dropList.isEmpty()) {
 
-                findExternalInferencing();
+                //findExternalInferencing();
                 con = owlse2.getConnection();
+                log.debug("Droppping starting point ...");
                 owlse2.dropStartingPoints(con, startingPointsToDrop);
                 con.close();
+                log.debug("Finished droppping starting point.");
+                log.debug("Droppping changed RDFDocuments ...");
                 processDropList();
-
+                log.debug("Finished droppping changed RDFDocuments.");
+                log.debug("Updating repository ...");
                 updateIriRepository();
-
+                log.debug("Updating repository ...");
                 log.debug("Running construct rules ...");
                 con = owlse2.getConnection();
 
                 ingestSwrlRules();
-
+                log.debug("Finished running construct rules.");
             }
             if (!newStartingPoints.isEmpty() && !newRepository) {
                 
                 con = owlse2.getConnection();
+                log.debug("Adding nrew starting point ...");
                 owlse2.setStartingPoints(con, newStartingPoints);
+                log.debug("Finished adding nrew starting point.");
                 con.close(); 
                 updateIriRepository();
 
@@ -285,18 +288,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         long elapsedTime = new Date().getTime() - startTime.getTime();
         log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
 
-        log
-                .debug("**********************************************************************************!");
-        log.info("Updating repository!");
-        Boolean updated = owlse2.update();
-
-        /*****************************************************
-         * ingest swrl rules
-         *****************************************************/
-        ingestSwrlRules();
-
-        log.info("Repository updateCatalog =" + updated);
-        log.info("RDF import complete.");
+//        log.debug("**********************************************************************************!");
+//        log.info("Updating repository!");
+//        Boolean updated = owlse2.update();
+//
+//        /*****************************************************
+//         * ingest swrl rules
+//         *****************************************************/
+//        ingestSwrlRules();
+//
+//        log.info("Repository updateCatalog =" + updated);
+//        log.info("RDF import complete.");
 
     }
     private void setupOwlimRepository() throws RepositoryException {
@@ -658,7 +660,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         List<String> bindingNames;
 
-        log.debug("Locating Construct rules...");
+        log.debug("Finding ExternalInferencing ...");
        
         try {
             con = owlse2.getConnection();
@@ -1802,7 +1804,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 }
             }
             catch (Exception e) {
-                log.error("updateCatalog() has a problem: " +
+                log.error("updateCatalogCache() has a problem: " +
                         e.getMessage() +
                         " biffCount: " + (++biffCount));
                 e.printStackTrace();
@@ -1919,8 +1921,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     log.debug("updateRepository2(): Updating Semantic Repository.");
 
 
-                    log.debug("updateRepository2(): Connecting to Repository...");
-                    RepositoryConnection con = owlse2.getConnection();
+                    //log.debug("updateRepository2(): Connecting to Repository...");
+                    //RepositoryConnection con = owlse2.getConnection();
                     log.info("updateRepository2(): Repository connection has been opened.");
                     if(thread.isInterrupted() || stopWorking ){
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
@@ -1936,13 +1938,16 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     }
 
                     log.debug("updateRepository2(): Updating semantic repository.");
-                    updateSemanticRepository2(con, importURLs);
+                    //updateSemanticRepository2(con, importURLs);
+                    updateSemanticRepository2(importURLs);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
-
-                    String filename = catalogCacheDirectory + "daprepository2";
+                    
+                    log.debug("updateRepository2(): Connecting to Repository...");
+                    RepositoryConnection con = owlse2.getConnection();
+                    String filename = catalogCacheDirectory + "daprepository.nt";
                     log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
                     dumpRepository(con, filename);
                     if(thread.isInterrupted() || stopWorking){
