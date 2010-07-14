@@ -841,6 +841,7 @@ public class ThreddsCatalogUtil {
 		String serviceName;
 		String s;
 		Element metadata, dset, access;
+        String datasetName;
 		/* Iterator i; */
 
 		log.debug("inheritedServiceName: " + inheritedServiceName);
@@ -848,6 +849,7 @@ public class ThreddsCatalogUtil {
 		serviceName = dataset.getAttributeValue("serviceName");
 		urlPath = dataset.getAttributeValue("urlPath");
 		metadata = dataset.getChild("metadata", THREDDS.NS);
+        datasetName = dataset.getAttributeValue("name");
 
 		if (metadata != null
 				&& metadata.getAttributeValue("inherited").equalsIgnoreCase(
@@ -863,7 +865,7 @@ public class ThreddsCatalogUtil {
 		}
 
 		if (urlPath != null) {
-			log.debug("<dataset> has urlPath atttribute: " + urlPath);
+			log.debug("<dataset> has urlPath attribute: " + urlPath);
 
 			if (serviceName == null) {
 				log
@@ -887,6 +889,7 @@ public class ThreddsCatalogUtil {
 		Iterator i = dataset.getChildren("access", THREDDS.NS).iterator();
 		while (i.hasNext()) {
 			access = (Element) i.next();
+            log.debug("Located thredds:access element in dataset '"+datasetName+"'");
 			datasetURLs.addAll(getAccessURLs(access, services, baseServerURL));
 		}
 

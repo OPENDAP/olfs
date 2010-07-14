@@ -18,6 +18,13 @@
             <xsl:apply-templates />
     </xsl:template>
 
+
+    <xsl:template match="thredds:service">
+        <xsl:copy-of select="."/>
+    </xsl:template>
+
+    
+
     <xsl:template match="thredds:catalog">
         <catalogIngest>
             <xsl:apply-templates />
@@ -85,7 +92,6 @@
 
             </xsl:for-each>
 
-            <xsl:copy-of select="$serviceElement"/>
             <xsl:copy-of select="thredds:metadata[@inherited='true']"/>
 
         </datasetScanIngest>

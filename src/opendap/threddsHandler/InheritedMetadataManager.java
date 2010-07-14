@@ -57,6 +57,10 @@ public class InheritedMetadataManager {
                     "            <xsl:apply-templates />\n" +
                     "    </xsl:template>\n" +
                     "\n" +
+                    "    <xsl:template match=\"thredds:service\">\n" +
+                    "        <xsl:copy-of select=\".\"/>\n" +
+                    "    </xsl:template>\n" +
+                    "\n" +
                     "    <xsl:template match=\"thredds:catalog\">\n" +
                     "        <catalogIngest>\n" +
                     "            <xsl:apply-templates />\n" +
@@ -148,6 +152,16 @@ public class InheritedMetadataManager {
         }
     }
 
+    /**
+     * Lock for thread safe operation.
+     */
+    private static ReentrantReadWriteLock _inventoryLock = new ReentrantReadWriteLock();
+
+
+    /**
+     * This ConcurrentHashMap<String,String[]> represents: ConcurrentHashMap<String catalogKey ,String[] metadataRootPathsFromThisCatalog>
+     */
+    private static ConcurrentHashMap<String, String[]> _catalog2MetadataMap = new ConcurrentHashMap<String, String[]>();
 
     /**
      * This  ConcurrentHashMap<String,HashMap<String,Vector<Element>>>  represents
@@ -156,11 +170,11 @@ public class InheritedMetadataManager {
     private static ConcurrentHashMap<String, HashMap<String, Vector<Element>>> _inheritedMetadata = new ConcurrentHashMap<String, HashMap<String, Vector<Element>>>();
 
     /**
-     * This ConcurrentHashMap<String,String[]> represents: ConcurrentHashMap<String catalogKey ,String[] metadataRootPathsFromThisCatalog>
+     * This ConcurrentHashMap<String,HashMap<String,Element>> represents:
+     * ConcurrentHashMap<String metadataRootPath,HashMap<String catalogKey,Element inheritedService>>
      */
-    private static ConcurrentHashMap<String, String[]> _catalog2MetadataMap = new ConcurrentHashMap<String, String[]>();
+    private static ConcurrentHashMap<String, HashMap<String, Vector<Element>>> _inheritedServices = new ConcurrentHashMap<String, HashMap<String, Vector<Element>>>();
 
-    private static ReentrantReadWriteLock _inventoryLock = new ReentrantReadWriteLock();
 
     /**
      * Inspect a THREDDS Catalog object and add any datasetScan metadata whose 'inherited' attribute is set to true
@@ -192,14 +206,26 @@ public class InheritedMetadataManager {
             Vector<String> metadataRootPaths = new Vector<String>();
             Vector<Element> metadataElements;
             HashMap<String, Vector<Element>> metadataForThisRootPath;
+            HashMap<String, Vector<Element>> inheritedServicesForThisRootPath;
 
             _dsIngestTransformer.transform(cat, baos);
 
 
             dsIngest = sb.build(new ByteArrayInputStream(baos.toByteArray()));
 
-            datasetScanIngests = dsIngest.getDescendants(new ElementFilter("datasetScanIngest"));
 
+            // Round up all of the services
+            Iterator i = dsIngest.getDescendants(new ElementFilter("service",THREDDS.NS));
+            HashMap<String,Element> serviceByName = new HashMap<String,Element>();
+            Element service;
+            while(i.hasNext()){
+                service = (Element)i.next();
+                serviceByName.put(service.getAttributeValue("name"),service);
+            }
+
+
+            //Round up all of the dataset scan elements that got morphed into datasetScanIngest Elements
+            datasetScanIngests = dsIngest.getDescendants(new ElementFilter("datasetScanIngest"));
             Vector<Element> ingests = new Vector<Element>();
             while (datasetScanIngests.hasNext()) {
                 ingests.add((Element) datasetScanIngests.next());
@@ -214,12 +240,16 @@ public class InheritedMetadataManager {
                     metadataElement.detach();
                     log.debug("Found inherited metadata.");
 
+
+
+
                     //################################################################################
                     //@todo Right now it removes the serviceName elements. Why is that a good thing?
                     //@todo If we leave them then we have to see if the serviceName resolves in the
                     //@todo code that produces uses the metadata in a new catalog. Right now that's
                     //@todo in BESThreddsDispatchHandler.handleRequest()
-                    Iterator i = metadataElement.getChildren("serviceName", THREDDS.NS).iterator();
+                    /*
+                    i = metadataElement.getChildren("serviceName", THREDDS.NS).iterator();
                     Vector<Element> serviceNameElements = new Vector<Element>();
                     while (i.hasNext()) {
                         serviceNameElements.add((Element) i.next());
@@ -228,8 +258,20 @@ public class InheritedMetadataManager {
                         serviceName.detach();
                         log.debug("Removed Element <thredds:serviceName>" + serviceName.getTextTrim() + "</thredds:serviceName> from inherited metadata.");
                     }
+                    */
                     //@todo We should probably carry the serviceName and service definitions through to the output catalog.
                     //################################################################################
+
+
+                    // The THREDDS specification states that multiple serviceName Elements will be ignored.
+                    // So we're only going to get the first one.
+                    // see http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/v1.0.2/InvCatalogSpec.html#threddsMetadataGroup
+                    Element inheritedService = null;
+                    Element serviceName = metadataElement.getChild("serviceName", THREDDS.NS);
+                    if(serviceName != null){
+                        service = serviceByName.get(serviceName.getTextTrim());
+                        inheritedService = getServiceDefintion(service);
+                    }
 
                     // This may be a poorly named variable, the value of metadataRootPath is the place
                     // in the BES directory hierarchy the metadata is to be injected
@@ -251,6 +293,33 @@ public class InheritedMetadataManager {
 
                         log.debug("Adding metadata element to inventory.");
                         metadataElements.add(metadataElement);
+
+
+                        if(inheritedService!=null){
+                            log.debug("Processing inheritedService for metadataRootPath: '"+metadataRootPath+"' catalogKey: '",catalogKey+"'");
+
+                            if (!_inheritedServices.contains(metadataRootPath)) {
+                                log.debug("Creating inherited services storage HashMap for " +
+                                        "metadataRootPath: '"+metadataRootPath+"'");
+                                _inheritedServices.put(metadataRootPath, new HashMap<String, Vector<Element>>());
+                            }
+
+                            inheritedServicesForThisRootPath = _inheritedServices.get(metadataRootPath);
+
+                            if(!inheritedServicesForThisRootPath.containsKey(catalogKey)){
+                                log.debug("Creating inherited services storage Vector for " +
+                                        "metadataRootPath: '"+metadataRootPath+"' originating from catalogKey: '",catalogKey+"'");
+                                inheritedServicesForThisRootPath.put(catalogKey, new Vector<Element>());
+                            }
+
+
+
+                            log.debug("Adding service '"+inheritedService.getAttributeValue("name")+
+                                    "' to inherited services inventory for metadataRootPath: "+metadataRootPath+"' " +
+                                    "originating from catalogKey: '",catalogKey+"'");
+                            Vector<Element> fromThisCatalogKey =  inheritedServicesForThisRootPath.get(catalogKey);
+                            fromThisCatalogKey.add(inheritedService);
+                        }
                         log.debug("Adding metadataRootPath '"+metadataRootPath+"'to list of metadataRootPaths " +
                                 "spawned by catalog '"+catalogKey+"'");
                         metadataRootPaths.add(metadataRootPath);
@@ -277,6 +346,7 @@ public class InheritedMetadataManager {
 
 
         HashMap<String, Vector<Element>> metadataForThisRootPath;
+        HashMap<String, Vector<Element>> servicesForThisRootPath;
 
         ReentrantReadWriteLock.WriteLock writeLock = _inventoryLock.writeLock();
 
@@ -292,18 +362,44 @@ public class InheritedMetadataManager {
                 // Get the metadata collection for this metadataRootPath
                 metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
 
-                // Remove all of the metadata elements from this metadataRootPath that came from this catalogKey
-                log.debug("purgeInheritedMetadata(): Removing all metadata in metadataRootPath '"+metadataRootPath +
-                        " that was ingested from the catalog '"+catalogKey+"' (catalogKey)");
-                metadataForThisRootPath.remove(catalogKey);
+                if(metadataForThisRootPath!=null){
 
-                // If the metadataRootPath is now empty (no more metadata associated with it) remove it from the collection.
-                if (metadataForThisRootPath.isEmpty()){
-                    log.debug("purgeInheritedMetadata(): Removing metadataRootPath '"+metadataRootPath +
-                            " from inventory (it's now empty)");
+                    // Remove all of the metadata elements from this metadataRootPath that came from this catalogKey
+                    log.debug("purgeInheritedMetadata(): Removing all metadata in metadataRootPath '"+metadataRootPath +
+                            " that was ingested from the catalog '"+catalogKey+"' (catalogKey)");
+                    metadataForThisRootPath.remove(catalogKey);
 
-                    _inheritedMetadata.remove(metadataRootPath);
+                    // If the metadataRootPath is now empty (no more metadata associated with it) remove it from the collection.
+                    if (metadataForThisRootPath.isEmpty()){
+                        log.debug("purgeInheritedMetadata(): Removing metadata container for metadataRootPath '"+metadataRootPath +
+                                " from inventory (it's now empty)");
+
+                        _inheritedMetadata.remove(metadataRootPath);
+                    }
                 }
+
+                // Purge the inherited service definitions for this metadataRootPath.
+                servicesForThisRootPath = _inheritedServices.get(metadataRootPath);
+
+                if(servicesForThisRootPath!=null){
+
+
+                    // Remove  the service element from this metadataRootPath that came from this catalogKey
+                    log.debug("purgeInheritedMetadata(): Removing service defintions in metadataRootPath '"+metadataRootPath +
+                            " that were ingested from the catalog '"+catalogKey+"' (catalogKey)");
+
+                    servicesForThisRootPath.remove(catalogKey);
+
+                    // If the metadataRootPath is now empty (no more services associated with it) remove it from the collection.
+                    if (servicesForThisRootPath.isEmpty()){
+                        log.debug("purgeInheritedMetadata(): Removing inherited services container for metadataRootPath '"+metadataRootPath +
+                                " from inventory (it's now empty)");
+                        _inheritedServices.remove(metadataRootPath);
+                    }
+
+
+                }
+
 
             }
             // Remove the inherited metadata associations for this catalogKey
@@ -346,6 +442,30 @@ public class InheritedMetadataManager {
         }
     }
 
+    public static boolean hasInheritedServices(String catalogKey) {
+
+        ReentrantReadWriteLock.ReadLock readLock = _inventoryLock.readLock();
+
+        try {
+            readLock.lock();
+
+            Enumeration<String> metadataRootPaths = _inheritedServices.keys();
+            String metadataRootPath;
+
+            while (metadataRootPaths.hasMoreElements()) {
+                metadataRootPath = metadataRootPaths.nextElement();
+                if (catalogKey.startsWith(metadataRootPath)) {
+                    log.debug("Found inherited metadata for catalog '"+catalogKey+"'");
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        finally {
+            readLock.unlock();
+        }
+    }
 
     public static Vector<Element> getInheritedMetadata(String catalogKey) {
 
@@ -389,6 +509,77 @@ public class InheritedMetadataManager {
         finally {
             readLock.unlock();
         }
+
+
+    }
+
+
+    public static Element getInheritedServices(String catalogKey) {
+
+
+        ReentrantReadWriteLock.ReadLock readLock = _inventoryLock.readLock();
+        try {
+            readLock.lock();
+
+            // Put the results in here...
+            Element inheritedServices = new Element("inheritedServices");
+
+            String metadataRootPath;
+            HashMap<String, Vector<Element>> servicesForThisRootPath;
+
+            HashMap<String, Element> serviceElements = new HashMap<String, Element>();
+
+            // Look for all applicable metadata in the inheritance tree.
+            Enumeration<String> metadataRootPaths = _inheritedServices.keys();
+            while (metadataRootPaths.hasMoreElements()) {
+
+                metadataRootPath = metadataRootPaths.nextElement();
+                if (catalogKey.startsWith(metadataRootPath)) {
+                    log.debug("Found applicable inherited service definition for catalog '"+catalogKey+"'");
+
+                    // Found applicable metadata collection
+                    servicesForThisRootPath = _inheritedServices.get(metadataRootPath);
+
+                    for (String sourceCatalogKey : servicesForThisRootPath.keySet()) {
+
+                        Vector<Element> services =  servicesForThisRootPath.get(sourceCatalogKey);
+                        for(Element service:  services){
+                            String serviceName = service.getAttributeValue("name");
+                            if(!serviceElements.containsKey(serviceName)){
+                                log.debug("Adding service element to returned collection.");
+                                serviceElements.put(serviceName, (Element) service.clone());
+                            }
+                            else {
+                                log.error("The service '"+serviceName+"' is multiply defined! Ignoring duplicate.");
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            inheritedServices.addContent(serviceElements.values());
+            return inheritedServices;
+        }
+        finally {
+            readLock.unlock();
+        }
+
+
+    }
+
+
+    private static Element getServiceDefintion(Element service){
+        Element serviceParent = service.getParentElement();
+        if(!serviceParent.getName().equals("service") ||  serviceParent.getNamespacePrefix().equals("thredds")){
+
+            return service;
+
+        }
+
+        return getServiceDefintion(serviceParent);
+
 
 
     }

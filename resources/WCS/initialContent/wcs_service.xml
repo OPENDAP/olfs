@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 -->
 <WcsService>
-    <WcsCatalog className="opendap.semantics.IRISail.StaticRDFCatalog">
+    <WcsCatalog className="opendap.semantics.IRISail.NewStaticRDFCatalog">
         <useUpdateCatalogThread updateInterval="1200" firstUpdateDelay="10"/>
 
         <!--

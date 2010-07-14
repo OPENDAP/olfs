@@ -35,6 +35,7 @@ import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -42,6 +43,9 @@ import org.jdom.transform.JDOMSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -198,7 +202,73 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                 Element topDataset = catalog.getChild("dataset", THREDDS.NS);
 
                 // Add the metadata content to the dataset element.
+                log.debug("Adding inherited metadata to catalog");
                 topDataset.addContent(1,metadata);
+
+                // Get the service definitions (if any) used by the inherited metadata?
+                Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(catalogID);
+                log.debug("Collecting inherited services.");
+                Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
+                HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
+                Element service;
+                while(i.hasNext()){
+                    service = (Element)i.next();
+                    inheritedServices.put(service.getAttributeValue("name"),service);
+                }
+
+                if(!inheritedServices.isEmpty()){
+
+
+                    
+                    log.debug("Collecting existing services.");
+                    i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
+                    HashMap<String, Element> existingServices = new HashMap<String, Element>();
+                    while(i.hasNext()){
+                        service = (Element)i.next();
+                        existingServices.put(service.getAttributeValue("name"),service);
+                    }
+
+
+                    String iServiceName;
+
+                    for(Element inheritedService: inheritedServices.values()){
+                        iServiceName = inheritedService.getAttributeValue("name");
+                        log.debug("Inherited service has service '"+iServiceName+"' - Checking existing services...");
+
+                        Element existingService = existingServices.get(iServiceName);
+
+                        if(existingService!=null){
+                            String iServiceType = inheritedService.getAttributeValue("serviceType");
+                            String iServiceBase = inheritedService.getAttributeValue("base");
+
+                            String eServiceType = existingService.getAttributeValue("serviceType");
+                            String eServiceBase = existingService.getAttributeValue("base");
+
+                            if(!iServiceType.equalsIgnoreCase(eServiceType) || !iServiceBase.equals(eServiceBase)){
+                                log.warn("Removing conflicting service definition for service '"+iServiceName+"' from inherited services");
+                                inheritedService.detach();
+                            }
+
+                        }
+                    }
+
+                    Collection<Element> servicesToAdd = inheritedServicesElement.getChildren("service",THREDDS.NS);
+                    Vector<Element> services = new Vector<Element>();
+                    for(Element e : servicesToAdd){
+                        services.add(e);
+                    }
+
+                    for(Element e : services){
+                        e.detach();
+                    }
+
+                   threddsCatalog.getRootElement().addContent(1,services);
+
+
+
+                }
+
+
 
                 // Transmit the catalog.
                 xmlo.output(threddsCatalog,response.getOutputStream());
