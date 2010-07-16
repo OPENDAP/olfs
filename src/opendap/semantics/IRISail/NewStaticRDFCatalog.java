@@ -232,10 +232,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             
             if (!dropList.isEmpty()) {
 
-                //findExternalInferencing();
+                findExternalInferencing();
                 con = owlse2.getConnection();
                 log.debug("Droppping starting point ...");
                 owlse2.dropStartingPoints(con, startingPointsToDrop);
+                //owlse2.dropStartingPoints(startingPointsToDrop);
                 con.close();
                 log.debug("Finished droppping starting point.");
                 log.debug("Droppping changed RDFDocuments ...");
@@ -245,7 +246,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 updateIriRepository();
                 log.debug("Updating repository ...");
                 log.debug("Running construct rules ...");
-                con = owlse2.getConnection();
+                //con = owlse2.getConnection();
 
                 ingestSwrlRules();
                 log.debug("Finished running construct rules.");
@@ -1987,7 +1988,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 throw e;
             }
             catch (Exception e) {
-                log.error("updateRepository() has a problem. Error Message: '" +
+                log.error("updateRepository2() has a problem. Error Message: '" +
                         e.getMessage() +
                         "'  biffCount: " + (++biffCount));
             }
@@ -2001,11 +2002,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
 
         if(thread.isInterrupted()){
-            log.warn("updateRepository(): WARNING! Thread "+thread.getName()+" was interrupted!");
+            log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
             throw new InterruptedException();
         }
 
-        log.debug("updateRepository() returning: " + success);
+        log.debug("updateRepository2() returning: " + success);
         return success;
 
 

@@ -176,18 +176,20 @@ public class IRISailRepository extends SailRepository {
         int queryTimes = 0;
         long ruleStartTime, ruleEndTime;
         int totalStAdded = 0; // number of statements added
-
+        int totalStAddedIn1Pass = 0; // number of statements added in 1 PASS
+        
         findConstruct();
-
+        
          //log.debug("Before running the construct rules:\n " +
          //opendap.coreServlet.Util.getMemoryReport());
         con = this.getConnection();
-         //con.setAutoCommit(false); //turn off autocommit
+         
         while (modelChanged && runNbr < runNbrMax) {
-            // log.debug("AutoCommit is " +con.isAutoCommit()); //check if
-            // autocommit
+            
             runNbr++;
             modelChanged = false;
+            totalStAddedIn1Pass = 0;
+            log.info("Total construct rule number =  " + this.constructQuery.size());
             //log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
             //        + " \n" + opendap.coreServlet.Util.getMemoryReport());
             int ruleNumber = 0;
@@ -206,18 +208,14 @@ public class IRISailRepository extends SailRepository {
                 context[0] = uriaddress;
 
                 String processedQueryString = convertSWRLQueryToSeasameQuery(qstring);
-
-                //log.debug("Source Query String ID: " + constructURL);
-                //log.debug("Source Query String: " + qstring
-                //        + "   Processed Query String: " + processedQueryString);
-
+                
                 try {
                      //log.debug("Prior to making new repository connection:\n "
                      //+ opendap.coreServlet.Util.getMemoryReport());
-
+                    log.debug("Original construct rule ID: " + constructURL);
                     GraphQuery graphQuery = con.prepareGraphQuery(
                             QueryLanguage.SERQL, processedQueryString);
-
+                    
                     log.info("Querying the repository. PASS #" + queryTimes
                             + " (construct rules pass #" + runNbr + ")");
 
@@ -271,9 +269,10 @@ public class IRISailRepository extends SailRepository {
 
                         case Function:
 
-                            process_fn(graphResult, creatValue, Added, toAdd,
+                            //process_fn(graphResult, creatValue, Added, toAdd,
+                            process_fn2(graphResult, creatValue, Added, toAdd,
                                     con, context);// postpocessing Join,
-                            // subtract, getWcsID
+                                                  // subtract, getWcsID
                             break;
                         case NONE:
                         default:
@@ -331,7 +330,7 @@ public class IRISailRepository extends SailRepository {
                 } catch (MalformedQueryException e) {
                     log.error("Caught MalformedQueryException! Msg: "
                             + e.getMessage());
-                    log.debug("graphqueryString: " + qstring);
+                    log.debug("MalformedQuery: " + processedQueryString);
                 } finally {
                     if (graphResult != null) {
                         try {
@@ -346,19 +345,24 @@ public class IRISailRepository extends SailRepository {
 
                 ruleEndTime = new Date().getTime();
                 double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
-                log.debug("Cnstruct rule " + ruleNumber + " takes " + ruleTime
+                                
+                //log.debug("Processed cnstruct rule : " + processedQueryString);
+                log.debug("Construct rule " + ruleNumber + " takes " + ruleTime
                         + " seconds in loop " + runNbr + " added " + stAdded
                         + " statements");
+                
                 totalStAdded = totalStAdded + stAdded;
+                totalStAddedIn1Pass = totalStAddedIn1Pass+ stAdded;
             } // for(String qstring
-            log.info("Completed pass " + runNbr + " of Construct evaluation");
+            log.info("Completed pass " + runNbr + " of Construct evaluation"+"Queried the repository " + 
+                    queryTimes + " times" + " added " + totalStAddedIn1Pass + " statements");
             log.info("Queried the repository " + queryTimes + " times");
 
             /*
              * if (totalStAdded > 0) { log.debug("Committing..."); con.commit();
              * //force flushing the memory log.debug("Commit finished"); }
              */
-
+            findConstruct();
         } // while (modelChanged
 
         try {
@@ -409,8 +413,8 @@ public class IRISailRepository extends SailRepository {
                     if (!constructQuery.contains(firstValue.stringValue())) {
                         constructQuery.add(firstValue.stringValue());
                     }
-                    log.debug("Adding construct to import pool: "
-                            + firstValue.toString());
+                    //log.debug("Adding construct to import pool: "
+                    //        + firstValue.toString());
                     Value secondValue = bindingSet.getValue("contexts");
                     constructContext.put(firstValue.stringValue(), secondValue
                             .stringValue());
@@ -513,7 +517,7 @@ public class IRISailRepository extends SailRepository {
         Pattern rproces4psub2 = Pattern.compile(pproces4sub2);
 
         String processedQueryString = queryString;
-        //log.info("Construct queryString: " + queryString);
+        log.info("Original construct: " + queryString);
         Matcher mreifStr = rproces4psub2.matcher(processedQueryString);
 
         Boolean hasReified = false;
@@ -601,8 +605,11 @@ public class IRISailRepository extends SailRepository {
                 if (myFunction != null) {
                     postProcessFlag = ProcessingTypes.Function;
                 }
-
-                String[] splittedStr = comma.split(functionMatcher.group(4));
+                
+                //String[] splittedStr = comma.split(functionMatcher.group(4));
+                CSVSplitter splitter = new CSVSplitter();
+                String[] splittedStr = splitter.split(functionMatcher.group(4));
+                
                 int i = 0;
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
@@ -612,11 +619,15 @@ public class IRISailRepository extends SailRepository {
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
+                        if(!element.equals(",")){
                         expand += element + "} ; rdf:rest {} rdf:first {";
-                        // log.info("element " + i + " = " + element);
+                        }else{
+                            expand += element;   
+                        }
+                        log.info("element " + i + " = " + element);
                     } else {
                         expand += element + "} ; rdf:rest {rdf:nil";
-                        // log.info("element " + i + " = " + element);
+                        log.info("element " + i + " = " + element);
                     }
                     log.info("Will postprocess fn:" + functionMatcher.group(3));
                 }
@@ -632,7 +643,7 @@ public class IRISailRepository extends SailRepository {
 
         }
 
-         log.info("processedQueryString = " + processedQueryString);
+        log.info("Processed construct: " + processedQueryString);
         return processedQueryString;
 
     }
@@ -1485,10 +1496,11 @@ public class IRISailRepository extends SailRepository {
         Date ltdparseDate;
         try {
             ltdparseDate = dateFormat.parse(ltd);
-            //log.debug("URI " + importURL);
-            //log.debug("lastmodified    " + ltdparseDate.toString());
+            log.debug("In  olderContext ...");
+            log.debug("URI " + importURL);
+            log.debug("lastmodified    " + ltdparseDate.toString());
             Date oldltdparseDate = dateFormat.parse(oltd);
-            //log.debug("oldlastmodified " + oldltdparseDate.toString());
+            log.debug("oldlastmodified " + oldltdparseDate.toString());
 
             if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
                 // context
@@ -2261,6 +2273,158 @@ public class IRISailRepository extends SailRepository {
 
     public enum ProcessingTypes {
         NONE, xsString, DropQuotes, RetypeTo, Increment, Function
+    }
+    /***************************************************************************
+     * process fn created statements
+     * 
+     * @param graphResult
+     * @param creatValue
+     * @param Added
+     * @param toAdd
+     * @param con
+     * @param context
+     * @throws QueryEvaluationException
+     * @throws RepositoryException
+     */
+    private void process_fn2(GraphQueryResult graphResult,
+            ValueFactory creatValue, Vector<Statement> Added,
+            Vector<Statement> toAdd, RepositoryConnection con,
+            Resource[] context) throws QueryEvaluationException,
+            RepositoryException {
+
+        log.debug("Processing fn statements.");
+
+        
+        URI rdffirst = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
+        URI rdfrest = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
+        URI endList = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
+        URI myfn = creatValue.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn");
+        URI myfnlist = creatValue.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist");
+         
+        FunctionTypes functionTypeFlag = FunctionTypes.None;
+        Value objLastSt = null;
+
+        URI prdLastSt = null;
+        Resource sbjLastSt = null;
+        //String myfnFullName = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn";
+        Statement oldSt = null;
+        while (graphResult.hasNext()) {
+            Statement st = graphResult.next();
+            Statement newSt = null;
+                        
+            Value obj = st.getObject();
+            Value listnode = null;
+
+            URI prd = st.getPredicate();
+            Resource sbj = st.getSubject();
+
+            
+            URI targetPrd = null;
+            
+            Resource targetSbj = null;
+            
+           
+            Method func = null;
+
+           
+            if ( prd.equals(myfn)){
+                targetSbj = sbjLastSt;
+                targetPrd = prdLastSt;
+                
+                        
+                String className; // class name
+                String fnName; // function name
+                //if (prd.equals(myfn) && isSbjBn) {
+                if (prd.equals(myfn)) {
+                    String functionImport =  obj.stringValue();
+                    int indexOfLastPoundSign = functionImport.lastIndexOf("#");
+                    
+                    className  =  functionImport.substring("import:".length(),indexOfLastPoundSign);
+                    fnName = functionImport.substring(indexOfLastPoundSign + 1);
+
+                    func = getMethodForFunction(className, fnName);
+
+                }
+                Boolean isEndList = endList.equals(obj);
+                List<String> rdfList = new ArrayList<String>();
+                int statementNbr = 1;
+                while (graphResult.hasNext() && !isEndList) {
+                    st = graphResult.next();
+                    statementNbr++;
+                    // log.debug("Current statement " + statementNbr + ": " +
+                    // st);
+                    obj = st.getObject();
+                    prd = st.getPredicate();
+                    sbj = st.getSubject();
+                    //mbnode = bnode.matcher(sbj.toString());
+                    //log.debug(" sbjLastSt = " + targetSbj );
+                    //log.debug(" prdLastSt = " + targetPrd );
+                    
+                    //log.debug(" sbj = " + sbj );
+                    //log.debug(" prd = " + prd );
+                    //log.debug(" obj = " + obj );
+                    if(myfnlist.equals(prd)){
+                        listnode=obj;
+                    }
+                    else if (listnode.equals(sbj) && rdffirst.equals(prd)) {
+                        String elementValue = obj.stringValue();
+                        rdfList.add(elementValue);
+                    }
+                    else if(listnode.equals(sbj) && rdfrest.equals(prd)){
+                        listnode=obj;
+                        isEndList = endList.equals(obj);
+                    }
+                }
+
+                if (func != null) {
+                    Value stObj = null;
+                    try {
+                        stObj = (Value) func.invoke(this, rdfList, creatValue);
+                        newSt = new StatementImpl(targetSbj, targetPrd, stObj);
+                    } catch (IllegalAccessException e) {
+                        log.error("Unable to invoke processing function "
+                                + func.getName()
+                                + "' Caught IllegalAccessException, msg: "
+                                + e.getMessage());
+                    } catch (InvocationTargetException e) {
+                        log.error("Unable to invoke processing function "
+                                + func.getName()
+                                + "' Caught InvocationTargetException, msg: "
+                                + e.getMessage());
+                    }
+                } else {
+                    log.warn("Process Function failed: No processing function found.");
+                }
+
+           } 
+
+            objLastSt = st.getObject();
+            prdLastSt = st.getPredicate();
+            sbjLastSt = st.getSubject();
+            // log.debug("new st to add = " + newSt.toString());
+            if(newSt != null){
+                st = newSt;
+                oldSt = null;
+            }
+            
+            if(oldSt != null){
+            toAdd.add(oldSt);
+            Added.add(oldSt);
+            con.add(oldSt, context); // add fn created new st
+            log.debug("process_fn add context: " + context[0].toString());
+            }
+            oldSt = st;
+            
+        } // while (graphResult.hasNext())
+        if(oldSt != null){
+            toAdd.add(oldSt);
+            Added.add(oldSt);
+            con.add(oldSt, context); // add fn created new st
+            log.debug("process_fn add context: " + context[0].toString());
+        }
+        
+        log.debug("After processing fn: " + toAdd.size()
+                + " statements are added.\n ");
     }
 
     /***************************************************************************

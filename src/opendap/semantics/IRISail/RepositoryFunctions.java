@@ -49,6 +49,21 @@ public class RepositoryFunctions {
         return stObjStr;
     }
 
+    public static Value localName(List<String> RDFList, ValueFactory createValue) {
+       
+        
+        String targetObj = "";
+       
+      
+            targetObj = RDFList.get(0); // rdfList.get(0) +
+            targetObj = targetObj.substring(targetObj.indexOf("#")+1);
+           
+
+        
+        
+
+        return createValue.createLiteral(targetObj);
+    }
 
 
     
