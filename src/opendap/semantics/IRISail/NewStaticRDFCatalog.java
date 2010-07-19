@@ -1744,21 +1744,83 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     public String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
-        return null;
+        String qString = createQuery("A_1D_latitude", fieldId);
+        String coordinateDapId = runQuery(qString);
+        return coordinateDapId;
+        
     }
 
     public String getLongitudeCoordinateDapId(String coverageId, String fieldId) {
-        return null;
+        String qString = createQuery("A_1D_longitude", fieldId);
+        String coordinateDapId = runQuery(qString);
+        return coordinateDapId;
+        
     }
 
     public String getElevationCoordinateDapId(String coverageId, String fieldId) {
-        return null;
+        String qString = createQuery("A_elevation", fieldId);
+        String coordinateDapId = runQuery(qString);
+        return coordinateDapId;
+        
     }
 
     public String getTimeCoordinateDapId(String coverageId, String fieldId) {
-        return null;
+        String qString = createQuery("A_time", fieldId);
+        String coordinateDapId = runQuery(qString);
+        return coordinateDapId;
     }
+    private String runQuery(String qString){
+        RepositoryConnection con;
+        String coordinateDapId = null; 
+        try {
+            con = owlse2.getConnection();
+        
+        TupleQueryResult result = null;
+        List<String> bindingNames;
+        
+        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,qString);
 
+        result = tupleQuery.evaluate();
+        
+        if (result != null) {
+            bindingNames = result.getBindingNames();
+
+            while (result.hasNext()) {
+                BindingSet bindingSet = (BindingSet) result.next();
+
+                Value firstValue = bindingSet.getValue("cid");
+                coordinateDapId = firstValue.stringValue();
+            }
+        } else {
+            log.debug("No query result!");
+
+        } 
+        } catch (RepositoryException e) {
+            log.error("getTimeCoordinateDapId(String coverageId, String fieldId) has a problem: " +
+                    e.getMessage()) ;
+            e.printStackTrace(); 
+        } catch (MalformedQueryException e) {
+            log.error("getTimeCoordinateDapId(String coverageId, String fieldId) has a problem: " +
+                    e.getMessage()) ;
+            e.printStackTrace();
+        } catch (QueryEvaluationException e) {
+            log.error("getTimeCoordinateDapId(String coverageId, String fieldId) has a problem: " +
+                    e.getMessage()) ;
+            e.printStackTrace();
+        }
+        return coordinateDapId;   
+    }
+    private String createQuery(String A_time, String fieldStr){
+        String qString = "select cid FROM {" 
+            + fieldStr + "} ncobj:hasCoordinate {cid} rdf:type {cfobj:"
+            + A_time  + "} WHERE field=<" +fieldStr + "> "
+            + "USING NAMESPACE "
+            + "wcs=<http://www.opengis.net/wcs/1.1#>, "
+            + "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "
+            + "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>";
+              
+        return qString ;
+    }
 
     public long getLastModified() {
 
