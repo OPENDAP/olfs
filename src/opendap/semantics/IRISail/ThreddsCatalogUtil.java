@@ -868,13 +868,11 @@ public class ThreddsCatalogUtil {
 			log.debug("<dataset> has urlPath attribute: " + urlPath);
 
 			if (serviceName == null) {
-				log
-						.debug("<dataset> missing serviceName atttribute. Checking for child element...");
+				log.debug("<dataset> missing serviceName attribute. Checking for child element...");
 				serviceName = dataset.getChildText("serviceName", THREDDS.NS);
 			}
 			if (serviceName == null) {
-				log
-						.debug("<dataset> missing serviceName childElement. Checking for inherited serviceName...");
+				log.debug("<dataset> missing serviceName childElement. Checking for inherited serviceName...");
 				serviceName = inheritedServiceName;
 			}
 
