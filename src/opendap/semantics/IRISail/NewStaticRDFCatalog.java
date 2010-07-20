@@ -232,41 +232,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 e.printStackTrace();
             }
             
-            if (!dropList.isEmpty()) {
-
-                findExternalInferencing();
-                con = owlse2.getConnection();
-                log.debug("Droppping starting point ...");
-                owlse2.dropStartingPoints(con, startingPointsToDrop);
-                //owlse2.dropStartingPoints(startingPointsToDrop);
-                con.close();
-                log.debug("Finished droppping starting point.");
-                log.debug("Droppping changed RDFDocuments ...");
-                processDropList();
-                log.debug("Finished droppping changed RDFDocuments.");
-                log.debug("Updating repository ...");
-                updateIriRepository();
-                log.debug("Updating repository ...");
-                log.debug("Running construct rules ...");
-                //con = owlse2.getConnection();
-
-                ingestSwrlRules();
-                log.debug("Finished running construct rules.");
-            }
-            if (!newStartingPoints.isEmpty() && !newRepository) {
-                
-                con = owlse2.getConnection();
-                log.debug("Adding nrew starting point ...");
-                owlse2.setStartingPoints(con, newStartingPoints);
-                log.debug("Finished adding nrew starting point.");
-                con.close(); 
-                updateIriRepository();
-
-                log.debug("Running construct rules ...");
-                
-                ingestSwrlRules();
-            }
-            else if (newRepository) {
+            if (newRepository) {
                 con = owlse2.getConnection();
                 //catalog.owlse2.setStartingPoints(catalog.con, configFileName,importURLs);
                 owlse2.setStartingPoints(con, newStartingPoints);
@@ -278,6 +244,43 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 
                 ingestSwrlRules();
                 
+            }
+            else {
+                if (!dropList.isEmpty()) {
+
+                    findExternalInferencing();
+                    con = owlse2.getConnection();
+                    log.debug("Droppping starting point ...");
+                    owlse2.dropStartingPoints(con, startingPointsToDrop);
+                    //owlse2.dropStartingPoints(startingPointsToDrop);
+                    con.close();
+                    log.debug("Finished droppping starting point.");
+                    log.debug("Droppping changed RDFDocuments ...");
+                    processDropList();
+                    log.debug("Finished droppping changed RDFDocuments.");
+                    log.debug("Updating repository ...");
+                    updateIriRepository();
+                    log.debug("Updating repository ...");
+                    log.debug("Running construct rules ...");
+                    //con = owlse2.getConnection();
+
+                    ingestSwrlRules();
+                    log.debug("Finished running construct rules.");
+                }
+                if (!newStartingPoints.isEmpty()) {
+
+                    con = owlse2.getConnection();
+                    log.debug("Adding new starting point ...");
+                    owlse2.setStartingPoints(con, newStartingPoints);
+                    log.debug("Finished adding nrew starting point.");
+                    con.close();
+                    updateIriRepository();
+
+                    log.debug("Running construct rules ...");
+
+                    ingestSwrlRules();
+                }
+
             }
 
         } catch (RepositoryException e) {
@@ -2169,23 +2172,30 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         while(i.hasNext()){
             coverageDescription  = (Element)i.next();
             identifierElem = coverageDescription.getChild("Identifier",WCS.WCS_NS);
-            coverageID = identifierElem.getTextTrim();
-            servers = coverageIDServer.get(coverageID);
+
+            if(identifierElem!=null){
+                coverageID = identifierElem.getTextTrim();
+                servers = coverageIDServer.get(coverageID);
 
 
-            Vector<Element> supportedFormats = getWcsSupportedFormatElements(new URL(servers.get(0)));
+                Vector<Element> supportedFormats = getWcsSupportedFormatElements(new URL(servers.get(0)));
 
-            coverageDescription.addContent(supportedFormats);
+                coverageDescription.addContent(supportedFormats);
 
-            msg = "Adding supported formats to coverage "+coverageID+ "\n"+
-                  "CoverageDescription Element: \n "+xmlo.outputString(coverageDescription)+"\n"+
-                  "Coverage "+coverageID+" held at: \n";
+                msg = "Adding supported formats to coverage "+coverageID+ "\n"+
+                      "CoverageDescription Element: \n "+xmlo.outputString(coverageDescription)+"\n"+
+                      "Coverage "+coverageID+" held at: \n";
 
-            for(String s: servers){
-                msg += "    "+s+"\n";
+                for(String s: servers){
+                    msg += "    "+s+"\n";
+                }
+
+                log.debug(msg);
             }
-            
-            log.debug(msg);
+            else {
+                log.error("Failed to locate wcs:Identifier element for Coverage!");
+                //@todo Throw an exception (what kind??) here!!
+            }
         }
 
 

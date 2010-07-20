@@ -346,7 +346,7 @@ public class IRISailRepository extends SailRepository {
                 ruleEndTime = new Date().getTime();
                 double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
                                 
-                //log.debug("Processed cnstruct rule : " + processedQueryString);
+                //log.debug("Processed construct rule : " + processedQueryString);
                 log.debug("Construct rule " + ruleNumber + " takes " + ruleTime
                         + " seconds in loop " + runNbr + " added " + stAdded
                         + " statements");
@@ -1581,8 +1581,6 @@ public class IRISailRepository extends SailRepository {
     /**
      * Set setStartingPoints statement for the importURI in the repository.
      * 
-     * @param importURL
-     * @param CollectionURL
      */
     public void dropStartingPoints(RepositoryConnection con, Vector <String> importURLs) {
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
@@ -1628,9 +1626,7 @@ public class IRISailRepository extends SailRepository {
     }  
     /**
      * Set setStartingPoints statement for the importURI in the repository.
-     * 
-     * @param importURL
-     * @param CollectionURL
+     *
      */
     public void setStartingPoints(RepositoryConnection con, Vector <String> importURLs) {
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
@@ -1685,7 +1681,6 @@ public class IRISailRepository extends SailRepository {
      * Set setStartingPoints statement for the importURI in the repository.
      * 
      * @param importURL
-     * @param CollectionURL
      */
     public void setStartingPoints(RepositoryConnection con, String importURL, Vector <String> importURLs) {
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
