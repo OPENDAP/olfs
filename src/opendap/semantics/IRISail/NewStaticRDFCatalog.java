@@ -47,6 +47,8 @@ import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.ntriples.NTriplesWriter;
+import org.openrdf.rio.trig.TriGWriter;
+import org.openrdf.rio.trix.TriXWriter;
 
 
 import com.ontotext.trree.owlim_ext.SailImpl;
@@ -1212,29 +1214,44 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    public void dumpRepository(RepositoryConnection con, String filename) {
+    private void dumpRepository(RepositoryConnection con, String filename) {
 
-        //export repository to an n-triple file
-        File outrps = new File(filename); //hard copy of repository
+        // export repository to an n-triple file
+        File outrps = new File(filename); // hard copy of repository
         try {
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
-            NTriplesWriter myNTRiplesWriter = new NTriplesWriter(myFileOutputStream);
+            if (filename.endsWith("nt")) {
+              
+                NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
+                        myFileOutputStream);
 
-            //log.info("Dumping explicit statements (as Ntriples) to: " + outrps.getAbsoluteFile());
+                con.export(myNTRiplesWriter);
+                myNTRiplesWriter.endRDF();
 
-            myNTRiplesWriter.startRDF();
-            myNTRiplesWriter.endRDF();
+            }
+            if (filename.endsWith("trix")) {
+                
+                TriXWriter myTriXWriter = new TriXWriter(myFileOutputStream);
 
-            con.export(myNTRiplesWriter);
+                con.export(myTriXWriter);
+                myTriXWriter.endRDF();
+
+            }
+            if (filename.endsWith("trig")) {
+               
+                TriGWriter myTriGWriter = new TriGWriter(myFileOutputStream);
+
+                con.export(myTriGWriter);
+                myTriGWriter.endRDF();
+
+            }
             log.info("Completed dumping explicit statements");
-
 
         } catch (Throwable e) {
             log.warn(e.getMessage());
         }
 
     }
-
     public void dumpRepository(String filename) throws RepositoryException {
 
         RepositoryConnection con = owlse2.getConnection();
@@ -2017,7 +2034,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
-                    
+                    log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
+                    filename = catalogCacheDirectory + "daprepository.trig";
+                    dumpRepository(con, filename);
+                    if(thread.isInterrupted() || stopWorking){
+                        log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+                        throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+                    }
                     log.debug("Extracting CoverageDescriptions from the Repository.");
                     extractCoverageDescrptionsFromRepository(con);
                     if(thread.isInterrupted() || stopWorking){
