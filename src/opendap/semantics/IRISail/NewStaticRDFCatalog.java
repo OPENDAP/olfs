@@ -100,8 +100,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private RepositoryConnection con;
     private Vector<String> repositoryContexts;
     private Vector<String> startingPoints;
-    private Vector<String> RDFDocumentList;
-    
+
     private HashMap<String, Boolean> downService;
     private Boolean newRepository;
     private Vector<String> imports;
@@ -143,7 +142,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         
         repositoryContexts = new Vector<String>();
         startingPoints = new Vector<String>(); // tracking startingpoint
-        RDFDocumentList = new Vector<String>();
         
         downService = new HashMap<String, Boolean>();
         imports = new Vector<String>();
@@ -527,12 +525,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Update repository
      */
     private void updateIriRepository() {
-        findNeededRDFDocuments();
-        while (!RDFDocumentList.isEmpty()) {
+        Vector<String> rdfDocList = new Vector<String>();
 
-            addNeededRDFDocuments();
+        findNeededRDFDocuments(rdfDocList);
+        while (!rdfDocList.isEmpty()) {
 
-            findNeededRDFDocuments();
+            addNeededRDFDocuments(rdfDocList);
+
+            findNeededRDFDocuments(rdfDocList);
         }
     }
 
@@ -540,7 +540,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Add all rdfcache:RDFDocuments that are needed
      */
     // private void addNeededRDFDocuments(RepositoryConnection con) {
-    private void addNeededRDFDocuments() {
+    private void addNeededRDFDocuments(Vector<String> rdfDocs) {
         URI uriaddress;
         long inferStartTime, inferEndTime;
         inferStartTime = new Date().getTime();
@@ -551,10 +551,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         try {
             con = owlse2.getConnection();
 
-            log.debug("RDFDocumentList.size=" + RDFDocumentList.size());
+            log.debug("rdfDocs.size=" + rdfDocs.size());
             notimport = 0;
-            while (!RDFDocumentList.isEmpty()) {
-                importURL = RDFDocumentList.remove(0).toString();
+            while (!rdfDocs.isEmpty()) {
+                importURL = rdfDocs.remove(0).toString();
 
                 log.debug("Checking import URL: " + importURL);
 
@@ -678,7 +678,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     }
                 }
                 imports.add(importURL);
-            } // while (!RDFDocumentList.isEmpty()
+            } // while (!rdfDocs.isEmpty()
         } catch (IOException e) {
             log.error("Caught an IOException! Msg: " + e.getMessage());
 
@@ -708,7 +708,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Find all rdfcache:RDFDocuments that are needed
      */
     // private void findNeededRDFDocuments(RepositoryConnection con) {
-    private void findNeededRDFDocuments() {
+    private void findNeededRDFDocuments(Vector<String> rdfDocs) {
         TupleQueryResult result = null;
         List<String> bindingNames;
         RepositoryConnection con = null;
@@ -739,12 +739,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 Value firstValue = bindingSet.getValue("doc");
                 String doc = firstValue.stringValue();
 
-                if (!RDFDocumentList.contains(doc) && !imports.contains(doc)
+                if (!rdfDocs.contains(doc) && !imports.contains(doc)
                         && !downService.containsValue(doc)
                         && doc.startsWith("http://")) {
-                    RDFDocumentList.add(doc);
+                    rdfDocs.add(doc);
 
-                    log.debug("Adding to RDFDocumentList: " + doc);
+                    log.debug("Adding to rdfDocs: " + doc);
                 }
             }
 
@@ -778,7 +778,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
 
         log.info("Number of needed files identified:  "
-                + RDFDocumentList.size());
+                + rdfDocs.size());
 
     }
 
