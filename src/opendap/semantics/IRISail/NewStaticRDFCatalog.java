@@ -238,7 +238,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             if (!newStartingPoints.isEmpty() && !catalog.newRepository) {
                 
                 catalog.con = catalog.owlse2.getConnection();
-                catalog.owlse2.setStartingPoints(catalog.con, newStartingPoints);
+                catalog.owlse2.addStartingPoints(catalog.con, newStartingPoints);
                 catalog.con.close(); 
                 catalog.updateIriRepository();
 
@@ -248,8 +248,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             }
             else if (catalog.newRepository) {
                 catalog.con = catalog.owlse2.getConnection();
-                //catalog.owlse2.setStartingPoints(catalog.con, configFileName,importURLs);
-                catalog.owlse2.setStartingPoints(catalog.con, newStartingPoints);
+                //catalog.owlse2.addStartingPoints(catalog.con, configFileName,importURLs);
+                catalog.owlse2.addStartingPoints(catalog.con, newStartingPoints);
                 catalog.con.close();
 
                 catalog.updateIriRepository();
@@ -417,7 +417,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                 try {
                     con = owlse2.getConnection();
-                    owlse2.setStartingPoints(con, newStartingPoints);
+                    owlse2.addStartingPoints(con, newStartingPoints);
                 }
                 finally {
                     if (con != null)
@@ -449,7 +449,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     try {
                         con = owlse2.getConnection();
                         log.debug("Adding new starting point ...");
-                        owlse2.setStartingPoints(con, newStartingPoints);
+                        owlse2.addStartingPoints(con, newStartingPoints);
                         log.debug("Finished adding nrew starting point.");
                     }
                     finally {

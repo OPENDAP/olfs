@@ -1603,7 +1603,7 @@ public class IRISailRepository extends SailRepository {
         }
     }
     /**
-     * Set setStartingPoints statement for the importURI in the repository.
+     * Set addStartingPoints statement for the importURI in the repository.
      * 
      */
     public void dropStartingPoints(RepositoryConnection con, Vector<String> importURLs) {
@@ -1633,82 +1633,63 @@ public class IRISailRepository extends SailRepository {
 
 
         } catch (RepositoryException e) {
-            log.error("In setStartingPoints, caught an RepositoryException! Msg: "
+            log.error("In addStartingPoints, caught an RepositoryException! Msg: "
                     + e.getMessage());
 
         } catch (MalformedURLException e) {
 
-            log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
+            log.error("In addStartingPoints, caught an MalformedURLException! Msg: "
                     + e.getMessage());
             //} catch (RDFParseException e) {
-            //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
+            //    log.error("In addStartingPoints, caught an RDFParseException! Msg: "
             //            + e.getMessage());
         } catch (IOException e) {
-            log.error("In setStartingPoints, caught an IOException! Msg: "
+            log.error("In addStartingPoints, caught an IOException! Msg: "
                     + e.getMessage());
         }
 
     }
 
     /**
-     * Set setStartingPoints statement for the importURI in the repository.
+     * Adds the passed list of starting points to the repository.
      *
+     *
+     * @param con
+     * @param importURLs
      */
-    public void setStartingPoints(RepositoryConnection con, Vector <String> importURLs) {
-        String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+    public void addStartingPoints(RepositoryConnection con, Vector<String> importURLs) {
 
-            ValueFactory f = this.getValueFactory();
-            
-            URI s = null;
-            URI isa = f.createURI(pred);
-            URI cont = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
-            URI o = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
-            URL url;
-            
-            try {
-                               
-                String rdfcache = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-                s = f.createURI(rdfcache);
-                url = new URL(rdfcache);
-                
-                con.add((Resource) s, isa, (Value) o, (Resource) cont);
-                                
-                log.info("Added to the repository <" + s + "> <" + isa
-                        + "> " + "<" + o + "> " + "<" + cont + "> ");
-                for (String importURL : importURLs){
-                
-                url = new URL(importURL);
-                s = f.createURI(importURL);
-                con.add((Resource) s, isa, (Value) o, (Resource) cont);
-                                                               
-                log.info("Added to the repository <" + s + "> <" + isa
-                        + "> " + "<" + o + "> " + "<" + cont + "> ");
-                } 
-                
-                                
-            } catch (RepositoryException e) {
-                log.error("In setStartingPoints, caught an RepositoryException! Msg: "
-                        + e.getMessage());
-
-            } catch (MalformedURLException e) {
-                
-                log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
-                        + e.getMessage());
-            //} catch (RDFParseException e) {
-            //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
-            //            + e.getMessage());
-            } catch (IOException e) {
-                log.error("In setStartingPoints, caught an IOException! Msg: "
-                        + e.getMessage());
+            for (String importURL : importURLs) {
+                addStartingPoint(con,importURL);
             }
-                   
-    }  
+    }
+
+
+    private boolean startingPointExists( RepositoryConnection con, String staringPointUrl){
+
+
+        return true;
+    }
+
+    private void addInternalStartingPoint(RepositoryConnection con){
+
+        String rdfcache = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+
+        if(!startingPointExists(con,rdfcache)){
+            addStartingPoint(con,rdfcache);   
+        }
+
+
+    }
+
+
     /**
-     * Set setStartingPoints statement for the importURI in the repository.
-     * 
+     * Adds the passed  starting point to the repository.
+     *
+     * @param con
      * @param importURL
      */
-    public void setStartingPoints(RepositoryConnection con, String importURL, Vector <String> importURLs) {
+    public void addStartingPoint(RepositoryConnection con, String importURL) {
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
             ValueFactory f = this.getValueFactory();
@@ -1720,17 +1701,7 @@ public class IRISailRepository extends SailRepository {
 
             
             try {
-                               
-                String rdfcache = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-                s = f.createURI(rdfcache);
-                url = new URL(rdfcache);
-                
-                con.add((Resource) s, isa, (Value) o, (Resource) cont);
-                
-                
-                log.info("Added to the repository <" + s + "> <" + isa
-                        + "> " + "<" + o + "> " + "<" + cont + "> ");
-                
+
                 if (importURL.startsWith("http://")) { //make sure an url and read it in
                 url = new URL(importURL);
                 s = f.createURI(importURL);
@@ -1743,18 +1714,18 @@ public class IRISailRepository extends SailRepository {
                 
                                 
             } catch (RepositoryException e) {
-                log.error("In setStartingPoints, caught an RepositoryException! Msg: "
+                log.error("In addStartingPoints, caught an RepositoryException! Msg: "
                         + e.getMessage());
 
             } catch (MalformedURLException e) {
                 
-                log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
+                log.error("In addStartingPoints, caught an MalformedURLException! Msg: "
                         + e.getMessage());
             //} catch (RDFParseException e) {
-            //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
+            //    log.error("In addStartingPoints, caught an RDFParseException! Msg: "
             //            + e.getMessage());
             } catch (IOException e) {
-                log.error("In setStartingPoints, caught an IOException! Msg: "
+                log.error("In addStartingPoints, caught an IOException! Msg: "
                         + e.getMessage());
             }
 
