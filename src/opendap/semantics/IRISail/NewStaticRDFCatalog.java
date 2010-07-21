@@ -1403,6 +1403,18 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private void ingestSwrlRules() throws RepositoryException{
         log.info("Running runConstruct ..");
         owlse2.runConstruct();
+        
+        String ltmod = owlse2.getLastModifiedTimeString(new Date()); 
+        try{
+        RepositoryConnection con = owlse2.getConnection();
+        String externalInferencing = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#externalInferencing";
+        owlse2.setLTMODContext(externalInferencing, ltmod, con);
+        
+        }
+        finally {
+            if (con != null)
+                con.close();
+        }
         log.info("Complete running runConstruct ..");
     }
 
