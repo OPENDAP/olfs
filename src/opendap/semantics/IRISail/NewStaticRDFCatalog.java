@@ -477,8 +477,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     newStartingPoints = findNewStartingPoints(con);
                     startingPointsToDrop = findChangedStartingPoints(con);
                     findChangedRDFDocuments(con);
-                    con.close();
-                    log.info("Connection is Closed!");
                 }
             } catch (RepositoryException e) {
                 e.printStackTrace();
@@ -486,6 +484,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             finally {
                 if(con!=null)
                     con.close();
+                log.info("Connection is Closed!");
             }
 
             if (newRepository) {
@@ -2271,11 +2270,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                     //log.debug("updateRepository2(): Connecting to Repository...");
                     //RepositoryConnection con = owlse2.getConnection();
-                    log.info("updateRepository2(): Repository connection has been opened.");
-                    if(thread.isInterrupted() || stopWorking ){
-                        log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-                        throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-                    }
+                    //log.info("updateRepository2(): Repository connection has been opened.");
+                    //if(thread.isInterrupted() || stopWorking ){
+                    //    log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+                    //    throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+                    //}
 
 
                     log.debug("updateRepository2(): Getting RDF imports.");
@@ -2286,8 +2285,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     }
 
                     log.debug("updateRepository2(): Updating semantic repository.");
-                    //updateSemanticRepository2(con, importURLs);
-                    updateSemanticRepository3(importURLs);
+                    updateSemanticRepository2(importURLs);
+                    //updateSemanticRepository3(importURLs);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
