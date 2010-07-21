@@ -423,6 +423,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     if (con != null)
                         con.close();
                 }
+
                 updateIriRepository();
                 log.debug("Running construct rules ...");
                 ingestSwrlRules();
@@ -528,12 +529,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         Vector<String> rdfDocList = new Vector<String>();
 
         findNeededRDFDocuments(rdfDocList);
+
         while (!rdfDocList.isEmpty()) {
 
             addNeededRDFDocuments(rdfDocList);
 
             findNeededRDFDocuments(rdfDocList);
         }
+
     }
 
     /*
@@ -667,8 +670,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                             
                             owlse2.setLTMODContext(importURL, con);
                         } catch (IOException e) {
-                            log
-                                    .error("Caught an IOException! in urlc.getInputStream() Msg: "
+                            log.error("Caught an IOException! in urlc.getInputStream() Msg: "
                                             + e.getMessage());
 
                         }
@@ -694,8 +696,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             try {
                 con.close();
             } catch (RepositoryException e) {
-                log
-                        .error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
+                log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
                                 + e.getMessage());
             }
             inferEndTime = new Date().getTime();
@@ -771,8 +772,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             try {
                 con.close();
             } catch (RepositoryException e) {
-                log
-                        .error("Caught a RepositoryException! in findNeededRDFDocuments() Msg: "
+                log.error("Caught a RepositoryException! in findNeededRDFDocuments() Msg: "
                                 + e.getMessage());
             }
         }
