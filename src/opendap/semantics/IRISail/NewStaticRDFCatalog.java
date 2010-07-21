@@ -382,7 +382,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 
         Date startTime = new Date();
         log.info("Evaluating importURLs for updateCatalog... ");
-        RepositoryConnection con;
+        RepositoryConnection con = null;
         try {
 
             
@@ -406,29 +406,38 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             } catch (RepositoryException e) {
                 e.printStackTrace();
             }
-            
+            finally {
+                if(con!=null)
+                    con.close();
+            }
+
             if (newRepository) {
-                con = owlse2.getConnection();
-                //catalog.owlse2.setStartingPoints(catalog.con, configFileName,importURLs);
-                owlse2.setStartingPoints(con, newStartingPoints);
-                con.close();
 
+                try{
+                    con = owlse2.getConnection();
+                    owlse2.setStartingPoints(con, newStartingPoints);
+                }
+                finally {
+                    if(con!=null)
+                        con.close();
+                }
                 updateIriRepository();
-
                 log.debug("Running construct rules ...");
-                
                 ingestSwrlRules();
-                
             }
             else {
                 if (!dropList.isEmpty()) {
 
                     findExternalInferencing();
-                    con = owlse2.getConnection();
-                    log.debug("Droppping starting point ...");
-                    owlse2.dropStartingPoints(con, startingPointsToDrop);
-                    //owlse2.dropStartingPoints(startingPointsToDrop);
-                    con.close();
+                    try {
+                        con = owlse2.getConnection();
+                        log.debug("Droppping starting point ...");
+                        owlse2.dropStartingPoints(con, startingPointsToDrop);
+                    }
+                    finally {
+                        if(con!=null)
+                            con.close();
+                    }
                     log.debug("Finished droppping starting point.");
                     log.debug("Droppping changed RDFDocuments ...");
                     processDropList();
@@ -437,18 +446,22 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     updateIriRepository();
                     log.debug("Updating repository ...");
                     log.debug("Running construct rules ...");
-                    //con = owlse2.getConnection();
 
                     ingestSwrlRules();
                     log.debug("Finished running construct rules.");
                 }
                 if (!newStartingPoints.isEmpty()) {
 
-                    con = owlse2.getConnection();
-                    log.debug("Adding new starting point ...");
-                    owlse2.setStartingPoints(con, newStartingPoints);
-                    log.debug("Finished adding nrew starting point.");
-                    con.close();
+                    try {
+                        con = owlse2.getConnection();
+                        log.debug("Adding new starting point ...");
+                        owlse2.setStartingPoints(con, newStartingPoints);
+                        log.debug("Finished adding nrew starting point.");
+                    }
+                    finally {
+                        if(con!=null)
+                            con.close();
+                    }
                     updateIriRepository();
 
                     log.debug("Running construct rules ...");
