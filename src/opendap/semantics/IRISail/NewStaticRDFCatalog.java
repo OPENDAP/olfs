@@ -3,7 +3,6 @@ package opendap.semantics.IRISail;
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -100,7 +99,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     
     private RepositoryConnection con;
     private Vector<String> repositoryContexts;
-    private Vector<String> dropList;
     private Vector<String> startingPoints;
     private Vector<String> RDFDocumentList;
     
@@ -141,7 +139,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         initialized = false;
         
         repositoryContexts = new Vector<String>();
-        dropList = new Vector<String>();
         startingPoints = new Vector<String>(); // tracking startingpoint
         RDFDocumentList = new Vector<String>();
         
@@ -149,8 +146,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         imports = new Vector<String>();
         
         newRepository = false;
-        constructs = new Vector<String>();
-        
+
     }
  /***   public static void main(String[] args) {
         long startTime, endTime;
@@ -375,92 +371,77 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
     }
     //private void updateSemanticRepository2(RepositoryConnection con,
+
     private void updateSemanticRepository2(
-    Vector<String> importURLs) throws InterruptedException,
+            Vector<String> importURLs) throws InterruptedException,
             RepositoryException {
-                
+
+        Vector<String> dropList = new Vector<String>();
+
         Date startTime = new Date();
         log.info("Evaluating importURLs for updateCatalog... ");
         RepositoryConnection con = null;
         try {
 
-            
-            for (String startingPointUrl :importURLs )
-            startingPoints.add(startingPointUrl); // startingpoint from input file
-            //setupOwlimRepository();
-            
+
+            for (String startingPointUrl : importURLs){
+                startingPoints.add(startingPointUrl); // startingpoint from input file
+                //setupOwlimRepository();
+            }
+
             Vector<String> newStartingPoints = null;
-            Vector<String> startingPointsToDrop = null;    
+            Vector<String> startingPointsToDrop = null;
             try {
                 con = owlse2.getConnection();
                 if (con.isOpen()) {
                     log.info("Connection is OPEN!");
-                    findUnneededRDFDocuments(con);
+
                     newStartingPoints = findNewStartingPoints(con);
+
+                    dropList.addAll(findUnneededRDFDocuments(con));
                     startingPointsToDrop = findChangedStartingPoints(con);
-                    findChangedRDFDocuments(con);
+                    dropList.addAll(startingPointsToDrop);
+                    dropList.addAll(findChangedRDFDocuments(con));
                 }
             } catch (RepositoryException e) {
                 e.printStackTrace();
             }
             finally {
-                if(con!=null)
+                if (con != null)
                     con.close();
                 log.info("Connection is Closed!");
             }
 
-            dropList.clear();
-            newStartingPoints = null;
-            startingPointsToDrop = null;
-            try {
-                con = owlse2.getConnection();
-                if (con.isOpen()) {
-                    log.info("Connection is OPEN!");
-                    findUnneededRDFDocuments(con);
-                    newStartingPoints = findNewStartingPoints(con);
-                    startingPointsToDrop = findChangedStartingPoints(con);
-                    findChangedRDFDocuments(con);
-                }
-            } catch (RepositoryException e) {
-                e.printStackTrace();
-            }
-            finally {
-                if(con!=null)
-                    con.close();
-                log.info("Connection is Closed!");
-            }
 
             if (newRepository) {
 
-                try{
+                try {
                     con = owlse2.getConnection();
                     owlse2.setStartingPoints(con, newStartingPoints);
                 }
                 finally {
-                    if(con!=null)
+                    if (con != null)
                         con.close();
                 }
                 updateIriRepository();
                 log.debug("Running construct rules ...");
                 ingestSwrlRules();
-            }
-            else {
+            } else {
                 if (!dropList.isEmpty()) {
 
-                    findExternalInferencing();
+                    dropList.addAll(findExternalInferencing());
                     try {
                         con = owlse2.getConnection();
                         log.debug("Dropping starting point ...");
                         owlse2.dropStartingPoints(con, startingPointsToDrop);
                     }
                     finally {
-                        if(con!=null)
+                        if (con != null)
                             con.close();
                     }
                     log.debug("Finished dropping starting point.");
-                    log.debug("Dropping changed RDFDocuments ...");
-                    processDropList();
-                    log.debug("Finished dropping changed RDFDocuments.");
+
+                    processDropList(dropList);
                 }
                 if (!newStartingPoints.isEmpty()) {
 
@@ -471,7 +452,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         log.debug("Finished adding nrew starting point.");
                     }
                     finally {
-                        if(con!=null)
+                        if (con != null)
                             con.close();
                     }
                 }
@@ -488,8 +469,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         } catch (RepositoryException e) {
             log.error("Caught RepositoryException in main(): "
                     + e.getMessage());
-       
-        } 
+
+        }
 
 
         long elapsedTime = new Date().getTime() - startTime.getTime();
@@ -508,6 +489,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 //        log.info("RDF import complete.");
 
     }
+
     private void setupOwlimRepository() throws RepositoryException {
         log.info("Building Semantic Repository.");
 
@@ -802,8 +784,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Drop URIs in the drop list
      */
     // private void processDropList(RepositoryConnection con) {
-    private void processDropList() {
+    private void processDropList(Vector<String> dropList) {
         RepositoryConnection con = null;
+
+        log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
+
         try {
             con = owlse2.getConnection();
 
@@ -835,7 +820,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                
 
             }
-            dropList.clear();
             if (thread.isInterrupted()) {
                 log.warn("processDropList(): WARNING! Thread "
                         + thread.getName() + " was interrupted!");
@@ -845,7 +829,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         } catch (RepositoryException e) {
             log.error("Caught RepositoryException! Msg: " + e.getMessage());
         }
-
         finally {
             try {
                 con.close();
@@ -855,17 +838,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                                 + e.getMessage());
             }
         }
+        log.debug("Finished dropping changed RDFDocuments and external inferencing contexts.");
+
     }
 
-    /***************************************************************************
-     * Find all Construct queries
-     */
-    // private void dropExternalInferencing(RepositoryConnection con) {
-    private void findExternalInferencing() {
+
+    private Vector<String> findExternalInferencing() {
         RepositoryConnection con = null;
         TupleQueryResult result = null;
 
         List<String> bindingNames;
+        Vector<String> externalInferencing = new Vector<String>();
 
         log.debug("Finding ExternalInferencing ...");
        
@@ -892,10 +875,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     BindingSet bindingSet = (BindingSet) result.next();
 
                     Value firstValue = bindingSet.getValue("crule");
-                    if (!dropList.contains(firstValue.stringValue())
-                            && !constructs.contains(firstValue.stringValue())) {
-                        dropList.add(firstValue.stringValue());
-                        constructs.add(firstValue.stringValue());
+                    if (!externalInferencing.contains(firstValue.stringValue())) {
+                        externalInferencing.add(firstValue.stringValue());
                     }
                     log.debug("Adding to droplist: " + firstValue.toString());
                 }
@@ -931,8 +912,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
 
-        log.info("Number of constructs added to droplist:  "
-                + constructs.size());
+        log.info("Located "
+                + externalInferencing.size()+ "external inferencing  constructs.");
+
+
+        return externalInferencing;
 
     }
 
@@ -940,11 +924,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Find all rdfcache:RDFDocuments that are not needed and do not belong to
      * rdfcache:StartingPoints and add them to the drop-list
      */
-    private void findUnneededRDFDocuments(RepositoryConnection con) {
+    private Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
         TupleQueryResult result = null;
         List<String> bindingNames;
+        Vector<String>  unneededRdfDocs = new Vector<String>();
 
-        log.debug("Locating unneeded files left over from last update ...");
+
+
+                
+        log.debug("Locating unneeded RDF files left over from last update ...");
 
         try {
 
@@ -974,10 +962,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     BindingSet bindingSet = (BindingSet) result.next();
 
                     Value firstValue = bindingSet.getValue("doc");
-                    if (!dropList.contains(firstValue.stringValue())) {
-                        dropList.add(firstValue.stringValue());
+                    if (!unneededRdfDocs.contains(firstValue.stringValue())) {
+                        unneededRdfDocs.add(firstValue.stringValue());
 
-                        log.debug("Adding to droplist: "
+                        log.debug("Found unneeded RDF Document: "
                                 + firstValue.toString());
                     }
                 }
@@ -1006,7 +994,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
 
-        log.info("Number of unneeded files identified:  " + dropList.size());
+        log.info("Identified " + unneededRdfDocs.size()+ " unneeded RDF documents.");
+        return unneededRdfDocs;
 
     }
 
@@ -1016,7 +1005,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      */
     private  Vector<String> findChangedStartingPoints(RepositoryConnection con) {
         Vector<String> result = null;
-        Vector<String> dropStartingPoints = new Vector<String> ();
+        Vector<String> changedStartingPoints = new Vector<String> ();
         log.debug("Checking if the old StartingPoint is still a startingpoint ...");
 
         try {
@@ -1028,10 +1017,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     //log.debug("StartingPoints: " + startpoint);
                     String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
                     if (!startingPoints.contains(startpoint)
-                            && !dropList.contains(startpoint)
                             && !startpoint.equals(internalStartingPoint)) {
-                        dropList.add(startpoint);
-                        dropStartingPoints.add(startpoint);
+                        changedStartingPoints.add(startpoint);
                         log.debug("Adding to droplist: " + startpoint);
                     }
                 }
@@ -1046,9 +1033,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
         }
 
-        log.info("Number of changed StartingPoints:  "
-                        + dropList.size());
-        return dropStartingPoints;
+        log.info("Located " + changedStartingPoints.size()+" starting points that have been changed.");
+        return changedStartingPoints;
     }
     
     /*
@@ -1144,9 +1130,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Find all rdfcache:RDFDocuments that has changed and add them to the
      * drop-list
      */
-    private void findChangedRDFDocuments(RepositoryConnection con) {
+    private Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
         TupleQueryResult result = null;
         List<String> bindingNames;
+        Vector<String> changedRdfDocuments = new Vector<String>();
 
         log.debug("Locating changeded files ...");
 
@@ -1176,11 +1163,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     // log.debug("DOC: " + importURL);
                     // log.debug("LASTMOD: " + secondtValue.stringValue());
                     
-                    if (owlse2.olderContext(importURL) && !dropList.contains(importURL)) { 
+                    if (owlse2.olderContext(importURL) && !changedRdfDocuments.contains(importURL)) {
                         
-                            dropList.add(importURL);
+                            changedRdfDocuments.add(importURL);
 
-                            log.debug("Adding to droplist: " + importURL);
+                            log.debug("Found changed RDF document: " + importURL);
                        
                     }
                 }
@@ -1209,9 +1196,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
 
-        log.info("Number of files to drop after  findChangedRDFDocuments "
-                + dropList.size());
+        log.info("Number of changed RDF documents detected:  "
+                + changedRdfDocuments.size());
 
+        return changedRdfDocuments;
     }
     
     
