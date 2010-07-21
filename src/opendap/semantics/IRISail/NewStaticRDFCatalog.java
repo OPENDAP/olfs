@@ -372,9 +372,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
     //private void updateSemanticRepository2(RepositoryConnection con,
 
-    private void updateSemanticRepository2(
-            Vector<String> importURLs) throws InterruptedException,
-            RepositoryException {
+    private void updateSemanticRepository2(Vector<String> importURLs)
+            throws InterruptedException,RepositoryException {
 
         Vector<String> dropList = new Vector<String>();
 
