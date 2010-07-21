@@ -434,7 +434,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     dropList.addAll(findExternalInferencingContexts());
                     try {
                         con = owlse2.getConnection();
-                        log.debug("Dropping starting point ...");
+                        log.debug("Dropping starting points ...");
                         owlse2.dropStartingPoints(con, startingPointsToDrop);
                     }
                     finally {
