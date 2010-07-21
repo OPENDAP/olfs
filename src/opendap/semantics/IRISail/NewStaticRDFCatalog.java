@@ -1414,8 +1414,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         finally {
             if (con != null)
                 con.close();
+            log.info("Complete running runConstruct ..");   
         }
-        log.info("Complete running runConstruct ..");
+        
     }
 
 
