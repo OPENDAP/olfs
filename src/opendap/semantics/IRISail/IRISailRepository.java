@@ -1582,48 +1582,50 @@ public class IRISailRepository extends SailRepository {
      * Set setStartingPoints statement for the importURI in the repository.
      * 
      */
-    public void dropStartingPoints(RepositoryConnection con, Vector <String> importURLs) {
+    public void dropStartingPoints(RepositoryConnection con, Vector<String> importURLs) {
+
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
-            ValueFactory f = this.getValueFactory();
-            
-            URI s = null;
-            URI isa = f.createURI(pred);
-            URI cont = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
-            URI o = f.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
-            URL url;
-            
-            try {
-                               
-                
-                for (String importURL : importURLs){
-                
-                url = new URL(importURL);
-                s = f.createURI(importURL);
-                con.remove((Resource) s, isa, (Value) o, (Resource) cont);
-                                                               
-                log.info("Remove from the repository <" + s + "> <" + isa
-                        + "> " + "<" + o + "> " + "<" + cont + "> ");
-                } 
-                
-                                
-            } catch (RepositoryException e) {
-                log.error("In setStartingPoints, caught an RepositoryException! Msg: "
-                        + e.getMessage());
+        ValueFactory valueFactory = this.getValueFactory();
 
-            } catch (MalformedURLException e) {
-                
-                log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
-                        + e.getMessage());
+        URI startingPointValue = null;
+        URI isa = valueFactory.createURI(pred);
+        URI context = valueFactory.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
+        URI startingPointType = valueFactory.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
+        URL url;
+
+        try {
+
+
+            for (String importURL : importURLs) {
+
+                url = new URL(importURL);
+                startingPointValue = valueFactory.createURI(importURL);
+                con.remove((Resource) startingPointValue, isa, (Value) startingPointType, (Resource) context);
+
+                log.info("Removed starting point " + importURL + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
+                        + "> " + "<" + startingPointType + "> " + "<" + context + "> )");
+            }
+
+
+        } catch (RepositoryException e) {
+            log.error("In setStartingPoints, caught an RepositoryException! Msg: "
+                    + e.getMessage());
+
+        } catch (MalformedURLException e) {
+
+            log.error("In setStartingPoints, caught an MalformedURLException! Msg: "
+                    + e.getMessage());
             //} catch (RDFParseException e) {
             //    log.error("In setStartingPoints, caught an RDFParseException! Msg: "
             //            + e.getMessage());
-            } catch (IOException e) {
-                log.error("In setStartingPoints, caught an IOException! Msg: "
-                        + e.getMessage());
-            }
-                   
-    }  
+        } catch (IOException e) {
+            log.error("In setStartingPoints, caught an IOException! Msg: "
+                    + e.getMessage());
+        }
+
+    }
+
     /**
      * Set setStartingPoints statement for the importURI in the repository.
      *
