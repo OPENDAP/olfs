@@ -634,7 +634,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                
 
             }
-            
+            dropList.clear();
             if (thread.isInterrupted()) {
                 log.warn("processDropList(): WARNING! Thread "
                         + thread.getName() + " was interrupted!");
