@@ -1093,7 +1093,7 @@ public class IRISailRepository extends SailRepository {
     /**
      * Checks and returns last modified time of an URL (context) via http
      * connection. The input is a string of an URL.
-     * 
+     *
      * @param urlstring
      */
 
@@ -1116,6 +1116,16 @@ public class IRISailRepository extends SailRepository {
         }
         return ltmodstr;
     }
+
+    public String getLTMOD(Date date) {
+        String ltmodstr = "";
+            Timestamp ltmodsql = new Timestamp(date.getTime());
+            String ltmodstrraw = ltmodsql.toString();
+            ltmodstr = ltmodstrraw.substring(0, 10) + "T"
+                    + ltmodstrraw.substring(11, 19) + "Z";
+        return ltmodstr;
+    }
+
 
     /**
      * Checks and returns last modified time of a context (URI) via querying
