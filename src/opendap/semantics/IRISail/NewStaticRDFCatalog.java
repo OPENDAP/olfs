@@ -487,6 +487,27 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 log.info("Connection is Closed!");
             }
 
+            dropList.clear();
+            newStartingPoints = null;
+            startingPointsToDrop = null;
+            try {
+                con = owlse2.getConnection();
+                if (con.isOpen()) {
+                    log.info("Connection is OPEN!");
+                    findUnneededRDFDocuments(con);
+                    newStartingPoints = findNewStartingPoints(con);
+                    startingPointsToDrop = findChangedStartingPoints(con);
+                    findChangedRDFDocuments(con);
+                }
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+            finally {
+                if(con!=null)
+                    con.close();
+                log.info("Connection is Closed!");
+            }
+
             if (newRepository) {
 
                 try{
@@ -507,24 +528,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     findExternalInferencing();
                     try {
                         con = owlse2.getConnection();
-                        log.debug("Droppping starting point ...");
+                        log.debug("Dropping starting point ...");
                         owlse2.dropStartingPoints(con, startingPointsToDrop);
                     }
                     finally {
                         if(con!=null)
                             con.close();
                     }
-                    log.debug("Finished droppping starting point.");
-                    log.debug("Droppping changed RDFDocuments ...");
+                    log.debug("Finished dropping starting point.");
+                    log.debug("Dropping changed RDFDocuments ...");
                     processDropList();
-                    log.debug("Finished droppping changed RDFDocuments.");
-                    log.debug("Updating repository ...");
-                    updateIriRepository();
-                    log.debug("Updating repository ...");
-                    log.debug("Running construct rules ...");
-
-                    ingestSwrlRules();
-                    log.debug("Finished running construct rules.");
+                    log.debug("Finished dropping changed RDFDocuments.");
                 }
                 if (!newStartingPoints.isEmpty()) {
 
@@ -538,12 +552,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         if(con!=null)
                             con.close();
                     }
-                    updateIriRepository();
-
-                    log.debug("Running construct rules ...");
-
-                    ingestSwrlRules();
                 }
+                log.debug("Updating repository ...");
+                updateIriRepository();
+                log.debug("Repository update complete.");
+
+                log.debug("Running construct rules ...");
+                ingestSwrlRules();
+                log.debug("Finished running construct rules.");
 
             }
 
@@ -553,8 +569,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
        
         } 
 
-        
-        
+
         long elapsedTime = new Date().getTime() - startTime.getTime();
         log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
 
@@ -957,7 +972,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     Value firstValue = bindingSet.getValue("crule");
                     if (!dropList.contains(firstValue.stringValue())
                             && !constructs.contains(firstValue.stringValue())) {
-                        //dropList.add(firstValue.stringValue());
+                        dropList.add(firstValue.stringValue());
                         constructs.add(firstValue.stringValue());
                     }
                     log.debug("Adding to droplist: " + firstValue.toString());
