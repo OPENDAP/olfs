@@ -106,7 +106,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private Boolean newRepository;
     private Vector<String> imports;
     private Vector<String> constructs;
-    
+
+    private static final String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+    private static final String rdfCache = "<"+internalStartingPoint+"#>";
+
     
 
     public NewStaticRDFCatalog() {
@@ -722,7 +725,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+                    + "rdfcache = " + rdfCache;
 
             log.debug("queryNeededRDFDocuments: " + queryString);
 
@@ -802,8 +805,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             for (String drop : dropList) {
                 uriDrop = new URIImpl(drop);
                 log.info("Dropping URI: " + drop);
-                String pred = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified";
-                String contURL = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#cachecontext";
+                String pred =  internalStartingPoint +"#last_modified";
+                String contURL = internalStartingPoint + "#cachecontext";
                 URI sbj = f.createURI(drop);
                 URI predicate = f.createURI(pred);
                 URI cont = f.createURI(contURL);
@@ -859,7 +862,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "WHERE crule != rdfcache:cachecontext AND crule != rdfcache:startingPoints AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
                     + "{crule} rdfcache:last_modified {time}) "
                     + "using namespace "
-                    + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+                    + "rdfcache = " + rdfCache;
 
             log.debug("queryString: " + queryString);
 
@@ -946,7 +949,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "SELECT doc "
                     + "FROM {tp} rdf:type {rdfcache:StartingPoint}; rdfcache:dependsOn {doc} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+                    + "rdfcache = " + rdfCache;
 
             log.debug("queryUnneededRDFDocuments: " + queryString);
 
@@ -1015,7 +1018,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 for (String startpoint : result) {
                     
                     //log.debug("StartingPoints: " + startpoint);
-                    String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
                     if (!startingPoints.contains(startpoint)
                             && !startpoint.equals(internalStartingPoint)) {
                         changedStartingPoints.add(startpoint);
@@ -1044,24 +1046,23 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private Vector<String> findNewStartingPoints(RepositoryConnection con) {
         Vector<String> result = null;
         Vector<String> newStartingPoints = new Vector<String> ();
-        log.debug("Checking new startingpoint ...");
+        log.debug("Checking for new starting points...");
 
         try {
 
             result = findStartingPoints(con);
-                        
-                for (String startpoint : startingPoints) {
-                    
-                    //log.debug("StartingPoints: " + startpoint);
-                    String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-                    if (!result.contains(startpoint)
-                            && !startpoint.equals(internalStartingPoint)) {
-                        
-                        newStartingPoints.add(startpoint);
 
-                        log.debug("Adding to New StartingPints list: " + startpoint);
-                    }
+            for (String startpoint : startingPoints) {
+
+                //log.debug("StartingPoints: " + startpoint);
+                if (!result.contains(startpoint)
+                        && !startpoint.equals(internalStartingPoint)) {
+
+                    newStartingPoints.add(startpoint);
+
+                    log.debug("Adding to New StartingPints list: " + startpoint);
                 }
+            }
             
         } catch (QueryEvaluationException e) {
             log.error("Caught an QueryEvaluationException! Msg: "
@@ -1090,7 +1091,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         String queryString = "SELECT doc "
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
             + "USING NAMESPACE "
-            + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+            + "rdfcache = " + rdfCache;
 
         log.debug("queryStartingPoints: " + queryString);
 
@@ -1112,7 +1113,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 Value firstValue = bindingSet.getValue("doc");
                 String startpoint = firstValue.stringValue();
                 //log.debug("StartingPoints: " + startpoint);
-                String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
                 if (!startpoint.equals(internalStartingPoint)) {
                     startingPoints.add(startpoint);
 
@@ -1142,7 +1142,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "FROM CONTEXT rdfcache:cachecontext "
                     + "{doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+                    + "rdfcache = "+rdfCache;
 
             log.debug("queryChangedRDFDocuments: " + queryString);
 
