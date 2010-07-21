@@ -225,7 +225,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 catalog.con.close();
                 catalog.log.debug("Finished droppping starting point.");
                 catalog.log.debug("Droppping changed RDFDocuments ...");
-                catalog.processDropList();
+                catalog.dropContexts();
                 catalog.log.debug("Finished droppping changed RDFDocuments.");
                 catalog.log.debug("Updating repository ...");
                 catalog.updateIriRepository();
@@ -443,7 +443,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     }
                     log.debug("Finished dropping starting point.");
 
-                    processDropList(dropList);
+                    dropContexts(dropList);
                 }
                 if (!newStartingPoints.isEmpty()) {
 
@@ -785,8 +785,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /*
      * Drop URIs in the drop list
      */
-    // private void processDropList(RepositoryConnection con) {
-    private void processDropList(Vector<String> dropList) {
+    // private void dropContexts(RepositoryConnection con) {
+    private void dropContexts(Vector<String> dropList) {
         RepositoryConnection con = null;
 
         log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
@@ -823,7 +823,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             }
             if (thread.isInterrupted()) {
-                log.warn("processDropList(): WARNING! Thread "
+                log.warn("dropContexts(): WARNING! Thread "
                         + thread.getName() + " was interrupted!");
                 return;
             }
@@ -835,8 +835,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             try {
                 con.close();
             } catch (RepositoryException e) {
-                log
-                        .error("Caught RepositoryException! while closing connection: "
+                log.error("Caught RepositoryException! while closing connection: "
                                 + e.getMessage());
             }
         }
