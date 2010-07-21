@@ -108,7 +108,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private Vector<String> constructs;
 
     private static final String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-    private static final String rdfCache = "<"+internalStartingPoint+"#>";
+    private static final String rdfCacheNamespace = internalStartingPoint+"#";
 
     
 
@@ -389,7 +389,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             for (String startingPointUrl : importURLs){
                 startingPoints.add(startingPointUrl); // startingpoint from input file
-                //setupOwlimRepository();
             }
 
             Vector<String> newStartingPoints = null;
@@ -725,7 +724,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = " + rdfCache;
+                    + "rdfcache = <"+ rdfCacheNamespace+">";
 
             log.debug("queryNeededRDFDocuments: " + queryString);
 
@@ -862,7 +861,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "WHERE crule != rdfcache:cachecontext AND crule != rdfcache:startingPoints AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
                     + "{crule} rdfcache:last_modified {time}) "
                     + "using namespace "
-                    + "rdfcache = " + rdfCache;
+                    + "rdfcache = <"+ rdfCacheNamespace+">";
 
             log.debug("queryString: " + queryString);
 
@@ -949,7 +948,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "SELECT doc "
                     + "FROM {tp} rdf:type {rdfcache:StartingPoint}; rdfcache:dependsOn {doc} "
                     + "USING NAMESPACE "
-                    + "rdfcache = " + rdfCache;
+                    + "rdfcache = <"+ rdfCacheNamespace+">";
 
             log.debug("queryUnneededRDFDocuments: " + queryString);
 
@@ -1091,7 +1090,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         String queryString = "SELECT doc "
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
             + "USING NAMESPACE "
-            + "rdfcache = " + rdfCache;
+            + "rdfcache = <"+ rdfCacheNamespace+">";
 
         log.debug("queryStartingPoints: " + queryString);
 
@@ -1142,7 +1141,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "FROM CONTEXT rdfcache:cachecontext "
                     + "{doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = "+rdfCache;
+                    + "rdfcache = <"+ rdfCacheNamespace+">";
 
             log.debug("queryChangedRDFDocuments: " + queryString);
 
