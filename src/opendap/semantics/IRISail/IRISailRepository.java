@@ -1517,15 +1517,27 @@ public class IRISailRepository extends SailRepository {
 
     /**
      * Set last_modified_time of the URI in the repository.
-     * 
      * @param importURL
+     * @param con
      */
     public void setLTMODContext(String importURL, RepositoryConnection con) {
+        String ltmod = this.getLTMODContext(importURL);
+        setLTMODContext(importURL, ltmod, con);
+    }
+
+
+    /**
+     *
+     *
+     * @param importURL
+     * @param ltmod
+     * @param con
+     */
+    public void setLTMODContext(String importURL, String ltmod, RepositoryConnection con) {
         String pred = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified";
         String contURL = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#cachecontext";
         if (!this.imports.contains(importURL)) { // not in the repository yet
             // log.debug(importURL);
-            String ltmod = this.getLTMODContext(importURL);
             // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
