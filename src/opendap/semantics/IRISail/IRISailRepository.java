@@ -1104,10 +1104,7 @@ public class IRISailRepository extends SailRepository {
             HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
             long ltmod = hc.getLastModified();
             // log.debug("lastModified: "+ltmod);
-            Timestamp ltmodsql = new Timestamp(ltmod);
-            String ltmodstrraw = ltmodsql.toString();
-            ltmodstr = ltmodstrraw.substring(0, 10) + "T"
-                    + ltmodstrraw.substring(11, 19) + "Z";
+            ltmodstr = getLastModifiedTimeString(ltmod);
         } catch (MalformedURLException e) {
             log.error("Caught a MalformedQueryException! Msg: "
                     + e.getLocalizedMessage());
@@ -1117,12 +1114,17 @@ public class IRISailRepository extends SailRepository {
         return ltmodstr;
     }
 
-    public String getLTMOD(Date date) {
+    public String getLastModifiedTimeString(Date date) {
+        return getLastModifiedTimeString(date.getTime());
+    }
+
+
+    public String getLastModifiedTimeString(long epochTime) {
         String ltmodstr = "";
-            Timestamp ltmodsql = new Timestamp(date.getTime());
-            String ltmodstrraw = ltmodsql.toString();
-            ltmodstr = ltmodstrraw.substring(0, 10) + "T"
-                    + ltmodstrraw.substring(11, 19) + "Z";
+        Timestamp ltmodsql = new Timestamp(epochTime);
+        String ltmodstrraw = ltmodsql.toString();
+        ltmodstr = ltmodstrraw.substring(0, 10) + "T"
+                + ltmodstrraw.substring(11, 19) + "Z";
         return ltmodstr;
     }
 
