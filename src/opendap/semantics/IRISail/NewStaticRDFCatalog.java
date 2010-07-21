@@ -9,6 +9,8 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
 
+
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,8 +29,11 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -93,7 +98,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private boolean initialized;
     
-    //private RepositoryConnection con;
+    private RepositoryConnection con;
     private Vector<String> repositoryContexts;
     private Vector<String> dropList;
     private Vector<String> startingPoints;
@@ -103,6 +108,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private Boolean newRepository;
     private Vector<String> imports;
     private Vector<String> constructs;
+    
+    
 
     public NewStaticRDFCatalog() {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
@@ -122,14 +129,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         backgroundUpdates = false;
         
-        //con = null;
+        con = null;
         owlse2 = null;
         buildDoc = null;
         _lastModified = -1;
         _config = null;
-        catalogCacheDirectory = null;
+        catalogCacheDirectory = ".";
         owlim_storage_folder ="owlim-storage";
-        resourcePath = null;
+        resourcePath = ".";
 
         initialized = false;
         
@@ -143,9 +150,176 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         
         newRepository = false;
         constructs = new Vector<String>();
+        
     }
+    public static void main(String[] args) {
+        long startTime, endTime;
+        double elapsedTime;
+        HashMap<String, Vector<String>> coverageIDServer;
 
+        //GenerateNTriples catalog = new GenerateNTriples();
+        startTime = new Date().getTime();
+        NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
+        if (args.length != 1) {
+            catalog.log
+                    .error("Usage: java -jar generatentriples.jar config_file/owl_file");
+            catalog.log
+                    .error("Example: java -jar generatentriples.jar file:///data/haibo/workspace/IRIWMS/wcs_service.xml");
+            catalog.log
+                    .error("Or: java -jar generatentriples.jar http://iri.columbia.edu/~haibo/opendaptest/datasetcoveragelist.owl");
+            System.exit(1);
 
+        }
+       
+        try {
+
+            System.out.println("arg0= " + args[0]);
+
+            String configFileName = null;
+            configFileName = args[0];
+            catalog.log.debug("main() using config file: " + configFileName);
+            Vector<String> importURLs = new Vector<String>();
+            if (configFileName.endsWith("xml")) {
+
+                Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
+
+                catalog.log.debug("main() using config file: " + configFileName);
+                catalog._config = (Element) olfsConfig.getDescendants(
+                        new ElementFilter("WcsCatalog")).next();
+                catalog.processConfig(catalog._config, catalog.catalogCacheDirectory,
+                        catalog.resourcePath);
+                catalog.log.debug("main(): Getting RDF imports.");
+                importURLs = catalog.getRdfImports(catalog._config);
+            } else if (configFileName.endsWith("owl")) {
+                importURLs.add(configFileName);
+
+            }
+
+            for (String startingPointUrl :importURLs )
+            catalog.startingPoints.add(startingPointUrl); // startingpoint from input file
+            catalog.setupOwlimRepository();
+            
+            Vector<String> newStartingPoints = null;
+            Vector<String> startingPointsToDrop = null;    
+            try {
+                catalog.con = catalog.owlse2.getConnection();
+                if (catalog.con.isOpen()) {
+                    catalog.log.info("Connection is OPEN!");
+                    catalog.findUnneededRDFDocuments(catalog.con);
+                    newStartingPoints = catalog.findNewStartingPoints(catalog.con);
+                    startingPointsToDrop = catalog.findChangedStartingPoints(catalog.con);
+                    catalog.findChangedRDFDocuments(catalog.con);
+                    catalog.con.close();
+                    catalog.log.info("Connection is Closed!");
+                }
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+            
+            if (!catalog.dropList.isEmpty()) {
+
+                catalog.findExternalInferencing();
+                catalog.con = catalog.owlse2.getConnection();
+                catalog.log.debug("Droppping starting point ...");
+                catalog.owlse2.dropStartingPoints(catalog.con, startingPointsToDrop);
+                catalog.con.close();
+                catalog.log.debug("Finished droppping starting point.");
+                catalog.log.debug("Droppping changed RDFDocuments ...");
+                catalog.processDropList();
+                catalog.log.debug("Finished droppping changed RDFDocuments.");
+                catalog.log.debug("Updating repository ...");
+                catalog.updateIriRepository();
+
+                catalog.log.debug("Running construct rules ...");
+                //catalog.con = catalog.owlse2.getConnection();
+                catalog.log.debug("Updating repository ...");
+                catalog.log.debug("Running construct rules ...");
+                catalog.ingestSwrlRules();
+                catalog.log.debug("Finished running construct rules.");
+            }
+            if (!newStartingPoints.isEmpty() && !catalog.newRepository) {
+                
+                catalog.con = catalog.owlse2.getConnection();
+                catalog.owlse2.setStartingPoints(catalog.con, newStartingPoints);
+                catalog.con.close(); 
+                catalog.updateIriRepository();
+
+                catalog.log.debug("Running construct rules ...");
+                
+                    catalog.ingestSwrlRules();
+            }
+            else if (catalog.newRepository) {
+                catalog.con = catalog.owlse2.getConnection();
+                //catalog.owlse2.setStartingPoints(catalog.con, configFileName,importURLs);
+                catalog.owlse2.setStartingPoints(catalog.con, newStartingPoints);
+                catalog.con.close();
+
+                catalog.updateIriRepository();
+
+                catalog.log.debug("Running construct rules ...");
+                
+                    catalog.ingestSwrlRules();
+                
+            }
+
+        } catch (RepositoryException e) {
+            catalog.log.error("Caught RepositoryException in main(): "
+                    + e.getMessage());
+
+        } catch (MalformedURLException e) {
+            catalog.log.error("Caught MalformedURLException in main(): "
+                    + e.getMessage());
+        } catch (IOException e) {
+            catalog.log
+                    .error("Caught IOException in main(): " + e.getMessage());
+        } catch (JDOMException e) {
+            catalog.log.error("Caught JDOMException in main(): "
+                    + e.getMessage());
+        }
+
+        String filename = catalog.catalogCacheDirectory + "owlimHorstRepository.nt";
+
+        catalog.log.debug("main(): Dumping Semantic Repository to: " + filename);
+        try {
+            catalog.con = catalog.owlse2.getConnection();
+            if (catalog.con.isOpen()) {
+                catalog.log.info("Connection is opened!");
+                catalog.dumpRepository(catalog.con, filename);
+                catalog.con.close();
+                catalog.log.info("Connection is closed!");
+            }
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+
+        filename = catalog.catalogCacheDirectory + "owlimHorstRepository.trig";
+        catalog.log.debug("main(): Dumping Semantic Repository to: " + filename);
+        try {
+            catalog.con = catalog.owlse2.getConnection();
+            if (catalog.con.isOpen()) {
+                catalog.log.info("Connection is opened!");
+                catalog.dumpRepository(catalog.con, filename);
+                catalog.extractCoverageDescrptionsFromRepository();
+                catalog.updateCatalogCache();
+                String coveragefilename = catalog.catalogCacheDirectory + "coverageXMLfromRDF.xml";
+                catalog.log.debug("updateRepository2(): Dumping CoverageDescriptions Document to: "+coveragefilename);
+                catalog.dumpCoverageDescriptionsDocument(coveragefilename);
+                catalog.con.close();
+                catalog.log.info("Connection is closed!");
+            }
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        catalog.destroy();
+        endTime = new Date().getTime();
+        elapsedTime = (endTime - startTime) / 1000;
+        catalog.log.info("Completed generating triples in " + elapsedTime + " seconds.");
+    }
+/*****
     public static void main(String[] args) {
 
         long startTime, endTime;
@@ -200,6 +374,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
     }
+    */
     //private void updateSemanticRepository2(RepositoryConnection con,
     private void updateSemanticRepository2(
     Vector<String> importURLs) throws InterruptedException,
@@ -693,7 +868,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     Value firstValue = bindingSet.getValue("crule");
                     if (!dropList.contains(firstValue.stringValue())
                             && !constructs.contains(firstValue.stringValue())) {
-                        dropList.add(firstValue.stringValue());
+                        //dropList.add(firstValue.stringValue());
                         constructs.add(firstValue.stringValue());
                     }
                     log.debug("Adding to droplist: " + firstValue.toString());
