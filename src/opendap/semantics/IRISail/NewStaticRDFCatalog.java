@@ -148,7 +148,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         newRepository = false;
 
     }
- /***   public static void main(String[] args) {
+    /*** 
+   public static void main(String[] args) {
         long startTime, endTime;
         double elapsedTime;
         HashMap<String, Vector<String>> coverageIDServer;
@@ -315,7 +316,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         elapsedTime = (endTime - startTime) / 1000;
         catalog.log.info("Completed generating triples in " + elapsedTime + " seconds.");
     }****/
-
+   
     public static void main(String[] args) {
 
         long startTime, endTime;

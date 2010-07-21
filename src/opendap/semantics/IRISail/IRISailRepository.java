@@ -374,7 +374,7 @@ public class IRISailRepository extends SailRepository {
         double totaltime = (endTime - startTime) / 1000.0;
         log.info("In construct for " + totaltime + " seconds");
         log.info("Total number of statements added in construct: "
-                + Added.size() + " \n");
+                + totalStAdded + " \n");
 
     }
 
