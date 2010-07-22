@@ -160,6 +160,32 @@ public class RepositoryUtility {
             addStartingPoint(con, valueFactory, internalStartingPoint);
         }
     }
+    public static void addInternalStartingPoint(SailRepository repo) {
+        RepositoryConnection con = null;
+        ValueFactory valueFactory;
+
+        try {
+            con = repo.getConnection();
+            valueFactory = repo.getValueFactory();
+            addInternalStartingPoint(con, valueFactory);
+        }
+        catch (RepositoryException e) {
+            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
+                    + e.getMessage());
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                            + e.getMessage());
+                }
+            }
+        }
+
+
+    }
+
 
     public static void addStartingPoint(SailRepository repo, String startingPointUrl) {
         RepositoryConnection con = null;
@@ -204,7 +230,6 @@ public class RepositoryUtility {
 
 
             try {
-                addInternalStartingPoint(con, valueFactory);
 
                 if (importURL.startsWith("http://")) { //make sure an url and read it in
                 url = new URL(importURL);

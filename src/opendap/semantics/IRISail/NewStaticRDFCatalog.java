@@ -1259,10 +1259,22 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.debug("Semantic Repository 'ruleset' set to: "+ ruleset);
 
 
+
+
         log.info("Intializing Semantic Repository.");
 
         // Initialize repository
         owlse2.startup(); //needed
+
+
+
+
+
+
+        log.info("Adding InternalStartingPoint to repository.");
+
+        RepositoryUtility.addInternalStartingPoint(owlse2);
+
         log.info("Semantic Repository Ready.");
 
         if(Thread.currentThread().isInterrupted())
