@@ -160,7 +160,7 @@ public class RepositoryUtility {
 
         String queryString = "SELECT doc "
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
-            + "WHERE doc = " + internalStartingPoint + " " 
+            + "WHERE doc = <" + internalStartingPoint + "> " 
             + "USING NAMESPACE "
             + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
@@ -518,7 +518,7 @@ public class RepositoryUtility {
 
     public static boolean isNewRepository(RepositoryConnection con) throws MalformedQueryException, RepositoryException, QueryEvaluationException {
 
-            return startingPointExists(con,internalStartingPoint);
+            return !startingPointExists(con,internalStartingPoint);
             
 
     }
