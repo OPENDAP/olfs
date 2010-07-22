@@ -429,9 +429,19 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 //RepositoryUtility.dumpRepository(Syst);
 
 
-                updateIriRepository();
-                log.debug("Running construct rules ...");
-                ingestSwrlRules();
+                log.debug("Updating repository ...");
+                if(updateIriRepository()){
+                    log.debug("Repository update complete. Changes detected.");
+
+                    log.debug("Running construct rules ...");
+                    ingestSwrlRules();
+                    log.debug("Finished running construct rules.");
+
+                } else{
+                    log.debug("Repository update complete. No changes detected, rules not rerun..");
+
+                }
+                
             } else {
                 if (!dropList.isEmpty()) {
 
@@ -463,12 +473,18 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     }
                 }
                 log.debug("Updating repository ...");
-                updateIriRepository();
-                log.debug("Repository update complete.");
+                if(updateIriRepository()){
+                    log.debug("Repository update complete. Changes detected.");
 
-                log.debug("Running construct rules ...");
-                ingestSwrlRules();
-                log.debug("Finished running construct rules.");
+                    log.debug("Running construct rules ...");
+                    ingestSwrlRules();
+                    log.debug("Finished running construct rules.");
+
+                } else{
+                    log.debug("Repository update complete. No changes detected, rules not rerun..");
+
+                }
+
 
             }
 
@@ -530,18 +546,23 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /*
      * Update repository
      */
-    private void updateIriRepository() {
+    private boolean updateIriRepository() {
+
+        boolean repositoryChanged = false;
+
         Vector<String> rdfDocList = new Vector<String>();
 
         findNeededRDFDocuments(rdfDocList);
 
         while (!rdfDocList.isEmpty()) {
+            repositoryChanged = true;
 
             addNeededRDFDocuments(rdfDocList);
 
             findNeededRDFDocuments(rdfDocList);
         }
 
+        return repositoryChanged;
     }
 
     /*
@@ -949,6 +970,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             String queryString = "(SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext "
                     + "{doc} rdfcache:last_modified {lmt} "
+                    + "WHERE doc != <" + RepositoryUtility.rdfCacheNamespace+"externalInferencing> "
                     + "MINUS "
                     + "SELECT doc "
                     + "FROM {doc} rdf:type {rdfcache:StartingPoint}) "
