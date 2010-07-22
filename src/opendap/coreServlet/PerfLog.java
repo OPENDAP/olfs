@@ -52,6 +52,17 @@ public class PerfLog {
     //private static volatile long logID = 0;
 
     private static Logger log;
+    static{
+        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+
+        try {
+            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+        }
+        catch(NoClassDefFoundError e) {
+            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            throw e;
+        }
+    }
 
     /**
      * Initialize logging for the web application context in which the given
@@ -223,15 +234,6 @@ public class PerfLog {
         System.out.println("+++PerfLog.initLogging() - Logback configured.");
 
 
-        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
-
-        try {
-            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
-        }
-        catch(NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
-            throw e;
-        }
 
         System.out.println("Done.");
 
