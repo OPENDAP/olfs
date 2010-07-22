@@ -8,9 +8,14 @@ import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.ntriples.NTriplesWriter;
+import org.openrdf.rio.trig.TriGWriter;
+import org.openrdf.rio.trix.TriXWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -155,7 +160,7 @@ public class RepositoryUtility {
 
         String queryString = "SELECT doc "
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
-            + "WHERE doc = "+internalStartingPoint
+            + "WHERE doc = " + internalStartingPoint + " " 
             + "USING NAMESPACE "
             + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
@@ -395,7 +400,7 @@ public class RepositoryUtility {
 
                     newStartingPoints.add(startpoint);
 
-                    log.debug("Adding to New StartingPints list: " + startpoint);
+                    log.debug("Adding to New StartingPoints list: " + startpoint);
                 }
             }
 
@@ -492,6 +497,10 @@ public class RepositoryUtility {
         catch (RepositoryException e) {
             log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
                     + e.getMessage());
+        } catch (QueryEvaluationException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } finally {
             if (con != null) {
                 try {
@@ -507,21 +516,10 @@ public class RepositoryUtility {
 
     }
 
-    public static boolean isNewRepository(RepositoryConnection con){
-        try{
-            TupleQueryResult result = queryForStartingPoints(con);
-            if (result != null && !result.hasNext()) {
-                return true;
-            }
+    public static boolean isNewRepository(RepositoryConnection con) throws MalformedQueryException, RepositoryException, QueryEvaluationException {
 
-        } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
-        } catch (QueryEvaluationException e) {
-            log.error("Caught QueryEvaluationException! Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
-        }
-        return false;
+            return startingPointExists(con,internalStartingPoint);
+            
 
     }
 
@@ -548,5 +546,55 @@ public class RepositoryUtility {
     }
 
 
+    public static void dumpRepository(RepositoryConnection con, String filename) {
 
+        // export repository to an n-triple file
+        File outrps = new File(filename); // hard copy of repository
+        try {
+            FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
+            if (filename.endsWith("nt")) {
+
+                NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
+                        myFileOutputStream);
+
+                con.export(myNTRiplesWriter);
+                myNTRiplesWriter.endRDF();
+
+            }
+            if (filename.endsWith("trix")) {
+
+                TriXWriter myTriXWriter = new TriXWriter(myFileOutputStream);
+
+                con.export(myTriXWriter);
+                myTriXWriter.endRDF();
+
+            }
+            if (filename.endsWith("trig")) {
+
+                TriGWriter myTriGWriter = new TriGWriter(myFileOutputStream);
+
+                con.export(myTriGWriter);
+                myTriGWriter.endRDF();
+
+            }
+            log.info("Completed dumping explicit statements");
+
+        } catch (Throwable e) {
+            log.warn(e.getMessage());
+        }
+
+    }
+
+    public static void dumpRepository(SailRepository owlse2, String filename) throws RepositoryException {
+
+        RepositoryConnection con = owlse2.getConnection();
+        log.info("Repository connection has been opened.");
+
+        dumpRepository(con, filename);
+
+        log.info("Closing repository connection.");
+        con.close();  //close connection first
+
+
+    }
 }

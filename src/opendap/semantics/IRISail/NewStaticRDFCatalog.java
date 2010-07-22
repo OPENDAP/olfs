@@ -51,9 +51,6 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.rio.ntriples.NTriplesWriter;
-import org.openrdf.rio.trig.TriGWriter;
-import org.openrdf.rio.trix.TriXWriter;
 
 
 import com.ontotext.trree.owlim_ext.SailImpl;
@@ -404,7 +401,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             } catch (RepositoryException e) {
                 e.printStackTrace();
             }
-            finally {
+            catch (QueryEvaluationException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (MalformedQueryException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } finally {
                 if (con != null)
                     con.close();
                 log.info("Connection is Closed!");
@@ -413,6 +414,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             if (isNewRepository) {
 
+
+                //System.getProperty("user.dir")+"/repositorySnapshot.beforeClose.nt";
                 try {
                     con = owlse2.getConnection();
                     RepositoryUtility.addStartingPoints(con, owlse2.getValueFactory(), newStartingPoints);
@@ -421,6 +424,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     if (con != null)
                         con.close();
                 }
+
+
+                //RepositoryUtility.dumpRepository(Syst);
+
 
                 updateIriRepository();
                 log.debug("Running construct rules ...");
@@ -1306,58 +1313,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
-    private void dumpRepository(RepositoryConnection con, String filename) {
-
-        // export repository to an n-triple file
-        File outrps = new File(filename); // hard copy of repository
-        try {
-            FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
-            if (filename.endsWith("nt")) {
-              
-                NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
-                        myFileOutputStream);
-
-                con.export(myNTRiplesWriter);
-                myNTRiplesWriter.endRDF();
-
-            }
-            if (filename.endsWith("trix")) {
-                
-                TriXWriter myTriXWriter = new TriXWriter(myFileOutputStream);
-
-                con.export(myTriXWriter);
-                myTriXWriter.endRDF();
-
-            }
-            if (filename.endsWith("trig")) {
-               
-                TriGWriter myTriGWriter = new TriGWriter(myFileOutputStream);
-
-                con.export(myTriGWriter);
-                myTriGWriter.endRDF();
-
-            }
-            log.info("Completed dumping explicit statements");
-
-        } catch (Throwable e) {
-            log.warn(e.getMessage());
-        }
-
-    }
-    public void dumpRepository(String filename) throws RepositoryException {
-
-        RepositoryConnection con = owlse2.getConnection();
-        log.info("Repository connection has been opened.");
-
-        dumpRepository(con, filename);
-
-        log.info("Closing repository connection.");
-        con.close();  //close connection first
-
-
-    }
-
     private void processContexts() throws RepositoryException {
 
         RepositoryConnection con = owlse2.getConnection();
@@ -2122,14 +2077,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     RepositoryConnection con = owlse2.getConnection();
                     String filename = catalogCacheDirectory + "daprepository.nt";
                     log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
-                    dumpRepository(con, filename);
+                    RepositoryUtility.dumpRepository(con, filename);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
                     log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
                     filename = catalogCacheDirectory + "daprepository.trig";
-                    dumpRepository(con, filename);
+                    RepositoryUtility.dumpRepository(con, filename);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
