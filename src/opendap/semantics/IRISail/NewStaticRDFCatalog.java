@@ -826,6 +826,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             URI uriDrop = null;
             log.info("Deleting contexts in drop list ...");
 
+
+
             ValueFactory f = owlse2.getValueFactory();
 
             for (String drop : dropList) {
@@ -846,7 +848,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                 log.info("Finished removing context: " + sbj);
 
-                }
+            }
             if (thread.isInterrupted()) {
                 log.warn("dropContexts(): WARNING! Thread "
                         + thread.getName() + " was interrupted!");
@@ -906,8 +908,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     Value firstValue = bindingSet.getValue("crule");
                     if (!externalInferencing.contains(firstValue.stringValue())) {
                         externalInferencing.add(firstValue.stringValue());
+                        log.debug("Adding to external inferencing list: " + firstValue.toString());
                     }
-                    log.debug("Adding to droplist: " + firstValue.toString());
                 }
             } else {
                 log.debug("No construct rule found!");
