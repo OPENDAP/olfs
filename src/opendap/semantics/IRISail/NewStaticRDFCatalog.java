@@ -473,7 +473,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     }
                 }
                 log.debug("Updating repository ...");
-                if(updateIriRepository()){
+                if(updateIriRepository() || !dropList.isEmpty()){
                     log.debug("Repository update complete. Changes detected.");
 
                     log.debug("Running construct rules ...");
