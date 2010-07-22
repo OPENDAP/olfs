@@ -38,9 +38,6 @@ public class RepositoryUtility {
 
 
 
-
-
-
     public static void dropStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
@@ -579,8 +576,8 @@ public class RepositoryUtility {
             }
             log.info("Completed dumping explicit statements");
 
-        } catch (Throwable e) {
-            log.warn(e.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to dump repository! msg: "+e.getMessage());
         }
 
     }

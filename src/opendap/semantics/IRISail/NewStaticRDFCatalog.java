@@ -838,17 +838,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 URI cont = f.createURI(contURL);
                 
                 log.info("Removing context: " + sbj);
-
                 con.remove((Resource) null, null, null, (Resource) sbj);
+                con.remove((Resource) sbj, null, null);
 
                 log.info("Removing last_modified: " + sbj);
                 con.remove(sbj, predicate, null, cont); // remove last_modified
 
                 log.info("Finished removing context: " + sbj);
 
-               
-
-            }
+                }
             if (thread.isInterrupted()) {
                 log.warn("dropContexts(): WARNING! Thread "
                         + thread.getName() + " was interrupted!");
