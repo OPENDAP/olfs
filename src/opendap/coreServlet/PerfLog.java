@@ -268,9 +268,14 @@ public class PerfLog {
         String logPath = path + "logs";
         File logPathFile = new File(logPath);
         if (!logPathFile.exists()) {
+            log.debug("Creating log dir: "+logPath);
             if (!logPathFile.mkdirs()) {
                 throw new RuntimeException("Creation of logfile directory failed." + logPath);
             }
+        }
+        else {
+            log.debug("Found log dir: "+logPath);
+
         }
 
         // read in Log4J config file
@@ -280,10 +285,12 @@ public class PerfLog {
             String logbackConfig = path + "logback-test.xml";
             File f = new File(logbackConfig);
             if (!f.exists()) {
+                log.debug("Unable to locate logback configuration: "+logbackConfig);
                 logbackConfig = path + "logback.xml";
                 f = new File(logbackConfig);
                 if (!f.exists()) {
-                        logbackConfig = null;
+                    log.debug("Unable to locate logback configuration: "+logbackConfig);
+                    logbackConfig = null;
                 }
 
             }
