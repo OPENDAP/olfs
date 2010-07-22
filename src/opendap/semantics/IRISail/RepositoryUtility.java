@@ -367,8 +367,9 @@ public class RepositoryUtility {
             for (String startpoint : startingPointUrls) {
 
                 //log.debug("StartingPoints: " + startpoint);
-                if (!result.contains(startpoint)
-                        && !startpoint.equals(RepositoryUtility.internalStartingPoint)) {
+                
+                if (!result.contains(startpoint) &&
+                        !startpoint.equals(RepositoryUtility.internalStartingPoint)) {
 
                     newStartingPoints.add(startpoint);
 
