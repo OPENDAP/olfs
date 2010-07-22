@@ -237,7 +237,98 @@ public class PerfLog {
 
         isLogInit = true;
     }
-                    
+
+
+
+    /**
+     * Initialize logging for the web application context in which the given
+     * servlet is running. Two types of logging are supported:
+     * <p/>
+     * 1) Regular logging using the SLF4J API.
+     * 2) Performance logging which can write Apache common logging format logs,
+     * use the PerfLog.logServerStartup(String) method.
+     * <p/>
+     * The log directory is determined by the servlet containers content
+     * directory. The configuration of logging is controlled by the log4j.xml
+     * file.
+     *
+     */
+    public static void initLogging() {
+        // Initialize logging if not already done.
+        if (isLogInit)
+            return;
+
+
+        String path = System.getProperty("user.dir")+"/";
+
+
+        System.out.println("+++PerfLog.initLogging()");
+
+        // set up the log path
+        String logPath = path + "logs";
+        File logPathFile = new File(logPath);
+        if (!logPathFile.exists()) {
+            if (!logPathFile.mkdirs()) {
+                throw new RuntimeException("Creation of logfile directory failed." + logPath);
+            }
+        }
+
+        // read in Log4J config file
+        System.setProperty("logdir", logPath); // variable substitution
+
+
+            String logbackConfig = path + "logback-test.xml";
+            File f = new File(logbackConfig);
+            if (!f.exists()) {
+                logbackConfig = path + "logback.xml";
+                f = new File(logbackConfig);
+                if (!f.exists()) {
+                        logbackConfig = null;
+                }
+
+            }
+
+
+        if(logbackConfig != null){
+            System.out.println("+++PerfLog.initLogging() - Logback configuration using: "+ logbackConfig);
+
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            try {
+              JoranConfigurator configurator = new JoranConfigurator();
+              configurator.setContext(lc);
+              // the context was probably already configured by default configuration
+              // rules
+              lc.reset();
+              configurator.doConfigure(logbackConfig);
+            } catch (JoranException je) {
+               je.printStackTrace();
+            }
+            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+
+        }
+        else {
+            System.out.println("+++PerfLog.initLogging() - Logback configuration using logback " +
+                    "default configuration mechanism");
+        }
+
+        System.out.println("+++PerfLog.initLogging() - Logback configured.");
+
+
+        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+
+        try {
+            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+        }
+        catch(NoClassDefFoundError e) {
+            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            throw e;
+        }
+
+        System.out.println("Done.");
+
+        isLogInit = true;
+    }
+
 
 
     /**
