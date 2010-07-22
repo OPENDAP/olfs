@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import opendap.logging.PerfLog;
 import org.slf4j.Logger;
 
 /**

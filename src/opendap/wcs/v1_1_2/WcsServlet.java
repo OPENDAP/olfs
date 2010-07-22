@@ -24,10 +24,10 @@
 package opendap.wcs.v1_1_2;
 
 import opendap.coreServlet.*;
+import opendap.logging.PerfLog;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcsGateway;
 
+import opendap.logging.PerfLog;
 import org.slf4j.Logger;
 import org.jdom.Document;
 

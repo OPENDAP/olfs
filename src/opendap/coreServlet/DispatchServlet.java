@@ -35,6 +35,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import opendap.logging.PerfLog;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;

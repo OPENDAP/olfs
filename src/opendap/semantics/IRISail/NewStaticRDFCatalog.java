@@ -1,7 +1,7 @@
 package opendap.semantics.IRISail;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import opendap.coreServlet.PerfLog;
+import opendap.logging.PerfLog;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;

@@ -22,8 +22,9 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.coreServlet;
+package opendap.logging;
 
+import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.ServletContext;
-import javax.xml.parsers.FactoryConfigurationError;
 import java.io.File;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -53,7 +53,7 @@ public class PerfLog {
 
     private static Logger log;
     static{
-        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+        System.out.print("+++PerfLog.initLogging() - Instantiating Logger...");
 
         try {
             log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
@@ -188,88 +188,6 @@ public class PerfLog {
         String logPath = path + "logs";
         File logPathFile = new File(logPath);
         if (!logPathFile.exists()) {
-            if (!logPathFile.mkdirs()) {
-                throw new RuntimeException("Creation of logfile directory failed." + logPath);
-            }
-        }
-
-        // read in Log4J config file
-        System.setProperty("logdir", logPath); // variable substitution
-
-
-            String logbackConfig = path + "logback-test.xml";
-            File f = new File(logbackConfig);
-            if (!f.exists()) {
-                logbackConfig = path + "logback.xml";
-                f = new File(logbackConfig);
-                if (!f.exists()) {
-                        logbackConfig = null;
-                }
-
-            }
-
-
-        if(logbackConfig != null){
-            System.out.println("+++PerfLog.initLogging() - Logback configuration using: "+ logbackConfig);
-
-            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-            try {
-              JoranConfigurator configurator = new JoranConfigurator();
-              configurator.setContext(lc);
-              // the context was probably already configured by default configuration
-              // rules
-              lc.reset();
-              configurator.doConfigure(logbackConfig);
-            } catch (JoranException je) {
-               je.printStackTrace();
-            }
-            StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
-
-        }
-        else {
-            System.out.println("+++PerfLog.initLogging() - Logback configuration using logback " +
-                    "default configuration mechanism");
-        }
-
-        System.out.println("+++PerfLog.initLogging() - Logback configured.");
-
-
-
-        System.out.println("Done.");
-
-        isLogInit = true;
-    }
-
-
-
-    /**
-     * Initialize logging for the web application context in which the given
-     * servlet is running. Two types of logging are supported:
-     * <p/>
-     * 1) Regular logging using the SLF4J API.
-     * 2) Performance logging which can write Apache common logging format logs,
-     * use the PerfLog.logServerStartup(String) method.
-     * <p/>
-     * The log directory is determined by the servlet containers content
-     * directory. The configuration of logging is controlled by the log4j.xml
-     * file.
-     *
-     */
-    public static void initLogging() {
-        // Initialize logging if not already done.
-        if (isLogInit)
-            return;
-
-
-        String path = System.getProperty("user.dir")+"/";
-
-
-        System.out.println("+++PerfLog.initLogging()");
-
-        // set up the log path
-        String logPath = path + "logs";
-        File logPathFile = new File(logPath);
-        if (!logPathFile.exists()) {
             log.debug("Creating log dir: "+logPath);
             if (!logPathFile.mkdirs()) {
                 throw new RuntimeException("Creation of logfile directory failed." + logPath);
@@ -336,6 +254,29 @@ public class PerfLog {
         System.out.println("Done.");
 
         isLogInit = true;
+    }
+    
+
+
+
+    /**
+     * Initialize logging for the web application context in which the given
+     * servlet is running. Two types of logging are supported:
+     * <p/>
+     * 1) Regular logging using the SLF4J API.
+     * 2) Performance logging which can write Apache common logging format logs,
+     * use the PerfLog.logServerStartup(String) method.
+     * <p/>
+     * The log directory is determined by the servlet containers content
+     * directory. The configuration of logging is controlled by the log4j.xml
+     * file.
+     *
+     */
+    public static void initLogging() {
+
+        String path = System.getProperty("user.dir")+"/";
+
+        initLogging(path);
     }
 
 
