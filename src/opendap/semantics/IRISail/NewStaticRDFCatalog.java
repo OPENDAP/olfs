@@ -1,7 +1,7 @@
 package opendap.semantics.IRISail;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import opendap.logging.PerfLog;
+import opendap.logging.LogUtil;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
@@ -318,7 +318,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         try {
-            PerfLog.initLogging();
+            LogUtil.initLogging();
 
             Map<String, String> env = System.getenv();
             catalog.resourcePath = ".";

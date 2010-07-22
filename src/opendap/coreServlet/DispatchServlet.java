@@ -35,7 +35,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import opendap.logging.PerfLog;
+import opendap.logging.LogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -125,7 +125,7 @@ public class DispatchServlet extends HttpServlet {
 
 
         // init logging
-        PerfLog.logServerStartup("init()");
+        LogUtil.logServerStartup("init()");
         log.info("init() start.");
 
         PersistentContentHandler.installInitialContent(this);
@@ -345,7 +345,7 @@ public class DispatchServlet extends HttpServlet {
      * Starts the logging process.
      */
     private void initLogging() {
-        PerfLog.initLogging(this);
+        LogUtil.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
     }
@@ -394,7 +394,7 @@ public class DispatchServlet extends HttpServlet {
                 RequestCache.startRequestIfNeeded();
 
                 int reqno = reqNumber.incrementAndGet();
-                PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
+                LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
 
                 log.debug(Util.getMemoryReport());
 
@@ -418,7 +418,7 @@ public class DispatchServlet extends HttpServlet {
                 if (dh != null) {
                     log.debug("Request being handled by: " + dh.getClass().getName());
                     dh.handleRequest(request, response);
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
     
                 } else {
                     send404(request,response);
@@ -506,7 +506,7 @@ public class DispatchServlet extends HttpServlet {
         }
 
         log.info("Sent Resource Not Found (404) - nothing left to check.");
-        PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+        LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
 
     }
 
@@ -554,7 +554,7 @@ public class DispatchServlet extends HttpServlet {
 
                 int reqno = reqNumber.incrementAndGet();
 
-                PerfLog.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
+                LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-POST", Long.toString(reqno));
 
                 log.debug(Util.showRequest(request, reqno));
 
@@ -571,12 +571,12 @@ public class DispatchServlet extends HttpServlet {
                 if (dh != null) {
                     log.debug("Request being handled by: " + dh.getClass().getName());
                     dh.handleRequest(request, response);
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     log.info("Sent Resource Not Found (404) - nothing left to check.");
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
                 }
             }
             finally {
@@ -638,7 +638,7 @@ public class DispatchServlet extends HttpServlet {
         RequestCache.startRequest();
 
         long reqno = reqNumber.incrementAndGet();
-        PerfLog.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
 
         try {
 
@@ -654,7 +654,7 @@ public class DispatchServlet extends HttpServlet {
             return -1;
         }
         finally {
-            PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
         }
 
@@ -665,7 +665,7 @@ public class DispatchServlet extends HttpServlet {
 
     public void destroy() {
 
-        PerfLog.logServerShutdown("destroy()");
+        LogUtil.logServerShutdown("destroy()");
 
         for (DispatchHandler dh : httpGetDispatchHandlers) {
             log.debug("Shutting down handler: " + dh.getClass().getName());

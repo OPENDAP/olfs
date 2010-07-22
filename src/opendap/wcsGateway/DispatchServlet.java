@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcsGateway;
 
-import opendap.logging.PerfLog;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 import org.jdom.Document;
 
@@ -144,7 +144,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            PerfLog.logServerAccessStart(request, "WCS_SERVICE_ACCESS","HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "WCS_SERVICE_ACCESS","HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 

@@ -24,7 +24,7 @@
 package opendap.wcs.v1_1_2;
 
 import opendap.coreServlet.*;
-import opendap.logging.PerfLog;
+import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
@@ -54,7 +54,7 @@ public class WcsServlet extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
-        PerfLog.initLogging(this);
+        LogUtil.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 

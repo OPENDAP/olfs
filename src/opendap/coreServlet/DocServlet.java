@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import opendap.logging.PerfLog;
+import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 
 /**
@@ -141,7 +141,7 @@ public class DocServlet extends HttpServlet {
 
         try {
 
-            PerfLog.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -206,19 +206,19 @@ public class DocServlet extends HttpServlet {
                             sos.flush();
                     }
 
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
+                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
 
 
                 } else {
                     log.debug("   Requested item does not exist. Returning '404 Not Found'");
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    PerfLog.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
+                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
 
                 }
 
             }
             else
-                PerfLog.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
+                LogUtil.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
 
 
         }

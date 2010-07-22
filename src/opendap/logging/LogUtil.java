@@ -46,20 +46,20 @@ import ch.qos.logback.core.util.StatusPrinter;
  * Date: Feb 6, 2007
  * Time: 3:34:35 PM
  */
-public class PerfLog {
+public class LogUtil {
 
     private static boolean isLogInit = false;
     //private static volatile long logID = 0;
 
     private static Logger log;
     static{
-        System.out.print("+++PerfLog.initLogging() - Instantiating Logger...");
+        System.out.print("+++LogUtil.initLogging() - Instantiating Logger...");
 
         try {
-            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+            log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
         }
         catch(NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            System.out.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
     }
@@ -70,7 +70,7 @@ public class PerfLog {
      * <p/>
      * 1) Regular logging using the SLF4J API.
      * 2) Performance logging which can write Apache common logging format logs,
-     * use the PerfLog.logServerStartup(String) method.
+     * use the LogUtil.logServerStartup(String) method.
      * <p/>
      * The log directory is determined by the servlet containers content
      * directory. The configuration of logging is controlled by the log4j.xml
@@ -83,7 +83,7 @@ public class PerfLog {
         if (isLogInit)
             return;
 
-        System.out.println("+++PerfLog.initLogging()");
+        System.out.println("+++LogUtil.initLogging()");
         ServletContext servletContext = servlet.getServletContext();
 
         // set up the log path
@@ -118,7 +118,7 @@ public class PerfLog {
             }
 
             if(logbackConfig != null){
-                System.out.println("+++PerfLog.initLogging() - Logback configuration using: "+ logbackConfig);
+                System.out.println("+++LogUtil.initLogging() - Logback configuration using: "+ logbackConfig);
 
                 LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
                 try {
@@ -135,23 +135,23 @@ public class PerfLog {
 
             }
             else {
-                System.out.println("+++PerfLog.initLogging() - Logback configuration using logback " +
+                System.out.println("+++LogUtil.initLogging() - Logback configuration using logback " +
                         "default configuration mechanism");
             }
 
-            System.out.println("+++PerfLog.initLogging() - Logback configured.");
+            System.out.println("+++LogUtil.initLogging() - Logback configured.");
 
         } catch (Exception t) {
             t.printStackTrace();
         }
 
-        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+        System.out.print("+++LogUtil.initLogging() - Insiantiating Logger...");
 
         try {
-            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+            log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
         }
         catch(NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            System.out.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
 
@@ -169,7 +169,7 @@ public class PerfLog {
      * <p/>
      * 1) Regular logging using the SLF4J API.
      * 2) Performance logging which can write Apache common logging format logs,
-     * use the PerfLog.logServerStartup(String) method.
+     * use the LogUtil.logServerStartup(String) method.
      * <p/>
      * The log directory is determined by the servlet containers content
      * directory. The configuration of logging is controlled by the log4j.xml
@@ -182,7 +182,7 @@ public class PerfLog {
         if (isLogInit)
             return;
 
-        System.out.println("+++PerfLog.initLogging()");
+        System.out.println("+++LogUtil.initLogging()");
 
         // set up the log path
         String logPath = path + "logs";
@@ -217,7 +217,7 @@ public class PerfLog {
 
 
         if(logbackConfig != null){
-            System.out.println("+++PerfLog.initLogging() - Logback configuration using: "+ logbackConfig);
+            System.out.println("+++LogUtil.initLogging() - Logback configuration using: "+ logbackConfig);
 
             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
             try {
@@ -234,20 +234,20 @@ public class PerfLog {
 
         }
         else {
-            System.out.println("+++PerfLog.initLogging() - Logback configuration using logback " +
+            System.out.println("+++LogUtil.initLogging() - Logback configuration using logback " +
                     "default configuration mechanism");
         }
 
-        System.out.println("+++PerfLog.initLogging() - Logback configured.");
+        System.out.println("+++LogUtil.initLogging() - Logback configured.");
 
 
-        System.out.print("+++PerfLog.initLogging() - Insiantiating Logger...");
+        System.out.print("+++LogUtil.initLogging() - Insiantiating Logger...");
 
         try {
-            log = org.slf4j.LoggerFactory.getLogger(PerfLog.class);
+            log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
         }
         catch(NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++PerfLog.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            System.out.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
 
@@ -265,7 +265,7 @@ public class PerfLog {
      * <p/>
      * 1) Regular logging using the SLF4J API.
      * 2) Performance logging which can write Apache common logging format logs,
-     * use the PerfLog.logServerStartup(String) method.
+     * use the LogUtil.logServerStartup(String) method.
      * <p/>
      * The log directory is determined by the servlet containers content
      * directory. The configuration of logging is controlled by the log4j.xml
@@ -300,7 +300,7 @@ public class PerfLog {
      */
     public static void logServerStartup(String source) {
         // Setup context.
-        synchronized (PerfLog.class) {
+        synchronized (LogUtil.class) {
             MDC.put("ID", "Server Startup");
             MDC.put("SOURCE", source);
         }
@@ -328,7 +328,7 @@ public class PerfLog {
      */
     public static void logServerShutdown(String source) {
         // Setup context.
-        synchronized (PerfLog.class) {
+        synchronized (LogUtil.class) {
             MDC.put("ID", "Server Startup");
             MDC.put("SOURCE", source);
         }
