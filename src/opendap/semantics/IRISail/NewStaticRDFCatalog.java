@@ -99,17 +99,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     
     private RepositoryConnection con;
     private Vector<String> repositoryContexts;
-    private Vector<String> startingPoints;
 
     private HashMap<String, Boolean> downService;
-    private Boolean newRepository;
     private Vector<String> imports;
     private Vector<String> constructs;
 
-    private static final String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-    private static final String rdfCacheNamespace = internalStartingPoint+"#";
-
-    
 
     public NewStaticRDFCatalog() {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
@@ -141,12 +135,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         initialized = false;
         
         repositoryContexts = new Vector<String>();
-        startingPoints = new Vector<String>(); // tracking startingpoint
-        
+
         downService = new HashMap<String, Boolean>();
         imports = new Vector<String>();
         
-        newRepository = false;
 
     }
     /*** 
@@ -378,6 +370,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             throws InterruptedException,RepositoryException {
 
         Vector<String> dropList = new Vector<String>();
+        Vector<String> startingPoints = new Vector<String>();
+        boolean isNewRepository = true;
+
 
         Date startTime = new Date();
         log.info("Evaluating importURLs for updateCatalog... ");
@@ -396,10 +391,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 if (con.isOpen()) {
                     log.info("Connection is OPEN!");
 
-                    newStartingPoints = findNewStartingPoints(con);
+                    isNewRepository = RepositoryUtility.isNewRepository(con);
+
+                    newStartingPoints = RepositoryUtility.findNewStartingPoints(con,startingPoints);
 
                     dropList.addAll(findUnneededRDFDocuments(con));
-                    startingPointsToDrop = findChangedStartingPoints(con);
+                    startingPointsToDrop = RepositoryUtility.findChangedStartingPoints(con, startingPoints);
                     dropList.addAll(startingPointsToDrop);
                     dropList.addAll(findChangedRDFDocuments(con));
                 }
@@ -413,11 +410,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             }
 
 
-            if (newRepository) {
+            if (isNewRepository) {
 
                 try {
                     con = owlse2.getConnection();
-                    owlse2.addStartingPoints(con, newStartingPoints);
+                    RepositoryUtility.addStartingPoints(con, owlse2.getValueFactory(), newStartingPoints);
                 }
                 finally {
                     if (con != null)
@@ -434,7 +431,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     try {
                         con = owlse2.getConnection();
                         log.debug("Dropping starting points ...");
-                        owlse2.dropStartingPoints(con, startingPointsToDrop);
+                        RepositoryUtility.dropStartingPoints(con, owlse2.getValueFactory(), startingPointsToDrop);
                     }
                     finally {
                         if (con != null)
@@ -449,7 +446,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     try {
                         con = owlse2.getConnection();
                         log.debug("Adding new starting point ...");
-                        owlse2.addStartingPoints(con, newStartingPoints);
+                        RepositoryUtility.addStartingPoints(con, owlse2.getValueFactory(), newStartingPoints);
                         log.debug("Finished adding nrew starting point.");
                     }
                     finally {
@@ -725,7 +722,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <"+ rdfCacheNamespace+">";
+                    + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
             log.debug("queryNeededRDFDocuments: " + queryString);
 
@@ -786,7 +783,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Drop URIs in the drop list
      */
     // private void dropContexts(RepositoryConnection con) {
-    private void dropContexts(Vector<String> dropList) {
+    public  void dropContexts(Vector<String> dropList) {
         RepositoryConnection con = null;
 
         log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
@@ -804,8 +801,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             for (String drop : dropList) {
                 uriDrop = new URIImpl(drop);
                 log.info("Dropping URI: " + drop);
-                String pred =  internalStartingPoint +"#last_modified";
-                String contURL = internalStartingPoint + "#cachecontext";
+                String pred =  RepositoryUtility.internalStartingPoint +"#last_modified";
+                String contURL = RepositoryUtility.internalStartingPoint + "#cachecontext";
                 URI sbj = f.createURI(drop);
                 URI predicate = f.createURI(pred);
                 URI cont = f.createURI(contURL);
@@ -863,7 +860,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "WHERE crule != rdfcache:cachecontext AND crule != rdfcache:startingPoints AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
                     + "{crule} rdfcache:last_modified {time}) "
                     + "using namespace "
-                    + "rdfcache = <"+ rdfCacheNamespace+">";
+                    + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
             log.debug("queryString: " + queryString);
 
@@ -950,7 +947,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "SELECT doc "
                     + "FROM {tp} rdf:type {rdfcache:StartingPoint}; rdfcache:dependsOn {doc} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <"+ rdfCacheNamespace+">";
+                    + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
             log.debug("queryUnneededRDFDocuments: " + queryString);
 
@@ -1004,130 +1001,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     /*
-     * Add the old StartingPoint that is no longer a StartingPoint in this
-     * update to the drop-list
-     */
-    private  Vector<String> findChangedStartingPoints(RepositoryConnection con) {
-        Vector<String> result = null;
-        Vector<String> changedStartingPoints = new Vector<String> ();
-        log.debug("Checking if the old StartingPoint is still a startingpoint ...");
-
-        try {
-
-            result = findStartingPoints(con);
-                        
-                for (String startpoint : result) {
-                    
-                    //log.debug("StartingPoints: " + startpoint);
-                    if (!startingPoints.contains(startpoint)
-                            && !startpoint.equals(internalStartingPoint)) {
-                        changedStartingPoints.add(startpoint);
-                        log.debug("Adding to droplist: " + startpoint);
-                    }
-                }
-            
-        } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
-                    + e.getMessage());
-
-        } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
-        }
-
-        log.info("Located " + changedStartingPoints.size()+" starting points that have been changed.");
-        return changedStartingPoints;
-    }
-    
-    /*
-     * Find new StartingPoints in the input file but not in the repository yet
-     * 
-     */
-    private Vector<String> findNewStartingPoints(RepositoryConnection con) {
-        Vector<String> result = null;
-        Vector<String> newStartingPoints = new Vector<String> ();
-        log.debug("Checking for new starting points...");
-
-        try {
-
-            result = findStartingPoints(con);
-
-            for (String startpoint : startingPoints) {
-
-                //log.debug("StartingPoints: " + startpoint);
-                if (!result.contains(startpoint)
-                        && !startpoint.equals(internalStartingPoint)) {
-
-                    newStartingPoints.add(startpoint);
-
-                    log.debug("Adding to New StartingPints list: " + startpoint);
-                }
-            }
-            
-        } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
-                    + e.getMessage());
-
-        } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
-        }
-
-        log.info("Number of new StartingPoints: " + newStartingPoints.size());
-        return newStartingPoints;
-    }
-    /*
-     * Find all starting points in the repository
-     * 
-     */
-    private Vector<String> findStartingPoints(RepositoryConnection con) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        TupleQueryResult result = null;
-        List<String> bindingNames;
-        Vector<String> startingPoints = new Vector <String> ();
-        
-        log.debug("Finding startingpoints in the reposoitory ...");
-        
-        String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
-            + "USING NAMESPACE "
-            + "rdfcache = <"+ rdfCacheNamespace+">";
-
-        log.debug("queryStartingPoints: " + queryString);
-
-        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,queryString);
-
-        result = tupleQuery.evaluate();
-        if (result != null) {
-            bindingNames = result.getBindingNames();
-
-            if (!result.hasNext()) {
-
-                newRepository = true;
-                log.debug("NEW repository = " + newRepository);
-            }
-
-            while (result.hasNext()) {
-                BindingSet bindingSet = (BindingSet) result.next();
-
-                Value firstValue = bindingSet.getValue("doc");
-                String startpoint = firstValue.stringValue();
-                //log.debug("StartingPoints: " + startpoint);
-                if (!startpoint.equals(internalStartingPoint)) {
-                    startingPoints.add(startpoint);
-
-                    //log.debug("Starting point in the repository: " + startpoint);
-                }
-            }
-        } else {
-            log.debug("No query result!");
-
-        }
-        return startingPoints;
-            
-    }
-    /*
      * Find all rdfcache:RDFDocuments that has changed and add them to the
      * drop-list
      */
@@ -1143,7 +1016,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "FROM CONTEXT rdfcache:cachecontext "
                     + "{doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <"+ rdfCacheNamespace+">";
+                    + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
             log.debug("queryChangedRDFDocuments: " + queryString);
 
