@@ -887,7 +887,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             con = owlse2.getConnection();
             
             String queryString = "select distinct crule from context crule {} prop {} "
-                    + "WHERE crule != rdfcache:cachecontext AND crule != rdfcache:startingPoints AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
+                    + "WHERE crule != rdfcache:cachecontext "
+                    + "AND crule != rdfcache:startingPoints " 
+                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
                     + "{crule} rdfcache:last_modified {time}) "
                     + "using namespace "
                     + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
@@ -970,7 +972,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             String queryString = "(SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext "
                     + "{doc} rdfcache:last_modified {lmt} "
-                    + "WHERE doc != <" + RepositoryUtility.rdfCacheNamespace+"externalInferencing> "
+                    //+ "WHERE doc != <" + RepositoryUtility.rdfCacheNamespace+"externalInferencing> "
                     + "MINUS "
                     + "SELECT doc "
                     + "FROM {doc} rdf:type {rdfcache:StartingPoint}) "
@@ -1318,12 +1320,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private void ingestSwrlRules() throws RepositoryException{
         log.info("Running runConstruct ..");
         owlse2.runConstruct();
-        
+
+        /*
         String ltmod = owlse2.getLastModifiedTimeString(new Date()); 
         try{
-        RepositoryConnection con = owlse2.getConnection();
-        String externalInferencing = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#externalInferencing";
-        owlse2.setLTMODContext(externalInferencing, ltmod, con);
+            RepositoryConnection con = owlse2.getConnection();
+            String externalInferencing = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#externalInferencing";
+            owlse2.setLTMODContext(externalInferencing, ltmod, con);
         
         }
         finally {
@@ -1331,6 +1334,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 con.close();
             log.info("Complete running runConstruct ..");   
         }
+        */
         
     }
 
