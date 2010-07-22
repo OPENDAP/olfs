@@ -31,20 +31,19 @@ public class RepositoryUtility {
     public static final String rdfCacheNamespace = internalStartingPoint+"#";
 
 
-    private static boolean hasInternalStartingPoint = false;
 
 
 
 
 
-    public static void dropStartingPoints(SailRepository repo, Vector<String> importURLs) {
+    public static void dropStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
 
         try {
             con = repo.getConnection();
             valueFactory = repo.getValueFactory();
-            RepositoryUtility.dropStartingPoints(con, valueFactory, importURLs);
+            RepositoryUtility.dropStartingPoints(con, valueFactory, startingPointUrls);
         }
         catch (RepositoryException e) {
             log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
@@ -67,7 +66,7 @@ public class RepositoryUtility {
      * Set addStartingPoints statement for the importURI in the repository.
      *
      */
-    public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> importURLs) {
+    public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
 
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
@@ -81,7 +80,7 @@ public class RepositoryUtility {
         try {
 
 
-            for (String importURL : importURLs) {
+            for (String importURL : startingPointUrls) {
 
                 url = new URL(importURL);
                 startingPointValue = valueFactory.createURI(importURL);
@@ -269,7 +268,7 @@ public class RepositoryUtility {
     public static   Vector<String> findChangedStartingPoints(RepositoryConnection con, Vector<String> startingPointsUrls) {
         Vector<String> result = null;
         Vector<String> changedStartingPoints = new Vector<String> ();
-        log.debug("Checking if the old StartingPoint is still a startingpoint ...");
+        log.debug("Checking if the old StartingPoint is still a StartingPoint ...");
 
         try {
 

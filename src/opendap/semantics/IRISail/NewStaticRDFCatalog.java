@@ -604,6 +604,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                     log.debug("Import URL appears valid ( " + importURL + " )");
 
+                    //@todo make this a more robust
                     String urlsufix = importURL.substring(
                             (importURL.length() - 4), importURL.length());
 
@@ -724,7 +725,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     + "USING NAMESPACE "
                     + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
-            log.debug("queryNeededRDFDocuments: " + queryString);
+            log.debug("Query for NeededRDFDocuments: " + queryString);
 
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
                     queryString);
