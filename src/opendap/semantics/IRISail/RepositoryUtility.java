@@ -149,13 +149,29 @@ public class RepositoryUtility {
             }
     }
 
-    private static boolean startingPointExists( RepositoryConnection con, String staringPointUrl){
+    private static boolean startingPointExists( RepositoryConnection con, String staringPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+        TupleQueryResult result = null;
+        boolean hasInternalStaringPoint = false;
 
+        String queryString = "SELECT doc "
+            + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
+            + "WHERE doc = "+internalStartingPoint
+            + "USING NAMESPACE "
+            + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
-        return false;
+        log.debug("queryStartingPoints: " + queryString);
+
+        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,queryString);
+
+        result = tupleQuery.evaluate();
+        if (result.hasNext()){  //has internal starting point
+        hasInternalStaringPoint = true;
+        }
+        return hasInternalStaringPoint;
     }
 
-    private static void addInternalStartingPoint(RepositoryConnection con, ValueFactory valueFactory){
+    private static void addInternalStartingPoint(RepositoryConnection con, ValueFactory valueFactory) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+       
         if(!startingPointExists(con,internalStartingPoint)){
             addStartingPoint(con, valueFactory, internalStartingPoint);
         }
@@ -171,6 +187,12 @@ public class RepositoryUtility {
         }
         catch (RepositoryException e) {
             log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
+                    + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error(e.getClass().getName()+": Malformed query. Msg: "
+                    + e.getMessage()); 
+        } catch (QueryEvaluationException e) {
+            log.error(e.getClass().getName()+": QueryEvaluationException. Msg: "
                     + e.getMessage());
         } finally {
             if (con != null) {
