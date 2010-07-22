@@ -152,7 +152,7 @@ public class RepositoryUtility {
     private static boolean startingPointExists( RepositoryConnection con, String staringPointUrl){
 
 
-        return true;
+        return false;
     }
 
     private static void addInternalStartingPoint(RepositoryConnection con, ValueFactory valueFactory){
