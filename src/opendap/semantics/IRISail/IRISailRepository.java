@@ -522,8 +522,6 @@ public class IRISailRepository extends SailRepository {
 
         Boolean hasReified = false;
 
-        log.debug("");
-
         if (mreifStr.find()) {
             String reifstr = " {} rdf:type {rdf:Statement} ; "
                     + " rdf:subject {" + mreifStr.group(1) + "} ;"
