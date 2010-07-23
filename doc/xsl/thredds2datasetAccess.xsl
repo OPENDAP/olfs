@@ -186,6 +186,7 @@
                     <xsl:if test="@urlPath">
                         <xsl:for-each select="$allDapServices/thredds:service">
                             <xsl:element name="dapDatasetAccess">
+                                <xsl:attribute name="serviceName" select="@name"/>
                                 <xsl:attribute name="url">
                                     <xsl:value-of select="concat($catalogServer,@base,$urlPath)"/>
                                 </xsl:attribute>
@@ -198,14 +199,17 @@
                                 <xsl:variable name="service"
                                               select="key('service-by-name',@serviceName,$documentRoot)"/>
                                 <xsl:variable name="dapService">
-                                    <xsl:call-template name="dapServices">
-                                        <xsl:with-param name="serviceNames" select="$service"/>
-                                    </xsl:call-template>
+                                    <xsl:apply-templates mode="dapServices" select="$service"/>
                                 </xsl:variable>
+                                <!--
+                                <xsl:copy-of select="$service"/>
+                                <xsl:copy-of select="$dapService"/>
+                                -->
                                 <xsl:if test="$dapService">
                                     <xsl:element name="dapDatasetAccess">
+                                        <xsl:attribute name="serviceName" select="$dapService/thredds:service/@name"/>
                                         <xsl:attribute name="url">
-                                            <xsl:value-of select="concat($catalogServer,$dapService/@base,@urlPath)"/>
+                                            <xsl:value-of select="concat($catalogServer,$dapService/thredds:service/@base,@urlPath)"/>
                                         </xsl:attribute>
                                     </xsl:element>
                                 </xsl:if>
@@ -213,6 +217,7 @@
                             <xsl:otherwise>
                                 <xsl:if test="$defaultDapService/thredds:service">
                                     <xsl:element name="dapDatasetAccess">
+                                        <xsl:attribute name="serviceName" select="$defaultDapService/thredds:service/@name"/>
                                         <xsl:attribute name="url">
                                             <xsl:value-of
                                                     select="concat($catalogServer,$defaultDapService/thredds:service/@base,@urlPath)"/>
@@ -235,14 +240,8 @@
     <xsl:template name="dapServices">
         <xsl:param name="serviceNames"/>
         <xsl:for-each select="$serviceNames/thredds:serviceName">
-            <xsl:variable name="serviceName">
-                <xsl:value-of select="."/>
-            </xsl:variable>
-            <xsl:variable name="thisSrvc" select="key('service-by-name',$serviceName,$documentRoot)"/>
-
-            <xsl:apply-templates mode="dapServices" select="$thisSrvc"/>
+            <xsl:apply-templates mode="dapServices" select="key('service-by-name',.,$documentRoot)"/>
         </xsl:for-each>
-
     </xsl:template>
 
 
