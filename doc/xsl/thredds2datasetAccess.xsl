@@ -25,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 -->
 <!DOCTYPE xsl:stylesheet [
-]>
+        ]>
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
@@ -35,12 +35,13 @@
                 xmlns:ncml="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
-                >
-    <xsl:param name="catalogServer" />
-    <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
+        >
+    <xsl:param name="catalogServer"/>
+    <xsl:param name="catalogUrlPath"/>
+    <xsl:output method='xml' encoding='UTF-8' indent='yes'/>
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
-
+    <xsl:variable name="documentRoot" select="/"/>
 
 
     <!-- This is the identity transform template. If this were the only template
@@ -54,92 +55,201 @@
 
 
     <xsl:template match="thredds:catalog">
-        <catalog>
+        <xsl:element name="catalog">
             <xsl:apply-templates>
-                <xsl:with-param name="indent"/>
-                <xsl:with-param name="inheritedMetadta"/>
-            </xsl:apply-templates>            
-        </catalog>
+                <xsl:with-param name="inheritedMetadata">
+                    <xsl:element name="emptyNode"/>
+                </xsl:with-param>
+            </xsl:apply-templates>
+        </xsl:element>
+
     </xsl:template>
 
-    <xsl:template match="thredds:service" />
-
-
-
+    <xsl:template match="thredds:service"/>
+    <xsl:template match="thredds:metadata"/>
+    
+    <xsl:template match="thredds:catalogRef">
+        <xsl:element name="thredds:catalogRef">
+            <xsl:attribute name="name" select="@name"/>
+            <xsl:attribute name="ID" select="@ID"/>
+            <xsl:attribute name="xlink:title" select="@xlink:title"/>
+            <xsl:attribute name="xlink:type" select="@xlink:type"/>
+            <xsl:attribute name="xlink:href">
+                <xsl:choose>
+                    <xsl:when test="starts-with(@xlink:href,'http://')" >
+                        <xsl:value-of select="@xlink:href"/>
+                    </xsl:when>
+                    <xsl:when test="starts-with(@xlink:href,'/')" >
+                        <xsl:value-of select="concat($catalogServer,@xlink:href)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat($catalogUrlPath,@xlink:href)"/>   
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:apply-templates/>
+         </xsl:element>
+    </xsl:template>
+    
 
     <!--***********************************************
-       -
-       -
-       -
-       -
-       -
-       -
-       -
-     -->
+      -
+      -
+      -
+      -
+      -
+      -
+      -
+    -->
     <xsl:template match="thredds:dataset">
-        <xsl:param name="indent" />
-        <xsl:param name="inheritedMetadata" />
+        <xsl:param name="inheritedMetadata"/>
 
-        <xsl:variable name="inheritedServiceName">
-            <xsl:if test="$inheritedMetadata">
-                <xsl:copy-of select="$inheritedMetadata/descendant::thredds:ServiceName"/>    
-            </xsl:if>
-        </xsl:variable> 
-        
-        <xsl:variable name="serviceNames" >
-            <xsl:if test="@serviceName">
-                <xsl:element name="thredds:serviceName"><xsl:value-of select="@serviceName"/></xsl:element>
-            </xsl:if>
-            <xsl:copy-of select="thredds:serviceName | thredds:metadata/thredds:serviceName"/>
-            <xsl:copy-of select="$inheritedServiceName"/>
+        <xsl:variable name="inheritedServiceNames">
+            <xsl:apply-templates mode="serviceNames" select="$inheritedMetadata"/>
         </xsl:variable>
 
 
-        
+        <xsl:variable name="allMyServiceNames">
+            <xsl:if test="@serviceName">
+                <xsl:element name="thredds:serviceName">
+                    <xsl:value-of select="@serviceName"/>
+                </xsl:element>
+            </xsl:if>
+            <xsl:copy-of select="thredds:serviceName | thredds:metadata/thredds:serviceName"/>
+            <xsl:copy-of select="$inheritedServiceNames"/>
+        </xsl:variable>
+
+        <xsl:variable name="defaultService">
+            <xsl:choose>
+                <xsl:when test="./thredds:serviceName">
+                    <xsl:copy-of select="./thredds:serviceName"/>
+                </xsl:when>
+                <xsl:when test="./thredds:serviceName">
+                    <xsl:copy-of select="./thredds:metadata/thredds:serviceName"/>
+                </xsl:when>
+                <xsl:when test="@serviceName">
+                    <xsl:element name="thredds:serviceName">
+                        <xsl:value-of select="@serviceName"/>
+                    </xsl:element>
+                </xsl:when>
+                <xsl:when test="$inheritedServiceNames">
+                    <xsl:copy-of select="$inheritedServiceNames"/>
+                </xsl:when>
+                <xsl:otherwise/>
+            </xsl:choose>
+        </xsl:variable>
+
+
+        <xsl:variable name="allDapServices">
+            <xsl:call-template name="dapServices">
+                <xsl:with-param name="serviceNames" select="$allMyServiceNames"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="defaultDapService">
+            <xsl:call-template name="dapServices">
+                <xsl:with-param name="serviceNames" select="$defaultService"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="urlPath" select="@urlPath"/>
+
 
         <xsl:choose>
             <xsl:when test="boolean(thredds:dataset) or boolean(thredds:catalogRef)">
-                <compoundDataset>
+                <xsl:element name="CompoundDataset">
+                    <xsl:attribute name="name" select="@name"/>
                     <xsl:apply-templates>
-                        <xsl:with-param name="indent"><xsl:value-of select="$indent" />&#160;&#160;</xsl:with-param>
                         <!--
                           -   Note that the followiing parameter uses an XPath that
                           -   accumulates inherited thredds:metadata elements as it descends the
                           -   hierarchy.
                           -->
-                        <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]"/>
-                         
+                        <xsl:with-param name="inheritedMetadata"
+                                        select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]"/>
                     </xsl:apply-templates>
-                    
-                </compoundDataset>
+                </xsl:element>
             </xsl:when>
             <xsl:otherwise>
-            <datasetAccess>
-                <xsl:attribute name="datasetName"><xsl:value-of select="@name"/></xsl:attribute>
-
-                <xsl:if test="$inheritedServiceName!=''">
-                    <inheritedServiceName><xsl:value-of select="$inheritedServiceName"/></inheritedServiceName>
-                </xsl:if>
-                <serviceNames>
-                    <xsl:copy-of select="$serviceNames"/>                    
-                </serviceNames>
-                <dapServces>
-                    <xsl:for-each select="$serviceNames" >
-                        <xsl:copy-of select="."/>
-                        
+                <!--
+                <xsl:if test="@urlPath">
+                    <xsl:for-each select="$defaultDapService/thredds:service">
+                        <dapDatasetAcces>
+                            <xsl:attribute name="url" ><xsl:value-of select="concat($catalogServer,@base,$urlPath)"/></xsl:attribute>          
+                        </dapDatasetAcces>
                     </xsl:for-each>
-                </dapServces>
-                
-
-
-
-
-            </datasetAccess>
+                     
+                </xsl:if>
+                -->
+                <xsl:element name="dataset">
+                    <xsl:attribute name="name" select="@name"/>
+                    <xsl:if test="@urlPath">
+                        <xsl:for-each select="$allDapServices/thredds:service">
+                            <xsl:element name="dapDatasetAccess">
+                                <xsl:attribute name="url">
+                                    <xsl:value-of select="concat($catalogServer,@base,$urlPath)"/>
+                                </xsl:attribute>
+                            </xsl:element>
+                        </xsl:for-each>
+                    </xsl:if>
+                    <xsl:for-each select="thredds:access">
+                        <xsl:choose>
+                            <xsl:when test="@serviceName">
+                                <xsl:variable name="service"
+                                              select="key('service-by-name',@serviceName,$documentRoot)"/>
+                                <xsl:variable name="dapService">
+                                    <xsl:call-template name="dapServices">
+                                        <xsl:with-param name="serviceNames" select="$service"/>
+                                    </xsl:call-template>
+                                </xsl:variable>
+                                <xsl:if test="$dapService">
+                                    <xsl:element name="dapDatasetAccess">
+                                        <xsl:attribute name="url">
+                                            <xsl:value-of select="concat($catalogServer,$dapService/@base,@urlPath)"/>
+                                        </xsl:attribute>
+                                    </xsl:element>
+                                </xsl:if>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:if test="$defaultDapService/thredds:service">
+                                    <xsl:element name="dapDatasetAccess">
+                                        <xsl:attribute name="url">
+                                            <xsl:value-of
+                                                    select="concat($catalogServer,$defaultDapService/thredds:service/@base,@urlPath)"/>
+                                        </xsl:attribute>
+                                    </xsl:element>
+                                </xsl:if>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
+                </xsl:element>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template mode="dapServices" match="thredds:service">
+        <xsl:copy-of select="descendant-or-self::thredds:service[lower-case(@serviceType)='opendap']"/>
+    </xsl:template>
+
+
+    <xsl:template name="dapServices">
+        <xsl:param name="serviceNames"/>
+        <xsl:for-each select="$serviceNames/thredds:serviceName">
+            <xsl:variable name="serviceName">
+                <xsl:value-of select="."/>
+            </xsl:variable>
+            <xsl:variable name="thisSrvc" select="key('service-by-name',$serviceName,$documentRoot)"/>
+
+            <xsl:apply-templates mode="dapServices" select="$thisSrvc"/>
+        </xsl:for-each>
 
     </xsl:template>
 
+
+    <xsl:template mode="serviceNames" match="@* | node()">
+        <xsl:copy-of select="thredds:serviceName"/>
+        <xsl:apply-templates mode="serviceNames"/>
+    </xsl:template>
 
 
 </xsl:stylesheet>
