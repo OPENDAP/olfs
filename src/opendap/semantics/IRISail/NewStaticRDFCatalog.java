@@ -2033,11 +2033,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         RepositoryConnection con = owlse2.getConnection();
-        log.debug("QueryString (coverage ID and server URL): \n" + queryString);
+        log.debug("getCoverageIDServerURL() - QueryString (coverage ID and server URL): \n" + queryString);
         TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
 
         result = tupleQuery.evaluate();
-        log.debug("Qresult: " + result.hasNext());
+        log.debug("getCoverageIDServerURL() - Qresult: " + result.hasNext());
         List<String> bindingNames = result.getBindingNames();
         //log.debug(bindingNames.probeServletContext());
         while (result.hasNext()) {
@@ -2050,10 +2050,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 Value valueOfcoverageid = (Value) bindingSet.getValue("coverageid");
                 Value valueOfcoverageurl = (Value) bindingSet.getValue("coverageurl");
                 coverageURL.addElement(valueOfcoverageurl.stringValue());
-                //log.debug("coverageid:");
-                //log.debug(valueOfcoverageid.stringValue());
-                //log.debug("coverageurl:");
-                log.debug(valueOfcoverageurl.stringValue());
+                log.debug("getCoverageIDServerURL() - coverageid: "+valueOfcoverageid.stringValue());
+                log.debug("getCoverageIDServerURL() - coverageurl: "+valueOfcoverageurl.stringValue());
                 if (coverageIDServer.containsKey(valueOfcoverageid.stringValue()))
                     coverageIDServer.get(valueOfcoverageid.stringValue()).addElement(valueOfcoverageurl.stringValue());
                 else
