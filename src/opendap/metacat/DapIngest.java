@@ -74,7 +74,7 @@ public class DapIngest {
     private static Logger log = LoggerFactory.getLogger(DapIngest.class);
     
     /// This is the prefix for all the document ids made up of DDX URLs
-    final static String docidScope = "opendap.";
+    final static String docidScope = "opendap";
     
     /// If metacat needs an explicit schema for our generated EML, use this.
     final static String docidSchema = "/Users/jimg/src/eml-2.10/eml.xsd";
@@ -92,7 +92,7 @@ public class DapIngest {
     // Increment once for each insert
     private Integer metacatId = 1;
     // This should change rarely
-    private String metacatRevision = ".2";
+    private String metacatRevision = "2";
         
     private boolean readThreddsFromCache = false;
     private boolean readDDXsFromCache = false;
@@ -126,6 +126,7 @@ public class DapIngest {
 				
 		options.addOption("n", "cache-name", true, "Use this to set a prefix for the cache name.");
 		
+		options.addOption("S", "no-save-cache", false, "Use the cache, but don't save it to disk");
 		options.addOption("N", "no-cache", false, "Don't cache whatever is being crawled, retrieved or built. Combined with --verbose, you can try something and see the result printed on stdout.");
 		options.addOption("v", "verbose", false, "Print information about the crawl");
 		options.addOption("V", "very-verbose", false, "Print resultant documents from the crawl (DDX and EML) in addition to whatever --verbose does.");
@@ -147,6 +148,8 @@ public class DapIngest {
 		
 		options.addOption("m", "metacat", true, "Stuff the EML into metacat; must include  URL to a metacat instance.");
 		
+		boolean saveCache = true;
+		
 		try {
 		    // parse the command line arguments
 		    CommandLine line = parser.parse( options, args );
@@ -161,6 +164,7 @@ public class DapIngest {
 		    // Extract all the options stuff here.
 		    String cacheNamePrefix = line.getOptionValue("cache-name", "");
 		    boolean useCaching = !line.hasOption("no-cache");
+		    saveCache = !line.hasOption("no-save-cache");
 		    
 		    ingester.verbose = line.hasOption("verbose");
 		    ingester.veryVerbose = line.hasOption("very-verbose");
@@ -227,17 +231,15 @@ public class DapIngest {
                     log.debug("login(): response=" + response);
                     log.debug("login(): Session ID=" + ingester.metacat.getSessionId());
                     
-                    /*
-                    String id = ingester.metacat.getLastDocid(ingester.metacatUsername);
+                    String id = ingester.metacat.getLastDocid(docidScope);
                     log.debug("getLastDocid(): ID=" + id);
                     
                     // if not null, use the value, else use the default of 1
                     if (!isEmpty(id)) {
-                    	ingester.metacatId = Integer.valueOf(id);
+                    	// TODO Parse id, get number, load into metacatId
                     	++ingester.metacatId;
                     }
-                    */
-                    
+
                     emlInsert = true;
                 } 
                 catch (MetacatAuthException mae) {
@@ -253,10 +255,11 @@ public class DapIngest {
         	// Now do whatever we've been told to do...
         		
 		    if (ingester.veryVerbose) {
-		        // print internal state
+		        // print internal logger state
 		        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		        StatusPrinter.print(lc);
 
+		        // 
 		    	System.out.println("Catalog Root: " + catalogRoot);
 		    	System.out.println("Cache name: " + cacheNamePrefix);
 		    	if (metacatURL != "")
@@ -270,7 +273,7 @@ public class DapIngest {
 		    else if (eml_insert_all_cached)
 		    	ingester.insertEMLFromCache(cacheNamePrefix);
 		    else
-		    	ingester.crawlTHREDDS(catalogRoot,  restart, ddxRetrieve,  emlBuild,  emlInsert);
+		    	ingester.crawlTHREDDS(catalogRoot, restart, ddxRetrieve,  emlBuild,  emlInsert);
 		    
 		    if (ingester.verbose)
     			ingester.recordStats();
@@ -287,12 +290,14 @@ public class DapIngest {
 			try {
 				// Might add code to save the sate of a crawl here and add an
 				// option that enables the restart feature
-				if (ingester.threddsCatalogUtil != null)
-					ingester.threddsCatalogUtil.saveCatalogCache();
-				if (ingester.ddxRetriever != null)
-					ingester.ddxRetriever.saveDDXCache();
-				if (ingester.emlBuilder != null)
-					ingester.emlBuilder.saveEMLCache();
+				if (saveCache) {
+					if (ingester.threddsCatalogUtil != null)
+						ingester.threddsCatalogUtil.saveCatalogCache();
+					if (ingester.ddxRetriever != null)
+						ingester.ddxRetriever.saveDDXCache();
+					if (ingester.emlBuilder != null)
+						ingester.emlBuilder.saveEMLCache();
+				}
 			}
 			catch (Exception e) {
 				err.println("Error saving cache state!");
@@ -453,7 +458,7 @@ public class DapIngest {
      * @return A docuement id string suitable for use with metacat
      */
     private String getDocid(String url) {
-    	return docidScope + metacatId.toString() + metacatRevision;
+    	return docidScope + "." + metacatId.toString() + "." + metacatRevision;
     }
     
     /**

@@ -36,7 +36,6 @@ import java.util.Enumeration;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -80,7 +79,6 @@ public class DDXRetriever {
 	/**
 	 * @param args
 	 */
-	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		DDXRetriever retriever = null;
 		
@@ -92,41 +90,40 @@ public class DDXRetriever {
 		
 		// The default action is to read from the net, checking the cache and
 		// print the document to standard output.
+		
+		options.addOption("v", "verbose", false, "Print all of the DDXs");
+		
 		options.addOption("r", "read-cache", false, "Read DDX from the cache");
 		options.addOption("n", "no-cache", false, "Do not cache DDXs. Ignored with -r or -p");
 		options.addOption("p", "print-cached", false, "Print all of the cached DDXs");
-		
-		options.addOption( OptionBuilder.withLongOpt( "cache-name" )
-				.withDescription( "Use this to set a prefix for the cache name." )
-				.hasArg()
-				.withArgName("cacheName")
-				.create() );
-
-		options.addOption( OptionBuilder.withLongOpt( "ddx-url" )
-		                                .withDescription( "use this as the DDX URL" )
-		                                .hasArg()
-		                                .withArgName("ddxURL")
-		                                .create() );
+		options.addOption("N", "cache-name", true, "Use this to set a prefix for the cache name.");
+		options.addOption("u", "ddx-url", true, "use this as the DDX URL");
 		
 		try {
 		    // parse the command line arguments
 		    CommandLine line = parser.parse( options, args );
 
+		    boolean verbose = line.hasOption("verbose");
+		    
 		    String ddxURL = line.getOptionValue("ddx-url");
 		    System.out.println("DDX URL: " + ddxURL);
 
 		    // This sets the useCache and namePrefix fields of the class
-		    retriever = new DDXRetriever(!line.hasOption( "n"), line.getOptionValue("cache-name"));
+		    String cacheName = line.getOptionValue("cache-name", "");
+		    log.debug("cacheName: " + cacheName);
+		    boolean useCache = !cacheName.isEmpty();
+		    retriever = new DDXRetriever(useCache, cacheName);
 
-		    if (line.hasOption( "r")) {
+		    if (line.hasOption("read-cache")) {
 		    	System.out.println("DDX: " + retriever.getCachedDDXDoc(ddxURL));
 		    }
-		    else if (line.hasOption( "p")) {
+		    else if (line.hasOption("print-cached")) {
 		    	Enumeration<String> ddxs = retriever.DDXCache.getLastVisitedKeys();
 		    	while (ddxs.hasMoreElements()) {
 		    		ddxURL = ddxs.nextElement();
 		    		System.out.println("DDX URL: " + ddxURL);
-		    		System.out.println("DDX: " + retriever.DDXCache.getCachedResponse(ddxURL));
+		    		if (verbose)
+		    			System.out.println("DDX: " + retriever.DDXCache.getCachedResponse(ddxURL));
 		    	}
 		    }
 		    else {
@@ -136,7 +133,7 @@ public class DDXRetriever {
 			// Save the cache if the neither the 'no-cache' nor read-cache
 			// options were used (in the latter case, nothing was added to the
 			// cache).
-	    	if (!(line.hasOption( "n") && line.hasOption( "r")))
+	    	if (!(line.hasOption("no-cache") && line.hasOption("read-cache")))
 	    		retriever.DDXCache.saveState();
 
 		}
@@ -202,8 +199,10 @@ public class DDXRetriever {
 			finally {
 				is.close();
 			}
+			
 			return sb.toString();
-		} else {
+		}
+		else {
 			return "";
 		}
 	}	

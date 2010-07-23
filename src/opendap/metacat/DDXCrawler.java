@@ -84,23 +84,14 @@ public class DDXCrawler {
 		// create the Options
 		Options options = new Options();
 		
-		options.addOption("t", "thredds-cache", false, "Use cached thredds catalogs");
-		options.addOption("d", "ddx-cache", false, "Cache ddx responses");
+		options.addOption("t", "use-thredds-cache", false, "Use cached thredds catalogs");
+		options.addOption("d", "cache-ddx", false, "Cache ddx responses");
 		options.addOption("p", "print-ddx", false, "Print the DDX responses");
 		options.addOption("v", "verbose", false, "Verbose output");
-		options.addOption("r", "restore", false, "Restore the crawl from a saved state file");
+		options.addOption("R", "restore", false, "Restore the crawl from a saved state file");
 		
-		options.addOption( OptionBuilder.withLongOpt( "cache-name" )
-                						.withDescription( "Use this to set a prefix for the cache name." )
-                						.hasArg()
-                						.withArgName("cacheName")
-                						.create() );
-
-		options.addOption( OptionBuilder.withLongOpt( "catalog-root" )
-		                                .withDescription( "use this as the root catalog" )
-		                                .hasArg()
-		                                .withArgName("catalogRoot")
-		                                .create() );
+		options.addOption("n", "cache-name", true, "Use this to set a prefix for the cache name");
+		options.addOption("r", "catalog-root", true, "Use this as the root catalog");
 		
 		try {
 		    // parse the command line arguments
@@ -112,16 +103,16 @@ public class DDXCrawler {
 		    crawler.cacheNamePrefix = line.getOptionValue("cache-name");
 		    System.out.println("Cache name: " + crawler.cacheNamePrefix);
 		    
-		    if (line.hasOption("v"))
+		    if (line.hasOption("verbose"))
 		    	crawler.verbose = true;
-		    if (line.hasOption("p"))		    
+		    if (line.hasOption("print-ddx"))		    
 		    	crawler.printDDX = true;
 		    
 		    // The sense of these caching options is odd because they are to
 		    // not use caching and are false (i.e., caching is on by default.
-		    boolean useDDXCache = line.hasOption("d");
-		    boolean readFromThreddsCache = line.hasOption("t");
-		    boolean restoreState = line.hasOption("r");
+		    boolean useDDXCache = line.hasOption("cache-ddx");
+		    boolean readFromThreddsCache = line.hasOption("use-thredds-cache");
+		    boolean restoreState = line.hasOption("restore");
 		    
 			// In this program, the ThreddsCatalogUtils _always_ writes to the cache
 			// when it reads a new document. The readFromThreddsCache determines

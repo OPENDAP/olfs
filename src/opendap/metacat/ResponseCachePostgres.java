@@ -96,7 +96,7 @@ public class ResponseCachePostgres {
     private static Logger log = LoggerFactory.getLogger(ResponseCachePostgres.class);
 
     public class ResponseCacheKeysEnumeration implements Enumeration<String> {
-    	private Enumeration<String> e = null;
+    	//private Enumeration<String> e = null;
     	ResultSet rs = null;
     	PreparedStatement ps = null;
     	
@@ -118,7 +118,7 @@ public class ResponseCachePostgres {
 				return rs.next();
 			}
 			catch (SQLException e1) {
-				log.error("Could not get next row in the result set for a ResponseCacheKeysEnumeration.", e);
+				log.error("Could not get next row in the result set for a ResponseCacheKeysEnumeration.", e1);
 				return false;
 			}
 		}
@@ -129,7 +129,7 @@ public class ResponseCachePostgres {
 				return rs.getString(1);
 			}
 			catch (SQLException e1) {
-				log.error("Could not get a string from the result set for a ResponseCacheKeysEnumeration.", e);
+				log.error("Could not get a string from the result set for a ResponseCacheKeysEnumeration.", e1);
 				return "";
 			}
 		}
@@ -141,7 +141,7 @@ public class ResponseCachePostgres {
 				ps.close();
 			}
 			catch (SQLException e1) {
-				log.error("Could not get a string from the result set for a ResponseCacheKeysEnumeration.", e);
+				log.error("Could not get a string from the result set for a ResponseCacheKeysEnumeration.", e1);
 			}
 		}
 	}
