@@ -200,6 +200,43 @@
 		</fileset>
 	</path>
 
+	<!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+	<pathconvert property="crawlers_libs.jar" pathsep=" ">
+		<mapper>
+			<chainedmapper>
+				<!-- remove absolute path -->
+				<flattenmapper />
+				<!-- add lib/ prefix -->
+				<globmapper from="*" to="../lib/*" />
+			</chainedmapper>
+		</mapper>
+		<path>
+			<!-- lib.home contains all jar files -->
+			<fileset dir="${lib.dir}">
+				<include name="${slf4j.lib}" />
+				<include name="${logback-core.lib}" />
+				<include name="${logback-classic.lib}" />
+				<include name="${jdom.lib}" />
+				<include name="${commons-cli.lib}" />
+				<include name="${commons-httpclient.lib}" />
+				<include name="${saxon-jdom.lib}" />
+				<include name="${saxon-s9api.lib}" />
+				<include name="${saxon.lib}" />
+
+				<!-- Used for metacat -->
+				<include name="${metacat.lib}" />
+				<include name="${nceas-utilities.lib}" />
+				<include name="${httpclient.lib}" />
+				<include name="${servlet-api.lib}" />
+				<include name="${catalina.lib}" />
+				<include name="${xalan.lib}" />
+
+				<include name="${postgres-jdbc.lib}" />
+			</fileset>
+		</path>
+	</pathconvert>
+
+
 	<target name="all" depends="clean,compile" description="Builds lots of stuff." />
 
 	<target name="clean" description="Remove up ALL build products.">
@@ -284,6 +321,62 @@
 		</jar>
 	</target>
 
+	<target name="BuildDDXRetriever"
+        depends="compile"
+        description="Build the executable jar file run by the ddx_retriever.sh script">
+
+		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
+		<copy file="${resources.dir}/metacat/ddx_retriever.sh" todir="${build.run}/" />
+
+		<copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
+		<copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+
+		<!-- Used for metacat -->
+		<copy file="${lib.dir}/${metacat.lib}" todir="${build.lib}/"/>
+		<copy file="${lib.dir}/${nceas-utilities.lib}" todir="${build.lib}/"/>
+		<copy file="${lib.dir}/${httpclient.lib}" todir="${build.lib}/"/>
+		<copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/"/>
+		<copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/"/>
+
+		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
+
+		<jar destfile="${build.libexec}/DDXRetriever.jar">
+			<!-- manifest="${resources.dir}/META-INF/DDXCrawler.MANIFEST.MF" -->
+			<fileset dir="${build.classes}">
+				<include name="opendap/**/*.class"/>
+			</fileset>
+			<!-- This adds the file to the jar at the top level. Using fileset
+                 dir="..." and an <include .../> element adds the directory
+                 structure, too -->
+			<fileset file="resources/metacat/logback.xml"/>
+
+			<!-- define MANIFEST.MF -->
+			<manifest>
+				<attribute name="Built-By" value="ant" />
+				<attribute name="Main-Class" value="opendap.metacat.DDXRetriever" />
+				<!--section name="common">
+                  <attribute name="Specification-Title" value="${component.name}" />
+                  <attribute name="Specification-Version" value="${component.version}" />
+                  <attribute name="Specification-Vendor" value="${component.vendor}" />
+                  <attribute name="Implementation-Title" value="${component.name}" />
+                  <attribute name="Implementation-Version" value="${component.version} ${TODAY}" />
+                  <attribute name="Implementation-Vendor" value="${component.vendor}" />
+                </section-->
+
+				<!-- finally, use the magically generated libs path -->
+				<attribute name="Class-Path" value="${crawlers_libs.jar}" />
+			</manifest>
+		</jar>
+
+	</target>
+
 	<target name="BuildDDXCrawler"
         depends="compile"
         description="Build the executable jar file run by the ddx_crawler.sh script">
@@ -310,8 +403,8 @@
 
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
-		<jar destfile="${build.libexec}/DDXCrawler.jar"
-            manifest="${resources.dir}/META-INF/DDXCrawler.MANIFEST.MF">
+		<jar destfile="${build.libexec}/DDXCrawler.jar">
+			<!-- manifest="${resources.dir}/META-INF/DDXCrawler.MANIFEST.MF" -->
 			<fileset dir="${build.classes}">
 				<include name="opendap/**/*.class"/>
 			</fileset>
@@ -319,6 +412,23 @@
                  dir="..." and an <include .../> element adds the directory
                  structure, too -->
 			<fileset file="resources/metacat/logback.xml"/>
+
+			<!-- define MANIFEST.MF -->
+			<manifest>
+				<attribute name="Built-By" value="ant" />
+				<attribute name="Main-Class" value="opendap.metacat.DDXCrawler" />
+				<!--section name="common">
+                  <attribute name="Specification-Title" value="${component.name}" />
+                  <attribute name="Specification-Version" value="${component.version}" />
+                  <attribute name="Specification-Vendor" value="${component.vendor}" />
+                  <attribute name="Implementation-Title" value="${component.name}" />
+                  <attribute name="Implementation-Version" value="${component.version} ${TODAY}" />
+                  <attribute name="Implementation-Vendor" value="${component.vendor}" />
+                </section-->
+
+				<!-- finally, use the magically generated libs path -->
+				<attribute name="Class-Path" value="${crawlers_libs.jar}" />
+			</manifest>
 		</jar>
 
 	</target>
@@ -392,44 +502,8 @@
 
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
-		<!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
-		<pathconvert property="libs.jar" pathsep=" ">
-			<mapper>
-				<chainedmapper>
-					<!-- remove absolute path -->
-					<flattenmapper />
-					<!-- add lib/ prefix -->
-					<globmapper from="*" to="../lib/*" />
-				</chainedmapper>
-			</mapper>
-			<path>
-				<!-- lib.home contains all jar files -->
-				<fileset dir="${lib.dir}">
-				       <include name="${slf4j.lib}" />
-				        <include name="${logback-core.lib}" />
-				        <include name="${logback-classic.lib}" />
-				        <include name="${jdom.lib}" />
-				        <include name="${commons-cli.lib}" />
-				        <include name="${commons-httpclient.lib}" />
-				        <include name="${saxon-jdom.lib}" />
-				        <include name="${saxon-s9api.lib}" />
-				        <include name="${saxon.lib}" />
-
-				        <!-- Used for metacat -->
-				        <include name="${metacat.lib}" />
-				        <include name="${nceas-utilities.lib}" />
-				        <include name="${httpclient.lib}" />
-				        <include name="${servlet-api.lib}" />
-				        <include name="${catalina.lib}" />
-				        <include name="${xalan.lib}" />
-
-				        <include name="${postgres-jdbc.lib}" />
-				</fileset>
-			</path>
-		</pathconvert>
-
 		<jar destfile="${build.libexec}/DapIngest.jar">
-		<!-- manifest="${resources.dir}/META-INF/DapIngest.MANIFEST.MF" -->
+			<!-- manifest="${resources.dir}/META-INF/DapIngest.MANIFEST.MF" -->
 			<fileset dir="${build.classes}">
 				<include name="opendap/**/*.class" />
 			</fileset>
@@ -437,12 +511,12 @@
                     dir="..." and an <include .../> element adds the directory
                     structure, too -->
 			<fileset file="resources/metacat/logback.xml" />
-			
-		    <!-- define MANIFEST.MF -->
-		      <manifest>
-		        <attribute name="Built-By" value="ant" />
-		        <attribute name="Main-Class" value="opendap.metacat.DapIngest" />
-		        <!--section name="common">
+
+			<!-- define MANIFEST.MF -->
+			<manifest>
+				<attribute name="Built-By" value="ant" />
+				<attribute name="Main-Class" value="opendap.metacat.DapIngest" />
+				<!--section name="common">
 		          <attribute name="Specification-Title" value="${component.name}" />
 		          <attribute name="Specification-Version" value="${component.version}" />
 		          <attribute name="Specification-Vendor" value="${component.vendor}" />
@@ -450,10 +524,10 @@
 		          <attribute name="Implementation-Version" value="${component.version} ${TODAY}" />
 		          <attribute name="Implementation-Vendor" value="${component.vendor}" />
 		        </section-->
-		   
-		        <!-- finally, use the magically generated libs path -->
-		        <attribute name="Class-Path" value="${libs.jar}" />
-		      </manifest>
+
+				<!-- finally, use the magically generated libs path -->
+				<attribute name="Class-Path" value="${crawlers_libs.jar}" />
+			</manifest>
 		</jar>
 
 	</target>
@@ -482,22 +556,34 @@
 
 	</target>
 
-	<target name="DDXCrawlerTest" depends="compile">
+	<target name="runDDXCrawlerTest" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
 
 		<java classname="opendap.metacat.DDXCrawler" fork="true" dir="${build.run}">
-			<arg line="--catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" />
-			<arg line="--cache-name=test.opendap.org" />
+			<!--arg line="- -catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" /-->
+			<arg line="--catalog-root=http://satdat1.gso.uri.edu/opendap/catalog.xml"/>
+			<arg line="--cache-name=satdat1.gso.uri.edu" />
 			<arg line="--verbose" />
-			<arg line="--ddx-cache" />
-			<arg line="--thredds-cache" />
+			<arg line="--cache-ddx" />
 			<classpath refid="classpath" />
 		</java>
 
 	</target>
 
-	<target name="DDXCrawlerTestRestart" depends="compile">
+	<target name="runDDXRetrieverTest" depends="compile">
+
+		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
+
+		<java classname="opendap.metacat.DDXRetriever" fork="true" dir="${build.run}">
+			<arg line="--cache-name=test.opendap.org" />
+			<arg line="--print-cached" />
+			<classpath refid="classpath" />
+		</java>
+
+	</target>
+
+	<target name="runDDXCrawlerTestRestart" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
 
@@ -533,6 +619,45 @@
 
 	</target>
 
+	<target  name="runURLComponents" depends="compile">
+
+		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
+
+		<java classname="opendap.metacat.URLComponents"
+                    fork="true"
+                    dir="${build.run}">
+		    <arg line="http://data.nodc.noaa.gov/opendap/hyrax/ghrsst/L2P/TMI/REMSS/1999/152/19990601-TMI-REMSS-L2P-tmi_L2b_v04_008684.dat-v01.nc.gz.ddx"/>
+			<classpath refid="classpath"/>
+		</java>
+
+	</target>
+
+    <target  name="runURLClassification" depends="compile">
+
+        <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
+
+        <java classname="opendap.metacat.URLClassification"
+                    fork="true"
+                    dir="${build.run}">
+            <arg line="http://data.nodc.noaa.gov/opendap/hyrax/ghrsst/L2P/TMI/REMSS/1999/152/19990601-TMI-REMSS-L2P-tmi_L2b_v04_008684.dat-v01.nc.gz.ddx"/>
+            <classpath refid="classpath"/>
+        </java>
+
+    </target>
+
+    <target  name="runURLClassifier" depends="compile">
+
+        <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
+
+        <java classname="opendap.metacat.URLClassifier"
+                    fork="true"
+                    dir="${build.run}">
+            <arg line="data.nodc.noaa.gov"/>
+            <classpath refid="classpath"/>
+        </java>
+
+    </target>
+
 	<target  name="Print_EML_from_cache" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback.xml" tofile="${build.classes}/logback.xml"/>
@@ -542,27 +667,25 @@
             fork="true"
             dir="${build.run}">
 			<arg line="--verbose"/>
-			<arg line="--very-verbose"/>
-			<arg line="--cache-name=test.opendap.org"/>
-			<arg line="--eml-print-all-cached"/>
-			<classpath refid="classpath"/>
+			<arg line="--very-verbose" />
+			<arg line="--cache-name=test.opendap.org" />
+			<arg line="--eml-print-all-cached" />
+			<classpath refid="classpath" />
 		</java>
 
 	</target>
 
-	<target  name="Insert_EML_from_cache" depends="compile">
+	<target name="Insert_EML_from_cache" depends="compile">
 
-		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-		<copy file="${resources.dir}/metacat/ddx2eml-3.1.xsl" tofile="${build.run}/ddx2eml-3.1.xsl"/>
+		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml" />
+		<copy file="${resources.dir}/metacat/ddx2eml-3.1.xsl" tofile="${build.run}/ddx2eml-3.1.xsl" />
 
-		<java classname="opendap.metacat.DapIngest"
-            fork="true"
-            dir="${build.run}">
-			<arg line="--verbose"/>
-			<arg line="--metacat=http://localhost:8080/knb/metacat"/>
-			<arg line="--eml-insert-all-cached"/>
-			<arg line="--cache-name=data.nodc.noaa.gov"/>
-			<classpath refid="classpath"/>
+		<java classname="opendap.metacat.DapIngest" fork="true" dir="${build.run}">
+			<arg line="--verbose" />
+			<arg line="--metacat=http://localhost:8080/knb/metacat" />
+			<arg line="--eml-insert-all-cached" />
+			<arg line="--cache-name=data.nodc.noaa.gov" />
+			<classpath refid="classpath" />
 		</java>
 
 	</target>
