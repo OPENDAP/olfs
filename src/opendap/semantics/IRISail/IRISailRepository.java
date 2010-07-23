@@ -2151,20 +2151,20 @@ public class IRISailRepository extends SailRepository {
      * @throws RepositoryException
      */
     private void process_fn2(GraphQueryResult graphResult,
-            ValueFactory creatValue, Vector<Statement> Added,
-            Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
+                             ValueFactory creatValue, Vector<Statement> Added,
+                             Vector<Statement> toAdd, RepositoryConnection con,
+                             Resource[] context) throws QueryEvaluationException,
             RepositoryException {
 
         log.debug("Processing fn statements.");
 
-        
+
         URI rdffirst = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
         URI rdfrest = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
         URI endList = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
         URI myfn = creatValue.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn");
         URI myfnlist = creatValue.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist");
-         
+
         FunctionTypes functionTypeFlag = FunctionTypes.None;
         Value objLastSt = null;
 
@@ -2175,35 +2175,35 @@ public class IRISailRepository extends SailRepository {
         while (graphResult.hasNext()) {
             Statement st = graphResult.next();
             Statement newSt = null;
-                        
+
             Value obj = st.getObject();
             Value listnode = null;
 
             URI prd = st.getPredicate();
             Resource sbj = st.getSubject();
 
-            
+
             URI targetPrd = null;
-            
+
             Resource targetSbj = null;
-            
-           
+
+
             Method func = null;
 
-           
-            if ( prd.equals(myfn)){
+
+            if (prd.equals(myfn)) {
                 targetSbj = sbjLastSt;
                 targetPrd = prdLastSt;
-                
-                        
+
+
                 String className; // class name
                 String fnName; // function name
                 //if (prd.equals(myfn) && isSbjBn) {
                 if (prd.equals(myfn)) {
-                    String functionImport =  obj.stringValue();
+                    String functionImport = obj.stringValue();
                     int indexOfLastPoundSign = functionImport.lastIndexOf("#");
-                    
-                    className  =  functionImport.substring("import:".length(),indexOfLastPoundSign);
+
+                    className = functionImport.substring("import:".length(), indexOfLastPoundSign);
                     fnName = functionImport.substring(indexOfLastPoundSign + 1);
 
                     func = getMethodForFunction(className, fnName);
@@ -2223,19 +2223,17 @@ public class IRISailRepository extends SailRepository {
                     //mbnode = bnode.matcher(sbj.toString());
                     //log.debug(" sbjLastSt = " + targetSbj );
                     //log.debug(" prdLastSt = " + targetPrd );
-                    
+
                     //log.debug(" sbj = " + sbj );
                     //log.debug(" prd = " + prd );
                     //log.debug(" obj = " + obj );
-                    if(myfnlist.equals(prd)){
-                        listnode=obj;
-                    }
-                    else if (listnode.equals(sbj) && rdffirst.equals(prd)) {
+                    if (myfnlist.equals(prd)) {
+                        listnode = obj;
+                    } else if (listnode.equals(sbj) && rdffirst.equals(prd)) {
                         String elementValue = obj.stringValue();
                         rdfList.add(elementValue);
-                    }
-                    else if(listnode.equals(sbj) && rdfrest.equals(prd)){
-                        listnode=obj;
+                    } else if (listnode.equals(sbj) && rdfrest.equals(prd)) {
+                        listnode = obj;
                         isEndList = endList.equals(obj);
                     }
                 }
@@ -2260,33 +2258,33 @@ public class IRISailRepository extends SailRepository {
                     log.warn("Process Function failed: No processing function found.");
                 }
 
-           } 
+            }
 
             objLastSt = st.getObject();
             prdLastSt = st.getPredicate();
             sbjLastSt = st.getSubject();
             // log.debug("new st to add = " + newSt.toString());
-            if(newSt != null){
+            if (newSt != null) {
                 st = newSt;
                 oldSt = null;
             }
-            
-            if(oldSt != null){
-            toAdd.add(oldSt);
-            Added.add(oldSt);
-            con.add(oldSt, context); // add fn created new st
-            log.debug("process_fn add context: " + context[0].toString());
+
+            if (oldSt != null) {
+                toAdd.add(oldSt);
+                Added.add(oldSt);
+                con.add(oldSt, context); // add fn created new st
+                log.debug("process_fn add context: " + context[0].toString());
             }
             oldSt = st;
-            
+
         } // while (graphResult.hasNext())
-        if(oldSt != null){
+        if (oldSt != null) {
             toAdd.add(oldSt);
             Added.add(oldSt);
             con.add(oldSt, context); // add fn created new st
             log.debug("process_fn add context: " + context[0].toString());
         }
-        
+
         log.debug("After processing fn: " + toAdd.size()
                 + " statements are added.\n ");
     }
@@ -2429,7 +2427,13 @@ public class IRISailRepository extends SailRepository {
             toAdd.add(st);
             Added.add(st);
             con.add(st, context); // add fn created st
-            log.debug("process_fn add context: " + context);
+
+            String msg = "process_fn added statement: " + st.toString()+" to context(s): ";
+            for(Resource r: context){
+                msg += r.toString()+"   ";
+            }
+            log.debug(msg);
+
         } // while (graphResult.hasNext())
         log.debug("After processing fn: " + toAdd.size()
                 + " statements are added.\n ");

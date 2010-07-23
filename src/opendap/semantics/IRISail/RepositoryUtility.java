@@ -7,6 +7,7 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.rio.trig.TriGWriter;
@@ -548,6 +549,7 @@ public class RepositoryUtility {
         // export repository to an n-triple file
         File outrps = new File(filename); // hard copy of repository
         try {
+            log.info("Dumping repository to: '"+filename+"'");
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
             if (filename.endsWith("nt")) {
 
@@ -582,16 +584,69 @@ public class RepositoryUtility {
 
     }
 
-    public static void dumpRepository(SailRepository owlse2, String filename) throws RepositoryException {
+    public static void dumpRepository(SailRepository owlse2, String filename) {
 
-        RepositoryConnection con = owlse2.getConnection();
-        log.info("Repository connection has been opened.");
+        RepositoryConnection con = null;
 
-        dumpRepository(con, filename);
+        try {
+            con = owlse2.getConnection();
+            dumpRepository(con, filename);
+        }
+        catch (RepositoryException e) {
+            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+        } finally {
+            log.debug("Closing repository connection.");
 
-        log.info("Closing repository connection.");
-        con.close();  //close connection first
+            if(con!=null){
+                try {
+                    con.close();  //close connection first
+                }
+                catch(RepositoryException e){
+                    log.error("Failed to close repository connection. Msg: "+e.getMessage());
+                }
+            }
+        }
 
 
+    }
+
+
+    public static void showContexts(SailRepository repository){
+        RepositoryConnection con = null;
+
+        try {
+            con = repository.getConnection();
+            showContexts(con);
+        }
+        catch (RepositoryException e) {
+            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+        } finally {
+            log.debug("Closing repository connection.");
+
+            if(con!=null){
+                try {
+                    con.close();  //close connection first
+                }
+                catch(RepositoryException e){
+                    log.error("Failed to close repository connection. Msg: "+e.getMessage());
+                }
+            }
+        }
+
+    }
+    public static void showContexts(RepositoryConnection con){
+
+        String msg = "\nRepository ContextIDs:\n";
+        try {
+            RepositoryResult<Resource> contextIds = con.getContextIDs();
+
+            for(Resource contextId : contextIds.asList()){
+                msg += "    "+contextId+"\n";
+            }
+
+            log.info(msg);
+        } catch (RepositoryException e) {
+            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+        }
     }
 }

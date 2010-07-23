@@ -373,7 +373,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         Date startTime = new Date();
-        log.info("Evaluating importURLs for updateCatalog... ");
+        log.info("-----------------------------------------------------------------------");
+        log.info("updateSemanticRepository2() Start.");
+        RepositoryUtility.showContexts(owlse2);
         RepositoryConnection con = null;
         try {
 
@@ -411,6 +413,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 log.info("Connection is Closed!");
             }
 
+            RepositoryUtility.showContexts(owlse2);
 
             if (isNewRepository) {
 
@@ -441,6 +444,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     log.debug("Repository update complete. No changes detected, rules not rerun..");
 
                 }
+                RepositoryUtility.showContexts(owlse2);
+
                 
             } else {
                 if (!dropList.isEmpty()) {
@@ -456,8 +461,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                             con.close();
                     }
                     log.debug("Finished dropping starting point.");
+                    RepositoryUtility.showContexts(owlse2);
 
                     dropContexts(dropList);
+                    RepositoryUtility.showContexts(owlse2);
+
                 }
                 if (!newStartingPoints.isEmpty()) {
 
@@ -471,18 +479,25 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         if (con != null)
                             con.close();
                     }
+                    RepositoryUtility.showContexts(owlse2);
+
                 }
                 log.debug("Updating repository ...");
                 if(updateIriRepository() || !dropList.isEmpty()){
+                    RepositoryUtility.showContexts(owlse2);
+
                     log.debug("Repository update complete. Changes detected.");
 
                     log.debug("Running construct rules ...");
                     ingestSwrlRules();
                     log.debug("Finished running construct rules.");
+                    RepositoryUtility.showContexts(owlse2);
+
 
                 } else{
                     log.debug("Repository update complete. No changes detected, rules not rerun..");
-
+                    RepositoryUtility.showContexts(owlse2);
+                    
                 }
 
 
@@ -497,6 +512,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         long elapsedTime = new Date().getTime() - startTime.getTime();
         log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
+
+        log.info("updateSemanticRepository2() End.");
+        log.info("-----------------------------------------------------------------------");
+
 
 //        log.debug("**********************************************************************************!");
 //        log.info("Updating repository!");
