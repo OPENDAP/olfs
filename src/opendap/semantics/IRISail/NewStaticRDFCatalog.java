@@ -375,7 +375,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         Date startTime = new Date();
         log.info("-----------------------------------------------------------------------");
         log.info("updateSemanticRepository2() Start.");
-        RepositoryUtility.showContexts(owlse2);
+        log.debug(RepositoryUtility.showContexts(owlse2));
         RepositoryConnection con = null;
         try {
 
@@ -413,7 +413,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 log.info("Connection is Closed!");
             }
 
-            RepositoryUtility.showContexts(owlse2);
+            log.debug(RepositoryUtility.showContexts(owlse2));
 
             if (isNewRepository) {
 
@@ -444,7 +444,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     log.debug("Repository update complete. No changes detected, rules not rerun..");
 
                 }
-                RepositoryUtility.showContexts(owlse2);
+                log.debug(RepositoryUtility.showContexts(owlse2));
 
                 
             } else {
@@ -461,10 +461,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                             con.close();
                     }
                     log.debug("Finished dropping starting point.");
-                    RepositoryUtility.showContexts(owlse2);
+                    log.debug(RepositoryUtility.showContexts(owlse2));
 
                     dropContexts(dropList);
-                    RepositoryUtility.showContexts(owlse2);
+                    log.debug(RepositoryUtility.showContexts(owlse2));
 
                 }
                 if (!newStartingPoints.isEmpty()) {
@@ -479,25 +479,25 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         if (con != null)
                             con.close();
                     }
-                    RepositoryUtility.showContexts(owlse2);
+                    log.debug(RepositoryUtility.showContexts(owlse2));
 
                 }
                 log.debug("Updating repository ...");
                 if(updateIriRepository() || !dropList.isEmpty()){
-                    RepositoryUtility.showContexts(owlse2);
+                    log.debug(RepositoryUtility.showContexts(owlse2));
 
                     log.debug("Repository update complete. Changes detected.");
 
                     log.debug("Running construct rules ...");
                     ingestSwrlRules();
                     log.debug("Finished running construct rules.");
-                    RepositoryUtility.showContexts(owlse2);
+                    log.debug(RepositoryUtility.showContexts(owlse2));
 
 
                 } else{
                     log.debug("Repository update complete. No changes detected, rules not rerun..");
-                    RepositoryUtility.showContexts(owlse2);
-                    
+                    log.debug(RepositoryUtility.showContexts(owlse2));
+
                 }
 
 
@@ -1410,28 +1410,28 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) {
         //retrieve XML from the RDF store.
-        log.info("Extracting CoverageDescriptions from repository.");
+        log.info("extractCoverageDescrptionsFromRepository() - Extracting CoverageDescriptions from repository.");
+        log.info("extractCoverageDescrptionsFromRepository() - Building CoverageDescription XML from repository.");
         buildDoc = new XMLfromRDF(con, "CoverageDescriptions", "http://www.opengis.net/wcs/1.1#CoverageDescription");
         buildDoc.getXMLfromRDF("http://www.opengis.net/wcs/1.1#CoverageDescription"); //build a JDOM doc by querying against the RDF store
 
-        // Next we update the Repositories cached maps of of datasetUrl/serverIDs datasetUrl/wcsID
-        // This bothers me: Before we moved these HashMaps int the IRISailRepository it was a general purpose class for
-        // twiddling with Semantics - no it's a specialization of that general class for WCS. 
-        //owlse2.updateIdCaches();
-
-
+        // Next we update the  cached maps  of datasetUrl/serverIDs and datasetUrl/wcsID
+        // held in the CoverageIDGenerator so that subsequent calls to the CoverageIdGenerator
+        // create new IDs correctly.
 
         try {
+            log.info("extractCoverageDescrptionsFromRepository() - Updating CoverageIdGenerator Id Caches.");
             HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL();
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
         } catch (RepositoryException e) {
-            log.error("getCoverageIDServerURL(): Caught RepositoryException. msg: "
+            log.error("extractCoverageDescrptionsFromRepository(): Caught RepositoryException. msg: "
                     + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("getCoverageIDServerURL(): Caught MalformedQueryException. msg: "
+            log.error("extractCoverageDescrptionsFromRepository(): Caught MalformedQueryException. msg: "
                     + e.getMessage());
         } catch (QueryEvaluationException e) {
-            log.error("getCoverageIDServerURL(): Caught QueryEvaluationException. msg: "
+
+            log.error("extractCoverageDescrptionsFromRepository(): Caught QueryEvaluationException. msg: "
                     + e.getMessage());
         }
 
@@ -2281,7 +2281,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 log.debug(msg);
             }
             else {
-                log.error("Failed to locate wcs:Identifier element for Coverage!");
+                log.error("addSupportedFormats() - Failed to locate wcs:Identifier element for Coverage!");
                 //@todo Throw an exception (what kind??) here!!
             }
         }

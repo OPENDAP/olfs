@@ -611,15 +611,17 @@ public class RepositoryUtility {
     }
 
 
-    public static void showContexts(SailRepository repository){
+    public static String showContexts(SailRepository repository){
         RepositoryConnection con = null;
+        String msg;
 
         try {
             con = repository.getConnection();
-            showContexts(con);
+            msg =  showContexts(con);
         }
         catch (RepositoryException e) {
-            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+            msg = "Failed to open repository connection. Msg: "+e.getMessage();
+            log.error(msg);
         } finally {
             log.debug("Closing repository connection.");
 
@@ -632,9 +634,10 @@ public class RepositoryUtility {
                 }
             }
         }
+        return msg;
 
     }
-    public static void showContexts(RepositoryConnection con){
+    public static String showContexts(RepositoryConnection con){
 
         String msg = "\nRepository ContextIDs:\n";
         try {
@@ -644,9 +647,11 @@ public class RepositoryUtility {
                 msg += "    "+contextId+"\n";
             }
 
-            log.info(msg);
         } catch (RepositoryException e) {
-            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+            msg = "Failed to open repository connection. Msg: "+e.getMessage();
+            log.error(msg);
         }
+
+        return msg;
     }
 }
