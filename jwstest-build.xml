@@ -28,7 +28,7 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+        name="Java WebStart Test"
         default="all" basedir=".">
 
     <!-- Global Properties for Java-OPeNDAP software development -->
@@ -288,14 +288,6 @@
             signedjar="${build.webstart}/logback-classic.jar" storepass="${keystore.password}"/>
 
     </target>
-
-
-
-
-
-
-
-
 
 
 

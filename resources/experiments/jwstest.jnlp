@@ -23,7 +23,8 @@
   </resources>
 
   <application-desc main-class="opendap.experiments.JwsTest">
-    <argument>-datsetUrl={datasetURL}</argument>
+      <argument>&lt;CommandLineArgument_01&gt;</argument>
+      <argument>&lt;CommandLineArgument_02&gt;</argument>
   </application-desc>
 </jnlp>
 

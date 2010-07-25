@@ -197,6 +197,12 @@ public class MimeTypes {
         typeMap.put("dods",    "text/x-dods_data");
 
 
+        typeMap.put("jnlp",    "application/x-java-jnlp-file");
+
+
+
+
+
 
 
     }
