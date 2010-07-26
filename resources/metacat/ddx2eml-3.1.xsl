@@ -23,7 +23,7 @@ saxon 9. -->
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 
-    <xsl:variable name="ddx2eml_version">3.0.0</xsl:variable>
+    <xsl:variable name="ddx2eml_version">3.1.0</xsl:variable>
 
     <xsl:template match="@*|text()"/>
     <xsl:template match="*"/>
