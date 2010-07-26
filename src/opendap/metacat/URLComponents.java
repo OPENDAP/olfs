@@ -22,28 +22,30 @@ public class URLComponents {
     private static Logger log = LoggerFactory.getLogger(URLComponents.class);
 
 	public static void main(String[] args) {
-		if (args.length < 1) return;
-		
+		if (args.length < 1)
+			return;
+
 		try {
-		URLComponents up = new URLComponents(args[0]);
-		System.out.println("URL: " + args[0]);
-		System.out.println(up.getMachine());
-		String[] comps = up.getComponents();
-		for (String s: comps)
-			System.out.println(s);
+			URLComponents up = new URLComponents(args[0]);
+			System.out.println("URL: " + args[0]);
+			System.out.println(up.getMachine());
+			String[] comps = up.getComponents();
+			for (String s : comps)
+				System.out.println(s);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * A URL is parsed by first removing the protocol and '://' parts, 
-	 * then the machne part. What remains is the path, where '/' separates the
-	 * components until the leaf (file) is found. Within the file we consider
-	 * any non-alphanum to be a separator.
+	 * A URL is parsed by first removing the protocol and '://' parts, then the
+	 * machne part. What remains is the path, where '/' separates the components
+	 * until the leaf (file) is found. Within the file we consider any
+	 * non-alphanum to be a separator.
 	 * 
-	 * @param url The URL to parse.
+	 * @param url
+	 *            The URL to parse.
 	 */
 	URLComponents(String url) throws Exception {
 		try {
@@ -84,7 +86,7 @@ public class URLComponents {
 	 * @return The concatenation of the two arrays
 	 */
 	public static <T> T[] concat(T[] first, T[] second) {
-		T[] result = Arrays.copyOf(first, first.length + second.length);
+		final T[] result = Arrays.copyOf(first, first.length + second.length);
 		System.arraycopy(second, 0, result, first.length, second.length);
 		return result;
 	}
@@ -98,7 +100,7 @@ public class URLComponents {
 	 * @see concat
 	 */
 	@SuppressWarnings("unchecked")
-	static <T> T[] concat_java5(T[] a, T[] b) {
+	public static <T> T[] concat_java5(T[] a, T[] b) {
 	    final int alen = a.length;
 	    final int blen = b.length;
 	    final T[] result = (T[]) java.lang.reflect.Array.

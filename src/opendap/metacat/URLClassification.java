@@ -57,8 +57,10 @@ public class URLClassification {
 			else if (comp.matches("[0-9]+[A-Za-z]+[0-9]*")) {
 				int j = 0;
 				classes[i] = "";
-				while (j < comp.length() && Character.isDigit(comp.charAt(j++)))
+				while (j < comp.length() && Character.isDigit(comp.charAt(j))) {
 					classes[i] += 'd';
+					++j;
+				}
 				while(j < comp.length())
 					classes[i] += comp.charAt(j++);
 				++i;

@@ -59,7 +59,8 @@ public class URLClassifier {
 		
 		ps.println("Completed classification: " + (new Date()).toString());
 		
-		c.printClassifications(ps);
+		//c.printClassifications(ps);
+		c.printCompleteClassifications(ps);
 	}
 	
 	public void classify() {
