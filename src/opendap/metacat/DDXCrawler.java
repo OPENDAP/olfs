@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -67,13 +66,13 @@ public class DDXCrawler {
     
     private boolean verbose = false;
     private boolean printDDX = false;
+    private boolean fetchDDX = false;
     
     private String cacheNamePrefix = "";
     	
 	/**
 	 * @param args
 	 */
-	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		
 		DDXCrawler crawler = new DDXCrawler();
@@ -85,6 +84,7 @@ public class DDXCrawler {
 		Options options = new Options();
 		
 		options.addOption("t", "use-thredds-cache", false, "Use cached thredds catalogs");
+		options.addOption("f", "fetch-ddx", false, "Fetch ddx responses");
 		options.addOption("d", "cache-ddx", false, "Cache ddx responses");
 		options.addOption("p", "print-ddx", false, "Print the DDX responses");
 		options.addOption("v", "verbose", false, "Verbose output");
@@ -103,10 +103,9 @@ public class DDXCrawler {
 		    crawler.cacheNamePrefix = line.getOptionValue("cache-name");
 		    System.out.println("Cache name: " + crawler.cacheNamePrefix);
 		    
-		    if (line.hasOption("verbose"))
-		    	crawler.verbose = true;
-		    if (line.hasOption("print-ddx"))		    
-		    	crawler.printDDX = true;
+		    crawler.verbose = line.hasOption("verbose");
+		    crawler.printDDX = line.hasOption("print-ddx");
+		    crawler.fetchDDX = line.hasOption("fetch-ddx");
 		    
 		    // The sense of these caching options is odd because they are to
 		    // not use caching and are false (i.e., caching is on by default.
@@ -158,13 +157,22 @@ public class DDXCrawler {
 				DDXURLs = threddsCatalogUtil.getDDXUrls(catalogURL);
 				for (String DDXURL : DDXURLs) {
 					++DDXsVisited;
-					String ddx = ddxRetriever.getDDXDoc(DDXURL);
-					if (ddx == null)
-						log.error("No DDX returned from: " + DDXURL);
-					else if (verbose) {
-						ps.println("Top URL: " + DDXURL);
-						if (printDDX)
-							ps.println("DDX: " + ddx);
+					if (fetchDDX) {
+						String ddx = ddxRetriever.getDDXDoc(DDXURL);
+						if (ddx == null)
+							log.error("No DDX returned from: " + DDXURL);
+						else if (verbose) {
+							ps.println("Top URL: " + DDXURL);
+							if (printDDX)
+								ps.println("DDX: " + ddx);
+						}
+					}
+					else {
+						// Just save the URL without the expensive DDX retrieval
+						// Set the LMT to zero so 
+						ddxRetriever.getCache().setLastVisited(DDXURL, 0);
+						if (verbose)
+							ps.println("Top URL: " + DDXURL);
 					}
 				}
 			}
@@ -179,18 +187,28 @@ public class DDXCrawler {
 				DDXURLs = threddsCatalogUtil.getDDXUrls(childURL);
 				for (String DDXURL : DDXURLs) {
 					++DDXsVisited;
-					String ddx = ddxRetriever.getDDXDoc(DDXURL);
-					if (ddx == null)
-						log.error("No DDX returned from: " + DDXURL);
-					else if (verbose) {
-						ps.println("URL: " + DDXURL);
-						if (printDDX)
-							ps.println("DDX: " + ddx);
-						/*
-						 if (DDXURL.equals("http://test.opendap.org:8080/opendap/hyrax/data/oaflux/daily/lhsh_oaflux_1981.nc.ddx")
-								&& !restoreState)
-							throw new Exception("simulated error!");
-						*/
+					if (fetchDDX) {
+						String ddx = ddxRetriever.getDDXDoc(DDXURL);
+						if (ddx == null)
+							log.error("No DDX returned from: " + DDXURL);
+						else if (verbose) {
+							ps.println("URL: " + DDXURL);
+							if (printDDX)
+								ps.println("DDX: " + ddx);
+							/*
+							 * if(DDXURL.equals(
+							 * "http://test.opendap.org:8080/opendap/hyrax/data/oaflux/daily/lhsh_oaflux_1981.nc.ddx"
+							 * ) && !restoreState) throw new
+							 * Exception("simulated error!");
+							 */
+						}
+					}
+					else {
+						// Just save the URL without the expensive DDX retrieval
+						// Set the LMT to zero so
+						ddxRetriever.getCache().setLastVisited(DDXURL, 0);
+						if (verbose)
+							ps.println("Top URL: " + DDXURL);
 					}
 				}
 			}

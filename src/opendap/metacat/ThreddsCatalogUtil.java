@@ -150,11 +150,16 @@ public class ThreddsCatalogUtil {
 			Vector<String> URLs = getCatalogRefURLs(catalogURL);
 			if (URLs != null) {
 				for (String URL : URLs) {
-					if (writeToCache && !TCCache.isVisited(URL)) {
-						TCCache.setLastVisited(URL, 1);
-						childURLs.push(URL);
+					log.debug("About to push " + URL);
+					if (writeToCache) {
+						if (!TCCache.isVisited(URL)) {
+							log.debug("URL (" + URL + ") not yet visitied; pushed on stack");
+							TCCache.setLastVisited(URL, 1);
+							childURLs.push(URL);
+						}
 					}
-					else {	
+					else {
+						log.debug("Not testing if URL is on stack");
 						childURLs.push(URL);
 					}
 				}
@@ -163,11 +168,13 @@ public class ThreddsCatalogUtil {
 		
 		@Override
 		public boolean hasMoreElements() {
+			log.debug("In hasMoreElements");
 			return !childURLs.isEmpty();
 		}
 
 		@Override
 		public String nextElement() {
+			log.debug("In nextElement");
 			try {
 				String child = childURLs.pop();
 				log.debug("Read child: [" + child + "].");
