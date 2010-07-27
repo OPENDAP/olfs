@@ -75,7 +75,10 @@
         <appender-ref ref="DebugLog"/>
     </logger>
 
-    <logger name="opendap.metacat.ThreddsCatalogUtil" level="ERROR">
+    <logger name="opendap.metacat.ResponseCachePostgres" level="ERROR">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    <logger name="opendap.metacat.ThreddsCatalogUtil" level="DEBUG">
         <appender-ref ref="ErrorLog"/>
     </logger>
     
