@@ -194,7 +194,7 @@ public class XMLfromRDF {
                     }
                     String queryString1 = createQueryString(valueOfobj.toString(), valueOfvalueclass);
                     String parent,ns;
-                                                        
+                    log.debug("queryString1: " +queryString1);                                    
                     if (topURI.lastIndexOf("#") >= 0){
                                 
                         int pl = topURI.lastIndexOf("#");
