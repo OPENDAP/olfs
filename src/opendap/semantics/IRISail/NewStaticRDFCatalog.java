@@ -2115,7 +2115,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
-                    
+
+
+                    /* ##########################################################################
+                       Dump repository to disk as N-Triples
+                     */
                     log.debug("updateRepository2(): Connecting to Repository...");
                     RepositoryConnection con = owlse2.getConnection();
                     String filename = catalogCacheDirectory + "daprepository.nt";
@@ -2125,6 +2129,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
+                    /* ##########################################################################
+                       Dump repository to disk as Triples with their contexts.
+                     */
                     log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
                     filename = catalogCacheDirectory + "daprepository.trig";
                     RepositoryUtility.dumpRepository(con, filename);
@@ -2132,7 +2139,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
                     }
-                    log.debug("Extracting CoverageDescriptions from the Repository.");
+
+
+                    
+                    log.debug("updateRepository2(): Extracting CoverageDescriptions from the Repository.");
                     extractCoverageDescrptionsFromRepository(con);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
