@@ -269,8 +269,8 @@ public class IRISailRepository extends SailRepository {
 
                         case Function:
 
-                            process_fn(graphResult, creatValue, Added, toAdd,
-                            //process_fn2(graphResult, creatValue, Added, toAdd,
+                            //process_fn(graphResult, creatValue, Added, toAdd,
+                            process_fn2(graphResult, creatValue, Added, toAdd,
                                     con, context);// postpocessing Join,
                                                   // subtract, getWcsID
                             break;
