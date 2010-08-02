@@ -314,7 +314,10 @@ public class RdfPersistence {
                     } else {
 
                         log.debug("Import URL appears valid ( " + importURL + " )");
-
+                        URL urlImport = new URL(importURL);
+                        URLConnection urlc = urlImport.openConnection();
+                        urlc.connect();
+                        String contentType = urlc.getContentType();
                         //@todo make this a more robust
                         String urlsufix = importURL.substring(
                                 (importURL.length() - 4), importURL.length());
@@ -350,22 +353,18 @@ public class RdfPersistence {
                                     (Resource) uriaddress);
                             owlse2.setLTMODContext(importURL, con); // set last modified
                                                                     // time for the context
-
+                            owlse2.setContentTypeContext(importURL,contentType, con); //
                             log.debug("Finished importing URL " + importURL);
 
                         } else {
                             notimport++;
-                            URL url = new URL(importURL);
-                            URLConnection urlc = url.openConnection();
-                            
+                                                        
                             urlc.setRequestProperty("Accept",
                                             "application/rdf+xml,application/xml,text/xml,*/*");
                             // urlc.setRequestProperty("Accept",
                             // "application/rdf+xml, application/xml;
                             // q=0.9,text/xml; q=0.9, */*; q=0.2");
-                            urlc.connect();
-                            String contentType = urlc.getContentType();
-                            
+                                                        
                             try {
                                 InputStream inStream = urlc.getInputStream();
 

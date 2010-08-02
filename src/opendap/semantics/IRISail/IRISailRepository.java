@@ -358,10 +358,6 @@ public class IRISailRepository extends SailRepository {
                     queryTimes + " times" + " added " + totalStAddedIn1Pass + " statements");
             log.info("Queried the repository " + queryTimes + " times");
 
-            /*
-             * if (totalStAdded > 0) { log.debug("Committing..."); con.commit();
-             * //force flushing the memory log.debug("Commit finished"); }
-             */
             findConstruct();
         } // while (modelChanged
 
@@ -1482,6 +1478,37 @@ public class IRISailRepository extends SailRepository {
     }
 
     /**
+     *
+     *
+     * @param importURL
+     * @param ltmod
+     * @param con
+     */
+    public void setContentTypeContext(String importURL, String contentType, RepositoryConnection con) {
+        String pred = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#contenttype";
+        String contURL = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#cachecontext";
+        if (!this.imports.contains(importURL)) { // not in the repository yet
+            
+            ValueFactory f = this.getValueFactory();
+            URI s = f.createURI(importURL);
+            URI p = f.createURI(pred);
+            URI cont = f.createURI(contURL);
+            
+            Literal o = f.createLiteral(contentType);
+
+            try {
+
+                con.add((Resource) s, p, (Value) o, (Resource) cont);
+
+            } catch (RepositoryException e) {
+                log.error("Caught an RepositoryException! Msg: "
+                        + e.getMessage());
+
+            }
+
+        }
+    }
+    /**
      * Return true if import context is newer.
      * 
      * @param importURL
@@ -1789,40 +1816,20 @@ public class IRISailRepository extends SailRepository {
                                         .info("lastmodified is newer than oldlastmodified, deleting the old context!");
                                 URI context2remove = new URIImpl(importURL);
                                 con.clear((Resource) context2remove);
-                                deleteLTMODContext(importURL, con); // delete
-                                                                    // last
-                                                                    // modified
-                                                                    // time of
-                                                                    // the
-                                                                    // context
-
+                                deleteLTMODContext(importURL, con); // delete last modified time of the context
+                                                                    
                                 // deleteIsContainedBy(importURL,
                                 // CollectionURL); //need some work here!!!
                                 log.info("finished deleting " + importURL);
-                                // con.commit(); //force transaction
-                                /*
-                                 * leave for adding in next turn URL url = new
-                                 * URL(importURL); uriaddress = new
-                                 * URIImpl(importURL); log.info("Importing
-                                 * "+importURL); con.add(url, importURL,
-                                 * RDFFormat.RDFXML, (Resource) uriaddress);
-                                 * setLTMODContext(importURL, con); //set last
-                                 * modified time for the context
-                                 * //setIsContainedBy(importURL, CollectionURL);
-                                 * //need some work here!!! log.info("Finished
-                                 * Importing "+importURL); update = true;
-                                 */
+                                
                                 importID.add(importURL); // put back into the
                                 // add list
                             } else {
                                 log.info("Skip old URL: " + importURL);
                             }
                         }
-                        if (!this.imports.contains(importURL)) { // not in
-                                                                    // the
-                                                                    // import
-                                                                    // list yet
-
+                        if (!this.imports.contains(importURL)) { // not in the import list yet
+                                                                    
                             if (!importInRepository.contains(importURL)) {
                                 log.debug("Repository does not have: "
                                         + importURL);
@@ -1841,13 +1848,8 @@ public class IRISailRepository extends SailRepository {
                                     log.info("Importing URL " + url);
                                     con.add(url, importURL, RDFFormat.RDFXML,
                                             (Resource) uriaddress);
-                                    setLTMODContext(importURL, con); // set
-                                                                        // last
-                                                                        // modified
-                                                                        // time
-                                                                        // the
-                                                                        // context
-
+                                    setLTMODContext(importURL, con); // set last modified time
+                                                                        
                                     // setIsContainedBy(importURL,
                                     // CollectionURL); //need some work here!!!
                                     update = true;
@@ -1872,14 +1874,8 @@ public class IRISailRepository extends SailRepository {
                                         con.add(inStream, importURL,
                                                 RDFFormat.RDFXML,
                                                 (Resource) uriaddress);
-                                        setLTMODContext(importURL, con); // set
-                                                                            // last
-                                                                            // modified
-                                                                            // time
-                                                                            // for
-                                                                            // the
-                                                                            // context
-
+                                        setLTMODContext(importURL, con); // set last modified time
+                                                                           
                                         // setIsContainedBy(importURL,
                                         // CollectionURL); //need some work
                                         // here!!!
@@ -1909,7 +1905,7 @@ public class IRISailRepository extends SailRepository {
 
                         } // if (! this.imports.contains(importURL))
                     } // if (this.downService.get(importURL))
-                    // con.commit();
+                    
                 }// while (!importID.empty()
 
                 i++;

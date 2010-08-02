@@ -1334,7 +1334,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         boolean success = false;
         
         int biffCount = 0;
-       // Thread thread = Thread.currentThread();
+        Thread thread = Thread.currentThread();
         
         RdfPersistence updateRepository = new RdfPersistence(owlse2); 
         
@@ -1349,10 +1349,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
          String filename = catalogCacheDirectory + "daprepository.nt";
          log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
          RepositoryUtility.dumpRepository(con, filename);
-        // if(thread.isInterrupted() || stopWorking){
-        //     log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-        //     throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-        // }
+         if(thread.isInterrupted() || stopWorking){
+             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+         }
             
             /* ##########################################################################
             Dump repository to disk as Triples with their contexts.
@@ -1360,34 +1360,34 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
          log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
          filename = catalogCacheDirectory + "daprepository.trig";
          RepositoryUtility.dumpRepository(con, filename);
-        // if(thread.isInterrupted() || stopWorking){
-        //     log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-        //    throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-        // }
+         if(thread.isInterrupted() || stopWorking){
+             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+            throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+         }
 
 
          
          log.debug("updateRepository2(): Extracting CoverageDescriptions from the Repository.");
          extractCoverageDescrptionsFromRepository(con);
-        // if(thread.isInterrupted() || stopWorking){
-         //    log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-         //    throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-        // }
+         if(thread.isInterrupted() || stopWorking){
+             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+         }
 
          filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
          log.debug("updateRepository2(): Dumping CoverageDescriptions Document to: "+filename);
          dumpCoverageDescriptionsDocument(filename);
-         //if(thread.isInterrupted() || stopWorking){
-         //    log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-          //   throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-        // }
+         if(thread.isInterrupted() || stopWorking){
+             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+         }
 
          log.info("updateRepository2(): Closing repository!");
          con.close();  //close connection first
-        // if(thread.isInterrupted() || stopWorking){
-         //    log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-        //     throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-        // }
+         if(thread.isInterrupted() || stopWorking){
+             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+         }
 
         } catch (InterruptedException e) {
             log.error("Thread interrupted "+ e.getMessage());
