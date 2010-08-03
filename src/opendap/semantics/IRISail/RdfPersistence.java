@@ -1,4 +1,4 @@
-package opendap.semantics.IRISail;
+package iri.generatentriples;
 import net.sf.saxon.s9api.SaxonApiException;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -38,8 +38,7 @@ public class RdfPersistence {
 
         private IRISailRepository owlse2;
         
-        private String resourcePath;
-        private String cacheDirectory;
+        
        
         private Vector<String> repositoryContexts;
      
@@ -56,8 +55,7 @@ public class RdfPersistence {
                         
             downService = new HashMap<String, Boolean>();
             imports = new Vector<String>();
-            resourcePath = "./";
-            cacheDirectory = "./wms-cache/";
+            
          
         }
 
@@ -359,8 +357,8 @@ public class RdfPersistence {
                         } else {
                             notimport++;
                                                         
-                            urlc.setRequestProperty("Accept",
-                                            "application/rdf+xml,application/xml,text/xml,*/*");
+                            //urlc.setRequestProperty("Accept",
+                            //                "application/rdf+xml,application/xml,text/xml,*/*");
                             // urlc.setRequestProperty("Accept",
                             // "application/rdf+xml, application/xml;
                             // q=0.9,text/xml; q=0.9, */*; q=0.2");
@@ -401,6 +399,7 @@ public class RdfPersistence {
                 log.error("Caught an RepositoryException! Msg: " + e.getMessage());
             } finally {
                 try {
+                    imports.add(importURL); //skip this file
                     con.close();
                 } catch (RepositoryException e) {
                     log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
@@ -811,72 +810,7 @@ public class RdfPersistence {
             return changedRdfDocuments;
         }
 
-        private void processConfig(Element config, String defaultCacheDirectory,
-                String defaultResourcePath) {
-
-            Element e;
-            File file;
-
-            /**
-             * ######################################################## Process
-             * configuration.
-             */
-            cacheDirectory = defaultCacheDirectory;
-            e = config.getChild("CacheDirectory");
-            if (e != null)
-                cacheDirectory = e.getTextTrim();
-            if (cacheDirectory != null && cacheDirectory.length() > 0
-                    && !cacheDirectory.endsWith("/"))
-                cacheDirectory += "/";
-
-            file = new File(cacheDirectory);
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    log
-                            .error("Unable to create cache directory: "
-                                    + cacheDirectory);
-                    if (!cacheDirectory.equals(defaultCacheDirectory)) {
-                        file = new File(defaultCacheDirectory);
-                        if (!file.exists()) {
-                            if (!file.mkdirs()) {
-                                log.error("Unable to create cache directory: "
-                                        + defaultCacheDirectory);
-                                log.error("Process probably doomed...");
-                            }
-                        }
-                    } else {
-                        log.error("Process probably doomed...");
-                    }
-
-                }
-            }
-            log.info("Using cacheDirectory: " + cacheDirectory);
-
-            resourcePath = defaultResourcePath;
-            e = config.getChild("ResourcePath");
-            if (e != null)
-                resourcePath = e.getTextTrim();
-
-            if (resourcePath != null && resourcePath.length() > 0
-                    && !resourcePath.endsWith("/"))
-                resourcePath += "/";
-
-            file = new File(this.resourcePath);
-            if (!file.exists()) {
-                log.error("Unable to locate resource directory: " + resourcePath);
-                file = new File(defaultResourcePath);
-                if (!file.exists()) {
-                    log.error("Unable to locate default resource directory: "
-                            + defaultResourcePath);
-                    log.error("Process probably doomed...");
-                }
-
-            }
-
-            log.info("Using resourcePath: " + resourcePath);
-
-        }
-
+        
 
         public void destroy() {
 
