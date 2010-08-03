@@ -1,4 +1,4 @@
-package iri.generatentriples;
+package opendap.semantics.IRISail;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
