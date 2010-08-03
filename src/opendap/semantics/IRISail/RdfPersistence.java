@@ -1,4 +1,4 @@
-package iri.generatentriples;
+package opendap.semantics.IRISail;
 import net.sf.saxon.s9api.SaxonApiException;
 import org.jdom.Element;
 import org.slf4j.Logger;
