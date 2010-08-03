@@ -1,4 +1,4 @@
-package opendap.semantics.IRISail;
+package iri.generatentriples;
 
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -555,24 +555,27 @@ public class RepositoryUtility {
 
                 NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
                         myFileOutputStream);
-
+                
                 con.export(myNTRiplesWriter);
+                myNTRiplesWriter.startRDF();
                 myNTRiplesWriter.endRDF();
 
             }
             if (filename.endsWith("trix")) {
 
                 TriXWriter myTriXWriter = new TriXWriter(myFileOutputStream);
-
+                
                 con.export(myTriXWriter);
+                myTriXWriter.startRDF();
                 myTriXWriter.endRDF();
 
             }
             if (filename.endsWith("trig")) {
 
                 TriGWriter myTriGWriter = new TriGWriter(myFileOutputStream);
-
+                
                 con.export(myTriGWriter);
+                myTriGWriter.startRDF();
                 myTriGWriter.endRDF();
 
             }
