@@ -269,8 +269,8 @@ public class IRISailRepository extends SailRepository {
 
                         case Function:
 
-                            process_fn(graphResult, creatValue, Added, toAdd,
-                            //process_fn2(graphResult, creatValue, Added, toAdd,
+                            //process_fn(graphResult, creatValue, Added, toAdd,
+                            process_fn2(graphResult, creatValue, Added, toAdd,
                                     con, context);// postpocessing Join,
                                                   // subtract, getWcsID
                             break;
@@ -551,7 +551,7 @@ public class IRISailRepository extends SailRepository {
         
         Matcher functionMatcher = p_fn_className.matcher(processedQueryString);
         
-        String expand = "";
+        //String expand = "";
         if (stringMatcher.find()) {
             postProcessFlag = ProcessingTypes.xsString;
             String vname = stringMatcher.group(1);
@@ -583,6 +583,58 @@ public class IRISailRepository extends SailRepository {
         else if (functionMatcher.find()) {
             functionMatcher.reset(); //reset the matcher
             String fullyQualifiedFunctionName;
+            while (functionMatcher.find()) {
+                String expand = ""; 
+                String rdfFunctionName = functionMatcher.group(3);
+                String rdfClassName = functionMatcher.group(5);
+                
+                
+                fullyQualifiedFunctionName = rdfClassName + "#" + rdfFunctionName;
+
+                log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
+                log.debug("class_name = " + rdfClassName); // class name of the function
+                
+                Method myFunction = getMethodForFunction(rdfClassName, rdfFunctionName);
+
+                if (myFunction != null) {
+                    postProcessFlag = ProcessingTypes.Function;
+                }
+                
+                //String[] splittedStr = comma.split(functionMatcher.group(4));
+                CSVSplitter splitter = new CSVSplitter();
+                String[] splittedStr = splitter.split(functionMatcher.group(4));
+                
+                int i = 0;
+                String fn = functionMatcher.group(2);
+                String functionName = functionMatcher.group(3);
+
+                expand += "}  <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn> {" + fn + ":" + functionName
+                        + "} ; <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#mylist> {} rdf:first {";
+                for (String element : splittedStr) {
+                    i++;
+                    if (i < splittedStr.length) {
+                        if(!element.equals(",")){
+                        expand += element + "} ; rdf:rest {} rdf:first {";
+                        }else{
+                            expand += element;   
+                        }
+                        log.info("element " + i + " = " + element);
+                    } else {
+                        expand += element + "} ; rdf:rest {rdf:nil";
+                        log.info("element " + i + " = " + element);
+                    }
+                    log.info("Will postprocess fn:" + functionMatcher.group(3));
+                }
+                
+                
+                
+                processedQueryString = processedQueryString.substring(0, functionMatcher.start(1)) + expand + processedQueryString.substring(functionMatcher.end(1));
+                
+                functionMatcher.reset(processedQueryString);
+                
+                
+            }
+            /*** 
             while (functionMatcher.find()) {
             
                 String rdfFunctionName = functionMatcher.group(3);
@@ -625,7 +677,7 @@ public class IRISailRepository extends SailRepository {
                     }
                     log.info("Will postprocess fn:" + functionMatcher.group(3));
                 }
-                // log.info("expand = " + expand);
+                
                 
                 
                 processedQueryString = processedQueryString.substring(0, functionMatcher.start(1)) + expand + processedQueryString.substring(functionMatcher.end(1));
@@ -633,7 +685,7 @@ public class IRISailRepository extends SailRepository {
                 functionMatcher.reset(processedQueryString);
                 
                 
-            }
+            }*/
 
         }
 
@@ -2164,7 +2216,7 @@ public class IRISailRepository extends SailRepository {
 
         URI prdLastSt = null;
         Resource sbjLastSt = null;
-        //String myfnFullName = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#myfn";
+        
         Statement oldSt = null;
         while (graphResult.hasNext()) {
             Statement st = graphResult.next();
@@ -2252,13 +2304,14 @@ public class IRISailRepository extends SailRepository {
                     log.warn("Process Function failed: No processing function found.");
                 }
 
-            }
+            } //if (prd.equals(myfn))
 
             objLastSt = st.getObject();
             prdLastSt = st.getPredicate();
             sbjLastSt = st.getSubject();
-            // log.debug("new st to add = " + newSt.toString());
+             
             if (newSt != null) {
+                log.debug("new st to add = " + newSt.toString());   
                 st = newSt;
                 oldSt = null;
             }
