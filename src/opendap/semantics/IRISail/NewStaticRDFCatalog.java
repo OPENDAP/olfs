@@ -1256,13 +1256,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     public void updateCatalog()  throws RepositoryException, InterruptedException{
 
         setupRepository();
-        extractCoverageDescrptionsFromRepository();
         try {
             log.debug("updateRepository(): Getting RDF imports.");
             Vector<String> startingpoints = getRdfImports(_config);
-            if (updateRepository(startingpoints))
+            if (updateRepository(startingpoints)) {
+                extractCoverageDescrptionsFromRepository();
                 updateCatalogCache();
-            
+            }
+
         }
         finally {
             shutdownRepository();
