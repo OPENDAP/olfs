@@ -261,16 +261,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
         
     public void updateCatalog2()  throws RepositoryException, InterruptedException{
-        Vector<String> importURLs = new Vector<String>();
-        Vector<String> startingPoints = new Vector<String>();
 
         log.debug("updateCatalog2(): Getting RDF imports.");
-        importURLs = getRdfImports(_config);
 
-        for (String startingPointUrl :importURLs ){
-            startingPoints.add(startingPointUrl); // startingpoint from input file
-        }
-        updateRepository2(startingPoints); 
+        Vector<String> startingPoints = getRdfImports(_config);
+        updateRepository2(startingPoints);
         
     }
     
