@@ -279,12 +279,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             
             String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
 
-            log.debug("main(): Dumping Semantic Repository to: " + filename);
+            log.debug("updateRepository2(): Dumping Semantic Repository to: " + filename);
             
             RepositoryUtility.dumpRepository(owlse2, filename);
             
             filename = catalogCacheDirectory + "owlimHorstRepository.trig";
-            log.debug("main(): Dumping Semantic Repository to: " + filename);
+            log.debug("updateRepository2(): Dumping Semantic Repository to: " + filename);
             RepositoryUtility.dumpRepository(owlse2, filename);
             
             log.debug("updateRepository2(): Extracting CoverageDescriptions from the Repository.");
@@ -295,7 +295,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             extractCoverageDescrptionsFromRepository(con);
             
             } catch (RepositoryException e) {
-                log.error("Caught RepositoryException " + e.getMessage()); 
+                log.error("updateRepository2(): Caught RepositoryException " + e.getMessage()); 
             }
             finally{con.close();}
 
