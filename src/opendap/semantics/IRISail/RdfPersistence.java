@@ -105,7 +105,7 @@ public class RdfPersistence {
 
                     log.debug("Updating repository ...");
                     boolean modelChanged = true;
-                    //if(updateIriRepository()){
+
                     while(modelChanged){
                         log.debug("Repository update complete. Changes detected.");
 
@@ -114,12 +114,7 @@ public class RdfPersistence {
                         log.debug("Finished running construct rules.");
                         modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                     }
-                    //} else{
-                    //    log.debug("Repository update complete. No changes detected, rules not rerun..");
-
-                    //}
                     log.debug(RepositoryUtility.showContexts(repository));
-
                     repositoryHasBeenChanged = true;
                     
 
