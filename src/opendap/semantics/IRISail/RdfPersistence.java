@@ -32,12 +32,14 @@ public class RdfPersistence {
 
 
 
-        public static void updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls)
+        public static boolean updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls)
         throws InterruptedException,RepositoryException {
+
 
             Vector<String> dropList = new Vector<String>();
             Vector<String> startingPoints = new Vector<String>();
             boolean isNewRepository = true;
+            boolean repositoryHasBeenChanged = false;
 
             RdfImporter rdfImporter = new RdfImporter();
 
@@ -118,6 +120,9 @@ public class RdfPersistence {
                     //}
                     log.debug(RepositoryUtility.showContexts(repository));
 
+                    repositoryHasBeenChanged = true;
+                    
+
                 } else {
                     if (!dropList.isEmpty()) {
 
@@ -173,6 +178,8 @@ public class RdfPersistence {
                             modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                         }
 
+                        repositoryHasBeenChanged = true;
+
                     } else{
                         log.debug("Repository update complete. No changes detected, rules not rerun..");
                         log.debug(RepositoryUtility.showContexts(repository));
@@ -192,10 +199,11 @@ public class RdfPersistence {
             long elapsedTime = new Date().getTime() - startTime.getTime();
             log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
 
-            log.info("updateSemanticRepository2() End.");
+            log.info("updateSemanticRepository() End.");
             log.info("-----------------------------------------------------------------------");
             
 
+            return repositoryHasBeenChanged;
         }
 
         /*

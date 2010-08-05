@@ -226,7 +226,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     
     public boolean updateRepository(IRISailRepository repository, Vector <String> startingPoints) throws RepositoryException, InterruptedException{
 
-        RdfPersistence.updateSemanticRepository(repository, startingPoints);
+        boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints);
 
         String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
         log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
@@ -237,7 +237,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         RepositoryUtility.dumpRepository(repository, filename);
 
 
-        return true;
+        return repositoryChanged;
 
 
 
