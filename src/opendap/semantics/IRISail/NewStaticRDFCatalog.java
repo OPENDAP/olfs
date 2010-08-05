@@ -1121,6 +1121,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return now.getTime() - timeOfLastUpdate;
     }
 
+
+    /*
     public boolean updateRepository_OLD(Vector<String> startingPoints) throws InterruptedException {
 
         boolean success = false;
@@ -1133,9 +1135,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         try {
             updateRepository.updateSemanticRepository(owlse2,startingPoints);
             
-            /* ##########################################################################
-            Dump repository to disk as N-Triples
-          */
+         //##########################################################################
+         //  Dump repository to disk as N-Triples
          log.debug("updateRepository2(): Connecting to Repository...");
          RepositoryConnection con = owlse2.getConnection();
          String filename = catalogCacheDirectory + "daprepository.nt";
@@ -1146,9 +1147,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
              throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
          }
 
-            /* ##########################################################################
-            Dump repository to disk as Triples with their contexts.
-          */
+         //#########################################################################
+         //Dump repository to disk as Triples with their contexts.
          log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
          filename = catalogCacheDirectory + "daprepository.trig";
          RepositoryUtility.dumpRepository(con, filename);
@@ -1188,7 +1188,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
         return success;
     }
-
+    */
     
 
 
