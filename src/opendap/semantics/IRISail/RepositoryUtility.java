@@ -4,6 +4,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -18,9 +19,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -178,6 +185,7 @@ public class RepositoryUtility {
         if(!startingPointExists(con,internalStartingPoint)){
             addStartingPoint(con, valueFactory, internalStartingPoint);
         }
+        
     }
     public static void addInternalStartingPoint(SailRepository repo) {
         RepositoryConnection con = null;
@@ -256,7 +264,7 @@ public class RepositoryUtility {
 
             try {
 
-                if (importURL.startsWith("http://")) { //make sure an url and read it in
+                if (importURL.startsWith("http://")) { //make sure it's a url and read it in
                 url = new URL(importURL);
                 s = valueFactory.createURI(importURL);
                 con.add((Resource) s, isa, (Value) o, (Resource) cont);
@@ -657,4 +665,148 @@ public class RepositoryUtility {
 
         return msg;
     }
+
+    /**
+     * Return true if import context is newer.
+     *
+     * @param con
+     * @param importURL
+     * @return Boolean
+     */
+    public static Boolean olderContext(RepositoryConnection con, String importURL) {
+        Boolean oldLMT = false;
+
+        String oldltmod = getLastModifiedTime(con, importURL); // LMT from repository
+
+        if (oldltmod.isEmpty()) {
+            oldLMT = true;
+            return oldLMT;
+        }
+        String oltd = oldltmod.substring(0, 10) + " "
+                + oldltmod.substring(11, 19);
+        String ltmod = getLTMODContext(importURL);
+
+        String ltd = ltmod.substring(0, 10) + " " + ltmod.substring(11, 19);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd hh:mm:ss");
+        Date ltdparseDate;
+        try {
+            ltdparseDate = dateFormat.parse(ltd);
+            log.debug("In  olderContext ...");
+            log.debug("URI " + importURL);
+            log.debug("lastmodified    " + ltdparseDate.toString());
+            Date oldltdparseDate = dateFormat.parse(oltd);
+            log.debug("oldlastmodified " + oldltdparseDate.toString());
+
+            if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
+                // context
+
+                log.info("Import context is newer: " + importURL);
+                oldLMT = true;
+            }
+        } catch (ParseException e) {
+            log.error("Caught an ParseException! Msg: " + e.getMessage());
+
+        }
+        return oldLMT;
+    }
+
+
+
+
+    /**
+     * Checks and returns last modified time of a context (URI) via querying
+     * against the repository on contexts.
+     *
+     * @param urlstring
+     */
+    public static String getLastModifiedTime(RepositoryConnection con, String urlstring) {
+        TupleQueryResult result = null;
+        String ltmodstr = "";
+        URI uriaddress = new URIImpl(urlstring);
+        Resource[] context = new Resource[1];
+        context[0] = (Resource) uriaddress;
+
+        //String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
+        //        + uriaddress
+        //        + "> {x} <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified> {y} "
+        //        + "where x=<" + uriaddress + ">";
+
+        String queryString = "SELECT doc,lastmod FROM CONTEXT "
+                  + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
+                  + "where doc=<" + uriaddress + ">"
+                  + "USING NAMESPACE "
+                  + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+        try {
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+            result = tupleQuery.evaluate();
+
+            BindingSet bindingSet;
+            Value valueOfY;
+
+            while (result.hasNext()) { // should have only one value
+                bindingSet = (BindingSet) result.next();
+                Set<String> names = bindingSet.getBindingNames();
+                // for (String name : names) {
+                // log.debug("BindingNames: " + name);
+                // }
+                valueOfY = (Value) bindingSet.getValue("lastmod");
+                ltmodstr = valueOfY.stringValue();
+                // log.debug("Y:" + valueOfY.stringValue());
+
+            }
+
+        } catch (QueryEvaluationException e) {
+            log.error("Caught a QueryEvaluationException! Msg: "
+                    + e.getMessage());
+        } catch (RepositoryException e) {
+            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught a MalformedQueryException! Msg: "
+                    + e.getMessage());
+        } finally {
+            try {
+                result.close();
+
+            } catch (Exception e) {
+                log.error("Caught an Exception! Msg: " + e.getMessage());
+            }
+        }
+
+        return ltmodstr;
+    }
+    public static String getLTMODContext(String urlstring) {
+        String ltmodstr = "";
+        try {
+            URL myurl = new URL(urlstring);
+            HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
+            long ltmod = hc.getLastModified();
+            // log.debug("lastModified: "+ltmod);
+            ltmodstr = getLastModifiedTimeString(ltmod);
+        } catch (MalformedURLException e) {
+            log.error("Caught a MalformedQueryException! Msg: "
+                    + e.getLocalizedMessage());
+        } catch (IOException e) {
+            log.error("Caught an IOException! Msg: " + e.getMessage(), e);
+        }
+        return ltmodstr;
+    }
+
+    public static String getLastModifiedTimeString(Date date) {
+        return getLastModifiedTimeString(date.getTime());
+    }
+
+
+    public static String getLastModifiedTimeString(long epochTime) {
+        String ltmodstr = "";
+        Timestamp ltmodsql = new Timestamp(epochTime);
+        String ltmodstrraw = ltmodsql.toString();
+        ltmodstr = ltmodstrraw.substring(0, 10) + "T"
+                + ltmodstrraw.substring(11, 19) + "Z";
+        return ltmodstr;
+    }
+
+
+
 }

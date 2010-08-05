@@ -1,10 +1,8 @@
 package opendap.semantics.IRISail;
 import net.sf.saxon.s9api.SaxonApiException;
-import org.jdom.Element;
 import org.slf4j.Logger;
 import java.util.*;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -25,65 +23,44 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
-import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
-import org.openrdf.sail.memory.MemoryStore;
 
 public class RdfPersistence {
    
-        private Logger log;
-
-        private IRISailRepository owlse2;
-        
-        
+        private static Logger log;
        
-        private Vector<String> repositoryContexts;
-     
-        private HashMap<String, Boolean> downService;
-       
-        private Vector<String> imports; //list of imported and skipped
-        
-       
-        public RdfPersistence(IRISailRepository repository) {
+        public RdfPersistence() {
             log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-           
-            owlse2 = repository;
-            repositoryContexts = new Vector<String>();
-                        
-            downService = new HashMap<String, Boolean>();
-            imports = new Vector<String>();
-            
-         
         }
 
 
-        public void updateSemanticRepository(Vector<String> importURLs)
+        public static void updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls)
         throws InterruptedException,RepositoryException {
 
             Vector<String> dropList = new Vector<String>();
             Vector<String> startingPoints = new Vector<String>();
             boolean isNewRepository = true;
 
+            RdfImporter rdfImporter = new RdfImporter();
+
 
             Date startTime = new Date();
             log.info("-----------------------------------------------------------------------");
             log.info("updateSemanticRepository() Start.");
-            log.debug(RepositoryUtility.showContexts(owlse2));
+            log.debug(RepositoryUtility.showContexts(repository));
             RepositoryConnection con = null;
             try {
 
 
-                for (String startingPointUrl : importURLs){
+                for (String startingPointUrl : startingPointUrls){
                     startingPoints.add(startingPointUrl); // startingpoint from input file
                 }
 
                 Vector<String> newStartingPoints = null;
                 Vector<String> startingPointsToDrop = null;
                 try {
-                    con = owlse2.getConnection();
+                    con = repository.getConnection();
                     if (con.isOpen()) {
                         log.info("Connection is OPEN!");
 
@@ -97,15 +74,15 @@ public class RdfPersistence {
                         dropList.addAll(findChangedRDFDocuments(con));
                     }
                 } catch (RepositoryException e) {
-                  log.error("Caught RepositoryException updateSemanticRepository(Vector<String> importURLs)" +
+                  log.error("Caught RepositoryException updateSemanticRepository(Vector<String> startingPointUrls)" +
                           e.getMessage());
                 }
                 catch (QueryEvaluationException e) {
-                    log.error("Caught QueryEvaluationException updateSemanticRepository(Vector<String> importURLs)" +
+                    log.error("Caught QueryEvaluationException updateSemanticRepository(Vector<String> startingPointUrls)" +
                             e.getMessage());
                     
                 } catch (MalformedQueryException e) {
-                    log.error("Caught MalformedQueryException updateSemanticRepository(Vector<String> importURLs)" +
+                    log.error("Caught MalformedQueryException updateSemanticRepository(Vector<String> startingPointUrls)" +
                             e.getMessage());  
                 } finally {
                     if (con != null)
@@ -113,14 +90,14 @@ public class RdfPersistence {
                     log.info("Connection is Closed!");
                 }
 
-                log.debug(RepositoryUtility.showContexts(owlse2));
+                log.debug(RepositoryUtility.showContexts(repository));
 
                 if (isNewRepository) {
 
                     try {
-                        RepositoryUtility.addInternalStartingPoint(owlse2);
-                        con = owlse2.getConnection();
-                        RepositoryUtility.addStartingPoints(con, owlse2.getValueFactory(), newStartingPoints);
+                        RepositoryUtility.addInternalStartingPoint(repository);
+                        con = repository.getConnection();
+                        RepositoryUtility.addStartingPoints(con, repository.getValueFactory(), newStartingPoints);
                     }
                     finally {
                         if (con != null)
@@ -134,74 +111,74 @@ public class RdfPersistence {
                         log.debug("Repository update complete. Changes detected.");
 
                         log.debug("Running construct rules ...");
-                        ingestSwrlRules();
+                        repository.runConstruct();
                         log.debug("Finished running construct rules.");
-                        modelChanged = updateIriRepository();
+                        modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                     }
                     //} else{
                     //    log.debug("Repository update complete. No changes detected, rules not rerun..");
 
                     //}
-                    log.debug(RepositoryUtility.showContexts(owlse2));
+                    log.debug(RepositoryUtility.showContexts(repository));
 
                 } else {
                     if (!dropList.isEmpty()) {
 
-                        dropList.addAll(findExternalInferencingContexts());
+                        dropList.addAll(findExternalInferencingContexts(repository));
                         try {
-                            con = owlse2.getConnection();
+                            con = repository.getConnection();
                             log.debug("Dropping starting points ...");
-                            RepositoryUtility.dropStartingPoints(con, owlse2.getValueFactory(), startingPointsToDrop);
+                            RepositoryUtility.dropStartingPoints(con, repository.getValueFactory(), startingPointsToDrop);
                         }
                         finally {
                             if (con != null)
                                 con.close();
                         }
                         log.debug("Finished dropping starting point.");
-                        log.debug(RepositoryUtility.showContexts(owlse2));
+                        log.debug(RepositoryUtility.showContexts(repository));
 
-                        dropContexts(dropList);
-                        log.debug(RepositoryUtility.showContexts(owlse2));
+                        dropContexts(repository,dropList);
+                        log.debug(RepositoryUtility.showContexts(repository));
 
                     }
                     if (!newStartingPoints.isEmpty()) {
 
                         try {
-                            con = owlse2.getConnection();
+                            con = repository.getConnection();
                             log.debug("Adding new starting point ...");
-                            RepositoryUtility.addStartingPoints(con, owlse2.getValueFactory(), newStartingPoints);
+                            RepositoryUtility.addStartingPoints(con, repository.getValueFactory(), newStartingPoints);
                             log.debug("Finished adding nrew starting point.");
                         }
                         finally {
                             if (con != null)
                                 con.close();
                         }
-                        log.debug(RepositoryUtility.showContexts(owlse2));
+                        log.debug(RepositoryUtility.showContexts(repository));
 
                     }
                     log.debug("Updating repository ...");
-                    boolean modelChanged = updateIriRepository();
+                    boolean modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                     
                     if(modelChanged || !dropList.isEmpty()) {
                         log.debug("Running construct rules ...");
-                        ingestSwrlRules();
+                        repository.runConstruct();
                         log.debug("Finished running construct rules.");
-                        modelChanged = updateIriRepository();
+                        modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                         while(modelChanged){
-                            log.debug(RepositoryUtility.showContexts(owlse2));
+                            log.debug(RepositoryUtility.showContexts(repository));
 
                             log.debug("Repository update complete. Changes detected.");
 
                             log.debug("Running construct rules ...");
-                            ingestSwrlRules();
+                            repository.runConstruct();
                             log.debug("Finished running construct rules.");
-                            log.debug(RepositoryUtility.showContexts(owlse2));
-                            modelChanged = updateIriRepository();
+                            log.debug(RepositoryUtility.showContexts(repository));
+                            modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                         }
 
                     } else{
                         log.debug("Repository update complete. No changes detected, rules not rerun..");
-                        log.debug(RepositoryUtility.showContexts(owlse2));
+                        log.debug(RepositoryUtility.showContexts(repository));
 
                     }
 
@@ -223,212 +200,18 @@ public class RdfPersistence {
             
 
         }
-        
-        /*******************************************
-         * Update repository
-         */
-        private boolean updateIriRepository() {
-
-            boolean repositoryChanged = false;
-
-            Vector<String> rdfDocList = new Vector<String>();
-
-            findNeededRDFDocuments(rdfDocList);
-
-            while (!rdfDocList.isEmpty()) {
-                repositoryChanged = true;
-
-                addNeededRDFDocuments(rdfDocList);
-
-                findNeededRDFDocuments(rdfDocList);
-            }
-
-            return repositoryChanged;
-        }
-        /*
-         * Add all rdfcache:RDFDocuments that are needed
-         */
-        // private void addNeededRDFDocuments(RepositoryConnection con) {
-        private void addNeededRDFDocuments(Vector<String> rdfDocs) {
-            URI uriaddress;
-            long inferStartTime, inferEndTime;
-            inferStartTime = new Date().getTime();
-
-            String importURL = "";
-            RepositoryConnection con = null;
-            int notimport = 0;
-            try {
-                con = owlse2.getConnection();
-
-                log.debug("rdfDocs.size=" + rdfDocs.size());
-                notimport = 0;
-                while (!rdfDocs.isEmpty()) {
-                    importURL = rdfDocs.remove(0).toString();
-
-                    log.debug("Checking import URL: " + importURL);
-
-                    URL myurl = new URL(importURL);
-
-                    HttpURLConnection hc = (HttpURLConnection) myurl
-                            .openConnection();
-                    
-                    String contentType = hc.getContentType();
-                    log.debug("Connected to import URL: " + importURL);
-
-                    int rsCode = -1;
-                    try {
-                        rsCode = hc.getResponseCode();
-                    } catch (IOException e) {
-                        log.error("Unable to get HTTP status code for " + importURL
-                                + " Caught IOException! Msg: " + e.getMessage());
-                    }
-                    log.debug("Got HTTP status code: " + rsCode);
-
-                    if (downService.containsValue(importURL)
-                            && downService.get(importURL)) {
-                        log.error("Server error, Skip " + importURL);
-                    } else if (rsCode == -1) {
-                        log.error("Unable to get an HTTP status code for resource "
-                                + importURL + " WILL NOT IMPORT!");
-                        downService.put(importURL, true);
-
-                    } else if (rsCode > 500) { // server error
-                        if (rsCode == 503) {
-                            log.error("Error 503 Skipping " + importURL);
-                            
-                        } else{
-                            log.error("Server Error? Received HTTP Status code "
-                                    + rsCode + " for URL: " + importURL);
-                        }
-                        downService.put(importURL, true);
-                    } else if (rsCode == 304) {
-                        log.info("Not modified " + importURL);
-                        downService.put(importURL, true);
-                    } else if (rsCode == 404) {
-                        log.error("Received HTTP 404 status for resource: "
-                                + importURL);
-                        downService.put(importURL, true);
-                    } else if (rsCode == 403) {
-                        log.error("Received HTTP 403 status for resource: "
-                                + importURL);
-                        downService.put(importURL, true);
-                    } else {
-
-                        log.debug("Import URL appears valid ( " + importURL + " )");
-                        
-                        //@todo make this a more robust
-                        String urlsufix = importURL.substring(
-                                (importURL.length() - 4), importURL.length());
-
-                        if (urlsufix.equals(".owl") || urlsufix.equals(".rdf")) {
-
-                            uriaddress = new URIImpl(importURL);
-
-                            URL url;
-
-                            url = new URL(importURL);
-
-                            log.info("Importing URL " + url);
-                            con.add(url, importURL, RDFFormat.RDFXML,
-                                    (Resource) uriaddress);
-                            owlse2.setLTMODContext(importURL, con); // set last modified
-                                                                    // time of the context
-                            owlse2.setContentTypeContext(importURL,contentType, con);
-                            log.info("Finished importing URL " + url);
-
-                        } else if (importURL.substring((importURL.length() - 4),
-                                importURL.length()).equals(".xsd")) {
-
-                            uriaddress = new URIImpl(importURL);
-
-                            ByteArrayInputStream inStream;
-                            log.info("Transforming URL " + importURL);
-                            inStream = new ByteArrayInputStream(owlse2
-                                    .transformXSD(importURL).toByteArray());
-                            log.info("Finished transforming URL " + importURL);
-                            log.debug("Importing URL " + importURL);
-                            con.add(inStream, importURL, RDFFormat.RDFXML,
-                                    (Resource) uriaddress);
-                            owlse2.setLTMODContext(importURL, con); // set last modified
-                                                                    // time for the context
-                            owlse2.setContentTypeContext(importURL,contentType, con); //
-                            log.debug("Finished importing URL " + importURL);
-
-                        } else {
-                           
-                                                        
-                            //urlc.setRequestProperty("Accept",
-                            //                "application/rdf+xml,application/xml,text/xml,*/*");
-                            // urlc.setRequestProperty("Accept",
-                            // "application/rdf+xml, application/xml;
-                            // q=0.9,text/xml; q=0.9, */*; q=0.2");
-                                                        
-                            try {
-                                InputStream inStream = hc.getInputStream();
-
-                                uriaddress = new URIImpl(importURL);
-                            if (contentType.equalsIgnoreCase("text/xml")||contentType.equalsIgnoreCase("application/xml")
-                                || contentType.equalsIgnoreCase("application/rdf+xml"))   {
-                                con.add(inStream, importURL, RDFFormat.RDFXML,
-                                        (Resource) uriaddress);
-                                log.info("Imported xml = " + importURL);
-                            }else{
-                                notimport++;
-                                log.info("Skip " + importURL);
-                                log.info("Total skipped = " + notimport);
-                            }
-                                owlse2.setLTMODContext(importURL, con);
-                                owlse2.setContentTypeContext(importURL,contentType, con);
-                            } catch (IOException e) {
-                                log.error("Caught an IOException! in urlc.getInputStream() Msg: "
-                                                + e.getMessage());
-
-                            }
-                           
-                            
-                        }
-                    }
-                    imports.add(importURL); //files touched will not import again
-                } // while (!rdfDocs.isEmpty()
-            } catch (IOException e) {
-                
-                log.error("Caught an IOException! Msg: " + e.getMessage());
-
-            } catch (SaxonApiException e) {
-                imports.add(importURL); //skip this file
-                log.error("Caught a SaxsonException! Msg: " + e.getMessage());
-            } catch (RDFParseException e) {
-                imports.add(importURL); //skip this file
-                log.error("Caught an RDFParseException! Msg: " + e.getMessage());
-            } catch (RepositoryException e) {
-
-                log.error("Caught an RepositoryException! Msg: " + e.getMessage());
-            } finally {
-                try {
-                    imports.add(importURL); //skip this file
-                    con.close();
-                } catch (RepositoryException e) {
-                    log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
-                                    + e.getMessage());
-                }
-                inferEndTime = new Date().getTime();
-                double inferTime = (inferEndTime - inferStartTime) / 1000.0;
-                log.debug("Import takes " + inferTime + " seconds");
-            }
-        }
-
 
         /*
          * Drop URIs in the drop list
          */
         // private void dropContexts(RepositoryConnection con) {
-        public  void dropContexts(Vector<String> dropList) {
+        public  static void dropContexts(IRISailRepository repository, Vector<String> dropList) {
             RepositoryConnection con = null;
 
             log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
 
             try {
-                con = owlse2.getConnection();
+                con = repository.getConnection();
 
                 Thread thread = Thread.currentThread();
 
@@ -437,7 +220,7 @@ public class RdfPersistence {
 
 
 
-                ValueFactory f = owlse2.getValueFactory();
+                ValueFactory f = repository.getValueFactory();
 
                 for (String drop : dropList) {
                     uriDrop = new URIImpl(drop);
@@ -482,7 +265,7 @@ public class RdfPersistence {
          * Locate all of the of the contexts generated by externbal inferencing (construct rule) activities.
          * @return  A lists of contexts that were generated by construct rules (i.e. external inferencing)
          */
-        private Vector<String> findExternalInferencingContexts() {
+        private static Vector<String> findExternalInferencingContexts(IRISailRepository repository) {
             RepositoryConnection con = null;
             TupleQueryResult result = null;
 
@@ -492,7 +275,7 @@ public class RdfPersistence {
             log.debug("Finding ExternalInferencing ...");
            
             try {
-                con = owlse2.getConnection();
+                con = repository.getConnection();
                 
                 String queryString = "select distinct crule from context crule {} prop {} "
                         + "WHERE crule != rdfcache:cachecontext "
@@ -561,91 +344,13 @@ public class RdfPersistence {
 
         }
 
-        /*
-         * Find all rdfcache:RDFDocuments that are needed
-         */
-        // private void findNeededRDFDocuments(RepositoryConnection con) {
-        private void findNeededRDFDocuments(Vector<String> rdfDocs) {
-            TupleQueryResult result = null;
-            List<String> bindingNames;
-            RepositoryConnection con = null;
-            try {
-                con = owlse2.getConnection();
-
-                String queryString = "(SELECT doc "
-                        + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
-                        + "union "
-                        + "SELECT doc "
-                        + "FROM {tp} rdf:type {rdfcache:StartingPoint}; rdfcache:dependsOn {doc}) "
-                        + "MINUS "
-                        + "SELECT doc "
-                        + "FROM CONTEXT rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
-                        + "USING NAMESPACE "
-                        + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
-
-                log.debug("Query for NeededRDFDocuments: " + queryString);
-
-                TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
-                        queryString);
-
-                result = tupleQuery.evaluate();
-
-                while (result.hasNext()) {
-                    BindingSet bindingSet = result.next();
-                    
-                    Value firstValue = bindingSet.getValue("doc");
-                    String doc = firstValue.stringValue();
-
-                    if (!rdfDocs.contains(doc) && !imports.contains(doc)
-                            && !downService.containsValue(doc)
-                            && doc.startsWith("http://")) {
-                        rdfDocs.add(doc);
-
-                        log.debug("Adding to rdfDocs: " + doc);
-                    }
-                }
-
-            } catch (QueryEvaluationException e) {
-                log.error("Caught an QueryEvaluationException! Msg: "
-                        + e.getMessage());
-
-            } catch (RepositoryException e) {
-                log.error("Caught RepositoryException! Msg: " + e.getMessage());
-            } catch (MalformedQueryException e) {
-                log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
-            }
-
-            finally {
-                if (result != null) {
-                    try {
-                        result.close();
-                    } catch (QueryEvaluationException e) {
-                        log.error("Caught a QueryEvaluationException! Msg: "
-                                + e.getMessage());
-                    }
-                }
-
-                try {
-                    con.close();
-                } catch (RepositoryException e) {
-                    log.error("Caught a RepositoryException! in findNeededRDFDocuments() Msg: "
-                                    + e.getMessage());
-                }
-            }
-
-            log.info("Number of needed files identified:  "
-                    + rdfDocs.size());
-
-        }
-     
-
 
 
         /*
          * Find all rdfcache:RDFDocuments that are not needed and do not belong to
          * rdfcache:StartingPoints and add them to the drop-list
          */
-        private Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
+        private static Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
             TupleQueryResult result = null;
             List<String> bindingNames;
             Vector<String>  unneededRdfDocs = new Vector<String>();
@@ -728,7 +433,7 @@ public class RdfPersistence {
          * Find all rdfcache:RDFDocuments that has changed and add them to the
          * drop-list
          */
-        private Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
+        private static Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
             TupleQueryResult result = null;
             List<String> bindingNames;
             Vector<String> changedRdfDocuments = new Vector<String>();
@@ -761,7 +466,7 @@ public class RdfPersistence {
                         // log.debug("DOC: " + importURL);
                         // log.debug("LASTMOD: " + secondtValue.stringValue());
                         
-                        if (owlse2.olderContext(importURL) && !changedRdfDocuments.contains(importURL)) {
+                        if (RepositoryUtility.olderContext(con,importURL) && !changedRdfDocuments.contains(importURL)) {
                             
                                 changedRdfDocuments.add(importURL);
 
@@ -801,166 +506,6 @@ public class RdfPersistence {
         }
 
         
-
-        public void destroy() {
-
-            try {
-
-                log.info("Shutting Down Semantic Repository.");
-
-                // con.close();
-                owlse2.shutDown();
-                log.info("Semantic Repository Has Been Shutdown.");
-            } catch (RepositoryException e) {
-                log.error("destroy(): Failed to shutdown Semantic Repository.");
-            } finally {
-
-            }
-
-        }
-
-        private Vector<String> getRdfImports(Element config) {
-
-            Vector<String> rdfImports = new Vector<String>();
-            Element e;
-            String s;
-
-            /**
-             * Load individual dataset references
-             */
-            Iterator i = config.getChildren("dataset").iterator();
-            String datasetURL;
-            while (i.hasNext()) {
-                e = (Element) i.next();
-                datasetURL = e.getTextNormalize();
-
-                if (!datasetURL.endsWith(".rdf")) {
-
-                    if (datasetURL.endsWith(".ddx") | datasetURL.endsWith(".dds")
-                            | datasetURL.endsWith(".das")) {
-                        datasetURL = datasetURL.substring(0, datasetURL
-                                .lastIndexOf("."));
-                    }
-                    datasetURL += ".rdf";
-                }
-                rdfImports.add(datasetURL);
-                log.info("Added dataset reference " + datasetURL
-                        + " to RDF imports list.");
-            }
-
-            /**
-             * Load RDF Imports
-             */
-            i = config.getChildren("RdfImport").iterator();
-            while (i.hasNext()) {
-                e = (Element) i.next();
-                s = e.getTextNormalize();
-                rdfImports.add(s);
-                log.info("Added reference " + s + " to RDF imports list.");
-            }
-
-            return rdfImports;
-
-        }
-
-        private void processContexts(RepositoryConnection con)
-                throws RepositoryException {
-
-            // retrieve context
-            RepositoryResult<Resource> contextID = con.getContextIDs();
-            int contextTol = 0;
-
-            while (contextID != null && contextID.hasNext()) {
-                String ctstr = contextID.next().toString();
-                log.info("Context: " + ctstr);
-                owlse2.printRDFContext(ctstr);
-                repositoryContexts.add(ctstr);
-                owlse2.printLTMODContext(ctstr);
-                contextTol++;
-
-            }
-
-            contextID.close(); // needed to release resources
-            log.info("Found  " + contextTol + " Contexts");
-
-        }
-
- 
-        private void ingestSwrlRules() throws RepositoryException {
-            log.info("Running runConstruct ..");
-            owlse2.runConstruct();
-            
-            log.info("Complete running runConstruct ..");
-        }
-
-
-        public void dropStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
-            RepositoryConnection con = null;
-            ValueFactory valueFactory;
-
-            try {
-                con = repo.getConnection();
-                valueFactory = repo.getValueFactory();
-                dropStartingPoints(con, valueFactory, startingPointUrls);
-            }
-            catch (RepositoryException e) {
-                log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
-                        + e.getMessage());
-            } finally {
-                if (con != null) {
-                    try {
-                        con.close();
-                    } catch (RepositoryException e) {
-                        log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
-                                + e.getMessage());
-                    }
-                }
-            }
-
-
-        }
-        public  void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
-
-            String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-
-
-            URI startingPointValue = null;
-            URI isa = valueFactory.createURI(pred);
-            URI context = valueFactory.createURI(RepositoryUtility.rdfCacheNamespace+"startingPoints");
-            URI startingPointType = valueFactory.createURI(RepositoryUtility.rdfCacheNamespace+"StartingPoint");
-            URL url;
-
-            try {
-
-
-                for (String importURL : startingPointUrls) {
-
-                    url = new URL(importURL);
-                    startingPointValue = valueFactory.createURI(importURL);
-                    con.remove((Resource) startingPointValue, isa, (Value) startingPointType, (Resource) context);
-
-                    log.info("Removed starting point " + importURL + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
-                            + "> " + "<" + startingPointType + "> " + "<" + context + "> )");
-                }
-
-
-            } catch (RepositoryException e) {
-                log.error("In addStartingPoints, caught an RepositoryException! Msg: "
-                        + e.getMessage());
-
-            } catch (MalformedURLException e) {
-
-                log.error("In addStartingPoints, caught an MalformedURLException! Msg: "
-                        + e.getMessage());
-                //} catch (RDFParseException e) {
-                //    log.error("In addStartingPoints, caught an RDFParseException! Msg: "
-                //            + e.getMessage());
-            } catch (IOException e) {
-                log.error("In addStartingPoints, caught an IOException! Msg: "
-                        + e.getMessage());
-            }
-
-        }
 
 
     }

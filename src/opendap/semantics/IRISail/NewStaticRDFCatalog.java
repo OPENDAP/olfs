@@ -1,7 +1,5 @@
 package opendap.semantics.IRISail;
 
-import net.sf.saxon.s9api.SaxonApiException;
-import opendap.logging.LogUtil;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -20,15 +18,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -36,11 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -49,9 +39,6 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 
 
 import com.ontotext.trree.owlim_ext.SailImpl;
@@ -141,20 +128,21 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-   /*
-    public static void main(String[] args) {
 
+    /*******************************************************/
+    /*******************************************************/
+
+    public static void main(String[] args) {
         long startTime, endTime;
         double elapsedTime;
 
-
+        
         NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
-
-
+        startTime = new Date().getTime();
+  
         try {
-            LogUtil.initLogging();
-
-            Map<String, String> env = System.getenv();
+            
+            System.out.println("arg0= " + args[0]);
             catalog.resourcePath = ".";
             catalog.catalogCacheDirectory = ".";
 
@@ -171,8 +159,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
             catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
 
-            //catalog.loadWcsCatalogFromRepository();
-
+            catalog.log.debug("main() using config file: " + configFileName);
+            
+           // catalog.updateCatalog();
             for (int i = 0; i < 1; i++) {
                 startTime = new Date().getTime();
                                
@@ -186,247 +175,78 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 catalog.setStopFlag(false);
                 //Thread.sleep(5000);
             }
+        } catch (RepositoryException e) {
+            catalog.log.error("Caught RepositoryException in main(): "
+                    + e.getMessage());
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            catalog.log.error("Caught MalformedURLException in main(): "
+                    + e.getMessage()); 
+        } catch (IOException e) {
+            catalog.log.error("Caught IOException in main(): "
+                    + e.getMessage());  
+        } catch (JDOMException e) {
+            catalog.log.error("Caught JDOMException in main(): "
+                    + e.getMessage());  
+        } catch (InterruptedException e) {
+            catalog.log.error("Caught InterruptedException in main(): "
+                    + e.getMessage());
+        }
+        
+    }
+    /*******************************************************/
+    /*******************************************************/
+
+    public void updateCatalog()  throws RepositoryException, InterruptedException{
+
+        IRISailRepository repository = setupRepository();
+        try {
+            log.debug("updateRepository(): Getting starting points (RDF imports).");
+            Vector<String> startingPoints = getRdfImports(_config);
+
+            log.debug("updateCatalog(): Updating Repository...");
+            if (updateRepository(repository, startingPoints)) {
+                log.debug("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
+                extractCoverageDescrptionsFromRepository(repository);
+
+                String filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
+                log.debug("updateCatalog(): Dumping CoverageDescriptions Document to: "+filename);
+                dumpCoverageDescriptionsDocument(filename);
+
+                log.debug("updateCatalog(): Updating catalog cache....");
+                updateCatalogCache(repository);
+
+            }
         }
         finally {
-            catalog.destroy();
-
+            shutdownRepository(repository);
         }
-    }
-*/
-    
-    public static void main(String[] args) {
-        long startTime, endTime;
-        double elapsedTime;
 
-        
-        NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
-        startTime = new Date().getTime();
-  
-        try {
-            
-            System.out.println("arg0= " + args[0]);
-            catalog.resourcePath = ".";
-            catalog.catalogCacheDirectory = ".";
-
-            String configFileName;
-
-            configFileName = "file:///data/haibo/workspace/ioos/wcs_service.xml";
-            if (args.length > 0)
-                configFileName = args[0];
-
-
-            catalog.log.debug("main() using config file: " + configFileName);
-            Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
-
-            catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
-            catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
-
-            catalog.log.debug("main() using config file: " + configFileName);
-            
-           // catalog.updateCatalog2();
-            for (int i = 0; i < 1; i++) {
-                startTime = new Date().getTime();
-                               
-                catalog.updateCatalog2();
-                endTime = new Date().getTime();
-                elapsedTime = (endTime - startTime) / 1000.0;
-                catalog.log.debug("Completed catalog update in " + elapsedTime + " seconds.");
-                catalog.log.debug("########################################################################################");
-                catalog.log.debug("########################################################################################");
-                catalog.log.debug("########################################################################################");
-                catalog.setStopFlag(false);
-                //Thread.sleep(5000);
-            }
-        } catch (RepositoryException e) {
-            catalog.log.error("Caught RepositoryException in main(): "
-                    + e.getMessage());
-
-        } catch (MalformedURLException e) {
-            catalog.log.error("Caught MalformedURLException in main(): "
-                    + e.getMessage()); 
-        } catch (IOException e) {
-            catalog.log.error("Caught IOException in main(): "
-                    + e.getMessage());  
-        } catch (JDOMException e) {
-            catalog.log.error("Caught JDOMException in main(): "
-                    + e.getMessage());  
-        } catch (InterruptedException e) {
-            catalog.log.error("Caught InterruptedException in main(): "
-                    + e.getMessage());
-        }
-        
-    }
-        
-    public void updateCatalog2()  throws RepositoryException, InterruptedException{
-
-        log.debug("updateCatalog2(): Getting RDF imports.");
-
-        Vector<String> startingPoints = getRdfImports(_config);
-        updateRepository2(startingPoints);
-        
     }
     
-    public void updateRepository2(Vector <String> startingPoints) throws RepositoryException, InterruptedException{
-       
-        setupRepository();
-        
-        RdfPersistence updateRep = new RdfPersistence(owlse2); 
-        
-            updateRep.updateSemanticRepository(startingPoints);
-            
-            String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
+    public boolean updateRepository(IRISailRepository repository, Vector <String> startingPoints) throws RepositoryException, InterruptedException{
 
-            log.debug("updateRepository2(): Dumping Semantic Repository to: " + filename);
-            
-            RepositoryUtility.dumpRepository(owlse2, filename);
-            
-            filename = catalogCacheDirectory + "owlimHorstRepository.trig";
-            log.debug("updateRepository2(): Dumping Semantic Repository to: " + filename);
-            RepositoryUtility.dumpRepository(owlse2, filename);
-            
-            log.debug("updateRepository2(): Extracting CoverageDescriptions from the Repository.");
-            RepositoryConnection con = null;
-            try {
-                con = owlse2.getConnection();
-            
-            extractCoverageDescrptionsFromRepository(con);
-            
-            } catch (RepositoryException e) {
-                log.error("updateRepository2(): Caught RepositoryException " + e.getMessage()); 
-            }
-            finally{con.close();}
 
-            filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
-            log.debug("updateRepository2(): Dumping CoverageDescriptions Document to: "+filename);
-            dumpCoverageDescriptionsDocument(filename);
-            
-            destroy();
-              
-         
+
+        RdfPersistence updateRep = new RdfPersistence();
+        updateRep.updateSemanticRepository(repository, startingPoints);
+
+
+        String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
+        log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+        RepositoryUtility.dumpRepository(repository, filename);
+
+        filename = catalogCacheDirectory + "owlimHorstRepository.trig";
+        log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+        RepositoryUtility.dumpRepository(repository, filename);
+
+
+        return true;
+
+
+
     }
- /*   public static void main(String[] args) {
-        long startTime, endTime;
-        double elapsedTime;
 
-        
-        NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
-        startTime = new Date().getTime();
-  
-        Vector<String> startingPoints = new Vector<String>();
-        
-        if (args.length != 1) {
-            catalog.log
-                    .error("Usage: java -jar generatentriples.jar config_file/owl_file");
-            catalog.log
-                    .error("Example: java -jar generatentriples.jar file:///data/haibo/workspace/IRIWMS/wcs_service.xml");
-            catalog.log
-                    .error("Or: java -jar generatentriples.jar http://iri.columbia.edu/~haibo/opendaptest/datasetcoveragelist.owl");
-            System.exit(1);
-
-        }
-
-        try {
-            
-            System.out.println("arg0= " + args[0]);
-
-            String configFileName = null;
-            configFileName = args[0];
-            catalog.log.debug("main() using config file: " + configFileName);
-            Vector<String> importURLs = new Vector<String>();
-            if (configFileName.endsWith("xml")) {
-
-                Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
-
-                catalog.log.debug("main() using config file: " + configFileName);
-                catalog._config = (Element) olfsConfig.getDescendants(
-                        new ElementFilter("WcsCatalog")).next();
-                catalog.processConfig(catalog._config, catalog.catalogCacheDirectory,
-                        catalog.resourcePath);
-                catalog.log.debug("main(): Getting RDF imports.");
-                importURLs = catalog.getRdfImports(catalog._config);
-            } else if (configFileName.endsWith("owl")) {
-                importURLs.add(configFileName);
-
-            }
-
-            for (String startingPointUrl :importURLs ){
-            startingPoints.add(startingPointUrl); // startingpoint from input file
-            }
-            
-            catalog.setupRepository();
-           
-            RdfPersistence updateRepository = new RdfPersistence(catalog.owlse2); 
-            try {
-                updateRepository.updateSemanticRepository(startingPoints);
-                
-            } catch (InterruptedException e) {
-                catalog.log.error("Thread interrupted "+ e.getMessage());
-            }
-        } catch (RepositoryException e) {
-            catalog.log.error("Caught RepositoryException in main(): "
-                    + e.getMessage());
-
-        } catch (MalformedURLException e) {
-            catalog.log.error("Caught MalformedURLException in main(): "
-                    + e.getMessage()); 
-        } catch (IOException e) {
-            catalog.log.error("Caught IOException in main(): "
-                    + e.getMessage());  
-        } catch (JDOMException e) {
-            catalog.log.error("Caught JDOMException in main(): "
-                    + e.getMessage());  
-        } catch (InterruptedException e) {
-            catalog.log.error("Caught InterruptedException in main(): "
-                    + e.getMessage());
-        }
-
-
-        elapsedTime = new Date().getTime() - startTime;
-        catalog.log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
-
-        catalog.log.info("updateSemanticRepository2() End.");
-        catalog.log.info("-----------------------------------------------------------------------");
-
-            
-
-        String filename = catalog.catalogCacheDirectory + "owlimHorstRepository.nt";
-
-        catalog.log.debug("main(): Dumping Semantic Repository to: " + filename);
-        
-        RepositoryUtility.dumpRepository(catalog.owlse2, filename);
-        
-        filename = catalog.catalogCacheDirectory + "owlimHorstRepository.trig";
-        catalog.log.debug("main(): Dumping Semantic Repository to: " + filename);
-        RepositoryUtility.dumpRepository(catalog.owlse2, filename);
-        
-        catalog.log.debug("updateRepository2(): Extracting CoverageDescriptions from the Repository.");
-        RepositoryConnection con;
-        try {
-            con = catalog.owlse2.getConnection();
-        
-        catalog.extractCoverageDescrptionsFromRepository(con);
-        con.close();
-        } catch (RepositoryException e) {
-            catalog.log.error("Caught RepositoryException " + e.getMessage()); 
-        }
-        
-
-        filename = catalog.catalogCacheDirectory + "coverageXMLfromRDF.xml";
-        catalog.log.debug("updateRepository2(): Dumping CoverageDescriptions Document to: "+filename);
-        catalog.dumpCoverageDescriptionsDocument(filename);
-        
-        catalog.destroy();
-        endTime = new Date().getTime();
-        elapsedTime = (endTime - startTime) / 1000;
-        catalog.log.info("Completed NewStaticRDFCatalog in " + elapsedTime + " seconds.");
-        
-    } */  
-    /*******************************************************/
-    /*******************************************************/
-    
     public void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
         long startTime, endTime;
         double elapsedTime;
@@ -434,14 +254,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("#############################################");
         log.info("Loading WCS Catalog from Semantic Repository.");
         startTime = new Date().getTime();
-        setupRepository();
-        
-        extractCoverageDescrptionsFromRepository();
-        updateCatalogCache();
-        shutdownRepository();
+        IRISailRepository repository = setupRepository();
+        try {
+            extractCoverageDescrptionsFromRepository(repository);
+            updateCatalogCache(repository);
+        }
+        finally {
+            shutdownRepository(repository);
+        }
         endTime = new Date().getTime();
         elapsedTime = (endTime - startTime) / 1000.0;
-        log.info("WCS Catalog loaded from the Semantic Repository. Loaded in "+ elapsedTime + " seconds.");
+        log.info("WCS Catalog loaded from the Semantic Repository. Loaded in " + elapsedTime + " seconds.");
         log.info("#############################################");
         log.info("#############################################");
     }
@@ -457,8 +280,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         if (initialized)
             return;
 
-
-
         backgroundUpdates = false;
 
         _config = config;
@@ -473,8 +294,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         } else {
             updateCatalog();
         }
-
-
 
         initialized = true;
     }
@@ -561,24 +380,23 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     }
-    private void shutdownRepository() throws RepositoryException {
+    private void shutdownRepository(IRISailRepository repository) throws RepositoryException {
 
         log.debug("shutdownRepository)(): Shutting down Repository...");
-            owlse2.shutDown();
+        repository.shutDown();
         log.debug("shutdownRepository(): Repository shutdown complete.");
     }
 
-    private void setupRepository() throws RepositoryException, InterruptedException {
+    private IRISailRepository setupRepository() throws RepositoryException, InterruptedException {
 
 
         log.info("Setting up Semantic Repository.");
 
         //OWLIM Sail Repository (inferencing makes this somewhat slow)
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
-        owlse2 = new IRISailRepository(owlimSail, resourcePath, catalogCacheDirectory); //owlim inferencing
+        IRISailRepository repository = new IRISailRepository(owlimSail, resourcePath, catalogCacheDirectory); //owlim inferencing
 
 
-        //owlse2 = new IRISailRepository(new MemoryStore()); //memory store
 
         log.info("Configuring Semantic Repository.");
         File storageDir = new File(catalogCacheDirectory); //define local copy of repository
@@ -604,52 +422,28 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("Intializing Semantic Repository.");
 
         // Initialize repository
-        owlse2.startup(); //needed
-
-
-
-
-
+        repository.startup(); //needed
 
         log.info("Adding InternalStartingPoint to repository.");
 
-        RepositoryUtility.addInternalStartingPoint(owlse2);
+        RepositoryUtility.addInternalStartingPoint(repository);
 
         log.info("Semantic Repository Ready.");
 
         if(Thread.currentThread().isInterrupted())
             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
 
+        owlse2 = repository;
+
+        return repository;
 
     }
 
-
-
-    private void ingestSwrlRules() throws RepositoryException{
-        log.info("Running runConstruct ..");
-        owlse2.runConstruct();
-
-        /*
-        String ltmod = owlse2.getLastModifiedTimeString(new Date()); 
-        try{
-            RepositoryConnection con = owlse2.getConnection();
-            String externalInferencing = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#externalInferencing";
-            owlse2.setLTMODContext(externalInferencing, ltmod, con);
-        
-        }
-        finally {
-            if (con != null)
-                con.close();
-            log.info("Complete running runConstruct ..");   
-        }
-        */
-        
-    }
 
 
  
-    private void extractCoverageDescrptionsFromRepository() throws RepositoryException {
-        RepositoryConnection con = owlse2.getConnection();
+    private void extractCoverageDescrptionsFromRepository(IRISailRepository repository) throws RepositoryException {
+        RepositoryConnection con = repository.getConnection();
         log.info("Repository connection has been opened.");
 
         extractCoverageDescrptionsFromRepository(con);
@@ -673,7 +467,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         try {
             log.info("extractCoverageDescrptionsFromRepository() - Updating CoverageIdGenerator Id Caches.");
-            HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL();
+            HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL(con);
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
         } catch (RepositoryException e) {
             log.error("extractCoverageDescrptionsFromRepository(): Caught RepositoryException. msg: "
@@ -706,8 +500,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         Can we remove this??? Yes, once we are happy with the JDom Doc retrieval (HB Dec032009)
         */
         try {
-            File destinationFile = new File(filename);
-            FileOutputStream fos = new FileOutputStream(destinationFile);
+            FileOutputStream fos = new FileOutputStream(filename);
             outputter.output(buildDoc.getDoc(), fos);
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -740,7 +533,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 log.debug("destroy(): catalogUpdateThread '"+catalogUpdateThread+"' interrupt() called.");
             }
             log.info("destroy(): Attempting to shutdown Semantic Repository.");
-            shutdownRepository();
+            shutdownRepository(owlse2);
             log.info("destroy(): Semantic Repository Has been shutdown.");
 
         } catch (RepositoryException e) {
@@ -842,14 +635,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void ingestCatalog() throws Exception {
+    private void ingestCatalog(IRISailRepository repository) throws Exception {
 
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
 
         List<Element> cd = buildDoc.getDoc().getRootElement().getChildren();
         Iterator<Element> i = cd.iterator();
-        HashMap<String, String> idltm = owlse2.getLMT();
+        HashMap<String, String> idltm = repository.getLMT();
         String lastMDT = "nolastMDT";
         while (i.hasNext()) {
             Element e = i.next();
@@ -1197,7 +990,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    public void updateCatalogCache()  throws InterruptedException{
+    public void updateCatalogCache(IRISailRepository repository)  throws InterruptedException{
 
         Thread thread = Thread.currentThread();
 
@@ -1216,11 +1009,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                 if (!stopWorking && !thread.isInterrupted()) {
 
-                    coverageIDServer = getCoverageIDServerURL();
+                    coverageIDServer = getCoverageIDServerURL(repository);
 
                     addSupportedFormats(buildDoc.getRootElement());
 
-                    ingestCatalog();
+                    ingestCatalog(repository);
                     timeOfLastUpdate = new Date().getTime();
 
                     log.debug("Catalog Cache updated at "+ new Date(timeOfLastUpdate));
@@ -1253,20 +1046,25 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    public void updateCatalog()  throws RepositoryException, InterruptedException{
 
-        setupRepository();
+    public HashMap<String, Vector<String>> getCoverageIDServerURL(IRISailRepository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        RepositoryConnection con = null;
+        HashMap<String, Vector<String>> coverageIDServer;
+
         try {
-            log.debug("updateRepository(): Getting RDF imports.");
-            Vector<String> startingpoints = getRdfImports(_config);
-            if (updateRepository(startingpoints)) {
-                extractCoverageDescrptionsFromRepository();
-                updateCatalogCache();
-            }
+            con = repo.getConnection();
+            coverageIDServer = getCoverageIDServerURL(con);
+            return coverageIDServer;
 
-        }
-        finally {
-            shutdownRepository();
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                            + e.getMessage());
+                }
+            }
         }
     }
 
@@ -1277,8 +1075,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * @throws MalformedQueryException
      * @throws QueryEvaluationException
      */
-    public HashMap<String, Vector<String>> getCoverageIDServerURL() throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        TupleQueryResult result = null;
+    public HashMap<String, Vector<String>> getCoverageIDServerURL(RepositoryConnection con) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        TupleQueryResult result;
         HashMap<String, Vector<String>> coverageIDServer = new HashMap<String, Vector<String>>();
 
         String queryString = "SELECT coverageurl,coverageid " +
@@ -1288,7 +1086,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 "wcs = <http://www.opengis.net/wcs/1.1#>";
 
 
-        RepositoryConnection con = owlse2.getConnection();
         log.debug("getCoverageIDServerURL() - QueryString (coverage ID and server URL): \n" + queryString);
         TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
 
@@ -1315,7 +1112,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             }
         }
-        con.close();
         return coverageIDServer;
 
     }
@@ -1325,17 +1121,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return now.getTime() - timeOfLastUpdate;
     }
 
-    public boolean updateRepository(Vector<String> startingPoints) throws InterruptedException {
+    public boolean updateRepository_OLD(Vector<String> startingPoints) throws InterruptedException {
 
         boolean success = false;
         
         int biffCount = 0;
         Thread thread = Thread.currentThread();
         
-        RdfPersistence updateRepository = new RdfPersistence(owlse2); 
+        RdfPersistence updateRepository = new RdfPersistence(); 
         
         try {
-            updateRepository.updateSemanticRepository(startingPoints);
+            updateRepository.updateSemanticRepository(owlse2,startingPoints);
             
             /* ##########################################################################
             Dump repository to disk as N-Triples
@@ -1349,7 +1145,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
              log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
              throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
          }
-            
+
             /* ##########################################################################
             Dump repository to disk as Triples with their contexts.
           */
@@ -1517,5 +1313,18 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
+
+    private void checkExecutionState() throws InterruptedException {
+
+        Thread thread = Thread.currentThread();
+
+        boolean isInterrupted = thread.isInterrupted();
+
+        if(isInterrupted || stopWorking){
+            log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+            throw new InterruptedException("Thread.currentThread.isInterrupted() returned '"+isInterrupted+"'. stopWorking='"+stopWorking+"'");
+        }
+
+    }
 
 }
