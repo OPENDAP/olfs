@@ -44,7 +44,7 @@ public class RdfPersistence {
      
         private HashMap<String, Boolean> downService;
        
-        private Vector<String> imports;
+        private Vector<String> imports; //list of imported and skipped
         
        
         public RdfPersistence(IRISailRepository repository) {
@@ -271,6 +271,8 @@ public class RdfPersistence {
 
                     HttpURLConnection hc = (HttpURLConnection) myurl
                             .openConnection();
+                    
+                    String contentType = hc.getContentType();
                     log.debug("Connected to import URL: " + importURL);
 
                     int rsCode = -1;
@@ -312,10 +314,7 @@ public class RdfPersistence {
                     } else {
 
                         log.debug("Import URL appears valid ( " + importURL + " )");
-                        URL urlImport = new URL(importURL);
-                        URLConnection urlc = urlImport.openConnection();
-                        urlc.connect();
-                        String contentType = urlc.getContentType();
+                        
                         //@todo make this a more robust
                         String urlsufix = importURL.substring(
                                 (importURL.length() - 4), importURL.length());
@@ -333,7 +332,7 @@ public class RdfPersistence {
                                     (Resource) uriaddress);
                             owlse2.setLTMODContext(importURL, con); // set last modified
                                                                     // time of the context
-                            
+                            owlse2.setContentTypeContext(importURL,contentType, con);
                             log.info("Finished importing URL " + url);
 
                         } else if (importURL.substring((importURL.length() - 4),
@@ -364,27 +363,31 @@ public class RdfPersistence {
                             // q=0.9,text/xml; q=0.9, */*; q=0.2");
                                                         
                             try {
-                                InputStream inStream = urlc.getInputStream();
+                                InputStream inStream = hc.getInputStream();
 
                                 uriaddress = new URIImpl(importURL);
                             if (contentType.equalsIgnoreCase("text/xml")||contentType.equalsIgnoreCase("application/xml")
                                 || contentType.equalsIgnoreCase("application/rdf+xml"))   {
                                 con.add(inStream, importURL, RDFFormat.RDFXML,
                                         (Resource) uriaddress);
-                                log.info("Imported non owl/xsd = " + importURL);
+                                log.info("Imported xml = " + importURL);
+                            }else{
+                                
+                                log.info("Skip " + importURL);
+                                log.info("Total skipped = " + notimport);
                             }
                                 owlse2.setLTMODContext(importURL, con);
+                                owlse2.setContentTypeContext(importURL,contentType, con);
                             } catch (IOException e) {
                                 log.error("Caught an IOException! in urlc.getInputStream() Msg: "
                                                 + e.getMessage());
 
                             }
                            
-                            log.info("Imported non owl/xsd = " + importURL);
-                            log.info("Total non owl/xsd Nr = " + notimport);
+                            
                         }
                     }
-                    imports.add(importURL);
+                    imports.add(importURL); //files touched will not import again
                 } // while (!rdfDocs.isEmpty()
             } catch (IOException e) {
                 log.error("Caught an IOException! Msg: " + e.getMessage());
@@ -412,22 +415,6 @@ public class RdfPersistence {
         }
 
 
-        private String getContentTypeContext(String urlstring) {
-            String contentType = "";
-            try {
-                URL myurl = new URL(urlstring);
-                HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
-                
-                contentType = hc.getContentType();
-                
-            } catch (MalformedURLException e) {
-                log.error("Caught a MalformedQueryException! Msg: "
-                        + e.getLocalizedMessage());
-            } catch (IOException e) {
-                log.error("Caught an IOException! Msg: " + e.getMessage(), e);
-            }
-            return contentType;
-        }
         /*
          * Drop URIs in the drop list
          */
