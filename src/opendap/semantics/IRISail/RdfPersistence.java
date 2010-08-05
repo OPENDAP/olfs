@@ -30,8 +30,8 @@ public class RdfPersistence {
    
         private static Logger log;
        
-        public RdfPersistence() {
-            log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        static  {
+            log = org.slf4j.LoggerFactory.getLogger(RdfPersistence.class);
         }
 
 
