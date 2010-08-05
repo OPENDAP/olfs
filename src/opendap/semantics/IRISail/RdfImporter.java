@@ -202,28 +202,12 @@ public class RdfImporter {
                             + importURL + " WILL NOT IMPORT!");
                     downService.put(importURL, true);
 
-                } else if (rsCode > 500) { // server error
-                    if (rsCode == 503) {
-                        log.error("Error 503 Skipping " + importURL);
-                    }
-                    else {
-                        log.error("Server Error? Received HTTP Status code "
-                                + rsCode + " for URL: " + importURL);
-                    }
+                }
+                else if (rsCode != 200){
+                    log.error("Got HTTP status code "+rsCode+" Skipping importURL " + importURL);
                     downService.put(importURL, true);
-
-                } else if (rsCode == 304) {
-                    log.info("Not modified " + importURL);
-                    downService.put(importURL, true);
-                } else if (rsCode == 404) {
-                    log.error("Received HTTP 404 status for resource: "
-                            + importURL);
-                    downService.put(importURL, true);
-                } else if (rsCode == 403) {
-                    log.error("Received HTTP 403 status for resource: "
-                            + importURL);
-                    downService.put(importURL, true);
-                } else {
+                }
+                else {
 
                     log.debug("Import URL appears valid ( " + importURL + " )");
                     URL urlImport = new URL(importURL);
