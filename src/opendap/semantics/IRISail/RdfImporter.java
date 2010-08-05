@@ -181,8 +181,7 @@ public class RdfImporter {
 
                 URL myurl = new URL(importURL);
 
-                HttpURLConnection hc = (HttpURLConnection) myurl
-                        .openConnection();
+                HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
                 log.debug("Connected to import URL: " + importURL);
 
                 int rsCode = -1;
@@ -204,7 +203,7 @@ public class RdfImporter {
 
                 }
                 else if (rsCode != 200){
-                    log.error("Error! Got HTTP status code "+rsCode+" Skipping importURL " + importURL);
+                    log.error("Error!  HTTP status code "+rsCode+" Skipping importURL " + importURL);
                     downService.put(importURL, true);
                 }
                 else {
