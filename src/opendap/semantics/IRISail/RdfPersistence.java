@@ -295,11 +295,12 @@ public class RdfPersistence {
                     } else if (rsCode > 500) { // server error
                         if (rsCode == 503) {
                             log.error("Error 503 Skipping " + importURL);
-                            downService.put(importURL, true);
-                        } else
+                            
+                        } else{
                             log.error("Server Error? Received HTTP Status code "
                                     + rsCode + " for URL: " + importURL);
-
+                        }
+                        downService.put(importURL, true);
                     } else if (rsCode == 304) {
                         log.info("Not modified " + importURL);
                         downService.put(importURL, true);
@@ -354,7 +355,7 @@ public class RdfPersistence {
                             log.debug("Finished importing URL " + importURL);
 
                         } else {
-                            notimport++;
+                           
                                                         
                             //urlc.setRequestProperty("Accept",
                             //                "application/rdf+xml,application/xml,text/xml,*/*");
@@ -372,7 +373,7 @@ public class RdfPersistence {
                                         (Resource) uriaddress);
                                 log.info("Imported xml = " + importURL);
                             }else{
-                                
+                                notimport++;
                                 log.info("Skip " + importURL);
                                 log.info("Total skipped = " + notimport);
                             }
