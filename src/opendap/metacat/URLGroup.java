@@ -10,7 +10,7 @@ public class URLGroup {
 	private String[] classification;
 	private Set<String> urls;
 	
-	public URLGroup(String url) {
+	public URLGroup(String url) throws Exception {
 		URLClassification c = new URLClassification(url);
 		classification = c.getClassification();
 		urls = new HashSet<String>();
