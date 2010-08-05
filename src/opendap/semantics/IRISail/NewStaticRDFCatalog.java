@@ -204,18 +204,21 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             log.debug("updateRepository(): Getting starting points (RDF imports).");
             Vector<String> startingPoints = getRdfImports(_config);
 
-            log.debug("updateCatalog(): Updating Repository...");
+            log.info("updateCatalog(): Updating Repository...");
             if (updateRepository(repository, startingPoints)) {
-                log.debug("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
+                log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
                 extractCoverageDescrptionsFromRepository(repository);
 
                 String filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
-                log.debug("updateCatalog(): Dumping CoverageDescriptions Document to: "+filename);
+                log.info("updateCatalog(): Dumping CoverageDescriptions Document to: "+filename);
                 dumpCoverageDescriptionsDocument(filename);
 
-                log.debug("updateCatalog(): Updating catalog cache....");
+                log.info("updateCatalog(): Updating catalog cache....");
                 updateCatalogCache(repository);
 
+            }
+            else {
+                log.info("updateCatalog(): The repository was unchanged, nothing else to do.");
             }
         }
         finally {
