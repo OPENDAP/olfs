@@ -230,7 +230,8 @@ public class RdfImporter {
                                 (Resource) uriaddress);
                         repository.setLTMODContext(importURL, con); // set last modified
                                                                 // time of the context
-
+                        repository.setContentTypeContext(importURL,contentType, con); //
+                        
                         log.info("Finished importing URL " + url);
 
                     } else if (importURL.substring((importURL.length() - 4),
