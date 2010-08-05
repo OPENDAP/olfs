@@ -391,12 +391,14 @@ public class RdfPersistence {
                     imports.add(importURL); //files touched will not import again
                 } // while (!rdfDocs.isEmpty()
             } catch (IOException e) {
+                
                 log.error("Caught an IOException! Msg: " + e.getMessage());
 
             } catch (SaxonApiException e) {
+                imports.add(importURL); //skip this file
                 log.error("Caught a SaxsonException! Msg: " + e.getMessage());
             } catch (RDFParseException e) {
-
+                imports.add(importURL); //skip this file
                 log.error("Caught an RDFParseException! Msg: " + e.getMessage());
             } catch (RepositoryException e) {
 
