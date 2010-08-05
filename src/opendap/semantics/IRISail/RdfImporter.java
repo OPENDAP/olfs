@@ -204,7 +204,7 @@ public class RdfImporter {
 
                 }
                 else if (rsCode != 200){
-                    log.error("Got HTTP status code "+rsCode+" Skipping importURL " + importURL);
+                    log.error("Error! Got HTTP status code "+rsCode+" Skipping importURL " + importURL);
                     downService.put(importURL, true);
                 }
                 else {
