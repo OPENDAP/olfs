@@ -29,7 +29,7 @@ import org.openrdf.rio.RDFParseException;
 public class RdfPersistence {
    
         private static Logger log = org.slf4j.LoggerFactory.getLogger(RdfPersistence.class);
-        
+
 
 
         public static void updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls)
@@ -51,7 +51,7 @@ public class RdfPersistence {
 
 
                 for (String startingPointUrl : startingPointUrls){
-                    startingPoints.add(startingPointUrl); // startingpoint from input file
+                    startingPoints.add(startingPointUrl); // starting point from input file
                 }
 
                 Vector<String> newStartingPoints = null;

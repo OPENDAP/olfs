@@ -205,10 +205,12 @@ public class RdfImporter {
                 } else if (rsCode > 500) { // server error
                     if (rsCode == 503) {
                         log.error("Error 503 Skipping " + importURL);
-                        downService.put(importURL, true);
-                    } else
+                    }
+                    else {
                         log.error("Server Error? Received HTTP Status code "
                                 + rsCode + " for URL: " + importURL);
+                    }
+                    downService.put(importURL, true);
 
                 } else if (rsCode == 304) {
                     log.info("Not modified " + importURL);
