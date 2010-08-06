@@ -77,6 +77,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String owlim_storage_folder;
     private String resourcePath;
     private boolean backgroundUpdates;
+    private boolean overrideBackgroundUpdates;
     private HashMap<String, Vector<String> >  coverageIDServer;
 
     
@@ -84,18 +85,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private boolean initialized;
     
    
-    private Vector<String> repositoryContexts;
 
-    private HashMap<String, Boolean> downService;
-    private Vector<String> imports;
-    private Vector<String> constructs;
 
 
     public NewStaticRDFCatalog() {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         catalogUpdateInterval = 20 * 60 * 1000; // 20 minutes worth of milliseconds
-        firstUpdateDelay = 5 * 1000; // 5 second worth of milliseconds
+        firstUpdateDelay = 5 * 1000; // 5 seconds worth of milliseconds
         timeOfLastUpdate = 0;
         stopWorking = false;
 
@@ -103,11 +100,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         coverages = new ConcurrentHashMap<String, CoverageDescription>();
 
         _repositoryLock = new ReentrantReadWriteLock();
+
         repositoryUpdateActive = new AtomicBoolean();
 
         repositoryUpdateActive.set(false);
 
         backgroundUpdates = false;
+        overrideBackgroundUpdates = false;
         
        
         owlse2 = null;
@@ -120,11 +119,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         initialized = false;
         
-        repositoryContexts = new Vector<String>();
 
-        downService = new HashMap<String, Boolean>();
-        imports = new Vector<String>();
-        
 
     }
 
@@ -142,7 +137,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
   
         try {
             
-            System.out.println("arg0= " + args[0]);
+            System.out.println("arg[0]= " + args[0]);
             catalog.resourcePath = ".";
             catalog.catalogCacheDirectory = ".";
 
@@ -157,45 +152,57 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
 
             catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
-            catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
 
-            catalog.log.debug("main() using config file: " + configFileName);
+            startTime = new Date().getTime();
+
+            catalog.overrideBackgroundUpdates = true;
+
+            catalog.init(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
             
-           // catalog.updateCatalog();
-            for (int i = 0; i < 1; i++) {
-                startTime = new Date().getTime();
-                               
-                catalog.updateCatalog();
-                endTime = new Date().getTime();
-                elapsedTime = (endTime - startTime) / 1000.0;
-                catalog.log.debug("Completed catalog update in " + elapsedTime + " seconds.");
-                catalog.log.debug("########################################################################################");
-                catalog.log.debug("########################################################################################");
-                catalog.log.debug("########################################################################################");
-                catalog.setStopFlag(false);
-                //Thread.sleep(5000);
-            }
-        } catch (RepositoryException e) {
-            catalog.log.error("Caught RepositoryException in main(): "
-                    + e.getMessage());
+            endTime = new Date().getTime();
+            elapsedTime = (endTime - startTime) / 1000.0;
+            catalog.log.debug("Completed catalog update in " + elapsedTime + " seconds.");
+            catalog.log.debug("########################################################################################");
+            catalog.log.debug("########################################################################################");
+            catalog.log.debug("########################################################################################");
+            
 
-        } catch (MalformedURLException e) {
-            catalog.log.error("Caught MalformedURLException in main(): "
-                    + e.getMessage()); 
-        } catch (IOException e) {
-            catalog.log.error("Caught IOException in main(): "
-                    + e.getMessage());  
-        } catch (JDOMException e) {
-            catalog.log.error("Caught JDOMException in main(): "
-                    + e.getMessage());  
-        } catch (InterruptedException e) {
-            catalog.log.error("Caught InterruptedException in main(): "
+        } catch (Exception e) {
+            catalog.log.error("Caught "+e.getClass().getName()+" in main(): "
                     + e.getMessage());
+            e.printStackTrace();
         }
         
     }
     /*******************************************************/
     /*******************************************************/
+
+
+
+    public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
+
+        if (initialized)
+            return;
+
+        backgroundUpdates = false;
+
+        _config = config;
+
+        processConfig(_config,defaultCacheDirectory, defaultResourcePath );
+
+        loadWcsCatalogFromRepository();
+
+        if (backgroundUpdates && !overrideBackgroundUpdates) {
+            catalogUpdateThread = new Thread(this);
+            catalogUpdateThread.start();
+        } else {
+            updateCatalog();
+        }
+
+        initialized = true;
+    }
+
+
 
     public void updateCatalog()  throws RepositoryException, InterruptedException{
 
@@ -274,28 +281,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
-
-        if (initialized)
-            return;
-
-        backgroundUpdates = false;
-
-        _config = config;
-
-        processConfig(_config,defaultCacheDirectory, defaultResourcePath );
-
-        loadWcsCatalogFromRepository();
-
-        if (backgroundUpdates) {
-            catalogUpdateThread = new Thread(this);
-            catalogUpdateThread.start();
-        } else {
-            updateCatalog();
-        }
-
-        initialized = true;
-    }
 
 
     private void processConfig(Element config,String defaultCacheDirectory, String defaultResourcePath){
@@ -642,7 +627,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         List<Element> cd = buildDoc.getDoc().getRootElement().getChildren();
         Iterator<Element> i = cd.iterator();
         HashMap<String, String> idltm = repository.getLMT();
-        String lastMDT = "nolastMDT";
+        String lastMDT;
+
+
         while (i.hasNext()) {
             Element e = i.next();
 
@@ -674,9 +661,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public void ingestCoverageDescription(URL server, Element cde, long lastModified) throws Exception {
-
-    }
 
 
     public void ingestCoverageDescription(Element cde, long lastModified) {
@@ -972,7 +956,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             + "wcs=<http://www.opengis.net/wcs/1.1#>, "
             + "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "
             + "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>";
-              
+
+        log.debug("createQuery: Built query string"+qString);
         return qString ;
     }
 
