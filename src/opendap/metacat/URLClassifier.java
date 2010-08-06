@@ -59,8 +59,8 @@ public class URLClassifier {
 			c.classify();
 			ps.println("Completed classification: " + (new Date()).toString());
 			
-			//c.printClassifications(ps);
-			c.printCompleteClassifications(ps);
+			c.printClassifications(ps);
+			//c.printCompleteClassifications(ps);
 		} 
 		catch (Exception e) {
 			log.error("Could not open the output file: " + e.getLocalizedMessage());

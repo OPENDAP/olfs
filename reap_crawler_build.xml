@@ -563,7 +563,7 @@
 		<java classname="opendap.metacat.DDXCrawler" fork="true" dir="${build.run}">
 			<!--arg line="- -catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" /-->
 			<arg line="--catalog-root=http://test.opendap.org/opendap/catalog.xml"/>
-			<arg line="--cache-name=rucur_test" />
+			<arg line="--cache-name=ddx_urls_only" />
 			<arg line="--verbose" />
 			<arg line="--cache-ddx" />
 			<classpath refid="classpath" />
@@ -652,7 +652,7 @@
         <java classname="opendap.metacat.URLClassifier"
                     fork="true"
                     dir="${build.run}">
-            <arg line="satdat1.gso.uri.edu"/>
+            <arg line="opendap.csiro.au_urls_only"/>
             <classpath refid="classpath"/>
         </java>
 

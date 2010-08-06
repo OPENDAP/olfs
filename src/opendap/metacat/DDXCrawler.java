@@ -107,8 +107,6 @@ public class DDXCrawler {
 		    crawler.printDDX = line.hasOption("print-ddx");
 		    crawler.fetchDDX = line.hasOption("fetch-ddx");
 		    
-		    // The sense of these caching options is odd because they are to
-		    // not use caching and are false (i.e., caching is on by default.
 		    boolean useDDXCache = line.hasOption("cache-ddx");
 		    boolean readFromThreddsCache = line.hasOption("use-thredds-cache");
 		    boolean restoreState = line.hasOption("restore");
