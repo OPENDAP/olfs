@@ -153,13 +153,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
 
-            startTime = new Date().getTime();
 
             catalog.overrideBackgroundUpdates = true;
 
+            startTime = new Date().getTime();
             catalog.init(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
-            
             endTime = new Date().getTime();
+
             elapsedTime = (endTime - startTime) / 1000.0;
             catalog.log.debug("Completed catalog update in " + elapsedTime + " seconds.");
             catalog.log.debug("########################################################################################");
