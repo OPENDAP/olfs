@@ -2,7 +2,6 @@ package opendap.semantics.IRISail;
 
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -127,14 +126,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /*******************************************************/
     /*******************************************************/
 
+    /**
+     *
+     * @param args   Command line arguments
+     */
     public static void main(String[] args) {
         long startTime, endTime;
         double elapsedTime;
 
         
         NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
-        startTime = new Date().getTime();
-  
+
         try {
             
             System.out.println("arg[0]= " + args[0]);
@@ -914,17 +916,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             con = owlse2.getConnection();
         
         TupleQueryResult result = null;
-        List<String> bindingNames;
-        
+
         TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,qString);
 
         result = tupleQuery.evaluate();
         
         if (result != null) {
-            bindingNames = result.getBindingNames();
 
             while (result.hasNext()) {
-                BindingSet bindingSet = (BindingSet) result.next();
+                BindingSet bindingSet = result.next();
 
                 Value firstValue = bindingSet.getValue("cid");
                 coordinateDapId = firstValue.stringValue();
@@ -1052,8 +1052,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
     }
 
+
     /**
-     * 
+     *
+     * @param con
      * @return
      * @throws RepositoryException
      * @throws MalformedQueryException
@@ -1075,17 +1077,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         result = tupleQuery.evaluate();
         log.debug("getCoverageIDServerURL() - Qresult: " + result.hasNext());
-        List<String> bindingNames = result.getBindingNames();
-        //log.debug(bindingNames.probeServletContext());
         while (result.hasNext()) {
-            BindingSet bindingSet = (BindingSet) result.next();
-            // log.debug(bindingSet.probeServletContext());
+            BindingSet bindingSet =  result.next();
             Vector<String> coverageURL = new Vector<String>();
 
             if (bindingSet.getValue("coverageid") != null && bindingSet.getValue("coverageurl") != null) {
 
-                Value valueOfcoverageid = (Value) bindingSet.getValue("coverageid");
-                Value valueOfcoverageurl = (Value) bindingSet.getValue("coverageurl");
+                Value valueOfcoverageid =  bindingSet.getValue("coverageid");
+                Value valueOfcoverageurl = bindingSet.getValue("coverageurl");
                 coverageURL.addElement(valueOfcoverageurl.stringValue());
                 log.debug("getCoverageIDServerURL() - coverageid: "+valueOfcoverageid.stringValue());
                 log.debug("getCoverageIDServerURL() - coverageurl: "+valueOfcoverageurl.stringValue());
@@ -1100,10 +1099,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public long getCatalogAge() {
-        Date now = new Date();
-        return now.getTime() - timeOfLastUpdate;
-    }
 
 
     /*
