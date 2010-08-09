@@ -236,7 +236,7 @@
 	        <include name="${owlim.lib}"/>
             <include name="${trree.lib}"/>
             <include name="${openrdf-sesame.lib}"/>
-
+            <include name="${WebInfResources.dir}/logback-test.xml"/>
 
         </fileset>
     </path>
