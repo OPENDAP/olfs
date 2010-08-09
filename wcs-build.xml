@@ -28,7 +28,7 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+        name="Web Coverage Service"
         default="all" basedir=".">
 
     <!-- Global Properties for Java-OPeNDAP software development -->
@@ -455,13 +455,13 @@
 
     </target>
 
-    <target  name="sw" depends="compileSW">
+    <target  name="test" depends="compile">
 
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
         <copy file="${resources.dir}/WEB-INF/logback.xml" tofile="${build.classes}/logback.xml"/>
 
-        <java classname="opendap.semantics.IRISail.GettingStarted"
+        <java classname="opendap.semantics.IRISail.NewStaticRDFCatalog"
               fork="true"
               dir="${build.run}"
                 >
