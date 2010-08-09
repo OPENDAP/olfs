@@ -6,11 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Given a URL passed to the constructor, parse teh URL and provide access
+ * Given a URL passed to the constructor, parse the URL and provide access
  * to its various parts. This class will break out the machine, path and leaf
- * components of the URL and will attempt to identify certain parts as dates,
- * etc., that are to be treated as equivalent even though they have different 
- * literal values.
+ * components of the URL.
  * 
  * @author jimg
  *

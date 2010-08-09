@@ -1,4 +1,4 @@
-package opendap.metacat.cluster;
+package opendap.metacat.cluster_example;
 
 import java.util.Vector;
 
