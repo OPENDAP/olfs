@@ -467,7 +467,7 @@
               dir="${build.run}"
                 >
             <classpath refid="compile.classpath"/>
-            <arg>${CONFIG_FILE}</arg>
+            <arg value="${CONFIG_FILE}"/>
         </java>
 
     </target>
