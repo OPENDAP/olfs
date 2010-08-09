@@ -236,7 +236,6 @@
 	        <include name="${owlim.lib}"/>
             <include name="${trree.lib}"/>
             <include name="${openrdf-sesame.lib}"/>
-            <include name="${WebInfResources.dir}/logback-test.xml"/>
 
         </fileset>
     </path>
@@ -460,7 +459,7 @@
 
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
-        <copy file="${resources.dir}/WEB-INF/logback.xml" tofile="${build.classes}/logback.xml"/>
+        <copy file="${resources.dir}/WEB-INF/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
 
         <java classname="opendap.semantics.IRISail.NewStaticRDFCatalog"
               fork="true"
