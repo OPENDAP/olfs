@@ -23,7 +23,6 @@
 package opendap.metacat;
 
 import java.io.PrintStream;
-//import java.util.Enumeration;
 import java.util.Vector;
 
 import org.apache.commons.cli.CommandLine;

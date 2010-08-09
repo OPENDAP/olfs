@@ -45,7 +45,7 @@ public class URLComponents {
 	 * @param url
 	 *            The URL to parse.
 	 */
-	URLComponents(String url) throws Exception {
+	public URLComponents(String url) throws Exception {
 		try {
 			url = url.substring(url.indexOf("//") + 2);
 
@@ -66,11 +66,11 @@ public class URLComponents {
 		}
 	}
 	
-	String getMachine() {
+	public String getMachine() {
 		return machine;
 	}
 	
-	String[] getComponents() {
+	public String[] getComponents() {
 		return components;
 	}
 	

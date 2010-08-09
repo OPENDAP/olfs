@@ -26,7 +26,7 @@ public class URLClassifier {
 	
 	private DDXRetriever ddxSource;
 	
-    private static Logger log = LoggerFactory.getLogger(DDXRetriever.class);
+    private static Logger log = LoggerFactory.getLogger(URLClassifier.class);
 
 	public URLClassifier(String cacheName) throws Exception {
 		ddxSource = new DDXRetriever(true, cacheName);
