@@ -51,21 +51,24 @@ public class CoverageDescription {
 
     private File myFile;
 
+    private String _latitudeCoordinateDapId;
+    private String _longitudeCoordinateDapId;
+    private String _elevationCoordinateDapId;
+    private String _timeCoordinateDapId;
+
+
 
     public CoverageDescription(Element cd, long lastModified) throws WcsException{
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-
-
-
-
+        _latitudeCoordinateDapId = null;
+        _longitudeCoordinateDapId = null;
+        _elevationCoordinateDapId = null;
+        _timeCoordinateDapId = null;
 
 
         WCS.checkCoverageDescription(cd);
         myCD = cd;
-
-
-
 
         myFile = null;
         this.lastModified = lastModified;
@@ -300,6 +303,41 @@ public class CoverageDescription {
     public Element getElement(){
         return (Element) myCD.clone();
     }
+
+
+
+    public String getLatitudeCoordinateDapId() {
+        return _latitudeCoordinateDapId;
+
+    }
+    public void setLatitudeCoordinateDapId(String dapId) {
+        _latitudeCoordinateDapId = dapId;
+
+    }
+
+    public String getLongitudeCoordinateDapId() {
+        return _longitudeCoordinateDapId;
+    }
+    public void setLongitudeCoordinateDapId(String dapId) {
+        _longitudeCoordinateDapId = dapId;
+    }
+
+    public String getElevationCoordinateDapId() {
+        return _elevationCoordinateDapId;
+
+    }
+    public void setElevationCoordinateDapId(String dapId) {
+        _elevationCoordinateDapId = dapId;
+
+    }
+
+    public String getTimeCoordinateDapId() {
+        return _timeCoordinateDapId;
+    }
+    public void setTimeCoordinateDapId(String dapId) {
+        _timeCoordinateDapId = dapId;
+    }
+
 
 
 }
