@@ -47,6 +47,7 @@
          tag information from CVS.
     -->
     <property name="VERSION" value="Not.A.Release"/>
+    <property name="CONFIG_FILE" value="ConfigFileNotSpecified"/>
 
 
     <!-- Compiler Settings -->
@@ -466,6 +467,7 @@
               dir="${build.run}"
                 >
             <classpath refid="compile.classpath"/>
+            <arg>${CONFIG_FILE}</arg>
         </java>
 
     </target>
