@@ -139,7 +139,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         try {
             
-            System.out.println("arg[0]= " + args[0]);
+            if(args.length>0)
+                System.out.println("arg[0]= " + args[0]);
             catalog.resourcePath = ".";
             catalog.catalogCacheDirectory = ".";
 
@@ -626,17 +627,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
 
-        List<Element> cd = buildDoc.getDoc().getRootElement().getChildren();
-        Iterator<Element> i = cd.iterator();
+        List<Element> coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
         HashMap<String, String> idltm = repository.getLMT();
         String lastMDT;
 
 
-        while (i.hasNext()) {
-            Element e = i.next();
+        for(Element cde: coverageDescriptions){
 
-            List<Element> elist = e.getChildren();
-            Iterator<Element> j = elist.iterator();
+            List<Element> elementList = cde.getChildren();
+            Iterator<Element> j = elementList.iterator();
 
             while (j.hasNext()) {
                 Element eID = j.next();
@@ -651,10 +650,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     Date date = sdf.parse(datetime);
                     log.debug("Date and Time: " + date.getTime());
 
-                    ingestCoverageDescription(e, date.getTime());
-                    //log.debug("element: "+ eID.getText());
-                    //log.debug("lastMDT = "+ lastMDT);
-                    log.debug("Add element " + e.getName());
+                    CoverageDescription coverageDescription = ingestCoverageDescription(cde, date.getTime());
+
+                    if(coverageDescription!=null){
+                        
+                    }
+
+                    log.debug("Add element " + cde.getName());
                 }
             }
         }//while(i.hasNext()
@@ -665,9 +667,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    public void ingestCoverageDescription(Element cde, long lastModified) {
+    public CoverageDescription ingestCoverageDescription(Element cde, long lastModified) {
 
-        CoverageDescription cd;
+        CoverageDescription cd = null;
         try {
             cd = new CoverageDescription(cde, lastModified);
             coverages.put(cd.getIdentifier(), cd);
@@ -680,6 +682,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             log.error("ingestCoverageDescription(): WcsException: " + wcseElem + "");
             log.error("ingestCoverageDescription(): Here is the XML element that failed to ingest: " + cvgDesc);
         }
+
+        return cd;
     }
 
     public boolean hasCoverage(String id) {
