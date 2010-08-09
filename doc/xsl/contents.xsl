@@ -33,6 +33,10 @@
                 >
     <xsl:import href="version.xsl"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
+    
+    <xsl:variable name="serviceContext">/opendap</xsl:variable>
+    <xsl:variable name="docsService">/docs</xsl:variable>
+    <xsl:variable name="dapService">/hyrax</xsl:variable>
 
 
 
@@ -46,7 +50,7 @@
 
     <xsl:template match="bes:showCatalog">
             <head>
-                <link rel='stylesheet' href='/opendap/docs/css/contents.css'
+                <link rel='stylesheet' href='{$serviceContext}{$docsService}/css/contents.css'
                       type='text/css'/>
                 <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="bes:dataset/@name"/></title>
             </head>
@@ -57,19 +61,24 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$serviceContext}{$docsService}/images/logo.gif'/>
                 <h1>Contents of
-                    <xsl:if test="bes:dataset/@prefix!='/'" >
-                        <xsl:if test="bes:dataset/@name='/'" >
-                            <xsl:value-of select="bes:dataset/@prefix"/>
-                        </xsl:if>
-                        <xsl:if test="bes:dataset/@name!='/'" >
-                            <xsl:value-of select="bes:dataset/@prefix"/><xsl:value-of select="bes:dataset/@name"/>
-                        </xsl:if>
-                    </xsl:if>
-                    <xsl:if test="bes:dataset/@prefix='/'" >
-                        <xsl:value-of select="bes:dataset/@name"/>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="bes:dataset/@prefix!='/'" >
+                            <xsl:choose>
+                                <xsl:when test="bes:dataset/@name='/'" >
+                                    <xsl:value-of select="bes:dataset/@prefix"/>
+                                </xsl:when>
+                                <xsl:otherwise >
+                                    <xsl:value-of select="bes:dataset/@prefix"/><xsl:value-of select="bes:dataset/@name"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise >
+                            <xsl:value-of select="bes:dataset/@name"/>
+                        </xsl:otherwise>
+
+                    </xsl:choose>
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
@@ -84,6 +93,7 @@
                             <th align="center">Last Modified</th>
                             <th align="center">Size</th>
                             <th align="center">Response Links</th>
+                            <th align="center">Webstart</th>
                         </tr>
                         <tr>
                             <td>
@@ -135,7 +145,7 @@
                         <td>
                             <div class="small" align="left">
                                 THREDDS Catalog
-                                <a href="/opendap{bes:dataset/@name[.!='/']}/catalog.xml">
+                                <a href="{$serviceContext}{$dapService}{bes:dataset/@name[.!='/']}/catalog.xml">
                                     XML
                                 </a>
                             </div>
@@ -165,7 +175,7 @@
                     </xsl:if>
 
                     <br/>
-                    <a href='/opendap/docs/'>Documentation</a>
+                    <a href='{$serviceContext}{$docsService}/'>Documentation</a>
                 </h3>
 
             </body>
@@ -200,7 +210,7 @@
         </xsl:choose>
     </xsl:template>
 
-    
+
 
     <xsl:template name="DapServiceLinks" >
         <td align="left">
@@ -219,7 +229,6 @@
         </td>
 
         <td align="center">
-            <!-- <a href="{../@name}.rdf">rdf</a> -->
             <a href="{../@name}.ddx">ddx</a>
             <a href="{../@name}.dds">dds</a>
             <a href="{../@name}.das">das</a>
@@ -227,6 +236,32 @@
             <a href="{../@name}.html">html</a>
             <a href="{../@name}.rdf">rdf</a>
         </td>
+        <xsl:call-template name="WebStartLinks"/>
+    </xsl:template>
+
+
+
+
+    <xsl:template name="WebStartLinks" >
+        <td align="center">
+
+
+            <script language="JavaScript"><xsl:comment>
+                var pageUrl = location.href;
+                var index = pageUrl.lastIndexOf("/")+1;
+                
+                var collectionUrl = pageUrl.substring(0,index);
+                document.write('&#60;A HREF="{$serviceContext}/webstart/idv?dataset=' +
+                collectionUrl+'<xsl:value-of select="../@name"/>"' +
+                '&#62;IDV&#60;/A&#62; ');
+
+                document.write('&#60;A HREF="{$serviceContext}/webstart/netcdfToolsUI?dataset=' +
+                location.href + '<xsl:value-of select="../@name"/>"' +
+                '&#62;ToolsUI&#60;/A&#62; ');
+
+            // </xsl:comment></script>
+        </td>
+        
     </xsl:template>
 
 

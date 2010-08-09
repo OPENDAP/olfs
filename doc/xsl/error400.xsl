@@ -33,13 +33,18 @@
                 >
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
+    <xsl:variable name="serviceContext">/opendap</xsl:variable>
+    <xsl:variable name="docsService">/docs</xsl:variable>
+    <xsl:variable name="dapService">/hyrax</xsl:variable>
+
+
     <xsl:template match="/bes:BESError">
 
         <html>
             <head>
                 <meta http-equiv="Content-Type"
                       content="text/html; charset=ISO-8859-1"/>
-                <link rel='stylesheet' href='/opendap/docs/css/contents.css'
+                <link rel='stylesheet' href='{$serviceContext}{$docsService}/css/contents.css'
                       type='text/css' />
                 <title>Hyrax: Bad Request</title>
             </head>
@@ -52,7 +57,7 @@
                     <tr>
                         <td>
                             <img alt="BadRequest"
-                                 src="/opendap/docs/images/BadDapRequest.gif"
+                                 src="{$serviceContext}{$docsService}/images/BadDapRequest.gif"
                                  width="323" height="350"/>
                         </td>
                         <td>

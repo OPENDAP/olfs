@@ -143,39 +143,45 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         String contextName = request.getContextPath();
         String servletName = servlet.getServletName();
 
-        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+        log.debug(Util.probeRequest(servlet,request));
 
-        if (collectionName.endsWith("/catalog.xml")) {
-            collectionName = collectionName.substring(0, collectionName.lastIndexOf("catalog.xml"));
+        String fullContextName; 
+
+        String besCatalogName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+
+        if (besCatalogName.endsWith("/catalog.xml")) {
+            besCatalogName = besCatalogName.substring(0, besCatalogName.lastIndexOf("catalog.xml"));
         }
 
-        if (!collectionName.endsWith("/"))
-            collectionName += "/";
+        if (!besCatalogName.endsWith("/"))
+            besCatalogName += "/";
 
-        if (collectionName.startsWith("/"))
-            collectionName = collectionName.substring(1,collectionName.length());
+        if (besCatalogName.startsWith("/"))
+            besCatalogName = besCatalogName.substring(1, besCatalogName.length());
 
-        log.debug("sendThreddsCatalog() - collectionName:  " + collectionName);
+        log.debug("sendThreddsCatalog() - besCatalogName:  " + besCatalogName);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Document showCatalogDoc = new Document();
 
-        if (BesXmlAPI.getCatalog(collectionName, showCatalogDoc)) {
+        if (BesXmlAPI.getCatalog(besCatalogName, showCatalogDoc)) {
 
 
             log.debug(xmlo.outputString(showCatalogDoc));
 
             String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
+            //showCatalogToThreddsCatalog.setParameter("serviceContext",);
+
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
 
 
 
-            String catalogID = contextName +(servletName.startsWith("/")?"":"/") + servletName +
-                    (collectionName.startsWith("/")?"":"/") + collectionName;
+            String threddsCatalogID = contextName +(servletName.startsWith("/")?"":"/") + servletName +
+                    (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
 
 
             response.setContentType("text/xml");
@@ -183,11 +189,11 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             response.setHeader("Content-Description", "thredds_catalog");
 
 
-            if(InheritedMetadataManager.hasInheritedMetadata(catalogID)){
-                log.debug("Found inherited metadata for collection '"+collectionName+"'");
+            if(InheritedMetadataManager.hasInheritedMetadata(threddsCatalogID)){
+                log.debug("Found inherited metadata for collection '"+ besCatalogName +"'");
 
                 // Go get the inherited metadata elements.
-                Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(catalogID);
+                Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(threddsCatalogID);
 
                 // Transform the BES  showCatalog response into a thredds catalog
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -206,7 +212,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                 topDataset.addContent(1,metadata);
 
                 // Get the service definitions (if any) used by the inherited metadata?
-                Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(catalogID);
+                Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
                 log.debug("Collecting inherited services.");
                 Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
                 HashMap<String, Element> inheritedServices = new HashMap<String, Element>();

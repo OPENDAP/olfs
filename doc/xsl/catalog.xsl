@@ -36,9 +36,20 @@
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
-
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
+    <xsl:variable name="serviceContext">/opendap</xsl:variable>
+    <xsl:variable name="dapService">/hyrax</xsl:variable>
+
+
+
+    <xsl:variable name="besPrefix">        
+        <xsl:if test="/bes:response/bes:showCatalog/bes:dataset/@prefix != '/' ">
+            <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
+        </xsl:if>
+    </xsl:variable>
+    
+    <xsl:variable name="context" select="concat($serviceContext,$dapService,$besPrefix)"/>
 
 
     <!--***********************************************
@@ -47,8 +58,8 @@
      -->
     <xsl:template match="bes:showCatalog">
         <thredds:catalog>
-            <thredds:service name="dap" serviceType="OPeNDAP" base="/opendap/hyrax/"/>
-            <thredds:service name="file" serviceType="HTTPServer" base="/opendap/hyrax/"/>
+            <thredds:service name="dap" serviceType="OPeNDAP" base="{$context}"/>
+            <thredds:service name="file" serviceType="HTTPServer" base="{$context}"/>
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -71,46 +82,43 @@
     <xsl:template match="bes:dataset">
 
 
-        <xsl:if test="bes:dataset">
-            <thredds:dataset name="{@name}" ID="{@name}">
-                <xsl:apply-templates />
-            </thredds:dataset>
-        </xsl:if>
-
-        <xsl:if test="not(bes:dataset)">
-
-            <xsl:if test="@node='true'">
-                <thredds:catalogRef name="{@name}" xlink:href="{@name}/catalog.xml" xlink:title="{@name}" xlink:type="simple" >
-                    <xsl:attribute name="ID">
-                        <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                    </xsl:attribute>
-                </thredds:catalogRef>
-            </xsl:if >
-
-            <xsl:if test="not(@node='true')">
-                <thredds:dataset name="{@name}"  >
-                    <xsl:attribute name="ID">
-                        <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                    </xsl:attribute>
-                    <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
-                    <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
-                    <xsl:call-template name="DatasetAccess"/>
+        <xsl:choose>
+            <xsl:when test="bes:dataset">
+                <thredds:dataset name="{@name}" ID="{$context}{@name}">
+                    <xsl:apply-templates />
                 </thredds:dataset>
-            </xsl:if >
-        </xsl:if>
+            </xsl:when>
+
+            <xsl:otherwise>
+
+                <xsl:if test="@node='true'">
+                    <thredds:catalogRef name="{@name}" xlink:href="{@name}/catalog.xml" xlink:title="{@name}" xlink:type="simple" >
+                        <xsl:attribute name="ID">
+                            <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                        </xsl:attribute>
+                    </thredds:catalogRef>
+                </xsl:if >
+
+                <xsl:if test="not(@node='true')">
+                    <thredds:dataset name="{@name}"  >
+                        <xsl:attribute name="ID">
+                            <xsl:value-of select="$context"/><xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                        </xsl:attribute>
+                        <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
+                        <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
+                        <xsl:call-template name="DatasetAccess"/>
+                    </thredds:dataset>
+                </xsl:if >
+            </xsl:otherwise>
+
+        </xsl:choose>
+
 
     </xsl:template>
 
     <xsl:template name="DatasetAccess">
 
-
-
         <thredds:access>
-
-
-
-
-
         <xsl:choose>
             <xsl:when test="bes:serviceRef">
                 <xsl:attribute name="serviceName"><xsl:value-of select="bes:serviceRef"/></xsl:attribute>
