@@ -23,11 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.webstart;
 
-import opendap.coreServlet.MimeTypes;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.Scrub;
-import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
@@ -35,9 +36,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,11 +51,13 @@ public class WebStartServlet extends HttpServlet {
 
     private Logger log;
 
+    private boolean disabled = false;
     private String resourcesDirectory;
+    private Document configDoc;
 
 
-    private ViewerRequestHandler idvViewer = null;
-    private Vector<ViewerRequestHandler> viewers = null;
+    private JwsHandler idvViewer = null;
+    private Vector<JwsHandler> jwsHandlers = null;
 
     //private Document configDoc;
     private AtomicInteger reqNumber;
@@ -64,49 +65,170 @@ public class WebStartServlet extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
-        LogUtil.initLogging(this);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
 
         reqNumber = new AtomicInteger(0);
 
-        String dir = ServletUtil.getContentPath(this) + "resources/WebStart";
+        String dir = ServletUtil.getContentPath(this) + "WebStart";
 
         File f = new File(dir);
 
-        if (f.exists() && f.isDirectory())
+        log.info("Checking for resources Directory: " + dir);
+        if (f.exists() && f.isDirectory()){
             resourcesDirectory = dir;
+            log.info("Found resources Directory: " + dir);
+        }
         else {
+            log.warn("Could not locate resources Directory: " + dir);
+            dir = this.getServletContext().getRealPath("WebStart");
+            f = new File(dir);
+            log.info("Checking for resources Directory: " + dir);
+            if (f.exists() && f.isDirectory()){
+                resourcesDirectory = dir;
+                log.info("Found resources Directory: " + dir);
+            }
+            else {
+                disabled = true;
+                log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                log.error("Could not locate resources Directory: " + dir);
+                log.error("Java WebStart Disabled!");
+                log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-            resourcesDirectory = this.getServletContext().getRealPath("resources/WebStart");
+
+            }
 
         }
-        log.info("resourcesDirectory: " + resourcesDirectory);
+
+        if(!disabled){
+            log.info("resourcesDirectory: " + resourcesDirectory);
+
+            configDoc = loadConfig();
 
 
-
-
-        // Build Handler Objects
-        idvViewer = new IdvViewerRequestHandler();
-
-        viewers = new Vector<ViewerRequestHandler>();
-
-        viewers.add(idvViewer);
-
-        for(ViewerRequestHandler vrh: viewers){
-            vrh.init(resourcesDirectory);
+            // Build Handler Objects
+            jwsHandlers = buildJwsHandlers(resourcesDirectory,configDoc.getRootElement());
         }
 
 
-        // Build configuration elements
+    }
+
+
+
+
+    /**
+     * Loads the configuration file specified in the servlet parameter
+     * OLFSConfigFileName.
+     *
+     * @throws ServletException When the file is missing, unreadable, or fails
+     *                          to parse (as an XML document).
+     */
+    private Document loadConfig() throws ServletException {
+
+        Document doc;
+
+        String filename = getInitParameter("WebStartConfigFileName");
+        if (filename == null) {
+            String msg = "Servlet configuration must include a file name for " +
+                    "the WebStart configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
+
+        filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
+
+        log.debug("Loading Configuration File: " + filename);
 
 
         try {
 
-        } catch (Exception e) {
-            throw new ServletException(e);
+            File confFile = new File(filename);
+            FileInputStream fis = new FileInputStream(confFile);
+
+            try {
+                // Parse the XML doc into a Document object.
+                SAXBuilder sb = new SAXBuilder();
+                doc = sb.build(fis);
+            }
+            finally {
+            	fis.close();
+            }
+
+        } catch (FileNotFoundException e) {
+            String msg = "WebStart configuration file \"" + filename + "\" cannot be found.";
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (IOException e) {
+            String msg = "WebStart configuration file \"" + filename + "\" is not readable.";
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (JDOMException e) {
+            String msg = "WebStart configuration file \"" + filename + "\" cannot be parsed.";
+            log.error(msg);
+            throw new ServletException(msg, e);
         }
+
+        log.debug("WebStart Configuration loaded and parsed.");
+        return doc;
+
+    }
+
+    /**
+     * Navigates the config document to instantiate an ordered list of
+     * JwsHandler Handlers. Then all of the handlers are initialized by
+     * calling their init() methods and passing into them the XML Element
+     * that defined them from the config document.
+     *
+     * @return A VEector of JwsHandlers that have been intialized and are ready to use.
+     * @throws ServletException When things go poorly
+     */
+    private Vector<JwsHandler> buildJwsHandlers(String resourcesDir, Element webStartConfig) throws ServletException {
+
+        String msg;
+
+        Vector<JwsHandler> jwsHandlers = new Vector<JwsHandler>();
+
+        log.debug("Building JwsHandlers");
+
+
+        for (Object o : webStartConfig.getChildren("JwsHandler")) {
+            Element handlerElement = (Element) o;
+            String className = handlerElement.getAttribute("className").getValue();
+            JwsHandler dh;
+            try {
+
+                log.debug("Building Handler: " + className);
+                Class classDefinition = Class.forName(className);
+                dh = (JwsHandler) classDefinition.newInstance();
+
+            } catch (ClassNotFoundException e) {
+                msg = "Cannot find class: " + className;
+                log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (InstantiationException e) {
+                msg = "Cannot instantiate class: " + className;
+                log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (IllegalAccessException e) {
+                msg = "Cannot access class: " + className;
+                log.error(msg);
+                throw new ServletException(msg, e);
+            } catch (ClassCastException e) {
+                msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
+                log.error(msg);
+                throw new ServletException(msg, e);
+            }
+
+            log.debug("Initializing Handler: " + className);
+            dh.init(handlerElement,resourcesDir);
+
+            jwsHandlers.add(dh);
+        }
+
+        log.debug("JwsHandlers have been built.");
+        return jwsHandlers;
+
     }
 
 
@@ -114,6 +236,8 @@ public class WebStartServlet extends HttpServlet {
 
         long lmt;
 
+        if(disabled)
+            return -1;
 
         String name = Scrub.fileName(getName(req));
 
@@ -135,16 +259,6 @@ public class WebStartServlet extends HttpServlet {
     }
 
 
-    private boolean redirect(HttpServletRequest req, HttpServletResponse res) throws IOException {
-
-        if (req.getPathInfo() == null) {
-            res.sendRedirect(Scrub.urlContent(req.getRequestURI()+"/index.html"));
-            log.debug("Sent redirect to make the web page work!");
-            return true;
-        }
-        return false;
-    }
-
 
     private String getName(HttpServletRequest req) {
 
@@ -159,118 +273,58 @@ public class WebStartServlet extends HttpServlet {
 
 
 
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-            throws IOException, ServletException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
+
+        LogUtil.logServerAccessStart(req, "WebStartServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
+
+       String serviceName = req.getPathInfo();
+        while(serviceName.startsWith("/")){
+            serviceName = serviceName.substring(1,serviceName.length());
+        }
+        if(serviceName.equals(""))
+            serviceName = null;
+       String query = req.getQueryString();
+
+        log.debug(opendap.coreServlet.Util.showRequest(req,reqNumber.get()));
+        log.debug(opendap.coreServlet.Util.probeRequest(this,req));
 
         try {
 
-            LogUtil.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
+            if(disabled){
+                log.error("Java WebStart is disabled!");
+                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                return;
 
-            if (!redirect(request, response)) {
+            }
 
-                String name = Scrub.fileName(getName(request));
-
-                log.debug("DocServlet - The client requested this: " + name);
-
-
-                File f = new File(name);
-
-                if (f.exists()) {
-                    log.debug("Requested item exists.");
+            Vector<JwsHandler> whoWantsIt = new Vector<JwsHandler>();
 
 
-                    String suffix = null;
-                    if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
-                        suffix = name.substring(name.lastIndexOf('.') + 1);
-                    }
+            for(JwsHandler vrh: jwsHandlers){
+                if(vrh.datasetCanBeViewed(serviceName,query)){
+                    whoWantsIt.add(vrh);
+                    log.debug("The Java WebStart Handler '"+vrh.getClass().getName()+"' wants" +
+                            "to handle the request: '"+serviceName+"?"+query+"'");
+                }
+            }
 
 
-                    if (suffix != null) {
-                        String mType = MimeTypes.getMimeType(suffix);
-                        if (mType != null)
-                            response.setContentType(mType);
-                        log.debug("   MIME type: " + mType + "  ");
-                    }
+            if(!whoWantsIt.isEmpty()){
+                JwsHandler jwsh  = whoWantsIt.get(0);
+                if(jwsh!=null){
+                    String jnlpContent = jwsh.getJnlpForDataset(query);
+                    String mType = MimeTypes.getMimeType("jnlp");
+                    if (mType != null)
+                        resp.setContentType(mType);
 
-                    log.debug("Found Potential WebStart file: " +name);
-
-
-
-
-
-
-
-
-
-
-
-                    ServletOutputStream sos = null;
-                    FileInputStream fis = new FileInputStream(f);
-
-                    try {
-
-
-                        sos = response.getOutputStream();
-
-                        byte buff[] = new byte[8192];
-                        int rc;
-                        boolean doneReading = false;
-                        while (!doneReading) {
-                            rc = fis.read(buff);
-                            if (rc < 0) {
-                                doneReading = true;
-                            } else if (rc > 0) {
-                                sos.write(buff, 0, rc);
-                            }
-
-                        }
-                    }
-                    finally {
-
-                        if(fis!=null)
-                            fis.close();
-
-                        if(sos!=null)
-                            sos.flush();
-                    }
-
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
-
-
-                } else {
-                    log.debug("   Requested item does not exist. Returning '404 Not Found'");
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
-
+                    PrintWriter pw = resp.getWriter();
+                    pw.print(jnlpContent);
                 }
 
             }
-            else
-                LogUtil.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
-
-
-        }
-        catch( Throwable t){
-            try {
-                OPeNDAPException.anyExceptionHandler(t, response);
-            }
-            catch(Throwable t2) {
-                log.error("BAD THINGS HAPPENED!", t2);
-            }
-        }
-    }
-
-    public void doGet2(HttpServletRequest req, HttpServletResponse resp) {
-
-        String requestUrl = "";
-        try {
-
-            for(ViewerRequestHandler vrh: viewers){
-                if(vrh.datasetCanBeViewed(requestUrl)){
-                    resp.getWriter();
-
-                }
+            else {
+                log.error("Unable to locate a Java WebStart handler to respond to: '"+serviceName+"?"+query+"'");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
 
 

@@ -1,20 +1,29 @@
 package opendap.webstart;
 
-import opendap.bes.BesXmlAPI;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
-import java.io.*;
-import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
 
-public class IdvViewerRequestHandler extends JwsHandler {
+/**
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: Jul 27, 2010
+ * Time: 9:54:15 AM
+ * To change this template use File | Settings | File Templates.
+ */
+public class NetCdfToolsViewerRequestHandler extends JwsHandler {
 
     private Logger log;
     private String resourcesDir;
     private Element config;
 
-    private String _serviceId = "idv";
+    private String HTTP = "http://";
+
+    private String _serviceId = "netcdfToolsUI";
     private String _jnlpFileName = _serviceId+".jnlp";
+
 
     public void init(Element config, String resourcesDirectory) {
 
@@ -44,7 +53,7 @@ public class IdvViewerRequestHandler extends JwsHandler {
 
     public String getViewerLinkHtml(String context, String datasetURI) {
 
-        return "<a href='" + context + "/webstart/idv.jnlp?url=" + datasetURI + "'>IDV</a>";
+        return "<a href='" + context + "/webstart/netcdfToolsUI.jnlp?url=" + datasetURI + "'>IDV</a>";
     }
 
 
@@ -56,6 +65,7 @@ public class IdvViewerRequestHandler extends JwsHandler {
         if(query.startsWith(queryStart)){
             datasetUrl = query.substring(queryStart.length(),query.length());
         }
+
 
 
         String  jnlp = "";
@@ -70,6 +80,24 @@ public class IdvViewerRequestHandler extends JwsHandler {
         log.debug("Got JNLP:\n"+jnlp);
 
 
+        String catalogUrl = "";
+
+        if(datasetUrl.contains("/"))
+            catalogUrl = datasetUrl.substring(0,datasetUrl.lastIndexOf("/")+1);
+
+        catalogUrl += "catalog.xml";
+
+        log.debug("catalogUrl: "+catalogUrl);
+
+        String datasetId = "";
+
+        if(datasetUrl.startsWith(HTTP)){
+            datasetId = datasetUrl.substring(HTTP.length(),datasetUrl.length());
+            datasetId = datasetId.substring(datasetId.indexOf("/"),datasetId.length());
+        }
+
+        log.debug("datasetId: "+datasetId);
+
 
         jnlp = jnlp.replace("{datasetUrl}",datasetUrl);
 
@@ -80,7 +108,6 @@ public class IdvViewerRequestHandler extends JwsHandler {
 
 
     }
-
 
 
 }

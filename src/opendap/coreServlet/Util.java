@@ -61,6 +61,9 @@ public class Util {
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
         msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
+        msg +="\n";
+        msg +="ReqInfo:\n";
+        msg += ReqInfo.toString(req);
         msg += "-------------------------------------------";
 
         return msg;
@@ -223,7 +226,6 @@ public class Util {
      *
      * @param servlet The Servlet to Probe
      * @param request The <code>HttpServletRequest</code> object to probe.
-     * @param scnfg The servlet Config to probe
      * @return A string containing the probe inormation
      */
     public static String probeRequest(HttpServlet servlet, HttpServletRequest request) {

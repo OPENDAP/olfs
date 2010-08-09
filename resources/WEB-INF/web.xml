@@ -46,6 +46,22 @@
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>webstart</servlet-name>
+
+        <servlet-class>opendap.webstart.WebStartServlet</servlet-class>
+
+        <init-param>
+            <param-name>WebStartConfigFileName</param-name>
+            <param-value>webstart.xml</param-value>
+        </init-param>
+
+        <load-on-startup>1</load-on-startup>
+
+    </servlet>
+
+
+
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
@@ -70,6 +86,12 @@
     <servlet-mapping>
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs/*</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet-mapping>
+        <servlet-name>webstart</servlet-name>
+        <url-pattern>/webstart/*</url-pattern>
     </servlet-mapping>
 
 

@@ -91,6 +91,23 @@ public class ReqInfo {
     }
 
     /**
+     * Get service context portion of the URL - everything in the URL after the name of the server and before the localID (aka relativeUrl) of the dataset.
+     * @param request The client request.
+     * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
+     * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
+     */
+
+    public static String getFullServiceContext(HttpServletRequest request){
+
+        String requestUri = request.getRequestURI().toString();
+
+        String serviceContext = requestUri.substring(0, requestUri.lastIndexOf(request.getPathInfo()));
+
+        return serviceContext;
+
+    }
+
+    /**
      * Returns the full source name for this request. This is essentially the same as the value
      * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
      * is null then the full source name is "/".
@@ -409,11 +426,9 @@ public class ReqInfo {
         s += "getRelativeUrl(): "+ getRelativeUrl(request) + "\n";
         s += "getBesDataSourceID(): "+ getBesDataSourceID(getRelativeUrl(request)) + "\n";
         s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
-        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
         s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
         s += "getConstraintExpression(): "+ ReqInfo.getConstraintExpression(request) + "\n";
         s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
-        s += "getBesDataSourceID(): "+  getBesDataSourceID(getRelativeUrl(request)) + "\n";
         s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
         s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
         s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
