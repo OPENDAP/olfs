@@ -941,11 +941,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         
         if (result != null) {
 
+
             while (result.hasNext()) {
+
+                
                 BindingSet bindingSet = result.next();
-                
+
                 Value firstValue = bindingSet.getValue("cid");
-                
+
                 coordinateDapId = firstValue.stringValue();
             }
         } else {
