@@ -26,7 +26,7 @@
 -->
 <WcsService>
     <WcsCatalog className="opendap.semantics.IRISail.NewStaticRDFCatalog">
-        <useUpdateCatalogThread updateInterval="1200" firstUpdateDelay="10"/>
+        <useUpdateCatalogThread updateInterval="28800" firstUpdateDelay="10"/>
 
         <!--
         <CacheDirectory>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/content/WCS/StaticRDFCatalog/</CacheDirectory>
@@ -34,7 +34,8 @@
         -->
 
         <RdfImport>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</RdfImport>
-        <ThreddsCatalog>http://test.opendap.org:8090/opendap/ioos/catalog.xml</ThreddsCatalog>
+        <dataset>http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
+        <dataset>http://test.opendap.org:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
 
         <!--
         <dataset>http://localhost:8080/opendap/data/nc/examples/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc.ddx</dataset>
