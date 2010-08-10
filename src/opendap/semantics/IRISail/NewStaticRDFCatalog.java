@@ -53,7 +53,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private AtomicBoolean repositoryUpdateActive;
     private ReentrantReadWriteLock _repositoryLock;
-    private IRISailRepository owlse2;
     private XMLfromRDF buildDoc;
 
     private long _catalogLastModifiedTime;
@@ -107,8 +106,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         backgroundUpdates = false;
         overrideBackgroundUpdates = false;
         
-       
-        owlse2 = null;
         buildDoc = null;
         _catalogLastModifiedTime = -1;
         _config = null;
@@ -420,7 +417,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         if(Thread.currentThread().isInterrupted())
             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
 
-        owlse2 = repository;
 
         return repository;
 
@@ -519,12 +515,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 catalogUpdateThread.interrupt();
                 log.debug("destroy(): catalogUpdateThread '"+catalogUpdateThread+"' interrupt() called.");
             }
-            log.info("destroy(): Attempting to shutdown Semantic Repository.");
-            shutdownRepository(owlse2);
-            log.info("destroy(): Semantic Repository Has been shutdown.");
 
-        } catch (RepositoryException e) {
-            log.error("destroy(): Failed to shutdown Semantic Repository.");
         }
         finally{
             catLock.unlock();
