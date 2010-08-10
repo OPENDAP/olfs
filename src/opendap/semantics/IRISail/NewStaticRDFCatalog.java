@@ -5,6 +5,7 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.openrdf.query.*;
 import org.slf4j.Logger;
 
 
@@ -30,12 +31,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.openrdf.model.Value;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
@@ -948,7 +943,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             while (result.hasNext()) {
                 BindingSet bindingSet = result.next();
-
+                
                 Value firstValue = bindingSet.getValue("cid");
                 
                 coordinateDapId = firstValue.stringValue();
@@ -997,8 +992,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field "+
         "{field} wcs:Identifier {fieldid}, "+
         "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time} "+
-        "WHERE covid= " +"" + "AND fieldid="+ fieldStr +
-        "USING NAMESPACE " +
+        "WHERE covid= " +coordinateName + " "+
+        "AND fieldid="+ fieldStr +
+        " USING NAMESPACE " +
            "wcs=<http://www.opengis.net/wcs/1.1#>, "+
            "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "+
            "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#> ";
