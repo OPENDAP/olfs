@@ -1314,10 +1314,10 @@ public class IRISailRepository extends SailRepository {
     }
 
     /**
-     * Returns a Hash containing last modified time of a context (URI) from the
-     * repository.
+     * Returns a Hash containing last modified times of each context (URI) in the
+     * repository, keyed by the context name.
      */
-    public HashMap<String, String> getLMT() {
+    public HashMap<String, String> getLastModifiedTimesForContexts() {
         TupleQueryResult result = null;
         String ltmodstr = "";
         String idstr = "";
@@ -1533,7 +1533,7 @@ public class IRISailRepository extends SailRepository {
      *
      *
      * @param importURL
-     * @param ltmod
+     * @param contentType
      * @param con
      */
     public void setContentTypeContext(String importURL, String contentType, RepositoryConnection con) {

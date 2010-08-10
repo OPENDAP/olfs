@@ -56,7 +56,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private IRISailRepository owlse2;
     private XMLfromRDF buildDoc;
 
-    private long _lastModified;
+    private long _catalogLastModifiedTime;
 
     private ConcurrentHashMap<String, CoverageDescription> coverages;
     private ReentrantReadWriteLock _catalogLock;
@@ -110,7 +110,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
        
         owlse2 = null;
         buildDoc = null;
-        _lastModified = -1;
+        _catalogLastModifiedTime = -1;
         _config = null;
         catalogCacheDirectory = ".";
         owlim_storage_folder ="owlim-storage";
@@ -628,46 +628,46 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         List<Element> coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
-        HashMap<String, String> idltm = repository.getLMT();
-        String lastMDT;
-
+        HashMap<String, String> lmtfc = repository.getLastModifiedTimesForContexts();
+        String contextLMT;
+        String id;
+        Element idElement;
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        long lastModifiedTime;
 
         for(Element cde: coverageDescriptions){
 
-            List<Element> elementList = cde.getChildren();
-            Iterator<Element> j = elementList.iterator();
+            idElement = cde.getChild("Identifier",WCS.WCS_NS);
 
-            while (j.hasNext()) {
-                Element eID = j.next();
-                String idstr = eID.getName();
-                if (idstr.equalsIgnoreCase("Identifier")) {
+            if(idElement!=null){
+                id = idElement.getTextTrim();
+                contextLMT = lmtfc.get(id);
 
-                    lastMDT = idltm.get(eID.getText());
+                String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
+                log.debug("CoverageDescription '"+id+"' has a last modified time of " + dateTime);
+                lastModifiedTime = sdf.parse(dateTime).getTime();
+                CoverageDescription coverageDescription = ingestCoverageDescription(cde, lastModifiedTime);
 
-                    String datetime = lastMDT.substring(0, 10) + " " + lastMDT.substring(11, 19) + " +0000";
+                if(_catalogLastModifiedTime <lastModifiedTime)
+                    _catalogLastModifiedTime = lastModifiedTime;
 
-                    DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-                    Date date = sdf.parse(datetime);
-                    log.debug("Date and Time: " + date.getTime());
+                if(coverageDescription!=null){
 
-                    CoverageDescription coverageDescription = ingestCoverageDescription(cde, date.getTime());
-
-                    if(coverageDescription!=null){
-                        
-                    }
-
-                    log.debug("Add element " + cde.getName());
                 }
-            }
-        }//while(i.hasNext()
 
-        _lastModified = -1;
+                log.debug("Ingested CoverageDescription '" + id + "'");
+
+            }
+
+
+
+        }
 
     }
 
 
 
-    public CoverageDescription ingestCoverageDescription(Element cde, long lastModified) {
+    private CoverageDescription ingestCoverageDescription(Element cde, long lastModified) {
 
         CoverageDescription cd = null;
         try {
@@ -967,7 +967,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     public long getLastModified() {
 
-        return _lastModified;
+        return _catalogLastModifiedTime;
     }
 
     public void setStopFlag(boolean flag){
