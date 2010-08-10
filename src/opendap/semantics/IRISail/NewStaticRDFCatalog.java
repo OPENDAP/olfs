@@ -994,7 +994,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
            "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, "+
           "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>" ;*/
         String qString = "select cid " +
-        "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs: "+
+        "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:"+
         "Field {field} wcs:Identifier {fieldid}, "+
         "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time} "+
         "WHERE covid= " +"" + "AND fieldid="+ fieldStr +
