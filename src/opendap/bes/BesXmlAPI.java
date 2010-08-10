@@ -57,6 +57,7 @@ public class BesXmlAPI {
     public static String ASCII      = "ascii";
     public static String HTML_FORM  = "html_form";
     public static String INFO_PAGE  = "info_page";
+    public static String XML_DATA   = "xml_data";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
@@ -375,6 +376,38 @@ public class BesXmlAPI {
         return besTransaction(
                 dataSource,
                 getNetcdfFileOutRequest(dataSource,constraintExpression,xdap_accept),
+                os,
+                err);
+    }
+
+
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public static boolean writeXmlDataResponse(String dataSource,
+                                             String constraintExpression,
+                                            String xdap_accept,
+                                            OutputStream os,
+                                            OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getXmlDataRequest(dataSource,constraintExpression,xdap_accept),
                 os,
                 err);
     }
@@ -1199,6 +1232,25 @@ public class BesXmlAPI {
 
 
     }
+    /**
+     *  Returns the XML data response for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public static Document getXmlDataRequest(String dataSource,
+                                         String ce,
+                                         String xdap_accept)
+            throws BadConfigurationException {
+
+        return getRequestDocument(XML_DATA,dataSource,ce,xdap_accept,null,null,null,XML_ERRORS);
+
+    }
+
 
 
     public static  Document getRequestDocument(String type,

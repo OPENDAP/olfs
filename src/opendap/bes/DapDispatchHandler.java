@@ -87,12 +87,13 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         registerDispatchMethod(".*.dds",     "sendDDS");
         registerDispatchMethod(".*.das",     "sendDAS");
         registerDispatchMethod(".*.dods",    "sendDAP2Data");
-        registerDispatchMethod(".*.dap",    "sendDataDDX");
+        registerDispatchMethod(".*.dap",     "sendDataDDX");
         registerDispatchMethod(".*.info",    "sendInfo");
         registerDispatchMethod(".*.html?",   "sendHTMLRequestForm");
         registerDispatchMethod(".*.asc(ii)?","sendASCII");
         registerDispatchMethod(".*.nc",      "sendNetcdfFileOut");
         registerDispatchMethod(".*.rdf",     "sendDDX2RDF");
+        registerDispatchMethod(".*.xdods",   "sendXmlData");
 
 
         log.info("masterDispatchRegex=\""+getDispatchRegex()+"\"");
@@ -667,6 +668,56 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         os.flush();
         log.info("Sent ASCII.");
+
+
+    }
+    public void sendXmlData(HttpServletRequest request,
+                          HttpServletResponse response)
+            throws Exception {
+
+
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+        response.setContentType("text/xml");
+        Version.setOpendapMimeHeaders(request,response);
+        response.setHeader("Content-Description", "dap_xml");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+
+        log.debug("sendXmlData(): Data For: " + dataSource +
+                    "    CE: '" + constraintExpression + "'");
+
+
+
+        ServletOutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+
+        if(!BesXmlAPI.writeXmlDataResponse(
+                dataSource,
+                constraintExpression,
+                xdap_accept,
+                os,
+                erros)){
+
+//            String msg = new String(erros.toByteArray());
+//            log.error(msg);
+//            os.write(msg.getBytes());
+
+            response.setHeader("Content-Description", "dods_error");
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            //besError.setErrorCode(BESError.INTERNAL_ERROR);
+            besError.sendErrorResponse(_servlet,response);
+            log.error(besError.getMessage());
+        }
+
+        os.flush();
+        log.info("Sent XML Data Response.");
 
 
     }
