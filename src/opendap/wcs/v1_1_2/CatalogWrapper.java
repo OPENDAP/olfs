@@ -124,22 +124,6 @@ public class CatalogWrapper {
         return _catalogImpl.getSupportedCrsElements();
     }
 
-    public static String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
-        return _catalogImpl.getLatitudeCoordinateDapId(coverageId, fieldId);
-    }
-
-    public static String getLongitudeCoordinateDapId(String coverageId, String fieldId) {
-        return _catalogImpl.getLongitudeCoordinateDapId(coverageId, fieldId);
-    }
-
-    public static String getElevationCoordinateDapId(String coverageId, String fieldId) {
-        return _catalogImpl.getElevationCoordinateDapId(coverageId, fieldId);
-    }
-
-    public static String getTimeCoordinateDapId(String coverageId, String fieldId) {
-        return _catalogImpl.getTimeCoordinateDapId(coverageId, fieldId);
-    }
-
 
     private static void ingestCapabilitiesMetadata(Element config) throws Exception  {
         Element e1, e2;

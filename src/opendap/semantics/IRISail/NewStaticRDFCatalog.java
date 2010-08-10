@@ -627,40 +627,68 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
 
-        List<Element> coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
-        HashMap<String, String> lmtfc = repository.getLastModifiedTimesForContexts();
+        HashMap<String, String> lmtfc;
         String contextLMT;
-        String id;
+        String coverageID;
         Element idElement;
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         long lastModifiedTime;
+        String dapVariableID;
+        RepositoryConnection con = null;
 
-        for(Element cde: coverageDescriptions){
 
-            idElement = cde.getChild("Identifier",WCS.WCS_NS);
+        List<Element> coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
 
-            if(idElement!=null){
-                id = idElement.getTextTrim();
-                contextLMT = lmtfc.get(id);
+        try {
+            con = repository.getConnection();
+            lmtfc = RepositoryUtility.getLastModifiedTimesForContexts(con);
 
-                String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
-                log.debug("CoverageDescription '"+id+"' has a last modified time of " + dateTime);
-                lastModifiedTime = sdf.parse(dateTime).getTime();
-                CoverageDescription coverageDescription = ingestCoverageDescription(cde, lastModifiedTime);
+            for(Element cde: coverageDescriptions){
 
-                if(_catalogLastModifiedTime <lastModifiedTime)
-                    _catalogLastModifiedTime = lastModifiedTime;
+                idElement = cde.getChild("Identifier",WCS.WCS_NS);
 
-                if(coverageDescription!=null){
+                if(idElement!=null){
+                    coverageID = idElement.getTextTrim();
+                    contextLMT = lmtfc.get(coverageID);
+
+                    String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
+                    log.debug("CoverageDescription '"+coverageID+"' has a last modified time of " + dateTime);
+                    lastModifiedTime = sdf.parse(dateTime).getTime();
+                    CoverageDescription coverageDescription = ingestCoverageDescription(cde, lastModifiedTime);
+
+                    if(_catalogLastModifiedTime <lastModifiedTime)
+                        _catalogLastModifiedTime = lastModifiedTime;
+
+                    if(coverageDescription!=null){
+
+                      for(String fieldID: coverageDescription.getFieldIDs()){
+
+                          dapVariableID = getLatitudeCoordinateDapId( con, coverageID,  fieldID);
+                          coverageDescription.setLatitudeCoordinateDapId(fieldID,dapVariableID);
+
+                          dapVariableID = getLongitudeCoordinateDapId( con, coverageID,  fieldID);
+                          coverageDescription.setLongitudeCoordinateDapId(fieldID,dapVariableID);
+
+                          dapVariableID = getElevationCoordinateDapId( con, coverageID,  fieldID);
+                          coverageDescription.setElevationCoordinateDapId(fieldID,dapVariableID);
+
+                          dapVariableID = getTimeCoordinateDapId( con, coverageID,  fieldID);
+                          coverageDescription.setTimeCoordinateDapId(fieldID,dapVariableID);
+
+
+                      }
+
+                    }
+
+                    log.debug("Ingested CoverageDescription '" + coverageID + "'");
 
                 }
 
-                log.debug("Ingested CoverageDescription '" + id + "'");
-
             }
-
-
-
+        }
+        finally {
+            if(con!=null)
+                con.close();
         }
 
     }
@@ -887,38 +915,36 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return supportedCRSs;
     }
 
-    public String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
-        String qString = createQuery("A_1D_latitude", fieldId);
-        String coordinateDapId = runQuery(qString);
+    private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        String qString = createCoordinateIdQuery("A_1D_latitude", fieldId);
+        String coordinateDapId = runQuery(con, qString);
         return coordinateDapId;
         
     }
 
-    public String getLongitudeCoordinateDapId(String coverageId, String fieldId) {
-        String qString = createQuery("A_1D_longitude", fieldId);
-        String coordinateDapId = runQuery(qString);
+    private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        String qString = createCoordinateIdQuery("A_1D_longitude", fieldId);
+        String coordinateDapId = runQuery(con, qString);
         return coordinateDapId;
         
     }
 
-    public String getElevationCoordinateDapId(String coverageId, String fieldId) {
-        String qString = createQuery("A_elevation", fieldId);
-        String coordinateDapId = runQuery(qString);
+    private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        String qString = createCoordinateIdQuery("A_elevation", fieldId);
+        String coordinateDapId = runQuery(con, qString);
         return coordinateDapId;
         
     }
 
-    public String getTimeCoordinateDapId(String coverageId, String fieldId) {
-        String qString = createQuery("A_time", fieldId);
-        String coordinateDapId = runQuery(qString);
+    private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        String qString = createCoordinateIdQuery("A_time", fieldId);
+        String coordinateDapId = runQuery(con, qString);
         return coordinateDapId;
     }
-    private String runQuery(String qString){
-        RepositoryConnection con;
-        String coordinateDapId = null; 
+    private String runQuery(RepositoryConnection con, String qString){
+        String coordinateDapId = null;
         try {
-            con = owlse2.getConnection();
-        
+
         TupleQueryResult result = null;
 
         TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,qString);
@@ -952,16 +978,16 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
         return coordinateDapId;   
     }
-    private String createQuery(String A_time, String fieldStr){
+    private String createCoordinateIdQuery(String A_time, String fieldStr){
         String qString = "select cid FROM {" 
             + fieldStr + "} ncobj:hasCoordinate {cid} rdf:type {cfobj:"
-            + A_time  + "} WHERE field=<" +fieldStr + "> "
+            + A_time  + "} WHERE field={" +fieldStr + "} "
             + "USING NAMESPACE "
             + "wcs=<http://www.opengis.net/wcs/1.1#>, "
             + "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "
             + "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>";
 
-        log.debug("createQuery: Built query string"+qString);
+        log.debug("createCoordinateIdQuery: Built query string: '"+qString+"'");
         return qString ;
     }
 

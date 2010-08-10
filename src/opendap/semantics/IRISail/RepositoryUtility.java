@@ -25,10 +25,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -805,6 +802,100 @@ public class RepositoryUtility {
         ltmodstr = ltmodstrraw.substring(0, 10) + "T"
                 + ltmodstrraw.substring(11, 19) + "Z";
         return ltmodstr;
+    }
+
+    /**
+     * Returns a Hash containing last modified times of each context (URI) in the
+     * repository, keyed by the context name.
+     * @param repository The repository from which to harvest the contexts and their associated last
+     * modified times.
+     */
+    public static HashMap<String, String> getLastModifiedTimesForContexts(IRISailRepository repository) {
+        RepositoryConnection con = null;
+
+        try{
+            con = repository.getConnection();
+            return getLastModifiedTimesForContexts(con);
+        }
+        catch (RepositoryException e) {
+            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+        }
+        finally {
+            if(con!=null){
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+                }
+            }
+        }
+        return new HashMap<String, String>();
+    }
+
+
+
+    /**
+     * Returns a Hash containing last modified times of each context (URI) in the
+     * repository, keyed by the context name.
+     * @param con A connection to the repoistory from which to harvest the contexts and their associated last
+     * modified times.
+     */
+    public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) {
+        TupleQueryResult result = null;
+        String ltmodstr = "";
+        String idstr = "";
+        HashMap<String, String> idltm = new HashMap<String, String>();
+        String queryString = "SELECT DISTINCT id, lmt "
+                + "FROM "
+                + "{cd} wcs:Identifier {id}; "
+                + "rdfs:isDefinedBy {doc} rdfcache:last_modified {lmt} "
+                + "using namespace "
+                + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>, "
+                + "wcs= <http://www.opengis.net/wcs/1.1#>";
+
+        try {
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+            result = tupleQuery.evaluate();
+
+            BindingSet bindingSet;
+            Value valueOfID = null;
+            Value valueOfLMT;
+
+            while (result.hasNext()) {
+                bindingSet = (BindingSet) result.next();
+
+                valueOfLMT = (Value) bindingSet.getValue("lmt");
+                ltmodstr = valueOfLMT.stringValue();
+
+                valueOfID = (Value) bindingSet.getValue("id");
+                idstr = valueOfID.stringValue();
+
+                idltm.put(idstr, ltmodstr);
+
+                // log.debug("ID:" + valueOfID.stringValue());
+                // log.debug("LMT:" + valueOfLMT.stringValue());
+
+            }
+        } catch (QueryEvaluationException e) {
+            log.error("Caught a QueryEvaluationException! Msg: "
+                    + e.getMessage());
+        } catch (RepositoryException e) {
+            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught a MalformedQueryException! Msg: "
+                    + e.getMessage());
+        } finally {
+            try {
+                if(result!=null)
+                    result.close();
+            } catch (QueryEvaluationException e) {
+                log.error("Caught a QueryEvaluationException! Msg: "
+                        + e.getMessage());
+            }
+        }
+
+        return idltm;
     }
 
 

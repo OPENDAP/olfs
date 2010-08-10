@@ -831,7 +831,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         List<Element> cd = buildDoc.getDoc().getRootElement().getChildren();
         Iterator<Element> i = cd.iterator();
-        HashMap<String, String> idltm = owlse2.getLastModifiedTimesForContexts();
+        HashMap<String, String> idltm = RepositoryUtility.getLastModifiedTimesForContexts(owlse2);
         String lastMDT = "nolastMDT";
         while (i.hasNext()) {
             Element e = i.next();

@@ -26,12 +26,11 @@ package opendap.wcs.v1_1_2;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.*;
 import java.io.*;
 
 /**
@@ -51,20 +50,20 @@ public class CoverageDescription {
 
     private File myFile;
 
-    private String _latitudeCoordinateDapId;
-    private String _longitudeCoordinateDapId;
-    private String _elevationCoordinateDapId;
-    private String _timeCoordinateDapId;
+    private HashMap<String,String> _latitudeCoordinateDapId;
+    private HashMap<String,String> _longitudeCoordinateDapId;
+    private HashMap<String,String> _elevationCoordinateDapId;
+    private HashMap<String,String> _timeCoordinateDapId;
 
 
 
     public CoverageDescription(Element cd, long lastModified) throws WcsException{
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        _latitudeCoordinateDapId = null;
-        _longitudeCoordinateDapId = null;
-        _elevationCoordinateDapId = null;
-        _timeCoordinateDapId = null;
+        _latitudeCoordinateDapId = new HashMap<String,String>();
+        _longitudeCoordinateDapId = new HashMap<String,String>();
+        _elevationCoordinateDapId = new HashMap<String,String>();
+        _timeCoordinateDapId = new HashMap<String,String>();
 
 
         WCS.checkCoverageDescription(cd);
@@ -306,38 +305,57 @@ public class CoverageDescription {
 
 
 
-    public String getLatitudeCoordinateDapId() {
-        return _latitudeCoordinateDapId;
+    public String getLatitudeCoordinateDapId(String fieldID) {
+        return _latitudeCoordinateDapId.get(fieldID);
 
     }
-    public void setLatitudeCoordinateDapId(String dapId) {
-        _latitudeCoordinateDapId = dapId;
-
-    }
-
-    public String getLongitudeCoordinateDapId() {
-        return _longitudeCoordinateDapId;
-    }
-    public void setLongitudeCoordinateDapId(String dapId) {
-        _longitudeCoordinateDapId = dapId;
-    }
-
-    public String getElevationCoordinateDapId() {
-        return _elevationCoordinateDapId;
-
-    }
-    public void setElevationCoordinateDapId(String dapId) {
-        _elevationCoordinateDapId = dapId;
+    public void setLatitudeCoordinateDapId(String fieldID, String dapVariableID) {
+        _latitudeCoordinateDapId.put(fieldID,dapVariableID);
 
     }
 
-    public String getTimeCoordinateDapId() {
-        return _timeCoordinateDapId;
+    public String getLongitudeCoordinateDapId(String fieldID) {
+        return _longitudeCoordinateDapId.get(fieldID);
     }
-    public void setTimeCoordinateDapId(String dapId) {
-        _timeCoordinateDapId = dapId;
+    public void setLongitudeCoordinateDapId(String fieldID, String dapVariableID) {
+        _longitudeCoordinateDapId.put(fieldID,dapVariableID);
+    }
+
+    public String getElevationCoordinateDapId(String fieldID) {
+        return _elevationCoordinateDapId.get(fieldID);
+
+    }
+    public void setElevationCoordinateDapId(String fieldID, String dapVariableID) {
+        _elevationCoordinateDapId.put(fieldID,dapVariableID);
+
+    }
+
+    public String getTimeCoordinateDapId(String fieldID) {
+        return _timeCoordinateDapId.get(fieldID);
+    }
+    public void setTimeCoordinateDapId(String fieldID, String dapVariableID) {
+        _timeCoordinateDapId.put(fieldID,dapVariableID);
     }
 
 
+    public String[] getFieldIDs(){
+        Vector<String> fIDs = new Vector<String>();
+        Element field, identifier;
+        String id;
+
+        Iterator i =  myCD.getDescendants(new ElementFilter("Field",WCS.WCS_NS));
+        while(i.hasNext()){
+            field = (Element) i.next();
+            identifier = field.getChild("Identifier",WCS.WCS_NS);
+            if(identifier!=null){
+                id = identifier.getTextTrim();
+                fIDs.add(id);
+            }
+        }
+
+        String[] fieldIDs = new String[fIDs.size()];
+
+        return fIDs.toArray(fieldIDs);
+    }
 
 }
