@@ -998,9 +998,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field "+
         "{field} wcs:Identifier {fieldid}, "+
         "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time} "+
-        "WHERE covid= " +coordinateName + " "+
-        "AND fieldid="+ fieldStr +
-        " USING NAMESPACE " +
+        "WHERE covid=\"" +coordinateName + "\" "+
+        "AND fieldid=\""+ fieldStr + "\" "+
+        "USING NAMESPACE " +
            "wcs=<http://www.opengis.net/wcs/1.1#>, "+
            "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "+
            "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#> ";
@@ -1019,7 +1019,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
+                                                             
 
 
     public void updateCatalogCache(IRISailRepository repository)  throws InterruptedException{
