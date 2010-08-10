@@ -940,7 +940,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         result = tupleQuery.evaluate();
         
-        if (result.hasNext()) {
+        if (result!=null && result.hasNext()) {
 
             while (result.hasNext()) {
                 
