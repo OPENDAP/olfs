@@ -903,9 +903,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID the represents the latitude coordinate for FieldID: "+fieldId);
+        log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: "+fieldId);
         String qString = createCoordinateIdQuery("A_1D_latitude", fieldId);
         String coordinateDapId = runQuery(con, qString);
+        log.debug("getLatitudeCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the latitude coordinate for FieldID: "+fieldId);
         return coordinateDapId;
         
     }
@@ -939,11 +940,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         result = tupleQuery.evaluate();
         
-        if (result != null) {
-
+        if (result.hasNext()) {
 
             while (result.hasNext()) {
-
                 
                 BindingSet bindingSet = result.next();
 
@@ -952,7 +951,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 coordinateDapId = firstValue.stringValue();
             }
         } else {
-            log.debug("No query result!");
+            log.error("No query result!");
 
         } 
         } catch (RepositoryException e) {
