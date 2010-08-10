@@ -661,8 +661,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                           dapVariableID = getTimeCoordinateDapId( con, coverageID,  fieldID);
                           coverageDescription.setTimeCoordinateDapId(fieldID,dapVariableID);
-
-
                       }
 
                     }
