@@ -385,6 +385,7 @@ public class ThreddsCatalogUtil {
 			String newCatalogURL;
 			Element catalogRef;
 
+			@SuppressWarnings("rawtypes")
 			Iterator i = catalog.getDescendants(new ElementFilter("catalogRef", THREDDS.NS));
 			while (i.hasNext()) {
 				catalogRef = (Element) i.next();
@@ -564,6 +565,7 @@ public class ThreddsCatalogUtil {
 					service);
 
 			Element dataset;
+			@SuppressWarnings("rawtypes")
 			Iterator i = catalog.getChildren(THREDDS.DATASET, THREDDS.NS).iterator();
 			while (i.hasNext()) {
 				dataset = (Element) i.next();
@@ -701,8 +703,8 @@ public class ThreddsCatalogUtil {
 	private HashMap<String, Element> collectServices(Element threddsCatalog) {
 		HashMap<String, Element> services = new HashMap<String, Element>();
 
-		Iterator i = threddsCatalog.getDescendants(new ElementFilter(
-				THREDDS.SERVICE, THREDDS.NS));
+		@SuppressWarnings("rawtypes")
+		Iterator i = threddsCatalog.getDescendants(new ElementFilter(THREDDS.SERVICE, THREDDS.NS));
 
 		Element srvcElem;
 		while (i.hasNext()) {
@@ -794,6 +796,7 @@ public class ThreddsCatalogUtil {
 			}
 		}
 
+		@SuppressWarnings("rawtypes")
 		Iterator i = dataset.getChildren("access", THREDDS.NS).iterator();
 		while (i.hasNext()) {
 			access = (Element) i.next();
@@ -832,6 +835,7 @@ public class ThreddsCatalogUtil {
 			serviceType = service.getAttributeValue("serviceType");
 
 			if (serviceType.equalsIgnoreCase("Compound")) {
+				@SuppressWarnings("rawtypes")
 				Iterator i = service.getChildren("service", THREDDS.NS).iterator();
 				while (i.hasNext()) {
 					srvc = (Element) i.next();
