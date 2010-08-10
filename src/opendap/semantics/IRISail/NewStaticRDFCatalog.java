@@ -912,22 +912,28 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: "+fieldId);
         String qString = createCoordinateIdQuery("A_1D_longitude", fieldId);
         String coordinateDapId = runQuery(con, qString);
+        log.debug("getLongitudeCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the longitude coordinate for FieldID: "+fieldId);
         return coordinateDapId;
         
     }
 
     private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: "+fieldId);
         String qString = createCoordinateIdQuery("A_elevation", fieldId);
         String coordinateDapId = runQuery(con, qString);
+        log.debug("getElevationCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the elevation coordinate for FieldID: "+fieldId);
         return coordinateDapId;
         
     }
 
     private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
+        log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: "+fieldId);
         String qString = createCoordinateIdQuery("A_time", fieldId);
         String coordinateDapId = runQuery(con, qString);
+        log.debug("getTimeCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the time coordinate for FieldID: "+fieldId);
         return coordinateDapId;
     }
     private String runQuery(RepositoryConnection con, String qString){
