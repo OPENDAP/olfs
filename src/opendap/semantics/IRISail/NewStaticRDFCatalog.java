@@ -9,7 +9,6 @@ import org.openrdf.query.*;
 import org.slf4j.Logger;
 
 
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -71,14 +70,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String resourcePath;
     private boolean backgroundUpdates;
     private boolean overrideBackgroundUpdates;
-    private HashMap<String, Vector<String> >  coverageIDServer;
+    private HashMap<String, Vector<String>> coverageIDServer;
 
-    
 
     private boolean initialized;
-    
-   
-
 
 
     public NewStaticRDFCatalog() {
@@ -100,16 +95,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         backgroundUpdates = false;
         overrideBackgroundUpdates = false;
-        
+
         buildDoc = null;
         _catalogLastModifiedTime = -1;
         _config = null;
         catalogCacheDirectory = ".";
-        owlim_storage_folder ="owlim-storage";
+        owlim_storage_folder = "owlim-storage";
         resourcePath = ".";
 
         initialized = false;
-        
 
 
     }
@@ -119,19 +113,18 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /*******************************************************/
 
     /**
-     *
-     * @param args   Command line arguments
+     * @param args Command line arguments
      */
     public static void main(String[] args) {
         long startTime, endTime;
         double elapsedTime;
 
-        
+
         NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
 
         try {
-            
-            if(args.length>0)
+
+            if (args.length > 0)
                 System.out.println("arg[0]= " + args[0]);
             catalog.resourcePath = ".";
             catalog.catalogCacheDirectory = ".";
@@ -160,18 +153,19 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catalog.log.debug("########################################################################################");
             catalog.log.debug("########################################################################################");
             catalog.log.debug("########################################################################################");
-            
+
 
         } catch (Exception e) {
-            catalog.log.error("Caught "+e.getClass().getName()+" in main(): "
+            catalog.log.error("Caught " + e.getClass().getName() + " in main(): "
                     + e.getMessage());
             e.printStackTrace();
         }
-        
+
     }
     /*******************************************************/
-    /*******************************************************/
-
+    /**
+     * ***************************************************
+     */
 
 
     public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
@@ -183,7 +177,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         _config = config;
 
-        processConfig(_config,defaultCacheDirectory, defaultResourcePath );
+        processConfig(_config, defaultCacheDirectory, defaultResourcePath);
 
         loadWcsCatalogFromRepository();
 
@@ -198,8 +192,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
-    public void updateCatalog()  throws RepositoryException, InterruptedException{
+    public void updateCatalog() throws RepositoryException, InterruptedException {
 
         IRISailRepository repository = setupRepository();
         try {
@@ -212,14 +205,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 extractCoverageDescrptionsFromRepository(repository);
 
                 String filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
-                log.info("updateCatalog(): Dumping CoverageDescriptions Document to: "+filename);
+                log.info("updateCatalog(): Dumping CoverageDescriptions Document to: " + filename);
                 dumpCoverageDescriptionsDocument(filename);
 
                 log.info("updateCatalog(): Updating catalog cache....");
                 updateCatalogCache(repository);
 
-            }
-            else {
+            } else {
                 log.info("updateCatalog(): The repository was unchanged, nothing else to do.");
             }
         }
@@ -228,8 +220,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
 
     }
-    
-    public boolean updateRepository(IRISailRepository repository, Vector <String> startingPoints) throws RepositoryException, InterruptedException{
+
+    public boolean updateRepository(IRISailRepository repository, Vector<String> startingPoints) throws RepositoryException, InterruptedException {
 
         boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints);
 
@@ -243,7 +235,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         return repositoryChanged;
-
 
 
     }
@@ -270,15 +261,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("#############################################");
     }
 
-    public String getDataAccessUrl(String coverageID){
+    public String getDataAccessUrl(String coverageID) {
 
         return coverageIDServer.get(coverageID).firstElement();
 
     }
 
 
-
-    private void processConfig(Element config,String defaultCacheDirectory, String defaultResourcePath){
+    private void processConfig(Element config, String defaultCacheDirectory, String defaultResourcePath) {
 
         Element e;
         File file;
@@ -299,7 +289,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         if (!file.exists()) {
             if (!file.mkdirs()) {
                 log.error("Unable to create cache directory: " + catalogCacheDirectory);
-                if(!catalogCacheDirectory.equals(defaultCacheDirectory)){
+                if (!catalogCacheDirectory.equals(defaultCacheDirectory)) {
                     file = new File(defaultCacheDirectory);
                     if (!file.exists()) {
                         if (!file.mkdirs()) {
@@ -307,14 +297,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                             log.error("Process probably doomed...");
                         }
                     }
-                }
-                else {
+                } else {
                     log.error("Process probably doomed...");
                 }
 
             }
         }
-        log.info("Using catalogCacheDirectory: "+ catalogCacheDirectory);
+        log.info("Using catalogCacheDirectory: " + catalogCacheDirectory);
 
         resourcePath = defaultResourcePath;
         e = config.getChild("ResourcePath");
@@ -337,28 +326,28 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
 
-        log.info("Using resourcePath: "+resourcePath);
+        log.info("Using resourcePath: " + resourcePath);
 
         e = config.getChild("useUpdateCatalogThread");
-        if(e != null){
+        if (e != null) {
             backgroundUpdates = true;
             String s = e.getAttributeValue("updateInterval");
-            if (s != null){
+            if (s != null) {
                 catalogUpdateInterval = Long.parseLong(s) * 1000;
             }
             s = e.getAttributeValue("firstUpdateDelay");
-            if (s != null){
+            if (s != null) {
                 firstUpdateDelay = Long.parseLong(s) * 1000;
             }
 
         }
-        log.info("backgroundUpdates:       "+backgroundUpdates);
-        log.info("Catalog update interval: "+catalogUpdateInterval+"ms");
-        log.info("First update delay:     "+firstUpdateDelay+"ms");
-
+        log.info("backgroundUpdates:       " + backgroundUpdates);
+        log.info("Catalog update interval: " + catalogUpdateInterval + "ms");
+        log.info("First update delay:     " + firstUpdateDelay + "ms");
 
 
     }
+
     private void shutdownRepository(IRISailRepository repository) throws RepositoryException {
 
         log.debug("shutdownRepository)(): Shutting down Repository...");
@@ -376,14 +365,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         IRISailRepository repository = new IRISailRepository(owlimSail, resourcePath, catalogCacheDirectory); //owlim inferencing
 
 
-
         log.info("Configuring Semantic Repository.");
         File storageDir = new File(catalogCacheDirectory); //define local copy of repository
         owlimSail.setDataDir(storageDir);
-        log.debug("Semantic Repository Data directory set to: "+ catalogCacheDirectory);
+        log.debug("Semantic Repository Data directory set to: " + catalogCacheDirectory);
         // prepare config
         owlimSail.setParameter("storage-folder", owlim_storage_folder);
-        log.debug("Semantic Repository 'storage-folder' set to: "+owlim_storage_folder);
+        log.debug("Semantic Repository 'storage-folder' set to: " + owlim_storage_folder);
 
         // Choose the operational ruleset
         String ruleset;
@@ -393,9 +381,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         owlimSail.setParameter("ruleset", ruleset);
         //owlimSail.setParameter("ruleset", "owl-max");
         //owlimSail.setParameter("partialRDFs", "false");
-        log.debug("Semantic Repository 'ruleset' set to: "+ ruleset);
-
-
+        log.debug("Semantic Repository 'ruleset' set to: " + ruleset);
 
 
         log.info("Intializing Semantic Repository.");
@@ -409,7 +395,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         log.info("Semantic Repository Ready.");
 
-        if(Thread.currentThread().isInterrupted())
+        if (Thread.currentThread().isInterrupted())
             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
 
 
@@ -418,8 +404,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
- 
     private void extractCoverageDescrptionsFromRepository(IRISailRepository repository) throws RepositoryException {
         RepositoryConnection con = repository.getConnection();
         log.info("Repository connection has been opened.");
@@ -445,7 +429,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         try {
             log.info("extractCoverageDescrptionsFromRepository() - Updating CoverageIdGenerator Id Caches.");
-            HashMap<String, Vector<String>> coverageIdToServerMap =  getCoverageIDServerURL(con);
+            HashMap<String, Vector<String>> coverageIdToServerMap = getCoverageIDServerURL(con);
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
         } catch (RepositoryException e) {
             log.error("extractCoverageDescrptionsFromRepository(): Caught RepositoryException. msg: "
@@ -461,9 +445,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     }
-
-
-
 
 
     private void dumpCoverageDescriptionsDocument(String filename) {
@@ -489,8 +470,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
-
     public void destroy() {
 
 
@@ -505,14 +484,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             reposLock.lock();
             log.debug("destroy(): WriteLocks Aquired.");
             setStopFlag(true);
-            if(catalogUpdateThread!=null){
-                log.debug("destroy() Current thread '"+Thread.currentThread().getName()+"' Interrupting catalogUpdateThread '"+catalogUpdateThread+"'");
+            if (catalogUpdateThread != null) {
+                log.debug("destroy() Current thread '" + Thread.currentThread().getName() + "' Interrupting catalogUpdateThread '" + catalogUpdateThread + "'");
                 catalogUpdateThread.interrupt();
-                log.debug("destroy(): catalogUpdateThread '"+catalogUpdateThread+"' interrupt() called.");
+                log.debug("destroy(): catalogUpdateThread '" + catalogUpdateThread + "' interrupt() called.");
             }
 
         }
-        finally{
+        finally {
             catLock.unlock();
             reposLock.unlock();
             log.debug("destroy(): Released WriteLock for _catalogLock and _repositoryLock.");
@@ -520,8 +499,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
 
     }
-
-
 
 
     private Vector<String> getRdfImports(Element config) {
@@ -553,7 +530,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             rdfImports.add(datasetURL);
             log.info("Added dataset reference " + datasetURL + " to RDF imports list.");
 
-            log.debug("<wcs:Identifier>"+CoverageIdGenerator.getWcsIdString(datasetURL)+"</wcs:Identifier>");
+            log.debug("<wcs:Identifier>" + CoverageIdGenerator.getWcsIdString(datasetURL) + "</wcs:Identifier>");
         }
 
 
@@ -580,7 +557,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catch (Exception e1) {
                 log.debug("ThreddsCatalogUtil exception: " + e1.getMessage());
             }
-            
+
             Vector<String> datasetURLs = tcu.getDataAccessURLs(catalogURL, ThreddsCatalogUtil.SERVICE.OPeNDAP, recurse);
 
             for (String dataset : datasetURLs) {
@@ -629,39 +606,39 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             con = repository.getConnection();
             lmtfc = RepositoryUtility.getLastModifiedTimesForContexts(con);
 
-            for(Element cde: coverageDescriptions){
+            for (Element cde : coverageDescriptions) {
 
-                idElement = cde.getChild("Identifier",WCS.WCS_NS);
+                idElement = cde.getChild("Identifier", WCS.WCS_NS);
 
-                if(idElement!=null){
+                if (idElement != null) {
                     coverageID = idElement.getTextTrim();
                     contextLMT = lmtfc.get(coverageID);
 
                     String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
-                    log.debug("CoverageDescription '"+coverageID+"' has a last modified time of " + dateTime);
+                    log.debug("CoverageDescription '" + coverageID + "' has a last modified time of " + dateTime);
                     lastModifiedTime = sdf.parse(dateTime).getTime();
                     CoverageDescription coverageDescription = ingestCoverageDescription(cde, lastModifiedTime);
 
-                    if(_catalogLastModifiedTime <lastModifiedTime)
+                    if (_catalogLastModifiedTime < lastModifiedTime)
                         _catalogLastModifiedTime = lastModifiedTime;
 
-                    if(coverageDescription!=null){
+                    if (coverageDescription != null) {
 
-                      for(String fieldID: coverageDescription.getFieldIDs()){
-                          log.debug("Getting DAP Coordinate IDs for FieldID: "+fieldID);
+                        for (String fieldID : coverageDescription.getFieldIDs()) {
+                            log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
 
-                          dapVariableID = getLatitudeCoordinateDapId( con, coverageID,  fieldID);
-                          coverageDescription.setLatitudeCoordinateDapId(fieldID,dapVariableID);
+                            dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
+                            coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
 
-                          dapVariableID = getLongitudeCoordinateDapId( con, coverageID,  fieldID);
-                          coverageDescription.setLongitudeCoordinateDapId(fieldID,dapVariableID);
+                            dapVariableID = getLongitudeCoordinateDapId(con, coverageID, fieldID);
+                            coverageDescription.setLongitudeCoordinateDapId(fieldID, dapVariableID);
 
-                          dapVariableID = getElevationCoordinateDapId( con, coverageID,  fieldID);
-                          coverageDescription.setElevationCoordinateDapId(fieldID,dapVariableID);
+                            dapVariableID = getElevationCoordinateDapId(con, coverageID, fieldID);
+                            coverageDescription.setElevationCoordinateDapId(fieldID, dapVariableID);
 
-                          dapVariableID = getTimeCoordinateDapId( con, coverageID,  fieldID);
-                          coverageDescription.setTimeCoordinateDapId(fieldID,dapVariableID);
-                      }
+                            dapVariableID = getTimeCoordinateDapId(con, coverageID, fieldID);
+                            coverageDescription.setTimeCoordinateDapId(fieldID, dapVariableID);
+                        }
 
                     }
 
@@ -672,12 +649,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             }
         }
         finally {
-            if(con!=null)
+            if (con != null)
                 con.close();
         }
 
     }
-
 
 
     private CoverageDescription ingestCoverageDescription(Element cde, long lastModified) {
@@ -725,7 +701,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             CoverageDescription cd = coverages.get(id);
 
-            if(cd==null)
+            if (cd == null)
                 return null;
 
             return cd.getElement();
@@ -771,7 +747,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
 
 
-
     }
 
     public List<Element> getCoverageSummaryElements() throws WcsException {
@@ -801,9 +776,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             lock.unlock();
             log.debug("_catalogLock ReadLock Released.");
         }
-
-
-
 
 
         return coverageSummaries;
@@ -901,79 +873,71 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: "+fieldId);
+        log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_1D_latitude", fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getLatitudeCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the latitude coordinate for FieldID: "+fieldId);
+        log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
-        
+
     }
 
     private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: "+fieldId);
+        log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_1D_longitude", fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getLongitudeCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the longitude coordinate for FieldID: "+fieldId);
+        log.debug("getLongitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
-        
+
     }
 
     private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: "+fieldId);
+        log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_elevation", fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getElevationCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the elevation coordinate for FieldID: "+fieldId);
+        log.debug("getElevationCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         return coordinateDapId;
-        
+
     }
 
     private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: "+fieldId);
+        log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_time", fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getTimeCoordinateDapId(): '"+coordinateDapId+"' is the DAP variable ID that represents the time coordinate for FieldID: "+fieldId);
+        log.debug("getTimeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         return coordinateDapId;
     }
-    private String runQuery(RepositoryConnection con, String qString){
+
+    private String runQuery(RepositoryConnection con, String qString) {
         String coordinateDapId = null;
         try {
 
-        TupleQueryResult result = null;
+            TupleQueryResult result = null;
 
-        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,qString);
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);
 
-        result = tupleQuery.evaluate();
-        
-        if (result!=null && result.hasNext()) {
+            result = tupleQuery.evaluate();
 
-            while (result.hasNext()) {
-                
-                BindingSet bindingSet = result.next();
+            if (result != null && result.hasNext()) {
 
-                Value firstValue = bindingSet.getValue("cid");
+                while (result.hasNext()) {
 
-                coordinateDapId = firstValue.stringValue();
+                    BindingSet bindingSet = result.next();
+
+                    Value firstValue = bindingSet.getValue("cid");
+
+                    coordinateDapId = firstValue.stringValue();
+                }
+            } else {
+                log.error("No query result!");
+
             }
-        } else {
-            log.error("No query result!");
-
-        } 
-        } catch (RepositoryException e) {
-            log.error("getTimeCoordinateDapId(String coverageId, String fieldId) has a problem: " +
-                    e.getMessage()) ;
-            e.printStackTrace(); 
-        } catch (MalformedQueryException e) {
-            log.error("getTimeCoordinateDapId(String coverageId, String fieldId) has a problem: " +
-                    e.getMessage()) ;
-            e.printStackTrace();
-        } catch (QueryEvaluationException e) {
-            log.error("getTimeCoordinateDapId(String coverageId, String fieldId) has a problem: " +
-                    e.getMessage()) ;
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("runQuery(): Query FAILED. Caught "+ e.getClass().getName()+ " Message: " + e.getMessage());
         }
-        return coordinateDapId;   
+        return coordinateDapId;
     }
-    private String createCoordinateIdQuery(String coordinateName, String fieldStr){
+
+    private String createCoordinateIdQuery(String coordinateName, String fieldStr) {
         /* String qString = "select cid FROM {" 
             + fieldStr + "} ncobj:hasCoordinate {cid} rdf:type {cfobj:"
             + coordinateName  + "} WHERE field={" +fieldStr + "} "
@@ -995,18 +959,18 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
            "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, "+
           "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>" ;*/
         String qString = "select cid " +
-        "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field "+
-        "{field} wcs:Identifier {fieldid}, "+
-        "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time} "+
-        "WHERE covid=\"" +coordinateName + "\" "+
-        "AND fieldid=\""+ fieldStr + "\" "+
-        "USING NAMESPACE " +
-           "wcs=<http://www.opengis.net/wcs/1.1#>, "+
-           "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "+
-           "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#> ";
-        
-        log.debug("createCoordinateIdQuery: Built query string: '"+qString+"'");
-        return qString ;
+                "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
+                "{field} wcs:Identifier {fieldid}, " +
+                "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time} " +
+                "WHERE covid=\"" + coordinateName + "\" " +
+                "AND fieldid=\"" + fieldStr + "\" " +
+                "USING NAMESPACE " +
+                "wcs=<http://www.opengis.net/wcs/1.1#>, " +
+                "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
+                "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#> ";
+
+        log.debug("createCoordinateIdQuery: Built query string: '" + qString + "'");
+        return qString;
     }
 
     public long getLastModified() {
@@ -1014,22 +978,19 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return _catalogLastModifiedTime;
     }
 
-    public void setStopFlag(boolean flag){
+    public void setStopFlag(boolean flag) {
         stopWorking = flag;
     }
 
 
-                                                             
-
-
-    public void updateCatalogCache(IRISailRepository repository)  throws InterruptedException{
+    public void updateCatalogCache(IRISailRepository repository) throws InterruptedException {
 
         Thread thread = Thread.currentThread();
 
 
         int biffCount = 0;
 
-        if (!stopWorking && !thread.isInterrupted() ) {
+        if (!stopWorking && !thread.isInterrupted()) {
 
             ReentrantReadWriteLock.WriteLock catlock = _catalogLock.writeLock();
             ReentrantReadWriteLock.ReadLock repLock = _repositoryLock.readLock();
@@ -1048,7 +1009,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     ingestCatalog(repository);
                     timeOfLastUpdate = new Date().getTime();
 
-                    log.debug("Catalog Cache updated at "+ new Date(timeOfLastUpdate));
+                    log.debug("Catalog Cache updated at " + new Date(timeOfLastUpdate));
 
 
                 }
@@ -1067,16 +1028,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
 
-        if(thread.isInterrupted()) {
-            log.warn("updateCatalog(): WARNING! Thread "+thread.getName()+" was interrupted!");
+        if (thread.isInterrupted()) {
+            log.warn("updateCatalog(): WARNING! Thread " + thread.getName() + " was interrupted!");
             throw new InterruptedException();
         }
 
     }
-
-
-
-
 
 
     public HashMap<String, Vector<String>> getCoverageIDServerURL(IRISailRepository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
@@ -1093,7 +1050,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                    log.error(e.getClass().getName() + ": Failed to close repository connection. Msg: "
                             + e.getMessage());
                 }
             }
@@ -1102,7 +1059,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     /**
-     *
      * @param con
      * @return
      * @throws RepositoryException
@@ -1126,16 +1082,16 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         result = tupleQuery.evaluate();
         log.debug("getCoverageIDServerURL() - Qresult: " + result.hasNext());
         while (result.hasNext()) {
-            BindingSet bindingSet =  result.next();
+            BindingSet bindingSet = result.next();
             Vector<String> coverageURL = new Vector<String>();
 
             if (bindingSet.getValue("coverageid") != null && bindingSet.getValue("coverageurl") != null) {
 
-                Value valueOfcoverageid =  bindingSet.getValue("coverageid");
+                Value valueOfcoverageid = bindingSet.getValue("coverageid");
                 Value valueOfcoverageurl = bindingSet.getValue("coverageurl");
                 coverageURL.addElement(valueOfcoverageurl.stringValue());
-                log.debug("getCoverageIDServerURL() - coverageid: "+valueOfcoverageid.stringValue());
-                log.debug("getCoverageIDServerURL() - coverageurl: "+valueOfcoverageurl.stringValue());
+                log.debug("getCoverageIDServerURL() - coverageid: " + valueOfcoverageid.stringValue());
+                log.debug("getCoverageIDServerURL() - coverageurl: " + valueOfcoverageurl.stringValue());
                 if (coverageIDServer.containsKey(valueOfcoverageid.stringValue()))
                     coverageIDServer.get(valueOfcoverageid.stringValue()).addElement(valueOfcoverageurl.stringValue());
                 else
@@ -1146,7 +1102,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return coverageIDServer;
 
     }
-
 
 
     /*
@@ -1216,7 +1171,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return success;
     }
     */
-    
 
 
     public void run() {
@@ -1246,7 +1200,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     try {
                         updateCatalog();
                     } catch (RepositoryException e) {
-                        log.error("Problem using Repository! msg: "+e.getMessage());
+                        log.error("Problem using Repository! msg: " + e.getMessage());
                     }
                     endTime = new Date().getTime();
                     elapsedTime = (endTime - startTime);
@@ -1275,7 +1229,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    private void  addSupportedFormats(Element coverages) throws MalformedURLException {
+    private void addSupportedFormats(Element coverages) throws MalformedURLException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -1287,11 +1241,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         Vector<String> servers;
 
         i = coverages.getChildren().iterator();
-        while(i.hasNext()){
-            coverageDescription  = (Element)i.next();
-            identifierElem = coverageDescription.getChild("Identifier",WCS.WCS_NS);
+        while (i.hasNext()) {
+            coverageDescription = (Element) i.next();
+            identifierElem = coverageDescription.getChild("Identifier", WCS.WCS_NS);
 
-            if(identifierElem!=null){
+            if (identifierElem != null) {
                 coverageID = identifierElem.getTextTrim();
                 servers = coverageIDServer.get(coverageID);
 
@@ -1300,42 +1254,37 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                 coverageDescription.addContent(supportedFormats);
 
-                msg = "Adding supported formats to coverage "+coverageID+ "\n"+
-                      "CoverageDescription Element: \n "+xmlo.outputString(coverageDescription)+"\n"+
-                      "Coverage "+coverageID+" held at: \n";
+                msg = "Adding supported formats to coverage " + coverageID + "\n" +
+                        "CoverageDescription Element: \n " + xmlo.outputString(coverageDescription) + "\n" +
+                        "Coverage " + coverageID + " held at: \n";
 
-                for(String s: servers){
-                    msg += "    "+s+"\n";
+                for (String s : servers) {
+                    msg += "    " + s + "\n";
                 }
 
                 log.debug(msg);
-            }
-            else {
+            } else {
                 log.error("addSupportedFormats() - Failed to locate wcs:Identifier element for Coverage!");
                 //@todo Throw an exception (what kind??) here!!
             }
         }
 
 
-
-
-
     }
 
-    private Vector<Element> getWcsSupportedFormatElements(URL dapServerUrl){
+    private Vector<Element> getWcsSupportedFormatElements(URL dapServerUrl) {
 
         Vector<Element> sfEs = new Vector<Element>();
         String[] formats = ServerCapabilities.getSupportedFormatStrings(dapServerUrl);
         Element sf;
 
-        for(String format: formats){
-            sf = new Element("SupportedFormat",WCS.WCS_NS);
+        for (String format : formats) {
+            sf = new Element("SupportedFormat", WCS.WCS_NS);
             sf.setText(format);
             sfEs.add(sf);
         }
 
         return sfEs;
-
 
 
     }
@@ -1347,9 +1296,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         boolean isInterrupted = thread.isInterrupted();
 
-        if(isInterrupted || stopWorking){
-            log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-            throw new InterruptedException("Thread.currentThread.isInterrupted() returned '"+isInterrupted+"'. stopWorking='"+stopWorking+"'");
+        if (isInterrupted || stopWorking) {
+            log.warn("updateRepository2(): WARNING! Thread " + thread.getName() + " was interrupted!");
+            throw new InterruptedException("Thread.currentThread.isInterrupted() returned '" + isInterrupted + "'. stopWorking='" + stopWorking + "'");
         }
 
     }
