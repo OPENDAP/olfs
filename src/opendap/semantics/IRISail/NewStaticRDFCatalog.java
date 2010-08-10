@@ -978,10 +978,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         }
         return coordinateDapId;   
     }
-    private String createCoordinateIdQuery(String A_time, String fieldStr){
+    private String createCoordinateIdQuery(String coordinateName, String fieldStr){
         String qString = "select cid FROM {" 
             + fieldStr + "} ncobj:hasCoordinate {cid} rdf:type {cfobj:"
-            + A_time  + "} WHERE field={" +fieldStr + "} "
+            + coordinateName  + "} WHERE field={" +fieldStr + "} "
             + "USING NAMESPACE "
             + "wcs=<http://www.opengis.net/wcs/1.1#>, "
             + "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "
