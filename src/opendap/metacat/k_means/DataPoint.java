@@ -18,15 +18,26 @@ package opendap.metacat.k_means;
  */
 
 public class DataPoint {
-	private double mX, mY;
+	private double mX, mY, mZ;
 	private String mObjName;
+	private int mCompNum;
 	private Cluster mCluster;
 	private double mEuDt;
 
-	public DataPoint(double x, double y, String name) {
+	public DataPoint(double fv[], String name, int comp) {
+		this(fv[0], fv[1], fv[2], name, comp);
+	}
+	
+	public DataPoint(int fv[], String name, int comp) {
+		this((double)fv[0], (double)fv[1], (double)fv[2], name, comp);
+	}
+	
+	public DataPoint(double x, double y, double z, String name, int comp) {
 		this.mX = x;
 		this.mY = y;
+		this.mZ = z;
 		this.mObjName = name;
+		this.mCompNum = comp;
 		this.mCluster = null;
 	}
 
@@ -39,11 +50,15 @@ public class DataPoint {
 
 		// called when DP is added to a cluster or when a Centroid is
 		// recalculated.
-		mEuDt = Math.sqrt(Math.pow((mX - mCluster.getCentroid().getCx()), 2) + Math.pow((mY - mCluster.getCentroid().getCy()), 2));
+		mEuDt = Math.sqrt(Math.pow((mX - mCluster.getCentroid().getCx()), 2) 
+				          + Math.pow((mY - mCluster.getCentroid().getCy()), 2)
+				          + Math.pow((mZ - mCluster.getCentroid().getCz()), 2));
 	}
 
 	public double testEuclideanDistance(Centroid c) {
-		return Math.sqrt(Math.pow((mX - c.getCx()), 2) + Math.pow((mY - c.getCy()), 2));
+		return Math.sqrt(Math.pow((mX - c.getCx()), 2) 
+						 + Math.pow((mY - c.getCy()), 2)
+						 + Math.pow((mZ - c.getCz()), 2));
 	}
 
 	public double getX() {
@@ -52,6 +67,10 @@ public class DataPoint {
 
 	public double getY() {
 		return mY;
+	}
+
+	public double getZ() {
+		return mZ;
 	}
 
 	public Cluster getCluster() {
@@ -64,6 +83,10 @@ public class DataPoint {
 
 	public String getObjName() {
 		return mObjName;
+	}
+
+	public int getCompNum() {
+		return mCompNum;
 	}
 
 }

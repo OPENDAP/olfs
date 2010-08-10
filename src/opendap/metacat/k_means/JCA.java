@@ -2,6 +2,9 @@ package opendap.metacat.k_means;
 
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class is the entry point for constructing Cluster Analysis objects. Each
  * instance of JCA object is associated with one or more clusters, and a Vector
@@ -16,6 +19,7 @@ public class JCA {
 	private int miter;
 	private Vector<DataPoint> mDataPoints = new Vector<DataPoint>();
 	private double mSWCSS;
+    private static Logger log = LoggerFactory.getLogger(JCA.class);
 
 	public JCA(int k, int iter, Vector<DataPoint> dataPoints) {
 		clusters = new Cluster[k];
@@ -38,7 +42,8 @@ public class JCA {
 		// set Starting centroid positions - Start of Step 1
 		setInitialCentroids();
 		int n = 0;
-		// assign DataPoint to clusters
+		// assign DataPoint to clusters. this distributes the data points to
+		// clusters without making any initial guess at a likely best choice.
 		loop1: while (true) {
 			for (int l = 0; l < clusters.length; l++) {
 				clusters[l].addDataPoint(mDataPoints.elementAt(n));
@@ -48,9 +53,12 @@ public class JCA {
 			}
 		}
 
+		log.debug("Data points initially assigned to clusters: " + n);
+		
 		// calculate E for all the clusters
 		calcSWCSS();
-
+		log.debug("Initial SWCSS value: " + getSWCSS());
+		
 		// recalculate Cluster centroids - Start of Step 2
 		for (int i = 0; i < clusters.length; i++) {
 			clusters[i].getCentroid().calcCentroid();
@@ -58,6 +66,7 @@ public class JCA {
 
 		// recalculate E for all the clusters
 		calcSWCSS();
+		log.debug("Second SWCSS value: " + getSWCSS());
 
 		for (int i = 0; i < miter; i++) {
 			// enter the loop for cluster 1
@@ -119,11 +128,12 @@ public class JCA {
 
 	private void setInitialCentroids() {
 		// kn = (round((max-min)/k)*n)+min where n is from 0 to (k-1).
-		double cx = 0, cy = 0;
+		double cx = 0, cy = 0, cz = 0;
 		for (int n = 1; n <= clusters.length; n++) {
 			cx = (((getMaxXValue() - getMinXValue()) / (clusters.length + 1)) * n) + getMinXValue();
 			cy = (((getMaxYValue() - getMinYValue()) / (clusters.length + 1)) * n) + getMinYValue();
-			Centroid c1 = new Centroid(cx, cy);
+			cz = (((getMaxZValue() - getMinZValue()) / (clusters.length + 1)) * n) + getMinZValue();
+			Centroid c1 = new Centroid(cx, cy, cz);
 			clusters[n - 1].setCentroid(c1);
 			c1.setCluster(clusters[n - 1]);
 		}
@@ -165,6 +175,26 @@ public class JCA {
 		for (int i = 0; i < mDataPoints.size(); i++) {
 			DataPoint dp = mDataPoints.elementAt(i);
 			temp = (dp.getY() < temp) ? dp.getY() : temp;
+		}
+		return temp;
+	}
+
+	private double getMaxZValue() {
+		double temp = 0;
+		temp = mDataPoints.elementAt(0).getZ();
+		for (int i = 0; i < mDataPoints.size(); i++) {
+			DataPoint dp = mDataPoints.elementAt(i);
+			temp = (dp.getZ() > temp) ? dp.getZ() : temp;
+		}
+		return temp;
+	}
+
+	private double getMinZValue() {
+		double temp = 0;
+		temp = mDataPoints.elementAt(0).getZ();
+		for (int i = 0; i < mDataPoints.size(); i++) {
+			DataPoint dp = mDataPoints.elementAt(i);
+			temp = (dp.getZ() < temp) ? dp.getZ() : temp;
 		}
 		return temp;
 	}

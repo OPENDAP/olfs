@@ -1,6 +1,7 @@
 package opendap.metacat.k_means;
 
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.slf4j.Logger;
@@ -9,9 +10,6 @@ import org.slf4j.LoggerFactory;
 import opendap.metacat.DDXRetriever;
 import opendap.metacat.URLComponents;
 
-/**
- * Created by IntelliJ IDEA. User: shyam.s Date: Apr 18, 2004 Time: 4:26:06 PM
- */
 public class KMeans {
     private static Logger log = LoggerFactory.getLogger(KMeans.class);
 
@@ -22,37 +20,29 @@ public class KMeans {
 		
 		try {
 			DDXRetriever ddxSource = new DDXRetriever(true, cacheName);
-			//Build the datapoints for a particular crawl
+			//Build the data points for a particular crawl
 			Vector<DataPoint> dataPoints = km.buildDataPoints(ddxSource);
+			
+			JCA jca = new JCA(2, 1000, dataPoints);
+			jca.startAnalysis();
+
+			Vector<DataPoint> v[] = jca.getClusterOutput();
+			for (int i = 0; i < v.length; i++) {
+				Vector<DataPoint> tempV = v[i];
+				System.out.println("----------- Cluster " + i + " ---------");
+				Iterator<DataPoint> iter = tempV.iterator();
+				while (iter.hasNext()) {
+					DataPoint dpTemp = (DataPoint) iter.next();
+					System.out.println(dpTemp.getObjName() + 
+							"[" + dpTemp.getX() + "," + dpTemp.getY() + "," + dpTemp.getZ() + "]");
+				}
+			}
 		}
 		catch (Exception e) {
 			System.err.println("Exception: " + e.getLocalizedMessage());
 			e.printStackTrace();
 			return;
 		}
-	
-		/*
-		dataPoints.add(new DataPoint(22, 21, "p53"));
-		dataPoints.add(new DataPoint(19, 20, "bcl2"));
-		dataPoints.add(new DataPoint(18, 22, "fas"));
-		dataPoints.add(new DataPoint(1, 3, "amylase"));
-		dataPoints.add(new DataPoint(3, 2, "maltase"));
-		*/
-		/*
-		JCA jca = new JCA(2, 1000, dataPoints);
-		jca.startAnalysis();
-
-		Vector<DataPoint> v[] = jca.getClusterOutput();
-		for (int i = 0; i < v.length; i++) {
-			Vector<DataPoint> tempV = v[i];
-			System.out.println("----------- Cluster " + i + " ---------");
-			Iterator<DataPoint> iter = tempV.iterator();
-			while (iter.hasNext()) {
-				DataPoint dpTemp = (DataPoint) iter.next();
-				System.out.println(dpTemp.getObjName() + "[" + dpTemp.getX() + "," + dpTemp.getY() + "]");
-			}
-		}
-		*/
 	}
 	
 	/**
@@ -78,21 +68,21 @@ public class KMeans {
 				log.error("URLComponets: " + e.getMessage());
 				continue;
 			}
-
+			
+			int i = 0;
 			String[] components = urlComps.getComponents();
 			for (String component : components) {
 				ComponentFeatures cf = new ComponentFeatures(component);
-				int fv[] =  cf.getFeatureVector();
-				System.out.println("Component: " + component + ", Features: " + new Integer(fv[0]).toString() + ", " + new Integer(fv[1]).toString() + ", " + new Integer(fv[2]).toString());
-				double dv[] =  cf.getNormalizedFeatureVector();
-				System.out.println("Component: " + component + ", Features: " + new Double(dv[0]).toString() + ", " + new Double(dv[1]).toString() + ", " + new Double(dv[2]).toString());
+
+				//int fv[] =  cf.getFeatureVector();
+				// log.debug("Component: " + component + ", Features: " + new Integer(fv[0]).toString() + ", " + new Integer(fv[1]).toString() + ", " + new Integer(fv[2]).toString());
+				// double dv[] =  cf.getNormalizedFeatureVector();
+				// log.debug("Component: " + component + ", Features: " + new Double(dv[0]).toString() + ", " + new Double(dv[1]).toString() + ", " + new Double(dv[2]).toString());
 				
-				//dataPoints.add(new DataPoint(cf.getFeatureVector(), ddxURL, i++));
+				dataPoints.add(new DataPoint(cf.getFeatureVector(), ddxURL, i++));
 			}
     	}
-
-		dataPoints.add(new DataPoint(22, 21, "p53"));
-		
+    	
 		return dataPoints;
 	}
 }

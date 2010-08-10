@@ -15,30 +15,35 @@ package opendap.metacat.k_means;
  */
 
 class Centroid {
-	private double mCx, mCy;
+	private double mCx, mCy, mCz;
 	private Cluster mCluster;
 
-	public Centroid(double cx, double cy) {
+	public Centroid(double cx, double cy, double cz) {
 		this.mCx = cx;
 		this.mCy = cy;
+		this.mCz = cz;
 	}
 
 	public void calcCentroid() { // only called by CAInstance
 		int numDP = mCluster.getNumDataPoints();
-		double tempX = 0, tempY = 0;
+		double tempX = 0, tempY = 0, tempZ = 0;
 		int i;
-		// caluclating the new Centroid
+		// calculating the new Centroid
 		for (i = 0; i < numDP; i++) {
 			tempX = tempX + mCluster.getDataPoint(i).getX();
 			// total for x
 			tempY = tempY + mCluster.getDataPoint(i).getY();
 			// total for y
+			tempZ = tempZ + mCluster.getDataPoint(i).getZ();
+			// total for z
 		}
 		this.mCx = tempX / numDP;
 		this.mCy = tempY / numDP;
+		this.mCz = tempZ / numDP;
 		// calculating the new Euclidean Distance for each Data Point
 		tempX = 0;
 		tempY = 0;
+		tempZ = 0;
 		for (i = 0; i < numDP; i++) {
 			mCluster.getDataPoint(i).calcEuclideanDistance();
 		}
@@ -56,6 +61,10 @@ class Centroid {
 
 	public double getCy() {
 		return mCy;
+	}
+
+	public double getCz() {
+		return mCz;
 	}
 
 	public Cluster getCluster() {
