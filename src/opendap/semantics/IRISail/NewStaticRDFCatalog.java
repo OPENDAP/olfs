@@ -938,39 +938,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     private String createCoordinateIdQuery(String coordinateName, String coverageStr, String fieldStr) {
-        /* String qString = "select cid FROM {" 
-            + fieldStr + "} ncobj:hasCoordinate {cid} rdf:type {cfobj:"
-            + coordinateName  + "} WHERE field={" +fieldStr + "} "
-            + "USING NAMESPACE "
-            + "wcs=<http://www.opengis.net/wcs/1.1#>, "
-            + "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "
-            + "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>";
         
-        String qString = "select cid,cidid " +
-        "FROM {cover} wcs:Identifier {covid} ; "+
-        "wcs:Range {} wcs:Field {field} wcs:Identifier {fieldid}, "+
-        "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time}; "+
-        "dap:localId {cidid} "+
-        "WHERE covid = " +coordinateName + "AND fieldid=" + fieldStr +
-        
-        " USING NAMESPACE "+
-           "wcs=<http://www.opengis.net/wcs/1.1#>, "+
-           "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, "+
-           "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, "+
-          "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>" ;*/   
-
-       /* String qString =
-                "select cid " +
-                "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
-                "{field} wcs:Identifier {fieldid},{field} " +
-                "ncobj:hasCoordinate {cid} rdf:type {cfobj:"+coordinateName+"} " +
-                "WHERE covid=\""+coordinateName+"\" " +
-                "AND fieldid=\"" + fieldStr + "\" " +
-                "USING NAMESPACE " +
-                "wcs=<http://www.opengis.net/wcs/1.1#>, " +
-                "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
-                "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>";
-        */
         String qString = "select cid,cidid " +
         "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
         "{field} wcs:Identifier {fieldid}, " +
