@@ -1,5 +1,6 @@
 package opendap.semantics.IRISail;
 
+import opendap.logging.LogUtil;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
@@ -119,8 +120,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         long startTime, endTime;
         double elapsedTime;
 
+        String workingDir =  System.getProperty("user.dir");
+        LogUtil.initLogging(workingDir);
+        
 
         NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
+
 
         try {
 
@@ -140,6 +145,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
 
             catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
+
+
 
 
             catalog.overrideBackgroundUpdates = true;
