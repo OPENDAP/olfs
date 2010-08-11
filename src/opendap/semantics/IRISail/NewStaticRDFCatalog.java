@@ -874,7 +874,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
-        String qString = createCoordinateIdQuery("A_1D_latitude", fieldId);
+        String qString = createCoordinateIdQuery("A_1D_latitude", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
         log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
@@ -883,7 +883,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
-        String qString = createCoordinateIdQuery("A_1D_longitude", fieldId);
+        String qString = createCoordinateIdQuery("A_1D_longitude", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
         log.debug("getLongitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
@@ -892,7 +892,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
-        String qString = createCoordinateIdQuery("A_elevation", fieldId);
+        String qString = createCoordinateIdQuery("A_elevation", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
         log.debug("getElevationCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         return coordinateDapId;
@@ -901,7 +901,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
-        String qString = createCoordinateIdQuery("A_time", fieldId);
+        String qString = createCoordinateIdQuery("A_time", fieldId, coverageId);
         String coordinateDapId = runQuery(con, qString);
         log.debug("getTimeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         return coordinateDapId;
@@ -937,7 +937,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return coordinateDapId;
     }
 
-    private String createCoordinateIdQuery(String coordinateName, String fieldStr) {
+    private String createCoordinateIdQuery(String coordinateName, String coverageStr, String fieldStr) {
         /* String qString = "select cid FROM {" 
             + fieldStr + "} ncobj:hasCoordinate {cid} rdf:type {cfobj:"
             + coordinateName  + "} WHERE field={" +fieldStr + "} "
@@ -959,7 +959,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
            "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, "+
           "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>" ;*/   
 
-        String qString =
+       /* String qString =
                 "select cid " +
                 "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
                 "{field} wcs:Identifier {fieldid},{field} " +
@@ -970,8 +970,17 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 "wcs=<http://www.opengis.net/wcs/1.1#>, " +
                 "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
                 "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>";
-
-        
+        */
+        String qString = "select cid,cidid " +
+        "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
+        "{field} wcs:Identifier {fieldid}, " +
+        "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:A_time}; dap:localId {cidid} " +
+        "WHERE covid= \"" + coverageStr + "\" AND fieldid=\"" + fieldStr + "\"" +
+        " USING NAMESPACE " +
+           "wcs=<http://www.opengis.net/wcs/1.1#>, " +
+           "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
+           "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, " +
+          "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>" ;
 
 
         log.debug("createCoordinateIdQuery: Built query string: '" + qString + "'");
