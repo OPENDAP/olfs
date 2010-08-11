@@ -83,17 +83,17 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         dispatchMethods = new HashMap<Pattern,Method>();
 
 
-        registerDispatchMethod(".*.ddx",     "sendDDX");
-        registerDispatchMethod(".*.dds",     "sendDDS");
-        registerDispatchMethod(".*.das",     "sendDAS");
-        registerDispatchMethod(".*.dods",    "sendDAP2Data");
-        registerDispatchMethod(".*.dap",     "sendDataDDX");
-        registerDispatchMethod(".*.info",    "sendInfo");
-        registerDispatchMethod(".*.html?",   "sendHTMLRequestForm");
-        registerDispatchMethod(".*.asc(ii)?","sendASCII");
-        registerDispatchMethod(".*.nc",      "sendNetcdfFileOut");
-        registerDispatchMethod(".*.rdf",     "sendDDX2RDF");
-        registerDispatchMethod(".*.xdods",   "sendXmlData");
+        registerDispatchMethod(".*\\.ddx",     "sendDDX");
+        registerDispatchMethod(".*\\.dds",     "sendDDS");
+        registerDispatchMethod(".*\\.das",     "sendDAS");
+        registerDispatchMethod(".*\\.dods",    "sendDAP2Data");
+        registerDispatchMethod(".*\\.dap",     "sendDataDDX");
+        registerDispatchMethod(".*\\.info",    "sendInfo");
+        registerDispatchMethod(".*\\.html?",   "sendHTMLRequestForm");
+        registerDispatchMethod(".*\\.asc(ii)?","sendASCII");
+        registerDispatchMethod(".*\\.nc",      "sendNetcdfFileOut");
+        registerDispatchMethod(".*\\.rdf",     "sendDDX2RDF");
+        registerDispatchMethod(".*\\.xdods",   "sendXmlData");
 
 
         log.info("masterDispatchRegex=\""+getDispatchRegex()+"\"");
@@ -671,6 +671,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     }
+
+
+    
     public void sendXmlData(HttpServletRequest request,
                           HttpServletResponse response)
             throws Exception {
