@@ -610,6 +610,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
+        log.info("Flushing catalog.");
+        coverages.clear();
+
 
         HashMap<String, String> lmtfc;
         String contextLMT;
@@ -683,7 +686,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         try {
             cd = new CoverageDescription(cde, lastModified);
             coverages.put(cd.getIdentifier(), cd);
-            log.info("Ingested CoverageDescription: " + cd.getIdentifier());
+            //log.info("Ingested CoverageDescription: " + cd.getIdentifier());
         } catch (WcsException e) {
             XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
             String wcseElem = xmlo.outputString(e.getExceptionElement());
@@ -894,37 +897,37 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
+        //log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_latitude", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
+        //log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
 
     }
 
     private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
+        //log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_longitude", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getLongitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
+        //log.debug("getLongitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
 
     }
 
     private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
+        //log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_elevation", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getElevationCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
+        //log.debug("getElevationCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         return coordinateDapId;
 
     }
 
     private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
-        log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
+        //log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_time", coverageId, fieldId);
         String coordinateDapId = runQuery(con, qString);
-        log.debug("getTimeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
+        //log.debug("getTimeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         return coordinateDapId;
     }
 
@@ -1258,9 +1261,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                 coverageDescription.addContent(supportedFormats);
 
-                msg = "Adding supported formats to coverage " + coverageID + "\n" +
-                        "CoverageDescription Element: \n " + xmlo.outputString(coverageDescription) + "\n" +
-                        "Coverage " + coverageID + " held at: \n";
+                msg = "Adding supported formats to coverage " + coverageID  +
+                        //"CoverageDescription Element: \n " + xmlo.outputString(coverageDescription) + "\n" +
+                        "Coverage  held at: \n";
 
                 for (String s : servers) {
                     msg += "    " + s + "\n";
