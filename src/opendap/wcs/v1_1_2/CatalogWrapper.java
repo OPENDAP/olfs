@@ -344,7 +344,13 @@ public class CatalogWrapper {
         log.info("Destroy Complete");
     }
 
+    public static void update(){
 
+        _catalogImpl.update();
+
+        log.info("Update Complete");
+          
+    }
 
 
 

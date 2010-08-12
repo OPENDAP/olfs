@@ -377,4 +377,8 @@ public class LocalFileCatalog implements WcsCatalog {
     public void destroy(){}
 
 
+    public void update(){
+    }
+
+
 }

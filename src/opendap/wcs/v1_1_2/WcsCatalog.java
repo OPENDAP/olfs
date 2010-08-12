@@ -321,4 +321,8 @@ public interface WcsCatalog {
 
 
 
+    public void update();
+
+
+
 }

@@ -1170,7 +1170,16 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
+    public void update(){
 
+        try {
+
+            updateCatalog();
+        }
+        catch(Exception e){
+            log.error("update(): FAILED!!! Caught "+e.getClass().getName()+"   Message: "+e.getMessage());
+        }
+    }
 
     public void updateCatalog()  throws RepositoryException, InterruptedException{
 

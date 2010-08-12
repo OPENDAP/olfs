@@ -403,6 +403,11 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
                         sendDescribeCoveragePage(request, response);
                         log.info("Returning WCS Describe Coverage Page.");
                     }
+                    else if(relativeURL.equals("update()")){
+                        log.info("Updating catalog.");
+                        update();
+                        log.info("Catalog update complete.");
+                    }
                     else {
                         response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     }
@@ -416,7 +421,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
-
+    public void update(){
+        CatalogWrapper.update();
+    }
 
 
 

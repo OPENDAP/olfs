@@ -198,13 +198,20 @@ public class CoverageRequestProcessor {
                     throw new WcsException("No such wcs:Field: "+ Scrub.fileName(fieldID),
                             WcsException.INVALID_PARAMETER_VALUE,"ows:Identifier");
 
+
+                String dapLatitude  = coverage.getLatitudeCoordinateDapId(fieldID);
+                String dapLongitude = coverage.getLongitudeCoordinateDapId(fieldID);
+                String dapElevation = coverage.getElevationCoordinateDapId(fieldID);
+                String dapTime      = coverage.getTimeCoordinateDapId(fieldID);
+
+
                 if(proj!=null)
                     proj += ",";
                 if(proj==null)
                     proj = "";
 
                 
-                proj += "geogrid("+fs.getID()+","+subsetBB.getDapGeoGridFunctionBoundingBox() +")";
+                proj += "geogrid("+fieldID+","+subsetBB.getDapGeoGridFunctionBoundingBox() +")";
 
                 //String gridConstraint = geoIndex(dataAccessUrl,fieldID, subsetBB.getDapGeoGridFunctionBoundingBox());
 
