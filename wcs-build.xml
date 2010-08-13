@@ -459,7 +459,7 @@
 
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
-        <copy file="${resources.dir}/WEB-INF/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
+        <copy file="${resources.dir}/WEB-INF/logback-test.xml" tofile="${build.run}/logback-test.xml"/>
 
         <java classname="opendap.semantics.IRISail.NewStaticRDFCatalog"
               fork="true"

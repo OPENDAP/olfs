@@ -53,13 +53,14 @@ public class LogUtil {
 
     private static Logger log;
     static{
-        System.out.print("+++LogUtil.initLogging() - Instantiating Logger...");
+        System.out.print("+++LogUtil.static - Instantiating Logger ... ");
 
         try {
             log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);
+            System.out.print("Logger instantiated.\n");
         }
         catch(NoClassDefFoundError e) {
-            System.out.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+            System.err.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
     }
@@ -190,14 +191,16 @@ public class LogUtil {
         String logPath = path + "logs";
         File logPathFile = new File(logPath);
         if (!logPathFile.exists()) {
-            log.debug("Creating log dir: " + logPath);
+            System.out.println("+++LogUtil.initLogging(): Creating log dir: " + logPath);
             if (!logPathFile.mkdirs()) {
                 throw new RuntimeException("Creation of logfile directory failed." + logPath);
             }
         } else {
-            log.debug("Found log dir: " + logPath);
+            System.out.println("+++LogUtil.initLogging(): Found log dir: " + logPath);
 
         }
+
+        System.out.println("+++LogUtil.initLogging(): Using log dir: " + logPath);
 
         // read in Log4J config file
         System.setProperty("logdir", logPath); // variable substitution
@@ -206,11 +209,11 @@ public class LogUtil {
         String logbackConfig = path + "logback-test.xml";
         File f = new File(logbackConfig);
         if (!f.exists()) {
-            log.debug("Unable to locate logback configuration: " + logbackConfig);
+            System.out.println("+++LogUtil.initLogging(): Unable to locate logback configuration: " + logbackConfig);
             logbackConfig = path + "logback.xml";
             f = new File(logbackConfig);
             if (!f.exists()) {
-                log.debug("Unable to locate logback configuration: " + logbackConfig);
+                System.out.println("+++LogUtil.initLogging(): Unable to locate logback configuration: " + logbackConfig);
                 logbackConfig = null;
             }
 
