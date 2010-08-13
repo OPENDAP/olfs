@@ -26,7 +26,7 @@
 
 <!-- Build file for the REAP THREDDS/DDX/EML Crawler and related software -->
 
-<project name="Cluster Example" default="all" basedir=".">
+<project name="KMeans" default="all" basedir=".">
 
 	<!-- Compiler Settings -->
 

@@ -619,32 +619,6 @@
 
 	</target>
 
-	<target  name="runURLComponents" depends="compile">
-
-		<copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-
-		<java classname="opendap.metacat.URLComponents"
-                    fork="true"
-                    dir="${build.run}">
-		    <arg line="http://data.nodc.noaa.gov/opendap/hyrax/ghrsst/L2P/TMI/REMSS/1999/152/19990601-TMI-REMSS-L2P-tmi_L2b_v04_008684.dat-v01.nc.gz.ddx"/>
-			<classpath refid="classpath"/>
-		</java>
-
-	</target>
-
-    <target  name="runURLClassification" depends="compile">
-
-        <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
-
-        <java classname="opendap.metacat.URLClassification"
-                    fork="true"
-                    dir="${build.run}">
-            <arg line="http://data.nodc.noaa.gov/opendap/hyrax/ghrsst/L2P/TMI/REMSS/1999/152/19990601-TMI-REMSS-L2P-tmi_L2b_v04_008684.dat-v01.nc.gz.ddx"/>
-            <classpath refid="classpath"/>
-        </java>
-
-    </target>
-
     <target  name="runURLClassifier" depends="compile">
 
         <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
@@ -652,12 +626,16 @@
         <java classname="opendap.metacat.URLClassifier"
                     fork="true"
                     dir="${build.run}">
-            <arg line="opendap.csiro.au_urls_only"/>
+        	<jvmarg value="-Xms256m"/>
+        	<jvmarg value="-Xmx1024m"/>
+            <arg line="airscal1u.ecs.nasa.gov"/>
             <classpath refid="classpath"/>
         </java>
 
     </target>
-
+    
+	<!--arg line="opendap.csiro.au_urls_only"/-->
+	
 	<target  name="Print_EML_from_cache" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback.xml" tofile="${build.classes}/logback.xml"/>
