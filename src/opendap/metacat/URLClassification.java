@@ -3,6 +3,7 @@ package opendap.metacat;
 public class URLClassification {
 	String[] classes;
 	
+	// Testing only...
 	public static void main(String args[]) {
 		if (args.length < 1) return;
 		
@@ -22,11 +23,11 @@ public class URLClassification {
 	}
 
 	public URLClassification(URLComponents url) {
-		buildEquivalenceClass(url);
+		buildEquivalenceClasses(url);
 	}
 	
 	public URLClassification(String url) throws Exception {
-		buildEquivalenceClass(new URLComponents(url));
+		buildEquivalenceClasses(new URLComponents(url));
 	}
 	
 	/**
@@ -34,13 +35,13 @@ public class URLClassification {
 	 * 
 	 * @param url An instance of URLParser
 	 */
-	private void buildEquivalenceClass(URLComponents url) {
+	private void buildEquivalenceClasses(URLComponents url) {
 		String[] comps = url.getComponents();
 		
-		classes = new String[comps.length + 1];
+		classes = new String[comps.length];
 		
-		classes[0] = url.getMachine();
-		int i = 1;
+		// classes[0] = url.getMachine();
+		int i = 0;
 		for(String comp: comps) {
 			// Rule: if comp is all digits, replace each with 'd'
 			if (comp.matches("[0-9]+")) {

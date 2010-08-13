@@ -88,6 +88,10 @@ import java.sql.*;
  *       (5/14/10) And I tried using Metacat as the 'cache', but it's too
  *       picky about the validity of the XML.
  * 
+ * @todo Make a mode of operation that does not require Postgres. Sometimes you
+ * 		 this is only used to store URLs and not responses, so Postgres isn't
+ * 		 used. However, it's always initialized.
+ *  
  * @author jimg
  * 
  */
