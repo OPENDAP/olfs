@@ -1071,7 +1071,38 @@ public class IRISailRepository extends SailRepository {
         log.info("Number of imports:  " + importID.size());
         return importID;
     }
+    /**
+     * Compile and execute a simple transformation that applies a stylesheet to
+     * an input stream, and serializing the result to an OutPutStream
+     */
+    public ByteArrayOutputStream transformRDFa(String inURI)
+            throws SaxonApiException {
+        log.debug("In transformFDRa");
+        
+        String transformStyleFileName = resourceDir + "xsl/RDFa2RDFXML.xsl";
 
+        Processor proc = new Processor(false);
+        XsltCompiler comp = proc.newXsltCompiler();
+        XsltExecutable exp = comp.compile(new StreamSource(new File(
+                transformStyleFileName)));
+        
+        XdmNode source = proc.newDocumentBuilder().build(
+                new StreamSource(inURI));
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        out.setOutputStream(outStream);
+        XsltTransformer trans = exp.load();
+        trans.setInitialContextNode(source);
+        trans.setDestination(out);
+        trans.transform();
+        log.info(outStream.toString());
+        log.debug("Output written to OutputStream");
+        return outStream;
+        
+        
+    }
     /**
      * Compile and execute a simple transformation that applies a stylesheet to
      * an input stream, and serializing the result to an OutPutStream

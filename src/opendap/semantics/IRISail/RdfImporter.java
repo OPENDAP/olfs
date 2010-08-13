@@ -252,6 +252,27 @@ public class RdfImporter {
                         repository.setContentTypeContext(importURL,contentType, con); //
                         log.debug("Finished importing URL " + importURL);
 
+                    } else if (importURL.substring((importURL.length() - 7),
+                            importURL.length()).equals("+psdef/")) {
+
+                        uriaddress = new URIImpl(importURL);
+
+                        ByteArrayInputStream inStream;
+                        log.info("Transforming RDFa " + importURL);
+                        
+                        inStream = new ByteArrayInputStream(repository
+                                .transformRDFa(importURL).toByteArray());
+                       
+                        log.info("Finished transforming RDFa " + importURL);
+                        log.debug("Importing RDFa " + importURL);
+                        con.add(inStream, importURL, RDFFormat.RDFXML,
+                                (Resource) uriaddress);
+                                                
+                        repository.setLTMODContext(importURL, con); // set last modified
+                                                                // time for the context
+                        repository.setContentTypeContext(importURL,contentType, con); //
+                        log.debug("Finished importing URL " + importURL);
+
                     } else {
                         notimport++;
 
@@ -265,8 +286,8 @@ public class RdfImporter {
                             InputStream inStream = urlc.getInputStream();
 
                             uriaddress = new URIImpl(importURL);
-                        if (contentType.equalsIgnoreCase("text/xml")||contentType.equalsIgnoreCase("application/xml")
-                            || contentType.equalsIgnoreCase("application/rdf+xml"))   {
+                        if ((contentType != null) && (contentType.equalsIgnoreCase("text/xml")||contentType.equalsIgnoreCase("application/xml")
+                            || contentType.equalsIgnoreCase("application/rdf+xml")))   {
                             con.add(inStream, importURL, RDFFormat.RDFXML,
                                     (Resource) uriaddress);
                             log.info("Imported non owl/xsd = " + importURL);
