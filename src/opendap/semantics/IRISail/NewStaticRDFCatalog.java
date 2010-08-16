@@ -129,10 +129,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         try {
 
-            if (args.length > 0)
-                System.out.println("arg[0]= " + args[0]);
-            catalog.resourcePath = ".";
-            catalog.catalogCacheDirectory = ".";
+            catalog.resourcePath = workingDir;
+            catalog.catalogCacheDirectory = workingDir;
 
             String configFileName;
 
