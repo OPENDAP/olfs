@@ -429,10 +429,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         // Initialize repository
         repository.startup(); //needed
 
-        log.info("Adding InternalStartingPoint to repository.");
-
-        RepositoryUtility.addInternalStartingPoint(repository);
-
         log.info("Semantic Repository Ready.");
 
         if (Thread.currentThread().isInterrupted())
