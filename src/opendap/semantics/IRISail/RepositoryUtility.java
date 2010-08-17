@@ -397,18 +397,19 @@ public class RepositoryUtility {
 
             result = findAllStartingPoints(con);
 
-            if(!result.contains(internalStartingPoint))
+            if(!result.contains(internalStartingPoint)){
+                log.debug("Internal StartingPoint not present in repository, adding to list.");
+
                 newStartingPoints.add(internalStartingPoint);
+            }
 
             for (String startpoint : startingPointUrls) {
-
-                //log.debug("StartingPoints: " + startpoint);
                 
-                if (!result.contains(startpoint)) {
+                if (!result.contains(startpoint) && !startpoint.equals(internalStartingPoint)) {
 
                     newStartingPoints.add(startpoint);
 
-                    log.debug("Adding to New StartingPoints list: " + startpoint);
+                    log.debug("Found New StartingPoint: " + startpoint);
                 }
             }
 
