@@ -94,7 +94,7 @@ public class RdfPersistence {
 
                     RepositoryUtility.addStartingPoints(repository, newStartingPoints);
 
-                    log.debug("Updating repository ...");
+                    log.debug("Staring points ingested. Updating repository...");
                     boolean modelChanged = true;
 
                     while(modelChanged){
