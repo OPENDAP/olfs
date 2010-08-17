@@ -25,6 +25,7 @@ package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
 
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -55,13 +56,14 @@ public interface WcsCatalog {
      * self from multiple calls.
      *
      *
-     * @param config The WcsCatalog configuration element.
+     * @param config A URL the when de-referenced will return a document that contains
+     * a WcsCatalog configuration element as a child of the root element.
      * @param cacheDir The directory into which the catalog may choose to write persistent content,
      * intermediate files, etc.
      * @param resourcePath The path to the resource bundle delivered with the software.
      * @throws Exception When the bad things happen.
      */
-    public void init(Element config, String cacheDir, String resourcePath) throws Exception;
+    public void init(URL config, String cacheDir, String resourcePath) throws Exception;
 
 
 

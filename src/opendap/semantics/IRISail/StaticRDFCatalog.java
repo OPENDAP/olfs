@@ -2,7 +2,9 @@ package opendap.semantics.IRISail;
 
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
@@ -73,7 +75,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
     private boolean stopWorking = false;
 
-    private Element _config;
+    private URL _configFile;
 
 
     private String catalogCacheDirectory;
@@ -108,7 +110,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         owlse2 = null;
         buildDoc = null;
         _lastModified = -1;
-        _config = null;
+        _configFile = null;
         catalogCacheDirectory = null;
         owlim_storage_folder ="owlim-storage";
         resourcePath = null;
@@ -141,10 +143,14 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
             catalog.log.debug("main() using config file: " + configFileName);
-            Element olfsConfig = opendap.xml.Util.getDocumentRoot(configFileName);
 
-            catalog._config = (Element) olfsConfig.getDescendants(new ElementFilter("WcsCatalog")).next();
-            catalog.processConfig(catalog._config, catalog.catalogCacheDirectory, catalog.resourcePath);
+            URL configFileUrl = new URL(configFileName);
+
+            SAXBuilder sb = new SAXBuilder();
+            Element configFileRoot = sb.build(configFileUrl).getRootElement();
+            Element catalogConfig = configFileRoot.getChild("WcsCatalog");
+
+            catalog.processConfig(catalogConfig, catalog.catalogCacheDirectory, catalog.resourcePath);
 
             catalog.loadWcsCatalogFromRepository();
 
@@ -196,7 +202,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public void init(Element config, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
+    public void init(URL configFile, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
 
         if (initialized)
             return;
@@ -205,9 +211,15 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
         backgroundUpdates = false;
 
-        _config = config;
+        _configFile = configFile;
 
-        processConfig(_config,defaultCacheDirectory, defaultResourcePath );
+
+        SAXBuilder sb = new SAXBuilder();
+        Element configFileRoot = sb.build(configFile).getRootElement();
+        Element catalogConfig = configFileRoot.getChild("WcsCatalog");
+
+
+        processConfig(catalogConfig,defaultCacheDirectory, defaultResourcePath );
 
         loadWcsCatalogFromRepository();
 
@@ -740,17 +752,22 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    private Vector<String> getRdfImports(Element config) {
+    private Vector<String> getRdfImports(URL configFileUrl) throws IOException, JDOMException {
 
         Vector<String> rdfImports = new Vector<String>();
         Element e;
         String s;
 
 
+        SAXBuilder sb = new SAXBuilder();
+        Element configFileRoot = sb.build(configFileUrl).getRootElement();
+        Element catalogConfig = configFileRoot.getChild("WcsCatalog");
+
+
         /**
          * Load individual dataset references
          */
-        Iterator i = config.getChildren("dataset").iterator();
+        Iterator i = catalogConfig.getChildren("dataset").iterator();
         String datasetURL;
         while (i.hasNext()) {
             e = (Element) i.next();
@@ -776,7 +793,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         /**
          * Load THREDDS Catalog references.
          */
-        i = config.getChildren("ThreddsCatalog").iterator();
+        i = catalogConfig.getChildren("ThreddsCatalog").iterator();
         String catalogURL;
         boolean recurse;
         while (i.hasNext()) {
@@ -811,7 +828,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
         /**
          * Load RDF Imports
          */
-        i = config.getChildren("RdfImport").iterator();
+        i = catalogConfig.getChildren("RdfImport").iterator();
         while (i.hasNext()) {
             e = (Element) i.next();
             s = e.getTextNormalize();
@@ -1284,7 +1301,7 @@ public class StaticRDFCatalog implements WcsCatalog, Runnable {
 
 
                     log.debug("updateRepository(): Getting RDF imports.");
-                    Vector<String> importURLs = getRdfImports(_config);
+                    Vector<String> importURLs = getRdfImports(_configFile);
                     if(thread.isInterrupted() || stopWorking){
                         log.warn("updateRepository(): WARNING! Thread "+thread.getName()+" was interrupted!");
                         throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");

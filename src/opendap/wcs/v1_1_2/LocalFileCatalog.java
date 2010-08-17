@@ -24,10 +24,12 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
 
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,11 +85,11 @@ public class LocalFileCatalog implements WcsCatalog {
                     <CoveragesDirectory>true</CoveragesDirectory>
                 </WcsCatalog>
 
-     * @param config
+     * @param configFile
      * @throws Exception
      */
 
-    public void init(Element config, String peristentContentPath, String contextPath) throws Exception{
+    public void init(URL configFile, String persistentContentPath, String contextPath) throws Exception{
 
         if(intitialized)
             return;
@@ -98,13 +100,15 @@ public class LocalFileCatalog implements WcsCatalog {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
+        SAXBuilder sb = new SAXBuilder();
+        Element configFileRoot = sb.build(configFile).getRootElement();
 
+        Element catalogConfig = configFileRoot.getChild("WcsCatalog");
 
-
-        e1 = config.getChild("CoveragesDirectory");
+        e1 = catalogConfig.getChild("CoveragesDirectory");
         if(e1==null){
             msg = "Cannot find CoveragesDirectory element in " +
-                    "configuration element: "+ xmlo.outputString(config);
+                    "configuration element: "+ xmlo.outputString(catalogConfig);
             log.error(msg);
             throw new IOException(msg);
         }
@@ -129,10 +133,6 @@ public class LocalFileCatalog implements WcsCatalog {
 
         if(intitialized)
             return;
-
-
-
-
 
         //Catalog._useMemoryCache =  useMemoryCache;
         _catalogDir =  catalogDir;

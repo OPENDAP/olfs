@@ -42,6 +42,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletException;
 import javax.xml.transform.stream.StreamSource;
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.io.*;
 
@@ -157,15 +159,18 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             throw new Exception(msg);
         }
         if(!configFile.canRead()){
-            String username = System.getProperty("user.name");
+            String userName = System.getProperty("user.name");
             msg = "The WCS Service Configuration File '"+serviceConfigFilename+"' exists but cannot be read." +
-                    " Is there a file permission problem? Is the user '"+username+"' allowed read acces on that file?";
+                    " Is there a file permission problem? Is the user '"+userName+"' allowed read access on that file?";
             log.error(msg);
             throw new Exception(msg);
         }
 
+
+
+        URL serviceConfigUrl = new URL("file://" + serviceConfigFilename);
         SAXBuilder sb = new SAXBuilder();
-        serviceConfig = sb.build(configFile).getRootElement();
+        serviceConfig = sb.build(serviceConfigUrl).getRootElement();
         
 
         WcsCatalog catalog;
@@ -243,7 +248,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             String defautCatalogCacheDir = _serviceContentPath + catalog.getClass().getSimpleName()+"/";
 
 
-            catalog.init(catalogConfig, defautCatalogCacheDir, _resourcePath);
+            catalog.init(serviceConfigUrl, defautCatalogCacheDir, _resourcePath);
         }
 
 
