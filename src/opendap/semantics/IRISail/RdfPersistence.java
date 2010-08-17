@@ -136,7 +136,7 @@ public class RdfPersistence {
                             con = repository.getConnection();
                             log.debug("Adding new starting point ...");
                             RepositoryUtility.addStartingPoints(con, repository.getValueFactory(), newStartingPoints);
-                            log.debug("Finished adding nrew starting point.");
+                            log.debug("Finished adding new starting point.");
                         }
                         finally {
                             if (con != null)
