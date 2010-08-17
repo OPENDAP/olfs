@@ -345,10 +345,15 @@ public class RepositoryUtility {
 
 
 
-    /*
+
+    /**
      * Find new StartingPoints in the input file but not in the repository yet. If the internal starting point is not
-      * present in the repository, then it will be added to the returned list of new starting points. 
+     * present in the repository, then it will be added to the returned list of new starting points.
      *
+     * @param con  A connection to the repository to serach.
+     * @param startingPointUrls A list of candidate starting ;oints
+     * @return All of the starting points in the passed sratingPointUrls that are not already present in the repository.
+     * If the internalStartingPoint is not present in the repository it wioll be returned too.
      */
     public static  Vector<String> findNewStartingPoints(RepositoryConnection con, Vector<String> startingPointUrls) {
         Vector<String> result = null;
