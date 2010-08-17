@@ -53,14 +53,13 @@ public class RdfPersistence {
                 startingPoints.add(startingPointUrl); // starting point from input file
             }
 
-            Vector<String> newStartingPoints = null;
+            Vector<String> newStartingPoints = new Vector<String>();
             Vector<String> startingPointsToDrop = null;
             try {
                 con = repository.getConnection();
                 if (con.isOpen()) {
                     log.info("Connection is OPEN!");
 
-                    isNewRepository = RepositoryUtility.isNewRepository(con);
 
                     newStartingPoints = RepositoryUtility.findNewStartingPoints(con, startingPoints);
 
@@ -71,14 +70,6 @@ public class RdfPersistence {
                 }
             } catch (RepositoryException e) {
                 log.error("Caught RepositoryException updateSemanticRepository(Vector<String> startingPointUrls)" +
-                        e.getMessage());
-            }
-            catch (QueryEvaluationException e) {
-                log.error("Caught QueryEvaluationException updateSemanticRepository(Vector<String> startingPointUrls)" +
-                        e.getMessage());
-
-            } catch (MalformedQueryException e) {
-                log.error("Caught MalformedQueryException updateSemanticRepository(Vector<String> startingPointUrls)" +
                         e.getMessage());
             } finally {
                 if (con != null)
