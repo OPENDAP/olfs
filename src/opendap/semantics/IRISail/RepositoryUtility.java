@@ -158,7 +158,7 @@ public class RepositoryUtility {
         }
     }
 
-    private static boolean startingPointExists( RepositoryConnection con, String startingPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+    public static boolean startingPointExists( RepositoryConnection con, String startingPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
         TupleQueryResult result = null;
         boolean hasInternalStaringPoint = false;
 
@@ -179,45 +179,6 @@ public class RepositoryUtility {
         return hasInternalStaringPoint;
     }
 
-    private static void addInternalStartingPoint(RepositoryConnection con, ValueFactory valueFactory) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
-       
-        if(!startingPointExists(con,internalStartingPoint)){
-            log.info("Adding the internal starting point.");
-            addStartingPoint(con, valueFactory, internalStartingPoint);
-        }
-        
-    }
-    public static void addInternalStartingPoint(SailRepository repo) {
-        RepositoryConnection con = null;
-        ValueFactory valueFactory;
-
-        try {
-            con = repo.getConnection();
-            valueFactory = repo.getValueFactory();
-            addInternalStartingPoint(con, valueFactory);
-        }
-        catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
-                    + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error(e.getClass().getName()+": Malformed query. Msg: "
-                    + e.getMessage()); 
-        } catch (QueryEvaluationException e) {
-            log.error(e.getClass().getName()+": QueryEvaluationException. Msg: "
-                    + e.getMessage());
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
-                            + e.getMessage());
-                }
-            }
-        }
-
-
-    }
 
 
     public static void addStartingPoint(SailRepository repo, String startingPointUrl) {
@@ -385,7 +346,8 @@ public class RepositoryUtility {
 
 
     /*
-     * Find new StartingPoints in the input file but not in the repository yet
+     * Find new StartingPoints in the input file but not in the repository yet. If the internal starting point is not
+      * present in the repository, then it will be added to the returned list of new starting points. 
      *
      */
     public static  Vector<String> findNewStartingPoints(RepositoryConnection con, Vector<String> startingPointUrls) {
@@ -495,41 +457,6 @@ public class RepositoryUtility {
     }
 
 
-    public static boolean isNewRepository(SailRepository repo) {
-        RepositoryConnection con = null;
-
-        try {
-            con = repo.getConnection();
-            return isNewRepository(con);
-        }
-        catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
-                    + e.getMessage());
-        } catch (QueryEvaluationException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
-                            + e.getMessage());
-                }
-            }
-        }
-        return true;
-
-
-    }
-
-    public static boolean isNewRepository(RepositoryConnection con) throws MalformedQueryException, RepositoryException, QueryEvaluationException {
-
-            return !startingPointExists(con,internalStartingPoint);
-            
-
-    }
 
 
     private static TupleQueryResult queryForStartingPoints(RepositoryConnection con) throws QueryEvaluationException, MalformedQueryException, RepositoryException {

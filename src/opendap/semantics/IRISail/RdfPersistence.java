@@ -107,7 +107,10 @@ public class RdfPersistence {
                 modelChanged = true;
 
             }
-            if(rdfImporter.importReferencedRdfDocs(repository)){
+
+            log.debug("Checking for referenced documents that are not already in the repository.");
+            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository);
+            if(foundNewDocuments){
                 modelChanged = true;
             }
 
