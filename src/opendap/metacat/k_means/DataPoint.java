@@ -20,24 +20,26 @@ package opendap.metacat.k_means;
 public class DataPoint {
 	private double mX, mY, mZ;
 	private String mObjName;
+	private String mComp;
 	private int mCompNum;
 	private Cluster mCluster;
 	private double mEuDt;
 
-	public DataPoint(double fv[], String name, int comp) {
-		this(fv[0], fv[1], fv[2], name, comp);
+	public DataPoint(double fv[], String name, String comp, int compNum) {
+		this(fv[0], fv[1], fv[2], name, comp, compNum);
 	}
 	
-	public DataPoint(int fv[], String name, int comp) {
-		this((double)fv[0], (double)fv[1], (double)fv[2], name, comp);
+	public DataPoint(int fv[], String name, String comp, int compNum) {
+		this((double)fv[0], (double)fv[1], (double)fv[2], name, comp, compNum);
 	}
 	
-	public DataPoint(double x, double y, double z, String name, int comp) {
+	public DataPoint(double x, double y, double z, String name, String comp, int compNum) {
 		this.mX = x;
 		this.mY = y;
 		this.mZ = z;
 		this.mObjName = name;
-		this.mCompNum = comp;
+		this.mComp = comp;
+		this.mCompNum = compNum;
 		this.mCluster = null;
 	}
 
@@ -83,6 +85,10 @@ public class DataPoint {
 
 	public String getObjName() {
 		return mObjName;
+	}
+
+	public String getComp() {
+		return mComp;
 	}
 
 	public int getCompNum() {

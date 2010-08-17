@@ -23,18 +23,18 @@ public class KMeans {
 			//Build the data points for a particular crawl
 			Vector<DataPoint> dataPoints = km.buildDataPoints(ddxSource);
 			
-			JCA jca = new JCA(2, 1000, dataPoints);
+			JCA jca = new JCA(5, 1000, dataPoints);
 			jca.startAnalysis();
 
 			Vector<DataPoint> v[] = jca.getClusterOutput();
 			for (int i = 0; i < v.length; i++) {
 				Vector<DataPoint> tempV = v[i];
-				System.out.println("----------- Cluster " + i + " ---------");
+				log.debug("----------- Cluster " + i + " ---------");
 				Iterator<DataPoint> iter = tempV.iterator();
 				while (iter.hasNext()) {
 					DataPoint dpTemp = (DataPoint) iter.next();
-					System.out.println(dpTemp.getObjName() + 
-							"[" + dpTemp.getX() + "," + dpTemp.getY() + "," + dpTemp.getZ() + "]");
+					log.debug(dpTemp.getObjName() + ":" + dpTemp.getCompNum() + ": " + dpTemp.getComp()
+							+ " [" + dpTemp.getX() + "," + dpTemp.getY() + "," + dpTemp.getZ() + "]");
 				}
 			}
 		}
@@ -79,7 +79,7 @@ public class KMeans {
 				// double dv[] =  cf.getNormalizedFeatureVector();
 				// log.debug("Component: " + component + ", Features: " + new Double(dv[0]).toString() + ", " + new Double(dv[1]).toString() + ", " + new Double(dv[2]).toString());
 				
-				dataPoints.add(new DataPoint(cf.getFeatureVector(), ddxURL, i++));
+				dataPoints.add(new DataPoint(cf.getFeatureVector(), ddxURL, component, i++));
 			}
     	}
     	
