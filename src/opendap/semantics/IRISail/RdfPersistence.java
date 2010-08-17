@@ -35,7 +35,8 @@ public class RdfPersistence {
 
         Vector<String> dropList = new Vector<String>();
         Vector<String> startingPoints = new Vector<String>();
-        boolean isNewRepository = true;
+        Vector<String> newStartingPoints = new Vector<String>();
+        Vector<String> startingPointsToDrop = null;
         boolean repositoryHasBeenChanged = false;
 
         RdfImporter rdfImporter = new RdfImporter();
@@ -53,8 +54,6 @@ public class RdfPersistence {
                 startingPoints.add(startingPointUrl); // starting point from input file
             }
 
-            Vector<String> newStartingPoints = new Vector<String>();
-            Vector<String> startingPointsToDrop = null;
             try {
                 con = repository.getConnection();
                 if (con.isOpen()) {
