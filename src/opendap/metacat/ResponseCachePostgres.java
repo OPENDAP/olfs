@@ -70,8 +70,8 @@ import java.sql.*;
  *       DDX URLs with no caching took an average of 64s. 2. Crawling the 153
  *       DDX URLs with the cache where a conditional GET was used took 39s 3.
  *       Processing the cached DDXs with no HTTP access of any kind too 9s There
- *       was no difference bewteen the time associated with saving the DDXs and
- *       LMT in the cache and not (so caching had no discernable overhead in
+ *       was no difference between the time associated with saving the DDXs and
+ *       LMT in the cache and not (so caching had no discernible overhead in
  *       this example)
  * 
  * @note More performance information (4/28/10): Memory use. I retrieved ~43K
