@@ -98,11 +98,12 @@ public class RdfPersistence {
                     boolean modelChanged = true;
 
                     while(modelChanged){
-                        log.debug("Repository update complete. Changes detected.");
+                        log.debug("Repository has been changed.");
 
                         log.debug("Running construct rules ...");
                         repository.runConstruct();
                         log.debug("Finished running construct rules.");
+                        log.debug("Ingesting additional referenced RDF imports.");
                         modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                     }
                     log.debug(RepositoryUtility.showContexts(repository));
