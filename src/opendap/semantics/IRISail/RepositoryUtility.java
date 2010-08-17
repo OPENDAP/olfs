@@ -447,11 +447,8 @@ public class RepositoryUtility {
                 Value firstValue = bindingSet.getValue("doc");
                 String startpoint = firstValue.stringValue();
                 //log.debug("StartingPoints: " + startpoint);
-                if (!startpoint.equals(RepositoryUtility.internalStartingPoint)) {
-                    startingPoints.add(startpoint);
+                startingPoints.add(startpoint);
 
-                    //log.debug("Starting point in the repository: " + startpoint);
-                }
             }
         } else {
             log.debug("No query result!");

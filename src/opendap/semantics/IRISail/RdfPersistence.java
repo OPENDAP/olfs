@@ -34,7 +34,6 @@ public class RdfPersistence {
 
 
         Vector<String> dropList = new Vector<String>();
-        Vector<String> startingPoints = new Vector<String>();
         Vector<String> newStartingPoints = new Vector<String>();
         Vector<String> startingPointsToDrop = null;
         boolean repositoryHasBeenChanged = false;
@@ -50,9 +49,6 @@ public class RdfPersistence {
         try {
 
 
-            for (String startingPointUrl : startingPointUrls) {
-                startingPoints.add(startingPointUrl); // starting point from input file
-            }
 
             try {
                 con = repository.getConnection();
@@ -60,10 +56,10 @@ public class RdfPersistence {
                     log.info("Connection is OPEN!");
 
 
-                    newStartingPoints = RepositoryUtility.findNewStartingPoints(con, startingPoints);
+                    newStartingPoints = RepositoryUtility.findNewStartingPoints(con, startingPointUrls);
 
                     dropList.addAll(findUnneededRDFDocuments(con));
-                    startingPointsToDrop = RepositoryUtility.findChangedStartingPoints(con, startingPoints);
+                    startingPointsToDrop = RepositoryUtility.findChangedStartingPoints(con, startingPointUrls);
                     dropList.addAll(startingPointsToDrop);
                     dropList.addAll(findChangedRDFDocuments(con));
                 }
