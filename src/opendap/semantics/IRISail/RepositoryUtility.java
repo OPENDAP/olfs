@@ -397,12 +397,14 @@ public class RepositoryUtility {
 
             result = findAllStartingPoints(con);
 
+            if(!result.contains(internalStartingPoint))
+                newStartingPoints.add(internalStartingPoint);
+
             for (String startpoint : startingPointUrls) {
 
                 //log.debug("StartingPoints: " + startpoint);
                 
-                if (!result.contains(startpoint) &&
-                        !startpoint.equals(RepositoryUtility.internalStartingPoint)) {
+                if (!result.contains(startpoint)) {
 
                     newStartingPoints.add(startpoint);
 
