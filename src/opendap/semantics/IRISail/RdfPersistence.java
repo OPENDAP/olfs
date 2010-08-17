@@ -103,6 +103,7 @@ public class RdfPersistence {
                         log.debug("Running construct rules ...");
                         repository.runConstruct();
                         log.debug("Finished running construct rules.");
+                        
                         log.debug("Ingesting additional referenced RDF imports.");
                         modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                     }
