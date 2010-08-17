@@ -158,13 +158,13 @@ public class RepositoryUtility {
         }
     }
 
-    private static boolean startingPointExists( RepositoryConnection con, String staringPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+    private static boolean startingPointExists( RepositoryConnection con, String startingPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
         TupleQueryResult result = null;
         boolean hasInternalStaringPoint = false;
 
         String queryString = "SELECT doc "
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
-            + "WHERE doc = <" + internalStartingPoint + "> " 
+            + "WHERE doc = <" + startingPointUrl + "> "
             + "USING NAMESPACE "
             + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
 
