@@ -399,7 +399,6 @@ public class RepositoryUtility {
 
             if(!result.contains(internalStartingPoint)){
                 log.debug("Internal StartingPoint not present in repository, adding to list.");
-
                 newStartingPoints.add(internalStartingPoint);
             }
 
