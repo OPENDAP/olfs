@@ -94,7 +94,7 @@ public class RdfPersistence {
 
                     RepositoryUtility.addStartingPoints(repository, newStartingPoints);
 
-                    log.debug("Staring points ingested. Updating repository...");
+                    log.debug("Starting points ingested. Updating repository...");
                     boolean modelChanged = true;
 
                     while(modelChanged){
@@ -113,35 +113,26 @@ public class RdfPersistence {
                 } else {
                     if (!dropList.isEmpty()) {
 
+                        log.debug("Add external inferencing contexts to dropList");
                         dropList.addAll(findExternalInferencingContexts(repository));
-                        try {
-                            con = repository.getConnection();
-                            log.debug("Dropping starting points ...");
-                            RepositoryUtility.dropStartingPoints(con, repository.getValueFactory(), startingPointsToDrop);
-                        }
-                        finally {
-                            if (con != null)
-                                con.close();
-                        }
-                        log.debug("Finished dropping starting point.");
+
+                        log.debug("Dropping starting points ...");
+                        RepositoryUtility.dropStartingPoints(repository, startingPointsToDrop);
+                        log.debug("Finished dropping starting points.");
+
                         log.debug(RepositoryUtility.showContexts(repository));
 
+                        log.debug("Dropping contexts.");
                         dropContexts(repository,dropList);
                         log.debug(RepositoryUtility.showContexts(repository));
 
                     }
                     if (!newStartingPoints.isEmpty()) {
 
-                        try {
-                            con = repository.getConnection();
-                            log.debug("Adding new starting point ...");
-                            RepositoryUtility.addStartingPoints(con, repository.getValueFactory(), newStartingPoints);
-                            log.debug("Finished adding new starting point.");
-                        }
-                        finally {
-                            if (con != null)
-                                con.close();
-                        }
+                        log.debug("Adding new starting point ...");
+                        RepositoryUtility.addStartingPoints(repository,  newStartingPoints);
+                        log.debug("Finished adding new starting point.");
+
                         log.debug(RepositoryUtility.showContexts(repository));
 
                     }
