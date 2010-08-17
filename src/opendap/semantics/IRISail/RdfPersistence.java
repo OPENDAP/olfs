@@ -147,9 +147,7 @@ public class RdfPersistence {
                     //boolean modelChanged = rdfImporter.importReferencedRdfDocs(repository);
 
                     if(modelChanged) {
-                        log.debug("Running construct rules ...");
-                        repository.runConstruct();
-                        log.debug("Finished running construct rules.");
+                        
                         rdfImporter.importReferencedRdfDocs(repository);
                         while(modelChanged){
                             log.debug(RepositoryUtility.showContexts(repository));
