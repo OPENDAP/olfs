@@ -94,6 +94,7 @@ public class RdfPersistence {
 
                     RepositoryUtility.addStartingPoints(repository, newStartingPoints);
 
+
                     log.debug("Starting points ingested. Updating repository...");
                     boolean modelChanged = true;
 
@@ -109,9 +110,10 @@ public class RdfPersistence {
                     }
                     log.debug(RepositoryUtility.showContexts(repository));
                     repositoryHasBeenChanged = true;
-                    
+
 
                 } else {
+                    boolean modelChanged = false;
                     if (!dropList.isEmpty()) {
 
                         log.debug("Add external inferencing contexts to dropList");
@@ -127,6 +129,8 @@ public class RdfPersistence {
                         dropContexts(repository,dropList);
                         log.debug(RepositoryUtility.showContexts(repository));
 
+                        modelChanged = true;
+
                     }
                     if (!newStartingPoints.isEmpty()) {
 
@@ -135,16 +139,18 @@ public class RdfPersistence {
                         log.debug("Finished adding new starting point.");
 
                         log.debug(RepositoryUtility.showContexts(repository));
+                        modelChanged = true;
 
                     }
-                    log.debug("Updating repository ...");
-                    boolean modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                     
-                    if(modelChanged || !dropList.isEmpty()) {
+                    log.debug("Updating repository ...");
+                    //boolean modelChanged = rdfImporter.importReferencedRdfDocs(repository);
+
+                    if(modelChanged) {
                         log.debug("Running construct rules ...");
                         repository.runConstruct();
                         log.debug("Finished running construct rules.");
-                        modelChanged = rdfImporter.importReferencedRdfDocs(repository);
+                        rdfImporter.importReferencedRdfDocs(repository);
                         while(modelChanged){
                             log.debug(RepositoryUtility.showContexts(repository));
 
@@ -156,6 +162,7 @@ public class RdfPersistence {
                             log.debug(RepositoryUtility.showContexts(repository));
                             modelChanged = rdfImporter.importReferencedRdfDocs(repository);
                         }
+
 
                         repositoryHasBeenChanged = true;
 
