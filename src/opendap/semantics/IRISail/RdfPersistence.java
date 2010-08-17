@@ -88,15 +88,11 @@ public class RdfPersistence {
 
                 if (isNewRepository) {
 
-                    try {
-                        RepositoryUtility.addInternalStartingPoint(repository);
-                        con = repository.getConnection();
-                        RepositoryUtility.addStartingPoints(con, repository.getValueFactory(), newStartingPoints);
-                    }
-                    finally {
-                        if (con != null)
-                            con.close();
-                    }
+                    log.info("This is a new repository!");
+
+                    RepositoryUtility.addInternalStartingPoint(repository);
+
+                    RepositoryUtility.addStartingPoints(repository, newStartingPoints);
 
                     log.debug("Updating repository ...");
                     boolean modelChanged = true;

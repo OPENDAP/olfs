@@ -151,9 +151,11 @@ public class RepositoryUtility {
      */
     public static void addStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
 
-            for (String importURL : startingPointUrls) {
-                addStartingPoint(con, valueFactory, importURL);
-            }
+        log.debug("Adding StartingPoints...");
+
+        for (String importURL : startingPointUrls) {
+            addStartingPoint(con, valueFactory, importURL);
+        }
     }
 
     private static boolean startingPointExists( RepositoryConnection con, String staringPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
@@ -180,6 +182,7 @@ public class RepositoryUtility {
     private static void addInternalStartingPoint(RepositoryConnection con, ValueFactory valueFactory) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
        
         if(!startingPointExists(con,internalStartingPoint)){
+            log.info("Adding the internal starting point.");
             addStartingPoint(con, valueFactory, internalStartingPoint);
         }
         
@@ -267,24 +270,24 @@ public class RepositoryUtility {
                 con.add((Resource) s, isa, (Value) o, (Resource) cont);
 
 
-                log.info("Added to the repository <" + s + "> <" + isa
+                log.info("addStartingPoint(): Added StartingPoint to the repository <" + s + "> <" + isa
                         + "> " + "<" + o + "> " + "<" + cont + "> ");
                 }
 
 
             } catch (RepositoryException e) {
-                log.error("In addStartingPoints, caught an RepositoryException! Msg: "
+                log.error("addStartingPoint(): Caught an RepositoryException! Msg: "
                         + e.getMessage());
 
             } catch (MalformedURLException e) {
 
-                log.error("In addStartingPoints, caught an MalformedURLException! Msg: "
+                log.error("addStartingPoint(): Caught an MalformedURLException! Msg: "
                         + e.getMessage());
             //} catch (RDFParseException e) {
             //    log.error("In addStartingPoints, caught an RDFParseException! Msg: "
             //            + e.getMessage());
             } catch (IOException e) {
-                log.error("In addStartingPoints, caught an IOException! Msg: "
+                log.error("addStartingPoint(): Caught an IOException! Msg: "
                         + e.getMessage());
             }
 
