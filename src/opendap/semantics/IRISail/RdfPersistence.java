@@ -117,13 +117,13 @@ public class RdfPersistence {
                 modelChanged = true;
 
             }
+            if(rdfImporter.importReferencedRdfDocs(repository)){
+                modelChanged = true;
+            }
 
-            log.debug("Updating repository ...");
-            //boolean modelChanged = rdfImporter.importReferencedRdfDocs(repository);
+            if (modelChanged) {
 
-            boolean foundNewDocs = rdfImporter.importReferencedRdfDocs(repository);
-
-            if (modelChanged || foundNewDocs) {
+                log.debug("Updating repository ...");
 
                 while (modelChanged) {
                     log.debug("Repository changes detected.");
