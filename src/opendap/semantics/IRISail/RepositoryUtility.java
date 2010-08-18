@@ -40,6 +40,19 @@ public class RepositoryUtility {
     public static final String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
     public static final String rdfCacheNamespace = internalStartingPoint+"#";
 
+    public static final String lastModifiedContext        = rdfCacheNamespace + "last_modified";
+    public static final String cacheContext               = rdfCacheNamespace + "cachecontext";
+    public static final String contentTypeContext         = rdfCacheNamespace + "contenttype";
+    public static final String externalInferencingContext = rdfCacheNamespace + "externalInferencing";
+
+    public static final String startingPointsContext      = rdfCacheNamespace + "startingPoints";
+    public static final String startingPointContext       = rdfCacheNamespace + "StartingPoint";
+
+
+    public static final String functionsContext           = rdfCacheNamespace + "myfn";
+    public static final String listContext                = rdfCacheNamespace + "mylist";
+    public static final String isContainedByContext       = rdfCacheNamespace + "isContainedBy";
+    public static final String reTypeToContext            = rdfCacheNamespace + "reTypeTo";
 
 
 
@@ -218,8 +231,8 @@ public class RepositoryUtility {
 
             URI s = valueFactory.createURI(importURL);
             URI isa = valueFactory.createURI(pred);
-            URI cont = valueFactory.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
-            URI o = valueFactory.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#StartingPoint");
+            URI startingPointsContext = valueFactory.createURI(RepositoryUtility.startingPointsContext);
+            URI startingPointContext = valueFactory.createURI(RepositoryUtility.startingPointContext);
             URL url;
 
 
@@ -228,11 +241,11 @@ public class RepositoryUtility {
                 if (importURL.startsWith("http://")) { //make sure it's a url and read it in
                 url = new URL(importURL);
                 s = valueFactory.createURI(importURL);
-                con.add((Resource) s, isa, (Value) o, (Resource) cont);
+                con.add((Resource) s, isa, (Value) startingPointContext, (Resource) startingPointsContext);
 
 
                 log.info("addStartingPoint(): Added StartingPoint to the repository <" + s + "> <" + isa
-                        + "> " + "<" + o + "> " + "<" + cont + "> ");
+                        + "> " + "<" + startingPointContext + "> " + "<" + startingPointsContext + "> ");
                 }
 
 
@@ -660,14 +673,14 @@ public class RepositoryUtility {
 
         //String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
         //        + uriaddress
-        //        + "> {x} <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#last_modified> {y} "
+        //        + "> {x} <"+RepositoryUtility.lastModifiedContext+"> {y} "
         //        + "where x=<" + uriaddress + ">";
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
                   + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
-                  + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>";
+                  + "rdfcache = <"+RepositoryUtility.rdfCacheNamespace+">";
         try {
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
                     queryString);
@@ -784,7 +797,7 @@ public class RepositoryUtility {
                 + "{cd} wcs:Identifier {id}; "
                 + "rdfs:isDefinedBy {doc} rdfcache:last_modified {lmt} "
                 + "using namespace "
-                + "rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>, "
+                + "rdfcache = <"+RepositoryUtility.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";
 
         try {

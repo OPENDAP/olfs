@@ -171,21 +171,19 @@ public class RdfPersistence {
             ValueFactory valueFactory = repository.getValueFactory();
 
             for (String drop : dropList) {
-                log.info("Dropping URI: " + drop);
-                String pred = RepositoryUtility.internalStartingPoint + "#last_modified";
-                String contURL = RepositoryUtility.internalStartingPoint + "#cachecontext";
-                URI sbj = valueFactory.createURI(drop);
-                URI predicate = valueFactory.createURI(pred);
-                URI cont = valueFactory.createURI(contURL);
+                log.info("Dropping context URI: " + drop);
+                URI contextToDrop = valueFactory.createURI(drop);
+                URI lastModifiedContext = valueFactory.createURI(RepositoryUtility.lastModifiedContext);
+                URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContext);
 
-                log.info("Removing context: " + sbj);
-                con.remove((Resource) null, null, null, (Resource) sbj);
-                con.remove(sbj, null, null);
+                log.info("Removing context: " + contextToDrop);
+                con.remove((Resource) null, null, null, (Resource) contextToDrop);
+                con.remove(contextToDrop, null, null);
 
-                log.info("Removing last_modified: " + sbj);
-                con.remove(sbj, predicate, null, cont); // remove last_modified
+                log.info("Removing last_modified: " + contextToDrop);
+                con.remove(contextToDrop, lastModifiedContext, null, cacheContext); // remove last_modified
 
-                log.info("Finished removing context: " + sbj);
+                log.info("Finished removing context: " + contextToDrop);
 
             }
             if (thread.isInterrupted()) {
