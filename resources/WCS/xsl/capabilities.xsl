@@ -359,7 +359,7 @@
     </xsl:template>
 
     <xsl:template match="ows:Operation" mode="operMetadata">
-        <xsl:value-of select="./local-name()"/>:
+        <xsl:value-of select="local-name(.)"/>:
         <xsl:value-of select="@name"/>
         <ul>
             <xsl:apply-templates mode="operMetadata"/>
@@ -372,7 +372,7 @@
         <xsl:for-each select="*">
             <li>
                 HTTP
-                <xsl:value-of select="./local-name()"/>
+                <xsl:value-of select="concat(local-name(.),' ')"/>
                 <xsl:if test="ows:Constraint">
                     (<xsl:value-of select="ows:Constraint/ows:AllowedValues/ows:Value"/>)
                 </xsl:if>

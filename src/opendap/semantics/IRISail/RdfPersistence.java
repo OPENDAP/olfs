@@ -173,8 +173,8 @@ public class RdfPersistence {
             for (String drop : dropList) {
                 log.info("Dropping context URI: " + drop);
                 URI contextToDrop = valueFactory.createURI(drop);
-                URI lastModifiedContext = valueFactory.createURI(RepositoryUtility.lastModifiedContext);
-                URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContext);
+                URI lastModifiedContext = valueFactory.createURI(RepositoryUtility.lastModifiedContextUri);
+                URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContextUri);
 
                 log.info("Removing context: " + contextToDrop);
                 con.remove((Resource) null, null, null, contextToDrop);

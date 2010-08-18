@@ -203,7 +203,7 @@ public class IRISailRepository extends SailRepository {
                 String constructURL = this.constructContext.get(qstring);
 
                 //URI uriaddress = new URIImpl(constructURL);
-                URI uriaddress = new URIImpl(RepositoryUtility.externalInferencingContext);
+                URI uriaddress = new URIImpl(RepositoryUtility.externalInferencingContextUri);
                 Resource[] context = new Resource[1];
                 context[0] = uriaddress;
 
@@ -608,8 +608,8 @@ public class IRISailRepository extends SailRepository {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                expand += "}  <"+RepositoryUtility.functionsContext+"> {" + fn + ":" + functionName
-                        + "} ; <"+RepositoryUtility.listContext+"> {} rdf:first {";
+                expand += "}  <"+RepositoryUtility.functionsContextUri +"> {" + fn + ":" + functionName
+                        + "} ; <"+RepositoryUtility.listContextUri +"> {} rdf:first {";
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
@@ -660,8 +660,8 @@ public class IRISailRepository extends SailRepository {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                expand += "}  <"+RepositoryUtility.functionsContext+"> {" + fn + ":" + functionName
-                        + "} ; <"+RepositoryUtility.listContext+"> {} rdf:first {";
+                expand += "}  <"+RepositoryUtility.functionsContextUri+"> {" + fn + ":" + functionName
+                        + "} ; <"+RepositoryUtility.listContextUri+"> {} rdf:first {";
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
@@ -834,7 +834,7 @@ public class IRISailRepository extends SailRepository {
         String pproces3sub = "(.+)";
         Pattern rproces3sub = Pattern.compile(pproces3sub);
 
-        String pproces3subsub1 = "<"+RepositoryUtility.reTypeToContext+"> <([^>]+)>";
+        String pproces3subsub1 = "<"+RepositoryUtility.reTypeToContextUri +"> <([^>]+)>";
         String pproces3subsub2 = "([^ ]+) <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> (\"(.+)\")\\^\\^";
 
         Pattern rproces3subsub1 = Pattern.compile(pproces3subsub1);
@@ -1222,7 +1222,7 @@ public class IRISailRepository extends SailRepository {
 
         String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
                 + uriaddress
-                + "> {x} <"+RepositoryUtility.lastModifiedContext+"> {y} "
+                + "> {x} <"+RepositoryUtility.lastModifiedContextUri +"> {y} "
                 + "where x=<" + uriaddress + ">";
 
         try {
@@ -1288,7 +1288,7 @@ public class IRISailRepository extends SailRepository {
 
         //String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
         //        + uriaddress
-        //        + "> {x} <"+RepositoryUtility.lastModifiedContext+"> {y} "
+        //        + "> {x} <"+RepositoryUtility.lastModifiedContextUri+"> {y} "
         //        + "where x=<" + uriaddress + ">";
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
@@ -1447,7 +1447,7 @@ public class IRISailRepository extends SailRepository {
         RepositoryConnection con = null;
         String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
                 + uriaddress
-                + "> {x} <"+RepositoryUtility.lastModifiedContext+"> {y} "
+                + "> {x} <"+RepositoryUtility.lastModifiedContextUri +"> {y} "
                 + "where x=<" + uriaddress + ">";
 
         try {
@@ -1503,8 +1503,8 @@ public class IRISailRepository extends SailRepository {
             
             ValueFactory valueFactory = this.getValueFactory();
             URI s = valueFactory.createURI(importURL);
-            URI contentTypeContext = valueFactory.createURI(RepositoryUtility.contentTypeContext);
-            URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContext);
+            URI contentTypeContext = valueFactory.createURI(RepositoryUtility.contentTypeContextUri);
+            URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContextUri);
             
             Literal o = valueFactory.createLiteral(contentType);
 
@@ -1589,8 +1589,8 @@ public class IRISailRepository extends SailRepository {
             // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
-            URI p = f.createURI(RepositoryUtility.lastModifiedContext);
-            URI cont = f.createURI(RepositoryUtility.cacheContext);
+            URI p = f.createURI(RepositoryUtility.lastModifiedContextUri);
+            URI cont = f.createURI(RepositoryUtility.cacheContextUri);
             URI sxd = f.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
             Literal o = f.createLiteral(ltmod, sxd);
 
@@ -1620,7 +1620,7 @@ public class IRISailRepository extends SailRepository {
             // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
-            URI lastModifiedContext = f.createURI(RepositoryUtility.lastModifiedContext);
+            URI lastModifiedContext = f.createURI(RepositoryUtility.lastModifiedContextUri);
             URI cont = f.createURI(importURL);
             URI sxd = f.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
             Literal o = f.createLiteral(ltmod, sxd);
@@ -1652,7 +1652,7 @@ public class IRISailRepository extends SailRepository {
             // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
-            URI p = f.createURI(RepositoryUtility.isContainedByContext);
+            URI p = f.createURI(RepositoryUtility.isContainedByContextUri);
             URI cont = f.createURI(importURL);
             URI o = f.createURI(CollectionURL);
 
@@ -1690,7 +1690,7 @@ public class IRISailRepository extends SailRepository {
             // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
-            URI p = f.createURI(RepositoryUtility.isContainedByContext);
+            URI p = f.createURI(RepositoryUtility.isContainedByContextUri);
             URI cont = f.createURI(importURL);
             URI o = f.createURI(CollectionURL);
 
@@ -2164,8 +2164,8 @@ public class IRISailRepository extends SailRepository {
         URI rdffirst = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
         URI rdfrest = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
         URI endList = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
-        URI myfn = creatValue.createURI(RepositoryUtility.functionsContext);
-        URI myfnlist = creatValue.createURI(RepositoryUtility.listContext);
+        URI myfn = creatValue.createURI(RepositoryUtility.functionsContextUri);
+        URI myfnlist = creatValue.createURI(RepositoryUtility.listContextUri);
 
         FunctionTypes functionTypeFlag = FunctionTypes.None;
         Value objLastSt = null;
@@ -2379,7 +2379,7 @@ public class IRISailRepository extends SailRepository {
                      //log.debug("prd = " + prd.stringValue() );
                     // @todo This is supposed to be a full URI match and not a local name match!!!
                     //if (prd.getLocalName().equals("myfn") && isSbjBn) {
-                    if (prd.stringValue().equals(RepositoryUtility.functionsContext) && isSbjBn) {
+                    if (prd.stringValue().equals(RepositoryUtility.functionsContextUri) && isSbjBn) {
                         String functionImport =  obj.stringValue();
                         int indexOfLastPoundSign = functionImport.lastIndexOf("#");
                         

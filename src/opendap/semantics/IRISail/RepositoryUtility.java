@@ -37,22 +37,40 @@ import java.util.*;
 public class RepositoryUtility {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryUtility.class);
-    public static final String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-    public static final String rdfCacheNamespace = internalStartingPoint+"#";
 
-    public static final String lastModifiedContext        = rdfCacheNamespace + "last_modified";
-    public static final String cacheContext               = rdfCacheNamespace + "cachecontext";
-    public static final String contentTypeContext         = rdfCacheNamespace + "contenttype";
-    public static final String externalInferencingContext = rdfCacheNamespace + "externalInferencing";
-
-    public static final String startingPointsContext      = rdfCacheNamespace + "startingPoints";
-    public static final String startingPointContext       = rdfCacheNamespace + "StartingPoint";
+    public static final String internalStartingPoint         = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+    public static final String rdfCacheNamespace             = internalStartingPoint+"#";
 
 
-    public static final String functionsContext           = rdfCacheNamespace + "myfn";
-    public static final String listContext                = rdfCacheNamespace + "mylist";
-    public static final String isContainedByContext       = rdfCacheNamespace + "isContainedBy";
-    public static final String reTypeToContext            = rdfCacheNamespace + "reTypeTo";
+    public static String lastModifiedContext                 = "last_modified";
+    public static final String lastModifiedContextUri        = rdfCacheNamespace + lastModifiedContext;
+
+    public static String cacheContext                        = "cachecontext";
+    public static final String cacheContextUri               = rdfCacheNamespace + cacheContext;
+
+    public static String contentTypeContext                  = "contenttype";
+    public static final String contentTypeContextUri         = rdfCacheNamespace + contentTypeContext;
+
+    public static String externalInferencingContext          = "externalInferencing";
+    public static final String externalInferencingContextUri = rdfCacheNamespace + externalInferencingContext;
+
+    public static String startingPointsContext               = "startingPoints";
+    public static final String startingPointsContextUri      = rdfCacheNamespace + startingPointsContext;
+
+    public static String startingPointContext                = "StartingPoint";
+    public static final String startingPointContextUri       = rdfCacheNamespace + startingPointContext;
+
+    public static String functionsContext                    = "myfn";
+    public static final String functionsContextUri           = rdfCacheNamespace + functionsContext;
+
+    public static String listContext                         = "mylist";
+    public static final String listContextUri                = rdfCacheNamespace + listContext;
+
+    public static String isContainedByContext                = "isContainedBy";
+    public static final String isContainedByContextUri       = rdfCacheNamespace + isContainedByContext;
+
+    public static String reTypeToContext                     = "reTypeTo";
+    public static final String reTypeToContextUri            = rdfCacheNamespace + reTypeToContext;
 
 
 
@@ -231,8 +249,8 @@ public class RepositoryUtility {
 
             URI s = valueFactory.createURI(importURL);
             URI isa = valueFactory.createURI(pred);
-            URI startingPointsContext = valueFactory.createURI(RepositoryUtility.startingPointsContext);
-            URI startingPointContext = valueFactory.createURI(RepositoryUtility.startingPointContext);
+            URI startingPointsContext = valueFactory.createURI(RepositoryUtility.startingPointsContextUri);
+            URI startingPointContext = valueFactory.createURI(RepositoryUtility.startingPointContextUri);
             URL url;
 
 
@@ -673,7 +691,7 @@ public class RepositoryUtility {
 
         //String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
         //        + uriaddress
-        //        + "> {x} <"+RepositoryUtility.lastModifiedContext+"> {y} "
+        //        + "> {x} <"+RepositoryUtility.lastModifiedContextUri+"> {y} "
         //        + "where x=<" + uriaddress + ">";
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
