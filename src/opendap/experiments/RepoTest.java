@@ -52,36 +52,50 @@ public class RepoTest {
 
             System.out.println("\n\n#######################################");
             SailRepository repo = setupRepository(workingDir);
-            loadStatements(repo,"test.trig");
+            fileName = "test.trig";
+            loadStatements(repo,fileName);
+            System.out.println("Loaded RDF statements from "+fileName);
+            System.out.println(showContexts(repo));
             repo.shutDown();
-            System.out.println("Loaded RDF statements from trig file.");
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
+            System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
             fileName = "UnchangedTestStatementsFromOwlim.trig"; 
-            System.out.println("Dumping statements loaded from repository persistence to '"+fileName+"'");
             dumpRepository(repo,fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
+            System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
             System.out.println("Dropping Statement.");
             dropStatement(repo);
             System.out.println(showContexts(repo));
             fileName = "AfterDropFromMemory.trig";
-            System.out.println("Dumping statements in memory to '"+fileName+"'");
             dumpRepository(repo,fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
+            System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
             fileName = "AfterDropFromOwlim.trig";
-            System.out.println("Dumping statements loaded from repository persistence to '"+fileName+"'");
             dumpRepository(repo,fileName);
             repo.shutDown();
+
+            System.out.println("\n#######################################");
+            purgeRepositoryCache(workingDir);
+
+            System.out.println("\n\n#######################################");
+            repo = setupRepository(workingDir);
+            fileName = "AfterDropFromOwlim.trig";
+            loadStatements(repo,fileName);
+            System.out.println("Loaded RDF statements from "+fileName);
+            System.out.println(showContexts(repo));
+            repo.shutDown();
+
 
 
         } catch (Exception e) {
@@ -138,7 +152,7 @@ public class RepoTest {
         System.out.println("Purging repository cache...");
         File repoCache = new File(cacheDir+repositoryStorage);
 
-        repoCache.delete();
+        deleteDir(repoCache);
 
 
     }
@@ -300,6 +314,21 @@ public class RepoTest {
         }
 
 
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        // The directory is now empty so delete it
+        return dir.delete();
     }
 
 
