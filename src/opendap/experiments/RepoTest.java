@@ -37,6 +37,8 @@ public class RepoTest {
         long startTime, endTime;
         double elapsedTime;
 
+        String fileName;
+
         String workingDir =  System.getProperty("user.dir");
         System.out.println("Current directory: "+workingDir);
 
@@ -44,9 +46,11 @@ public class RepoTest {
         startTime = new Date().getTime();
 
         try {
-            purgeRepositoryCache(workingDir);
 
             System.out.println("\n#######################################");
+            purgeRepositoryCache(workingDir);
+
+            System.out.println("\n\n#######################################");
             SailRepository repo = setupRepository(workingDir);
             loadStatements(repo,"test.trig");
             repo.shutDown();
@@ -55,8 +59,9 @@ public class RepoTest {
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println(showContexts(repo));
-            System.out.println("Dumping statements loaded from repository persistence.");
-            dumpRepository(repo,"fromOwlim.trig");
+            fileName = "UnchangedTestStatementsFromOwlim.trig"; 
+            System.out.println("Dumping statements loaded from repository persistence to '"+fileName+"'");
+            dumpRepository(repo,fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
@@ -65,14 +70,17 @@ public class RepoTest {
             System.out.println("Dropping Statement.");
             dropStatement(repo);
             System.out.println(showContexts(repo));
-            dumpRepository(repo,"AfterDropFromMemory.trig");
+            fileName = "AfterDropFromMemory.trig";
+            System.out.println("Dumping statements in memory to '"+fileName+"'");
+            dumpRepository(repo,fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println(showContexts(repo));
-            System.out.println("Dumping statements loaded from repository persistence.");
-            dumpRepository(repo,"AfterDropFromOwlim.trig");
+            fileName = "AfterDropFromOwlim.trig";
+            System.out.println("Dumping statements loaded from repository persistence to '"+fileName+"'");
+            dumpRepository(repo,fileName);
             repo.shutDown();
 
 
