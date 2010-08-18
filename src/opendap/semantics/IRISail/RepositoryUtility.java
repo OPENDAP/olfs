@@ -111,14 +111,14 @@ public class RepositoryUtility {
 
         URI startingPointValue;
         URI isa = valueFactory.createURI(pred);
-        URI context = valueFactory.createURI(rdfCacheNamespace+"startingPoints");
-        URI startingPointType = valueFactory.createURI(rdfCacheNamespace+"StartingPoint");
+        URI context = valueFactory.createURI(startingPointsContextUri);
+        URI startingPointType = valueFactory.createURI(startingPointContextUri);
 
         try {
             for (String startingPoint : startingPointUrls) {
 
                 startingPointValue = valueFactory.createURI(startingPoint);
-                con.remove(startingPointValue, isa, startingPointType, (Resource) context);
+                con.remove(startingPointValue, isa, startingPointType, context);
 
                 log.info("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                         + "> " + "<" + startingPointType + "> " + "<" + context + "> )");
