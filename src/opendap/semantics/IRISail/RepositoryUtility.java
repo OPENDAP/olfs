@@ -125,6 +125,7 @@ public class RepositoryUtility {
                 log.info("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                         + "> " + "<" + startingPointType + "> " + "<" + context + "> )");
             }
+            con.commit();
 
 
         } catch (RepositoryException e) {
