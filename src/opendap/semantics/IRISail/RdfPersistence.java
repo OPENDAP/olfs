@@ -192,8 +192,8 @@ public class RdfPersistence {
                 URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContextUri);
 
                 log.info("Removing context: " + contextToDrop);
-                con.remove((Resource) null, null, null, contextToDrop);
-                //con.clear(contextToDrop);
+                //con.remove((Resource) null, null, null, contextToDrop);
+                con.clear(contextToDrop);
                 //con.remove(contextToDrop, null, null);
 
                 log.info("Removing last_modified: " + contextToDrop);
