@@ -114,6 +114,8 @@ public class RepositoryUtility {
         URI context = valueFactory.createURI(startingPointsContextUri);
         URI startingPointType = valueFactory.createURI(startingPointContextUri);
 
+        
+
         try {
             for (String startingPoint : startingPointUrls) {
 

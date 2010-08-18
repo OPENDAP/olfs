@@ -74,15 +74,24 @@ public class RdfPersistence {
 
             log.debug(RepositoryUtility.showContexts(repository));
 
+
             boolean modelChanged = false;
             if (!dropList.isEmpty()) {
 
                 log.debug("Add external inferencing contexts to dropList");
                 dropList.addAll(findExternalInferencingContexts(repository));
 
+                String filename =  "PriorToDropStartingPointsRepository.trig";
+                log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+                RepositoryUtility.dumpRepository(repository, filename);
+
                 log.debug("Dropping starting points ...");
                 RepositoryUtility.dropStartingPoints(repository, startingPointsToDrop);
                 log.debug("Finished dropping starting points.");
+
+                filename =  "PostDropStartingPointsRepository.trig";
+                log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+                RepositoryUtility.dumpRepository(repository, filename);
 
                 log.debug(RepositoryUtility.showContexts(repository));
 
@@ -93,6 +102,8 @@ public class RdfPersistence {
                 modelChanged = true;
 
             }
+
+
             if (!newStartingPoints.isEmpty()) {
 
                 log.debug("Adding new starting point ...");
