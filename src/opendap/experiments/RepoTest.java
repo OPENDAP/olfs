@@ -75,33 +75,26 @@ public class RepoTest {
 
         System.out.println("Setting up Semantic Repository.");
 
-        //OWLIM Sail Repository (inferencing makes this somewhat slow)
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
         SailRepository repo = new SailRepository(owlimSail);
 
         System.out.println("Configuring Semantic Repository.");
-        File storageDir = new File(cacheDir); //define local copy of repository
+        File storageDir = new File(cacheDir);
         owlimSail.setDataDir(storageDir);
         System.out.println("Semantic Repository Data directory set to: " + cacheDir);
-        // prepare config
+
         owlimSail.setParameter("storage-folder", repositoryStorage);
         System.out.println("Semantic Repository 'storage-folder' set to: " + repositoryStorage);
 
-        // Choose the operational ruleset
-        String ruleset;
-        ruleset = "owl-horst";
-        //ruleset = "owl-max";
-
-        owlimSail.setParameter("ruleset", ruleset);
-        //owlimSail.setParameter("ruleset", "owl-max");
-        //owlimSail.setParameter("partialRDFs", "false");
-        System.out.println("Semantic Repository 'ruleset' set to: " + ruleset);
+        String ruleSet;
+        ruleSet = "owl-horst";
+        owlimSail.setParameter("ruleset", ruleSet);
+        System.out.println("Semantic Repository 'ruleset' set to: " + ruleSet);
 
 
-        System.out.println("Intializing Semantic Repository.");
+        System.out.println("Initializing Semantic Repository.");
 
-        // Initialize repository
-        repo.initialize(); //needed
+        repo.initialize();
 
         System.out.println("Semantic Repository Ready.");
 
@@ -120,6 +113,7 @@ public class RepoTest {
             con = repo.getConnection();
             File rdfFile = new File(rdfFileName);
             con.add(rdfFile,"http://someURL#",RDFFormat.TRIG);
+            con.commit();
         }
         finally {
             if(con!=null) {
@@ -152,6 +146,8 @@ public class RepoTest {
         try {
             con = repo.getConnection();
             con.remove(startingPointValue, isa, startingPointType, startingPointsContext);
+            con.commit();
+            
             System.out.println("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                     + "> " + "<" + startingPointType + "> " + "<" + startingPointsContext + "> )");
 
@@ -208,7 +204,7 @@ public class RepoTest {
         // export repository to an n-triple file
         File outrps = new File(filename); // hard copy of repository
         try {
-            System.out.print("\nDumping repository to: '"+filename+"' ");
+            System.out.println("\nDumping repository to: '"+filename+"' ");
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
             if (filename.endsWith("nt")) {
 
@@ -238,7 +234,6 @@ public class RepoTest {
                 myTriGWriter.endRDF();
 
             }
-            System.out.println("Done.");
 
         } catch (Exception e) {
             System.err.println("Failed to dump repository! msg: "+e.getMessage());
