@@ -59,11 +59,13 @@ public class URLClassifier {
 		
 		try {
 			int numberOfUrls = c.pass1();
+			
 			ps.println("Completed classification: " + (new Date()).toString());
-			ps.println("Number of URLs processed: " + new Integer(numberOfUrls).toString())
-			;
+			ps.println("Number of URLs processed: " + new Integer(numberOfUrls).toString());
 			c.printClassifications(ps);
 			c.printCompleteClassifications(ps);
+			
+			
 		} 
 		catch (Exception e) {
 			log.error("Could not open the output file: " + e.getLocalizedMessage());
@@ -75,12 +77,12 @@ public class URLClassifier {
 
     	Enumeration<String> ddxURLs = ddxSource.getCache().getLastVisitedKeys();
     	
-    	// Special case for the first URL (because using 'for' with an iterator
-    	// fails when the iterator instance is null
+		// Special case for the first URLGroup (because using 'for' with an
+		// iterator fails when the iterator instance is null
     	if (ddxURLs.hasMoreElements()) {
     		String ddxURL = ddxURLs.nextElement();
 			URLComponents componets = new URLComponents(ddxURL);
-			URLClassification classification = new URLClassification(componets);
+			URLEquivalenceClasses classification = new URLEquivalenceClasses(componets);
 
     		URLGroup group = new URLGroup(ddxURL, componets, classification);
     		
@@ -95,7 +97,7 @@ public class URLClassifier {
 			log.debug("Processing URL: " + ddxURL);
 			try {
 				URLComponents componets = new URLComponents(ddxURL);
-				URLClassification classification = new URLClassification(componets);
+				URLEquivalenceClasses classification = new URLEquivalenceClasses(componets);
 
 				// Look for an existing equivalence class for this ddxURL. If
 				// one matches, add the ddxURL to it and stop looking for more

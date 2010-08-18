@@ -1,6 +1,6 @@
 package opendap.metacat;
 
-public class URLClassification {
+public class URLEquivalenceClasses {
 	String[] classes;
 	
 	// Testing only...
@@ -9,7 +9,7 @@ public class URLClassification {
 		
 		// URLComponents comps = new URLComponents(args[0]);
 		try {
-			URLClassification classification = new URLClassification(args[0]);
+			URLEquivalenceClasses classification = new URLEquivalenceClasses(args[0]);
 
 			System.out.println(args[0]); // print URL
 
@@ -22,11 +22,11 @@ public class URLClassification {
 		}
 	}
 
-	public URLClassification(URLComponents url) {
+	public URLEquivalenceClasses(URLComponents url) {
 		buildEquivalenceClasses(url);
 	}
 	
-	public URLClassification(String url) throws Exception {
+	public URLEquivalenceClasses(String url) throws Exception {
 		buildEquivalenceClasses(new URLComponents(url));
 	}
 	
