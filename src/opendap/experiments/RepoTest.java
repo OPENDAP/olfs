@@ -42,9 +42,11 @@ public class RepoTest {
         try {
 
             SailRepository repo = setupRepository(workingDir);
-
             loadStatements(repo,"test.trig");
+            repo.shutDown();
 
+            repo = setupRepository(workingDir);
+            
             System.out.println(showContexts(repo));
                           
             dropStatement(repo);
@@ -53,8 +55,7 @@ public class RepoTest {
 
             System.out.println(showContexts(repo));
 
-
-
+            repo.shutDown();
 
         } catch (Exception e) {
             System.err.println("Caught " + e.getClass().getName() + " in main(): "
