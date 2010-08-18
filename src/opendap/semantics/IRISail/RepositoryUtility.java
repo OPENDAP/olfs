@@ -122,7 +122,7 @@ public class RepositoryUtility {
 
                 url = new URL(importURL);
                 startingPointValue = valueFactory.createURI(importURL);
-                con.remove((Resource) startingPointValue, isa, (Value) startingPointType, (Resource) context);
+                con.remove(startingPointValue, isa, startingPointType, (Resource) context);
 
                 log.info("Removed starting point " + importURL + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                         + "> " + "<" + startingPointType + "> " + "<" + context + "> )");
