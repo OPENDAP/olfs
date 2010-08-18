@@ -115,8 +115,6 @@ public class RepositoryUtility {
         URI startingPointType = valueFactory.createURI(rdfCacheNamespace+"StartingPoint");
 
         try {
-
-
             for (String startingPoint : startingPointUrls) {
 
                 startingPointValue = valueFactory.createURI(startingPoint);
@@ -131,16 +129,6 @@ public class RepositoryUtility {
             log.error("In addStartingPoints, caught an RepositoryException! Msg: "
                     + e.getMessage());
 
-        } catch (MalformedURLException e) {
-
-            log.error("In addStartingPoints, caught an MalformedURLException! Msg: "
-                    + e.getMessage());
-            //} catch (RDFParseException e) {
-            //    log.error("In addStartingPoints, caught an RDFParseException! Msg: "
-            //            + e.getMessage());
-        } catch (IOException e) {
-            log.error("In addStartingPoints, caught an IOException! Msg: "
-                    + e.getMessage());
         }
 
     }
