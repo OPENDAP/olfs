@@ -81,16 +81,16 @@ public class RepoTest {
             repo = setupRepository(workingDir);
             System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
-            fileName = "AfterDropFromOwlim.trig";
+            fileName = "AfterDropFromOwlimPersistence.trig";
             dumpRepository(repo,fileName);
             repo.shutDown();
 
-            System.out.println("\n#######################################");
+            System.out.println("\n\n#######################################");
+            System.out.println("#######################################");
             purgeRepositoryCache(workingDir);
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
-            fileName = "AfterDropFromOwlim.trig";
             loadStatements(repo,fileName);
             System.out.println("Loaded RDF statements from "+fileName);
             System.out.println(showContexts(repo));
