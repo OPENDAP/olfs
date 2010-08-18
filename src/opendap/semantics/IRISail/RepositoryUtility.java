@@ -109,22 +109,20 @@ public class RepositoryUtility {
         String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
 
-        URI startingPointValue = null;
+        URI startingPointValue;
         URI isa = valueFactory.createURI(pred);
         URI context = valueFactory.createURI(rdfCacheNamespace+"startingPoints");
         URI startingPointType = valueFactory.createURI(rdfCacheNamespace+"StartingPoint");
-        URL url;
 
         try {
 
 
-            for (String importURL : startingPointUrls) {
+            for (String startingPoint : startingPointUrls) {
 
-                url = new URL(importURL);
-                startingPointValue = valueFactory.createURI(importURL);
+                startingPointValue = valueFactory.createURI(startingPoint);
                 con.remove(startingPointValue, isa, startingPointType, (Resource) context);
 
-                log.info("Removed starting point " + importURL + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
+                log.info("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                         + "> " + "<" + startingPointType + "> " + "<" + context + "> )");
             }
 
