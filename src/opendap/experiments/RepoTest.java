@@ -29,6 +29,9 @@ import java.util.Date;
 public class RepoTest {
 
 
+    static String repositoryStorage = "owlim-storage";
+
+
 
     public static void main(String[] args) {
         long startTime, endTime;
@@ -37,25 +40,41 @@ public class RepoTest {
         String workingDir =  System.getProperty("user.dir");
         System.out.println("Current directory: "+workingDir);
 
+
         startTime = new Date().getTime();
 
         try {
+            purgeRepositoryCache(workingDir);
 
+            System.out.println("#######################################");
             SailRepository repo = setupRepository(workingDir);
             loadStatements(repo,"test.trig");
             repo.shutDown();
+            System.out.println("Loaded RDF statements from trig file.");
 
+            System.out.println("#######################################");
             repo = setupRepository(workingDir);
-            
             System.out.println(showContexts(repo));
-                          
-            dropStatement(repo);
-
-            dumpRepository(repo,"test_drop.trig");
-
-            System.out.println(showContexts(repo));
-
+            System.out.println("Dumping statements loaded from repository persistence.");
+            dumpRepository(repo,"fromOwlim.trig");
             repo.shutDown();
+
+            System.out.println("#######################################");
+            repo = setupRepository(workingDir);
+            System.out.println(showContexts(repo));
+            System.out.println("Dropping Statement.");
+            dropStatement(repo);
+            System.out.println(showContexts(repo));
+            dumpRepository(repo,"AfterDropFromMemory.trig");
+            repo.shutDown();
+
+            System.out.println("#######################################");
+            repo = setupRepository(workingDir);
+            System.out.println(showContexts(repo));
+            System.out.println("Dumping statements loaded from repository persistence.");
+            dumpRepository(repo,"AfterDropFromOwlim.trig");
+            repo.shutDown();
+
 
         } catch (Exception e) {
             System.err.println("Caught " + e.getClass().getName() + " in main(): "
@@ -72,7 +91,6 @@ public class RepoTest {
     private static SailRepository setupRepository(String cacheDir) throws RepositoryException {
 
 
-        String repositoryStorage = "owlim-storage";
 
         System.out.println("Setting up Semantic Repository.");
 
@@ -104,6 +122,18 @@ public class RepoTest {
 
     }
 
+    public static void purgeRepositoryCache(String cacheDir){
+
+        if(!cacheDir.endsWith("/"))
+            cacheDir+="/";
+
+        System.out.println("Purging repository cache...");
+        File repoCache = new File(cacheDir+repositoryStorage);
+
+        repoCache.delete();
+
+
+    }
 
     private static void loadStatements(SailRepository repo, String rdfFileName) throws RepositoryException, IOException, RDFParseException {
 
