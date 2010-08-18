@@ -112,7 +112,7 @@ public class RepoTest {
         try {
             con = repo.getConnection();
             File rdfFile = new File(rdfFileName);
-            con.add(rdfFile,"http://someURL#",RDFFormat.TRIG);
+            con.add(rdfFile,"http://someBaseURI#",RDFFormat.TRIG);
             con.commit();
         }
         finally {
