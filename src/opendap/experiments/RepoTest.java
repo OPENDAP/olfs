@@ -152,6 +152,9 @@ public class RepoTest {
         try {
             con = repo.getConnection();
             con.remove(startingPointValue, isa, startingPointType, startingPointsContext);
+            System.out.println("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
+                    + "> " + "<" + startingPointType + "> " + "<" + startingPointsContext + "> )");
+
         }
         finally {
             if(con!=null) {
@@ -205,7 +208,7 @@ public class RepoTest {
         // export repository to an n-triple file
         File outrps = new File(filename); // hard copy of repository
         try {
-            System.out.println("Dumping repository to: '"+filename+"'");
+            System.out.print("\nDumping repository to: '"+filename+"' ");
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
             if (filename.endsWith("nt")) {
 
@@ -235,7 +238,7 @@ public class RepoTest {
                 myTriGWriter.endRDF();
 
             }
-            System.out.println("Completed dumping explicit statements");
+            System.out.println("Done.");
 
         } catch (Exception e) {
             System.err.println("Failed to dump repository! msg: "+e.getMessage());
