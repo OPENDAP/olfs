@@ -46,20 +46,20 @@ public class RepoTest {
         try {
             purgeRepositoryCache(workingDir);
 
-            System.out.println("#######################################");
+            System.out.println("\n#######################################");
             SailRepository repo = setupRepository(workingDir);
             loadStatements(repo,"test.trig");
             repo.shutDown();
             System.out.println("Loaded RDF statements from trig file.");
 
-            System.out.println("#######################################");
+            System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println(showContexts(repo));
             System.out.println("Dumping statements loaded from repository persistence.");
             dumpRepository(repo,"fromOwlim.trig");
             repo.shutDown();
 
-            System.out.println("#######################################");
+            System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println(showContexts(repo));
             System.out.println("Dropping Statement.");
@@ -68,7 +68,7 @@ public class RepoTest {
             dumpRepository(repo,"AfterDropFromMemory.trig");
             repo.shutDown();
 
-            System.out.println("#######################################");
+            System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println(showContexts(repo));
             System.out.println("Dumping statements loaded from repository persistence.");
