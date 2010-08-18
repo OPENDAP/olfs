@@ -99,6 +99,10 @@ public class RdfPersistence {
                 dropContexts(repository, dropList);
                 log.debug(RepositoryUtility.showContexts(repository));
 
+                filename =  "PostDropContextsRepository.trig";
+                log.debug("Dumping Semantic Repository to: " + filename);
+                RepositoryUtility.dumpRepository(repository, filename);
+
                 modelChanged = true;
 
             }
