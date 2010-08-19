@@ -2304,7 +2304,7 @@ public class IRISailRepository extends SailRepository {
      * @throws QueryEvaluationException
      * @throws RepositoryException
      */
-    private void process_fn(GraphQueryResult graphResult,
+    private void process_fn_OLD(GraphQueryResult graphResult,
             ValueFactory creatValue, Vector<Statement> Added,
             Vector<Statement> toAdd, RepositoryConnection con,
             Resource[] context) throws QueryEvaluationException,
@@ -2447,7 +2447,7 @@ public class IRISailRepository extends SailRepository {
      * @param createValue
      * @return
      */
-    public static Value join(List<String> RDFList, ValueFactory createValue) {
+    public static Value join_OLD(List<String> RDFList, ValueFactory createValue) {
         int i = 0;
         boolean joinStrIsURL = false;
         String targetObj = "";

@@ -73,6 +73,10 @@ public class RepositoryUtility {
     public static final String reTypeToContextUri            = rdfCacheNamespace + reTypeToContext;
 
 
+    public static String rdfType                             = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+
+
+
 
     public static void dropStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
@@ -106,11 +110,10 @@ public class RepositoryUtility {
      */
     public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
 
-        String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
 
         URI startingPointValue;
-        URI isa = valueFactory.createURI(pred);
+        URI isa = valueFactory.createURI(rdfType);
         URI startingPointsContext = valueFactory.createURI(startingPointsContextUri);
         URI startingPointType = valueFactory.createURI(startingPointContextUri);
 
@@ -231,46 +234,36 @@ public class RepositoryUtility {
      * Adds the passed  starting point to the repository.
      *
      * @param con
-     * @param importURL
+     * @param startingPoint
      */
-    public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String importURL) {
-        String pred = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+    public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint) {
 
-            URI s = valueFactory.createURI(importURL);
-            URI isa = valueFactory.createURI(pred);
-            URI startingPointsContext = valueFactory.createURI(RepositoryUtility.startingPointsContextUri);
-            URI startingPointContext = valueFactory.createURI(RepositoryUtility.startingPointContextUri);
-            URL url;
+        URI startingPointUri;
+        URI isa = valueFactory.createURI(rdfType);
+        URI startingPointsContext = valueFactory.createURI(RepositoryUtility.startingPointsContextUri);
+        URI startingPointContext = valueFactory.createURI(RepositoryUtility.startingPointContextUri);
 
 
-            try {
+        try {
 
-                if (importURL.startsWith("http://")) { //make sure it's a url and read it in
-                url = new URL(importURL);
-                s = valueFactory.createURI(importURL);
-                con.add((Resource) s, isa, (Value) startingPointContext, (Resource) startingPointsContext);
+            if (startingPoint.startsWith("http://")) { //make sure it's a url and read it in
+                startingPointUri = valueFactory.createURI(startingPoint);
+                con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
 
 
-                log.info("addStartingPoint(): Added StartingPoint to the repository <" + s + "> <" + isa
+                log.info("addStartingPoint(): Added StartingPoint to the repository <" + startingPointUri + "> <" + isa
                         + "> " + "<" + startingPointContext + "> " + "<" + startingPointsContext + "> ");
-                }
-
-
-            } catch (RepositoryException e) {
-                log.error("addStartingPoint(): Caught an RepositoryException! Msg: "
-                        + e.getMessage());
-
-            } catch (MalformedURLException e) {
-
-                log.error("addStartingPoint(): Caught an MalformedURLException! Msg: "
-                        + e.getMessage());
-            //} catch (RDFParseException e) {
-            //    log.error("In addStartingPoints, caught an RDFParseException! Msg: "
-            //            + e.getMessage());
-            } catch (IOException e) {
-                log.error("addStartingPoint(): Caught an IOException! Msg: "
-                        + e.getMessage());
             }
+            else {
+                log.error("addStartingPoint() - The startingPoint '"+startingPoint+"' does not appear to by a URL, skipping.");
+            }
+
+
+        } catch (RepositoryException e) {
+            log.error("addStartingPoint(): Caught an RepositoryException! Msg: "
+                    + e.getMessage());
+
+        }
 
 
     }
@@ -389,13 +382,13 @@ public class RepositoryUtility {
                 newStartingPoints.add(internalStartingPoint);
             }
 
-            for (String startpoint : startingPointUrls) {
+            for (String startingPoint : startingPointUrls) {
                 
-                if (!result.contains(startpoint) && !startpoint.equals(internalStartingPoint)) {
+                if (!result.contains(startingPoint) && !startingPoint.equals(internalStartingPoint)) {
 
-                    newStartingPoints.add(startpoint);
+                    newStartingPoints.add(startingPoint);
 
-                    log.debug("Found New StartingPoint: " + startpoint);
+                    log.debug("Found New StartingPoint: " + startingPoint);
                 }
             }
 
@@ -678,10 +671,6 @@ public class RepositoryUtility {
         Resource[] context = new Resource[1];
         context[0] = (Resource) uriaddress;
 
-        //String queryString = "SELECT DISTINCT x, y FROM CONTEXT <"
-        //        + uriaddress
-        //        + "> {x} <"+RepositoryUtility.lastModifiedContextUri+"> {y} "
-        //        + "where x=<" + uriaddress + ">";
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
                   + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
@@ -697,12 +686,12 @@ public class RepositoryUtility {
             Value valueOfY;
 
             while (result.hasNext()) { // should have only one value
-                bindingSet = (BindingSet) result.next();
-                Set<String> names = bindingSet.getBindingNames();
+                bindingSet =  result.next();
+                //Set<String> names = bindingSet.getBindingNames();
                 // for (String name : names) {
                 // log.debug("BindingNames: " + name);
                 // }
-                valueOfY = (Value) bindingSet.getValue("lastmod");
+                valueOfY =  bindingSet.getValue("lastmod");
                 ltmodstr = valueOfY.stringValue();
                 // log.debug("Y:" + valueOfY.stringValue());
 
