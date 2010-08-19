@@ -18,6 +18,7 @@ import org.openrdf.rio.trix.TriXWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Date;
 
 /**
@@ -32,74 +33,83 @@ public class RepoTest {
 
     static String repositoryStorage = "owlim-storage";
     static String startingPointsContext = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints";
+    
+    static DualPrinter dp;
+
+
 
     public static void main(String[] args) {
         long startTime, endTime;
         double elapsedTime;
 
         String fileName;
+        
 
         String workingDir = System.getProperty("user.dir");
         System.out.println("Current directory: " + workingDir);
-
 
         startTime = new Date().getTime();
 
         try {
 
-            System.out.println("\n#######################################");
+            PrintStream logFile = new PrintStream(new FileOutputStream("RepoTest.log"));
+
+            dp = new DualPrinter(System.out,logFile);
+
+
+            dp.println("\n#######################################");
             purgeRepositoryCache(workingDir);
 
-            System.out.println("\n\n#######################################");
+            dp.println("\n\n#######################################");
             SailRepository repo = setupRepository(workingDir);
             fileName = "test.trig";
             loadStatements(repo, fileName);
-            System.out.println("Loaded RDF statements from " + fileName);
-            System.out.println(showContexts(repo));
-            System.out.println(showStatements(repo,startingPointsContext));
+            dp.println("Loaded RDF statements from " + fileName);
+            dp.println(showContexts(repo));
+            dp.println(showStatements(repo,startingPointsContext));
             repo.shutDown();
 
-            System.out.println("\n\n#######################################");
+            dp.println("\n\n#######################################");
             repo = setupRepository(workingDir);
-            System.out.println("Loaded statements loaded from repository persistence...");
-            System.out.println(showContexts(repo));
-            System.out.println(showStatements(repo,startingPointsContext));
+            dp.println("Loaded statements loaded from repository persistence...");
+            dp.println(showContexts(repo));
+            dp.println(showStatements(repo,startingPointsContext));
             fileName = "UnchangedTestStatementsFromOwlim.trig";
             dumpRepository(repo, fileName);
             repo.shutDown();
 
-            System.out.println("\n\n#######################################");
+            dp.println("\n\n#######################################");
             repo = setupRepository(workingDir);
-            System.out.println("Loaded statements loaded from repository persistence...");
-            System.out.println(showContexts(repo));
-            System.out.println(showStatements(repo,startingPointsContext));
-            System.out.println("Dropping Statement.");
+            dp.println("Loaded statements loaded from repository persistence...");
+            dp.println(showContexts(repo));
+            dp.println(showStatements(repo,startingPointsContext));
+            dp.println("Dropping Statement.");
             dropStatement(repo);
-            System.out.println(showContexts(repo));
-            System.out.println(showStatements(repo,startingPointsContext));
+            dp.println(showContexts(repo));
+            dp.println(showStatements(repo,startingPointsContext));
             fileName = "AfterDropFromMemory.trig";
             dumpRepository(repo, fileName);
             repo.shutDown();
 
-            System.out.println("\n\n#######################################");
+            dp.println("\n\n#######################################");
             repo = setupRepository(workingDir);
-            System.out.println("Loaded statements loaded from repository persistence...");
-            System.out.println(showContexts(repo));
-            System.out.println(showStatements(repo,startingPointsContext));
+            dp.println("Loaded statements loaded from repository persistence...");
+            dp.println(showContexts(repo));
+            dp.println(showStatements(repo,startingPointsContext));
             fileName = "AfterDropFromOwlimPersistence.trig";
             dumpRepository(repo, fileName);
             repo.shutDown();
 
-            System.out.println("\n\n#######################################");
-            System.out.println("#######################################");
+            dp.println("\n\n#######################################");
+            dp.println("#######################################");
             purgeRepositoryCache(workingDir);
 
-            System.out.println("\n\n#######################################");
+            dp.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             loadStatements(repo, fileName);
-            System.out.println("Loaded RDF statements from " + fileName);
-            System.out.println(showContexts(repo));
-            System.out.println(showStatements(repo,startingPointsContext));
+            dp.println("Loaded RDF statements from " + fileName);
+            dp.println(showContexts(repo));
+            dp.println(showStatements(repo,startingPointsContext));
             repo.shutDown();
 
 
@@ -111,7 +121,7 @@ public class RepoTest {
         finally {
             endTime = new Date().getTime();
             elapsedTime = (endTime - startTime) / 1000.0;
-            System.out.println("Elapsed Time: " + elapsedTime + "s");
+            dp.println("Elapsed Time: " + elapsedTime + "s");
         }
 
     }
@@ -119,30 +129,30 @@ public class RepoTest {
     private static SailRepository setupRepository(String cacheDir) throws RepositoryException {
 
 
-        System.out.println("Setting up Semantic Repository.");
+        dp.println("Setting up Semantic Repository.");
 
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
         SailRepository repo = new SailRepository(owlimSail);
 
-        System.out.println("Configuring Semantic Repository.");
+        dp.println("Configuring Semantic Repository.");
         File storageDir = new File(cacheDir);
         owlimSail.setDataDir(storageDir);
-        System.out.println("Semantic Repository Data directory set to: " + cacheDir);
+        dp.println("Semantic Repository Data directory set to: " + cacheDir);
 
         owlimSail.setParameter("storage-folder", repositoryStorage);
-        System.out.println("Semantic Repository 'storage-folder' set to: " + repositoryStorage);
+        dp.println("Semantic Repository 'storage-folder' set to: " + repositoryStorage);
 
         String ruleSet;
         ruleSet = "owl-horst";
         owlimSail.setParameter("ruleset", ruleSet);
-        System.out.println("Semantic Repository 'ruleset' set to: " + ruleSet);
+        dp.println("Semantic Repository 'ruleset' set to: " + ruleSet);
 
 
-        System.out.println("Initializing Semantic Repository.");
+        dp.println("Initializing Semantic Repository.");
 
         repo.initialize();
 
-        System.out.println("Semantic Repository Ready.");
+        dp.println("Semantic Repository Ready.");
 
 
         return repo;
@@ -154,7 +164,7 @@ public class RepoTest {
         if (!cacheDir.endsWith("/"))
             cacheDir += "/";
 
-        System.out.println("Purging repository cache...");
+        dp.println("Purging repository cache...");
         File repoCache = new File(cacheDir + repositoryStorage);
 
         deleteDir(repoCache);
@@ -206,7 +216,7 @@ public class RepoTest {
             con.remove(startingPointValue, isa, startingPointType, startingPointsContext);
             con.commit();
 
-            System.out.println("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
+            dp.println("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                     + "> " + "<" + startingPointType + "> " + "<" + startingPointsContext + "> )");
 
         }
@@ -321,7 +331,7 @@ public class RepoTest {
         // export repository to an n-triple file
         File outrps = new File(filename); // hard copy of repository
         try {
-            System.out.println("\nDumping repository to: '" + filename + "' ");
+            dp.println("\nDumping repository to: '" + filename + "' ");
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
             if (filename.endsWith("nt")) {
 
@@ -393,6 +403,34 @@ public class RepoTest {
 
         // The directory is now empty so delete it
         return dir.delete();
+    }
+
+
+    static class DualPrinter  {
+
+        PrintStream _ps1, _ps2;
+        DualPrinter(PrintStream ps1, PrintStream ps2){
+            _ps1 = ps1;
+            _ps2 = ps2;
+
+        }
+
+        public void print(String msg){
+            _ps1.print(msg);
+            _ps2.print(msg);
+        }
+
+        public void println(String msg){
+            _ps1.println(msg);
+            _ps2.println(msg);
+        }
+
+        public void close(){
+            _ps1.close();
+            _ps2.close();
+        }
+
+
     }
 
 
