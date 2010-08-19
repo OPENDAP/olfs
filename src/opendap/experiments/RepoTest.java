@@ -2,6 +2,7 @@ package opendap.experiments;
 
 import com.ontotext.trree.owlim_ext.SailImpl;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.repository.RepositoryConnection;
@@ -30,8 +31,7 @@ public class RepoTest {
 
 
     static String repositoryStorage = "owlim-storage";
-
-
+    static String startingPointsContext = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints";
 
     public static void main(String[] args) {
         long startTime, endTime;
@@ -39,8 +39,8 @@ public class RepoTest {
 
         String fileName;
 
-        String workingDir =  System.getProperty("user.dir");
-        System.out.println("Current directory: "+workingDir);
+        String workingDir = System.getProperty("user.dir");
+        System.out.println("Current directory: " + workingDir);
 
 
         startTime = new Date().getTime();
@@ -53,36 +53,41 @@ public class RepoTest {
             System.out.println("\n\n#######################################");
             SailRepository repo = setupRepository(workingDir);
             fileName = "test.trig";
-            loadStatements(repo,fileName);
-            System.out.println("Loaded RDF statements from "+fileName);
+            loadStatements(repo, fileName);
+            System.out.println("Loaded RDF statements from " + fileName);
             System.out.println(showContexts(repo));
+            System.out.println(showStatements(repo,startingPointsContext));
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
-            fileName = "UnchangedTestStatementsFromOwlim.trig"; 
-            dumpRepository(repo,fileName);
+            System.out.println(showStatements(repo,startingPointsContext));
+            fileName = "UnchangedTestStatementsFromOwlim.trig";
+            dumpRepository(repo, fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
+            System.out.println(showStatements(repo,startingPointsContext));
             System.out.println("Dropping Statement.");
             dropStatement(repo);
             System.out.println(showContexts(repo));
+            System.out.println(showStatements(repo,startingPointsContext));
             fileName = "AfterDropFromMemory.trig";
-            dumpRepository(repo,fileName);
+            dumpRepository(repo, fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
             System.out.println("Loaded statements loaded from repository persistence...");
             System.out.println(showContexts(repo));
+            System.out.println(showStatements(repo,startingPointsContext));
             fileName = "AfterDropFromOwlimPersistence.trig";
-            dumpRepository(repo,fileName);
+            dumpRepository(repo, fileName);
             repo.shutDown();
 
             System.out.println("\n\n#######################################");
@@ -91,11 +96,11 @@ public class RepoTest {
 
             System.out.println("\n\n#######################################");
             repo = setupRepository(workingDir);
-            loadStatements(repo,fileName);
-            System.out.println("Loaded RDF statements from "+fileName);
+            loadStatements(repo, fileName);
+            System.out.println("Loaded RDF statements from " + fileName);
             System.out.println(showContexts(repo));
+            System.out.println(showStatements(repo,startingPointsContext));
             repo.shutDown();
-
 
 
         } catch (Exception e) {
@@ -106,12 +111,12 @@ public class RepoTest {
         finally {
             endTime = new Date().getTime();
             elapsedTime = (endTime - startTime) / 1000.0;
-            System.out.println("Elapsed Time: "+elapsedTime+"s");
+            System.out.println("Elapsed Time: " + elapsedTime + "s");
         }
 
     }
-    private static SailRepository setupRepository(String cacheDir) throws RepositoryException {
 
+    private static SailRepository setupRepository(String cacheDir) throws RepositoryException {
 
 
         System.out.println("Setting up Semantic Repository.");
@@ -144,13 +149,13 @@ public class RepoTest {
 
     }
 
-    public static void purgeRepositoryCache(String cacheDir){
+    public static void purgeRepositoryCache(String cacheDir) {
 
-        if(!cacheDir.endsWith("/"))
-            cacheDir+="/";
+        if (!cacheDir.endsWith("/"))
+            cacheDir += "/";
 
         System.out.println("Purging repository cache...");
-        File repoCache = new File(cacheDir+repositoryStorage);
+        File repoCache = new File(cacheDir + repositoryStorage);
 
         deleteDir(repoCache);
 
@@ -165,16 +170,16 @@ public class RepoTest {
         try {
             con = repo.getConnection();
             File rdfFile = new File(rdfFileName);
-            con.add(rdfFile,"http://someBaseURI#",RDFFormat.TRIG);
+            con.add(rdfFile, "http://someBaseURI#", RDFFormat.TRIG);
             con.commit();
         }
         finally {
-            if(con!=null) {
+            if (con != null) {
                 try {
                     con.close();  //close connection first
                 }
-                catch(RepositoryException e){
-                    System.err.println("Failed to close repository connection. Msg: "+e.getMessage());
+                catch (RepositoryException e) {
+                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
                 }
             }
         }
@@ -189,7 +194,7 @@ public class RepoTest {
 
         RepositoryConnection con = null;
 
-        String startingPoint = "http://test.opendap.org:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml.rdf" ;
+        String startingPoint = "http://test.opendap.org:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml.rdf";
         URI startingPointValue = valueFactory.createURI(startingPoint);
         URI isa = valueFactory.createURI(rdfType);
         URI startingPointsContext = valueFactory.createURI("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints");
@@ -200,52 +205,111 @@ public class RepoTest {
             con = repo.getConnection();
             con.remove(startingPointValue, isa, startingPointType, startingPointsContext);
             con.commit();
-            
+
             System.out.println("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                     + "> " + "<" + startingPointType + "> " + "<" + startingPointsContext + "> )");
 
         }
         finally {
-            if(con!=null) {
+            if (con != null) {
                 try {
                     con.close();  //close connection first
                 }
-                catch(RepositoryException e){
-                    System.err.println("Failed to close repository connection. Msg: "+e.getMessage());
+                catch (RepositoryException e) {
+                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
                 }
             }
         }
 
     }
+
     public static String showContexts(SailRepository repository) throws RepositoryException {
         RepositoryConnection con = null;
         String msg;
 
         try {
             con = repository.getConnection();
-            msg =  showContexts(con);
+            msg = showContexts(con);
         } finally {
 
-            if(con!=null){
+            if (con != null) {
                 try {
                     con.close();  //close connection first
                 }
-                catch(RepositoryException e){
-                    System.err.println("Failed to close repository connection. Msg: "+e.getMessage());
+                catch (RepositoryException e) {
+                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
                 }
             }
         }
         return msg;
 
     }
+
     public static String showContexts(RepositoryConnection con) throws RepositoryException {
 
-        String msg = "\nRepository ContextIDs:\n";
-            RepositoryResult<Resource> contextIds = con.getContextIDs();
+        String msg;
+        RepositoryResult<Resource> contextIds = con.getContextIDs();
 
-            for(Resource contextId : contextIds.asList()){
-                msg += "    "+contextId+"\n";
+        if(contextIds.hasNext()){
+            msg = "\nRepository ContextIDs:\n";
+            for (Resource contextId : contextIds.asList()) {
+                msg += "    " + contextId + "\n";
             }
+        }
+        else {
+            msg = "\nERROR - No context IDs. RepositoryConnection.getContextIDs() returned an empty RepositoryResult object.\n";
+
+        }
+
+
+        return msg;
+    }
+
+    public static String showStatements(SailRepository repository, String context) throws RepositoryException {
+        RepositoryConnection con = null;
+        String msg;
+        URI contextUri = null;
+        try {
+
+            if(context!=null)
+                contextUri = repository.getValueFactory().createURI(context);
+            con = repository.getConnection();
+            msg = showStatements(con, contextUri);
+        } finally {
+
+            if (con != null) {
+                try {
+                    con.close();  //close connection first
+                }
+                catch (RepositoryException e) {
+                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
+                }
+            }
+        }
+        return msg;
+
+    }
+
+    public static String showStatements(RepositoryConnection con, Resource context) throws RepositoryException {
+
+
+        String msg;
+
+        if(context!=null)
+            msg = "\nRepository Statements in context '"+context.stringValue()+"'\n";
+        else
+            msg = "\nALL Repository Statements:\n";
+
+
+        RepositoryResult<Statement> statements = con.getStatements(null,null,null,true,context);
+
+        for (Statement statement : statements.asList()) {
+            msg += "    <" + statement.getSubject()+">";
+            msg += "    <" + statement.getPredicate()+">";
+            msg += "    <" + statement.getObject()+">";
+            msg += "    <" + statement.getContext()+">";
+            msg += "\n";
+        }
 
 
         return msg;
@@ -257,7 +321,7 @@ public class RepoTest {
         // export repository to an n-triple file
         File outrps = new File(filename); // hard copy of repository
         try {
-            System.out.println("\nDumping repository to: '"+filename+"' ");
+            System.out.println("\nDumping repository to: '" + filename + "' ");
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
             if (filename.endsWith("nt")) {
 
@@ -289,7 +353,7 @@ public class RepoTest {
             }
 
         } catch (Exception e) {
-            System.err.println("Failed to dump repository! msg: "+e.getMessage());
+            System.err.println("Failed to dump repository! msg: " + e.getMessage());
         }
 
     }
@@ -303,12 +367,12 @@ public class RepoTest {
             dumpRepository(con, filename);
         } finally {
 
-            if(con!=null){
+            if (con != null) {
                 try {
                     con.close();  //close connection first
                 }
-                catch(RepositoryException e){
-                    System.err.println("Failed to close repository connection. Msg: "+e.getMessage());
+                catch (RepositoryException e) {
+                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
                 }
             }
         }
@@ -319,7 +383,7 @@ public class RepoTest {
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
+            for (int i = 0; i < children.length; i++) {
                 boolean success = deleteDir(new File(dir, children[i]));
                 if (!success) {
                     return false;
