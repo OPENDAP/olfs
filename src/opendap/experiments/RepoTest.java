@@ -114,7 +114,7 @@ public class RepoTest {
 
 
         } catch (Exception e) {
-            System.err.println("Caught " + e.getClass().getName() + " in main(): "
+            dp.println("Caught " + e.getClass().getName() + " in main(): "
                     + e.getMessage());
             e.printStackTrace(System.err);
         }
