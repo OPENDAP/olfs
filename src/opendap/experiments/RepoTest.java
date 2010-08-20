@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.Date;
 
 /**
@@ -62,7 +63,7 @@ public class RepoTest {
 
             dp.println("\n\n#######################################");
             SailRepository repo = setupRepository(workingDir);
-            fileName = "test.trig";
+            fileName = "http://scm.opendap.org/svn/trunk/olfs/src/opendap/experiments/test.trig";
             loadStatements(repo, fileName);
             dp.println("Loaded RDF statements from " + fileName);
             dp.println(showContexts(repo));
@@ -179,8 +180,15 @@ public class RepoTest {
 
         try {
             con = repo.getConnection();
-            File rdfFile = new File(rdfFileName);
-            con.add(rdfFile, "http://someBaseURI#", RDFFormat.TRIG);
+
+            if(rdfFileName.startsWith("http://")){
+                URL rdfUrl = new URL(rdfFileName);
+                con.add(rdfUrl, "http://someBaseURI#", RDFFormat.TRIG);
+            }
+            else {
+                File rdfFile = new File(rdfFileName);
+                con.add(rdfFile, "http://someBaseURI#", RDFFormat.TRIG);
+            }
             con.commit();
         }
         finally {
