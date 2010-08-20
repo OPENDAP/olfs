@@ -1380,8 +1380,10 @@ public class IRISailRepository extends SailRepository {
                     + e.getMessage());
         } finally {
             try {
-                result.close();
-                con.close();
+                if(result!=null)
+                    result.close();
+                if(con!=null)
+                    con.close();
             } catch (Exception e) {
                 log.error("Caught an Exception! Msg: " + e.getMessage());
 
