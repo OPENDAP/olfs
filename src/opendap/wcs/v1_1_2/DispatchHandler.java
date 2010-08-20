@@ -238,11 +238,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
             log.debug("Initializing instance of a WcsCatalog interface implementation:" + catalogClass);
 
 
-            //StaticRDFCatalog stc = new StaticRDFCatalog();
-	        //stc.startupSesameRepository();
-	        //stc.init(catalogConfig);
-            //catalog = stc;
-
+            
 
 
             String defautCatalogCacheDir = _serviceContentPath + catalog.getClass().getSimpleName()+"/";

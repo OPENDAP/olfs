@@ -45,7 +45,7 @@ import com.ontotext.trree.owlim_ext.SailImpl;
 public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
-    private Logger log; // = LoggerFactory.getLogger(StaticRDFCatalog.class);
+    private Logger log; 
 
 
     private AtomicBoolean repositoryUpdateActive;
