@@ -39,7 +39,7 @@
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
     <xsl:variable name="serviceContext">/opendap</xsl:variable>
-    <xsl:variable name="dapService">/hyrax</xsl:variable>
+    <xsl:variable name="dapService">/hyrax/</xsl:variable>
 
 
 

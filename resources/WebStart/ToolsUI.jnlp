@@ -36,6 +36,6 @@
   </resources>
 
   <application-desc main-class="ucar.nc2.ui.ToolsUI">
-    <argument>{catalog}#{dataset}</argument>
+    <argument>{catalogURL}#{datasetID}</argument>
   </application-desc>
 </jnlp>

@@ -21,7 +21,7 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
 
     private String HTTP = "http://";
 
-    private String _serviceId = "netcdfToolsUI";
+    private String _serviceId = "ToolsUI";
     private String _jnlpFileName = _serviceId+".jnlp";
 
 
@@ -98,10 +98,13 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
 
         log.debug("datasetId: "+datasetId);
 
+        //    <argument>{catalogURL}#{datasetID}</argument>
 
-        jnlp = jnlp.replace("{datasetUrl}",datasetUrl);
 
-        log.debug("Tweaked JNLP:\n"+jnlp);
+        jnlp = jnlp.replace("{datasetID}",datasetId);
+        jnlp = jnlp.replace("{catalogURL}",catalogUrl);
+
+        log.debug("JNLP modified for request:\n"+jnlp);
 
 
         return jnlp;

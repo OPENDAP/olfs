@@ -249,14 +249,14 @@
             <script language="JavaScript"><xsl:comment>
                 var pageUrl = location.href;
                 var index = pageUrl.lastIndexOf("/")+1;
-                
                 var collectionUrl = pageUrl.substring(0,index);
-                document.write('&#60;A HREF="{$serviceContext}/webstart/idv?dataset=' +
+
+                document.write('&#60;A HREF="'+'<xsl:value-of select="$serviceContext"/>'+'/webstart/idv?dataset=' +
                 collectionUrl+'<xsl:value-of select="../@name"/>"' +
                 '&#62;IDV&#60;/A&#62; ');
 
-                document.write('&#60;A HREF="{$serviceContext}/webstart/netcdfToolsUI?dataset=' +
-                location.href + '<xsl:value-of select="../@name"/>"' +
+                document.write('&#60;A HREF="'+'<xsl:value-of select="$serviceContext"/>'+'/webstart/ToolsUI?dataset=' +
+                collectionUrl + '<xsl:value-of select="../@name"/>"' +
                 '&#62;ToolsUI&#60;/A&#62; ');
 
             // </xsl:comment></script>
