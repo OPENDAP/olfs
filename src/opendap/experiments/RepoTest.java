@@ -34,6 +34,9 @@ public class RepoTest {
 
     static String repositoryStorage = "owlim-storage";
     static String startingPointsContext = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints";
+
+    
+    static String rdfInputFile = "http://scm.opendap.org/svn/trunk/olfs/src/opendap/experiments/test.trig";
     
     static DualPrinter dp;
 
@@ -44,7 +47,7 @@ public class RepoTest {
         double elapsedTime;
 
         String fileName;
-        
+
 
         String workingDir = System.getProperty("user.dir");
         System.out.println("Current directory: " + workingDir);
@@ -63,9 +66,8 @@ public class RepoTest {
 
             dp.println("\n\n#######################################");
             SailRepository repo = setupRepository(workingDir);
-            fileName = "http://scm.opendap.org/svn/trunk/olfs/src/opendap/experiments/test.trig";
-            loadStatements(repo, fileName);
-            dp.println("Loaded RDF statements from " + fileName);
+            loadStatements(repo, rdfInputFile);
+            dp.println("Loaded RDF statements from " + rdfInputFile);
             dp.println(showContexts(repo));
             dp.println(showStatements(repo,startingPointsContext));
             repo.shutDown();
