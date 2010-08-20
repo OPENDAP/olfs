@@ -1,6 +1,7 @@
 package opendap.metacat;
 
 import java.util.Arrays;
+import java.util.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,47 @@ public class URLComponents {
 			String[] path_components = path.split("/");
 
 			String[] file_components = file.split("[^A-Za-z0-9]");
+			
+			// Break up the parts of a filename further by assuming that a
+			// component that either starts or ends with a series of digits
+			// might really be separate from a character sequence that the
+			// above 'parse' has left attached.
+			Vector<String> sub_file_components = new Vector<String>();
+			
+			for (String comp: file_components) {
+				if (comp.matches("[A-za-z]+[0-9]+")) {
+					// gobble up the letters, push onto the vector
+					String first = new String(), rest = new String();
+					int j = 0;
+					while (j < comp.length() && Character.isLetter(comp.charAt(j)))
+						first += comp.charAt(j++);
+					// ... now add the digits
+					while(j < comp.length())
+						rest += comp.charAt(j++);
+					
+					sub_file_components.add(first);
+					sub_file_components.add(rest);
+				}
+				else if (comp.matches("[0-9]+[A-Za-z]+")) {
+					// gobble up the letters, push onto the vector
+					String first = new String(), rest = new String();
+					int j = 0;
+					while (j < comp.length() && Character.isDigit(comp.charAt(j)))
+						first += comp.charAt(j++);
+					// ... now add the digits
+					while(j < comp.length())
+						rest += comp.charAt(j++);
+					
+					sub_file_components.add(first);
+					sub_file_components.add(rest);
+				}
+				else
+					sub_file_components.add(comp);
+			}
 
+			file_components = new String[sub_file_components.size()];
+			sub_file_components.toArray(file_components);
+			
 			components = concat(path_components, file_components);
 		}
 		catch (StringIndexOutOfBoundsException e) {

@@ -8,10 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import opendap.metacat.URLProcessedComponents.ClassificationEnumeration;
+import opendap.metacat.URLProcessedComponents.classes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import edu.ucsb.nceas.utilities.Log;
 
 /** 
  * A URLGroup is a set of URLs each with the same number of components where
@@ -31,7 +32,7 @@ public class URLGroup {
 
 	//private Set<ParsedURL> urls;
 	private Set<String> urls;
-	private URLEquivalenceClasses classification;
+	private URLProcessedComponents processedComponents;
 	private Vector<Equivalence> equivalences;
 
     /**
@@ -48,6 +49,36 @@ public class URLGroup {
 		@Override
 		public String nextElement() {
 			return i.next(); //.getURL();
+		}
+	}
+	
+	public static enum DatePart {
+		year {
+			public String toString() { return "year"; }
+		},
+		year2 {
+			public String toString() { return "year, two digit"; }
+		},
+		month {
+			public String toString() { return "month"; }
+		},
+		month1 {
+			public String toString() { return "month, one digit"; }
+		},
+		day {
+			public String toString() { return "day"; }
+		},
+		daynum {
+			public String toString() { return "daynum"; }
+		},
+		hours {
+			public String toString() { return "hours"; }
+		},
+		minutes {
+			public String toString() { return "minutes"; }
+		},
+		seconds {
+			public String toString() { return "seconds"; }
 		}
 	}
 	
@@ -78,20 +109,24 @@ public class URLGroup {
 	 *       All the URLs in a URLGroup have either the same exact value or the
 	 *       same Equivalence class for corresponding path components.
 	 * 
-	 * @see URLEquivalenceClasses
+	 * @see URLProcessedComponents
 	 * @author jimg
 	 * 
 	 */
 	public class Equivalence {
 		int componentNumber;	// Which of the URL's components
 		String componentSpecifier; // This is the string used to encode the pattern (eg 'dddd')
+		boolean isPattern;
 		int totalMembers;		// Total number of data points
 		Map<String, Integer> componentOccurrences; // Occurrences of a given string
+		Set<DatePart> dateClassification;
 		
-		public Equivalence(int n, String s) {
+		public Equivalence(int n, String s, boolean p) {
 			componentOccurrences = new HashMap<String, Integer>();
+			dateClassification = new HashSet<DatePart>();
 			componentNumber = n;
 			componentSpecifier = s;
+			isPattern = p;
 			totalMembers = 0;
 		}
 		
@@ -116,15 +151,33 @@ public class URLGroup {
 		public String getComponentSpecifier() {
 			return componentSpecifier;
 		}
+
+		public boolean getIsPattern() {
+			return isPattern;
+		}
 		
+		/**
+		 * How many URLs contributed to this class? Should be the same as
+		 * URLGroup's totalMembers.
+		 * @return
+		 */
 		public int getTotalMembers() {
 			return totalMembers;
 		}
 		
+		/**
+		 * How many times does the value 'comp' show up?
+		 * @param comp
+		 * @return
+		 */
 		public int getOccurrences(String comp) {
 			return componentOccurrences.get(comp);
 		}
 		
+		/**
+		 * How many discreet values exist for this equivalence class?
+		 * @return
+		 */
 		public int getSize() {
 			return componentOccurrences.size();
 		}
@@ -142,6 +195,20 @@ public class URLGroup {
 				return comps.next();
 			}
 		}
+		
+		public ComponentsEnumeration getComponents() {
+			return new ComponentsEnumeration();
+		}
+		
+		public void addDateClassification(DatePart dp) {
+			dateClassification.add(dp);
+		}
+		
+		public Set<DatePart> getDateClassification() {
+			return dateClassification;
+		}
+		
+
 	}
 	
 	/**
@@ -176,21 +243,23 @@ public class URLGroup {
 	 * 
 	 * @param url The URL, a String
 	 * @param comps The parsed components of the URL
-	 * @param uc Classifications for the parsed components
+	 * @param pc Classifications for the parsed components
 	 * @throws Exception
 	 */
-	public URLGroup(String url, URLComponents comps, URLEquivalenceClasses uc) {
+	public URLGroup(String url, URLComponents comps, URLProcessedComponents pc) {
 		// By definition, each URL in a group has the same URLEquivalenceClasses
-		this.classification = uc;
+		this.processedComponents = pc;
 		this.urls = new HashSet<String>();
 		this.equivalences = new Vector<Equivalence>();
 		
 		// Initialize the Vector of Equivalences for this group
 		int i = 0;
-		for (String c: uc.getClassification()) {
-			equivalences.add(new Equivalence(i++, c));
+		ClassificationEnumeration ce = pc.getClassifications();
+		while (ce.hasMoreElements()) {
+			classes c = ce.nextElement();
+			equivalences.add(new Equivalence(i++, c.lexeme(), c.isPattern()));
 		}
-		
+
 		add(url, comps);
 	}
 	
@@ -207,7 +276,7 @@ public class URLGroup {
 		}
 	}
 	
-	public String[] getClassification() {
-		return classification.getClassification();
+	public URLProcessedComponents getClassifications() {
+		return processedComponents;
 	}	
 }
