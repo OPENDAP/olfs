@@ -23,8 +23,8 @@
   </resources>
 
   <application-desc main-class="opendap.experiments.JwsTest">
-      <argument>&lt;CommandLineArgument_01&gt;</argument>
-      <argument>&lt;CommandLineArgument_02&gt;</argument>
+      <argument>--dataset-url=http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</argument>
+      <argument>--verbose</argument>
   </application-desc>
 </jnlp>
 

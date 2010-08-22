@@ -253,7 +253,7 @@
     <target name="run" depends="dist">
 
         <java classname="opendap.experiments.JwsTest" fork="true" dir="${build.run}">
-            <arg line="--dataset-url=http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.html" />
+            <arg line="--dataset-url=http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml" />
             <arg line="--verbose" />
             <classpath refid="runtime.classpath" />
         </java>
