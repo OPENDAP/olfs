@@ -53,20 +53,20 @@ public class RdfImporter {
     /*******************************************
      * Update repository
      */
-    public boolean importReferencedRdfDocs(IRISailRepository repository) {
+    public boolean importReferencedRdfDocs(IRISailRepository repository,Vector<String> notImport) {
 
         boolean repositoryChanged = false;
 
         Vector<String> rdfDocList = new Vector<String>();
 
-        findNeededRDFDocuments(repository, rdfDocList);
+        findNeededRDFDocuments(repository, rdfDocList, notImport);
 
         while (!rdfDocList.isEmpty()) {
             repositoryChanged = true;
 
             addNeededRDFDocuments(repository, rdfDocList);
 
-            findNeededRDFDocuments(repository, rdfDocList);
+            findNeededRDFDocuments(repository, rdfDocList, notImport);
         }
 
         return repositoryChanged;
@@ -79,10 +79,13 @@ public class RdfImporter {
      * @param repository
      * @param rdfDocs
      */
-    private void findNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs) {
+    private void findNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs, Vector<String> noImports) {
         TupleQueryResult result = null;
         List<String> bindingNames;
         RepositoryConnection con = null;
+        if (noImports != null){
+            imports.addAll(noImports);
+        }
         try {
             con = repository.getConnection();
 

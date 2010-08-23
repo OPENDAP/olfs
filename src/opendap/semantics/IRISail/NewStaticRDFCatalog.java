@@ -223,7 +223,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             Vector<String> startingPoints = getRdfImports(_configFile);
 
             log.info("updateCatalog(): Updating Repository...");
-            if (updateRepository(repository, startingPoints)) {
+            Vector<String> notImport = null;
+            if (updateRepository(repository, startingPoints, notImport)) {
                 log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
                 extractCoverageDescrptionsFromRepository(repository);
 
@@ -244,9 +245,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public boolean updateRepository(IRISailRepository repository, Vector<String> startingPoints) throws RepositoryException, InterruptedException {
+    public boolean updateRepository(IRISailRepository repository, Vector<String> startingPoints, Vector<String> notImport) throws RepositoryException, InterruptedException {
 
-        boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints);
+        boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints, notImport);
 
         String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
         log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);

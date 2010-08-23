@@ -29,7 +29,7 @@ public class RdfPersistence {
      * @throws InterruptedException If the thread of execution is interrupted.
      * @throws RepositoryException  When there are problems working with the repository.
      */
-    public static boolean updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls)
+    public static boolean updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls, Vector<String> notImport)
             throws InterruptedException, RepositoryException {
 
 
@@ -120,7 +120,7 @@ public class RdfPersistence {
             }
 
             log.debug("Checking for referenced documents that are not already in the repository.");
-            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository);
+            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, notImport);
             if(foundNewDocuments){
                 modelChanged = true;
             }
@@ -137,7 +137,7 @@ public class RdfPersistence {
                     repository.runConstruct();
                     log.debug("Finished running construct rules.");
                     log.debug(RepositoryUtility.showContexts(repository));
-                    modelChanged = rdfImporter.importReferencedRdfDocs(repository);
+                    modelChanged = rdfImporter.importReferencedRdfDocs(repository, notImport);
                 }
 
 
