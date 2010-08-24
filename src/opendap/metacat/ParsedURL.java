@@ -14,18 +14,19 @@ import org.slf4j.LoggerFactory;
  * @author jimg
  *
  */
-public class URLComponents {
+public class ParsedURL {
 	private String machine;
 	private String[] components;
-
-    private static Logger log = LoggerFactory.getLogger(URLComponents.class);
+	private String theURL;
+	
+    private static Logger log = LoggerFactory.getLogger(ParsedURL.class);
 
 	public static void main(String[] args) {
 		if (args.length < 1)
 			return;
 
 		try {
-			URLComponents up = new URLComponents(args[0]);
+			ParsedURL up = new ParsedURL(args[0]);
 			System.out.println("URL: " + args[0]);
 			System.out.println(up.getMachine());
 			String[] comps = up.getComponents();
@@ -46,7 +47,9 @@ public class URLComponents {
 	 * @param url
 	 *            The URL to parse.
 	 */
-	public URLComponents(String url) throws Exception {
+	public ParsedURL(String url) throws Exception {
+		theURL = url;
+		
 		try {
 			url = url.substring(url.indexOf("//") + 2);
 
@@ -113,6 +116,10 @@ public class URLComponents {
 	
 	public String[] getComponents() {
 		return components;
+	}
+	
+	public String getTheURL() {
+		return theURL;
 	}
 	
 	/**

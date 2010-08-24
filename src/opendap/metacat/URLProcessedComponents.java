@@ -4,39 +4,42 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 public class URLProcessedComponents {
-	public class classes {
-		private String lexeme;
-		private boolean isPattern;
+	public class Lexeme {
+		private String value;
+		private boolean pattern;
 		
-		public boolean isPattern() { return isPattern; }
-		public String lexeme() { return lexeme; }
+		public Lexeme() {
+			value = "";
+			pattern = false;
+		}
+		public boolean isPattern() { return pattern; }
+		public String getValue() { return value; }
 	}
 
-	private Vector<classes> theClasses;
+	private Vector<Lexeme> theClasses;
 	
 	// Testing only...
 	
 	public static void main(String args[]) {
 		if (args.length < 1) return;
 		
-		// URLComponents comps = new URLComponents(args[0]);
 		try {
-			URLProcessedComponents classification = new URLProcessedComponents(args[0]);
+			URLProcessedComponents pc = new URLProcessedComponents(args[0]);
 
 			System.out.println(args[0]); // print URL
 
-			String classes[] = classification.getLexemes();
+			String classes[] = pc.getLexemeArray();
 			for (String cls : classes)
 				System.out.print(cls + " ");
 			System.out.println();
 			
-			ClassificationEnumeration ce = classification.getClassifications();
+			Lexemes ce = pc.getLexemes();
 			while (ce.hasMoreElements()) {
-				classes c = ce.nextElement();
+				Lexeme c = ce.nextElement();
 				if (c.isPattern())
-					System.out.print(c.lexeme() + ": pattern ");
+					System.out.print(c.getValue() + ": pattern ");
 				else
-					System.out.print(c.lexeme() + " ");
+					System.out.print(c.getValue() + " ");
 			}
 		}
 		catch (Exception e) {
@@ -45,12 +48,12 @@ public class URLProcessedComponents {
 	}
 	
 	
-	public URLProcessedComponents(URLComponents url) {
+	public URLProcessedComponents(ParsedURL url) {
 		buildEquivalenceClasses(url);
 	}
 	
 	public URLProcessedComponents(String url) throws Exception {
-		buildEquivalenceClasses(new URLComponents(url));
+		buildEquivalenceClasses(new ParsedURL(url));
 	}
 	
 	/**
@@ -58,95 +61,91 @@ public class URLProcessedComponents {
 	 * 
 	 * @param url An instance of URLParser
 	 */
-	private void buildEquivalenceClasses(URLComponents url) {
+	private void buildEquivalenceClasses(ParsedURL url) {
 		String[] comps = url.getComponents();
 		
-		theClasses = new Vector<classes>();
+		theClasses = new Vector<Lexeme>();
 		
-		// classes = new String[comps.length];
-		// isPattern = new boolean[comps.length];
-		
-		//int i = 0;
+		Lexeme previousLexeme = null;
 		for(String comp: comps) {
-			classes c = new classes();
+			Lexeme c = new Lexeme();
 			
 			// Rule: if comp is all digits, replace each with 'd'
 			if (comp.matches("[0-9]+")) {
 				int j = 0;
-				c.lexeme = ""; //classes[i] = "";
 				while (j++ < comp.length())
-					c.lexeme += 'd'; //classes[i] += 'd';
-
-				c.isPattern = true; //isPattern[i] = true;
+					c.value += 'd';
+				// Hack: if the previous lexeme was 'dddd' and this one is 'd'
+				// make it 'dd' because it's likely we have a degenerate case
+				// where months are represented using both one and two digit
+				// values.
+				if (previousLexeme != null && previousLexeme.value.equals("dddd") && c.value.equals("d"))
+					c.value += 'd';
+					
+				c.pattern = true;
 			}
 			// if comp is a string of digits followed by chars, replace each
 			// digit by a 'd' but keep the literal char data. Allow for a
 			// trailing sequence of digits to follow the char data, but treat
-			// those as literals.
-			else if (comp.matches("[0-9]+[A-Za-z]+[0-9]*")) {
+			// those as literals. Note that there are plenty of cases where
+			// a single digit starts out a literal so require at least two 
+			// digits at the front.
+			else if (comp.matches("[0-9][0-9]+[A-Za-z]+[0-9]*")) {
 				int j = 0;
-				c.lexeme = ""; //classes[i] = "";
 				while (j < comp.length() && Character.isDigit(comp.charAt(j))) {
-					c.lexeme += 'd'; //classes[i] += 'd';
+					c.value += 'd';
 					++j;
 				}
 				while(j < comp.length())
-					c.lexeme += comp.charAt(j++); // classes[i] += comp.charAt(j++);
+					c.value += comp.charAt(j++);
 
-				c.isPattern = true; //isPattern[i] = true;
+				c.pattern = true;
 			}
 			// If comp is a sequence of chars followed by a sequence of digits,
 			// replace the digits by 'd'.
 			else if (comp.matches("[A-Za-z]+[0-9]+")) {
 				int j = 0;
-				c.lexeme = ""; //classes[i] = "";
 				while (j < comp.length() && Character.isLetter(comp.charAt(j)))
-					c.lexeme += comp.charAt(j++); // classes[i] += comp.charAt(j++);
+					c.value += comp.charAt(j++);
 				while(j < comp.length()) {
-					c.lexeme += 'd'; //classes[i] += 'd';
+					c.value += 'd';
 					++j;
 				}
 
-				c.isPattern = true; //isPattern[i] = true;
+				c.pattern = true;
 			}
 			else {
-				c.lexeme = comp; // classes[i] = comp;
-				c.isPattern = false; // isPattern[i] = false;
+				c.value = comp;
+				c.pattern = false;
 			}
 			
 			theClasses.add(c);
-			
-			//++i;
+			previousLexeme = c;
 		}
 	}
 	
-	public class ClassificationEnumeration implements Enumeration<classes> {
-		private Enumeration<classes> e = theClasses.elements();
+	public class Lexemes implements Enumeration<Lexeme> {
+		private Enumeration<Lexeme> e = theClasses.elements();
 		@Override
 		public boolean hasMoreElements() {
 			return e.hasMoreElements();
 		}
 
 		@Override
-		public classes nextElement() {
+		public Lexeme nextElement() {
 			return e.nextElement();		
 		}
 	}
 	
-	public ClassificationEnumeration getClassifications() {
-		return new ClassificationEnumeration();
+	public Lexemes getLexemes() {
+		return new Lexemes();
 	}
 	
-	public String[] getLexemes() {
+	public String[] getLexemeArray() {
 		String[] result = new String[theClasses.size()];
 		int i = 0;
-		for (classes c: theClasses) 
-			result[i++] = c.lexeme;
+		for (Lexeme c: theClasses) 
+			result[i++] = c.value;
 		return result;
 	}
-	/*
-	public String[] getClassification() {
-		return classes;
-	}
-	*/
 }

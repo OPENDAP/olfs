@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import opendap.metacat.DDXRetriever;
-import opendap.metacat.URLComponents;
+import opendap.metacat.ParsedURL;
 
 public class KMeans {
     private static Logger log = LoggerFactory.getLogger(KMeans.class);
@@ -60,9 +60,9 @@ public class KMeans {
     	// fails when the iterator instance is null
     	while (ddxURLs.hasMoreElements()) {
     		String ddxURL = ddxURLs.nextElement();
-    		URLComponents urlComps = null;
+    		ParsedURL urlComps = null;
     		try {
-    			urlComps = new URLComponents(ddxURL);
+    			urlComps = new ParsedURL(ddxURL);
 			}
 			catch (Exception e) {
 				log.error("URLComponets: " + e.getMessage());
