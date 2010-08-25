@@ -45,15 +45,16 @@ public class RdfImporter {
         imports = new Vector<String>();
     }
 
-    public void reset(){
+    public void reset() {
         downService.clear();
         imports.clear();
     }
 
-    /*******************************************
+    /**
+     * ****************************************
      * Update repository
      */
-    public boolean importReferencedRdfDocs(IRISailRepository repository,Vector<String> notImport) {
+    public boolean importReferencedRdfDocs(IRISailRepository repository, Vector<String> notImport) {
 
         boolean repositoryChanged = false;
 
@@ -73,9 +74,9 @@ public class RdfImporter {
     }
 
 
-
     /**
      * Find all rdfcache:RDFDocuments that are referenced by existing documents in the repository.
+     *
      * @param repository
      * @param rdfDocs
      */
@@ -83,7 +84,7 @@ public class RdfImporter {
         TupleQueryResult result = null;
         List<String> bindingNames;
         RepositoryConnection con = null;
-        if (noImports != null){
+        if (noImports != null) {
             imports.addAll(noImports);
         }
         try {
@@ -98,7 +99,7 @@ public class RdfImporter {
                     + "SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
+                    + "rdfcache = <" + RepositoryUtility.rdfCacheNamespace + ">";
 
             log.debug("Query for NeededRDFDocuments: " + queryString);
 
@@ -146,7 +147,7 @@ public class RdfImporter {
                 con.close();
             } catch (RepositoryException e) {
                 log.error("Caught a RepositoryException! in findNeededRDFDocuments() Msg: "
-                                + e.getMessage());
+                        + e.getMessage());
             }
         }
 
@@ -156,11 +157,9 @@ public class RdfImporter {
     }
 
 
-
-
-
     /**
-     *  Add the each of the RDF documents whose URL's are in the passed Vector to the Repository.
+     * Add the each of the RDF documents whose URL's are in the passed Vector to the Repository.
+     *
      * @param repository
      * @param rdfDocs
      */
@@ -199,18 +198,15 @@ public class RdfImporter {
                 if (downService.containsValue(importURL)
                         && downService.get(importURL)) {
                     log.error("Server error, Skipping " + importURL);
-                }
-                else if (rsCode == -1) {
+                } else if (rsCode == -1) {
                     log.error("Unable to get an HTTP status code for resource "
                             + importURL + " WILL NOT IMPORT!");
                     downService.put(importURL, true);
 
-                }
-                else if (rsCode != 200){
-                    log.error("Error!  HTTP status code "+rsCode+" Skipping importURL " + importURL);
+                } else if (rsCode != 200) {
+                    log.error("Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
                     downService.put(importURL, true);
-                }
-                else {
+                } else {
 
                     log.debug("Import URL appears valid ( " + importURL + " )");
                     URL urlImport = new URL(importURL);
@@ -231,9 +227,9 @@ public class RdfImporter {
                         con.add(url, importURL, RDFFormat.RDFXML,
                                 (Resource) uriaddress);
                         repository.setLTMODContext(importURL, con); // set last modified
-                                                                // time of the context
-                        repository.setContentTypeContext(importURL,contentType, con); //
-                        
+                        // time of the context
+                        repository.setContentTypeContext(importURL, contentType, con); //
+
                         log.info("Finished importing URL " + url);
 
                     } else if (importURL.endsWith(".xsd")) {
@@ -249,8 +245,8 @@ public class RdfImporter {
                         con.add(inStream, importURL, RDFFormat.RDFXML,
                                 (Resource) uriaddress);
                         repository.setLTMODContext(importURL, con); // set last modified
-                                                                // time for the context
-                        repository.setContentTypeContext(importURL,contentType, con); //
+                        // time for the context
+                        repository.setContentTypeContext(importURL, contentType, con); //
                         log.debug("Finished importing URL " + importURL);
 
                     } else if (importURL.endsWith("+psdef/")) {
@@ -259,22 +255,20 @@ public class RdfImporter {
 
                         ByteArrayInputStream inStream;
                         log.info("Transforming RDFa " + importURL);
-                        
-                        inStream = new ByteArrayInputStream(repository
-                                .transformRDFa(importURL).toByteArray());
-                       
+
+                        inStream = new ByteArrayInputStream(repository.transformRDFa(importURL).toByteArray());
+
                         log.info("Finished transforming RDFa " + importURL);
                         log.debug("Importing RDFa " + importURL);
                         con.add(inStream, importURL, RDFFormat.RDFXML,
                                 (Resource) uriaddress);
-                                                
+
                         repository.setLTMODContext(importURL, con); // set last modified
-                                                                // time for the context
-                        repository.setContentTypeContext(importURL,contentType, con); //
+                        // time for the context
+                        repository.setContentTypeContext(importURL, contentType, con); //
                         log.debug("Finished importing URL " + importURL);
 
                     } else {
-                        notimport++;
 
                         //urlc.setRequestProperty("Accept",
                         //                "application/rdf+xml,application/xml,text/xml,*/*");
@@ -286,16 +280,24 @@ public class RdfImporter {
                             InputStream inStream = urlc.getInputStream();
 
                             uriaddress = new URIImpl(importURL);
-                        if ((contentType != null) && (contentType.equalsIgnoreCase("text/xml")||contentType.equalsIgnoreCase("application/xml")
-                            || contentType.equalsIgnoreCase("application/rdf+xml")))   {
-                            con.add(inStream, importURL, RDFFormat.RDFXML,
-                                    (Resource) uriaddress);
-                            log.info("Imported non owl/xsd = " + importURL);
-                        }
-                            repository.setLTMODContext(importURL, con);
+                            if ((contentType != null) &&
+                                    (contentType.equalsIgnoreCase("text/xml") ||
+                                     contentType.equalsIgnoreCase("application/xml") ||
+                                     contentType.equalsIgnoreCase("application/rdf+xml"))
+                                    ) {
+                                con.add(inStream, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
+                                repository.setLTMODContext(importURL, con);
+                                log.info("Imported non owl/xsd = " + importURL);
+                            }
+                            else {
+                                log.warn("SKIPPING Import URL '"+importURL+" It does not appear to reference a " +
+                                        "document that I know how to process.");
+                                notimport++;
+
+                            }
                         } catch (IOException e) {
                             log.error("Caught an IOException! in urlc.getInputStream() Msg: "
-                                            + e.getMessage());
+                                    + e.getMessage());
 
                         }
 
@@ -322,17 +324,13 @@ public class RdfImporter {
                 con.close();
             } catch (RepositoryException e) {
                 log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
-                                + e.getMessage());
+                        + e.getMessage());
             }
             inferEndTime = new Date().getTime();
             double inferTime = (inferEndTime - inferStartTime) / 1000.0;
             log.debug("Import takes " + inferTime + " seconds");
         }
     }
-
-
-
-
 
 
 }
