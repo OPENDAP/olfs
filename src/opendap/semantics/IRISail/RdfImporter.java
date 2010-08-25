@@ -62,9 +62,10 @@ public class RdfImporter {
         findNeededRDFDocuments(repository, rdfDocList);
 
         while (!rdfDocList.isEmpty()) {
-            repositoryChanged = true;
 
-            addNeededRDFDocuments(repository, rdfDocList);
+            if(addNeededRDFDocuments(repository, rdfDocList)){
+                repositoryChanged = true;
+            }
 
             rdfDocList.clear();
             
@@ -163,7 +164,7 @@ public class RdfImporter {
      * @param repository
      * @param rdfDocs
      */
-    private void addNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs) {
+    private boolean addNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs) {
         URI uriaddress;
         long inferStartTime, inferEndTime;
         inferStartTime = new Date().getTime();
@@ -174,6 +175,7 @@ public class RdfImporter {
         String contentType = "";
         HttpURLConnection hc = null;
         InputStream importIS = null;
+        boolean addedDocument = false;
 
 
         try {
@@ -238,6 +240,7 @@ public class RdfImporter {
 
                                 log.info("Finished importing URL " + url);
                                 imports.add(importURL);
+                                addedDocument = true;
 
 
                             } else if (importURL.endsWith(".xsd")) {
@@ -256,6 +259,7 @@ public class RdfImporter {
                                 repository.setContentTypeContext(importURL, contentType, con); //
                                 log.debug("Finished importing URL " + importURL);
                                 imports.add(importURL);
+                                addedDocument = true;
 
 
                             } else if (importURL.endsWith("+psdef/")) {
@@ -277,6 +281,7 @@ public class RdfImporter {
                                 repository.setContentTypeContext(importURL, contentType, con); //
                                 log.debug("Finished importing URL " + importURL);
                                 imports.add(importURL);
+                                addedDocument = true;
 
 
                             } else {
@@ -290,7 +295,8 @@ public class RdfImporter {
 
                                 uriaddress = new URIImpl(importURL);
                                 if ((contentType != null) &&
-                                        (contentType.equalsIgnoreCase("text/xml") ||
+                                        (contentType.equalsIgnoreCase("text/plain") ||
+                                                contentType.equalsIgnoreCase("text/xml") ||
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
@@ -299,9 +305,10 @@ public class RdfImporter {
                                     log.info("Imported non owl/xsd = " + importURL);
                                     imports.add(importURL);
                                     log.info("Imported non owl/xsd = " + importURL);
+                                    addedDocument = true;
 
                                 } else {
-                                    log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
+                                    log.warn("SKIPPING Import URL '" + importURL + "' It does not appear to reference a " +
                                             "document that I know how to process.");
                                     urlsToBeIgnored.add(importURL); //skip this file
                                     notimport++;
@@ -315,8 +322,10 @@ public class RdfImporter {
 
                 } catch (Exception e) {
                     log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
-                    if (importURL != null)
+                    if (importURL != null){
+                        log.warn("SKIPPING Import URL '"+importURL+"' Because bad things haoppened when we tried to get it.");
                         urlsToBeIgnored.add(importURL); //skip this file
+                    }
                 } finally {
                     if (importIS != null)
                         try {
@@ -349,6 +358,7 @@ public class RdfImporter {
 
 
         }
+        return addedDocument;
 
     }
 
