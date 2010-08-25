@@ -5,7 +5,7 @@ import java.util.Calendar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import opendap.metacat.Equivalence.Components;
+import opendap.metacat.Equivalence.Values;
 
 /**
  * This class holds the 'rules' for recognizing dates in the patterns formed
@@ -116,27 +116,18 @@ public class DateClassification {
 	}
 	
 	private static boolean isYear(Equivalence e) {
-		log.debug("Is this a year? (" + e.getComponentValue() + ")");
+		log.debug("Is this a year? (" + e.getPattern() + ")");
 		// If the pattern isn't right, fail without looking at values
-		if (!e.getComponentValue().equals("dddd"))
+		if (!e.getPattern().equals("dddd"))
 			return false;
 
 		// If there are any values outside the allowed range, fail
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			log.debug("Is '" + sv +"' a valid year?");
 			if (!isValidYear(sv))
 				return false;			
 		}
-		/*
-		ComponentsEnumeration c = e.getComponents();
-		while (c.hasMoreElements()) {
-			String sv = c.nextElement();
-			log.debug("Is '" + sv +"' a valid year?");
-			if (!isValidYear(sv))
-				return false;
-		}
-		*/
 		// If the pattern is OK and the values are all OK, return true
 		return true;
 	}
@@ -146,10 +137,10 @@ public class DateClassification {
 		// discrete values possible, bounded by the number of days in the year.
 		// This is not testing the values, just that the number of values
 		// found is sane.
-		if (!e.getComponentValue().equals("ddd") || !(e.getNumberOfValues() == 366 || e.getNumberOfValues() == 365))
+		if (!e.getPattern().equals("ddd") || !(e.getNumberOfValues() == 366 || e.getNumberOfValues() == 365))
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			if (!isValidDayNum(sv))
 				return false;
@@ -159,10 +150,10 @@ public class DateClassification {
 	}
 
 	private static boolean isDay(Equivalence e) {
-		if (!e.getComponentValue().equals("dd") || e.getNumberOfValues() != 31)
+		if (!e.getPattern().equals("dd") || e.getNumberOfValues() != 31)
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			if (!isValidDay(sv))
 				return false;
@@ -175,10 +166,10 @@ public class DateClassification {
 		// Test for two cases for the number of values: dd is always used (01
 		// to 12 or 00 to 11) or dd or d is used. In the later case there will
 		// likely be only three values that show up (10, 11 and 12).
-		if (!e.getComponentValue().equals("dd") || !(e.getNumberOfValues() == 12 || e.getNumberOfValues() == 3))
+		if (!e.getPattern().equals("dd") || !(e.getNumberOfValues() == 12 || e.getNumberOfValues() == 3))
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			if (!isValidMonth(sv))
 				return false;
@@ -193,10 +184,10 @@ public class DateClassification {
 		// There's no point in test the number of discrete values since 0-9 are
 		// all that's possible and all are valid when a single digit is used
 		// for Jan to Sept./Oct.
-		if (!e.getComponentValue().equals("d") || !(e.getNumberOfValues() == 10 || e.getNumberOfValues() == 9))
+		if (!e.getPattern().equals("d") || !(e.getNumberOfValues() == 10 || e.getNumberOfValues() == 9))
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			if (!isValidMonth(sv))
 				return false;
@@ -206,10 +197,10 @@ public class DateClassification {
 	}
 	
 	private static boolean isYearMonthDay(Equivalence e) {
-		if (!e.getComponentValue().equals("dddddddd")) // Eight digits
+		if (!e.getPattern().equals("dddddddd")) // Eight digits
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			String ysv = sv.substring(0, 4);
 			if (!isValidYear(ysv))
@@ -226,10 +217,10 @@ public class DateClassification {
 	}
 
 	private static boolean isYearMonth(Equivalence e) {
-		if (!e.getComponentValue().equals("dddddd")) // Six digits
+		if (!e.getPattern().equals("dddddd")) // Six digits
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			String ysv = sv.substring(0, 4);
 			if (!isValidYear(ysv))
@@ -243,10 +234,10 @@ public class DateClassification {
 	}
 
 	private static boolean isYearDayNum(Equivalence e) {
-		if (!e.getComponentValue().equals("ddddddd")) // 7 digits
+		if (!e.getPattern().equals("ddddddd")) // 7 digits
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			String ysv = sv.substring(0, 4);
 			if (!isValidYear(ysv))
@@ -260,10 +251,10 @@ public class DateClassification {
 	}
 	
 	private static boolean isYearDayNumTime(Equivalence e) {
-		if (!e.getComponentValue().equals("ddddddddddddd")) // 7 digits followed by 6 digits
+		if (!e.getPattern().equals("ddddddddddddd")) // 7 digits followed by 6 digits
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			String ysv = sv.substring(0, 4);
 			if (!isValidYear(ysv))
@@ -286,10 +277,10 @@ public class DateClassification {
 	}
 
 	private static boolean isYearDayNum2(Equivalence e) {
-		if (!e.getComponentValue().equals("ddddddddddd")) // 5 digits (two for year) followed by 6 digits
+		if (!e.getPattern().equals("ddddddddddd")) // 5 digits (two for year) followed by 6 digits
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			String ysv = sv.substring(0, 2);
 			if (!isValidYear2(ysv))
@@ -303,10 +294,10 @@ public class DateClassification {
 	}
 
 	private static boolean isYearDayNum2Time(Equivalence e) {
-		if (!e.getComponentValue().equals("ddddddddddd")) // 5 digits (two for year) followed by 6 digits
+		if (!e.getPattern().equals("ddddddddddd")) // 5 digits (two for year) followed by 6 digits
 			return false;
 
-		Components c = e.getComponents();
+		Values c = e.getValues();
 		for (String sv: c) {
 			String ysv = sv.substring(0, 2);
 			if (!isValidYear2(ysv))

@@ -1,8 +1,11 @@
 package opendap.metacat;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import opendap.metacat.DateClassification.DatePart;
+import opendap.metacat.URLProcessedComponents.Lexeme;
 
 /**
  * Store information about a particular 'equivalence class'. Each URLGroup
@@ -36,46 +40,72 @@ public class Equivalence {
 	
     private static Logger log = LoggerFactory.getLogger(Equivalence.class);
 
-	int componentNumber;	// Which of the URL's components
-	String componentValue; // This is the string used to encode the pattern (eg 'dddd')
-	boolean isPattern;
-	int totalMembers;		// Total number of data points
-	Map<String, Integer> componentOccurrences; // Occurrences of a given string
-	Set<DatePart> dateClassification;
+	private int patternPosition;	// Which of the URL's components
+	private String componentValue; // This is the string used to encode the pattern (eg 'dddd')
+	private boolean litteral;
+	private int totalMembers;		// Total number of data points
+	private List<DatePart> dateClassification;
 	
-	public Equivalence(int n, String s, boolean p) {
-		componentOccurrences = new HashMap<String, Integer>();
-		dateClassification = new HashSet<DatePart>();
-		componentNumber = n;
-		componentValue = s;
-		isPattern = p;
+	private Map<String, Integer> valueOccurrences; // Occurrences of a given string
+	private Map<String, ParsedURL> orderedURLs; // Mapping between values for thi equivalence and specific URLs
+	
+	/**
+	 * Make a new Equivalence. This does not add a URL to the Equivalence, it
+	 * only initializes the 'equivlence class.'
+	 * @param n Which parsed component of the URL does this Equivalnce correspond to
+	 * @param l What is the component value - and is it a pattern?
+	 */
+	public Equivalence(int n, Lexeme l) {
+		dateClassification = new ArrayList<DatePart>();
+		
+		valueOccurrences = new HashMap<String, Integer>();
+		orderedURLs = new HashMap<String, ParsedURL>();
+		
+		patternPosition = n;
+		componentValue = l.getValue();
+		litteral = !l.isPattern();
 		totalMembers = 0;
 	}
 	
-	public void add(String comp) {
+	/** 
+	 * Add a new component literal and its source URL to this equivalence 
+	 * class.
+	 * @param u The Parsed URL
+	 */
+	public void add(ParsedURL u) {
 		++totalMembers;
 		
+		String comp = u.getComponents()[patternPosition];
+		
+		// Record the number of occurrences of this particular value for the 
+		// Equivalence.
+		
 		// If comp is in there already, increment its count
-		if (componentOccurrences.containsKey(comp)) {
+		if (valueOccurrences.containsKey(comp)) {
 			log.debug("cache hit for " + comp);
-			componentOccurrences.put(comp, componentOccurrences.get(comp) + 1);
+			valueOccurrences.put(comp, valueOccurrences.get(comp) + 1);
 		}
 		else { // Add the comp and set count to one
 			log.debug("Adding new value (" + comp + ") for equiv class " + componentValue);
-			componentOccurrences.put(comp, 1);
-		}	
+			valueOccurrences.put(comp, 1);
+		}
+		
+		// ... And record the source URL for the particular value if this is
+		// a pattern
+		if (!litteral)
+			orderedURLs.put(comp, u);
 	}
 	
-	public int getComponentNumber() {
-		return componentNumber;
+	public int getPatternPosition() {
+		return patternPosition;
 	}
 	
-	public String getComponentValue() {
+	public String getPattern() {
 		return componentValue;
 	}
 
-	public boolean isPattern() {
-		return isPattern;
+	public boolean isLitteral() {
+		return litteral;
 	}
 	
 	/**
@@ -96,7 +126,7 @@ public class Equivalence {
 	 * @return
 	 */
 	public int getOccurrences(String comp) {
-		return componentOccurrences.get(comp);
+		return valueOccurrences.get(comp);
 	}
 	
 	/**
@@ -104,22 +134,50 @@ public class Equivalence {
 	 * @return
 	 */
 	public int getNumberOfValues() {
-		return componentOccurrences.size();
+		return valueOccurrences.size();
 	}
 
-	public class Components implements Iterable<String> {
-		private Iterator<String> comps = componentOccurrences.keySet().iterator();
+	public class Values implements Iterable<String> {
+		private Iterator<String> vals = valueOccurrences.keySet().iterator();
 
 		@Override
 		public Iterator<String> iterator() {
-			return comps;
+			return vals;
 		}
 	}
 
-	public Components getComponents() {
-		return new Components();
+	public Values getValues() {
+		return new Values();
 	}
 	
+	public class SortedValues implements Iterable<DateString> {
+		private ArrayList<DateString> sortedKeys;
+		private Iterator<DateString> sortedKeysIter;
+		
+		public SortedValues() {
+			// sortedKeys = new ArrayList<DateString>(valueOccurrences.keySet(), dateClassification);
+			sortedKeys = new ArrayList<DateString>(valueOccurrences.size());
+			for (String d: valueOccurrences.keySet()) 
+				sortedKeys.add(new DateString(d, dateClassification));
+			
+			Collections.sort(sortedKeys);
+			sortedKeysIter = sortedKeys.iterator();
+		}
+		
+		@Override
+		public Iterator<DateString> iterator() {
+			return sortedKeysIter;
+		}
+	}
+	
+	public SortedValues getSortedValues() {
+		return new SortedValues();
+	}
+
+	public ParsedURL getParsedURL(String comp) {
+		return orderedURLs.get(comp);
+	}
+
 	public void addDateClassification(DatePart dp) {
 		dateClassification.add(dp);
 	}
@@ -127,9 +185,23 @@ public class Equivalence {
 	public boolean hasDateClassification(DatePart dp) {
 		return dateClassification.contains(dp);
 	}
+
+	public int getNumberDateClassifications() {
+		return dateClassification.size();
+	}
 	
-	public Set<DatePart> getDateClassification() {
-		return dateClassification;
+	public class DateClassifications implements Iterable<DatePart> {
+		private Iterator<DatePart> dateParts = dateClassification.iterator();
+
+		@Override
+		public Iterator<DatePart> iterator() {
+			return dateParts;
+		}
+		
+	}
+	
+	public DateClassifications getDateClassifications() {
+		return new DateClassifications();
 	}
 }
 

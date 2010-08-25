@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import opendap.metacat.DateClassification.DatePart;
+import opendap.metacat.Equivalence.SortedValues;
 import opendap.metacat.URLGroup.Equivalences;
 import opendap.metacat.URLGroup.URLs;
 
@@ -147,7 +148,7 @@ public class URLClassifier {
 		for (URLGroup group : groups) {
 			Equivalences equivs = group.getEquivalences();
 			for (Equivalence e: equivs) {
-				if (e.isPattern()) {
+				if (!e.isLitteral()) {
 					DateClassification.classifyPotentialDate(e);
 				}
 			}
@@ -160,6 +161,7 @@ public class URLClassifier {
 	 * particular, it looks for year/month, year/month/day and year/daynum.
 	 * The Equivalences for the group in question are modified.
 	 */
+	/*
 	private void mergeAdjacentDates() {
 		for (URLGroup group : groups) {
 
@@ -180,7 +182,8 @@ public class URLClassifier {
 			
 		}
 	}
-
+	*/
+	/*
 	private void mergeAdjacentDates_no() {
 		for (URLGroup group : groups) {
 			Equivalences equivs = group.getEquivalences();
@@ -219,15 +222,9 @@ public class URLClassifier {
 					}
 				}
 			}
-			/*
-			EquivalenceEnumeration equivs = group.getEquivalences();
-			while (equivs.hasMoreElements()) {
-				Equivalence e = equivs.nextElement();
-				//
-			}
-			*/
 		}
 	}
+	*/
 	
 	private void printClassifications(PrintStream ps, boolean print_all_data, boolean print_histogram) {
 		Integer i = 0;
@@ -243,10 +240,10 @@ public class URLClassifier {
 				for (Equivalence e: equivs) {
 					String tm =  new Integer(e.getTotalMembers()).toString();
 					String dv = new Integer(e.getNumberOfValues()).toString();
-					ps.println("\tEquivalence class: "  + e.getComponentValue() + "; Total members: " + tm + "; Discreet values: " + dv);
-					if (e.getDateClassification().size() > 0) {
+					ps.println("\tEquivalence class: "  + e.getPattern() + "; Total members: " + tm + "; Discreet values: " + dv);
+					if (e.getNumberDateClassifications() > 0) {
 						ps.print("\t\tFound a potentail date:");
-						for (DatePart dp: e.getDateClassification())
+						for (DatePart dp: e.getDateClassifications())
 							ps.print(" " + dp.toString());		
 						ps.println();
 					}
@@ -254,12 +251,37 @@ public class URLClassifier {
 
 				ps.println();
 			}
-			
+			/*
 			if (print_all_data) {
 				URLs urls = group.getURLs();
 				for (ParsedURL u: urls)
 					ps.println("\t" + u.getTheURL());
 				ps.println();
+			}
+			*/
+			if (print_all_data) {
+				// Find the Equivalence with the most date parts; then sort and
+				// print
+				Equivalences equivs = group.getEquivalences();
+				Equivalence date = null;
+				int maxNumDateParts = 0;
+				for (Equivalence e : equivs) {
+					if (e.getNumberDateClassifications() > maxNumDateParts) {
+						maxNumDateParts = e.getNumberDateClassifications();
+						date = e;
+					}
+				}
+
+				if (date != null) {
+					SortedValues sc = date.getSortedValues();
+					for (DateString comp : sc) {
+						log.debug("DateString: " + comp.getDate());
+						ParsedURL p = date.getParsedURL(comp.getDate());
+						log.debug("ParsedURL: " + p);
+						ps.println("\t" + date.getParsedURL(comp.getDate()).getTheURL());
+					}
+					ps.println();
+				}
 			}
 		}
 	}

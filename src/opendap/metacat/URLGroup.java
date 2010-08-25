@@ -1,9 +1,7 @@
 package opendap.metacat;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -32,7 +30,6 @@ public class URLGroup {
 	private Set<ParsedURL> urls;
 	private URLProcessedComponents processedComponents;
 	private Vector<Equivalence> equivalences;
-	private Map<String, ParsedURL> orderedURLs;
 
 	public class URLs implements Iterable<ParsedURL> {
 		private Iterator<ParsedURL> i = urls.iterator();
@@ -83,36 +80,32 @@ public class URLGroup {
 	 */
 	public URLGroup(ParsedURL url, URLProcessedComponents pc) {
 		// By definition, each URL in a group has the same URLEquivalenceClasses
-		this.processedComponents = pc;
-		this.urls = new HashSet<ParsedURL>();
-		this.equivalences = new Vector<Equivalence>();
-		this.orderedURLs = new HashMap<String, ParsedURL>();
+		processedComponents = pc;
+		urls = new HashSet<ParsedURL>();
+		equivalences = new Vector<Equivalence>();
 		
 		// Initialize the Vector of Equivalences for this group
 		int i = 0;
 		Lexemes ce = pc.getLexemes();
 		while (ce.hasMoreElements()) {
 			Lexeme c = ce.nextElement();
-			equivalences.add(new Equivalence(i++, c.getValue(), c.isPattern()));
+			equivalences.add(new Equivalence(i++, c));
 		}
 
 		add(url);
 	}
 	
 	public void add(ParsedURL url) {
+		// First record the URL as being part of the Group
 		urls.add(url);
 		
-		String[] components = url.getComponents();
-		
-		// For the new URL, increment equivalence class counts
+		// Increment equivalence class counts
 		for (Equivalence e: equivalences) {
-			int i = e.getComponentNumber();
-			log.debug("Adding 'components[" + new Integer(i).toString() + "]': " + components[i]);
-			e.add(components[i]);
-			// Add the parsed url object (reference!) to the set of URLs for
-			// this equiv using th components[i] as the key. This enables the
-			// retrieval of the URLs according to a sort of the equivalence
-			// component's values.
+			// Because the ParsedURL has both the full and parsed components of
+			// the URL and because the Equivalence already knows whch part of
+			// the URL it is associated with, we can pass only the ParsedURL
+			// object.
+			e.add(url);
 		}
 	}
 	
