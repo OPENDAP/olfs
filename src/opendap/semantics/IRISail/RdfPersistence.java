@@ -110,6 +110,13 @@ public class RdfPersistence {
                 log.warn("Repository content has been changed! Flushing Repository!");
 
                 RepositoryUtility.clearRepository(repository);
+
+
+                String filename =  "PostRepositoryClear.trig";
+                log.debug("Dumping Semantic Repository to: " + filename);
+                RepositoryUtility.dumpRepository(repository, filename);
+
+
                 newStartingPoints = RepositoryUtility.findNewStartingPoints(repository, startingPointUrls);
 
                 modelChanged = true;
