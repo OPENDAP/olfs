@@ -38,45 +38,6 @@ public class RepositoryUtility {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryUtility.class);
 
-    public static final String internalStartingPoint         = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
-    public static final String rdfCacheNamespace             = internalStartingPoint+"#";
-
-
-    public static final String lastModifiedContext           = "last_modified";
-    public static final String lastModifiedContextUri        = rdfCacheNamespace + lastModifiedContext;
-
-    public static final String cacheContext                  = "cachecontext";
-    public static final String cacheContextUri               = rdfCacheNamespace + cacheContext;
-
-    public static final String contentTypeContext            = "contenttype";
-    public static final String contentTypeContextUri         = rdfCacheNamespace + contentTypeContext;
-
-    public static final String externalInferencingContext    = "externalInferencing";
-    public static final String externalInferencingContextUri = rdfCacheNamespace + externalInferencingContext;
-
-    public static final String startingPointsContext         = "startingPoints";
-    public static final String startingPointsContextUri      = rdfCacheNamespace + startingPointsContext;
-
-    public static final String startingPointContext          = "StartingPoint";
-    public static final String startingPointContextUri       = rdfCacheNamespace + startingPointContext;
-
-    public static final String functionsContext              = "myfn";
-    public static final String functionsContextUri           = rdfCacheNamespace + functionsContext;
-
-    public static final String listContext                   = "mylist";
-    public static final String listContextUri                = rdfCacheNamespace + listContext;
-
-    public static final String isContainedByContext          = "isContainedBy";
-    public static final String isContainedByContextUri       = rdfCacheNamespace + isContainedByContext;
-
-    public static final String reTypeToContext               = "reTypeTo";
-    public static final String reTypeToContextUri            = rdfCacheNamespace + reTypeToContext;
-
-
-    public static final String rdfType                       = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-
-
-
 
     public static void dropStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
@@ -113,9 +74,9 @@ public class RepositoryUtility {
 
 
         URI startingPointValue;
-        URI isa = valueFactory.createURI(rdfType);
-        URI startingPointsContext = valueFactory.createURI(startingPointsContextUri);
-        URI startingPointType = valueFactory.createURI(startingPointContextUri);
+        URI isa = valueFactory.createURI(Terms.rdfType);
+        URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
+        URI startingPointType = valueFactory.createURI(Terms.startingPointContextUri);
 
         
 
@@ -189,7 +150,7 @@ public class RepositoryUtility {
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
             + "WHERE doc = <" + startingPointUrl + "> "
             + "USING NAMESPACE "
-            + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
+            + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
         log.debug("queryStartingPoints: " + queryString);
 
@@ -239,9 +200,9 @@ public class RepositoryUtility {
     public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint) {
 
         URI startingPointUri;
-        URI isa = valueFactory.createURI(rdfType);
-        URI startingPointsContext = valueFactory.createURI(RepositoryUtility.startingPointsContextUri);
-        URI startingPointContext = valueFactory.createURI(RepositoryUtility.startingPointContextUri);
+        URI isa = valueFactory.createURI(Terms.rdfType);
+        URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
+        URI startingPointContext = valueFactory.createURI(Terms.startingPointContextUri);
 
 
         try {
@@ -310,7 +271,7 @@ public class RepositoryUtility {
 
                     //log.debug("StartingPoints: " + startpoint);
                     if (!startingPointsUrls.contains(startpoint)
-                            && !startpoint.equals(RepositoryUtility.internalStartingPoint)) {
+                            && !startpoint.equals(Terms.internalStartingPoint)) {
                         changedStartingPoints.add(startpoint);
                         log.debug("Adding to droplist: " + startpoint);
                     }
@@ -377,14 +338,14 @@ public class RepositoryUtility {
 
             result = findAllStartingPoints(con);
 
-            if(!result.contains(internalStartingPoint)){
+            if(!result.contains(Terms.internalStartingPoint)){
                 log.debug("Internal StartingPoint not present in repository, adding to list.");
-                newStartingPoints.add(internalStartingPoint);
+                newStartingPoints.add(Terms.internalStartingPoint);
             }
 
             for (String startingPoint : startingPointUrls) {
                 
-                if (!result.contains(startingPoint) && !startingPoint.equals(internalStartingPoint)) {
+                if (!result.contains(startingPoint) && !startingPoint.equals(Terms.internalStartingPoint)) {
 
                     newStartingPoints.add(startingPoint);
 
@@ -484,7 +445,7 @@ public class RepositoryUtility {
         String queryString = "SELECT doc "
             + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
             + "USING NAMESPACE "
-            + "rdfcache = <"+ RepositoryUtility.rdfCacheNamespace+">";
+            + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
         log.debug("queryStartingPoints: " + queryString);
 
@@ -676,7 +637,7 @@ public class RepositoryUtility {
                   + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
-                  + "rdfcache = <"+RepositoryUtility.rdfCacheNamespace+">";
+                  + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
         try {
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
                     queryString);
@@ -793,7 +754,7 @@ public class RepositoryUtility {
                 + "{cd} wcs:Identifier {id}; "
                 + "rdfs:isDefinedBy {doc} rdfcache:last_modified {lmt} "
                 + "using namespace "
-                + "rdfcache = <"+RepositoryUtility.rdfCacheNamespace+">, "
+                + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";
 
         try {

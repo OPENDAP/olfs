@@ -98,7 +98,7 @@ public class RdfImporter {
                     + "SELECT doc "
                     + "FROM CONTEXT rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <" + RepositoryUtility.rdfCacheNamespace + ">";
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
             log.debug("Query for NeededRDFDocuments: " + queryString);
 

@@ -6,15 +6,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,7 +45,6 @@ import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 
 import org.openrdf.sail.Sail;
@@ -186,7 +182,7 @@ public class IRISailRepository extends SailRepository {
                 String constructURL = this.constructContext.get(qstring);
 
                 //URI uriaddress = new URIImpl(constructURL);
-                URI uriaddress = new URIImpl(RepositoryUtility.externalInferencingContextUri);
+                URI uriaddress = new URIImpl(Terms.externalInferencingContextUri);
                 Resource[] context = new Resource[1];
                 context[0] = uriaddress;
 
@@ -372,7 +368,7 @@ public class IRISailRepository extends SailRepository {
                     + "FROM "
                     + "{contexts} rdfcache:serql_text {queries} "
                     + "using namespace "
-                    + "rdfcache = <"+RepositoryUtility.rdfCacheNamespace+">";
+                    + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
             log.debug("queryString: " + queryString);
 
@@ -555,8 +551,8 @@ public class IRISailRepository extends SailRepository {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                expand += "}  <"+RepositoryUtility.functionsContextUri +"> {" + fn + ":" + functionName
-                        + "} ; <"+RepositoryUtility.listContextUri +"> {} rdf:first {";
+                expand += "}  <"+ Terms.functionsContextUri +"> {" + fn + ":" + functionName
+                        + "} ; <"+ Terms.listContextUri +"> {} rdf:first {";
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
@@ -781,7 +777,7 @@ public class IRISailRepository extends SailRepository {
         String pproces3sub = "(.+)";
         Pattern rproces3sub = Pattern.compile(pproces3sub);
 
-        String pproces3subsub1 = "<"+RepositoryUtility.reTypeToContextUri +"> <([^>]+)>";
+        String pproces3subsub1 = "<"+ Terms.reTypeToContextUri +"> <([^>]+)>";
         String pproces3subsub2 = "([^ ]+) <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> (\"(.+)\")\\^\\^";
 
         Pattern rproces3subsub1 = Pattern.compile(pproces3subsub1);
@@ -1095,7 +1091,7 @@ public class IRISailRepository extends SailRepository {
                   + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
-                  + "rdfcache = <"+RepositoryUtility.rdfCacheNamespace+">";
+                  + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
         try {
             con = this.getConnection();
 
@@ -1157,8 +1153,8 @@ public class IRISailRepository extends SailRepository {
             
             ValueFactory valueFactory = this.getValueFactory();
             URI s = valueFactory.createURI(importURL);
-            URI contentTypeContext = valueFactory.createURI(RepositoryUtility.contentTypeContextUri);
-            URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContextUri);
+            URI contentTypeContext = valueFactory.createURI(Terms.contentTypeContextUri);
+            URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
             
             Literal o = valueFactory.createLiteral(contentType);
 
@@ -1200,8 +1196,8 @@ public class IRISailRepository extends SailRepository {
             // log.debug("lastmodified " + ltmod);
             ValueFactory f = this.getValueFactory();
             URI s = f.createURI(importURL);
-            URI p = f.createURI(RepositoryUtility.lastModifiedContextUri);
-            URI cont = f.createURI(RepositoryUtility.cacheContextUri);
+            URI p = f.createURI(Terms.lastModifiedContextUri);
+            URI cont = f.createURI(Terms.cacheContextUri);
             URI sxd = f.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
             Literal o = f.createLiteral(ltmod, sxd);
 
@@ -1253,8 +1249,8 @@ public class IRISailRepository extends SailRepository {
         URI rdffirst = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
         URI rdfrest = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
         URI endList = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
-        URI myfn = creatValue.createURI(RepositoryUtility.functionsContextUri);
-        URI myfnlist = creatValue.createURI(RepositoryUtility.listContextUri);
+        URI myfn = creatValue.createURI(Terms.functionsContextUri);
+        URI myfnlist = creatValue.createURI(Terms.listContextUri);
 
         FunctionTypes functionTypeFlag = FunctionTypes.None;
         Value objLastSt = null;

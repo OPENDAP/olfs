@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
-import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -188,8 +187,8 @@ public class RdfPersistence {
             for (String drop : dropList) {
                 log.info("Dropping context URI: " + drop);
                 URI contextToDrop = valueFactory.createURI(drop);
-                URI lastModifiedContext = valueFactory.createURI(RepositoryUtility.lastModifiedContextUri);
-                URI cacheContext = valueFactory.createURI(RepositoryUtility.cacheContextUri);
+                URI lastModifiedContext = valueFactory.createURI(Terms.lastModifiedContextUri);
+                URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
 
                 log.info("Removing context: " + contextToDrop);
                 con.clear(contextToDrop);
@@ -246,7 +245,7 @@ public class RdfPersistence {
                     + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
                     + "{crule} rdfcache:last_modified {time}) "
                     + "using namespace "
-                    + "rdfcache = <" + RepositoryUtility.rdfCacheNamespace + ">";
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
             log.debug("queryString: " + queryString);
 
@@ -334,7 +333,7 @@ public class RdfPersistence {
                     + "SELECT doc "
                     + "FROM {tp} rdf:type {rdfcache:StartingPoint}; rdfcache:dependsOn {doc} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <" + RepositoryUtility.rdfCacheNamespace + ">";
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
             log.debug("queryUnneededRDFDocuments: " + queryString);
 
@@ -406,7 +405,7 @@ public class RdfPersistence {
                     + "FROM CONTEXT rdfcache:cachecontext "
                     + "{doc} rdfcache:last_modified {lastmod} "
                     + "USING NAMESPACE "
-                    + "rdfcache = <" + RepositoryUtility.rdfCacheNamespace + ">";
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
             log.debug("queryChangedRDFDocuments: " + queryString);
 
