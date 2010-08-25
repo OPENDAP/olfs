@@ -33,7 +33,7 @@ public class RdfImporter {
 
 
     private HashSet<String> downService;
-    private Vector<String>  imports;
+    private Vector<String> imports;
 
 
     public RdfImporter() {
@@ -172,171 +172,186 @@ public class RdfImporter {
         HttpURLConnection hc = null;
         InputStream importIS = null;
 
+
         try {
             con = repository.getConnection();
+
 
             log.debug("rdfDocs.size=" + rdfDocs.size());
             notimport = 0;
             while (!rdfDocs.isEmpty()) {
                 importURL = rdfDocs.remove(0).toString();
 
-                log.debug("Checking import URL: " + importURL);
-
-                if (downService.contains(importURL)) {
-                    log.error("Previous server error, Skipping " + importURL);
-                }
-                else {
-
-                    URL myurl = new URL(importURL);
+                try {
 
 
-                    int rsCode;
-                    hc = (HttpURLConnection) myurl.openConnection();
-                    log.debug("Connected to import URL: " + importURL);
+                    log.debug("Checking import URL: " + importURL);
 
-                    rsCode = hc.getResponseCode();
-                    contentType = hc.getContentType();
-                    importIS = hc.getInputStream();
-
-                    log.debug("Got HTTP status code: " + rsCode);
-                    log.debug("Got Content Type:     " + contentType);
-
-                    if (rsCode == -1) {
-                        log.error("Unable to get an HTTP status code for resource "
-                                + importURL + " WILL NOT IMPORT!");
-                        downService.add(importURL);
-
-                    } else if (rsCode != 200) {
-                        log.error("Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
-                        downService.add(importURL);
+                    if (downService.contains(importURL)) {
+                        log.error("Previous server error, Skipping " + importURL);
                     } else {
 
-                        log.debug("Import URL appears valid ( " + importURL + " )");
-                        //@todo make this a more robust
-
-                        if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
-
-                            uriaddress = new URIImpl(importURL);
-
-                            URL url;
-
-                            url = new URL(importURL);
-
-                            log.info("Importing URL " + url);
-                            con.add(importIS, importURL, RDFFormat.RDFXML,
-                                    (Resource) uriaddress);
-                            repository.setLTMODContext(importURL, con); // set last modified
-                            // time of the context
-                            repository.setContentTypeContext(importURL, contentType, con); //
-
-                            log.info("Finished importing URL " + url);
-                            imports.add(importURL);
+                        URL myurl = new URL(importURL);
 
 
-                        } else if (importURL.endsWith(".xsd")) {
+                        int rsCode;
+                        hc = (HttpURLConnection) myurl.openConnection();
+                        log.debug("Connected to import URL: " + importURL);
 
-                            uriaddress = new URIImpl(importURL);
+                        rsCode = hc.getResponseCode();
+                        contentType = hc.getContentType();
+                        importIS = hc.getInputStream();
 
-                            ByteArrayInputStream inStream;
-                            log.info("Transforming URL " + importURL);
-                            inStream = new ByteArrayInputStream(repository.transformXSD(importIS).toByteArray());
-                            log.info("Finished transforming URL " + importURL);
-                            log.debug("Importing URL " + importURL);
-                            con.add(inStream, importURL, RDFFormat.RDFXML,
-                                    (Resource) uriaddress);
-                            repository.setLTMODContext(importURL, con); // set last modified
-                            // time for the context
-                            repository.setContentTypeContext(importURL, contentType, con); //
-                            log.debug("Finished importing URL " + importURL);
-                            imports.add(importURL);
+                        log.debug("Got HTTP status code: " + rsCode);
+                        log.debug("Got Content Type:     " + contentType);
 
+                        if (rsCode == -1) {
+                            log.error("Unable to get an HTTP status code for resource "
+                                    + importURL + " WILL NOT IMPORT!");
+                            downService.add(importURL);
 
-                        } else if (importURL.endsWith("+psdef/")) {
-
-                            uriaddress = new URIImpl(importURL);
-
-                            ByteArrayInputStream inStream;
-                            log.info("Transforming RDFa " + importURL);
-
-                            inStream = new ByteArrayInputStream(repository.transformRDFa(importIS).toByteArray());
-
-                            log.info("Finished transforming RDFa " + importURL);
-                            log.debug("Importing RDFa " + importURL);
-                            con.add(inStream, importURL, RDFFormat.RDFXML,
-                                    (Resource) uriaddress);
-
-                            repository.setLTMODContext(importURL, con); // set last modified
-                            // time for the context
-                            repository.setContentTypeContext(importURL, contentType, con); //
-                            log.debug("Finished importing URL " + importURL);
-                            imports.add(importURL);
-
-
+                        } else if (rsCode != 200) {
+                            log.error("Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
+                            downService.add(importURL);
                         } else {
 
-                            //urlc.setRequestProperty("Accept",
-                            //                "application/rdf+xml,application/xml,text/xml,*/*");
-                            // urlc.setRequestProperty("Accept",
-                            // "application/rdf+xml, application/xml;
-                            // q=0.9,text/xml; q=0.9, */*; q=0.2");
+                            log.debug("Import URL appears valid ( " + importURL + " )");
+                            //@todo make this a more robust
 
-                            try {
+                            if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
 
                                 uriaddress = new URIImpl(importURL);
-                                if ((contentType != null) &&
-                                        (contentType.equalsIgnoreCase("text/xml") ||
-                                                contentType.equalsIgnoreCase("application/xml") ||
-                                                contentType.equalsIgnoreCase("application/rdf+xml"))
-                                        ) {
-                                    con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
-                                    repository.setLTMODContext(importURL, con);
-                                    log.info("Imported non owl/xsd = " + importURL);
-                                    imports.add(importURL);
 
-                                } else {
-                                    log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
-                                            "document that I know how to process.");
-                                    downService.add(importURL); //skip this file
+                                URL url;
+
+                                url = new URL(importURL);
+
+                                log.info("Importing URL " + url);
+                                con.add(importIS, importURL, RDFFormat.RDFXML,
+                                        (Resource) uriaddress);
+                                repository.setLTMODContext(importURL, con); // set last modified
+                                // time of the context
+                                repository.setContentTypeContext(importURL, contentType, con); //
+
+                                log.info("Finished importing URL " + url);
+                                imports.add(importURL);
+
+
+                            } else if (importURL.endsWith(".xsd")) {
+
+                                uriaddress = new URIImpl(importURL);
+
+                                ByteArrayInputStream inStream;
+                                log.info("Transforming URL " + importURL);
+                                inStream = new ByteArrayInputStream(repository.transformXSD(importIS).toByteArray());
+                                log.info("Finished transforming URL " + importURL);
+                                log.debug("Importing URL " + importURL);
+                                con.add(inStream, importURL, RDFFormat.RDFXML,
+                                        (Resource) uriaddress);
+                                repository.setLTMODContext(importURL, con); // set last modified
+                                // time for the context
+                                repository.setContentTypeContext(importURL, contentType, con); //
+                                log.debug("Finished importing URL " + importURL);
+                                imports.add(importURL);
+
+
+                            } else if (importURL.endsWith("+psdef/")) {
+
+                                uriaddress = new URIImpl(importURL);
+
+                                ByteArrayInputStream inStream;
+                                log.info("Transforming RDFa " + importURL);
+
+                                inStream = new ByteArrayInputStream(repository.transformRDFa(importIS).toByteArray());
+
+                                log.info("Finished transforming RDFa " + importURL);
+                                log.debug("Importing RDFa " + importURL);
+                                con.add(inStream, importURL, RDFFormat.RDFXML,
+                                        (Resource) uriaddress);
+
+                                repository.setLTMODContext(importURL, con); // set last modified
+                                // time for the context
+                                repository.setContentTypeContext(importURL, contentType, con); //
+                                log.debug("Finished importing URL " + importURL);
+                                imports.add(importURL);
+
+
+                            } else {
+
+                                //urlc.setRequestProperty("Accept",
+                                //                "application/rdf+xml,application/xml,text/xml,*/*");
+                                // urlc.setRequestProperty("Accept",
+                                // "application/rdf+xml, application/xml;
+                                // q=0.9,text/xml; q=0.9, */*; q=0.2");
+
+                                try {
+
+                                    uriaddress = new URIImpl(importURL);
+                                    if ((contentType != null) &&
+                                            (contentType.equalsIgnoreCase("text/xml") ||
+                                                    contentType.equalsIgnoreCase("application/xml") ||
+                                                    contentType.equalsIgnoreCase("application/rdf+xml"))
+                                            ) {
+                                        con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
+                                        repository.setLTMODContext(importURL, con);
+                                        log.info("Imported non owl/xsd = " + importURL);
+                                        imports.add(importURL);
+
+                                    } else {
+                                        log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
+                                                "document that I know how to process.");
+                                        downService.add(importURL); //skip this file
+
+                                    }
+                                } catch (IOException e) {
+                                    log.error("Caught an IOException! in urlc.getInputStream() Msg: "
+                                            + e.getMessage());
 
                                 }
-                            } catch (IOException e) {
-                                log.error("Caught an IOException! in urlc.getInputStream() Msg: "
-                                        + e.getMessage());
 
+                                log.info("Imported non owl/xsd = " + importURL);
+                                log.info("Total non owl/xsd Nr = " + notimport);
                             }
-
-                            log.info("Imported non owl/xsd = " + importURL);
-                            log.info("Total non owl/xsd Nr = " + notimport);
                         }
-                    }
-                } // while (!rdfDocs.isEmpty()
+                    } // while (!rdfDocs.isEmpty()
+
+                } catch (Exception e) {
+                    log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+                    if (importURL != null)
+                        downService.add(importURL); //skip this file
+                } finally {
+                    if (importIS != null)
+                        try {
+                            importIS.close();
+                        } catch (IOException e) {
+                            log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+                        }
+                    if (hc != null)
+                        hc.disconnect();
+
+                }
             }
-        } catch (Exception e) {
-            log.error("addNeededRDFDocuments(): Caught "+e.getClass().getName()+" Message: " + e.getMessage());
-            if (importURL != null)
-                downService.add(importURL); //skip this file
-        } finally {
-            try {
+        }
+        catch (RepositoryException e) {
+            log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+        }
+        finally {
+            if (con != null) {
 
-                if(importIS != null)
-                    try {
-                        importIS.close();
-                    } catch (IOException e) {
-                        log.error("addNeededRDFDocuments(): Caught "+e.getClass().getName()+" Message: " + e.getMessage());
-                    }
-                if(hc!=null)
-                   hc.disconnect();
-
-                if (con != null)
+                try {
                     con.close();
-            } catch (RepositoryException e) {
-                log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
-                        + e.getMessage());
+                } catch (RepositoryException e) {
+                    log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
+                            + e.getMessage());
+                }
             }
             inferEndTime = new Date().getTime();
             double inferTime = (inferEndTime - inferStartTime) / 1000.0;
             log.debug("Import takes " + inferTime + " seconds");
+
+
         }
+
     }
 
 
