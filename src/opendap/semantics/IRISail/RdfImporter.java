@@ -298,15 +298,16 @@ public class RdfImporter {
                                     repository.setLTMODContext(importURL, con);
                                     log.info("Imported non owl/xsd = " + importURL);
                                     imports.add(importURL);
+                                    log.info("Imported non owl/xsd = " + importURL);
 
                                 } else {
                                     log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
                                             "document that I know how to process.");
                                     urlsToBeIgnored.add(importURL); //skip this file
+                                    notimport++;
 
                                 }
                                 
-                                log.info("Imported non owl/xsd = " + importURL);
                                 log.info("Total non owl/xsd Nr = " + notimport);
                             }
                         }
