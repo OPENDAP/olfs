@@ -147,7 +147,7 @@ public class RepositoryUtility {
         boolean hasInternalStaringPoint = false;
 
         String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
+            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"} "
             + "WHERE doc = <" + startingPointUrl + "> "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -443,7 +443,7 @@ public class RepositoryUtility {
         log.debug("Finding StartingPoints in the repository ...");
 
         String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:StartingPoint} "
+            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"} "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
@@ -634,7 +634,7 @@ public class RepositoryUtility {
 
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
-                  + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
+                  + "rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
                   + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -752,7 +752,7 @@ public class RepositoryUtility {
         String queryString = "SELECT DISTINCT id, lmt "
                 + "FROM "
                 + "{cd} wcs:Identifier {id}; "
-                + "rdfs:isDefinedBy {doc} rdfcache:last_modified {lmt} "
+                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModifiedContext+" {lmt} "
                 + "using namespace "
                 + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";

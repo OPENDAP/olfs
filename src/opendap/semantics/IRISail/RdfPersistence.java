@@ -240,10 +240,10 @@ public class RdfPersistence {
             con = repository.getConnection();
 
             String queryString = "select distinct crule from context crule {} prop {} "
-                    + "WHERE crule != rdfcache:cachecontext "
-                    + "AND crule != rdfcache:startingPoints "
-                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:cachecontext "
-                    + "{crule} rdfcache:last_modified {time}) "
+                    + "WHERE crule != rdfcache:"+Terms.cacheContext+" "
+                    + "AND crule != rdfcache:"+Terms.startingPointsContext+" "
+                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
+                    + "{crule} rdfcache:"+Terms.lastModifiedContext+" {time}) "
                     + "using namespace "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -323,15 +323,15 @@ public class RdfPersistence {
         try {
 
             String queryString = "(SELECT doc "
-                    + "FROM CONTEXT rdfcache:cachecontext "
-                    + "{doc} rdfcache:last_modified {lmt} "
-                    //+ "WHERE doc != <" + RepositoryUtility.rdfCacheNamespace+"externalInferencing> "
+                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
+                    + "{doc} rdfcache:"+Terms.lastModifiedContext+" {lmt} "
+                    //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {doc} rdf:type {rdfcache:StartingPoint}) "
+                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"}) "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:StartingPoint}; rdfcache:dependsOn {doc} "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointContext+"}; rdfcache:"+Terms.dependsOnContext+" {doc} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -402,8 +402,8 @@ public class RdfPersistence {
 
         try {
             String queryString = "SELECT doc,lastmod "
-                    + "FROM CONTEXT rdfcache:cachecontext "
-                    + "{doc} rdfcache:last_modified {lastmod} "
+                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
+                    + "{doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 

@@ -366,7 +366,7 @@ public class IRISailRepository extends SailRepository {
             con = this.getConnection();
             String queryString = "SELECT queries, contexts "
                     + "FROM "
-                    + "{contexts} rdfcache:serql_text {queries} "
+                    + "{contexts} rdfcache:"+Terms.serqlTextType+" {queries} "
                     + "using namespace "
                     + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
@@ -448,7 +448,7 @@ public class IRISailRepository extends SailRepository {
                 .compile("iridl:dropquotes\\(([^)]+)\\)");
         Pattern minusPattern = Pattern.compile("MINUS.*( using)?");
 
-        Pattern rdfCachePattern = Pattern.compile("rdfcache:retypeTo");
+        Pattern rdfCachePattern = Pattern.compile("rdfcache:"+Terms.reTypeToContext);
         Pattern xsd2owlPattern = Pattern
                 .compile("xsd2owl:increment\\(([^)]+)\\)");
 
@@ -512,7 +512,7 @@ public class IRISailRepository extends SailRepository {
 
         } else if (rdfcacheMatcher.find()) {
             postProcessFlag = ProcessingTypes.RetypeTo;
-            log.info("Will postprocess rdfcache:retypeTo");
+            log.info("Will postprocess rdfcache:"+Terms.reTypeToContext);
 
         } else if (xsd2owlMatcher.find()) {
             postProcessFlag = ProcessingTypes.Increment;
@@ -1088,7 +1088,7 @@ public class IRISailRepository extends SailRepository {
         //        + "where x=<" + uriaddress + ">";
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
-                  + "rdfcache:cachecontext {doc} rdfcache:last_modified {lastmod} "
+                  + "rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
                   + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
