@@ -457,6 +457,33 @@ public class RepositoryUtility {
     }
 
 
+    public static void clearRepository(SailRepository owlse2) {
+
+        RepositoryConnection con = null;
+
+        try {
+            con = owlse2.getConnection();
+            con.clear();
+        }
+        catch (RepositoryException e) {
+            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+        } finally {
+            log.debug("Closing repository connection.");
+
+            if(con!=null){
+                try {
+                    con.close();  //close connection first
+                }
+                catch(RepositoryException e){
+                    log.error("Failed to close repository connection. Msg: "+e.getMessage());
+                }
+            }
+        }
+
+
+    }
+
+
     public static void dumpRepository(RepositoryConnection con, String filename) {
 
         // export repository to an n-triple file
