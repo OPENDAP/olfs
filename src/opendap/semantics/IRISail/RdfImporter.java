@@ -284,31 +284,25 @@ public class RdfImporter {
                                 // "application/rdf+xml, application/xml;
                                 // q=0.9,text/xml; q=0.9, */*; q=0.2");
 
-                                try {
 
-                                    uriaddress = new URIImpl(importURL);
-                                    if ((contentType != null) &&
-                                            (contentType.equalsIgnoreCase("text/xml") ||
-                                                    contentType.equalsIgnoreCase("application/xml") ||
-                                                    contentType.equalsIgnoreCase("application/rdf+xml"))
-                                            ) {
-                                        con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
-                                        repository.setLTMODContext(importURL, con);
-                                        log.info("Imported non owl/xsd = " + importURL);
-                                        imports.add(importURL);
+                                uriaddress = new URIImpl(importURL);
+                                if ((contentType != null) &&
+                                        (contentType.equalsIgnoreCase("text/xml") ||
+                                                contentType.equalsIgnoreCase("application/xml") ||
+                                                contentType.equalsIgnoreCase("application/rdf+xml"))
+                                        ) {
+                                    con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
+                                    repository.setLTMODContext(importURL, con);
+                                    log.info("Imported non owl/xsd = " + importURL);
+                                    imports.add(importURL);
 
-                                    } else {
-                                        log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
-                                                "document that I know how to process.");
-                                        downService.add(importURL); //skip this file
-
-                                    }
-                                } catch (IOException e) {
-                                    log.error("Caught an IOException! in urlc.getInputStream() Msg: "
-                                            + e.getMessage());
+                                } else {
+                                    log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
+                                            "document that I know how to process.");
+                                    downService.add(importURL); //skip this file
 
                                 }
-
+                                
                                 log.info("Imported non owl/xsd = " + importURL);
                                 log.info("Total non owl/xsd Nr = " + notimport);
                             }
