@@ -110,7 +110,7 @@ public class RdfPersistence {
                 log.debug("Repository content has been changed! Flushing Repository!");
 
                 RepositoryUtility.clearRepository(repository);
-                newStartingPoints = RepositoryUtility.findNewStartingPoints(con, startingPointUrls);
+                newStartingPoints = RepositoryUtility.findNewStartingPoints(repository, startingPointUrls);
 
                 modelChanged = true;
 
