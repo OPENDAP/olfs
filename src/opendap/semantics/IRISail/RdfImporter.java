@@ -54,9 +54,9 @@ public class RdfImporter {
 
         Vector<String> rdfDocList = new Vector<String>();
 
-        if (doNotImportUrls != null) {
+        if (doNotImportUrls != null)
             urlsToBeIgnored.addAll(doNotImportUrls);
-        }
+        
 
 
         findNeededRDFDocuments(repository, rdfDocList);
