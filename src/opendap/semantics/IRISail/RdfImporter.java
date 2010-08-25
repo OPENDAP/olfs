@@ -90,10 +90,10 @@ public class RdfImporter {
             con = repository.getConnection();
 
             String queryString = "(SELECT doc "
-                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"} "
+                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
                     + "union "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointContext+"}; rdfcache:"+Terms.dependsOnContext+" {doc}) "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOnContext+" {doc}) "
                     + "MINUS "
                     + "SELECT doc "
                     + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "

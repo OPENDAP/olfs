@@ -1,6 +1,5 @@
 package opendap.semantics.IRISail;
 
-import org.openrdf.repository.sail.SailRepository;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -351,10 +350,10 @@ public class RdfPersistence {
                     //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"}) "
+                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"}) "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointContext+"}; rdfcache:"+Terms.dependsOnContext+" {doc} "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOnContext+" {doc} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 

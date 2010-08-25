@@ -147,7 +147,7 @@ public class RepositoryUtility {
         boolean hasInternalStaringPoint = false;
 
         String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"} "
+            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
             + "WHERE doc = <" + startingPointUrl + "> "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -443,7 +443,7 @@ public class RepositoryUtility {
         log.debug("Finding StartingPoints in the repository ...");
 
         String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointContext+"} "
+            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 

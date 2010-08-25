@@ -26,8 +26,8 @@ public class Terms {
     public static final String startingPointsContext         = "startingPoints";
     public static final String startingPointsContextUri      = rdfCacheNamespace + startingPointsContext;
 
-    public static final String startingPointContext          = "StartingPoint";
-    public static final String startingPointContextUri       = rdfCacheNamespace + startingPointContext;
+    public static final String startingPointType = "StartingPoint";
+    public static final String startingPointContextUri       = rdfCacheNamespace + startingPointType;
 
     public static final String functionsContext              = "myfn";
     public static final String functionsContextUri           = rdfCacheNamespace + functionsContext;
