@@ -169,7 +169,8 @@ public class RdfImporter {
         RepositoryConnection con = null;
         int notimport = 0;
         String contentType = "";
-
+        HttpURLConnection hc = null;
+        InputStream importIS = null;
 
         try {
             con = repository.getConnection();
@@ -190,14 +191,12 @@ public class RdfImporter {
 
 
                     int rsCode;
-                    HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
+                    hc = (HttpURLConnection) myurl.openConnection();
                     log.debug("Connected to import URL: " + importURL);
 
                     rsCode = hc.getResponseCode();
                     contentType = hc.getContentType();
-                    InputStream importIS = hc.getInputStream();
-
-                    hc.disconnect();
+                    importIS = hc.getInputStream();
 
                     log.debug("Got HTTP status code: " + rsCode);
                     log.debug("Got Content Type:     " + contentType);
@@ -224,7 +223,7 @@ public class RdfImporter {
                             url = new URL(importURL);
 
                             log.info("Importing URL " + url);
-                            con.add(url, importURL, RDFFormat.RDFXML,
+                            con.add(importIS, importURL, RDFFormat.RDFXML,
                                     (Resource) uriaddress);
                             repository.setLTMODContext(importURL, con); // set last modified
                             // time of the context
@@ -240,8 +239,7 @@ public class RdfImporter {
 
                             ByteArrayInputStream inStream;
                             log.info("Transforming URL " + importURL);
-                            inStream = new ByteArrayInputStream(repository
-                                    .transformXSD(importURL).toByteArray());
+                            inStream = new ByteArrayInputStream(repository.transformXSD(importIS).toByteArray());
                             log.info("Finished transforming URL " + importURL);
                             log.debug("Importing URL " + importURL);
                             con.add(inStream, importURL, RDFFormat.RDFXML,
@@ -260,7 +258,7 @@ public class RdfImporter {
                             ByteArrayInputStream inStream;
                             log.info("Transforming RDFa " + importURL);
 
-                            inStream = new ByteArrayInputStream(repository.transformRDFa(importURL).toByteArray());
+                            inStream = new ByteArrayInputStream(repository.transformRDFa(importIS).toByteArray());
 
                             log.info("Finished transforming RDFa " + importURL);
                             log.debug("Importing RDFa " + importURL);
@@ -283,7 +281,6 @@ public class RdfImporter {
                             // q=0.9,text/xml; q=0.9, */*; q=0.2");
 
                             try {
-                                InputStream inStream = hc.getInputStream();
 
                                 uriaddress = new URIImpl(importURL);
                                 if ((contentType != null) &&
@@ -291,7 +288,7 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                    con.add(inStream, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
+                                    con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
                                     repository.setLTMODContext(importURL, con);
                                     log.info("Imported non owl/xsd = " + importURL);
                                     imports.add(importURL);
@@ -299,7 +296,7 @@ public class RdfImporter {
                                 } else {
                                     log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
                                             "document that I know how to process.");
-                                    notimport++;
+                                    downService.add(importURL); //skip this file
 
                                 }
                             } catch (IOException e) {
@@ -316,10 +313,19 @@ public class RdfImporter {
             }
         } catch (Exception e) {
             log.error("addNeededRDFDocuments(): Caught "+e.getClass().getName()+" Message: " + e.getMessage());
+            if (importURL != null)
+                downService.add(importURL); //skip this file
         } finally {
             try {
-                if (importURL != null && !imports.contains(importURL))
-                    downService.add(importURL); //skip this file
+
+                if(importIS != null)
+                    try {
+                        importIS.close();
+                    } catch (IOException e) {
+                        log.error("addNeededRDFDocuments(): Caught "+e.getClass().getName()+" Message: " + e.getMessage());
+                    }
+                if(hc!=null)
+                   hc.disconnect();
 
                 if (con != null)
                     con.close();

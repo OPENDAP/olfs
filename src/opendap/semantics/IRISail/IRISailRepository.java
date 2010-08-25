@@ -1,9 +1,6 @@
 package opendap.semantics.IRISail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -939,16 +936,41 @@ public class IRISailRepository extends SailRepository {
     public ByteArrayOutputStream transformRDFa(String inURI)
             throws SaxonApiException {
         log.debug("In transformFDRa");
-        
+
+        return transformRDFa(new StreamSource(inURI));
+
+
+    }
+
+    /**
+     * Compile and execute a simple transformation that applies a stylesheet to
+     * an input stream, and serializing the result to an OutPutStream
+     */
+    public ByteArrayOutputStream transformRDFa(InputStream is)
+            throws SaxonApiException {
+        log.debug("In transformFDRa");
+
+        return transformRDFa(new StreamSource(is));
+
+
+    }
+
+    /**
+     * Compile and execute a simple transformation that applies a stylesheet to
+     * an input stream, and serializing the result to an OutPutStream
+     */
+    public ByteArrayOutputStream transformRDFa(StreamSource sourceURL)
+            throws SaxonApiException {
+        log.debug("In transformFDRa");
+
         String transformStyleFileName = resourceDir + "xsl/RDFa2RDFXML.xsl";
 
         Processor proc = new Processor(false);
         XsltCompiler comp = proc.newXsltCompiler();
         XsltExecutable exp = comp.compile(new StreamSource(new File(
                 transformStyleFileName)));
-        
-        XdmNode source = proc.newDocumentBuilder().build(
-                new StreamSource(inURI));
+
+        XdmNode source = proc.newDocumentBuilder().build(sourceURL);
         Serializer out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -961,14 +983,32 @@ public class IRISailRepository extends SailRepository {
         log.info(outStream.toString());
         log.debug("Output written to OutputStream");
         return outStream;
-        
-        
+
+
     }
     /**
      * Compile and execute a simple transformation that applies a stylesheet to
      * an input stream, and serializing the result to an OutPutStream
      */
     public ByteArrayOutputStream transformXSD(String inURI)
+            throws SaxonApiException {
+        return transformXSD(new StreamSource(inURI));
+    }
+
+    /**
+     * Compile and execute a simple transformation that applies a stylesheet to
+     * an input stream, and serializing the result to an OutPutStream
+     */
+    public ByteArrayOutputStream transformXSD(InputStream is)
+            throws SaxonApiException {
+            return transformXSD(new StreamSource(is));
+    }
+
+    /**
+     * Compile and execute a simple transformation that applies a stylesheet to
+     * an input stream, and serializing the result to an OutPutStream
+     */
+    public ByteArrayOutputStream transformXSD(StreamSource sourceUrl)
             throws SaxonApiException {
         log.debug("In transformXSD");
         String transformFileName = resourceDir + "xsl/xsd2owl.xsl";
@@ -979,8 +1019,7 @@ public class IRISailRepository extends SailRepository {
                 transformFileName)));
         // XsltExecutable exp = comp.compile(new StreamSource(new
         // File("/data/benno/xslt/xsd2owl.xsl")));
-        XdmNode source = proc.newDocumentBuilder().build(
-                new StreamSource(inURI));
+        XdmNode source = proc.newDocumentBuilder().build(sourceUrl);
         Serializer out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
