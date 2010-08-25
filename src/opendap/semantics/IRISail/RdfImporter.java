@@ -270,7 +270,7 @@ public class RdfImporter {
                             repository.setLTMODContext(importURL, con); // set last modified
                             // time for the context
                             repository.setContentTypeContext(importURL, contentType, con); //
-                            log.debug("Finished importing URL " + importURL);\
+                            log.debug("Finished importing URL " + importURL);
                             imports.add(importURL);
 
 
