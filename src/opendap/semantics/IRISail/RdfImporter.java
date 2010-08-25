@@ -1,6 +1,5 @@
 package opendap.semantics.IRISail;
 
-import net.sf.saxon.s9api.SaxonApiException;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -9,7 +8,6 @@ import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -32,18 +29,18 @@ public class RdfImporter {
     private Logger log;
 
 
-    private HashSet<String> downService;
+    private HashSet<String> urlsToBeIgnored;
     private Vector<String> imports;
 
 
     public RdfImporter() {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        downService = new HashSet<String>();
+        urlsToBeIgnored = new HashSet<String>();
         imports = new Vector<String>();
     }
 
     public void reset() {
-        downService.clear();
+        urlsToBeIgnored.clear();
         imports.clear();
     }
 
@@ -51,13 +48,18 @@ public class RdfImporter {
      * ****************************************
      * Update repository
      */
-    public boolean importReferencedRdfDocs(IRISailRepository repository, Vector<String> notImport) {
+    public boolean importReferencedRdfDocs(IRISailRepository repository, Vector<String> doNotImportUrls) {
 
         boolean repositoryChanged = false;
 
         Vector<String> rdfDocList = new Vector<String>();
 
-        findNeededRDFDocuments(repository, rdfDocList, notImport);
+        if (doNotImportUrls != null) {
+            urlsToBeIgnored.addAll(doNotImportUrls);
+        }
+
+
+        findNeededRDFDocuments(repository, rdfDocList);
 
         while (!rdfDocList.isEmpty()) {
             repositoryChanged = true;
@@ -66,7 +68,7 @@ public class RdfImporter {
 
             rdfDocList.clear();
             
-            findNeededRDFDocuments(repository, rdfDocList, notImport);
+            findNeededRDFDocuments(repository, rdfDocList);
         }
 
         return repositoryChanged;
@@ -79,13 +81,11 @@ public class RdfImporter {
      * @param repository
      * @param rdfDocs
      */
-    private void findNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs, Vector<String> noImports) {
+    private void findNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs) {
         TupleQueryResult result = null;
         List<String> bindingNames;
         RepositoryConnection con = null;
-        if (noImports != null) {
-            imports.addAll(noImports);
-        }
+
         try {
             con = repository.getConnection();
 
@@ -114,7 +114,7 @@ public class RdfImporter {
                 String doc = firstValue.stringValue();
 
                 if (!rdfDocs.contains(doc) && !imports.contains(doc)
-                        && !downService.contains(doc)
+                        && !urlsToBeIgnored.contains(doc)
                         && doc.startsWith("http://")) {
                     rdfDocs.add(doc);
 
@@ -189,7 +189,7 @@ public class RdfImporter {
 
                     log.debug("Checking import URL: " + importURL);
 
-                    if (downService.contains(importURL)) {
+                    if (urlsToBeIgnored.contains(importURL)) {
                         log.error("Previous server error, Skipping " + importURL);
                     } else {
 
@@ -210,11 +210,11 @@ public class RdfImporter {
                         if (rsCode == -1) {
                             log.error("Unable to get an HTTP status code for resource "
                                     + importURL + " WILL NOT IMPORT!");
-                            downService.add(importURL);
+                            urlsToBeIgnored.add(importURL);
 
                         } else if (rsCode != 200) {
                             log.error("Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
-                            downService.add(importURL);
+                            urlsToBeIgnored.add(importURL);
                         } else {
 
                             log.debug("Import URL appears valid ( " + importURL + " )");
@@ -301,7 +301,7 @@ public class RdfImporter {
                                 } else {
                                     log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
                                             "document that I know how to process.");
-                                    downService.add(importURL); //skip this file
+                                    urlsToBeIgnored.add(importURL); //skip this file
 
                                 }
                                 
@@ -314,7 +314,7 @@ public class RdfImporter {
                 } catch (Exception e) {
                     log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
                     if (importURL != null)
-                        downService.add(importURL); //skip this file
+                        urlsToBeIgnored.add(importURL); //skip this file
                 } finally {
                     if (importIS != null)
                         try {
