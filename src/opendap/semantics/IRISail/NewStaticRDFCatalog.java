@@ -167,11 +167,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
     /*******************************************************/
+
+
+
     /**
      * ***************************************************
      */
-
-
     public void init(URL configFile, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
 
         if (initialized)
