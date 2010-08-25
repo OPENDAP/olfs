@@ -168,7 +168,7 @@ public class RdfImporter {
         long inferStartTime, inferEndTime;
         inferStartTime = new Date().getTime();
 
-        String importURL = "";
+        String importURL = null;
         RepositoryConnection con = null;
         int notimport = 0;
         try {
@@ -320,8 +320,11 @@ public class RdfImporter {
             log.error("Caught an RepositoryException! Msg: " + e.getMessage());
         } finally {
             try {
-                imports.add(importURL); //skip this file
-                con.close();
+                if(importURL!=null && !imports.contains(importURL))
+                    imports.add(importURL); //skip this file
+
+                if(con!=null)
+                    con.close();
             } catch (RepositoryException e) {
                 log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
                         + e.getMessage());
