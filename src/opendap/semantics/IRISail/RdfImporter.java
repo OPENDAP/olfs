@@ -168,6 +168,9 @@ public class RdfImporter {
         String importURL = null;
         RepositoryConnection con = null;
         int notimport = 0;
+        String contentType = "";
+
+
         try {
             con = repository.getConnection();
 
@@ -180,21 +183,24 @@ public class RdfImporter {
 
                 if (downService.contains(importURL)) {
                     log.error("Previous server error, Skipping " + importURL);
-                } else {
+                }
+                else {
 
                     URL myurl = new URL(importURL);
 
+
+                    int rsCode;
                     HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
                     log.debug("Connected to import URL: " + importURL);
 
-                    int rsCode = -1;
-                    try {
-                        rsCode = hc.getResponseCode();
-                    } catch (IOException e) {
-                        log.error("Unable to get HTTP status code for " + importURL
-                                + " Caught IOException! Msg: " + e.getMessage());
-                    }
+                    rsCode = hc.getResponseCode();
+                    contentType = hc.getContentType();
+                    InputStream importIS = hc.getInputStream();
+
+                    hc.disconnect();
+
                     log.debug("Got HTTP status code: " + rsCode);
+                    log.debug("Got Content Type:     " + contentType);
 
                     if (rsCode == -1) {
                         log.error("Unable to get an HTTP status code for resource "
@@ -207,10 +213,6 @@ public class RdfImporter {
                     } else {
 
                         log.debug("Import URL appears valid ( " + importURL + " )");
-                        URL urlImport = new URL(importURL);
-                        URLConnection urlc = urlImport.openConnection();
-                        urlc.connect();
-                        String contentType = urlc.getContentType();
                         //@todo make this a more robust
 
                         if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
@@ -229,6 +231,8 @@ public class RdfImporter {
                             repository.setContentTypeContext(importURL, contentType, con); //
 
                             log.info("Finished importing URL " + url);
+                            imports.add(importURL);
+
 
                         } else if (importURL.endsWith(".xsd")) {
 
@@ -246,6 +250,8 @@ public class RdfImporter {
                             // time for the context
                             repository.setContentTypeContext(importURL, contentType, con); //
                             log.debug("Finished importing URL " + importURL);
+                            imports.add(importURL);
+
 
                         } else if (importURL.endsWith("+psdef/")) {
 
@@ -264,7 +270,9 @@ public class RdfImporter {
                             repository.setLTMODContext(importURL, con); // set last modified
                             // time for the context
                             repository.setContentTypeContext(importURL, contentType, con); //
-                            log.debug("Finished importing URL " + importURL);
+                            log.debug("Finished importing URL " + importURL);\
+                            imports.add(importURL);
+
 
                         } else {
 
@@ -275,7 +283,7 @@ public class RdfImporter {
                             // q=0.9,text/xml; q=0.9, */*; q=0.2");
 
                             try {
-                                InputStream inStream = urlc.getInputStream();
+                                InputStream inStream = hc.getInputStream();
 
                                 uriaddress = new URIImpl(importURL);
                                 if ((contentType != null) &&
@@ -286,6 +294,8 @@ public class RdfImporter {
                                     con.add(inStream, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
                                     repository.setLTMODContext(importURL, con);
                                     log.info("Imported non owl/xsd = " + importURL);
+                                    imports.add(importURL);
+
                                 } else {
                                     log.warn("SKIPPING Import URL '" + importURL + " It does not appear to reference a " +
                                             "document that I know how to process.");
@@ -302,20 +312,10 @@ public class RdfImporter {
                             log.info("Total non owl/xsd Nr = " + notimport);
                         }
                     }
-                    imports.add(importURL);
                 } // while (!rdfDocs.isEmpty()
             }
-        } catch (IOException e) {
-            log.error("Caught an IOException! Msg: " + e.getMessage());
-
-        } catch (SaxonApiException e) {
-            log.error("Caught a SaxsonException! Msg: " + e.getMessage());
-        } catch (RDFParseException e) {
-
-            log.error("Caught an RDFParseException! Msg: " + e.getMessage());
-        } catch (RepositoryException e) {
-
-            log.error("Caught an RepositoryException! Msg: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("addNeededRDFDocuments(): Caught "+e.getClass().getName()+" Message: " + e.getMessage());
         } finally {
             try {
                 if (importURL != null && !imports.contains(importURL))
