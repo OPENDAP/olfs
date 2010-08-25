@@ -171,7 +171,7 @@ public class RdfImporter {
 
         String importURL = null;
         RepositoryConnection con = null;
-        int notimport = 0;
+        int skipCount = 0;
         String contentType = "";
         HttpURLConnection hc = null;
         InputStream importIS = null;
@@ -183,7 +183,7 @@ public class RdfImporter {
 
 
             log.debug("rdfDocs.size=" + rdfDocs.size());
-            notimport = 0;
+            skipCount = 0;
             while (!rdfDocs.isEmpty()) {
                 importURL = rdfDocs.remove(0).toString();
 
@@ -311,11 +311,11 @@ public class RdfImporter {
                                     log.warn("SKIPPING Import URL '" + importURL + "' It does not appear to reference a " +
                                             "document that I know how to process.");
                                     urlsToBeIgnored.add(importURL); //skip this file
-                                    notimport++;
+                                    skipCount++;
 
                                 }
                                 
-                                log.info("Total non owl/xsd Nr = " + notimport);
+                                log.info("Total non owl/xsd files skipped: " + skipCount);
                             }
                         }
                     } // while (!rdfDocs.isEmpty()
