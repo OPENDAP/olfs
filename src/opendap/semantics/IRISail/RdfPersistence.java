@@ -107,7 +107,7 @@ public class RdfPersistence {
                 RepositoryUtility.dumpRepository(repository, filename);
 
                 */
-                log.debug("Repository content has been changed! Flushing Repository!");
+                log.warn("Repository content has been changed! Flushing Repository!");
 
                 RepositoryUtility.clearRepository(repository);
                 newStartingPoints = RepositoryUtility.findNewStartingPoints(repository, startingPointUrls);
