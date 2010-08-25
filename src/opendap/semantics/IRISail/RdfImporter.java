@@ -64,6 +64,8 @@ public class RdfImporter {
 
             addNeededRDFDocuments(repository, rdfDocList);
 
+            rdfDocList.clear();
+            
             findNeededRDFDocuments(repository, rdfDocList, notImport);
         }
 
