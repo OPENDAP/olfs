@@ -199,7 +199,8 @@ public class RdfImporter {
                 if (downService.containsValue(importURL)
                         && downService.get(importURL)) {
                     log.error("Server error, Skipping " + importURL);
-                } else if (rsCode == -1) {
+                }
+                else if (rsCode == -1) {
                     log.error("Unable to get an HTTP status code for resource "
                             + importURL + " WILL NOT IMPORT!");
                     downService.put(importURL, true);
@@ -217,10 +218,8 @@ public class RdfImporter {
                     urlc.connect();
                     String contentType = urlc.getContentType();
                     //@todo make this a more robust
-                    String urlsufix = importURL.substring(
-                            (importURL.length() - 4), importURL.length());
 
-                    if (urlsufix.equals(".owl") || urlsufix.equals(".rdf")) {
+                    if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
 
                         uriaddress = new URIImpl(importURL);
 
@@ -237,8 +236,7 @@ public class RdfImporter {
                         
                         log.info("Finished importing URL " + url);
 
-                    } else if (importURL.substring((importURL.length() - 4),
-                            importURL.length()).equals(".xsd")) {
+                    } else if (importURL.endsWith(".xsd")) {
 
                         uriaddress = new URIImpl(importURL);
 
@@ -255,8 +253,7 @@ public class RdfImporter {
                         repository.setContentTypeContext(importURL,contentType, con); //
                         log.debug("Finished importing URL " + importURL);
 
-                    } else if (importURL.substring((importURL.length() - 7),
-                            importURL.length()).equals("+psdef/")) {
+                    } else if (importURL.endsWith("+psdef/")) {
 
                         uriaddress = new URIImpl(importURL);
 
