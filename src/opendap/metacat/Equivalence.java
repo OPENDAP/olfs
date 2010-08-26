@@ -24,7 +24,7 @@ import opendap.metacat.URLProcessedComponents.Lexeme;
  * number of distinct values with zero outliers. At least that's the idea.
  * 
  * @note When a URL is parsed, it is broken into 'path components' which are
- *       literally the parts between the '/' characters, and witing the
+ *       literally the parts between the '/' characters, and writing the
  *       filename, any non alphanum character. For any path component that
  *       contains digits, the code makes an Equivalence. The equivalence
  *       classes preserve the morphology of the component; effectively they
@@ -47,19 +47,22 @@ public class Equivalence {
 	private List<DatePart> dateClassification;
 	
 	private Map<String, Integer> valueOccurrences; // Occurrences of a given string
-	private Map<String, ParsedURL> orderedURLs; // Mapping between values for thi equivalence and specific URLs
+	private Map<String, ParsedURL> valueURLs; // Mapping between values for thi equivalence and specific URLs
 	
 	/**
 	 * Make a new Equivalence. This does not add a URL to the Equivalence, it
-	 * only initializes the 'equivlence class.'
-	 * @param n Which parsed component of the URL does this Equivalnce correspond to
+	 * only initializes the 'equivalence class.'
+	 * @param n Which parsed component of the URL does this Equivalence correspond to
 	 * @param l What is the component value - and is it a pattern?
 	 */
 	public Equivalence(int n, Lexeme l) {
 		dateClassification = new ArrayList<DatePart>();
 		
 		valueOccurrences = new HashMap<String, Integer>();
-		orderedURLs = new HashMap<String, ParsedURL>();
+		// This is the mapping of values that matched a pattern and the URLs
+		// they came from. Once the values are ordered, it's easy to get the
+		// URLs in the same order.
+		valueURLs = new HashMap<String, ParsedURL>();
 		
 		patternPosition = n;
 		componentValue = l.getValue();
@@ -93,7 +96,7 @@ public class Equivalence {
 		// ... And record the source URL for the particular value if this is
 		// a pattern
 		if (!litteral)
-			orderedURLs.put(comp, u);
+			valueURLs.put(comp, u);
 	}
 	
 	public int getPatternPosition() {
@@ -120,7 +123,7 @@ public class Equivalence {
 	/**
 	 * How many times does the value 'comp' show up? For a pattern, this
 	 * can be any number between 1 and getTotalMembers(). If getIsPattern()
-	 * is false, ths must be equal to getTotalMembers().
+	 * is false, this must be equal to getTotalMembers().
 	 * 
 	 * @param comp
 	 * @return
@@ -175,7 +178,7 @@ public class Equivalence {
 	}
 
 	public ParsedURL getParsedURL(String comp) {
-		return orderedURLs.get(comp);
+		return valueURLs.get(comp);
 	}
 
 	public void addDateClassification(DatePart dp) {

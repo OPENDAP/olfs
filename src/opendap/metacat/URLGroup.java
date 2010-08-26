@@ -1,7 +1,9 @@
 package opendap.metacat;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -27,7 +29,7 @@ public class URLGroup {
 
     private static Logger log = LoggerFactory.getLogger(URLGroup.class);
 
-	private Set<ParsedURL> urls;
+	private List<ParsedURL> urls;
 	private URLProcessedComponents processedComponents;
 	private Vector<Equivalence> equivalences;
 
@@ -81,7 +83,7 @@ public class URLGroup {
 	public URLGroup(ParsedURL url, URLProcessedComponents pc) {
 		// By definition, each URL in a group has the same URLEquivalenceClasses
 		processedComponents = pc;
-		urls = new HashSet<ParsedURL>();
+		urls = new ArrayList<ParsedURL>();
 		equivalences = new Vector<Equivalence>();
 		
 		// Initialize the Vector of Equivalences for this group

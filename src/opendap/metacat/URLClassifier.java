@@ -272,6 +272,7 @@ public class URLClassifier {
 					}
 				}
 
+				// Either print the sorted URLs or just print them
 				if (date != null) {
 					SortedValues sc = date.getSortedValues();
 					for (DateString comp : sc) {
@@ -280,6 +281,12 @@ public class URLClassifier {
 						log.debug("ParsedURL: " + p);
 						ps.println("\t" + date.getParsedURL(comp.getDate()).getTheURL());
 					}
+					ps.println();
+				}
+				else {
+					URLs urls = group.getURLs();
+					for (ParsedURL u: urls)
+						ps.println("\t" + u.getTheURL());
 					ps.println();
 				}
 			}
