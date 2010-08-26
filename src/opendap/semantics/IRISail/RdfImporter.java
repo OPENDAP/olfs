@@ -188,7 +188,7 @@ public class RdfImporter {
 
         try {
             con = repository.getConnection();
-
+            
 
             log.debug("rdfDocs.size=" + rdfDocs.size());
             skipCount = 0;
@@ -233,7 +233,7 @@ public class RdfImporter {
 
                             if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
 
-                                importUrl(repository, con, importURL, importIS, contentType);
+                                importUrl(con, importURL, importIS, contentType);
 
                                 addedDocument = true;
 
@@ -248,7 +248,7 @@ public class RdfImporter {
 
                                 log.info("Finished transforming URL " + importURL);
 
-                                importUrl(repository, con, importURL, inStream, contentType);
+                                importUrl(con, importURL, inStream, contentType);
 
                                 addedDocument = true;
 
@@ -264,7 +264,7 @@ public class RdfImporter {
 
                                 log.info("Finished transforming RDFa " + importURL);
 
-                                importUrl(repository, con, importURL, inStream, contentType);
+                                importUrl(con, importURL, inStream, contentType);
 
                                 addedDocument = true;
 
@@ -284,7 +284,7 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                    importUrl(repository, con, importURL, importIS, contentType);
+                                    importUrl(con, importURL, importIS, contentType);
                                     log.info("Imported non owl/xsd from " + importURL);
                                     addedDocument = true;
 
@@ -344,13 +344,14 @@ public class RdfImporter {
     }
 
 
-    private void importUrl(Repository repository, RepositoryConnection con, String importURL, InputStream importIS, String contentType ) throws IOException, RDFParseException, RepositoryException {
+    private void importUrl(RepositoryConnection con, String importURL, InputStream importIS, String contentType ) throws IOException, RDFParseException, RepositoryException {
         log.info("Importing URL " + importURL);
+        ValueFactory valueFactory = con.getValueFactory();
         URI uriaddress = new URIImpl(importURL);
         con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
-        setLTMODContext(importURL, con, repository.getValueFactory()); // set last modified
+        setLTMODContext(importURL, con, valueFactory); // set last modified
         // time of the context
-        setContentTypeContext(importURL, contentType, con, repository.getValueFactory()); //
+        setContentTypeContext(importURL, contentType, con, valueFactory); //
 
         log.info("Finished importing URL " + importURL);
         imports.add(importURL);
