@@ -323,7 +323,7 @@ public interface WcsCatalog {
 
 
 
-    public void update();
+    public void update() throws Exception;
 
 
 

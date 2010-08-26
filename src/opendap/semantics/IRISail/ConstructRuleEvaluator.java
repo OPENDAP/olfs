@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -453,7 +454,7 @@ public class ConstructRuleEvaluator {
                 log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
                 log.debug("class_name = " + rdfClassName); // class name of the function
 
-                Method myFunction = IntrospectionUtil.getMethodForFunction(rdfClassName, rdfFunctionName);
+                Method myFunction = getMethodForFunction(rdfClassName, rdfFunctionName);
 
                 if (myFunction != null) {
                     postProcessFlag = ProcessingTypes.Function;
@@ -860,7 +861,7 @@ public class ConstructRuleEvaluator {
                     className = functionImport.substring("import:".length(), indexOfLastPoundSign);
                     fnName = functionImport.substring(indexOfLastPoundSign + 1);
 
-                    func = IntrospectionUtil.getMethodForFunction(className, fnName);
+                    func = getMethodForFunction(className, fnName);
 
                 }
                 Boolean isEndList = endList.equals(obj);
@@ -950,5 +951,116 @@ public class ConstructRuleEvaluator {
         log.debug("After processing fn: " + toAdd.size()
                 + " statements are added.\n ");
     }
+
+    public Method getMethodForFunction(String className,
+                                              String methodName) {
+
+        Method method;
+
+
+        try {
+            Class methodContext = Class.forName(className);
+            log.debug("getMethodForFunction() - Located java class: "
+                    + className);
+
+            try {
+                method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
+
+                if (Modifier.isStatic(method.getModifiers())) {
+                    log.debug("getMethodForFunction() - Located static java method: "
+                                    + getProcessingMethodDescription(method));
+                    return method;
+                }
+
+                /*
+                 * for(Constructor c : methodContext.getConstructors()){
+                 * if(c.getGenericParameterTypes().length==0){
+                 * log.debug("getMethodForFunction() - Located java class
+                 * '"+className+"' with a no element " + "constructor and the
+                 * method "+getProcessingMethodDescription(method)); return
+                 * method; } }
+                 */
+
+            } catch (NoSuchMethodException e) {
+                log.error("getMethodForFunction() - The class '" + className
+                        + "' does not contain a method called '" + methodName
+                        + "'");
+            }
+
+        } catch (ClassNotFoundException e) {
+            log.error("getMethodForFunction() - Unable to locate java class: "
+                    + className);
+        }
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
+        return null;
+
+    }
+
+    public  Method getMethodForFunction(Object classInstance,
+            String methodName) {
+
+        Method method;
+
+        Class methodContext = classInstance.getClass();
+        String className = methodContext.getName();
+
+
+        try {
+            method = methodContext.getMethod(methodName, List.class,
+                    ValueFactory.class);
+            log.debug("getMethodForFunction() - Located the java method: "
+                    + getProcessingMethodDescription(method)
+                    + " in an instance of the class '" + className + "'");
+            return method;
+
+        } catch (NoSuchMethodException e) {
+            log.error("getMethodForFunction() - The class '" + className
+                            + "' does not contain a method called '"
+                            + methodName + "'");
+        }
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
+        return null;
+
+    }
+
+    public  String getProcessingMethodDescription(Method m) {
+
+        String msg = "";
+
+        msg += m.getReturnType().getName() + " ";
+        msg += m.getName();
+
+        String params = "";
+        for (Class c : m.getParameterTypes()) {
+            if (!params.equals(""))
+                params += ", ";
+            params += c.getName();
+        }
+        msg += "(" + params + ")";
+
+        String exceptions = "";
+        for (Class c : m.getExceptionTypes()) {
+            if (!exceptions.equals(""))
+                exceptions += ", ";
+            exceptions += c.getName();
+        }
+        msg += " " + exceptions + ";";
+
+        return msg;
+
+    }
+
 
 }
