@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,7 +46,7 @@ import com.ontotext.trree.owlim_ext.SailImpl;
 public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
-    private Logger log; 
+    private Logger log;
 
 
     private AtomicBoolean repositoryUpdateActive;
@@ -54,8 +55,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private long _catalogLastModifiedTime;
 
+    private ReentrantReadWriteLock _catalogLock; // Protects coverages.
+    private HashMap<String, Vector<String>> coverageIDServer;
     private ConcurrentHashMap<String, CoverageDescription> coverages;
-    private ReentrantReadWriteLock _catalogLock;
 
     private Thread catalogUpdateThread;
     private long firstUpdateDelay;
@@ -63,7 +65,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private long timeOfLastUpdate;
 
 
-    private boolean stopWorking = false;
+    private AtomicBoolean stopWorking;
 
     private URL _configFile;
 
@@ -73,7 +75,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String resourcePath;
     private boolean backgroundUpdates;
     private boolean overrideBackgroundUpdates;
-    private HashMap<String, Vector<String>> coverageIDServer;
 
     private Vector<String> doNotImportTheseUrls;
 
@@ -87,7 +88,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         catalogUpdateInterval = 20 * 60 * 1000; // 20 minutes worth of milliseconds
         firstUpdateDelay = 5 * 1000; // 5 seconds worth of milliseconds
         timeOfLastUpdate = 0;
-        stopWorking = false;
+        stopWorking = new AtomicBoolean();
+        stopWorking.set(false);
 
         _catalogLock = new ReentrantReadWriteLock();
         coverages = new ConcurrentHashMap<String, CoverageDescription>();
@@ -126,9 +128,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         long startTime, endTime;
         double elapsedTime;
 
-        String workingDir =  System.getProperty("user.dir");
+        String workingDir = System.getProperty("user.dir");
         LogUtil.initLogging(workingDir);
-        
+
 
         NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
 
@@ -173,7 +175,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /*******************************************************/
 
 
-
     /**
      * ***************************************************
      */
@@ -204,21 +205,39 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         initialized = true;
     }
-    
+
 
     public void update() throws RepositoryException, InterruptedException, IOException, JDOMException {
 
+        String filename;
+        boolean repositoryChanged = false;
+        Lock repositoryWriteLock = _repositoryLock.writeLock();
+
         Repository repository = setupRepository();
+
         try {
+
+
+            repositoryWriteLock.lock();
+
             log.debug("updateRepository(): Getting starting points (RDF imports).");
             Vector<String> startingPoints = getRdfImports(_configFile);
 
             log.info("updateCatalog(): Updating Repository...");
-            if (updateRepository(repository, startingPoints, doNotImportTheseUrls)) {
+            repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
+
+            filename = catalogCacheDirectory + "owlimHorstRepository.trig";
+            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+            RepositoryOps.dumpRepository(repository, filename);
+
+
+            if (repositoryChanged) {
+                log.info("updateCatalog(): Repository has been changed!");
+
                 log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
                 extractCoverageDescrptionsFromRepository(repository);
 
-                String filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
+                filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
                 log.info("updateCatalog(): Dumping CoverageDescriptions Document to: " + filename);
                 dumpCoverageDescriptionsDocument(filename);
 
@@ -228,32 +247,19 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             } else {
                 log.info("updateCatalog(): The repository was unchanged, nothing else to do.");
             }
+
+
         }
         finally {
             shutdownRepository(repository);
+            repositoryWriteLock.unlock();
+
         }
 
     }
 
-    public boolean updateRepository(Repository repository, Vector<String> startingPoints, Vector<String> doNotImportTheseUrls) throws RepositoryException, InterruptedException {
 
-        boolean repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
-
-        String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
-        log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-        RepositoryOps.dumpRepository(repository, filename);
-
-        filename = catalogCacheDirectory + "owlimHorstRepository.trig";
-        log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-        RepositoryOps.dumpRepository(repository, filename);
-
-
-        return repositoryChanged;
-
-
-    }
-
-    public void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
+    private void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
         long startTime, endTime;
         double elapsedTime;
         log.info("#############################################");
@@ -320,7 +326,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("Using catalogCacheDirectory: " + catalogCacheDirectory);
 
 
-
         //########################################################
         //  Process Resource Path.
         //
@@ -348,7 +353,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("Using resourcePath: " + resourcePath);
 
 
-
         //########################################################
         //  Process useUpdateCatalogThread
         //
@@ -371,12 +375,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     }
-
-
-
-
-
-
 
 
     private void shutdownRepository(Repository repository) throws RepositoryException {
@@ -431,8 +429,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void extractCoverageDescrptionsFromRepository(Repository repository) throws RepositoryException {
+    private void extractCoverageDescrptionsFromRepository(Repository repository) throws RepositoryException, InterruptedException {
         RepositoryConnection con = null;
+
+
 
         try {
             con = repository.getConnection();
@@ -442,22 +442,26 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         }
         finally {
-            if(con!=null){
+            if (con != null) {
                 try {
                     log.info("Closing repository connection.");
                     con.close();
                 }
-                catch (Exception e){
-                    log.error("Caught "+e.getClass().getName()+" Message: "+e.getMessage());
+                catch (Exception e) {
+                    log.error("Caught " + e.getClass().getName() + " Message: " + e.getMessage());
                 }
             }
         }
 
+
+
     }
 
 
-    private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) {
+    private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) throws InterruptedException {
 
+
+        threadCheck();
         try {
             //retrieve XML from the RDF store.
             log.info("extractCoverageDescrptionsFromRepository() - Extracting CoverageDescriptions from repository.");
@@ -472,8 +476,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             HashMap<String, Vector<String>> coverageIdToServerMap = getCoverageIDServerURL(con);
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
         } catch (Exception e) {
-            log.error("extractCoverageDescrptionsFromRepository():  Caught "+e.getClass().getName()+" Message: "+e.getMessage());
+            log.error("extractCoverageDescrptionsFromRepository():  Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
+        threadCheck();
+
 
     }
 
@@ -624,6 +630,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
+
         log.info("Flushing catalog.");
         coverages.clear();
 
@@ -641,6 +648,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         List<Element> coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
 
         try {
+
             con = repository.getConnection();
             lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
 
@@ -732,9 +740,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     public Element getCoverageDescriptionElement(String id) {
 
-        ReentrantReadWriteLock.ReadLock lock = _catalogLock.readLock();
+        Lock catalogReadlock = _catalogLock.readLock();
         try {
-            lock.lock();
+            catalogReadlock.lock();
             log.debug("_catalogLock ReadLock Acquired.");
 
             CoverageDescription cd = coverages.get(id);
@@ -745,7 +753,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             return cd.getElement();
         }
         finally {
-            lock.unlock();
+            catalogReadlock.unlock();
             log.debug("_catalogLock ReadLock Released.");
         }
     }
@@ -756,7 +764,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     public CoverageDescription getCoverageDescription(String id) {
-        ReentrantReadWriteLock.ReadLock lock = _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             log.debug("_catalogLock ReadLock Acquired.");
@@ -772,7 +780,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     public Element getCoverageSummaryElement(String id) throws WcsException {
 
-        ReentrantReadWriteLock.ReadLock lock = _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
         try {
             lock.lock();
             log.debug("_catalogLock ReadLock Acquired.");
@@ -797,7 +805,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         CoverageDescription cd;
 
 
-        ReentrantReadWriteLock.ReadLock lock = _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
 
         try {
             lock.lock();
@@ -832,7 +840,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         CoverageDescription cd;
 
 
-        ReentrantReadWriteLock.ReadLock lock = _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
 
         try {
             lock.lock();
@@ -877,7 +885,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         CoverageDescription cd;
 
 
-        ReentrantReadWriteLock.ReadLock lock = _catalogLock.readLock();
+        Lock lock = _catalogLock.readLock();
 
         try {
             lock.lock();
@@ -970,7 +978,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             }
         } catch (Exception e) {
-            log.error("runQuery(): Query FAILED. Caught "+ e.getClass().getName()+ " Message: " + e.getMessage());
+            log.error("runQuery(): Query FAILED. Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
         return coordinateDapId;
     }
@@ -980,7 +988,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         String qString = "select cid,cidid " +
                 "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
                 "{field} wcs:Identifier {fieldid}, " +
-                "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:"+coordinateName+"}; dap:localId {cidid} " +
+                "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:" + coordinateName + "}; dap:localId {cidid} " +
                 "WHERE covid= \"" + coverageStr + "\" " +
                 "AND fieldid=\"" + fieldStr + "\" " +
                 "USING NAMESPACE " +
@@ -1000,64 +1008,69 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     public void setStopFlag(boolean flag) {
-        stopWorking = flag;
+        stopWorking.set(flag);
     }
 
 
-    public void updateCatalogCache(Repository repository) throws InterruptedException {
+    private void updateCatalogCache(Repository repository) throws InterruptedException {
 
-        Thread thread = Thread.currentThread();
 
 
         int biffCount = 0;
 
-        if (!stopWorking && !thread.isInterrupted()) {
+        threadCheck();
 
-            ReentrantReadWriteLock.WriteLock catlock = _catalogLock.writeLock();
-            ReentrantReadWriteLock.ReadLock repLock = _repositoryLock.readLock();
+        Lock catalogWriteLock = _catalogLock.writeLock();
 
-            try {
-                repLock.lock();
-                catlock.lock();
-                log.debug("_catalogLock WriteLock Acquired.");
+        try {
+            catalogWriteLock.lock();
 
-                if (!stopWorking && !thread.isInterrupted()) {
+            log.debug("_catalogLock WriteLock Acquired.");
 
-                    coverageIDServer = getCoverageIDServerURL(repository);
+            threadCheck();
 
-                    addSupportedFormats(buildDoc.getRootElement());
+            coverageIDServer = getCoverageIDServerURL(repository);
 
-                    ingestCatalog(repository);
-                    timeOfLastUpdate = new Date().getTime();
+            addSupportedFormats(buildDoc.getRootElement());
 
-                    log.debug("Catalog Cache updated at " + new Date(timeOfLastUpdate));
+            ingestCatalog(repository);
+            timeOfLastUpdate = new Date().getTime();
 
 
-                }
-            }
-            catch (Exception e) {
-                log.error("updateCatalogCache() has a problem: " +
-                        e.getMessage() +
-                        " biffCount: " + (++biffCount));
-                e.printStackTrace();
-            }
-            finally {
-                catlock.unlock();
-                repLock.unlock();
-                log.debug("_catalogLock WriteLock Released.");
-            }
+            log.debug("Catalog Cache updated at " + new Date(timeOfLastUpdate));
+
+
 
         }
+        catch (Exception e) {
+            log.error("updateCatalogCache() has a problem: " +
+                    e.getMessage() +
+                    " biffCount: " + (++biffCount));
+            e.printStackTrace();
+        }
+        finally {
+            catalogWriteLock.unlock();
+            log.debug("_catalogLock WriteLock Released.");
+        }
 
-        if (thread.isInterrupted()) {
-            log.warn("updateCatalog(): WARNING! Thread " + thread.getName() + " was interrupted!");
-            throw new InterruptedException();
+        threadCheck();
+
+
+
+    }
+
+    private void threadCheck() throws InterruptedException {
+        Thread thread = Thread.currentThread();
+        if(thread.isInterrupted() || stopWorking.get()){
+            stopWorking.set(true);
+            log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
+            throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
         }
 
     }
 
 
-    public HashMap<String, Vector<String>> getCoverageIDServerURL(Repository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+    private HashMap<String, Vector<String>> getCoverageIDServerURL(Repository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
         HashMap<String, Vector<String>> coverageIDServer;
 
@@ -1086,7 +1099,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * @throws MalformedQueryException
      * @throws QueryEvaluationException
      */
-    public HashMap<String, Vector<String>> getCoverageIDServerURL(RepositoryConnection con) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+    private HashMap<String, Vector<String>> getCoverageIDServerURL(RepositoryConnection con) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
         TupleQueryResult result;
         HashMap<String, Vector<String>> coverageIDServer = new HashMap<String, Vector<String>>();
 
@@ -1197,6 +1210,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     public void run() {
 
         try {
+            stopWorking.set(false);
+            int updateCounter = 0;
+            long startTime, endTime;
+            long elapsedTime, sleepTime;
+            Thread thread = Thread.currentThread();
+
+
             log.info("************* STARTING CATALOG UPDATE THREAD.");
             try {
                 log.info("************* CATALOG UPDATE THREAD sleeping for " + firstUpdateDelay / 1000.0 + " seconds.");
@@ -1204,16 +1224,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             } catch (InterruptedException e) {
                 log.warn("Caught Interrupted Exception.");
-                stopWorking = true;
+                stopWorking.set(true);
             }
 
-            int updateCounter = 0;
-            long startTime, endTime;
-            long elapsedTime, sleepTime;
-            stopWorking = false;
-            Thread thread = Thread.currentThread();
 
-            while (!stopWorking) {
+            while (!stopWorking.get()) {
 
                 try {
 
@@ -1221,7 +1236,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     try {
                         update();
                     } catch (Exception e) {
-                        log.error("Catalog Update FAILED!!! Caught "+e.getClass().getName()+"  Message: " + e.getMessage());
+                        log.error("Catalog Update FAILED!!! Caught " + e.getClass().getName() + "  Message: " + e.getMessage());
                     }
                     endTime = new Date().getTime();
                     elapsedTime = (endTime - startTime);
@@ -1229,15 +1244,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     log.debug("Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
 
                     sleepTime = catalogUpdateInterval - elapsedTime;
-                    stopWorking = thread.isInterrupted();
-                    if (!stopWorking && sleepTime > 0) {
+                    stopWorking.set(thread.isInterrupted());
+                    if (!stopWorking.get() && sleepTime > 0) {
                         log.debug("Catalog Update thread sleeping for " + sleepTime / 1000.0 + " seconds.");
                         Thread.sleep(sleepTime);
                     }
 
                 } catch (InterruptedException e) {
                     log.warn("Caught Interrupted Exception.");
-                    stopWorking = true;
+                    stopWorking.set(true);
 
                 }
             }
@@ -1275,7 +1290,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                 coverageDescription.addContent(supportedFormats);
 
-                msg = "Adding supported formats to coverage " + coverageID  +
+                msg = "Adding supported formats to coverage " + coverageID +
                         //"CoverageDescription Element: \n " + xmlo.outputString(coverageDescription) + "\n" +
                         "Coverage  held at: \n";
 
@@ -1317,10 +1332,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         boolean isInterrupted = thread.isInterrupted();
 
-        if (isInterrupted || stopWorking) {
-            log.warn("updateRepository2(): WARNING! Thread " + thread.getName() + " was interrupted!");
-            throw new InterruptedException("Thread.currentThread.isInterrupted() returned '" + isInterrupted + "'. stopWorking='" + stopWorking + "'");
-        }
+        threadCheck();
 
     }
 
