@@ -4,6 +4,7 @@ import org.openrdf.model.*;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
@@ -41,7 +42,7 @@ public class RepositoryUtility {
     private static Logger log = LoggerFactory.getLogger(RepositoryUtility.class);
 
 
-    public static void dropStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
+    public static void dropStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
 
@@ -102,7 +103,7 @@ public class RepositoryUtility {
 
     }
 
-    public static void addStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
+    public static void addStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
 
@@ -167,7 +168,7 @@ public class RepositoryUtility {
 
 
 
-    public static void addStartingPoint(SailRepository repo, String startingPointUrl) {
+    public static void addStartingPoint(Repository repo, String startingPointUrl) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
 
@@ -231,7 +232,7 @@ public class RepositoryUtility {
 
     }
 
-    public static Vector<String> findChangedStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
+    public static Vector<String> findChangedStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
 
         try {
@@ -294,7 +295,7 @@ public class RepositoryUtility {
     }
 
 
-    public static Vector<String> findNewStartingPoints(SailRepository repo, Vector<String> startingPointUrls) {
+    public static Vector<String> findNewStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
 
         try {
@@ -374,7 +375,7 @@ public class RepositoryUtility {
 
 
 
-    public static Vector<String> findAllStartingPoints(SailRepository repo) throws MalformedQueryException, QueryEvaluationException {
+    public static Vector<String> findAllStartingPoints(Repository repo) throws MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
 
         try {
@@ -459,7 +460,7 @@ public class RepositoryUtility {
     }
 
 
-    public static void clearRepository(SailRepository owlse2) {
+    public static void clearRepository(Repository owlse2) {
 
         RepositoryConnection con = null;
 
@@ -529,7 +530,7 @@ public class RepositoryUtility {
 
     }
 
-    public static void dumpRepository(SailRepository owlse2, String filename) {
+    public static void dumpRepository(Repository owlse2, String filename) {
 
         RepositoryConnection con = null;
 
@@ -556,7 +557,7 @@ public class RepositoryUtility {
     }
 
 
-    public static String showContexts(SailRepository repository){
+    public static String showContexts(Repository repository){
         RepositoryConnection con = null;
         String msg;
 
@@ -743,7 +744,7 @@ public class RepositoryUtility {
      * @param repository The repository from which to harvest the contexts and their associated last
      * modified times.
      */
-    public static HashMap<String, String> getLastModifiedTimesForContexts(SailRepository repository) {
+    public static HashMap<String, String> getLastModifiedTimesForContexts(Repository repository) {
         RepositoryConnection con = null;
 
         try{

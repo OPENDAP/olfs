@@ -4,6 +4,7 @@ import org.openrdf.model.*;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
@@ -53,7 +54,7 @@ public class ConstructRuleEvaluator {
      * Run all Construct queries and statement into repository
      */
 
-    public  void runConstruct(SailRepository repository) throws RepositoryException {
+    public  void runConstruct(Repository repository) throws RepositoryException {
 
         log.debug("-----------------------------------------------------------------");
         log.debug("------------------- Entering runConstruct() ---------------------");
@@ -272,7 +273,7 @@ public class ConstructRuleEvaluator {
     /*
      * Find all Construct queries
      */
-    private void findConstruct(SailRepository repository) {
+    private void findConstruct(Repository repository) {
         TupleQueryResult result = null;
         RepositoryConnection con = null;
         List<String> bindingNames;

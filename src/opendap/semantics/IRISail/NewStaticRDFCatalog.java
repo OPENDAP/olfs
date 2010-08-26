@@ -9,6 +9,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.openrdf.query.*;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.sail.SailRepository;
 import org.slf4j.Logger;
 
@@ -219,7 +220,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     public void updateCatalog() throws RepositoryException, InterruptedException, IOException, JDOMException {
 
-        SailRepository repository = setupRepository();
+        Repository repository = setupRepository();
         try {
             log.debug("updateRepository(): Getting starting points (RDF imports).");
             Vector<String> startingPoints = getRdfImports(_configFile);
@@ -247,7 +248,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public boolean updateRepository(SailRepository repository, Vector<String> startingPoints, Vector<String> doNotImportTheseUrls) throws RepositoryException, InterruptedException {
+    public boolean updateRepository(Repository repository, Vector<String> startingPoints, Vector<String> doNotImportTheseUrls) throws RepositoryException, InterruptedException {
 
         boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
 
@@ -272,7 +273,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.info("#############################################");
         log.info("Loading WCS Catalog from Semantic Repository.");
         startTime = new Date().getTime();
-        SailRepository repository = setupRepository();
+        Repository repository = setupRepository();
         try {
             extractCoverageDescrptionsFromRepository(repository);
             updateCatalogCache(repository);
@@ -391,21 +392,21 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
 
-    private void shutdownRepository(SailRepository repository) throws RepositoryException {
+    private void shutdownRepository(Repository repository) throws RepositoryException {
 
         log.debug("shutdownRepository)(): Shutting down Repository...");
         repository.shutDown();
         log.debug("shutdownRepository(): Repository shutdown complete.");
     }
 
-    private SailRepository setupRepository() throws RepositoryException, InterruptedException {
+    private Repository setupRepository() throws RepositoryException, InterruptedException {
 
 
         log.info("Setting up Semantic Repository.");
 
         //OWLIM Sail Repository (inferencing makes this somewhat slow)
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
-        SailRepository repository = new IRISailRepository(owlimSail); //owlim inferencing
+        Repository repository = new IRISailRepository(owlimSail); //owlim inferencing
 
 
         log.info("Configuring Semantic Repository.");
@@ -443,7 +444,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void extractCoverageDescrptionsFromRepository(SailRepository repository) throws RepositoryException {
+    private void extractCoverageDescrptionsFromRepository(Repository repository) throws RepositoryException {
         RepositoryConnection con = null;
 
         try {
@@ -632,7 +633,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void ingestCatalog(SailRepository repository) throws Exception {
+    private void ingestCatalog(Repository repository) throws Exception {
 
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
@@ -1016,7 +1017,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    public void updateCatalogCache(SailRepository repository) throws InterruptedException {
+    public void updateCatalogCache(Repository repository) throws InterruptedException {
 
         Thread thread = Thread.currentThread();
 
@@ -1069,7 +1070,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    public HashMap<String, Vector<String>> getCoverageIDServerURL(SailRepository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+    public HashMap<String, Vector<String>> getCoverageIDServerURL(Repository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
         HashMap<String, Vector<String>> coverageIDServer;
 
