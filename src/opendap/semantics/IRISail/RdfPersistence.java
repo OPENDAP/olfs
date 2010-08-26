@@ -20,7 +20,8 @@ public class RdfPersistence {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(RdfPersistence.class);
 
-
+    public static boolean flushRepositoryOnDrop = true;
+    
     /**
      * @param repository        The repository on which to operate.
      * @param startingPointUrls The list pof starting point URLs from the configuration file (aka "THE starting point")
@@ -28,7 +29,7 @@ public class RdfPersistence {
      * @throws InterruptedException If the thread of execution is interrupted.
      * @throws RepositoryException  When there are problems working with the repository.
      */
-    public static boolean updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls, Vector<String> notImport)
+    public static boolean updateSemanticRepository(IRISailRepository repository, Vector<String> startingPointUrls, Vector<String> doNotImportTheseUrls, String resourceDir)
             throws InterruptedException, RepositoryException {
 
 
@@ -37,7 +38,7 @@ public class RdfPersistence {
         Vector<String> startingPointsToDrop = null;
         boolean repositoryHasBeenChanged = false;
 
-        RdfImporter rdfImporter = new RdfImporter();
+        RdfImporter rdfImporter = new RdfImporter(resourceDir);
 
 
         Date startTime = new Date();
@@ -78,46 +79,52 @@ public class RdfPersistence {
 
 
             if (!dropList.isEmpty()) {
-                /*
-
-                log.debug("Add external inferencing contexts to dropList");
-                dropList.addAll(findExternalInferencingContexts(repository));
-
-                String filename =  "PriorToDropStartingPointsRepository.trig";
-                log.debug("Dumping Semantic Repository to: " + filename);
-                RepositoryUtility.dumpRepository(repository, filename);
-
-                log.debug("Dropping starting points ...");
-                RepositoryUtility.dropStartingPoints(repository, startingPointsToDrop);
-                log.debug("Finished dropping starting points.");
-
-                filename =  "PostDropStartingPointsRepository.trig";
-                log.debug("Dumping Semantic Repository to: " + filename);
-                RepositoryUtility.dumpRepository(repository, filename);
-
-                log.debug(RepositoryUtility.showContexts(repository));
-
-                log.debug("Dropping contexts.");
-                dropContexts(repository, dropList);
-                log.debug(RepositoryUtility.showContexts(repository));
-
-                filename =  "PostDropContextsRepository.trig";
-                log.debug("Dumping Semantic Repository to: " + filename);
-                RepositoryUtility.dumpRepository(repository, filename);
-
-                */
-                log.warn("Repository content has been changed! Flushing Repository!");
-
-                RepositoryUtility.clearRepository(repository);
 
 
-                String filename =  "PostRepositoryClear.trig";
-                log.debug("Dumping Semantic Repository to: " + filename);
-                RepositoryUtility.dumpRepository(repository, filename);
+                if(flushRepositoryOnDrop){
+                    log.warn("Repository content has been changed! Flushing Repository!");
+
+                    RepositoryUtility.clearRepository(repository);
 
 
-                newStartingPoints = RepositoryUtility.findNewStartingPoints(repository, startingPointUrls);
+                    String filename =  "PostRepositoryClear.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    RepositoryUtility.dumpRepository(repository, filename);
 
+
+                    newStartingPoints = RepositoryUtility.findNewStartingPoints(repository, startingPointUrls);
+
+
+                }
+                else {
+
+                    log.debug("Add external inferencing contexts to dropList");
+                    dropList.addAll(findExternalInferencingContexts(repository));
+
+                    String filename =  "PriorToDropStartingPointsRepository.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    RepositoryUtility.dumpRepository(repository, filename);
+
+                    log.debug("Dropping starting points ...");
+                    RepositoryUtility.dropStartingPoints(repository, startingPointsToDrop);
+                    log.debug("Finished dropping starting points.");
+
+                    filename =  "PostDropStartingPointsRepository.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    RepositoryUtility.dumpRepository(repository, filename);
+
+                    log.debug(RepositoryUtility.showContexts(repository));
+
+                    log.debug("Dropping contexts.");
+                    dropContexts(repository, dropList);
+                    log.debug(RepositoryUtility.showContexts(repository));
+
+                    filename =  "PostDropContextsRepository.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    RepositoryUtility.dumpRepository(repository, filename);
+
+                }
+                
                 modelChanged = true;
 
             }
@@ -135,7 +142,7 @@ public class RdfPersistence {
             }
 
             log.debug("Checking for referenced documents that are not already in the repository.");
-            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, notImport);
+            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
             if(foundNewDocuments){
                 modelChanged = true;
             }
@@ -143,16 +150,17 @@ public class RdfPersistence {
             if (modelChanged) {
 
                 log.debug("Updating repository ...");
+                ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
 
                 while (modelChanged) {
                     log.debug("Repository changes detected.");
                     log.debug(RepositoryUtility.showContexts(repository));
 
                     log.debug("Running construct rules ...");
-                    repository.runConstruct();
+                    constructRuleEvaluator.runConstruct(repository);
                     log.debug("Finished running construct rules.");
                     log.debug(RepositoryUtility.showContexts(repository));
-                    modelChanged = rdfImporter.importReferencedRdfDocs(repository, notImport);
+                    modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
                 }
 
 

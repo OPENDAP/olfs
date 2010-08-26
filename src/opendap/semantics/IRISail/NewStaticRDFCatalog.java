@@ -224,8 +224,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             Vector<String> startingPoints = getRdfImports(_configFile);
 
             log.info("updateCatalog(): Updating Repository...");
-            Vector<String> notImport = null;
-            if (updateRepository(repository, startingPoints, notImport)) {
+            Vector<String> doNotImportTheseUrls = null;
+            if (updateRepository(repository, startingPoints, doNotImportTheseUrls)) {
                 log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
                 extractCoverageDescrptionsFromRepository(repository);
 
@@ -246,9 +246,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-    public boolean updateRepository(IRISailRepository repository, Vector<String> startingPoints, Vector<String> notImport) throws RepositoryException, InterruptedException {
+    public boolean updateRepository(IRISailRepository repository, Vector<String> startingPoints, Vector<String> doNotImportTheseUrls) throws RepositoryException, InterruptedException {
 
-        boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints, notImport);
+        boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
 
         String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
         log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
@@ -404,7 +404,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         //OWLIM Sail Repository (inferencing makes this somewhat slow)
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
-        IRISailRepository repository = new IRISailRepository(owlimSail, resourcePath, catalogCacheDirectory); //owlim inferencing
+        IRISailRepository repository = new IRISailRepository(owlimSail); //owlim inferencing
 
 
         log.info("Configuring Semantic Repository.");

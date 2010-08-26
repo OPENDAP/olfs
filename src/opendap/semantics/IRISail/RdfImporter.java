@@ -1,18 +1,17 @@
 package opendap.semantics.IRISail;
 
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
+import net.sf.saxon.s9api.*;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -32,11 +31,14 @@ public class RdfImporter {
     private HashSet<String> urlsToBeIgnored;
     private Vector<String> imports;
 
+    private String resourceDir;
 
-    public RdfImporter() {
+
+    public RdfImporter(String resourceDir) {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         urlsToBeIgnored = new HashSet<String>();
         imports = new Vector<String>();
+        this.resourceDir = resourceDir;
     }
 
     public void reset() {
@@ -47,6 +49,10 @@ public class RdfImporter {
     /**
      * ****************************************
      * Update repository
+     *
+     * @param repository
+     * @param doNotImportUrls
+     * @return
      */
     public boolean importReferencedRdfDocs(IRISailRepository repository, Vector<String> doNotImportUrls) {
 
@@ -56,7 +62,7 @@ public class RdfImporter {
 
         if (doNotImportUrls != null)
             urlsToBeIgnored.addAll(doNotImportUrls);
-        
+
 
 
         findNeededRDFDocuments(repository, rdfDocList);
@@ -68,7 +74,7 @@ public class RdfImporter {
             }
 
             rdfDocList.clear();
-            
+
             findNeededRDFDocuments(repository, rdfDocList);
         }
 
@@ -185,7 +191,7 @@ public class RdfImporter {
             log.debug("rdfDocs.size=" + rdfDocs.size());
             skipCount = 0;
             while (!rdfDocs.isEmpty()) {
-                importURL = rdfDocs.remove(0).toString();
+                importURL = rdfDocs.remove(0);
 
                 try {
 
@@ -225,62 +231,39 @@ public class RdfImporter {
 
                             if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
 
-                                uriaddress = new URIImpl(importURL);
+                                importUrl(repository, con, importURL, importIS, contentType);
 
-                                URL url;
-
-                                url = new URL(importURL);
-
-                                log.info("Importing URL " + url);
-                                con.add(importIS, importURL, RDFFormat.RDFXML,
-                                        (Resource) uriaddress);
-                                repository.setLTMODContext(importURL, con); // set last modified
-                                // time of the context
-                                repository.setContentTypeContext(importURL, contentType, con); //
-
-                                log.info("Finished importing URL " + url);
-                                imports.add(importURL);
                                 addedDocument = true;
 
 
                             } else if (importURL.endsWith(".xsd")) {
 
-                                uriaddress = new URIImpl(importURL);
+                                String transformFile = "xsl/xsd2owl.xsl";
 
                                 ByteArrayInputStream inStream;
-                                log.info("Transforming URL " + importURL);
-                                inStream = new ByteArrayInputStream(repository.transformXSD(importIS).toByteArray());
+                                log.info("Transforming  '" + importURL+"' with "+transformFile);
+                                inStream = transform(importIS,resourceDir+transformFile);
+
                                 log.info("Finished transforming URL " + importURL);
-                                log.debug("Importing URL " + importURL);
-                                con.add(inStream, importURL, RDFFormat.RDFXML,
-                                        (Resource) uriaddress);
-                                repository.setLTMODContext(importURL, con); // set last modified
-                                // time for the context
-                                repository.setContentTypeContext(importURL, contentType, con); //
-                                log.debug("Finished importing URL " + importURL);
-                                imports.add(importURL);
+
+                                importUrl(repository, con, importURL, inStream, contentType);
+
                                 addedDocument = true;
 
 
                             } else if (importURL.endsWith("+psdef/")) {
 
-                                uriaddress = new URIImpl(importURL);
+                                String transformFile = "xsl/RDFa2RDFXML.xsl";
 
                                 ByteArrayInputStream inStream;
-                                log.info("Transforming RDFa " + importURL);
+                                log.info("Transforming " + importURL+" with "+transformFile);
 
-                                inStream = new ByteArrayInputStream(repository.transformRDFa(importIS).toByteArray());
+                                inStream = transform(importIS,resourceDir+transformFile);
 
                                 log.info("Finished transforming RDFa " + importURL);
-                                log.debug("Importing RDFa " + importURL);
-                                con.add(inStream, importURL, RDFFormat.RDFXML,
-                                        (Resource) uriaddress);
 
-                                repository.setLTMODContext(importURL, con); // set last modified
-                                // time for the context
-                                repository.setContentTypeContext(importURL, contentType, con); //
-                                log.debug("Finished importing URL " + importURL);
-                                imports.add(importURL);
+                                importUrl(repository, con, importURL, inStream, contentType);
+
                                 addedDocument = true;
 
 
@@ -293,18 +276,14 @@ public class RdfImporter {
                                 // q=0.9,text/xml; q=0.9, */*; q=0.2");
 
 
-                                uriaddress = new URIImpl(importURL);
                                 if ((contentType != null) &&
                                         (contentType.equalsIgnoreCase("text/plain") ||
                                                 contentType.equalsIgnoreCase("text/xml") ||
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                    con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
-                                    repository.setLTMODContext(importURL, con);
-                                    log.info("Imported non owl/xsd = " + importURL);
-                                    imports.add(importURL);
-                                    log.info("Imported non owl/xsd = " + importURL);
+                                    importUrl(repository, con, importURL, importIS, contentType);
+                                    log.info("Imported non owl/xsd from " + importURL);
                                     addedDocument = true;
 
                                 } else {
@@ -314,7 +293,7 @@ public class RdfImporter {
                                     skipCount++;
 
                                 }
-                                
+
                                 log.info("Total non owl/xsd files skipped: " + skipCount);
                             }
                         }
@@ -363,4 +342,144 @@ public class RdfImporter {
     }
 
 
+    private void importUrl(IRISailRepository repository, RepositoryConnection con, String importURL, InputStream importIS, String contentType ) throws IOException, RDFParseException, RepositoryException {
+        log.info("Importing URL " + importURL);
+        URI uriaddress = new URIImpl(importURL);
+        con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
+        setLTMODContext(importURL, con, repository.getValueFactory()); // set last modified
+        // time of the context
+        setContentTypeContext(importURL, contentType, con, repository.getValueFactory()); //
+
+        log.info("Finished importing URL " + importURL);
+        imports.add(importURL);
+
+    }
+
+    
+
+
+    /**
+     * Insert a statement declaring the content type of the document.
+     *
+     * @param importURL
+     * @param contentType
+     * @param con
+     */
+    public void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
+        if (!this.imports.contains(importURL)) { // not in the repository yet
+
+            URI s = valueFactory.createURI(importURL);
+            URI contentTypeContext = valueFactory.createURI(Terms.contentTypeContextUri);
+            URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
+
+            Literal o = valueFactory.createLiteral(contentType);
+
+            try {
+
+                con.add((Resource) s, contentTypeContext, (Value) o, (Resource) cacheContext);
+
+            } catch (RepositoryException e) {
+                log.error("Caught an RepositoryException! Msg: "
+                        + e.getMessage());
+
+            }
+
+        }
+    }
+
+
+
+    /**
+     * Set last_modified_time of the URI in the repository.
+     * @param importURL
+     * @param con
+     */
+    public void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) {
+        String ltmod = RepositoryUtility.getLTMODContext(importURL);
+        setLTMODContext(importURL, ltmod, con, valueFactory);
+    }
+
+
+    /**
+     *
+     *
+     * @param importURL
+     * @param ltmod
+     * @param con
+     */
+    public void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) {
+
+        if (!imports.contains(importURL)) { // not in the repository yet
+            // log.debug(importURL);
+            // log.debug("lastmodified " + ltmod);
+            URI s = valueFactory.createURI(importURL);
+            URI p = valueFactory.createURI(Terms.lastModifiedContextUri);
+            URI cont = valueFactory.createURI(Terms.cacheContextUri);
+            URI sxd = valueFactory.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
+            Literal o = valueFactory.createLiteral(ltmod, sxd);
+
+            try {
+
+                con.add((Resource) s, p, (Value) o, (Resource) cont);
+
+            } catch (RepositoryException e) {
+                log.error("Caught an RepositoryException! Msg: "
+                        + e.getMessage());
+
+            }
+
+        }
+    }
+
+
+    public ByteArrayInputStream transform(InputStream is, String xsltFileName) throws SaxonApiException {
+        return transform(new StreamSource(is),xsltFileName);
+
+    }
+
+    /**
+     * Compile and execute a simple transformation that applies a stylesheet to
+     * an input stream, and serializing the result to an OutPutStream
+     *
+     * @param sourceURL
+     * @return
+     * @throws net.sf.saxon.s9api.SaxonApiException
+     */
+    public ByteArrayInputStream transform(StreamSource sourceURL, String xsltFileName)
+            throws SaxonApiException {
+        log.debug("Executing XSL Transform Operation.");
+        log.debug("XSL Transform Filename: "+xsltFileName);
+
+        String doc = sourceURL.getSystemId();
+        if(doc==null)
+            doc = sourceURL.getPublicId();
+
+        if(doc==null)
+            doc = "StreamSource";
+
+
+        log.debug("Document to transform: "+doc);
+
+
+        Processor proc = new Processor(false);
+        XsltCompiler comp = proc.newXsltCompiler();
+        XsltExecutable exp = comp.compile(new StreamSource(new File(
+                xsltFileName)));
+
+        XdmNode source = proc.newDocumentBuilder().build(sourceURL);
+        Serializer out = new Serializer();
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
+        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        out.setOutputStream(outStream);
+        XsltTransformer trans = exp.load();
+        trans.setInitialContextNode(source);
+        trans.setDestination(out);
+        trans.transform();
+        log.info(outStream.toString());
+        log.debug("XSL Transform complete.");
+        return new ByteArrayInputStream(outStream.toByteArray());
+
+
+    }
 }

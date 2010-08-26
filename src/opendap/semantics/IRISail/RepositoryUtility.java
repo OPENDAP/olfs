@@ -1,9 +1,7 @@
 package opendap.semantics.IRISail;
 
-import org.openrdf.model.Resource;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
+import org.openrdf.model.*;
+import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
@@ -19,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +26,8 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -78,7 +80,7 @@ public class RepositoryUtility {
         URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
         URI startingPointType = valueFactory.createURI(Terms.startingPointContextUri);
 
-        
+
 
         try {
             for (String startingPoint : startingPointUrls) {
@@ -344,7 +346,7 @@ public class RepositoryUtility {
             }
 
             for (String startingPoint : startingPointUrls) {
-                
+
                 if (!result.contains(startingPoint) && !startingPoint.equals(Terms.internalStartingPoint)) {
 
                     newStartingPoints.add(startingPoint);
@@ -495,7 +497,7 @@ public class RepositoryUtility {
 
                 NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
                         myFileOutputStream);
-                
+
                 con.export(myNTRiplesWriter);
                 myNTRiplesWriter.startRDF();
                 myNTRiplesWriter.endRDF();
@@ -504,7 +506,7 @@ public class RepositoryUtility {
             if (filename.endsWith("trix")) {
 
                 TriXWriter myTriXWriter = new TriXWriter(myFileOutputStream);
-                
+
                 con.export(myTriXWriter);
                 myTriXWriter.startRDF();
                 myTriXWriter.endRDF();
@@ -513,7 +515,7 @@ public class RepositoryUtility {
             if (filename.endsWith("trig")) {
 
                 TriGWriter myTriGWriter = new TriGWriter(myFileOutputStream);
-                
+
                 con.export(myTriGWriter);
                 myTriGWriter.startRDF();
                 myTriGWriter.endRDF();
@@ -830,5 +832,167 @@ public class RepositoryUtility {
     }
 
 
+    public static Method getMethodForFunction(String className,
+                                              String methodName) {
 
+        Method method;
+
+        Logger log = LoggerFactory.getLogger(IRISailRepository.class);
+
+        try {
+            Class methodContext = Class.forName(className);
+            log.debug("getMethodForFunction() - Located java class: "
+                    + className);
+
+            try {
+                method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
+
+                if (Modifier.isStatic(method.getModifiers())) {
+                    log.debug("getMethodForFunction() - Located static java method: "
+                                    + getProcessingMethodDescription(method));
+                    return method;
+                }
+
+                /*
+                 * for(Constructor c : methodContext.getConstructors()){
+                 * if(c.getGenericParameterTypes().length==0){
+                 * log.debug("getMethodForFunction() - Located java class
+                 * '"+className+"' with a no element " + "constructor and the
+                 * method "+getProcessingMethodDescription(method)); return
+                 * method; } }
+                 */
+
+            } catch (NoSuchMethodException e) {
+                log.error("getMethodForFunction() - The class '" + className
+                        + "' does not contain a method called '" + methodName
+                        + "'");
+            }
+
+        } catch (ClassNotFoundException e) {
+            log.error("getMethodForFunction() - Unable to locate java class: "
+                    + className);
+        }
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
+        return null;
+
+    }
+
+    public static Method getMethodForFunction(Object classInstance,
+            String methodName) {
+
+        Method method;
+
+        Class methodContext = classInstance.getClass();
+        String className = methodContext.getName();
+
+        Logger log = LoggerFactory.getLogger(IRISailRepository.class);
+
+        try {
+            method = methodContext.getMethod(methodName, List.class,
+                    ValueFactory.class);
+            log.debug("getMethodForFunction() - Located the java method: "
+                    + getProcessingMethodDescription(method)
+                    + " in an instance of the class '" + className + "'");
+            return method;
+
+        } catch (NoSuchMethodException e) {
+            log.error("getMethodForFunction() - The class '" + className
+                            + "' does not contain a method called '"
+                            + methodName + "'");
+        }
+
+        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
+                        + "class: '"
+                        + className
+                        + "'   method: '"
+                        + methodName
+                        + "'");
+        return null;
+
+    }
+
+    public static String getProcessingMethodDescription(Method m) {
+
+        String msg = "";
+
+        msg += m.getReturnType().getName() + " ";
+        msg += m.getName();
+
+        String params = "";
+        for (Class c : m.getParameterTypes()) {
+            if (!params.equals(""))
+                params += ", ";
+            params += c.getName();
+        }
+        msg += "(" + params + ")";
+
+        String exceptions = "";
+        for (Class c : m.getExceptionTypes()) {
+            if (!exceptions.equals(""))
+                exceptions += ", ";
+            exceptions += c.getName();
+        }
+        msg += " " + exceptions + ";";
+
+        return msg;
+
+    }
+
+    /***************************************************************************
+     * processing xs:string
+     *
+     * @param graphResult
+     * @param creatValue
+     * @param Added
+     * @param toAdd
+     * @param con
+     * @param context
+     * @throws org.openrdf.query.QueryEvaluationException
+     * @throws org.openrdf.repository.RepositoryException
+     */
+
+    public static void process_xsString(GraphQueryResult graphResult,
+            ValueFactory creatValue, Vector<Statement> Added,
+            Vector<Statement> toAdd, RepositoryConnection con,
+            Resource[] context) throws QueryEvaluationException,
+            RepositoryException {
+
+        // pproces1 = (\"[^"]+\")\s+\.
+        String pproces1 = "(\\\"[^\"]+\\\")\\s+\\.";
+        // Create a Pattern object
+        Pattern rproces1 = Pattern.compile(pproces1);
+        // Now create matcher object.
+        while (graphResult.hasNext()) {
+            Statement st = graphResult.next();
+
+            Value obj = st.getObject();
+            URI prd = st.getPredicate();
+            Resource sbj = st.getSubject();
+            String statementStr = obj.toString();
+            Matcher m = rproces1.matcher(statementStr);
+            if (m.find()) {
+                String vname = m.group(1);
+                String replaceStr = vname
+                        + "^^<http://www.w3.org/2001/XMLSchema#string> .";
+                statementStr = m.replaceAll(replaceStr);
+                // log.debug("postprocess1 statementStr=" +statementStr);
+                // log.debug("vnam=" +vname);
+            }
+            Value stStr = creatValue.createLiteral(statementStr);
+            Statement stToAdd = new StatementImpl(sbj, prd, stStr);
+
+            toAdd.add(stToAdd);
+            Added.add(stToAdd);
+            con.add(stToAdd, context); // add process_xsString created st
+
+        }
+        // log.debug("After processing xs:string:\n " +
+        // opendap.coreServlet.Util.getMemoryReport());
+    }
 }
