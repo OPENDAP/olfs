@@ -354,8 +354,8 @@ public class RdfImporter {
 
 
             con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) importUri);
-            RepositoryUtility.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
-            RepositoryUtility.setContentTypeContext(importURL, contentType, con, valueFactory); //
+            RepositoryOps.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
+            RepositoryOps.setContentTypeContext(importURL, contentType, con, valueFactory); //
 
             log.info("Finished importing URL " + importURL);
             imports.add(importURL);

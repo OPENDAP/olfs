@@ -8,7 +8,6 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.rio.trig.TriGWriter;
 import org.openrdf.rio.trix.TriXWriter;
@@ -37,9 +36,10 @@ import java.util.regex.Pattern;
  * Time: 4:57:24 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RepositoryUtility {
+public class RepositoryOps {
 
-    private static Logger log = LoggerFactory.getLogger(RepositoryUtility.class);
+    private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
+    public static boolean flushRepositoryOnDrop = true;
 
 
     public static void dropStartingPoints(Repository repo, Vector<String> startingPointUrls) {
@@ -49,7 +49,7 @@ public class RepositoryUtility {
         try {
             con = repo.getConnection();
             valueFactory = repo.getValueFactory();
-            RepositoryUtility.dropStartingPoints(con, valueFactory, startingPointUrls);
+            RepositoryOps.dropStartingPoints(con, valueFactory, startingPointUrls);
         }
         catch (RepositoryException e) {
             log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
@@ -833,168 +833,6 @@ public class RepositoryUtility {
     }
 
 
-    public static Method getMethodForFunction(String className,
-                                              String methodName) {
-
-        Method method;
-
-
-        try {
-            Class methodContext = Class.forName(className);
-            log.debug("getMethodForFunction() - Located java class: "
-                    + className);
-
-            try {
-                method = methodContext.getMethod(methodName, List.class, ValueFactory.class);
-
-                if (Modifier.isStatic(method.getModifiers())) {
-                    log.debug("getMethodForFunction() - Located static java method: "
-                                    + getProcessingMethodDescription(method));
-                    return method;
-                }
-
-                /*
-                 * for(Constructor c : methodContext.getConstructors()){
-                 * if(c.getGenericParameterTypes().length==0){
-                 * log.debug("getMethodForFunction() - Located java class
-                 * '"+className+"' with a no element " + "constructor and the
-                 * method "+getProcessingMethodDescription(method)); return
-                 * method; } }
-                 */
-
-            } catch (NoSuchMethodException e) {
-                log.error("getMethodForFunction() - The class '" + className
-                        + "' does not contain a method called '" + methodName
-                        + "'");
-            }
-
-        } catch (ClassNotFoundException e) {
-            log.error("getMethodForFunction() - Unable to locate java class: "
-                    + className);
-        }
-
-        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
-                        + "class: '"
-                        + className
-                        + "'   method: '"
-                        + methodName
-                        + "'");
-        return null;
-
-    }
-
-    public static Method getMethodForFunction(Object classInstance,
-            String methodName) {
-
-        Method method;
-
-        Class methodContext = classInstance.getClass();
-        String className = methodContext.getName();
-
-
-        try {
-            method = methodContext.getMethod(methodName, List.class,
-                    ValueFactory.class);
-            log.debug("getMethodForFunction() - Located the java method: "
-                    + getProcessingMethodDescription(method)
-                    + " in an instance of the class '" + className + "'");
-            return method;
-
-        } catch (NoSuchMethodException e) {
-            log.error("getMethodForFunction() - The class '" + className
-                            + "' does not contain a method called '"
-                            + methodName + "'");
-        }
-
-        log.error("getMethodForFunction() - Unable to locate the requested java class/method combination. "
-                        + "class: '"
-                        + className
-                        + "'   method: '"
-                        + methodName
-                        + "'");
-        return null;
-
-    }
-
-    public static String getProcessingMethodDescription(Method m) {
-
-        String msg = "";
-
-        msg += m.getReturnType().getName() + " ";
-        msg += m.getName();
-
-        String params = "";
-        for (Class c : m.getParameterTypes()) {
-            if (!params.equals(""))
-                params += ", ";
-            params += c.getName();
-        }
-        msg += "(" + params + ")";
-
-        String exceptions = "";
-        for (Class c : m.getExceptionTypes()) {
-            if (!exceptions.equals(""))
-                exceptions += ", ";
-            exceptions += c.getName();
-        }
-        msg += " " + exceptions + ";";
-
-        return msg;
-
-    }
-
-    /***************************************************************************
-     * processing xs:string
-     *
-     * @param graphResult
-     * @param creatValue
-     * @param Added
-     * @param toAdd
-     * @param con
-     * @param context
-     * @throws org.openrdf.query.QueryEvaluationException
-     * @throws org.openrdf.repository.RepositoryException
-     */
-
-    public static void process_xsString(GraphQueryResult graphResult,
-            ValueFactory creatValue, Vector<Statement> Added,
-            Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
-            RepositoryException {
-
-        // pproces1 = (\"[^"]+\")\s+\.
-        String pproces1 = "(\\\"[^\"]+\\\")\\s+\\.";
-        // Create a Pattern object
-        Pattern rproces1 = Pattern.compile(pproces1);
-        // Now create matcher object.
-        while (graphResult.hasNext()) {
-            Statement st = graphResult.next();
-
-            Value obj = st.getObject();
-            URI prd = st.getPredicate();
-            Resource sbj = st.getSubject();
-            String statementStr = obj.toString();
-            Matcher m = rproces1.matcher(statementStr);
-            if (m.find()) {
-                String vname = m.group(1);
-                String replaceStr = vname
-                        + "^^<http://www.w3.org/2001/XMLSchema#string> .";
-                statementStr = m.replaceAll(replaceStr);
-                // log.debug("postprocess1 statementStr=" +statementStr);
-                // log.debug("vnam=" +vname);
-            }
-            Value stStr = creatValue.createLiteral(statementStr);
-            Statement stToAdd = new StatementImpl(sbj, prd, stStr);
-
-            toAdd.add(stToAdd);
-            Added.add(stToAdd);
-            con.add(stToAdd, context); // add process_xsString created st
-
-        }
-        // log.debug("After processing xs:string:\n " +
-        // opendap.coreServlet.Util.getMemoryReport());
-    }
-
     /**
      * Insert a statement declaring the content type of the document.
      *
@@ -1059,5 +897,454 @@ public class RepositoryUtility {
 
         }
 
+    }
+
+    /**
+     * @param repository        The repository on which to operate.
+     * @param startingPointUrls The list pof starting point URLs from the configuration file (aka "THE starting point")
+     * @return Returns true if the update results in changes to the repository.
+     * @throws InterruptedException If the thread of execution is interrupted.
+     * @throws org.openrdf.repository.RepositoryException  When there are problems working with the repository.
+     */
+    public static boolean updateSemanticRepository(Repository repository, Vector<String> startingPointUrls, Vector<String> doNotImportTheseUrls, String resourceDir)
+            throws InterruptedException, RepositoryException {
+
+
+        Vector<String> dropList = new Vector<String>();
+        Vector<String> newStartingPoints = new Vector<String>();
+        Vector<String> startingPointsToDrop = null;
+        boolean repositoryHasBeenChanged = false;
+
+        RdfImporter rdfImporter = new RdfImporter(resourceDir);
+
+
+        Date startTime = new Date();
+        log.info("-----------------------------------------------------------------------");
+        log.info("updateSemanticRepository() Start.");
+        log.debug(showContexts(repository));
+        RepositoryConnection con = null;
+        try {
+
+
+
+            try {
+                con = repository.getConnection();
+                if (con.isOpen()) {
+                    log.info("Connection is OPEN!");
+
+
+                    newStartingPoints = findNewStartingPoints(con, startingPointUrls);
+
+                    dropList.addAll(findUnneededRDFDocuments(con));
+                    startingPointsToDrop = findChangedStartingPoints(con, startingPointUrls);
+                    dropList.addAll(startingPointsToDrop);
+                    dropList.addAll(findChangedRDFDocuments(con));
+                }
+            } catch (RepositoryException e) {
+                log.error("Caught RepositoryException updateSemanticRepository(Vector<String> startingPointUrls)" +
+                        e.getMessage());
+            } finally {
+                if (con != null)
+                    con.close();
+                log.info("Connection is Closed!");
+            }
+
+            log.debug(showContexts(repository));
+
+
+            boolean modelChanged = false;
+
+
+            if (!dropList.isEmpty()) {
+
+
+                if(flushRepositoryOnDrop){
+                    log.warn("Repository content has been changed! Flushing Repository!");
+
+                    clearRepository(repository);
+
+
+                    String filename =  "PostRepositoryClear.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    dumpRepository(repository, filename);
+
+
+                    newStartingPoints = findNewStartingPoints(repository, startingPointUrls);
+
+
+                }
+                else {
+
+                    log.debug("Add external inferencing contexts to dropList");
+                    dropList.addAll(findExternalInferencingContexts(repository));
+
+                    String filename =  "PriorToDropStartingPointsRepository.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    dumpRepository(repository, filename);
+
+                    log.debug("Dropping starting points ...");
+                    dropStartingPoints(repository, startingPointsToDrop);
+                    log.debug("Finished dropping starting points.");
+
+                    filename =  "PostDropStartingPointsRepository.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    dumpRepository(repository, filename);
+
+                    log.debug(showContexts(repository));
+
+                    log.debug("Dropping contexts.");
+                    dropContexts(repository, dropList);
+                    log.debug(showContexts(repository));
+
+                    filename =  "PostDropContextsRepository.trig";
+                    log.debug("Dumping Semantic Repository to: " + filename);
+                    dumpRepository(repository, filename);
+
+                }
+                
+                modelChanged = true;
+
+            }
+
+
+            if (!newStartingPoints.isEmpty()) {
+
+                log.debug("Adding new starting points ...");
+                addStartingPoints(repository, newStartingPoints);
+                log.debug("Finished adding new starting points.");
+
+                log.debug(showContexts(repository));
+                modelChanged = true;
+
+            }
+
+            log.debug("Checking for referenced documents that are not already in the repository.");
+            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
+            if(foundNewDocuments){
+                modelChanged = true;
+            }
+
+            if (modelChanged) {
+
+                log.debug("Updating repository ...");
+                ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
+
+                while (modelChanged) {
+                    log.debug("Repository changes detected.");
+                    log.debug(showContexts(repository));
+
+                    log.debug("Running construct rules ...");
+                    constructRuleEvaluator.runConstruct(repository);
+                    log.debug("Finished running construct rules.");
+                    log.debug(showContexts(repository));
+                    modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
+                }
+
+
+                repositoryHasBeenChanged = true;
+
+            } else {
+                log.debug("Repository update complete. No changes detected, rules not rerun..");
+                log.debug(showContexts(repository));
+
+            }
+
+
+        } catch (RepositoryException e) {
+            log.error("Caught RepositoryException in main(): "
+                    + e.getMessage());
+
+        }
+
+
+        long elapsedTime = new Date().getTime() - startTime.getTime();
+        log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
+
+        log.info("updateSemanticRepository() End.");
+        log.info("-----------------------------------------------------------------------");
+
+
+        return repositoryHasBeenChanged;
+    }
+
+    public static void dropContexts(Repository repository, Vector<String> dropList) {
+        RepositoryConnection con = null;
+
+        log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
+
+        try {
+            con = repository.getConnection();
+
+            Thread thread = Thread.currentThread();
+
+            log.info("Deleting contexts in drop list ...");
+            ValueFactory valueFactory = repository.getValueFactory();
+
+            for (String drop : dropList) {
+                log.info("Dropping context URI: " + drop);
+                URI contextToDrop = valueFactory.createURI(drop);
+                URI lastModifiedContext = valueFactory.createURI(Terms.lastModifiedContextUri);
+                URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
+
+                log.info("Removing context: " + contextToDrop);
+                con.clear(contextToDrop);
+
+                log.info("Removing last_modified: " + contextToDrop);
+                con.remove(contextToDrop, null, null, cacheContext); // remove last_modified
+
+                log.info("Finished removing context: " + contextToDrop);
+
+            }
+            if (thread.isInterrupted()) {
+                log.warn("dropContexts(): WARNING! Thread "
+                        + thread.getName() + " was interrupted!");
+                return;
+            }
+
+        } catch (RepositoryException e) {
+            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (con != null)
+                    con.close();
+            } catch (RepositoryException e) {
+                log.error("Caught RepositoryException! while closing connection: "
+                        + e.getMessage());
+            }
+        }
+        log.debug("Finished dropping changed RDFDocuments and external inferencing contexts.");
+
+    }
+
+    /**
+     * Locate all of the of the contexts generated by externbal inferencing (construct rule) activities.
+     *
+     * @param repository The repository to operate on.
+     * @return A lists of contexts that were generated by construct rules (i.e. external inferencing)
+     */
+    static Vector<String> findExternalInferencingContexts(Repository repository) {
+        RepositoryConnection con = null;
+        TupleQueryResult result = null;
+
+        //List<String> bindingNames;
+        Vector<String> externalInferencing = new Vector<String>();
+
+        log.debug("Finding ExternalInferencing ...");
+
+        try {
+            con = repository.getConnection();
+
+            String queryString = "select distinct crule from context crule {} prop {} "
+                    + "WHERE crule != rdfcache:"+Terms.cacheContext+" "
+                    + "AND crule != rdfcache:"+Terms.startingPointsContext+" "
+                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
+                    + "{crule} rdfcache:"+Terms.lastModifiedContext+" {time}) "
+                    + "using namespace "
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
+
+            log.debug("queryString: " + queryString);
+
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+
+            result = tupleQuery.evaluate();
+
+            if (result != null) {
+                //bindingNames = result.getBindingNames();
+
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    Value firstValue = bindingSet.getValue("crule");
+                    if (!externalInferencing.contains(firstValue.stringValue())) {
+                        externalInferencing.add(firstValue.stringValue());
+                        log.debug("Adding to external inferencing list: " + firstValue.toString());
+                    }
+                }
+            } else {
+                log.debug("No construct rule found!");
+            }
+        } catch (QueryEvaluationException e) {
+            log.error("Caught an QueryEvaluationException! Msg: "
+                    + e.getMessage());
+
+        } catch (RepositoryException e) {
+            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+        }
+
+        finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (QueryEvaluationException e) {
+                    log.error("Caught a QueryEvaluationException! Msg: "
+                            + e.getMessage());
+                }
+            }
+            try {
+                con.close();
+            } catch (RepositoryException e) {
+                log
+                        .error("Caught RepositoryException! in dropExternalInferencing() Msg: "
+                                + e.getMessage());
+            }
+
+        }
+
+        log.info("Located "
+                + externalInferencing.size() + " context generated by external inferencing (construct rules).");
+
+
+        return externalInferencing;
+
+    }
+
+    static Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
+        TupleQueryResult result = null;
+        //List<String> bindingNames;
+        Vector<String> unneededRdfDocs = new Vector<String>();
+
+
+        log.debug("Locating unneeded RDF files left over from last update ...");
+
+        try {
+
+            String queryString = "(SELECT doc "
+                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
+                    + "{doc} rdfcache:"+Terms.lastModifiedContext+" {lmt} "
+                    //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
+                    + "MINUS "
+                    + "SELECT doc "
+                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"}) "
+                    + "MINUS "
+                    + "SELECT doc "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOnContext+" {doc} "
+                    + "USING NAMESPACE "
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
+
+            log.debug("queryUnneededRDFDocuments: " + queryString);
+
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+
+            result = tupleQuery.evaluate();
+
+            if (result != null) {
+                //bindingNames = result.getBindingNames();
+
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    Value firstValue = bindingSet.getValue("doc");
+                    if (!unneededRdfDocs.contains(firstValue.stringValue())) {
+                        unneededRdfDocs.add(firstValue.stringValue());
+
+                        log.debug("Found unneeded RDF Document: "
+                                + firstValue.toString());
+                    }
+                }
+            } else {
+                log.debug("No query result!");
+            }
+        } catch (QueryEvaluationException e) {
+            log.error("Caught an QueryEvaluationException! Msg: "
+                    + e.getMessage());
+
+        } catch (RepositoryException e) {
+            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+        }
+
+        finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (QueryEvaluationException e) {
+                    log.error("Caught a QueryEvaluationException! Msg: "
+                            + e.getMessage());
+                }
+            }
+
+        }
+
+        log.info("Identified " + unneededRdfDocs.size() + " unneeded RDF documents.");
+        return unneededRdfDocs;
+
+    }
+
+    static Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
+        TupleQueryResult result = null;
+        //List<String> bindingNames;
+        Vector<String> changedRdfDocuments = new Vector<String>();
+
+        log.debug("Locating changeded files ...");
+
+        try {
+            String queryString = "SELECT doc,lastmod "
+                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
+                    + "{doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
+                    + "USING NAMESPACE "
+                    + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
+
+            log.debug("queryChangedRDFDocuments: " + queryString);
+
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+
+            result = tupleQuery.evaluate();
+
+            if (result != null) {
+                //bindingNames = result.getBindingNames();
+
+                while (result.hasNext()) {
+                    BindingSet bindingSet = result.next();
+
+                    Value firstValue = bindingSet.getValue("doc");
+                    String importURL = firstValue.stringValue();
+                    // Value secondtValue = bindingSet.getValue("lastmod");
+                    // log.debug("DOC: " + importURL);
+                    // log.debug("LASTMOD: " + secondtValue.stringValue());
+
+                    if (olderContext(con, importURL) && !changedRdfDocuments.contains(importURL)) {
+
+                        changedRdfDocuments.add(importURL);
+
+                        log.debug("Found changed RDF document: " + importURL);
+
+                    }
+                }
+            } else {
+                log.debug("No query result!");
+            }
+        } catch (QueryEvaluationException e) {
+            log.error("Caught an QueryEvaluationException! Msg: "
+                    + e.getMessage());
+
+        } catch (RepositoryException e) {
+            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+        }
+
+        finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (QueryEvaluationException e) {
+                    log.error("Caught a QueryEvaluationException! Msg: "
+                            + e.getMessage());
+                }
+            }
+
+        }
+
+        log.info("Number of changed RDF documents detected:  "
+                + changedRdfDocuments.size());
+
+        return changedRdfDocuments;
     }
 }

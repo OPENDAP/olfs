@@ -7,15 +7,12 @@ import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.sail.Sail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +26,7 @@ import java.util.regex.Pattern;
 public class ConstructRuleEvaluator {
 
     private  Logger log;
+
 
     public static enum ProcessingTypes {
         NONE, xsString, DropQuotes, RetypeTo, Increment, Function
@@ -133,7 +131,7 @@ public class ConstructRuleEvaluator {
                         switch (postProcessFlag) {
 
                         case xsString:
-                            RepositoryUtility.process_xsString(graphResult, creatValue, Added,
+                            process_xsString(graphResult, creatValue, Added,
                                     toAdd, con, context);
                             //log.debug("After processing xs:string:\n "
                             //        + opendap.coreServlet.Util
@@ -455,7 +453,7 @@ public class ConstructRuleEvaluator {
                 log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
                 log.debug("class_name = " + rdfClassName); // class name of the function
 
-                Method myFunction = RepositoryUtility.getMethodForFunction(rdfClassName, rdfFunctionName);
+                Method myFunction = IntrospectionUtil.getMethodForFunction(rdfClassName, rdfFunctionName);
 
                 if (myFunction != null) {
                     postProcessFlag = ProcessingTypes.Function;
@@ -565,6 +563,60 @@ public class ConstructRuleEvaluator {
         // opendap.coreServlet.Util.getMemoryReport());
 
     }
+
+
+    /***************************************************************************
+     * processing xs:string
+     *
+     * @param graphResult
+     * @param creatValue
+     * @param Added
+     * @param toAdd
+     * @param con
+     * @param context
+     * @throws org.openrdf.query.QueryEvaluationException
+     * @throws org.openrdf.repository.RepositoryException
+     */
+
+    public static void process_xsString(GraphQueryResult graphResult,
+            ValueFactory creatValue, Vector<Statement> Added,
+            Vector<Statement> toAdd, RepositoryConnection con,
+            Resource[] context) throws QueryEvaluationException,
+            RepositoryException {
+
+        // pproces1 = (\"[^"]+\")\s+\.
+        String pproces1 = "(\\\"[^\"]+\\\")\\s+\\.";
+        // Create a Pattern object
+        Pattern rproces1 = Pattern.compile(pproces1);
+        // Now create matcher object.
+        while (graphResult.hasNext()) {
+            Statement st = graphResult.next();
+
+            Value obj = st.getObject();
+            URI prd = st.getPredicate();
+            Resource sbj = st.getSubject();
+            String statementStr = obj.toString();
+            Matcher m = rproces1.matcher(statementStr);
+            if (m.find()) {
+                String vname = m.group(1);
+                String replaceStr = vname
+                        + "^^<http://www.w3.org/2001/XMLSchema#string> .";
+                statementStr = m.replaceAll(replaceStr);
+                // log.debug("postprocess1 statementStr=" +statementStr);
+                // log.debug("vnam=" +vname);
+            }
+            Value stStr = creatValue.createLiteral(statementStr);
+            Statement stToAdd = new StatementImpl(sbj, prd, stStr);
+
+            toAdd.add(stToAdd);
+            Added.add(stToAdd);
+            con.add(stToAdd, context); // add process_xsString created st
+
+        }
+        // log.debug("After processing xs:string:\n " +
+        // opendap.coreServlet.Util.getMemoryReport());
+    }
+
 
     /***************************************************************************
      * cast type
@@ -808,7 +860,7 @@ public class ConstructRuleEvaluator {
                     className = functionImport.substring("import:".length(), indexOfLastPoundSign);
                     fnName = functionImport.substring(indexOfLastPoundSign + 1);
 
-                    func = RepositoryUtility.getMethodForFunction(className, fnName);
+                    func = IntrospectionUtil.getMethodForFunction(className, fnName);
 
                 }
                 Boolean isEndList = endList.equals(obj);

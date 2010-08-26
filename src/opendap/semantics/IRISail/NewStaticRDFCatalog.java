@@ -4,13 +4,11 @@ import opendap.logging.LogUtil;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
-import org.openrdf.repository.sail.SailRepository;
 import org.slf4j.Logger;
 
 
@@ -77,6 +75,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private boolean overrideBackgroundUpdates;
     private HashMap<String, Vector<String>> coverageIDServer;
 
+    private Vector<String> doNotImportTheseUrls;
+
 
     private boolean initialized;
 
@@ -107,6 +107,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         catalogCacheDirectory = ".";
         owlim_storage_folder = "owlim-storage";
         resourcePath = ".";
+
+        doNotImportTheseUrls = new Vector<String>();
 
         initialized = false;
 
@@ -197,28 +199,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catalogUpdateThread = new Thread(this);
             catalogUpdateThread.start();
         } else {
-            updateCatalog();
+            update();
         }
 
         initialized = true;
     }
-
-
-
-
-    public void update(){
-
-        try {
-
-            updateCatalog();
-        }
-        catch(Exception e){
-            log.error("update(): FAILED!!! Caught "+e.getClass().getName()+"   Message: "+e.getMessage());
-        }
-    }
     
 
-    public void updateCatalog() throws RepositoryException, InterruptedException, IOException, JDOMException {
+    public void update() throws RepositoryException, InterruptedException, IOException, JDOMException {
 
         Repository repository = setupRepository();
         try {
@@ -226,7 +214,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             Vector<String> startingPoints = getRdfImports(_configFile);
 
             log.info("updateCatalog(): Updating Repository...");
-            Vector<String> doNotImportTheseUrls = null;
             if (updateRepository(repository, startingPoints, doNotImportTheseUrls)) {
                 log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
                 extractCoverageDescrptionsFromRepository(repository);
@@ -250,15 +237,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     public boolean updateRepository(Repository repository, Vector<String> startingPoints, Vector<String> doNotImportTheseUrls) throws RepositoryException, InterruptedException {
 
-        boolean repositoryChanged = RdfPersistence.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
+        boolean repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
 
         String filename = catalogCacheDirectory + "owlimHorstRepository.nt";
         log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-        RepositoryUtility.dumpRepository(repository, filename);
+        RepositoryOps.dumpRepository(repository, filename);
 
         filename = catalogCacheDirectory + "owlimHorstRepository.trig";
         log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-        RepositoryUtility.dumpRepository(repository, filename);
+        RepositoryOps.dumpRepository(repository, filename);
 
 
         return repositoryChanged;
@@ -655,7 +642,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         try {
             con = repository.getConnection();
-            lmtfc = RepositoryUtility.getLastModifiedTimesForContexts(con);
+            lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
 
             for (Element cde : coverageDescriptions) {
 
@@ -1157,7 +1144,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
          RepositoryConnection con = owlse2.getConnection();
          String filename = catalogCacheDirectory + "daprepository.nt";
          log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
-         RepositoryUtility.dumpRepository(con, filename);
+         RepositoryOps.dumpRepository(con, filename);
          if(thread.isInterrupted() || stopWorking){
              log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
              throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
@@ -1167,7 +1154,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
          //Dump repository to disk as Triples with their contexts.
          log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
          filename = catalogCacheDirectory + "daprepository.trig";
-         RepositoryUtility.dumpRepository(con, filename);
+         RepositoryOps.dumpRepository(con, filename);
          if(thread.isInterrupted() || stopWorking){
              log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
@@ -1232,7 +1219,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                     startTime = new Date().getTime();
                     try {
-                        updateCatalog();
+                        update();
                     } catch (Exception e) {
                         log.error("Catalog Update FAILED!!! Caught "+e.getClass().getName()+"  Message: " + e.getMessage());
                     }
