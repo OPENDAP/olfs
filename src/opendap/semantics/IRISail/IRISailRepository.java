@@ -35,11 +35,7 @@ public class IRISailRepository extends SailRepository {
 
     public void initialize() throws org.openrdf.repository.RepositoryException {
         super.initialize();
-        setRepositoryDown(false);
-    }
-
-    private void setRepositoryDown(Boolean repositoryState) {
-        isRepositoryDown.set(repositoryState);
+        isRepositoryDown.set(false);
     }
 
     public Boolean isRepositoryDown() {
@@ -55,9 +51,9 @@ public class IRISailRepository extends SailRepository {
     public void shutDown() throws RepositoryException {
 
         log.debug("shutDown(): Shutting down Repository...");
-        if (!isRepositoryDown()) {
+        if (!isRepositoryDown.get()) {
             super.shutDown();
-            setRepositoryDown(true);
+            isRepositoryDown.set(false);
             log.info("shutDown(): Semantic Repository Has Been Shutdown.");
         } else {
             log.info("shutDown(): Semantic Repository was already down.");
