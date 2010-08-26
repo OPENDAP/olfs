@@ -2,11 +2,10 @@ package opendap.metacat;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -33,13 +32,13 @@ public class URLClassifier {
 
 	public URLClassifier(String cacheName) throws Exception {
 		ddxSource = new DDXRetriever(true, cacheName);
-		groups = new LinkedList<URLGroup>();
+		groups = new ArrayList<URLGroup>();
 	}
 
 	public static void main(String args[]) {
-		URLClassifier c;
+		URLClassifier classifier;
 		try {
-			c = new URLClassifier(args[0]);
+			classifier = new URLClassifier(args[0]);
 		}
 		catch (Exception e) {
 			System.err.println("Could not initialize ddx retriever: " + e.getLocalizedMessage());
@@ -60,17 +59,17 @@ public class URLClassifier {
 		ps.println("Starting classification: " + (new Date()).toString());
 		
 		try {
-			int numberOfUrls = c.assignUrlsToInitialGroups();
+			int numberOfUrls = classifier.assignUrlsToInitialGroups();
 			
 			ps.println("Completed pass 1: " + (new Date()).toString());
 			
-			c.lookForDates();
+			classifier.lookForDates();
 			
 			ps.println("Completed pass 2: " + (new Date()).toString());
 			
 			ps.println("Number of URLs processed: " + new Integer(numberOfUrls).toString());
-			c.printClassifications(ps);
-			c.printCompleteClassifications(ps);
+			classifier.printClassifications(ps);
+			classifier.printCompleteClassifications(ps);
 			
 			
 		} 
@@ -226,7 +225,7 @@ public class URLClassifier {
 	}
 	*/
 	
-	private void printClassifications(PrintStream ps, boolean print_all_urls, boolean print_urls, boolean print_histogram) {
+	private void printClassifications(PrintStream ps, boolean print_urls, boolean print_all_urls, boolean print_histogram) {
 		Integer i = 0;
 		for(URLGroup group: groups) {
 			ps.print(i.toString() + ": ");
@@ -289,8 +288,8 @@ public class URLClassifier {
 					else {
 						ParsedURL first = urls.get(0);
 						ParsedURL last = urls.get(urls.size() - 1);
-						ps.println("\t" + date.getParsedURL(first.getDate()).getTheURL());
-						ps.println("\t" + date.getParsedURL(last.getDate()).getTheURL());
+						ps.println("\t" + first.getTheURL());
+						ps.println("\t" + last.getTheURL());
 					}
 				}
 				ps.println();
@@ -299,11 +298,10 @@ public class URLClassifier {
 	}
 
 	public void printClassifications(PrintStream ps) {
-		printClassifications(ps, false, false);
+		printClassifications(ps, false, false, false);
 	}
 
 	public void printCompleteClassifications(PrintStream ps) {
-		printClassifications(ps, true, true);
+		printClassifications(ps, true, false, true);
 	}
-
 }

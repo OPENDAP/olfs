@@ -40,7 +40,7 @@ public class ParsedURL {
 
 	/**
 	 * A URL is parsed by first removing the protocol and '://' parts, then the
-	 * machne part. What remains is the path, where '/' separates the components
+	 * machine part. What remains is the path, where '/' separates the components
 	 * until the leaf (file) is found. Within the file we consider any
 	 * non-alphanum to be a separator.
 	 * 
@@ -124,7 +124,7 @@ public class ParsedURL {
 	
 	/**
 	 * Concatenate two arrays of the same type and return the result in an 
-	 * array. Requries Java 6
+	 * array. Requires Java 6
 	 * 
 	 * @param <T>
 	 * @param first The first array
