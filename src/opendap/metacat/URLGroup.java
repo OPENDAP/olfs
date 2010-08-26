@@ -1,10 +1,8 @@
 package opendap.metacat;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import opendap.metacat.URLProcessedComponents.Lexemes;
@@ -39,6 +37,14 @@ public class URLGroup {
 		@Override
 		public Iterator<ParsedURL> iterator() {
 			return i;
+		}
+
+		public ParsedURL get(int j) {
+			return urls.get(j);
+		}
+
+		public int size() {
+			return urls.size();
 		}
 	}
 	
@@ -101,12 +107,9 @@ public class URLGroup {
 		// First record the URL as being part of the Group
 		urls.add(url);
 		
-		// Increment equivalence class counts
+		// Increment equivalence class counts and add this URL to all 
+		// appropriate equivalences.
 		for (Equivalence e: equivalences) {
-			// Because the ParsedURL has both the full and parsed components of
-			// the URL and because the Equivalence already knows whch part of
-			// the URL it is associated with, we can pass only the ParsedURL
-			// object.
 			e.add(url);
 		}
 	}

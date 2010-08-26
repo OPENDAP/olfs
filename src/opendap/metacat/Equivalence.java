@@ -171,6 +171,15 @@ public class Equivalence {
 		public Iterator<DateString> iterator() {
 			return sortedKeysIter;
 		}
+		
+		public DateString get(int index) {
+			return sortedKeys.get(index);
+		}
+		
+		public int size() {
+			return sortedKeys.size();
+		}
+
 	}
 	
 	public SortedValues getSortedValues() {

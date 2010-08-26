@@ -226,7 +226,7 @@ public class URLClassifier {
 	}
 	*/
 	
-	private void printClassifications(PrintStream ps, boolean print_all_data, boolean print_histogram) {
+	private void printClassifications(PrintStream ps, boolean print_all_urls, boolean print_urls, boolean print_histogram) {
 		Integer i = 0;
 		for(URLGroup group: groups) {
 			ps.print(i.toString() + ": ");
@@ -251,15 +251,8 @@ public class URLClassifier {
 
 				ps.println();
 			}
-			/*
-			if (print_all_data) {
-				URLs urls = group.getURLs();
-				for (ParsedURL u: urls)
-					ps.println("\t" + u.getTheURL());
-				ps.println();
-			}
-			*/
-			if (print_all_data) {
+
+			if (print_urls) {
 				// Find the Equivalence with the most date parts; then sort and
 				// print
 				Equivalences equivs = group.getEquivalences();
@@ -275,20 +268,32 @@ public class URLClassifier {
 				// Either print the sorted URLs or just print them
 				if (date != null) {
 					SortedValues sc = date.getSortedValues();
-					for (DateString comp : sc) {
-						log.debug("DateString: " + comp.getDate());
-						ParsedURL p = date.getParsedURL(comp.getDate());
-						log.debug("ParsedURL: " + p);
-						ps.println("\t" + date.getParsedURL(comp.getDate()).getTheURL());
+					if (print_all_urls) {
+						for (DateString comp : sc) {
+							ps.println("\t" + date.getParsedURL(comp.getDate()).getTheURL());
+						}
+					} 
+					else { // Just print the first and last URL
+						DateString first = sc.get(0);
+						DateString last = sc.get(sc.size() - 1);
+						ps.println("\t" + date.getParsedURL(first.getDate()).getTheURL());
+						ps.println("\t" + date.getParsedURL(last.getDate()).getTheURL());
 					}
-					ps.println();
-				}
+				}				
 				else {
 					URLs urls = group.getURLs();
-					for (ParsedURL u: urls)
-						ps.println("\t" + u.getTheURL());
-					ps.println();
+					if (print_all_urls) {
+						for (ParsedURL u : urls)
+							ps.println("\t" + u.getTheURL());
+					}					
+					else {
+						ParsedURL first = urls.get(0);
+						ParsedURL last = urls.get(urls.size() - 1);
+						ps.println("\t" + date.getParsedURL(first.getDate()).getTheURL());
+						ps.println("\t" + date.getParsedURL(last.getDate()).getTheURL());
+					}
 				}
+				ps.println();
 			}
 		}
 	}
