@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class ConstructRuleEvaluator {
-    private  Logger log = LoggerFactory.getLogger(IRISailRepository.class);
+
+    private  Logger log;
 
     public static enum ProcessingTypes {
         NONE, xsString, DropQuotes, RetypeTo, Increment, Function

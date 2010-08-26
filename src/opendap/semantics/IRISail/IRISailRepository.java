@@ -33,7 +33,7 @@ public class IRISailRepository extends SailRepository {
     }
 
 
-    public void startup() throws org.openrdf.repository.RepositoryException {
+    public void initialize() throws org.openrdf.repository.RepositoryException {
         super.initialize();
         setRepositoryDown(false);
     }

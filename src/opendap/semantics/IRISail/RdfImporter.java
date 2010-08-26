@@ -6,6 +6,7 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class RdfImporter {
      * @param doNotImportUrls
      * @return
      */
-    public boolean importReferencedRdfDocs(IRISailRepository repository, Vector<String> doNotImportUrls) {
+    public boolean importReferencedRdfDocs(SailRepository repository, Vector<String> doNotImportUrls) {
 
         boolean repositoryChanged = false;
 
@@ -88,7 +89,7 @@ public class RdfImporter {
      * @param repository
      * @param rdfDocs
      */
-    private void findNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs) {
+    private void findNeededRDFDocuments(SailRepository repository, Vector<String> rdfDocs) {
         TupleQueryResult result = null;
         List<String> bindingNames;
         RepositoryConnection con = null;
@@ -170,7 +171,7 @@ public class RdfImporter {
      * @param repository
      * @param rdfDocs
      */
-    private boolean addNeededRDFDocuments(IRISailRepository repository, Vector<String> rdfDocs) {
+    private boolean addNeededRDFDocuments(SailRepository repository, Vector<String> rdfDocs) {
         URI uriaddress;
         long inferStartTime, inferEndTime;
         inferStartTime = new Date().getTime();
@@ -342,7 +343,7 @@ public class RdfImporter {
     }
 
 
-    private void importUrl(IRISailRepository repository, RepositoryConnection con, String importURL, InputStream importIS, String contentType ) throws IOException, RDFParseException, RepositoryException {
+    private void importUrl(SailRepository repository, RepositoryConnection con, String importURL, InputStream importIS, String contentType ) throws IOException, RDFParseException, RepositoryException {
         log.info("Importing URL " + importURL);
         URI uriaddress = new URIImpl(importURL);
         con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);

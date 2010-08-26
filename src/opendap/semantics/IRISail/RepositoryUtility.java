@@ -743,7 +743,7 @@ public class RepositoryUtility {
      * @param repository The repository from which to harvest the contexts and their associated last
      * modified times.
      */
-    public static HashMap<String, String> getLastModifiedTimesForContexts(IRISailRepository repository) {
+    public static HashMap<String, String> getLastModifiedTimesForContexts(SailRepository repository) {
         RepositoryConnection con = null;
 
         try{
@@ -837,7 +837,6 @@ public class RepositoryUtility {
 
         Method method;
 
-        Logger log = LoggerFactory.getLogger(IRISailRepository.class);
 
         try {
             Class methodContext = Class.forName(className);
@@ -891,7 +890,6 @@ public class RepositoryUtility {
         Class methodContext = classInstance.getClass();
         String className = methodContext.getName();
 
-        Logger log = LoggerFactory.getLogger(IRISailRepository.class);
 
         try {
             method = methodContext.getMethod(methodName, List.class,
