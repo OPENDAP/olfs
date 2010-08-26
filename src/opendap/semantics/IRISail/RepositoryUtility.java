@@ -994,4 +994,70 @@ public class RepositoryUtility {
         // log.debug("After processing xs:string:\n " +
         // opendap.coreServlet.Util.getMemoryReport());
     }
+
+    /**
+     * Insert a statement declaring the content type of the document.
+     *
+     * @param importURL
+     * @param contentType
+     * @param con
+     */
+    public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
+
+        URI s = valueFactory.createURI(importURL);
+        URI contentTypeContext = valueFactory.createURI(Terms.contentTypeContextUri);
+        URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
+
+        Literal o = valueFactory.createLiteral(contentType);
+
+        try {
+
+            con.add((Resource) s, contentTypeContext, (Value) o, (Resource) cacheContext);
+
+        } catch (RepositoryException e) {
+            log.error("Caught an RepositoryException! Msg: "
+                    + e.getMessage());
+
+        }
+
+    }
+
+    /**
+     * Set last_modified_time of the URI in the repository.
+     * @param importURL
+     * @param con
+     */
+    public static void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) {
+        String ltmod = getLTMODContext(importURL);
+        setLTMODContext(importURL, ltmod, con, valueFactory);
+    }
+
+    /**
+     *
+     *
+     * @param importURL
+     * @param ltmod
+     * @param con
+     */
+    public  static void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) {
+
+        // log.debug(importURL);
+        // log.debug("lastmodified " + ltmod);
+        URI s = valueFactory.createURI(importURL);
+        URI p = valueFactory.createURI(Terms.lastModifiedContextUri);
+        URI cont = valueFactory.createURI(Terms.cacheContextUri);
+        URI sxd = valueFactory.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
+        Literal o = valueFactory.createLiteral(ltmod, sxd);
+
+        try {
+
+            con.add((Resource) s, p, (Value) o, (Resource) cont);
+
+        } catch (RepositoryException e) {
+            log.error("Caught an RepositoryException! Msg: "
+                    + e.getMessage());
+
+        }
+
+    }
 }

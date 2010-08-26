@@ -7,7 +7,6 @@ import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
@@ -233,7 +232,7 @@ public class RdfImporter {
 
                             if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
 
-                                importUrl(con, importURL, importIS, contentType);
+                                importUrl(con, importURL, contentType, importIS);
 
                                 addedDocument = true;
 
@@ -248,7 +247,7 @@ public class RdfImporter {
 
                                 log.info("Finished transforming URL " + importURL);
 
-                                importUrl(con, importURL, inStream, contentType);
+                                importUrl(con, importURL, contentType, inStream);
 
                                 addedDocument = true;
 
@@ -264,7 +263,7 @@ public class RdfImporter {
 
                                 log.info("Finished transforming RDFa " + importURL);
 
-                                importUrl(con, importURL, inStream, contentType);
+                                importUrl(con, importURL, contentType, inStream);
 
                                 addedDocument = true;
 
@@ -284,7 +283,7 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                    importUrl(con, importURL, importIS, contentType);
+                                    importUrl(con, importURL, contentType, importIS);
                                     log.info("Imported non owl/xsd from " + importURL);
                                     addedDocument = true;
 
@@ -344,93 +343,25 @@ public class RdfImporter {
     }
 
 
-    private void importUrl(RepositoryConnection con, String importURL, InputStream importIS, String contentType ) throws IOException, RDFParseException, RepositoryException {
-        log.info("Importing URL " + importURL);
-        ValueFactory valueFactory = con.getValueFactory();
-        URI uriaddress = new URIImpl(importURL);
-        con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) uriaddress);
-        setLTMODContext(importURL, con, valueFactory); // set last modified
-        // time of the context
-        setContentTypeContext(importURL, contentType, con, valueFactory); //
+    private void importUrl(RepositoryConnection con, String importURL, String contentType, InputStream importIS) throws IOException, RDFParseException, RepositoryException {
 
-        log.info("Finished importing URL " + importURL);
-        imports.add(importURL);
-
-    }
-
-    
-
-
-    /**
-     * Insert a statement declaring the content type of the document.
-     *
-     * @param importURL
-     * @param contentType
-     * @param con
-     */
-    public void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
         if (!this.imports.contains(importURL)) { // not in the repository yet
 
-            URI s = valueFactory.createURI(importURL);
-            URI contentTypeContext = valueFactory.createURI(Terms.contentTypeContextUri);
-            URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
+            log.info("Importing URL " + importURL);
 
-            Literal o = valueFactory.createLiteral(contentType);
+            ValueFactory valueFactory = con.getValueFactory();
+            URI importUri = new URIImpl(importURL);
 
-            try {
 
-                con.add((Resource) s, contentTypeContext, (Value) o, (Resource) cacheContext);
+            con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) importUri);
+            RepositoryUtility.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
+            RepositoryUtility.setContentTypeContext(importURL, contentType, con, valueFactory); //
 
-            } catch (RepositoryException e) {
-                log.error("Caught an RepositoryException! Msg: "
-                        + e.getMessage());
-
-            }
-
+            log.info("Finished importing URL " + importURL);
+            imports.add(importURL);
         }
-    }
-
-
-
-    /**
-     * Set last_modified_time of the URI in the repository.
-     * @param importURL
-     * @param con
-     */
-    public void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) {
-        String ltmod = RepositoryUtility.getLTMODContext(importURL);
-        setLTMODContext(importURL, ltmod, con, valueFactory);
-    }
-
-
-    /**
-     *
-     *
-     * @param importURL
-     * @param ltmod
-     * @param con
-     */
-    public void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) {
-
-        if (!imports.contains(importURL)) { // not in the repository yet
-            // log.debug(importURL);
-            // log.debug("lastmodified " + ltmod);
-            URI s = valueFactory.createURI(importURL);
-            URI p = valueFactory.createURI(Terms.lastModifiedContextUri);
-            URI cont = valueFactory.createURI(Terms.cacheContextUri);
-            URI sxd = valueFactory.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
-            Literal o = valueFactory.createLiteral(ltmod, sxd);
-
-            try {
-
-                con.add((Resource) s, p, (Value) o, (Resource) cont);
-
-            } catch (RepositoryException e) {
-                log.error("Caught an RepositoryException! Msg: "
-                        + e.getMessage());
-
-            }
-
+        else {
+            log.error("Import URL '"+importURL+"' already has been imported! SKIPPING!");
         }
     }
 
