@@ -444,44 +444,48 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     private void extractCoverageDescrptionsFromRepository(SailRepository repository) throws RepositoryException {
-        RepositoryConnection con = repository.getConnection();
-        log.info("Repository connection has been opened.");
+        RepositoryConnection con = null;
 
-        extractCoverageDescrptionsFromRepository(con);
+        try {
+            con = repository.getConnection();
+            log.info("Repository connection has been opened.");
 
-        log.info("Closing repository connection.");
-        con.close();  //close connection first
+            extractCoverageDescrptionsFromRepository(con);
+
+        }
+        finally {
+            if(con!=null){
+                try {
+                    log.info("Closing repository connection.");
+                    con.close();
+                }
+                catch (Exception e){
+                    log.error("Caught "+e.getClass().getName()+" Message: "+e.getMessage());
+                }
+            }
+        }
 
     }
 
 
     private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) {
-        //retrieve XML from the RDF store.
-        log.info("extractCoverageDescrptionsFromRepository() - Extracting CoverageDescriptions from repository.");
-        log.info("extractCoverageDescrptionsFromRepository() - Building CoverageDescription XML from repository.");
-        buildDoc = new XMLfromRDF(con, "CoverageDescriptions", "http://www.opengis.net/wcs/1.1#CoverageDescription");
-        buildDoc.getXMLfromRDF("http://www.opengis.net/wcs/1.1#CoverageDescription"); //build a JDOM doc by querying against the RDF store
-
-        // Next we update the  cached maps  of datasetUrl/serverIDs and datasetUrl/wcsID
-        // held in the CoverageIDGenerator so that subsequent calls to the CoverageIdGenerator
-        // create new IDs correctly.
 
         try {
+            //retrieve XML from the RDF store.
+            log.info("extractCoverageDescrptionsFromRepository() - Extracting CoverageDescriptions from repository.");
+            log.info("extractCoverageDescrptionsFromRepository() - Building CoverageDescription XML from repository.");
+            buildDoc = new XMLfromRDF(con, "CoverageDescriptions", "http://www.opengis.net/wcs/1.1#CoverageDescription");
+            buildDoc.getXMLfromRDF("http://www.opengis.net/wcs/1.1#CoverageDescription"); //build a JDOM doc by querying against the RDF store
+
+            // Next we update the  cached maps  of datasetUrl/serverIDs and datasetUrl/wcsID
+            // held in the CoverageIDGenerator so that subsequent calls to the CoverageIdGenerator
+            // create new IDs correctly.
             log.info("extractCoverageDescrptionsFromRepository() - Updating CoverageIdGenerator Id Caches.");
             HashMap<String, Vector<String>> coverageIdToServerMap = getCoverageIDServerURL(con);
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
-        } catch (RepositoryException e) {
-            log.error("extractCoverageDescrptionsFromRepository(): Caught RepositoryException. msg: "
-                    + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("extractCoverageDescrptionsFromRepository(): Caught MalformedQueryException. msg: "
-                    + e.getMessage());
-        } catch (QueryEvaluationException e) {
-
-            log.error("extractCoverageDescrptionsFromRepository(): Caught QueryEvaluationException. msg: "
-                    + e.getMessage());
+        } catch (Exception e) {
+            log.error("extractCoverageDescrptionsFromRepository():  Caught "+e.getClass().getName()+" Message: "+e.getMessage());
         }
-
 
     }
 
