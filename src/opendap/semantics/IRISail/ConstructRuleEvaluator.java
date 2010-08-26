@@ -495,58 +495,6 @@ public class ConstructRuleEvaluator {
 
 
             }
-            /***
-            while (functionMatcher.find()) {
-
-                String rdfFunctionName = functionMatcher.group(3);
-                String rdfClassName = functionMatcher.group(5);
-
-
-                fullyQualifiedFunctionName = rdfClassName + "#" + rdfFunctionName;
-
-                log.debug("fullyQualifiedFunctionName = " + fullyQualifiedFunctionName); // full name of the function
-                log.debug("class_name = " + rdfClassName); // class name of the function
-
-                Method myFunction = getMethodForFunction(rdfClassName, rdfFunctionName);
-
-                if (myFunction != null) {
-                    postProcessFlag = ProcessingTypes.Function;
-                }
-
-                //String[] splittedStr = comma.split(functionMatcher.group(4));
-                CSVSplitter splitter = new CSVSplitter();
-                String[] splittedStr = splitter.split(functionMatcher.group(4));
-
-                int i = 0;
-                String fn = functionMatcher.group(2);
-                String functionName = functionMatcher.group(3);
-
-                expand += "}  <"+RepositoryUtility.functionsContextUri+"> {" + fn + ":" + functionName
-                        + "} ; <"+RepositoryUtility.listContextUri+"> {} rdf:first {";
-                for (String element : splittedStr) {
-                    i++;
-                    if (i < splittedStr.length) {
-                        if(!element.equals(",")){
-                        expand += element + "} ; rdf:rest {} rdf:first {";
-                        }else{
-                            expand += element;
-                        }
-                        log.info("element " + i + " = " + element);
-                    } else {
-                        expand += element + "} ; rdf:rest {rdf:nil";
-                        log.info("element " + i + " = " + element);
-                    }
-                    log.info("Will postprocess fn:" + functionMatcher.group(3));
-                }
-
-
-
-                processedQueryString = processedQueryString.substring(0, functionMatcher.start(1)) + expand + processedQueryString.substring(functionMatcher.end(1));
-
-                functionMatcher.reset(processedQueryString);
-
-
-            }*/
 
         }
 
