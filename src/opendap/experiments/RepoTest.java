@@ -5,6 +5,7 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
@@ -65,7 +66,7 @@ public class RepoTest {
             purgeRepositoryCache(workingDir);
 
             dp.println("\n\n#######################################");
-            SailRepository repo = setupRepository(workingDir);
+            Repository repo = setupRepository(workingDir);
             loadStatements(repo, rdfInputFile);
             dp.println("Loaded RDF statements from " + rdfInputFile);
             dp.println(showContexts(repo));
@@ -129,13 +130,13 @@ public class RepoTest {
 
     }
 
-    private static SailRepository setupRepository(String cacheDir) throws RepositoryException {
+    private static Repository setupRepository(String cacheDir) throws RepositoryException {
 
 
         dp.println("Setting up Semantic Repository.");
 
         SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
-        SailRepository repo = new SailRepository(owlimSail);
+        Repository repo = new SailRepository(owlimSail);
 
         dp.println("Configuring Semantic Repository.");
         File storageDir = new File(cacheDir);
@@ -175,7 +176,7 @@ public class RepoTest {
 
     }
 
-    private static void loadStatements(SailRepository repo, String rdfFileName) throws RepositoryException, IOException, RDFParseException {
+    private static void loadStatements(Repository repo, String rdfFileName) throws RepositoryException, IOException, RDFParseException {
 
 
         RepositoryConnection con = null;
@@ -207,7 +208,7 @@ public class RepoTest {
 
     }
 
-    private static void dropStatement(SailRepository repo) throws RepositoryException {
+    private static void dropStatement(Repository repo) throws RepositoryException {
         ValueFactory valueFactory = repo.getValueFactory();
 
         String rdfType = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
@@ -243,7 +244,7 @@ public class RepoTest {
 
     }
 
-    public static String showContexts(SailRepository repository) throws RepositoryException {
+    public static String showContexts(Repository repository) throws RepositoryException {
         RepositoryConnection con = null;
         String msg;
 
@@ -285,7 +286,7 @@ public class RepoTest {
         return msg;
     }
 
-    public static String showStatements(SailRepository repository, String context) throws RepositoryException {
+    public static String showStatements(Repository repository, String context) throws RepositoryException {
         RepositoryConnection con = null;
         String msg;
         URI contextUri = null;
@@ -378,7 +379,7 @@ public class RepoTest {
 
     }
 
-    public static void dumpRepository(SailRepository owlse2, String filename) throws RepositoryException {
+    public static void dumpRepository(Repository owlse2, String filename) throws RepositoryException {
 
         RepositoryConnection con = null;
 
