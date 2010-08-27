@@ -944,6 +944,8 @@ public class RepositoryOps {
                 log.info("Connection is Closed!");
             }
 
+            ProcessingState.checkState();
+
             log.debug(showContexts(repository));
 
 
@@ -981,6 +983,8 @@ public class RepositoryOps {
                     dropStartingPoints(repository, startingPointsToDrop);
                     log.debug("Finished dropping starting points.");
 
+                    ProcessingState.checkState();
+
                     filename =  "PostDropStartingPointsRepository.trig";
                     log.debug("Dumping Semantic Repository to: " + filename);
                     dumpRepository(repository, filename);
@@ -991,6 +995,8 @@ public class RepositoryOps {
                     dropContexts(repository, dropList);
                     log.debug(showContexts(repository));
 
+
+
                     filename =  "PostDropContextsRepository.trig";
                     log.debug("Dumping Semantic Repository to: " + filename);
                     dumpRepository(repository, filename);
@@ -1000,6 +1006,8 @@ public class RepositoryOps {
                 modelChanged = true;
 
             }
+
+            ProcessingState.checkState();
 
 
             if (!newStartingPoints.isEmpty()) {
@@ -1013,11 +1021,16 @@ public class RepositoryOps {
 
             }
 
+            ProcessingState.checkState();
+
             log.debug("Checking for referenced documents that are not already in the repository.");
             boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
             if(foundNewDocuments){
                 modelChanged = true;
             }
+
+            ProcessingState.checkState();
+
 
             if (modelChanged) {
 
@@ -1031,8 +1044,13 @@ public class RepositoryOps {
                     log.debug("Running construct rules ...");
                     constructRuleEvaluator.runConstruct(repository);
                     log.debug("Finished running construct rules.");
+
+                    ProcessingState.checkState();
+
                     log.debug(showContexts(repository));
                     modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
+                    
+                    ProcessingState.checkState();
                 }
 
 

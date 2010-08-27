@@ -65,7 +65,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private long timeOfLastUpdate;
 
 
-    private AtomicBoolean stopWorking;
 
     private URL _configFile;
 
@@ -88,8 +87,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         catalogUpdateInterval = 20 * 60 * 1000; // 20 minutes worth of milliseconds
         firstUpdateDelay = 5 * 1000; // 5 seconds worth of milliseconds
         timeOfLastUpdate = 0;
-        stopWorking = new AtomicBoolean();
-        stopWorking.set(false);
 
         _catalogLock = new ReentrantReadWriteLock();
         coverages = new ConcurrentHashMap<String, CoverageDescription>();
@@ -461,7 +458,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) throws InterruptedException {
 
 
-        threadCheck();
+        ProcessingState.checkState();
         try {
             //retrieve XML from the RDF store.
             log.info("extractCoverageDescrptionsFromRepository() - Extracting CoverageDescriptions from repository.");
@@ -478,7 +475,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         } catch (Exception e) {
             log.error("extractCoverageDescrptionsFromRepository():  Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
-        threadCheck();
+        ProcessingState.checkState();
 
 
     }
@@ -520,7 +517,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catLock.lock();
             reposLock.lock();
             log.debug("destroy(): WriteLocks Aquired.");
-            setStopFlag(true);
+            ProcessingState.stopProcessing();
             if (catalogUpdateThread != null) {
                 log.debug("destroy() Current thread '" + Thread.currentThread().getName() + "' Interrupting catalogUpdateThread '" + catalogUpdateThread + "'");
                 catalogUpdateThread.interrupt();
@@ -1007,10 +1004,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return _catalogLastModifiedTime;
     }
 
-    public void setStopFlag(boolean flag) {
-        stopWorking.set(flag);
-    }
-
 
     private void updateCatalogCache(Repository repository) throws InterruptedException {
 
@@ -1018,7 +1011,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         int biffCount = 0;
 
-        threadCheck();
+        ProcessingState.checkState();
 
         Lock catalogWriteLock = _catalogLock.writeLock();
 
@@ -1027,7 +1020,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             log.debug("_catalogLock WriteLock Acquired.");
 
-            threadCheck();
+            ProcessingState.checkState();
 
             coverageIDServer = getCoverageIDServerURL(repository);
 
@@ -1053,21 +1046,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             log.debug("_catalogLock WriteLock Released.");
         }
 
-        threadCheck();
+        ProcessingState.checkState();
 
 
 
     }
 
-    private void threadCheck() throws InterruptedException {
-        Thread thread = Thread.currentThread();
-        if(thread.isInterrupted() || stopWorking.get()){
-            stopWorking.set(true);
-            log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-            throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-        }
-
-    }
 
 
     private HashMap<String, Vector<String>> getCoverageIDServerURL(Repository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
@@ -1210,7 +1194,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     public void run() {
 
         try {
-            stopWorking.set(false);
+            ProcessingState.enableProcessing();
             int updateCounter = 0;
             long startTime, endTime;
             long elapsedTime, sleepTime;
@@ -1224,11 +1208,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             } catch (InterruptedException e) {
                 log.warn("Caught Interrupted Exception.");
-                stopWorking.set(true);
+                ProcessingState.stopProcessing();
             }
 
 
-            while (!stopWorking.get()) {
+            while (ProcessingState.continueProcessing()) {
 
                 try {
 
@@ -1244,15 +1228,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     log.debug("Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
 
                     sleepTime = catalogUpdateInterval - elapsedTime;
-                    stopWorking.set(thread.isInterrupted());
-                    if (!stopWorking.get() && sleepTime > 0) {
+                    if (ProcessingState.continueProcessing() && sleepTime > 0) {
                         log.debug("Catalog Update thread sleeping for " + sleepTime / 1000.0 + " seconds.");
                         Thread.sleep(sleepTime);
                     }
 
                 } catch (InterruptedException e) {
                     log.warn("Caught Interrupted Exception.");
-                    stopWorking.set(true);
+                    ProcessingState.stopProcessing();
 
                 }
             }
@@ -1326,14 +1309,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void checkExecutionState() throws InterruptedException {
 
-        Thread thread = Thread.currentThread();
-
-        boolean isInterrupted = thread.isInterrupted();
-
-        threadCheck();
-
-    }
 
 }
