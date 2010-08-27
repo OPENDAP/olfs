@@ -207,7 +207,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     public void update() throws RepositoryException, InterruptedException, IOException, JDOMException {
 
         String filename;
-        boolean repositoryChanged = false;
+        boolean repositoryChanged;
         Lock repositoryWriteLock = _repositoryLock.writeLock();
 
         Repository repository = setupRepository();
@@ -514,15 +514,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         try {
-            catLock.lock();
-            reposLock.lock();
-            log.debug("destroy(): WriteLocks Aquired.");
             ProcessingState.stopProcessing();
             if (catalogUpdateThread != null) {
                 log.debug("destroy() Current thread '" + Thread.currentThread().getName() + "' Interrupting catalogUpdateThread '" + catalogUpdateThread + "'");
                 catalogUpdateThread.interrupt();
                 log.debug("destroy(): catalogUpdateThread '" + catalogUpdateThread + "' interrupt() called.");
             }
+            catLock.lock();
+            reposLock.lock();
+            log.debug("destroy(): WriteLocks Aquired.");
 
         }
         finally {
