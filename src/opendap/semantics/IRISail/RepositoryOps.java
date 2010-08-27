@@ -1080,7 +1080,7 @@ public class RepositoryOps {
         return repositoryHasBeenChanged;
     }
 
-    public static void dropContexts(Repository repository, Vector<String> dropList) {
+    public static void dropContexts(Repository repository, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
 
         log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
@@ -1107,11 +1107,7 @@ public class RepositoryOps {
 
                 log.info("Finished removing context: " + contextToDrop);
 
-            }
-            if (thread.isInterrupted()) {
-                log.warn("dropContexts(): WARNING! Thread "
-                        + thread.getName() + " was interrupted!");
-                return;
+                ProcessingState.checkState();
             }
 
         } catch (RepositoryException e) {

@@ -344,7 +344,7 @@ public class CatalogWrapper {
         log.info("Destroy Complete");
     }
 
-    public static void update(){
+    public static void update() throws Exception{
 
         _catalogImpl.update();
 

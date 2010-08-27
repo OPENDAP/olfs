@@ -417,8 +417,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         log.info("Semantic Repository Ready.");
 
-        if (Thread.currentThread().isInterrupted())
-            throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+
+        ProcessingState.checkState();
 
 
         return repository;

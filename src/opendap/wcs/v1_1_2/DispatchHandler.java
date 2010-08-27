@@ -422,7 +422,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
-    public void update(){
+    public void update() throws Exception{
         CatalogWrapper.update();
     }
 
