@@ -26,9 +26,13 @@
 package opendap.coreServlet;
 
 
+import opendap.dap.Request;
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -67,11 +71,30 @@ import javax.servlet.http.HttpServletRequest;
 public class ReqInfo {
 
 
+
+    private static ConcurrentHashMap<String,String> serviceContexts;
+
     private static Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
 
     }
+
+    public static boolean addService(String serviceName, String serviceLocalID){
+        serviceContexts.put(serviceName,serviceLocalID);
+        return true;
+    }
+
+    public static boolean dropService(String serviceName){
+        serviceContexts.remove(serviceName);
+        return true;
+    }
+
+    public static Enumeration<String> getServiceNames(){
+        return serviceContexts.keys();
+    }
+
+
 
     /**
      * Get service portion of the URL - everything in the URL before the localID (aka relativeUrl) of the dataset.
@@ -81,12 +104,9 @@ public class ReqInfo {
      */
 
     public static String getServiceUrl(HttpServletRequest request){
-
-        String requestUrl = request.getRequestURL().toString();
-
-        String serviceUrl = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
-
-        return serviceUrl;
+        Request req = new Request(null,request);
+        
+        return req.getDapServiceUrl();
 
     }
 

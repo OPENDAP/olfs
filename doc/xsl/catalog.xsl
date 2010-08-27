@@ -35,21 +35,27 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
+    <xsl:param name="dapService"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
-    <xsl:variable name="serviceContext">/opendap</xsl:variable>
-    <xsl:variable name="dapService">/hyrax/</xsl:variable>
 
-
-
+    
     <xsl:variable name="besPrefix">        
-        <xsl:if test="/bes:response/bes:showCatalog/bes:dataset/@prefix != '/' ">
             <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
-        </xsl:if>
     </xsl:variable>
     
-    <xsl:variable name="context" select="concat($serviceContext,$dapService,$besPrefix)"/>
+    <xsl:variable name="besDapService">
+        <xsl:choose>
+            <xsl:when test="$besPrefix!='/'">
+                <xsl:value-of select="concat($dapService,$besPrefix)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$dapService"/>                               
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:variable>
 
 
     <!--***********************************************
@@ -58,8 +64,8 @@
      -->
     <xsl:template match="bes:showCatalog">
         <thredds:catalog>
-            <thredds:service name="dap" serviceType="OPeNDAP" base="{$context}"/>
-            <thredds:service name="file" serviceType="HTTPServer" base="{$context}"/>
+            <thredds:service name="dap" serviceType="OPeNDAP" base="{$besDapService}"/>
+            <thredds:service name="file" serviceType="HTTPServer" base="{$besDapService}"/>
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -84,7 +90,7 @@
 
         <xsl:choose>
             <xsl:when test="bes:dataset">
-                <thredds:dataset name="{@name}" ID="{$context}{@name}">
+                <thredds:dataset name="{@name}" ID="{$besDapService}{@name}">
                     <xsl:apply-templates />
                 </thredds:dataset>
             </xsl:when>
@@ -102,7 +108,7 @@
                 <xsl:if test="not(@node='true')">
                     <thredds:dataset name="{@name}"  >
                         <xsl:attribute name="ID">
-                            <xsl:value-of select="$context"/><xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
+                            <xsl:value-of select="$besDapService"/><xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
                         </xsl:attribute>
                         <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
                         <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>

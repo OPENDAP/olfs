@@ -5,7 +5,7 @@
     <vendor>OPeNDAP</vendor>
     <homepage href="http://www.opendap.org/"/>
     <description kind="short">A simple Java Web Start test application.</description>
-    <icon href="images/opendap_logo_masthead.gif"/>
+    <icon href="http://test.opendap.org/opendap/docs/images/opendap_logo_masthead.gif"/>
     <offline-allowed/>
   </information>
 

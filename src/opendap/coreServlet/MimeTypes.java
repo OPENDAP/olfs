@@ -57,6 +57,7 @@ public class MimeTypes {
         typeMap.put("shtm",  "text/xhtml");
 
         typeMap.put("xml",   "text/xml");
+        typeMap.put("jsp",   "text/jsp");
         typeMap.put("css",   "text/css");
 
 
@@ -194,7 +195,8 @@ public class MimeTypes {
 
         typeMap.put("das",     "text/x-dods_das");
         typeMap.put("dds",     "text/x-dods_dds");
-        typeMap.put("dods",    "text/x-dods_data");
+        typeMap.put("dods",    "application/octet-stream");
+        typeMap.put("xdods",   "text/xml");
 
 
         typeMap.put("jnlp",    "application/x-java-jnlp-file");

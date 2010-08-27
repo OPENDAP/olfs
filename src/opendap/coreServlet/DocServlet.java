@@ -35,6 +35,7 @@ import javax.servlet.ServletOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import opendap.logging.LogUtil;
@@ -139,6 +140,10 @@ public class DocServlet extends HttpServlet {
                       HttpServletResponse response)
             throws IOException, ServletException {
 
+
+        String contextPath = ServletUtil.getContextPath(this);
+        String servletName = "/" + this.getServletName();
+
         try {
 
             LogUtil.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
@@ -161,9 +166,9 @@ public class DocServlet extends HttpServlet {
                         suffix = name.substring(name.lastIndexOf('.') + 1);
                     }
 
-
+                    String mType = null;
                     if (suffix != null) {
-                        String mType = MimeTypes.getMimeType(suffix);
+                        mType = MimeTypes.getMimeType(suffix);
                         if (mType != null)
                             response.setContentType(mType);
                         log.debug("   MIME type: " + mType + "  ");
@@ -174,36 +179,55 @@ public class DocServlet extends HttpServlet {
                     //response.setStatus(HttpServletResponse.SC_OK);
 
                     log.debug("   Sending.");
+                    if (mType != null)
+                        response.setContentType(mType);
 
 
                     ServletOutputStream sos = null;
-                    FileInputStream fis = new FileInputStream(f);
-                    
-                    try {
+                    sos = response.getOutputStream();
 
 
-                        sos = response.getOutputStream();
+                    if(mType!=null && mType.startsWith("text/")){
 
-                        byte buff[] = new byte[8192];
-                        int rc;
-                        boolean doneReading = false;
-                        while (!doneReading) {
-                            rc = fis.read(buff);
-                            if (rc < 0) {
-                                doneReading = true;
-                            } else if (rc > 0) {
-                                sos.write(buff, 0, rc);
-                            }
+                        String docString  = readFileAsString(f);
 
-                        }
+                        log.debug("read file "+f.getAbsolutePath()+" into a String.");
+
+
+                        docString = docString.replace("<CONTEXT_PATH />",contextPath);
+                        docString = docString.replace("<SERVLET_NAME />",servletName);
+
+
+
+
+                        sos.println(docString);
+
                     }
-                    finally {
+                    else {
 
-                        if(fis!=null)
-                            fis.close();
+                        FileInputStream fis = new FileInputStream(f);
+                        try {    
+                            byte buff[] = new byte[8192];
+                            int rc;
+                            boolean doneReading = false;
+                            while (!doneReading) {
+                                rc = fis.read(buff);
+                                if (rc < 0) {
+                                    doneReading = true;
+                                } else if (rc > 0) {
+                                    sos.write(buff, 0, rc);
+                                }
 
-                        if(sos!=null)
-                            sos.flush();
+                            }
+                        }
+                        finally {
+
+                            if(fis!=null)
+                                fis.close();
+
+                            if(sos!=null)
+                                sos.flush();
+                        }
                     }
 
                     LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
@@ -230,6 +254,36 @@ public class DocServlet extends HttpServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         }
+    }
+
+
+    public static String readFileAsString(File file) throws IOException {
+
+        Scanner scanner = new Scanner(file);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        try {
+            while (scanner.hasNextLine()) {
+                stringBuilder.append(scanner.nextLine() + "\n");
+            }
+        } finally {
+            scanner.close();
+        }
+        return stringBuilder.toString();
+    }
+
+    public static String readFileAsString(String pathname) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        Scanner scanner = new Scanner(new File(pathname));
+
+        try {
+            while (scanner.hasNextLine()) {
+                stringBuilder.append(scanner.nextLine() + "\n");
+            }
+        } finally {
+            scanner.close();
+        }
+        return stringBuilder.toString();
     }
 
 

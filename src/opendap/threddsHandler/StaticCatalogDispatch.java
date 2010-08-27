@@ -24,6 +24,7 @@
 package opendap.threddsHandler;
 
 import opendap.coreServlet.*;
+import opendap.dap.Request;
 import opendap.xml.Transformer;
 import org.slf4j.Logger;
 import org.jdom.Element;
@@ -120,6 +121,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         String query = request.getQueryString();
 
+        Request orq = new Request(null,request);
+
         if (redirectRequest(request, response))
             return;
 
@@ -137,18 +140,18 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             if (query != null) {
                 if (query.startsWith("dataset=")) {
-                    sendDatasetHtmlPage(response, catalogKey, query);
+                    sendDatasetHtmlPage(orq, response, catalogKey, query);
                 } else {
                     response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Cannot process query: " + Scrub.urlContent(query));
                 }
 
 
             } else {
-                sendCatalogHTML(response, catalogKey);
+                sendCatalogHTML(orq, response, catalogKey);
             }
 
         } else { // Send the the raw catalog XML.
-            sendCatalogXML(response, catalogKey);
+            sendCatalogXML(orq, response, catalogKey);
         }
 
     }
@@ -201,7 +204,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void browseRemoteDataset(HttpServletResponse response,
+    private void browseRemoteDataset(Request oRequest,
+                                     HttpServletResponse response,
                                      String query) throws IOException, SaxonApiException {
 
 
@@ -258,14 +262,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Build the catalog document as an XdmNode.
             XdmNode catDoc = datasetToHtmlTransform.build(new StreamSource(catDocIs));
 
-
-            // Pass the targetDataset parameter to the transform
+            datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
             datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
-
-            // Pass the remoteRelativeURL parameter to the transform
             datasetToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
-
-            // Pass the remoteRelativeURL parameter to the transform
             datasetToHtmlTransform.setParameter("remoteHost", remoteHost);
 
 
@@ -294,9 +293,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Remote resource does not appear to reference a THREDDS Catalog.");
         }
         finally {
-            datasetToHtmlTransform.clearParameter("targetDataset");
-            datasetToHtmlTransform.clearParameter("remoteCatalog");
-            datasetToHtmlTransform.clearParameter("remoteHost");
+            datasetToHtmlTransform.clearAllParameters();
 
             if (catDocIs != null) {
                 try {
@@ -313,7 +310,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void browseRemoteCatalog(HttpServletResponse response,
+    private void browseRemoteCatalog(Request oRequest, HttpServletResponse response,
                                      String query) throws IOException, SaxonApiException {
 
 
@@ -361,6 +358,9 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Build the catalog document as an XdmNode.
             XdmNode catDoc = catalogToHtmlTransform.build(new StreamSource(catDocIs));
 
+            catalogToHtmlTransform.setParameter("dapService", oRequest.getDapServiceLocalID());
+            catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
+
             catalogToHtmlTransform.setParameter("remoteHost", remoteHost);
             catalogToHtmlTransform.setParameter("remoteRelativeURL", remoteRelativeURL);
             catalogToHtmlTransform.setParameter("remoteCatalog", remoteCatalog);
@@ -390,9 +390,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
         finally {
             // Clean up the transform before releasing it.
-            catalogToHtmlTransform.clearParameter("remoteHost");
-            catalogToHtmlTransform.clearParameter("remoteRelativeURL");
-            catalogToHtmlTransform.clearParameter("remoteCatalog");
+            catalogToHtmlTransform.clearAllParameters();
 
             if (catDocIs != null) {
                 try {
@@ -409,7 +407,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void sendDatasetHtmlPage(HttpServletResponse response,
+    private void sendDatasetHtmlPage(Request oRequest,
+                                     HttpServletResponse response,
                                      String catalogKey,
                                      String query) throws IOException, JDOMException, SaxonApiException {
 
@@ -445,7 +444,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             log.debug("targetDataset: " + targetDataset);
 
-            // Pass the query string as a parameter
+            // Pass the docsService  parameter to the transform
+            datasetToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
             datasetToHtmlTransform.setParameter("targetDataset", targetDataset);
 
 
@@ -463,7 +463,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         }
         finally {
-            datasetToHtmlTransform.clearParameter("targetDataset");
+            datasetToHtmlTransform.clearAllParameters();
             datasetToHtmlTransformLock.unlock();
 
         }
@@ -471,7 +471,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
     }
 
-    private void sendCatalogHTML(HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException {
+    private void sendCatalogHTML(Request oRequest, HttpServletResponse response, String catalogKey) throws SaxonApiException, IOException {
 
 
         try {
@@ -504,12 +504,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.setHeader("Content-Description", "thredds_catalog");
             response.setStatus(HttpServletResponse.SC_OK);
 
+            catalogToHtmlTransform.setParameter("dapService", oRequest.getDapServiceLocalID());
+            catalogToHtmlTransform.setParameter("docsService", oRequest.getDocsServiceLocalID());
+
             catalogToHtmlTransform.transform(catDoc, response.getOutputStream());
 
             log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
         }
         finally {
+            catalogToHtmlTransform.clearAllParameters();
             catalogToHtmlTransformLock.unlock();
         }
 
@@ -517,7 +521,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     }
 
 
-    private void sendCatalogXML(HttpServletResponse response, String catalogKey) throws Exception {
+    private void sendCatalogXML(Request oRequest, HttpServletResponse response, String catalogKey) throws Exception {
 
 
         Catalog cat = CatalogManager.getCatalog(catalogKey);

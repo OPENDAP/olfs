@@ -30,13 +30,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import opendap.dap.Request;
+import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.transform.JDOMSource;
 import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 
@@ -220,9 +224,11 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
+        Request oreq = new Request(null,request);
 
 
-        String collectionName  = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+
+        String collectionName  = Scrub.urlContent(oreq.getRelativeUrl());
 
         if(collectionName.endsWith("/contents.html")){
             collectionName = collectionName.substring(0,collectionName.lastIndexOf("contents.html"));
@@ -239,24 +245,30 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        Document catalog = new Document();
+        Document showCatalogDoc = new Document();
 
-        if(BesXmlAPI.getCatalog(collectionName,catalog)){
+        if(BesXmlAPI.getCatalog(collectionName,showCatalogDoc)){
+
+            log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
+
+            JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
             String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
 
-            XSLTransformer transformer = new XSLTransformer(xsltDoc);
+            Transformer transformer = new Transformer(xsltDoc);
 
-            Document contentsPage = transformer.transform(catalog);
+            transformer.setParameter("dapService",oreq.getDapServiceLocalID());
+            transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+            transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
 
-            xmlo.output(contentsPage, response.getWriter());
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform(besCatalog, response.getOutputStream());
 
-            log.debug("Catalog from BES:\n"+xmlo.outputString(catalog));
-            log.debug("HTML Presentation view of BES Catalog:\n"+xmlo.outputString(contentsPage));
+
 
         }
         else {
-            BESError besError = new BESError(catalog);
+            BESError besError = new BESError(showCatalogDoc);
             besError.sendErrorResponse(dispatchServlet,response);
             log.error(besError.getMessage());
 

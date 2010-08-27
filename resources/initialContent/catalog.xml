@@ -18,13 +18,13 @@ FIRST: Go Read The THREDDS Documentation:
 
     <!-- ************************************************************************************* -->
 
-    <service name="Hyrax" serviceType="OPeNDAP" base="/opendap/"/>
+    <service name="Hyrax" serviceType="OPeNDAP" base="/opendap/hyrax/"/>
 
     <!-- ************************************************************************************* -->
 
 
 
-    <catalogRef xlink:href="/opendap/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
+    <catalogRef xlink:href="/opendap/hyrax/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
 
 
 

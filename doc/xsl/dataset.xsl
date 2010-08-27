@@ -36,11 +36,14 @@
 
                 >
     <xsl:import href="version.xsl"/>
+    <xsl:param name="docsService"/>
     <xsl:param name="targetDataset" />
     <xsl:param name="remoteCatalog" />
     <xsl:param name="remoteHost" />
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
+
+
 
     <xsl:template match="thredds:catalog">
         <html>
@@ -94,7 +97,7 @@
                 <!--                                                        -->
 
                 <head>
-                    <link rel='stylesheet' href='/opendap/docs/css/thredds.css'
+                    <link rel='stylesheet' href='{$docsService}/css/thredds.css'
                           type='text/css'/>
                     <title>THREDDS Dataset: <xsl:value-of select="@name"/></title>
 
@@ -108,7 +111,7 @@
 
                     <table width="100%">
                         <tr>
-                            <td width="30%" align="left"><img alt="Logo" src='/opendap/docs/images/logo.gif' /></td>
+                            <td width="30%" align="left"><img alt="Logo" src='{$docsService}/images/logo.gif' /></td>
                             <td class="dark" align="left">Hyrax - THREDDS Dataset Detail</td>
                         </tr>
                     </table>
@@ -282,7 +285,7 @@
                     <h1><font size="0">OPeNDAP Hyrax <font class="small">(<xsl:value-of select="$HyraxVersion"/>)</font>
 
                         <br/>
-                        <a href='/opendap/docs/'>Documentation</a>
+                        <a href='{$docsService}'>Documentation</a>
                         </font>
                     </h1>
 

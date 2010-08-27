@@ -33,13 +33,15 @@
                 xmlns:wcs="http://www.opengis.net/wcs"
                 xmlns:gml="http://www.opengis.net/gml"
                 >
+    <xsl:param name="dapService"/>
+    <xsl:param name="docsService"/>
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
 
     <xsl:template match="wcs:CoverageOffering">
         <html>
             <head>
-                <link rel='stylesheet' href='/opendap/docs/css/contents.css'
+                <link rel='stylesheet' href='{$docsService}/css/contents.css'
                       type='text/css'/>
                 <title>OPeNDAP Hyrax: <xsl:value-of select="wcs:label"/></title>
             </head>
@@ -54,7 +56,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='/opendap/docs/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
                 <h1>
                     WCS - Coverage Offering: <xsl:value-of select="wcs:label"/>
                 </h1>
@@ -168,11 +170,11 @@
                         <td>
                             <div class="small" align="left">
                                 THREDDS Catalog
-                                <a href="/opendap/catalog.html">
+                                <a href="{$dapService}/catalog.html">
                                     HTML
                                 </a>
                                 &NBSP;
-                                <a href="/opendap/catalog.xml">
+                                <a href="{$dapService}/catalog.xml">
                                     XML
                                 </a>
                             </div>
@@ -195,7 +197,7 @@
                 <h3>OPeNDAP Hyrax WCS Gateway
 
                     <br/>
-                    <a href='/opendap/docs/'>Documentation</a>
+                    <a href='{$docsService}/'>Documentation</a>
                 </h3>
 
 

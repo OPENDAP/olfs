@@ -23,20 +23,25 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
+import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BESError;
 import opendap.bes.BesXmlAPI;
+import opendap.dap.Request;
+import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.transform.JDOMSource;
 import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.stream.StreamSource;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.text.SimpleDateFormat;
@@ -416,25 +421,26 @@ public class WcsDispatchHandler implements DispatchHandler {
             topDataset.addContent(p);
         }
 
-        Document catalog = new Document(showCatalog);
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        JDOMSource besCatalog = new JDOMSource(showCatalog);
 
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
+        Request oreq = new Request(null,req);
 
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
 
-        Document contentsPage = transformer.transform(catalog);
+        Transformer transformer = new Transformer(xsltDoc);
 
+        transformer.setParameter("dapService",oreq.getDapServiceLocalID());
+        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+        transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
 
-        //xmlo.output(catalog, System.out);
-        //xmlo.output(contentsPage, System.out);
 
         resp.setContentType("text/html");
         resp.setHeader("Content-Description", "dods_directory");
         resp.setStatus(HttpServletResponse.SC_OK);
-        xmlo.output(contentsPage, resp.getWriter());
+
+        // Transform the BES  showCatalog response into a HTML page for the browser
+        transformer.transform(besCatalog, resp.getOutputStream());
 
     }
 
@@ -488,6 +494,7 @@ public class WcsDispatchHandler implements DispatchHandler {
             topDataset.addContent(s);
         }
 
+        /*
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
@@ -504,6 +511,31 @@ public class WcsDispatchHandler implements DispatchHandler {
         response.setHeader("Content-Description", "dods_directory");
         response.setStatus(HttpServletResponse.SC_OK);
         xmlo.output(contentsPage, response.getWriter());
+
+
+        */
+
+        JDOMSource besCatalog = new JDOMSource(showCatalog);
+
+
+        Request oreq = new Request(null,request);
+
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
+
+        Transformer transformer = new Transformer(xsltDoc);
+
+        transformer.setParameter("dapService",oreq.getDapServiceLocalID());
+        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+        transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
+
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_directory");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        // Transform the BES  showCatalog response into a HTML page for the browser
+        transformer.transform(besCatalog, response.getOutputStream());
+
 
     }
 
@@ -561,6 +593,10 @@ public class WcsDispatchHandler implements DispatchHandler {
             topDataset.addContent(s);
         }
 
+
+
+
+        /*
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
@@ -578,6 +614,31 @@ public class WcsDispatchHandler implements DispatchHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         xmlo.output(contentsPage, response.getWriter());
 
+        */
+
+        
+        JDOMSource besCatalog = new JDOMSource(showCatalog);
+
+
+        Request oreq = new Request(null,request);
+
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
+
+        Transformer transformer = new Transformer(xsltDoc);
+
+        transformer.setParameter("dapService",oreq.getDapServiceLocalID());
+        transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
+        transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
+
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "dods_directory");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        // Transform the BES  showCatalog response into a HTML page for the browser
+        transformer.transform(besCatalog, response.getOutputStream());
+
+
     }
 
     public void sendCoverageOfferingsList(HttpServletRequest request,
@@ -587,6 +648,8 @@ public class WcsDispatchHandler implements DispatchHandler {
                                  String serviceName)
             throws Exception {
 
+
+        Request oRequest = new Request(null,request);
         String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
@@ -630,24 +693,25 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
+        Transformer transformer = new Transformer(xsltDoc);
+        transformer.setParameter("dapService", oRequest.getDapServiceLocalID());
+        transformer.setParameter("docsService", oRequest.getDocsServiceLocalID());
+
+
+
+        response.setContentType("text/html");
+        response.setHeader("Content-Description", "wcs_coverages_list");
 
         ReentrantReadWriteLock.ReadLock lock = service.getReadLock();
         try {
             lock.lock();
             Document capDoc = service.getCapabilitiesDocument();
-            //xmlo.output(capDoc, System.out);
 
-            Document contentsPage = transformer.transform(capDoc);
+            transformer.transform(new JDOMSource(capDoc), response.getOutputStream());
 
-            //xmlo.output(contentsPage, System.out);
+            log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
-            response.setContentType("text/html");
-            response.setHeader("Content-Description", "dods_directory");
-            response.setStatus(HttpServletResponse.SC_OK);
-            xmlo.output(contentsPage, response.getWriter());
 
         }
         finally {
@@ -664,6 +728,8 @@ public class WcsDispatchHandler implements DispatchHandler {
                               String serviceName,
                               String coverageName)
             throws Exception {
+
+        Request oRequest = new Request(null,request);
 
         /*
         String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
@@ -710,23 +776,33 @@ public class WcsDispatchHandler implements DispatchHandler {
             else {
                 log.debug("sendCoveragePage() Sending Coverage:  \"" + coverage.getName() + "\"");
 
-                Element coff = coverage.getConfigElement();
+                Element config = coverage.getConfigElement();
                 Element s;
                 DateFormat df = new SimpleDateFormat("yyy-mm-dd");
 
-                coff.detach();
+                config.detach();
 
-                Document doc = new Document(coff);
+                Document doc = new Document(config);
 
-                Document pageContent = null;
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+
                 String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/wcs_coveragePage.xsl");
-                XSLTransformer transformer = new XSLTransformer(xsltDoc);
+                Transformer transformer = new Transformer(xsltDoc);
+
+                transformer.setParameter("dapService", oRequest.getDapServiceLocalID());
+                transformer.setParameter("docsService", oRequest.getDocsServiceLocalID());
+
+
+
+
+                response.setContentType("text/html");
+                response.setHeader("Content-Description", "wcs_coverage_description");
 
                 if(coverage.hasTemporalDomain()){
                     log.debug("sendCoveragePage() " + coverage.getName() +
                             " has a temporal domain. Adding time datasets.");
-                    Element dset = coff.getChild(WCS.DOMAIN_SET,WCS.NS);
+                    Element dset = config.getChild(WCS.DOMAIN_SET,WCS.NS);
                     Element tdom = dset.getChild(WCS.TEMPORAL_DOMAIN,WCS.NS);
 
                     Vector<String> dates = coverage.generateDateStrings();
@@ -734,25 +810,24 @@ public class WcsDispatchHandler implements DispatchHandler {
                         s = newDataset(day, true, false, 0, df.parse(day));
                         tdom.addContent(s);
                     }
+                    JDOMSource configSource = new JDOMSource(doc);
+                    transformer.transform(configSource, response.getOutputStream());
 
-                    pageContent = transformer.transform(doc);
+                    log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
+
 
                 }
-                else if(coverage.hasSpatialDomain()){
+                else {
                     log.debug("sendCoveragePage() " + coverage.getName() +
                             " has no temporal domain.");
-                    pageContent = transformer.transform(doc);
+                    
+                    JDOMSource configSource = new JDOMSource(doc);
+                    transformer.transform(configSource, response.getOutputStream());
+
+                    log.debug("Used saxon to send THREDDS catalog (XML->XSLT(saxon)->HTML).");
 
                 }
 
-
-                //xmlo.output(coff, System.out);
-                //xmlo.output(pageContent, System.out);
-
-                response.setContentType("text/html");
-                response.setHeader("Content-Description", "dods_directory");
-                response.setStatus(HttpServletResponse.SC_OK);
-                xmlo.output(pageContent, response.getWriter());
 
 
 

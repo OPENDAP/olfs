@@ -15,7 +15,7 @@ public abstract class JwsHandler {
 
     public abstract String getJnlpForDataset(String query);
 
-    String readFileAsString(String pathname) throws IOException {
+    public static String readFileAsString(String pathname) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         Scanner scanner = new Scanner(new File(pathname));
 

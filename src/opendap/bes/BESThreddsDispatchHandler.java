@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
 
 import opendap.coreServlet.*;
+import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
 import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.xml.Transformer;
@@ -139,15 +140,13 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         log.debug("Processing THREDDS request.");
 
-
-        String contextName = request.getContextPath();
-        String servletName = servlet.getServletName();
+        Request oreq = new Request(servlet,request);
+        
 
         log.debug(Util.probeRequest(servlet,request));
 
-        String fullContextName; 
 
-        String besCatalogName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+        String besCatalogName = Scrub.urlContent(oreq.getRelativeUrl());
 
         if (besCatalogName.endsWith("/catalog.xml")) {
             besCatalogName = besCatalogName.substring(0, besCatalogName.lastIndexOf("catalog.xml"));
@@ -173,15 +172,14 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
-            //showCatalogToThreddsCatalog.setParameter("serviceContext",);
+
+            showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
+
+            // showCatalogToThreddsCatalog.setParameter("dapService",);
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-
-
-
-            String threddsCatalogID = contextName +(servletName.startsWith("/")?"":"/") + servletName +
-                    (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
+            String threddsCatalogID = oreq.getDapServiceLocalID() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
 
 
             response.setContentType("text/xml");

@@ -37,17 +37,21 @@
 
                 >
     <xsl:import href="version.xsl"/>
+    <xsl:param name="dapService"/>
+    <xsl:param name="docsService"/>
     <xsl:param name="remoteHost" />
     <xsl:param name="remoteRelativeURL" />
     <xsl:param name="remoteCatalog" />
     <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
+
+
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
     <xsl:template match="thredds:catalog">
         <html>
             <head>
-                <link rel='stylesheet' href='/opendap/docs/css/contents.css'
+                <link rel='stylesheet' href='{$docsService}/css/contents.css'
                       type='text/css'/>
                 <title>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
@@ -61,7 +65,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="Logo" src='/opendap/docs/images/logo.gif'/>
+                <img alt="Logo" src='{$docsService}/images/logo.gif'/>
                 <h1>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
                     <div class="small" align="left">
@@ -161,7 +165,7 @@
                 <h3><font size="0">OPeNDAP Hyrax </font><font class="small">(<xsl:value-of select="$HyraxVersion"/>)</font>
 
                     <br/>
-                    <a href='/opendap/docs/'>Documentation</a>
+                    <a href='{$docsService}/'>Documentation</a>
                 </h3>
 
 
@@ -365,7 +369,7 @@
        -
        -
        -
-       -    <service name="OPeNDAP-Hyrax" serviceType="OPeNDAP" base="/opendap/"/>
+       -    <service name="OPeNDAP-Hyrax" serviceType="OPeNDAP" base="{$dapService}"/>
      -->
 
 

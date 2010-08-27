@@ -530,7 +530,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     public void sendCapabilitesPresentationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/capabilities.xsl");

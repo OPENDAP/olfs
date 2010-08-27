@@ -31,13 +31,13 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
-    <xsl:import href="version.xsl"/>
-    <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
-    
-    <xsl:variable name="serviceContext">/opendap</xsl:variable>
-    <xsl:variable name="docsService">/docs</xsl:variable>
-    <xsl:variable name="dapService">/hyrax</xsl:variable>
+    <xsl:import href="version.xsl" />
 
+    <xsl:param name="dapService" />
+    <xsl:param name="docsService" />
+    <xsl:param name="webStartService" />
+
+    <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
 
 
     <xsl:template match="bes:response">
@@ -50,7 +50,7 @@
 
     <xsl:template match="bes:showCatalog">
             <head>
-                <link rel='stylesheet' href='{$serviceContext}{$docsService}/css/contents.css'
+                <link rel='stylesheet' href='{$docsService}/css/contents.css'
                       type='text/css'/>
                 <title>OPeNDAP Hyrax: Contents of <xsl:value-of select="bes:dataset/@name"/></title>
             </head>
@@ -61,7 +61,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='{$serviceContext}{$docsService}/images/logo.gif'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
                 <h1>Contents of
                     <xsl:choose>
                         <xsl:when test="bes:dataset/@prefix!='/'" >
@@ -144,10 +144,7 @@
                     <tr>
                         <td>
                             <div class="small" align="left">
-                                THREDDS Catalog
-                                <a href="{$serviceContext}{$dapService}{bes:dataset/@name[.!='/']}/catalog.xml">
-                                    XML
-                                </a>
+                                THREDDS Catalog <a href="catalog.xml">XML</a>
                             </div>
                         </td>
                         <td>
@@ -175,7 +172,7 @@
                     </xsl:if>
 
                     <br/>
-                    <a href='{$serviceContext}{$docsService}/'>Documentation</a>
+                    <a href='{$docsService}/'>Documentation</a>
                 </h3>
 
             </body>
@@ -251,11 +248,11 @@
                 var index = pageUrl.lastIndexOf("/")+1;
                 var collectionUrl = pageUrl.substring(0,index);
 
-                document.write('&#60;A HREF="'+'<xsl:value-of select="$serviceContext"/>'+'/webstart/idv?dataset=' +
+                document.write('&#60;A HREF="'+'<xsl:value-of select="$webStartService"/>'+'idv?dataset=' +
                 collectionUrl+'<xsl:value-of select="../@name"/>"' +
                 '&#62;IDV&#60;/A&#62; ');
 
-                document.write('&#60;A HREF="'+'<xsl:value-of select="$serviceContext"/>'+'/webstart/ToolsUI?dataset=' +
+                document.write('&#60;A HREF="'+'<xsl:value-of select="$webStartService"/>'+'ToolsUI?dataset=' +
                 collectionUrl + '<xsl:value-of select="../@name"/>"' +
                 '&#62;ToolsUI&#60;/A&#62; ');
 

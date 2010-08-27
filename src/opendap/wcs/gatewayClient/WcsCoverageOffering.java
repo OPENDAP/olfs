@@ -348,7 +348,7 @@ public class WcsCoverageOffering {
 
 
     public Element getConfigElement(){
-        return config;
+        return (Element)config.clone();
     }
 
 
