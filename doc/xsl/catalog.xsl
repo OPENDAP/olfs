@@ -90,31 +90,64 @@
 
         <xsl:choose>
             <xsl:when test="bes:dataset">
-                <thredds:dataset name="{@name}" ID="{$besDapService}{@name}">
+                <!--
+                This dataset is the  top level dataset. The only dataset that the bes
+                returns that will contain child datasets is the top level dataset in
+                the showCatalog response. This a major assumption and this XSLT will
+                fail if the bes changes this arrangement
+                -->
+
+                <xsl:variable name="ID">
+                    <xsl:choose>
+                        <xsl:when test="starts-with(@name,'/')">
+                            <xsl:value-of select="concat($besDapService,substring(@name,2))"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="concat($besDapService,@name)"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+
+                <thredds:dataset name="{@name}" ID="{$ID}">
                     <xsl:apply-templates />
                 </thredds:dataset>
             </xsl:when>
 
             <xsl:otherwise>
+                <!-- It's not a top level dataset... -->
 
-                <xsl:if test="@node='true'">
-                    <thredds:catalogRef name="{@name}" xlink:href="{@name}/catalog.xml" xlink:title="{@name}" xlink:type="simple" >
-                        <xsl:attribute name="ID">
-                            <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                        </xsl:attribute>
-                    </thredds:catalogRef>
-                </xsl:if >
 
-                <xsl:if test="not(@node='true')">
-                    <thredds:dataset name="{@name}"  >
-                        <xsl:attribute name="ID">
-                            <xsl:value-of select="$besDapService"/><xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                        </xsl:attribute>
-                        <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
-                        <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
-                        <xsl:call-template name="DatasetAccess"/>
-                    </thredds:dataset>
-                </xsl:if >
+                <xsl:variable name="ID">
+                    <xsl:choose>
+                        <xsl:when test="../@name='/'">
+                            <xsl:value-of select="$besDapService"/><xsl:value-of select="@name" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$besDapService"/><xsl:value-of select="../@name" />/<xsl:value-of select="@name" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+
+                <!-- <sanityCheck besDapService="{$besDapService}" parentName="{../@name}" myName="{@name}"  ID="{$ID}"/>  -->
+
+                <xsl:choose>
+                    <xsl:when test="@node='true'">
+                        <!-- This dataset is a node, aka a directory or collection -->
+
+                        <thredds:catalogRef name="{@name}" xlink:href="{@name}/catalog.xml" xlink:title="{@name}" xlink:type="simple" ID="{$ID}/" />
+                    </xsl:when >
+
+                    <xsl:otherwise>
+                        <!-- This dataset  a simple dataset, aka a file or a granule or a leaf -->
+
+                        <thredds:dataset name="{@name}" ID="{$ID}" >
+                            <thredds:dataSize units="bytes"><xsl:value-of select="@size" /></thredds:dataSize>
+                            <thredds:date type="modified"><xsl:value-of select="@lastModified" /></thredds:date>
+                            <xsl:call-template name="DatasetAccess"/>
+                        </thredds:dataset>
+                    </xsl:otherwise >
+
+                </xsl:choose>
             </xsl:otherwise>
 
         </xsl:choose>
@@ -124,19 +157,27 @@
 
     <xsl:template name="DatasetAccess">
 
+        <xsl:variable name="urlPath">
+            <xsl:choose>
+                <xsl:when test="../@name='/'">
+                    <xsl:value-of select="@name" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="../@name" />/<xsl:value-of select="@name" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+
         <thredds:access>
         <xsl:choose>
             <xsl:when test="bes:serviceRef">
                 <xsl:attribute name="serviceName"><xsl:value-of select="bes:serviceRef"/></xsl:attribute>
-                <xsl:attribute name="urlPath">
-                    <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                </xsl:attribute>
+                <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:attribute name="serviceName">file</xsl:attribute>
-                <xsl:attribute name="urlPath">
-                    <xsl:value-of select="../@name" /><xsl:if test="../@name[.!='/']">/</xsl:if><xsl:value-of select="@name" />
-                </xsl:attribute>
+                <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
             </xsl:otherwise>
         </xsl:choose>
         </thredds:access>

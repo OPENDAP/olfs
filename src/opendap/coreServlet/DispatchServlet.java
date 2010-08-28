@@ -400,7 +400,7 @@ public class DispatchServlet extends HttpServlet {
 
                 log.debug(Util.showRequest(request, reqno));
 
-                if(redirectForContextOnlyRequest(request,response))
+                if(redirectForServiceOnlyRequest(request,response))
                     return;
 
 
@@ -512,21 +512,32 @@ public class DispatchServlet extends HttpServlet {
 
 
 
+    private boolean isServiceOnlyRequest(HttpServletRequest req){
+        String contextPath = req.getContextPath();
+        String servletPath = req.getServletPath();
+        String reqURI = req.getRequestURI();
+
+        String serviceName = contextPath + servletPath;
+
+        if (reqURI.equals(serviceName)) {
+            return true;
+        }
+        return false;
+
+    }
 
 
 
 
-    private boolean redirectForContextOnlyRequest(HttpServletRequest req,
+    private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
                                                   HttpServletResponse res)
             throws IOException {
 
-        String context = req.getContextPath();
-        String reqURI = req.getRequestURI();
-
-        if (reqURI.equals(context)) {
-            String newURI = context+"/";
+        if (isServiceOnlyRequest(req)) {
+            String reqURI = req.getRequestURI();
+            String newURI = reqURI+"/";
             res.sendRedirect(Scrub.urlContent(newURI));
-            log.debug("Sent redirectForContextOnlyRequest to map the servlet " +
+            log.debug("Sent redirectForServiceOnlyRequest to map the servlet " +
                     "context to a URL that ends in a '/' character!");
             return true;
         }
@@ -639,6 +650,9 @@ public class DispatchServlet extends HttpServlet {
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
+
+        if(isServiceOnlyRequest(req))
+            return -1;
 
         try {
 
