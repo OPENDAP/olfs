@@ -860,13 +860,21 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         log.debug("sendDDX2RDF() for dataset: " + dataSource);
 
-        response.setContentType("text/xml");
+
+        String accepts = request.getHeader("Accepts");
+
+        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
+            response.setContentType("application/rdf+xml");
+        else
+            response.setContentType("text/xml");
+
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "text/xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
+
 
 
         String xdap_accept = "3.2";
