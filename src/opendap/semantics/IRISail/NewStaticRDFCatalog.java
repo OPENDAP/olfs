@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +48,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private Logger log;
 
 
-    private AtomicBoolean repositoryUpdateActive;
     private ReentrantReadWriteLock _repositoryLock;
     private XMLfromRDF buildDoc;
 
@@ -92,10 +90,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         coverages = new ConcurrentHashMap<String, CoverageDescription>();
 
         _repositoryLock = new ReentrantReadWriteLock();
-
-        repositoryUpdateActive = new AtomicBoolean();
-
-        repositoryUpdateActive.set(false);
 
         backgroundUpdates = false;
         overrideBackgroundUpdates = false;
@@ -623,7 +617,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void ingestCatalog(Repository repository) throws Exception {
+    private void ingestWcsCatalog(Repository repository) throws Exception {
 
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
 
@@ -660,7 +654,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                     String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
                     log.debug("CoverageDescription '" + coverageID + "' has a last modified time of " + dateTime);
                     lastModifiedTime = sdf.parse(dateTime).getTime();
-                    CoverageDescription coverageDescription = ingestCoverageDescription(cde, lastModifiedTime);
+                    CoverageDescription coverageDescription = ingestWcsCoverageDescription(cde, lastModifiedTime);
 
                     if (_catalogLastModifiedTime < lastModifiedTime)
                         _catalogLastModifiedTime = lastModifiedTime;
@@ -699,7 +693,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private CoverageDescription ingestCoverageDescription(Element cde, long lastModified) {
+    private CoverageDescription ingestWcsCoverageDescription(Element cde, long lastModified) {
 
         CoverageDescription cd = null;
         try {
@@ -710,9 +704,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
             String wcseElem = xmlo.outputString(e.getExceptionElement());
             String cvgDesc = xmlo.outputString(cde);
-            log.error("ingestCoverageDescription(): Failed to ingest CoverageDescription!");
-            log.error("ingestCoverageDescription(): WcsException: " + wcseElem + "");
-            log.error("ingestCoverageDescription(): Here is the XML element that failed to ingest: " + cvgDesc);
+            log.error("ingestWcsCoverageDescription(): Failed to ingest CoverageDescription!");
+            log.error("ingestWcsCoverageDescription(): WcsException: " + wcseElem + "");
+            log.error("ingestWcsCoverageDescription(): Here is the XML element that failed to ingest: " + cvgDesc);
         }
 
         return cd;
@@ -1026,7 +1020,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             addSupportedFormats(buildDoc.getRootElement());
 
-            ingestCatalog(repository);
+            ingestWcsCatalog(repository);
             timeOfLastUpdate = new Date().getTime();
 
 
@@ -1121,74 +1115,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
-    /*
-    public boolean updateRepository_OLD(Vector<String> startingPoints) throws InterruptedException {
-
-        boolean success = false;
-        
-        int biffCount = 0;
-        Thread thread = Thread.currentThread();
-        
-        RdfPersistence updateRepository = new RdfPersistence(); 
-        
-        try {
-            updateRepository.updateSemanticRepository(owlse2,startingPoints);
-            
-         //##########################################################################
-         //  Dump repository to disk as N-Triples
-         log.debug("updateRepository2(): Connecting to Repository...");
-         RepositoryConnection con = owlse2.getConnection();
-         String filename = catalogCacheDirectory + "daprepository.nt";
-         log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
-         RepositoryOps.dumpRepository(con, filename);
-         if(thread.isInterrupted() || stopWorking){
-             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-         }
-
-         //#########################################################################
-         //Dump repository to disk as Triples with their contexts.
-         log.debug("updateRepository2(): Dumping Semantic Repository to: "+filename);
-         filename = catalogCacheDirectory + "daprepository.trig";
-         RepositoryOps.dumpRepository(con, filename);
-         if(thread.isInterrupted() || stopWorking){
-             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-            throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-         }
-
-
-         
-         log.debug("updateRepository2(): Extracting CoverageDescriptions from the Repository.");
-         extractCoverageDescrptionsFromRepository(con);
-         if(thread.isInterrupted() || stopWorking){
-             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-         }
-
-         filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
-         log.debug("updateRepository2(): Dumping CoverageDescriptions Document to: "+filename);
-         dumpCoverageDescriptionsDocument(filename);
-         if(thread.isInterrupted() || stopWorking){
-             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-         }
-
-         log.info("updateRepository2(): Closing repository!");
-         con.close();  //close connection first
-         if(thread.isInterrupted() || stopWorking){
-             log.warn("updateRepository2(): WARNING! Thread "+thread.getName()+" was interrupted!");
-             throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
-         }
-
-        } catch (InterruptedException e) {
-            log.error("Thread interrupted "+ e.getMessage());
-        } catch (RepositoryException e) {
-            log.error(" updateRepository(Vector<String> startingPoints) caught RepositoryException"+ e.getMessage());
-        }
-        return success;
-    }
-    */
 
 
     public void run() {

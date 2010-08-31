@@ -274,9 +274,13 @@ public class RepositoryOps {
     }
 
 
-    /*
+    /**
      * Add the old StartingPoint that is no longer a StartingPoint in this
      * update to the drop-list
+     *
+     * @param con
+     * @param startingPointsUrls
+     * @return
      */
     public static   Vector<String> findChangedStartingPoints(RepositoryConnection con, Vector<String> startingPointsUrls) {
         Vector<String> result;
@@ -312,6 +316,12 @@ public class RepositoryOps {
     }
 
 
+    /**
+     * 
+     * @param repo
+     * @param startingPointUrls
+     * @return
+     */
     public static Vector<String> findNewStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
 
