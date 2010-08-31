@@ -163,14 +163,14 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 							</xsl:if>
 						</xsl:for-each>
 					</xsl:variable>
-						<rdfs:seeAlso rdf:resource="{$schemaLocationAtt}"/>
+						<xsd2owl:imports rdf:resource="{$schemaLocationAtt}"/>
 				</xsl:for-each>
 				<xsl:for-each select="./xsd:include">
 					<xsl:variable name="schemaLocationAtt">
 						<xsl:value-of select="@schemaLocation"/>
 					</xsl:variable>
 					<!-- If there is an alias for the namespace, use it. Otherwise, use the namespace URI -->
-						<rdfs:seeAlso rdf:resource="{$schemaLocationAtt}"/>
+						<xsd2owl:imports rdf:resource="{$schemaLocationAtt}"/>
 				</xsl:for-each>
 			</xsdr:schemaType>
 			<xsl:apply-templates/>
