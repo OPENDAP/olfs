@@ -140,7 +140,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			<!--xsl:copy-of select="node-set($used_namespaces)/*/namespace::*"/-->
 			<xsl:copy-of select="$used_namespaces/*/namespace::*"/>
 			<xsdr:schemaType rdf:about="">
-			   <owl:imports rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl" />
+			   <xsd2owl:dependsOn rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl" />
 				<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
 				</xsl:if>
