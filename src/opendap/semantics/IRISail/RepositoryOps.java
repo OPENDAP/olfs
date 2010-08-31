@@ -66,6 +66,11 @@ public class RepositoryOps {
     /**
      * Set addStartingPoints statement for the importURI in the repository.
      *
+
+     *
+     * @param con An open connection to the repository from which the staring points will be dropped.
+     * @param valueFactory A ValueFactory object for making URI and Name valued objects.
+     * @param startingPointUrls A list of starting point URLs to drop from the repository.
      */
     public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
 
@@ -128,7 +133,9 @@ public class RepositoryOps {
      * Adds the passed list of starting points to the repository.
      *
      *
+     *
      * @param con
+     * @param valueFactory
      * @param startingPointUrls
      */
     public static void addStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
@@ -140,8 +147,17 @@ public class RepositoryOps {
         }
     }
 
+    /**
+     *
+     * @param con
+     * @param startingPointUrl
+     * @return
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException
+     */
     public static boolean startingPointExists( RepositoryConnection con, String startingPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
-        TupleQueryResult result = null;
+        TupleQueryResult result;
         boolean hasInternalStaringPoint = false;
 
         String queryString = "SELECT doc "
@@ -162,7 +178,11 @@ public class RepositoryOps {
     }
 
 
-
+    /**
+     *
+     * @param repo
+     * @param startingPointUrl
+     */
     public static void addStartingPoint(Repository repo, String startingPointUrl) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
@@ -192,7 +212,9 @@ public class RepositoryOps {
     /**
      * Adds the passed  starting point to the repository.
      *
+     *
      * @param con
+     * @param valueFactory
      * @param startingPoint
      */
     public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint) {
@@ -257,7 +279,7 @@ public class RepositoryOps {
      * update to the drop-list
      */
     public static   Vector<String> findChangedStartingPoints(RepositoryConnection con, Vector<String> startingPointsUrls) {
-        Vector<String> result = null;
+        Vector<String> result;
         Vector<String> changedStartingPoints = new Vector<String> ();
         log.debug("Checking if the old StartingPoint is still a StartingPoint ...");
 
@@ -328,7 +350,7 @@ public class RepositoryOps {
      * If the internalStartingPoint is not present in the repository it will be returned too.
      */
     public static  Vector<String> findNewStartingPoints(RepositoryConnection con, Vector<String> startingPointUrls) {
-        Vector<String> result = null;
+        Vector<String> result;
         Vector<String> newStartingPoints = new Vector<String> ();
         log.debug("Checking for new starting points...");
 
@@ -414,7 +436,7 @@ public class RepositoryOps {
             }
 
             while (result.hasNext()) {
-                BindingSet bindingSet = (BindingSet) result.next();
+                BindingSet bindingSet = result.next();
 
                 Value firstValue = bindingSet.getValue("doc");
                 String startpoint = firstValue.stringValue();
@@ -434,9 +456,7 @@ public class RepositoryOps {
 
 
     private static TupleQueryResult queryForStartingPoints(RepositoryConnection con) throws QueryEvaluationException, MalformedQueryException, RepositoryException {
-        TupleQueryResult result = null;
-        List<String> bindingNames;
-        Vector<String> startingPoints = new Vector <String> ();
+        TupleQueryResult result;
 
         log.debug("Finding StartingPoints in the repository ...");
 
@@ -648,14 +668,15 @@ public class RepositoryOps {
      * Checks and returns last modified time of a context (URI) via querying
      * against the repository on contexts.
      *
+     *
+     * @param con
      * @param urlstring
+     * @return
      */
     public static String getLastModifiedTime(RepositoryConnection con, String urlstring) {
         TupleQueryResult result = null;
         String ltmodstr = "";
         URI uriaddress = new URIImpl(urlstring);
-        Resource[] context = new Resource[1];
-        context[0] = (Resource) uriaddress;
 
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
@@ -725,7 +746,7 @@ public class RepositoryOps {
 
 
     public static String getLastModifiedTimeString(long epochTime) {
-        String ltmodstr = "";
+        String ltmodstr;
         Timestamp ltmodsql = new Timestamp(epochTime);
         String ltmodstrraw = ltmodsql.toString();
         ltmodstr = ltmodstrraw.substring(0, 10) + "T"
@@ -738,6 +759,7 @@ public class RepositoryOps {
      * repository, keyed by the context name.
      * @param repository The repository from which to harvest the contexts and their associated last
      * modified times.
+     * @return
      */
     public static HashMap<String, String> getLastModifiedTimesForContexts(Repository repository) {
         RepositoryConnection con = null;
@@ -768,6 +790,7 @@ public class RepositoryOps {
      * repository, keyed by the context name.
      * @param con A connection to the repoistory from which to harvest the contexts and their associated last
      * modified times.
+     * @return
      */
     public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) {
         TupleQueryResult result = null;
@@ -831,9 +854,11 @@ public class RepositoryOps {
     /**
      * Insert a statement declaring the content type of the document.
      *
+     *
      * @param importURL
      * @param contentType
      * @param con
+     * @param valueFactory
      */
     public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
 
@@ -857,8 +882,10 @@ public class RepositoryOps {
 
     /**
      * Set last_modified_time of the URI in the repository.
+     *
      * @param importURL
      * @param con
+     * @param valueFactory
      */
     public static void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) {
         String ltmod = getLTMODContext(importURL);
@@ -868,9 +895,11 @@ public class RepositoryOps {
     /**
      *
      *
+     *
      * @param importURL
      * @param ltmod
      * @param con
+     * @param valueFactory
      */
     public  static void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) {
 
@@ -897,9 +926,11 @@ public class RepositoryOps {
     /**
      * @param repository        The repository on which to operate.
      * @param startingPointUrls The list pof starting point URLs from the configuration file (aka "THE starting point")
+     * @param doNotImportTheseUrls
+     * @param resourceDir
      * @return Returns true if the update results in changes to the repository.
      * @throws InterruptedException If the thread of execution is interrupted.
-     * @throws org.openrdf.repository.RepositoryException  When there are problems working with the repository.
+     * @throws RepositoryException  When there are problems working with the repository.
      */
     public static boolean updateSemanticRepository(Repository repository, Vector<String> startingPointUrls, Vector<String> doNotImportTheseUrls, String resourceDir)
             throws InterruptedException, RepositoryException {
@@ -1088,15 +1119,12 @@ public class RepositoryOps {
         try {
             con = repository.getConnection();
 
-            Thread thread = Thread.currentThread();
-
             log.info("Deleting contexts in drop list ...");
             ValueFactory valueFactory = repository.getValueFactory();
 
             for (String drop : dropList) {
                 log.info("Dropping context URI: " + drop);
                 URI contextToDrop = valueFactory.createURI(drop);
-                URI lastModifiedContext = valueFactory.createURI(Terms.lastModifiedContextUri);
                 URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
 
                 log.info("Removing context: " + contextToDrop);
