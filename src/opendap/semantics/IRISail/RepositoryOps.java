@@ -37,6 +37,11 @@ public class RepositoryOps {
     public static boolean flushRepositoryOnDrop = true;
 
 
+    /**
+     * 
+     * @param repo
+     * @param startingPointUrls
+     */
     public static void dropStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
@@ -103,6 +108,12 @@ public class RepositoryOps {
 
     }
 
+
+    /**
+     *
+     * @param repo
+     * @param startingPointUrls
+     */
     public static void addStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
@@ -249,6 +260,13 @@ public class RepositoryOps {
 
     }
 
+
+    /**
+     *
+     * @param repo
+     * @param startingPointUrls
+     * @return
+     */
     public static Vector<String> findChangedStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
 
@@ -398,10 +416,13 @@ public class RepositoryOps {
     }
 
 
-
-
-
-
+    /**
+     *
+     * @param repo
+     * @return
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException
+     */
     public static Vector<String> findAllStartingPoints(Repository repo) throws MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
 
@@ -463,8 +484,14 @@ public class RepositoryOps {
     }
 
 
-
-
+    /**
+     *
+     * @param con
+     * @return
+     * @throws QueryEvaluationException
+     * @throws MalformedQueryException
+     * @throws RepositoryException
+     */
     private static TupleQueryResult queryForStartingPoints(RepositoryConnection con) throws QueryEvaluationException, MalformedQueryException, RepositoryException {
         TupleQueryResult result;
 
@@ -484,7 +511,10 @@ public class RepositoryOps {
 
     }
 
-
+    /**
+     *
+     * @param owlse2
+     */
     public static void clearRepository(Repository owlse2) {
 
         RepositoryConnection con = null;
@@ -512,6 +542,11 @@ public class RepositoryOps {
     }
 
 
+    /**
+     *
+     * @param con
+     * @param filename
+     */
     public static void dumpRepository(RepositoryConnection con, String filename) {
 
         // export repository to an n-triple file
@@ -555,6 +590,11 @@ public class RepositoryOps {
 
     }
 
+    /**
+     *
+     * @param owlse2
+     * @param filename
+     */
     public static void dumpRepository(Repository owlse2, String filename) {
 
         RepositoryConnection con = null;
@@ -581,7 +621,11 @@ public class RepositoryOps {
 
     }
 
-
+    /**
+     *
+     * @param repository
+     * @return
+     */
     public static String showContexts(Repository repository){
         RepositoryConnection con = null;
         String msg;
@@ -608,6 +652,12 @@ public class RepositoryOps {
         return msg;
 
     }
+
+    /**
+     *
+     * @param con
+     * @return
+     */
     public static String showContexts(RepositoryConnection con){
 
         String msg = "\nRepository ContextIDs:\n";
@@ -733,6 +783,12 @@ public class RepositoryOps {
 
         return ltmodstr;
     }
+
+    /**
+     *
+     * @param urlstring
+     * @return
+     */
     public static String getLTMODContext(String urlstring) {
         String ltmodstr = "";
         try {
@@ -750,11 +806,20 @@ public class RepositoryOps {
         return ltmodstr;
     }
 
+    /**
+     *
+     * @param date
+     * @return
+     */
     public static String getLastModifiedTimeString(Date date) {
         return getLastModifiedTimeString(date.getTime());
     }
 
-
+    /**
+     *
+     * @param epochTime
+     * @return
+     */
     public static String getLastModifiedTimeString(long epochTime) {
         String ltmodstr;
         Timestamp ltmodsql = new Timestamp(epochTime);
@@ -1121,6 +1186,13 @@ public class RepositoryOps {
         return repositoryHasBeenChanged;
     }
 
+
+    /**
+     *
+     * @param repository
+     * @param dropList
+     * @throws InterruptedException
+     */
     public static void dropContexts(Repository repository, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
 
@@ -1249,6 +1321,12 @@ public class RepositoryOps {
 
     }
 
+
+    /**
+     *
+     * @param con
+     * @return
+     */
     static Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
         TupleQueryResult result = null;
         //List<String> bindingNames;
@@ -1323,6 +1401,12 @@ public class RepositoryOps {
 
     }
 
+    
+    /**
+     *
+     * @param con
+     * @return
+     */
     static Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
         TupleQueryResult result = null;
         //List<String> bindingNames;
