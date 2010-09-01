@@ -50,7 +50,7 @@ public class ConstructRuleEvaluator {
 
 
     /*
-     * Run all Construct queries and statement into repository
+     * Run all Construct queries and ingest resulting statements into repository
      */
 
     public  void runConstruct(Repository repository) throws RepositoryException {
@@ -270,7 +270,7 @@ public class ConstructRuleEvaluator {
     }
 
     /*
-     * Find all Construct queries
+     * Find all Construct queries stored in the repository
      */
     private void findConstruct(Repository repository) {
         TupleQueryResult result = null;
@@ -713,8 +713,7 @@ public class ConstructRuleEvaluator {
     }
 
     /***************************************************************************
-     * Increment numbers
-     * @todo WHAT DOES THIS METHOD ACTUALLY DO?
+     * Increment number by 1   
      *
      * @param graphResult
      * @param creatValue

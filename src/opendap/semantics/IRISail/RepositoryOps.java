@@ -38,7 +38,7 @@ public class RepositoryOps {
 
 
     /**
-     * 
+     * Remove the startingpoint statement.
      * @param repo
      * @param startingPointUrls
      */
@@ -69,10 +69,7 @@ public class RepositoryOps {
     }
 
     /**
-     * Set addStartingPoints statement for the importURI in the repository.
-     *
-
-     *
+     * Remove the startingpoint statement.
      * @param con An open connection to the repository from which the staring points will be dropped.
      * @param valueFactory A ValueFactory object for making URI and Name valued objects.
      * @param startingPointUrls A list of starting point URLs to drop from the repository.
@@ -110,7 +107,7 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Add startingpoint statements into the repository.
      * @param repo
      * @param startingPointUrls
      */
@@ -159,7 +156,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Test if a startingpoint is alread in the repository. Return true if it is already in.
      * @param con
      * @param startingPointUrl
      * @return
@@ -190,7 +187,7 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Add startingPoint statement into the repository.
      * @param repo
      * @param startingPointUrl
      */
@@ -293,8 +290,7 @@ public class RepositoryOps {
 
 
     /**
-     * Add the old StartingPoint that is no longer a StartingPoint in this
-     * update to the drop-list
+     * Return a list of old StartingPoint that is no longer a StartingPoint.
      *
      * @param con
      * @param startingPointsUrls
@@ -335,7 +331,7 @@ public class RepositoryOps {
 
 
     /**
-     * 
+     * Return a list of startingPoint which is not in the repository yet.
      * @param repo
      * @param startingPointUrls
      * @return
@@ -417,7 +413,7 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Return all startingPoints in the repository. 
      * @param repo
      * @return
      * @throws MalformedQueryException
@@ -485,9 +481,9 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Return all startingPoints as  TupleQueryResult.
      * @param con
-     * @return
+     * @return TupleQueryResult
      * @throws QueryEvaluationException
      * @throws MalformedQueryException
      * @throws RepositoryException
@@ -512,7 +508,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Wipe out the whole repository.
      * @param owlse2
      */
     public static void clearRepository(Repository owlse2) {
@@ -543,7 +539,7 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Write the repository content to a plain ASCII file in N-triples, Trix or trig format depending the file name sufix.
      * @param con
      * @param filename
      */
@@ -554,7 +550,7 @@ public class RepositoryOps {
         try {
             log.info("Dumping repository to: '"+filename+"'");
             FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
-            if (filename.endsWith("nt")) {
+            if (filename.endsWith(".nt")) {
 
                 NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
                         myFileOutputStream);
@@ -564,7 +560,7 @@ public class RepositoryOps {
                 myNTRiplesWriter.endRDF();
 
             }
-            if (filename.endsWith("trix")) {
+            if (filename.endsWith(".trix")) {
 
                 TriXWriter myTriXWriter = new TriXWriter(myFileOutputStream);
 
@@ -573,7 +569,7 @@ public class RepositoryOps {
                 myTriXWriter.endRDF();
 
             }
-            if (filename.endsWith("trig")) {
+            if (filename.endsWith(".trig")) {
 
                 TriGWriter myTriGWriter = new TriGWriter(myFileOutputStream);
 
@@ -591,7 +587,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Write the repository content to a plain ASCII file in N-triples, Trix or trig format depending the file name sufix.
      * @param owlse2
      * @param filename
      */
@@ -622,7 +618,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Return all contexts in the repository as a space separated string.
      * @param repository
      * @return
      */
@@ -654,7 +650,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Return all contexts in the repository as a separated string.
      * @param con
      * @return
      */
@@ -725,7 +721,7 @@ public class RepositoryOps {
 
 
     /**
-     * Checks and returns last modified time of a context (URI) via querying
+     * Check and return last modified time of a context (URI) via querying
      * against the repository on contexts.
      *
      *
@@ -785,7 +781,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Set last_modified_time of a context.
      * @param urlstring
      * @return
      */
@@ -807,7 +803,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Convert Date to last_modified_time
      * @param date
      * @return
      */
@@ -816,7 +812,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Convert time in long  to last_modified_time
      * @param epochTime
      * @return
      */
@@ -968,7 +964,7 @@ public class RepositoryOps {
     }
 
     /**
-     *
+     * Set last_modified_time of the URI in the repository.
      *
      *
      * @param importURL
@@ -999,6 +995,7 @@ public class RepositoryOps {
     }
 
     /**
+     * Update the repository. Drop outdated files, add new files and run construct rules.
      * @param repository        The repository on which to operate.
      * @param startingPointUrls The list pof starting point URLs from the configuration file (aka "THE starting point")
      * @param doNotImportTheseUrls
@@ -1188,7 +1185,7 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Remove contexts from the repository.
      * @param repository
      * @param dropList
      * @throws InterruptedException
@@ -1323,7 +1320,7 @@ public class RepositoryOps {
 
 
     /**
-     *
+     * Return a list of files not needed any more in the repository.
      * @param con
      * @return
      */
@@ -1403,7 +1400,7 @@ public class RepositoryOps {
 
     
     /**
-     *
+     * Return a list of files changed in the repository since last update.
      * @param con
      * @return
      */

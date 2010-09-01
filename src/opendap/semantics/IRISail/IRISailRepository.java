@@ -9,14 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class extends org.openrdf.repository.sail.SailRepository. It can be used
- * to populate a repository from a file or URL. It inherits all fields and
- * methods from parent class SailRepository. It also has new methods to
- * recursively add imports and seealso statements refered documents. It is RDF
- * schema aware.
+ *  A local SailRepository . 
  * 
  * @author Haibo liu, iri.columbia.edu
- * @version 1.0
+ * 
  */
 public class IRISailRepository extends SailRepository {
 

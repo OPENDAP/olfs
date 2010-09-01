@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * A repository that serves as a proxy for a remote repository on a Sesame server
  * @author haibo
  *
  */

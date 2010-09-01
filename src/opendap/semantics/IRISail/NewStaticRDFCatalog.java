@@ -40,7 +40,7 @@ import org.openrdf.repository.RepositoryException;
 import com.ontotext.trree.owlim_ext.SailImpl;
 
 /**
- * A colon of LocalFileCatalog
+ * @ToDo
  */
 public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 

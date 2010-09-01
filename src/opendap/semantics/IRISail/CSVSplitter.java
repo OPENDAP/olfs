@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
  
 /**
- * Comma Separated Values (CSV) Splitter. The guts of a CsvReader.
+ * Comma Separated Values (CSV) Splitter. 
  * quotes are preserved
  */
  

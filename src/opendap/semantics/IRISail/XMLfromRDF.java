@@ -51,29 +51,7 @@ public class XMLfromRDF {
 		this.root = new Element(rootElementStr,topURINS);
 		this.doc = new Document(root);
 		this.con = con;
-		/*this.queryString0 = "SELECT DISTINCT topnameprop, obj, valueclass "+
-		"FROM "+
-		"{container:} rdfs:range {containerclass} rdfs:subClassOf {} owl:onProperty {topprop:}; owl:allValuesFrom {valueclass}, "+ 
-		"{subject} topnameprop {obj} rdf:type {valueclass} "+
-		"WHERE topnameprop=topprop:" +
-		"using namespace "+
-		"xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
-		"owl = <http://www.w3.org/2002/07/owl#>, "+
-		"xsd = <http://www.w3.org/2001/XMLSchema#>, "+
-		"container = <http://www.opengis.net/wcs/1.1#CoverageDescriptions>, "+
-		"topprop = <"+topURI+">";
-		*/
-		/*this.queryString0 = "SELECT DISTINCT topnameprop, obj, valueclass "+
-        "FROM "+
-        "{containerclass} rdfs:subClassOf {} owl:onProperty {topprop:}; owl:allValuesFrom {valueclass}, "+ 
-        "{subject} topnameprop {obj} rdf:type {valueclass} "+
-        "WHERE topnameprop = topprop: " +
-        "using namespace "+
-        "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
-        "owl = <http://www.w3.org/2002/07/owl#>, "+
-        "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
-        "topprop = <"+topURI+">";
-		*/
+
 		this.queryString0 = "SELECT DISTINCT topprop:, obj, valueclass "+
 		"FROM "+
 		"{containerclass} rdfs:subClassOf {} owl:onProperty {topprop:}; owl:allValuesFrom {valueclass}, "+
@@ -103,13 +81,9 @@ public class XMLfromRDF {
 					Value valueOftopnameprop = (Value) bindingSet.getValue("topnameprop");
 					Value valueOfobj = (Value) bindingSet.getValue("obj");
 					Value valueOfobjtype = (Value) bindingSet.getValue("objtype");
-					//log.debug("topprop:");
-					//log.debug(valueOftopnameprop.stringValue());
-					//log.debug("obj:");
-					//log.debug(valueOfobj.stringValue());
+
 					Value valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
-					//log.debug("valueclass:");
-					//log.debug(valueOfvalueclass.stringValue());
+
 					
 					String uritypestr;
 					if (valueOfobjtype!= null){uritypestr= valueOfobjtype.stringValue();}
@@ -124,16 +98,16 @@ public class XMLfromRDF {
 						int pl = valueOftopnameprop.toString().lastIndexOf("#");
 						ns = valueOftopnameprop.toString().substring(0,pl);
 						parent = valueOftopnameprop.toString().substring(pl+1);
-						//log.debug("H# "+parent);
+
 					}else if(valueOftopnameprop.toString().lastIndexOf("/") >= 0){
 						int pl = valueOftopnameprop.toString().lastIndexOf("/");
 						ns = valueOftopnameprop.toString().substring(0,pl);
 						parent = valueOftopnameprop.toString().substring(pl+1);
-						//log.debug("H/ "+parent);
+
 					}else{
 						parent = valueOftopnameprop.toString();
 						ns = valueOftopnameprop.toString();
-						//log.debug("H "+parent);
+
 					}
 								
 					Element chd1 = new Element(parent,ns); //duplicated as the root
@@ -179,13 +153,9 @@ public class XMLfromRDF {
                     
                     Value valueOfobj = (Value) bindingSet.getValue("obj");
                     Value valueOfobjtype = (Value) bindingSet.getValue("objtype");
-                    //log.debug("topprop:");
-                    //log.debug(topURI);
-                    //log.debug("obj:");
-                    //log.debug(valueOfobj.stringValue());
+
                     Value valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
-                    //log.debug("valueclass:");
-                    //log.debug(valueOfvalueclass.stringValue());
+
                     
                     String uritypestr;
                     if (valueOfobjtype!= null){uritypestr= valueOfobjtype.stringValue();}
@@ -200,16 +170,16 @@ public class XMLfromRDF {
                         int pl = topURI.lastIndexOf("#");
                         ns = topURI.substring(0,pl);
                         parent = topURI.substring(pl+1);
-                        //log.debug("H# "+parent);
+
                     }else if(topURI.lastIndexOf("/") >= 0){
                         int pl = topURI.lastIndexOf("/");
                         ns = topURI.substring(0,pl);
                         parent = topURI.substring(pl+1);
-                        //log.debug("H/ "+parent);
+
                     }else{
                         parent = topURI;
                         ns = topURI;
-                        //log.debug("H "+parent);
+
                     }
                                 
                     Element chd1 = new Element(parent,ns); //duplicated as the root

@@ -49,7 +49,7 @@ public class RdfImporter {
 
     /**
      * ****************************************
-     * Update repository
+     * Update repository. Find and import documents into the repository.
      *
      * @param repository
      * @param doNotImportUrls
