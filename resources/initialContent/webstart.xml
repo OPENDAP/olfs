@@ -5,7 +5,7 @@
         <JnlpFileName>idv.jnlp</JnlpFileName>
     </JwsHandler>
 
-    <JwsHandler className="opendap.webstart.NetcdfTools">
+    <JwsHandler className="opendap.webstart.NetCdfToolsViewerRequestHandler">
         <JnlpFileName>idv.jnlp</JnlpFileName>
     </JwsHandler>
 
