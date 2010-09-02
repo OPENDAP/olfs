@@ -17,7 +17,7 @@ public class Terms {
     public static final String cacheContext                  = "cachecontext";
     public static final String cacheContextUri               = rdfCacheNamespace + cacheContext;
 
-    public static final String contentTypeContext            = "contenttype";
+    public static final String contentTypeContext            = "Content-Type";
     public static final String contentTypeContextUri         = rdfCacheNamespace + contentTypeContext;
 
     public static final String externalInferencingContext    = "externalInferencing";
