@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Given a URL passed to the constructor, parse the URL and provide access
  * to its various parts. This class will break out the machine, path and leaf
- * components of the URL.
+ * components of the URL. This also holds a copy of the  entire URL's original
+ * text, so that references to instances can get both components and the real
+ * thing. 
  * 
  * @author jimg
  *
