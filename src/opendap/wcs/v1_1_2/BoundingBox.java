@@ -285,7 +285,7 @@ public class BoundingBox {
      * @return A bounding box string representing this BoundingBox
      * suitable for use with the DAP "geogrid()" server side function.
      */
-    public String getDapGeoGridFunctionBoundingBox(){
+    public String getDapGeogridFunctionBoundingBox(){
         double minLongitude = lowerCorner[0];
         double maxLongitude = upperCorner[0];
         double minLatitude  = lowerCorner[1];
@@ -295,6 +295,30 @@ public class BoundingBox {
         String bb =  maxLatitude + "," + minLongitude  + "," + minLatitude + "," +  maxLongitude;
 
         return bb;
+    }
+
+
+    public String getDapGeogridFunctionElevationSubset(String dapElevationVariableName){
+        String subset=null;
+        if(hasElevation()){
+            subset = "\""+getElevationMin() + "<="+dapElevationVariableName+"<="+getElevationMax()+"\"";
+        }
+        return subset;
+
+    }
+
+    public boolean hasElevation(){
+        if(lowerCorner.length>2 && upperCorner.length>2)
+            return true;
+        return false;
+
+    }
+    public double getElevationMin(){
+        return lowerCorner[2];
+    }
+
+    public double getElevationMax(){
+        return upperCorner[2];
     }
 
 

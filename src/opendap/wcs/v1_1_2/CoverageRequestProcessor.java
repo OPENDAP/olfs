@@ -145,6 +145,7 @@ public class CoverageRequestProcessor {
         String proj=null;
 
         RangeSubset rs = req.getRangeSubset();
+        TemporalSubset ts = req.getTemporalSubset();
         String coverageID = req.getCoverageID();
         String fieldID;
         BoundingBox subsetBB = req.getBbox();
@@ -180,6 +181,7 @@ public class CoverageRequestProcessor {
 
             String dataAccessUrl = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
+            /*
             if(fields.length>1){
                 throw new WcsException("You may explicitly select only a single wcs:Field. " +
                         "You may implicitly select all of the wcs:Fields in the data set by " +
@@ -188,7 +190,7 @@ public class CoverageRequestProcessor {
                         "ows:Field");
 
             }
-
+            */
             
 
             for(RangeSubset.FieldSubset fs :fields){
@@ -199,10 +201,23 @@ public class CoverageRequestProcessor {
                             WcsException.INVALID_PARAMETER_VALUE,"ows:Identifier");
 
 
-                String dapLatitude  = coverage.getLatitudeCoordinateDapId(fieldID);
-                String dapLongitude = coverage.getLongitudeCoordinateDapId(fieldID);
-                String dapElevation = coverage.getElevationCoordinateDapId(fieldID);
-                String dapTime      = coverage.getTimeCoordinateDapId(fieldID);
+                String dapLatitude       = coverage.getLatitudeCoordinateDapId(fieldID);
+                String dapLongitude      = coverage.getLongitudeCoordinateDapId(fieldID);
+                String latLonBoundingBox =  subsetBB.getDapGeogridFunctionBoundingBox();
+
+
+                String dapElevation           = coverage.getElevationCoordinateDapId(fieldID);
+                String geogridElevationSubset = null;
+                if(subsetBB.hasElevation())
+                    geogridElevationSubset    = subsetBB.getDapGeogridFunctionElevationSubset(dapElevation);
+
+
+                String dapTime           = coverage.getTimeCoordinateDapId(fieldID);
+                String dapTimeUnits      = "seconds since 1970-01-01T00:00:00Z";
+                String geogridTimeSubset = null;
+                if(ts!= null)
+                    geogridTimeSubset    = ts.getDapGeogridFunctionTimeSubset(dapTime, dapTimeUnits);
+
 
 
                 if(proj!=null)
@@ -210,10 +225,28 @@ public class CoverageRequestProcessor {
                 if(proj==null)
                     proj = "";
 
-                
-                proj += "geogrid("+fieldID+","+subsetBB.getDapGeoGridFunctionBoundingBox() +")";
 
-                //String gridConstraint = geoIndex(dataAccessUrl,fieldID, subsetBB.getDapGeoGridFunctionBoundingBox());
+
+
+                // Full query.
+                proj += "geogrid(" +
+                            fieldID + "," +
+                            dapLatitude + "," +
+                            dapLongitude + "," +
+                            latLonBoundingBox +
+                            geogridElevationSubset!=null?"," +geogridElevationSubset:""  +
+                            geogridTimeSubset!=null?"," +geogridTimeSubset:""  +
+                        ")";
+
+
+                // Does not subset by time or elevation.
+                // proj += "geogrid("+fieldID+","+dapLatitude+","+dapLongitude+","+latLonBoundingBox +",\")";
+
+                
+
+                //proj += "geogrid("+fieldID+","+subsetBB.getDapGeogridFunctionBoundingBox() +")";
+
+                //String gridConstraint = geoIndex(dataAccessUrl,fieldID, subsetBB.getDapGeogridFunctionBoundingBox());
 
                 //proj += fieldID + gridConstraint;
 
@@ -225,12 +258,6 @@ public class CoverageRequestProcessor {
     }
 
 
-
-    public static String geoIndex(String datasetUrl, String gridID, String dapBoundingBox){
-
-        return "[0:1:1000][0:1:1000]";
-
-    }
 
 
 

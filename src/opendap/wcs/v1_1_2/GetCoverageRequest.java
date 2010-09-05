@@ -85,7 +85,7 @@ public class GetCoverageRequest {
         this.gridCRS = gridCRS;
     }
 
-    public TemporalSubset getTseq() {
+    public TemporalSubset getTemporalSubset() {
         return tseq;
     }
 

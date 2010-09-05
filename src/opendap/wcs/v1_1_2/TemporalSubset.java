@@ -24,20 +24,26 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  */
 public class TemporalSubset {
 
 
-    private TimeSequenceItem[] _items=null;
+    private Logger log;
+
+
+    private TimeSequenceItem[] _timeTequenceItems =null;
 
 
 
     public TemporalSubset(Element ts) throws WcsException {
+
+        log = LoggerFactory.getLogger(this.getClass());
 
         Iterator i;
         Element e;
@@ -63,13 +69,13 @@ public class TemporalSubset {
             i.next();
             count++;
         }
-        _items = new TimeSequenceItem[count];
+        _timeTequenceItems = new TimeSequenceItem[count];
 
         index = 0;
         i = ts.getDescendants();
         while(i.hasNext()){
             e = (Element) i.next();
-            _items[index++] = new TimeSequenceItem(e);
+            _timeTequenceItems[index++] = new TimeSequenceItem(e);
         }
 
 
@@ -96,10 +102,10 @@ public class TemporalSubset {
         // and time ranges.
         tmp = s.split(",");
 
-        _items = new TimeSequenceItem[tmp.length];
+        _timeTequenceItems = new TimeSequenceItem[tmp.length];
 
         for(int i=0; i<tmp.length ;i++){
-            _items[i] = new TimeSequenceItem(tmp[i]);
+            _timeTequenceItems[i] = new TimeSequenceItem(tmp[i]);
         }
 
     }
@@ -108,7 +114,7 @@ public class TemporalSubset {
     public Element getTemporalSubsetElement() throws WcsException {
         Element ts = new Element("TemporalSubset",WCS.WCS_NS);
 
-        for(TimeSequenceItem tsi: _items){
+        for(TimeSequenceItem tsi: _timeTequenceItems){
             ts.addContent(tsi.getXMLElementRepresentation());
         }
 
@@ -116,4 +122,54 @@ public class TemporalSubset {
     }
 
 
+    /**
+     * Returns a time subset string for the geogrid() server side function.
+     *
+     * Since geogrid() does not implement time semantics that must be handled here.
+     *
+     * @param dapTimeVar The name of the time variable.
+     * @return
+     * @throws WcsException
+     */
+    public String getDapGeogridFunctionTimeSubset(String dapTimeVar, String timeUnits)throws WcsException {
+
+        String dapTemporalSubset = null;
+
+        for(TimeSequenceItem tsi: _timeTequenceItems){
+
+            if(dapTemporalSubset != null)
+                dapTemporalSubset += ",";
+
+            if(tsi.isTimePeriod()){
+                String beginPosition = TimeConversion.convertTime(tsi.getBeginPosition(),timeUnits);
+                String endPosition = TimeConversion.convertTime(tsi.getEndPosition(),timeUnits);
+
+                dapTemporalSubset += "\""+beginPosition + "<="+dapTimeVar+"<="+endPosition+"\"";
+
+            }
+            else if(tsi.isTimePosition()){
+                String timePosition = TimeConversion.convertTime(tsi.getTimePosition(),timeUnits);
+                dapTemporalSubset += "\""+timePosition + "="+dapTimeVar+"\"";
+            }
+            else {
+                log.error("getDapGeogridFunctionTimeSubset(): TimeSequence is neither a TimePeriod or " +
+                        "TimePosition! This should never ever happen.");
+                throw new WcsException("TimeSequence is neither a " +
+                        "TimePeriod or TimePosition! This should " +
+                        "never ever happen.",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "TimeSequence");
+
+            }
+        }
+        return dapTemporalSubset;
+
+    }
+
+
+
+
+
+
+    
 }
