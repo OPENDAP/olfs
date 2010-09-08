@@ -675,6 +675,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                             dapVariableID = getTimeCoordinateDapId(con, coverageID, fieldID);
                             coverageDescription.setTimeCoordinateDapId(fieldID, dapVariableID);
+
+                            String timeUnits = getTimeUnits(con, coverageID, fieldID);
+                            coverageDescription.setTimeUnits(fieldID, timeUnits);
                         }
 
                     }
@@ -942,6 +945,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         String coordinateDapId = runQuery(con, qString);
         //log.debug("getTimeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         return coordinateDapId;
+    }
+
+    private String getTimeUnits(RepositoryConnection con, String coverageId, String fieldId) {
+        return "seconds since 1970-01-01T00:00:00Z";
     }
 
     private String runQuery(RepositoryConnection con, String qString) {
