@@ -213,7 +213,7 @@ public class CoverageRequestProcessor {
 
 
                 String dapTime           = coverage.getTimeCoordinateDapId(fieldID);
-                String dapTimeUnits      = "seconds since 1970-01-01T00:00:00Z";
+                String dapTimeUnits      = coverage.getTimeUnits(fieldID);
                 String geogridTimeSubset = null;
                 if(ts!= null)
                     geogridTimeSubset    = ts.getDapGeogridFunctionTimeSubset(dapTime, dapTimeUnits);

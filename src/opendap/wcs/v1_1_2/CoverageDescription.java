@@ -54,6 +54,7 @@ public class CoverageDescription {
     private HashMap<String,String> _longitudeCoordinateDapId;
     private HashMap<String,String> _elevationCoordinateDapId;
     private HashMap<String,String> _timeCoordinateDapId;
+    private HashMap<String,String> _timeUnits;
 
 
 
@@ -64,6 +65,7 @@ public class CoverageDescription {
         _longitudeCoordinateDapId = new HashMap<String,String>();
         _elevationCoordinateDapId = new HashMap<String,String>();
         _timeCoordinateDapId = new HashMap<String,String>();
+        _timeUnits = new HashMap<String,String>();
 
 
         WCS.checkCoverageDescription(cd);
@@ -335,6 +337,13 @@ public class CoverageDescription {
     }
     public void setTimeCoordinateDapId(String fieldID, String dapVariableID) {
         _timeCoordinateDapId.put(fieldID,dapVariableID);
+    }
+
+    public void setTimeUnits(String fieldID, String timeUnits) {
+        _timeUnits.put(fieldID,timeUnits);
+    }
+    public String getTimeUnits(String fieldID) {
+        return _timeUnits.get(fieldID);
     }
 
 
