@@ -997,9 +997,11 @@ public class RepositoryOps {
     /**
      * Update the repository. Drop outdated files, add new files and run construct rules.
      * @param repository        The repository on which to operate.
-     * @param startingPointUrls The list pof starting point URLs from the configuration file (aka "THE starting point")
-     * @param doNotImportTheseUrls
-     * @param resourceDir
+     * @param startingPointUrls The list of starting point URLs from the configuration file (aka "THE starting point")
+     * @param doNotImportTheseUrls  A list of URL's that should not be loaded into the repository, even if they are
+     * encountered in the tree of dependencies.
+     * @param resourceDir The local system directory in which to find crucial files (for example XSL transforms) used
+     * by the semantic processing.
      * @return Returns true if the update results in changes to the repository.
      * @throws InterruptedException If the thread of execution is interrupted.
      * @throws RepositoryException  When there are problems working with the repository.
