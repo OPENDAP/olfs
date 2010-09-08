@@ -7,6 +7,7 @@ import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
@@ -359,18 +360,15 @@ public class RdfImporter {
 
 
 
-/**
- * Take file to transform and the style sheet to apply, return transformed file as 
- * ByteArrayInputStream
- * @param is
- * @param xsltFileName
- * @return
- * @throws SaxonApiException
- * @throws IOException
- */
-
-
-    
+    /**
+     * Take file to transform and the style sheet to apply, return transformed file as 
+     * ByteArrayInputStream
+     * @param is
+     * @param xsltFileName
+     * @return
+     * @throws SaxonApiException
+     * @throws IOException
+     */
     public ByteArrayInputStream transform(InputStream is, String xsltFileName) throws SaxonApiException, IOException {
         return transform(new StreamSource(is),xsltFileName);
     }
@@ -428,50 +426,42 @@ public class RdfImporter {
     }
     /**
      * Return URL of the transformation file.
-     * @param String importUrl
-     * @param Repository repository
-     * @return String xsltTransformationFileUrl
+     * @param importUrl
+     * @param repository
+     * @return xsltTransformationFileUrl-Url of the transformation stylesheet
      */
     private String getXsltTransformation(Repository repository, String importUrl){
         TupleQueryResult result = null;
         
         RepositoryConnection con = null;
         String xsltTransformationFileUrl = null;
-        
+        ValueFactory f = null;
         try {
             con = repository.getConnection();
-               
-            String queryString = "SELECT file, xslt "
-                + "FROM {file} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
+            f = repository.getValueFactory();  
+            String queryString = "SELECT xslt "
+                + "FROM {<" + importUrl+ ">} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
                 + "[{xslt} dcterm:" + Terms.isReplacedBy + "{newxslt}] " 
                 + "WHERE newxslt=NULL "
                 + "using namespace "
                 + "dcterm = <" +Terms.dcTermNamespace+ ">, "
                 + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
-            log.debug("Query for transformation file: " + queryString);
-
-            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
-
-            result = tupleQuery.evaluate();
-        
-            while (result.hasNext()) {
-                BindingSet bindingSet = result.next();
-                Value firstValue = bindingSet.getValue("file");
-                Value secondValue = bindingSet.getValue("xslt");
             
-                if (firstValue.stringValue().equals(importUrl)){
-                    xsltTransformationFileUrl= secondValue.stringValue();
-                }
+            log.debug("Query for transformation file: " + queryString);
+            
+            String hasTran = Terms.rdfCacheNamespace + Terms.hasXsltTransformation;
+            
+            URI sbj = f.createURI(importUrl);
+            URI prd = f.createURI(hasTran);
+            RepositoryResult<Statement> statements = con.getStatements((Resource)sbj, prd, null,true);
+            
+            while (statements.hasNext()){
+                Statement s = statements.next();
+                xsltTransformationFileUrl= s.getObject().stringValue();
+                log.debug("Transformation file= " + xsltTransformationFileUrl);
             }
-        
         } catch (RepositoryException e) {
             log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
-                    +e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught a ! MalformedQueryException in getXsltTransformation Msg: "
-                    +e.getMessage());
-        } catch (QueryEvaluationException e) {
-            log.error("Caught a QueryEvaluationException! in getXsltTransformation Msg: "
                     +e.getMessage());
         }finally {
             if (result != null) {
