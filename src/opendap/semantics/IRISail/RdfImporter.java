@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -264,30 +265,8 @@ public class RdfImporter {
 
                                 addedDocument = true;
 
-
-                            /*} else if (importURL.endsWith("+psdef/")) {
-
-                                String transformFile = "xsl/RDFa2RDFXML.xsl";
-
-                                ByteArrayInputStream inStream;
-                                log.info("Transforming " + importURL+" with "+transformFile);
-
-                                inStream = transform(importIS,resourceDir+transformFile);
-
-                                log.info("Finished transforming RDFa " + importURL);
-
-                                importUrl(con, importURL, contentType, inStream);
-
-                                addedDocument = true;
-                             */
-
                             } else {
 
-                                //urlc.setRequestProperty("Accept",
-                                //                "application/rdf+xml,application/xml,text/xml,*/*");
-                                // urlc.setRequestProperty("Accept",
-                                // "application/rdf+xml, application/xml;
-                                // q=0.9,text/xml; q=0.9, */*; q=0.2");
 
 
                                 if ((contentType != null) &&
@@ -380,24 +359,33 @@ public class RdfImporter {
 
 
 
-
+/**
+ * Take file to transform and the style sheet to apply, return transformed file as 
+ * ByteArrayInputStream
+ * @param is
+ * @param xsltFileName
+ * @return
+ * @throws SaxonApiException
+ * @throws IOException
+ */
 
 
     
-    public ByteArrayInputStream transform(InputStream is, String xsltFileName) throws SaxonApiException {
+    public ByteArrayInputStream transform(InputStream is, String xsltFileName) throws SaxonApiException, IOException {
         return transform(new StreamSource(is),xsltFileName);
     }
 
     /**
-     * Compile and execute a simple transformation that applies a stylesheet to
+     * Compile and execute a simple transformation that applies a style sheet to
      * an input stream, and serializing the result to an OutPutStream
      *
      * @param sourceURL
-     * @return
+     * @return ByteArrayInputStream
      * @throws net.sf.saxon.s9api.SaxonApiException
+     * @throws IOException 
      */
     public ByteArrayInputStream transform(StreamSource sourceURL, String xsltFileName)
-            throws SaxonApiException {
+            throws SaxonApiException, IOException {
         log.debug("Executing XSL Transform Operation.");
         log.debug("XSL Transform Filename: "+xsltFileName);
 
@@ -411,12 +399,17 @@ public class RdfImporter {
 
         log.debug("Document to transform: "+doc);
 
-
+        
         Processor proc = new Processor(false);
         XsltCompiler comp = proc.newXsltCompiler();
-        XsltExecutable exp = comp.compile(new StreamSource(new File(
-                xsltFileName)));
-
+        XsltExecutable exp = null;
+        if (xsltFileName.startsWith("http://")){
+            URL myurl = new URL(xsltFileName);
+            HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
+            exp = comp.compile(new StreamSource(hc.getInputStream()));
+        } else{
+        exp = comp.compile(new StreamSource(new File(xsltFileName)));
+        }
         XdmNode source = proc.newDocumentBuilder().build(sourceURL);
         Serializer out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
@@ -441,36 +434,36 @@ public class RdfImporter {
      */
     private String getXsltTransformation(Repository repository, String importUrl){
         TupleQueryResult result = null;
-        List<String> bindingNames;
+        
         RepositoryConnection con = null;
         String xsltTransformationFileUrl = null;
         
         try {
             con = repository.getConnection();
                
-        String queryString = "SELECT file, xslt "
-        //+ "FROM {<" + importUrl + ">} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
-            + "FROM {file} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
-            + "[{xslt} dcterm:" + Terms.isReplacedBy + "{newxslt}] " 
-        + "WHERE newxslt=NULL "
-        + "using namespace "
-        + "dcterm = <" +Terms.dcTermNamespace+ ">, "
-        + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
-        log.debug("Query for transformation file: " + queryString);
+            String queryString = "SELECT file, xslt "
+                + "FROM {file} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
+                + "[{xslt} dcterm:" + Terms.isReplacedBy + "{newxslt}] " 
+                + "WHERE newxslt=NULL "
+                + "using namespace "
+                + "dcterm = <" +Terms.dcTermNamespace+ ">, "
+                + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
+            log.debug("Query for transformation file: " + queryString);
 
-        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
-                queryString);
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString);
 
-        result = tupleQuery.evaluate();
-        while (result.hasNext()) {
-            BindingSet bindingSet = result.next();
-            Value firstValue = bindingSet.getValue("file");
-            Value secondValue = bindingSet.getValue("xslt");
-            log.debug("Query for transformation file: " +firstValue.toString() );
-            if (firstValue.stringValue().equals(importUrl)){
-            xsltTransformationFileUrl= secondValue.stringValue();
+            result = tupleQuery.evaluate();
+        
+            while (result.hasNext()) {
+                BindingSet bindingSet = result.next();
+                Value firstValue = bindingSet.getValue("file");
+                Value secondValue = bindingSet.getValue("xslt");
+            
+                if (firstValue.stringValue().equals(importUrl)){
+                    xsltTransformationFileUrl= secondValue.stringValue();
+                }
             }
-        }
+        
         } catch (RepositoryException e) {
             log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
                     +e.getMessage());
