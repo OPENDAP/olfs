@@ -22,9 +22,10 @@ public class TimeConversion {
 
 
     /*
+    Examples:
 
    COARDS TIME:
-
+   <pre>
    <Array name="TIME">
        <Attribute name="units" type="String">
            <value>hour since 0000-01-01 00:00:00</value>

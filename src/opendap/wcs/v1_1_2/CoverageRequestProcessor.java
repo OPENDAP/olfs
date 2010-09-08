@@ -234,8 +234,8 @@ public class CoverageRequestProcessor {
                             dapLatitude + "," +
                             dapLongitude + "," +
                             latLonBoundingBox +
-                            geogridElevationSubset!=null?"," +geogridElevationSubset:""  +
-                            geogridTimeSubset!=null?"," +geogridTimeSubset:""  +
+                            (geogridElevationSubset!=null?"," +geogridElevationSubset:"")  +
+                            (geogridTimeSubset!=null?"," +geogridTimeSubset:"")  +
                         ")";
 
 
