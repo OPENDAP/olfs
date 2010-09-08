@@ -47,7 +47,13 @@ public class Terms {
         
     public static final String serqlTextType                 = "serql_text";
     public static final String serqlTextTypeUri              = rdfCacheNamespace + serqlTextType;
-
-
+    
+    public static final String hasXsltTransformation         = "hasXsltTransformation";
+    public static final String hasXsltTransformationUri      = rdfCacheNamespace + hasXsltTransformation;
+    
+    public static final String dcTermNamespace               = "http://purl.org/dc/terms/";
+    public static final String isReplacedBy                  = "isReplacedBy";
+    public static final String isReplacedByUri               = dcTermNamespace + isReplacedBy;
+    
     public static final String rdfType                       = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 }

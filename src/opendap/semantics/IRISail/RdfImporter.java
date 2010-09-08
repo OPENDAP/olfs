@@ -229,8 +229,21 @@ public class RdfImporter {
 
                             log.debug("Import URL appears valid ( " + importURL + " )");
                             //@todo make this a more robust
+                            String transformFile = getXsltTransformation(repository, importURL);
+                            log.debug("Transformation =  " + transformFile);
+                            if (transformFile != null){
+                                
+                                ByteArrayInputStream inStream;
+                                log.info("Transforming " + importURL+" with "+transformFile);
 
-                            if (importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
+                                inStream = transform(importIS,transformFile);
+
+                                log.info("Finished transforming RDFa " + importURL);
+
+                                importUrl(con, importURL, contentType, inStream);
+
+                                addedDocument = true;  
+                            }else if(importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
 
                                 importUrl(con, importURL, contentType, importIS);
 
@@ -239,7 +252,7 @@ public class RdfImporter {
 
                             } else if (importURL.endsWith(".xsd")) {
 
-                                String transformFile = "xsl/xsd2owl.xsl";
+                                transformFile = "xsl/xsd2owl.xsl";
 
                                 ByteArrayInputStream inStream;
                                 log.info("Transforming  '" + importURL+"' with "+transformFile);
@@ -252,7 +265,7 @@ public class RdfImporter {
                                 addedDocument = true;
 
 
-                            } else if (importURL.endsWith("+psdef/")) {
+                            /*} else if (importURL.endsWith("+psdef/")) {
 
                                 String transformFile = "xsl/RDFa2RDFXML.xsl";
 
@@ -266,7 +279,7 @@ public class RdfImporter {
                                 importUrl(con, importURL, contentType, inStream);
 
                                 addedDocument = true;
-
+                             */
 
                             } else {
 
@@ -419,5 +432,72 @@ public class RdfImporter {
         return new ByteArrayInputStream(outStream.toByteArray());
 
 
+    }
+    /**
+     * Return URL of the transformation file.
+     * @param String importUrl
+     * @param Repository repository
+     * @return String xsltTransformationFileUrl
+     */
+    private String getXsltTransformation(Repository repository, String importUrl){
+        TupleQueryResult result = null;
+        List<String> bindingNames;
+        RepositoryConnection con = null;
+        String xsltTransformationFileUrl = null;
+        
+        try {
+            con = repository.getConnection();
+               
+        String queryString = "SELECT file, xslt "
+        //+ "FROM {<" + importUrl + ">} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
+            + "FROM {file} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
+            + "[{xslt} dcterm:" + Terms.isReplacedBy + "{newxslt}] " 
+        + "WHERE newxslt=NULL "
+        + "using namespace "
+        + "dcterm = <" +Terms.dcTermNamespace+ ">, "
+        + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
+        log.debug("Query for transformation file: " + queryString);
+
+        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                queryString);
+
+        result = tupleQuery.evaluate();
+        while (result.hasNext()) {
+            BindingSet bindingSet = result.next();
+            Value firstValue = bindingSet.getValue("file");
+            Value secondValue = bindingSet.getValue("xslt");
+            log.debug("Query for transformation file: " +firstValue.toString() );
+            if (firstValue.stringValue().equals(importUrl)){
+            xsltTransformationFileUrl= secondValue.stringValue();
+            }
+        }
+        } catch (RepositoryException e) {
+            log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
+                    +e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("Caught a ! MalformedQueryException in getXsltTransformation Msg: "
+                    +e.getMessage());
+        } catch (QueryEvaluationException e) {
+            log.error("Caught a QueryEvaluationException! in getXsltTransformation Msg: "
+                    +e.getMessage());
+        }finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (QueryEvaluationException e) {
+                    log.error("Caught a QueryEvaluationException! in getXsltTransformation Msg: "
+                            + e.getMessage());
+                }
+            }
+
+            try {
+                con.close();
+            } catch (RepositoryException e) {
+                log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
+                        + e.getMessage());
+            }
+        }
+        
+        return xsltTransformationFileUrl;
     }
 }
