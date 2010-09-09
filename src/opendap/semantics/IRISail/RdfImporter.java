@@ -191,7 +191,7 @@ public class RdfImporter {
             con = repository.getConnection();
             
 
-            log.debug("rdfDocs.size=" + rdfDocs.size());
+            log.debug("addNeededRDFDocuments(): rdfDocs.size=" + rdfDocs.size());
             skipCount = 0;
             while (!rdfDocs.isEmpty()) {
                 importURL = rdfDocs.remove(0);
@@ -199,10 +199,10 @@ public class RdfImporter {
                 try {
 
 
-                    log.debug("Checking import URL: " + importURL);
+                    log.debug("addNeededRDFDocuments(): Checking import URL: " + importURL);
 
                     if (urlsToBeIgnored.contains(importURL)) {
-                        log.error("Previous server error, Skipping " + importURL);
+                        log.error("addNeededRDFDocuments(): Previous server error, Skipping " + importURL);
                     } else {
 
                         URL myurl = new URL(importURL);
@@ -210,37 +210,37 @@ public class RdfImporter {
 
                         int rsCode;
                         hc = (HttpURLConnection) myurl.openConnection();
-                        log.debug("Connected to import URL: " + importURL);
+                        log.debug("addNeededRDFDocuments(): Connected to import URL: " + importURL);
 
                         rsCode = hc.getResponseCode();
                         contentType = hc.getContentType();
                         importIS = hc.getInputStream();
 
-                        log.debug("Got HTTP status code: " + rsCode);
-                        log.debug("Got Content Type:     " + contentType);
+                        log.debug("addNeededRDFDocuments(): Got HTTP status code: " + rsCode);
+                        log.debug("addNeededRDFDocuments(): Got Content Type:     " + contentType);
 
                         if (rsCode == -1) {
-                            log.error("Unable to get an HTTP status code for resource "
+                            log.error("addNeededRDFDocuments(): Unable to get an HTTP status code for resource "
                                     + importURL + " WILL NOT IMPORT!");
                             urlsToBeIgnored.add(importURL);
 
                         } else if (rsCode != 200) {
-                            log.error("Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
+                            log.error("addNeededRDFDocuments(): Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
                             urlsToBeIgnored.add(importURL);
                         } else {
 
-                            log.debug("Import URL appears valid ( " + importURL + " )");
+                            log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + importURL + " )");
                             //@todo make this a more robust
                             String transformFile = getXsltStylesheet(repository, importURL);
-                            log.debug("Transformation =  " + transformFile);
+                            log.debug("addNeededRDFDocuments(): Transformation =  " + transformFile);
                             if (transformFile != null){
                                 
                                 ByteArrayInputStream inStream;
-                                log.info("Transforming " + importURL+" with "+transformFile);
+                                log.info("addNeededRDFDocuments(): Transforming " + importURL+" with "+transformFile);
 
                                 inStream = transform(importIS,transformFile);
 
-                                log.info("Finished transforming RDFa " + importURL);
+                                log.info("addNeededRDFDocuments(): Finished transforming RDFa " + importURL);
 
                                 importUrl(con, importURL, contentType, inStream);
 
@@ -257,10 +257,10 @@ public class RdfImporter {
                                 transformFile = "xsl/xsd2owl.xsl";
 
                                 ByteArrayInputStream inStream;
-                                log.info("Transforming  '" + importURL+"' with "+transformFile);
+                                log.info("addNeededRDFDocuments(): Transforming  '" + importURL+"' with "+transformFile);
                                 inStream = transform(importIS,resourceDir+transformFile);
 
-                                log.info("Finished transforming URL " + importURL);
+                                log.info("addNeededRDFDocuments(): Finished transforming URL " + importURL);
 
                                 importUrl(con, importURL, contentType, inStream);
 
@@ -277,18 +277,18 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
                                     importUrl(con, importURL, contentType, importIS);
-                                    log.info("Imported non owl/xsd from " + importURL);
+                                    log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + importURL);
                                     addedDocument = true;
 
                                 } else {
-                                    log.warn("SKIPPING Import URL '" + importURL + "' It does not appear to reference a " +
+                                    log.warn("addNeededRDFDocuments(): SKIPPING Import URL '" + importURL + "' It does not appear to reference a " +
                                             "document that I know how to process.");
                                     urlsToBeIgnored.add(importURL); //skip this file
                                     skipCount++;
 
                                 }
 
-                                log.info("Total non owl/xsd files skipped: " + skipCount);
+                                log.info("addNeededRDFDocuments(): Total non owl/xsd files skipped: " + skipCount);
                             }
                         }
                     } // while (!rdfDocs.isEmpty()
@@ -296,7 +296,7 @@ public class RdfImporter {
                 } catch (Exception e) {
                     log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
                     if (importURL != null){
-                        log.warn("SKIPPING Import URL '"+importURL+"' Because bad things haoppened when we tried to get it.");
+                        log.warn("addNeededRDFDocuments(): SKIPPING Import URL '"+importURL+"' Because bad things happened when we tried to get it.");
                         urlsToBeIgnored.add(importURL); //skip this file
                     }
                 } finally {
@@ -321,13 +321,13 @@ public class RdfImporter {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error("Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
+                    log.error("addNeededRDFDocuments(): Caught an RepositoryException! in addNeededRDFDocuments() Msg: "
                             + e.getMessage());
                 }
             }
             inferEndTime = new Date().getTime();
             double inferTime = (inferEndTime - inferStartTime) / 1000.0;
-            log.debug("Import takes " + inferTime + " seconds");
+            log.debug("addNeededRDFDocuments(): Import takes " + inferTime + " seconds");
 
 
         }
@@ -384,29 +384,29 @@ public class RdfImporter {
      */
     public ByteArrayInputStream transform(StreamSource sourceURL, String xsltFileName)
             throws SaxonApiException, IOException {
-        log.debug("Executing XSL Transform Operation.");
-        log.debug("XSL Transform Filename: "+xsltFileName);
+        log.debug("transform(): Executing XSL Transform Operation.");
+        log.debug("transform(): XSL Transform Filename: " + xsltFileName);
 
         String doc = sourceURL.getSystemId();
-        if(doc==null)
+        if (doc == null)
             doc = sourceURL.getPublicId();
 
-        if(doc==null)
+        if (doc == null)
             doc = "StreamSource";
 
 
-        log.debug("Document to transform: "+doc);
+        log.debug("transform(): Document to transform: " + doc);
 
-        
+
         Processor proc = new Processor(false);
         XsltCompiler comp = proc.newXsltCompiler();
         XsltExecutable exp = null;
-        if (xsltFileName.startsWith("http://")){
+        if (xsltFileName.startsWith("http://")) {
             URL myurl = new URL(xsltFileName);
             HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
             exp = comp.compile(new StreamSource(hc.getInputStream()));
-        } else{
-        exp = comp.compile(new StreamSource(new File(xsltFileName)));
+        } else {
+            exp = comp.compile(new StreamSource(new File(xsltFileName)));
         }
         XdmNode source = proc.newDocumentBuilder().build(sourceURL);
         Serializer out = new Serializer();
@@ -424,6 +424,7 @@ public class RdfImporter {
 
 
     }
+
     /**
      * Return URL of the transformation file.
      * @param importUrl-the file to transform
