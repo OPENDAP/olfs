@@ -29,8 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Create JDOM document by querying against Sesame2 RDF store.
- * @author Haibo Liu, haibo@iri.columbia.edu
+ * Create a JDOM document by querying against Sesame-OWLIM RDF store. The rootElementStr
+ * is the outer wrapper of the document. The topURI is the top element to retrieve
+ * from the repository.
+ *
+ * @author Haibo 
  * @version 1.0
  */
 public class XMLfromRDF {
@@ -39,15 +42,20 @@ public class XMLfromRDF {
 	private Element root;
 	private String queryString0;
 	private Logger log;
-/**
- * Constructor, initializes doc, creates top query.
- */
+
+    /**
+     * Constructor, create the top query and the outer wrapper of the document. 
+     * @param con-connection to the repository.
+     * @param rootElementStr-the outer wrapper of the document.
+     * @param topURI-the top element in the document.
+     */
 	public XMLfromRDF(RepositoryConnection con, String rootElementStr, String topURI) {
 		this.log = LoggerFactory.getLogger(getClass());
 		URI uri = new URIImpl(topURI);
-		int pl = topURI.lastIndexOf("#");
-		String ns = topURI.substring(0,pl);
-		Namespace topURINS = Namespace.getNamespace(ns);
+		//int pl = topURI.lastIndexOf("#");
+		//String ns = topURI.substring(0,pl);
+		//Namespace topURINS = Namespace.getNamespace(ns);
+        Namespace  topURINS = Namespace.getNamespace(uri.getNamespace());
 		this.root = new Element(rootElementStr,topURINS);
 		this.doc = new Document(root);
 		this.con = con;
@@ -62,78 +70,8 @@ public class XMLfromRDF {
         "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
         "topprop = <"+topURI+">";
 	}
-	public void getXMLfromRDF(){
-		TupleQueryResult result0 = null;
-		try{
-		    log.debug("queryString0: " +queryString0);
-			TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString0);
-			
-			result0 = tupleQuery.evaluate();
-			//log.debug("Qresult: "+result0.hasNext());
-			List<String> bindingNames = result0.getBindingNames();
-			//log.debug(bindingNames.probeServletContext());
-			while ( result0.hasNext()) {
-				BindingSet bindingSet = (BindingSet) result0.next();
-				//log.debug(bindingSet.probeServletContext());
-										
-				if (bindingSet.getValue("topnameprop") !=null && bindingSet.getValue("obj") != null 
-						&& bindingSet.getValue("valueclass") != null){
-					Value valueOftopnameprop = (Value) bindingSet.getValue("topnameprop");
-					Value valueOfobj = (Value) bindingSet.getValue("obj");
-					Value valueOfobjtype = (Value) bindingSet.getValue("objtype");
 
-					Value valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
-
-					
-					String uritypestr;
-					if (valueOfobjtype!= null){uritypestr= valueOfobjtype.stringValue();}
-					else{
-						uritypestr= "nullstring";	
-					}
-					String queryString1 = createQueryString(valueOfobj.toString(), valueOfvalueclass);
-					String parent,ns;
-														
-					if (valueOftopnameprop.toString().lastIndexOf("#") >= 0){
-								
-						int pl = valueOftopnameprop.toString().lastIndexOf("#");
-						ns = valueOftopnameprop.toString().substring(0,pl);
-						parent = valueOftopnameprop.toString().substring(pl+1);
-
-					}else if(valueOftopnameprop.toString().lastIndexOf("/") >= 0){
-						int pl = valueOftopnameprop.toString().lastIndexOf("/");
-						ns = valueOftopnameprop.toString().substring(0,pl);
-						parent = valueOftopnameprop.toString().substring(pl+1);
-
-					}else{
-						parent = valueOftopnameprop.toString();
-						ns = valueOftopnameprop.toString();
-
-					}
-								
-					Element chd1 = new Element(parent,ns); //duplicated as the root
-					
-					root.addContent(chd1);
-					this.addChildren(queryString1, chd1, con,doc);
-				} //if (bindingSet.getValue("topnameprop") 
-			} //while ( result0.hasNext())
-		}catch ( QueryEvaluationException e){
-			log.error(e.getMessage());
-		}catch (RepositoryException e){
-			log.error(e.getMessage());
-		}catch (MalformedQueryException e) {
-			log.error(e.getMessage());
-		}finally{
-            if(result0!=null){
-                try {
-                    result0.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-		}
-	}
-	
-	
+    	
 	public void getXMLfromRDF(String topURI){
         TupleQueryResult result0 = null;
         try{
