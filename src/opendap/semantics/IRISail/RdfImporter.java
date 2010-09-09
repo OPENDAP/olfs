@@ -419,7 +419,7 @@ public class RdfImporter {
         trans.setDestination(out);
         trans.transform();
         log.info(outStream.toString());
-        log.debug("XSL Transform complete.");
+        log.debug("transform(): XSL Transform complete.");
         return new ByteArrayInputStream(outStream.toByteArray());
 
 
