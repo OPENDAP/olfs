@@ -95,7 +95,7 @@
                 </tr>
             </table>
 
-            <h1><font size="0">Dataset: <xsl:value-of select="@name"/> </font>
+            <h1><font size="0">Dataset: <xsl:value-of select="@name"/> </font><br/>
             <font class="small_italic">(<xsl:value-of select="@xml:base"/>)</font>  </h1>
 
             <xsl:copy-of select="$webStartAppsLinks"/>
