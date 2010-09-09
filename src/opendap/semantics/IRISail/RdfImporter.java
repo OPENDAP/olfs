@@ -231,7 +231,7 @@ public class RdfImporter {
 
                             log.debug("Import URL appears valid ( " + importURL + " )");
                             //@todo make this a more robust
-                            String transformFile = getXsltTransformation(repository, importURL);
+                            String transformFile = getXsltStylesheet(repository, importURL);
                             log.debug("Transformation =  " + transformFile);
                             if (transformFile != null){
                                 
@@ -430,7 +430,7 @@ public class RdfImporter {
      * @param repository-the repository instance
      * @return xsltTransformationFileUrl-Url of the transformation stylesheet
      */
-    private String getXsltTransformation(Repository repository, String importUrl){
+    private String getXsltStylesheet(Repository repository, String importUrl){
         RepositoryConnection con = null;
         String xsltTransformationFileUrl = null;
         ValueFactory f = null;
