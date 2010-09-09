@@ -426,16 +426,16 @@ public class RdfImporter {
     }
     /**
      * Return URL of the transformation file.
-     * @param importUrl
-     * @param repository
+     * @param importUrl-the file to transform
+     * @param repository-the repository instance
      * @return xsltTransformationFileUrl-Url of the transformation stylesheet
      */
     private String getXsltTransformation(Repository repository, String importUrl){
-        TupleQueryResult result = null;
-        
         RepositoryConnection con = null;
         String xsltTransformationFileUrl = null;
         ValueFactory f = null;
+        RepositoryResult<Statement> statements = null;
+        
         try {
             con = repository.getConnection();
             f = repository.getValueFactory();  
@@ -444,7 +444,7 @@ public class RdfImporter {
             
             URI sbj = f.createURI(importUrl);
             URI prd = f.createURI(hasTran);
-            RepositoryResult<Statement> statements = con.getStatements((Resource)sbj, prd, null,true);
+            statements = con.getStatements((Resource)sbj, prd, null,true);
             
             while (statements.hasNext()){
                 Statement s = statements.next();
@@ -455,15 +455,13 @@ public class RdfImporter {
             log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
                     +e.getMessage());
         }finally {
-            if (result != null) {
-                try {
-                    result.close();
-                } catch (QueryEvaluationException e) {
-                    log.error("Caught a QueryEvaluationException! in getXsltTransformation Msg: "
-                            + e.getMessage());
-                }
+            try {
+                statements.close();
+            } catch (RepositoryException e) {
+                log.error("Caught a RepositoryException while closing statements! in getXsltTransformation Msg: "
+                        +e.getMessage());
             }
-
+           
             try {
                 con.close();
             } catch (RepositoryException e) {
