@@ -915,7 +915,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_latitude", coverageId, fieldId);
-        String coordinateDapId = runQuery(con, qString);
+        String coordinateDapId = runQuery(con, qString, "cidid");
         //log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
 
@@ -924,7 +924,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_longitude", coverageId, fieldId);
-        String coordinateDapId = runQuery(con, qString);
+        String coordinateDapId = runQuery(con, qString, "cidid");
         //log.debug("getLongitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         return coordinateDapId;
 
@@ -933,7 +933,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_elevation", coverageId, fieldId);
-        String coordinateDapId = runQuery(con, qString);
+        String coordinateDapId = runQuery(con, qString, "cidid");
         //log.debug("getElevationCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         return coordinateDapId;
 
@@ -942,16 +942,19 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_time", coverageId, fieldId);
-        String coordinateDapId = runQuery(con, qString);
+        String coordinateDapId = runQuery(con, qString, "cidid");
         //log.debug("getTimeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         return coordinateDapId;
     }
 
     private String getTimeUnits(RepositoryConnection con, String coverageId, String fieldId) {
-        return "seconds since 1970-01-01T00:00:00Z";
+        String qString = createCoordinateIdQuery("A_time", coverageId, fieldId);
+        String coordinateUnit = runQuery(con, qString, "unit");
+        log.debug("getTimeUnits(): '" + coordinateUnit + "' is the units of the time coordinate for FieldID: " + fieldId);
+        return coordinateUnit;
     }
 
-    private String runQuery(RepositoryConnection con, String qString) {
+    private String runQuery(RepositoryConnection con, String qString, String cidid) {
         String coordinateDapId = null;
         try {
 
@@ -967,7 +970,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
                     BindingSet bindingSet = result.next();
 
-                    Value firstValue = bindingSet.getValue("cidid");
+                    Value firstValue = bindingSet.getValue(cidid);
 
                     coordinateDapId = firstValue.stringValue();
                 }
@@ -999,7 +1002,25 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.debug("createCoordinateIdQuery: Built query string: '" + qString + "'");
         return qString;
     }
+    private String createCoordinateUnitsIdQuery(String coordinateName, String coverageStr, String fieldStr) {
 
+        String qString = "select cid,unit " +
+                "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
+                "{field} wcs:Identifier {fieldid}, " +
+                "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:" + coordinateName + "}; cfatt:units {unit} " +
+                "WHERE covid= \"" + coverageStr + "\" " +
+                "AND fieldid=\"" + fieldStr + "\" " +
+                "USING NAMESPACE " +
+                "wcs=<http://www.opengis.net/wcs/1.1#>, " +
+                "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
+                "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, " +
+                "cfatt=<http://iridl.ldeo.columbia.edu/ontologies/cf-att.owl#>, "+
+                "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>";
+        
+        log.debug("createTimeUnitsQuery: Built query string: '" + qString + "'");
+        return qString;
+    }
+    
     public long getLastModified() {
 
         return _catalogLastModifiedTime;
