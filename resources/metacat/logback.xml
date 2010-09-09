@@ -65,14 +65,7 @@
             <Pattern>${ErrorFormat}</Pattern>
         </layout>
     </appender>
-    
-    <!--logger name="opendap.metacat" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
-    </logger-->
-    <!--logger name="opendap.metacat.ThreddsCatalogUtil" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
-    </logger-->
-    
+        
     <logger name="opendap" level="ERROR">
         <appender-ref ref="ErrorLog"/>
     </logger>

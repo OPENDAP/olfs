@@ -1,6 +1,7 @@
 package opendap.metacat;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -21,8 +22,12 @@ public class DateString implements Comparable<DateString> {
 		calendar = getCalendar(d, dps);
 	}
 	
-	public String getDate() {
+	public String getDateString() {
 		return theDate;
+	}
+	
+	public Date getDate() {
+		return calendar.getTime();
 	}
 	
 	private GregorianCalendar getCalendar(String d, List<DatePart> dps) {

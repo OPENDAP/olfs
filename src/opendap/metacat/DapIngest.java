@@ -436,28 +436,19 @@ public class DapIngest {
 				insertEML(ddxUrl, eml);
 		}
 	}
-
-    /**
-     * To use a URL as a DocID in metacat, any dots (.) in the URL must be
-     * escaped. This function repalces dots with %2e
-     * @param URL
-     * @return The esacped URL
-     */
-    /*private String escapedURL(String URL) {
-    	return URL.replaceAll("\\.", "%2e");
-    }*/
     
     /**
-     * Given a URL, return the corresponding document id. A metacat docuement 
+     * Given a URL, return the corresponding document id. A metacat document 
      * id must be of the form <string>.<string>.<digit> Where the dots are 
      * literal and <string> must not contain any dots. Furthermore, only the
      * last two parts are used when accessing the document id; the first 
      * <string> is ignored. This method returns a document id by combining the 
      * value of the class' docidScope with an escaped URL and a '1'. 
-     * @param url
-     * @return A docuement id string suitable for use with metacat
+     * 
+     * @todo Fix this comment
+     * @return A document id string suitable for use with metacat
      */
-    private String getDocid(String url) {
+    private String getDocid() {
     	return docidScope + "." + metacatId.toString() + "." + metacatRevision;
     }
     
@@ -469,7 +460,7 @@ public class DapIngest {
      */
 	private void insertEML(String ddxUrl, String emlString) throws Exception {
 
-		String docid = getDocid(ddxUrl);
+		String docid = getDocid();
 		log.debug("Storing " + ddxUrl + "(docid:" + docid + ") in metacat.");
 
 		try {

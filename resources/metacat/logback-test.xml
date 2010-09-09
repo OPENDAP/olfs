@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 
-    <property name="logdir" value="DapIngest"/>
+    <property name="logdir" value="metacat"/>
     
     <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
-    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
+    <property name="ErrorFormat" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
     <property name="DebugFormat" value="[%thread] [%file:%line] %msg%n"/>
     <property name="InfoFormat" value="[%file:%line] %msg%n" />
     
@@ -63,7 +63,7 @@
             <MaxFileSize>5MB</MaxFileSize>
         </triggeringPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>${FORMAT}</Pattern>
+            <Pattern>${ErrorFormat}</Pattern>
         </layout>
     </appender>
     
@@ -71,14 +71,35 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
     
-    <logger name="opendap.metacat" level="DEBUG">
-        <appender-ref ref="DebugLog"/>
+    <logger name="opendap.metacat" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
     </logger>
 
-    <logger name="opendap.metacat.ResponseCachePostgres" level="ERROR">
-        <appender-ref ref="DebugLog"/>
+    <logger name="opendap.metacat.DateString" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
     </logger>
-    <logger name="opendap.metacat.ThreddsCatalogUtil" level="DEBUG">
+    
+    <logger name="opendap.metacat.URLClassifier" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.ClassifyServerBuildEML" level="DEBUG">
+        <appender-ref ref="InfoLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.ResponseCachePostgres" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.URLGroup" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.ResponseCachePostgres" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.ThreddsCatalogUtil" level="ERROR">
         <appender-ref ref="ErrorLog"/>
     </logger>
     

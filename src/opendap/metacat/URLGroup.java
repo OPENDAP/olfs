@@ -58,6 +58,16 @@ public class URLGroup {
 	}
 	
 	/**
+	 * How many URLs are in this groups?
+	 * 
+	 * @return The number of URL in the group.
+	 */
+	/*
+	public int getNumberOfUrls() {
+		return urls.size();
+	}
+	*/
+	/**
 	 * An Enumeration of the equivalence classes that help define this group.
 	 * @author jimg
 	 *
@@ -114,6 +124,28 @@ public class URLGroup {
 		}
 	}
 	
+	/**
+	 * Search for the Equivalence that has the largest number of DatePart 
+	 * instances and return it. This can be used to provide an ordering for
+	 * the URLs in the URLGroup.
+	 * 
+	 * @return An Equivalence for the component with the most date information.
+	 * Return null if no Equivalence has date information.
+	 */
+	public Equivalence getDateEquivalence() {
+		Equivalences equivs = getEquivalences();
+		Equivalence date = null;
+		int maxNumDateParts = 0;
+		for (Equivalence e : equivs) {
+			if (e.getNumberDateClassifications() > maxNumDateParts) {
+				maxNumDateParts = e.getNumberDateClassifications();
+				date = e;
+			}
+		}
+
+		return date;
+	}
+
 	public URLProcessedComponents getClassifications() {
 		return processedComponents;
 	}	

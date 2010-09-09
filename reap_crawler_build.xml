@@ -219,6 +219,7 @@
 				<include name="${jdom.lib}" />
 				<include name="${commons-cli.lib}" />
 				<include name="${commons-httpclient.lib}" />
+				
 				<include name="${saxon-jdom.lib}" />
 				<include name="${saxon-s9api.lib}" />
 				<include name="${saxon.lib}" />
@@ -235,6 +236,47 @@
 			</fileset>
 		</path>
 	</pathconvert>
+
+    <!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+      <pathconvert property="classifier_libs.jar" pathsep=" ">
+          <mapper>
+              <chainedmapper>
+                  <!-- remove absolute path -->
+                  <flattenmapper />
+                  <!-- add lib/ prefix -->
+                  <globmapper from="*" to="../lib/*" />
+              </chainedmapper>
+          </mapper>
+          <path>
+              <!-- lib.home contains all jar files -->
+              <fileset dir="${lib.dir}">
+                  <include name="${slf4j.lib}" />
+                  <include name="${logback-core.lib}" />
+                  <include name="${logback-classic.lib}" />
+                  <include name="${jdom.lib}" />
+                  <include name="${commons-cli.lib}" />
+                  <include name="${commons-httpclient.lib}" />
+                  <!--
+                  <include name="${saxon-jdom.lib}" />
+                  <include name="${saxon-s9api.lib}" />
+                  <include name="${saxon.lib}" />
+                  -->
+                  
+                  <!-- Used for metacat -->
+                  <!--
+                  <include name="${metacat.lib}" />
+                  <include name="${nceas-utilities.lib}" />
+                  <include name="${httpclient.lib}" />
+                  <include name="${servlet-api.lib}" />
+                  <include name="${catalina.lib}" />
+                  <include name="${xalan.lib}" />
+                  -->
+                  
+                  <include name="${postgres-jdbc.lib}" />
+              </fileset>
+          </path>
+      </pathconvert>
+
 
 
 	<target name="all" depends="clean,compile" description="Builds lots of stuff." />
@@ -467,8 +509,7 @@
 
 		<copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
 
-		<jar destfile="${build.libexec}/EMLBuilder.jar"
-            manifest="${resources.dir}/META-INF/EMLBuilder.MANIFEST.MF">
+		<jar destfile="${build.libexec}/EMLBuilder.jar">
 			<fileset dir="${build.classes}">
 				<include name="opendap/**/*.class"/>
 			</fileset>
@@ -476,50 +517,26 @@
                   dir="..." and an <include .../> element adds the directory
                   structure, too -->
 			<fileset file="resources/metacat/logback.xml"/>
+
+            <!-- define MANIFEST.MF -->
+            <manifest>
+                <attribute name="Built-By" value="ant" />
+                <attribute name="Main-Class" value="opendap.metacat.EMLBuilder" />
+                <!--section name="common">
+                  <attribute name="Specification-Title" value="${component.name}" />
+                  <attribute name="Specification-Version" value="${component.version}" />
+                  <attribute name="Specification-Vendor" value="${component.vendor}" />
+                  <attribute name="Implementation-Title" value="${component.name}" />
+                  <attribute name="Implementation-Version" value="${component.version} ${TODAY}" />
+                  <attribute name="Implementation-Vendor" value="${component.vendor}" />
+                </section-->
+
+                <!-- finally, use the magically generated libs path -->
+                <attribute name="Class-Path" value="${crawlers_libs.jar}" />
+            </manifest>
 		</jar>
 
 	</target>
-
-	   <!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
-	    <pathconvert property="classifier_libs.jar" pathsep=" ">
-	        <mapper>
-	            <chainedmapper>
-	                <!-- remove absolute path -->
-	                <flattenmapper />
-	                <!-- add lib/ prefix -->
-	                <globmapper from="*" to="../lib/*" />
-	            </chainedmapper>
-	        </mapper>
-	        <path>
-	            <!-- lib.home contains all jar files -->
-	            <fileset dir="${lib.dir}">
-	                <include name="${slf4j.lib}" />
-	                <include name="${logback-core.lib}" />
-	                <include name="${logback-classic.lib}" />
-	                <include name="${jdom.lib}" />
-	                <include name="${commons-cli.lib}" />
-	                <include name="${commons-httpclient.lib}" />
-	            	<!--
-	                <include name="${saxon-jdom.lib}" />
-	                <include name="${saxon-s9api.lib}" />
-	                <include name="${saxon.lib}" />
-                    -->
-	            	
-	                <!-- Used for metacat -->
-	            	<!--
-	                <include name="${metacat.lib}" />
-	                <include name="${nceas-utilities.lib}" />
-	                <include name="${httpclient.lib}" />
-	                <include name="${servlet-api.lib}" />
-	                <include name="${catalina.lib}" />
-	                <include name="${xalan.lib}" />
-                    -->
-	            	
-	                <include name="${postgres-jdbc.lib}" />
-	            </fileset>
-	        </path>
-	    </pathconvert>
-
 
     <target name="BuildURLClassifier"
         depends="compile"
@@ -789,6 +806,25 @@
 
 	</target>
 
+    <target  name="runClassifyServerBuildEML" depends="compile">
+
+        <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml"/>
+        <copy file="${resources.dir}/metacat/ddx2eml-3.2.xsl" tofile="${build.run}/ddx2eml-3.2.xsl"/>
+        <copy file="${resources.dir}/metacat/many_ddx2eml-1.0.xsl" tofile="${build.run}/many_ddx2eml-1.0.xsl"/>
+
+        <java classname="opendap.metacat.ClassifyServerBuildEML"
+                    fork="true"
+                    dir="${build.run}">
+            <jvmarg value="-Xms256m"/>
+            <jvmarg value="-Xmx1024m"/>
+        	<arg line="--verbose"/>
+            <arg line="--cache-name=satdat1.gso.uri.edu"/>
+        	<arg line="--catalog-root=http://satdat1.gso.uri.edu/opendap/catalog.xml"/>
+            <classpath refid="classpath"/>
+        </java>
+
+    </target>
+    
 	<!-- *******************************************************  -->
 
 	<!-- Run the 'Visited' cache builder -->

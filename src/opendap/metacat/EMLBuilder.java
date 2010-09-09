@@ -36,7 +36,6 @@ import opendap.xml.Transformer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -53,7 +52,9 @@ import org.slf4j.LoggerFactory;
  */
 public class EMLBuilder {
 
-	final static String ddx2emlPath = "ddx2eml-3.1.xsl";
+	final static String ddx2emlDefault = "ddx2eml-3.2.xsl";
+	
+	// private String ddx2emlPath;
 
 	private static Logger log = LoggerFactory.getLogger(EMLBuilder.class);
 
@@ -63,18 +64,22 @@ public class EMLBuilder {
     // This is the transformer that takes the DDX and returns EML
     private Transformer transformer;
 
-    private boolean verbose = false;
+    // private boolean verbose = false;
     
     private Date date = new Date();
 
 	public EMLBuilder() throws Exception {
-		this(false, "");
+		this(false, "", ddx2emlDefault);
 	}
 
 	public EMLBuilder(boolean useCache, String namePrefix) throws Exception{
+		this(useCache, namePrefix, ddx2emlDefault);
+	}
+	
+	public EMLBuilder(boolean useCache, String namePrefix, String xslt) throws Exception{
 
 		try {
-			transformer = new Transformer(ddx2emlPath);
+			transformer = new Transformer(xslt);
 		}
 		catch (SaxonApiException e) {
 			log.error("Could not build the XSL transformer object: ", e);
@@ -87,20 +92,22 @@ public class EMLBuilder {
 		if (useCache)
 			EMLCache = new ResponseCachePostgres(namePrefix + "EML", "eml_responses");
 	}
-
+	
 	/**
 	 * Get EML from a DDX URL or from the local cache of previously built
 	 * EML documents. This 'main()' builds an instance of DDXRetreiver so that
 	 * it can either read the DDX from the net or get it from a cache (other
 	 * options not withstanding) but the classes other methods assume that 
-	 * the DDX wil be accessed by the caller or a cached EML response is 
+	 * the DDX will be accessed by the caller or a cached EML response is 
 	 * being requested.
 	 * 
 	 * @param args
 	 */
-	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
-		EMLBuilder retriever = null;
+		
+		boolean verbose = false;
+		
+		EMLBuilder builder = null;
 
 		// create the command line parser
 		CommandLineParser parser = new PosixParser();
@@ -114,19 +121,8 @@ public class EMLBuilder {
 		options.addOption("n", "no-cache", false, "Do not cache EMLs. Ignored with -r or -p");
 		options.addOption("p", "print-cached", false, "Print all of the cached EMLs");
 		options.addOption("v", "verbose", false, "Wordy output");
-
-		options.addOption(OptionBuilder.withLongOpt("cache-name")
-						.withDescription( "Use this to set a prefix for the cache name.")
-						.hasArg()
-						.withArgName("cacheName")
-						.create());
-
-		options.addOption(OptionBuilder
-						.withLongOpt("ddx-url")
-						.withDescription("use this as the DDX URL and build the EML from the associated DDX document")
-						.hasArg()
-						.withArgName("ddxURL")
-						.create());
+		options.addOption("c", "cache-name", true, "Use this to set a prefix for the cache name.");
+		options.addOption("d", "ddx-url", true, "Use this as the DDX URL and build the EML from the associated DDX document.");
 
 		try {
 			// parse the command line arguments
@@ -137,51 +133,50 @@ public class EMLBuilder {
 			boolean useCache = !line.hasOption("n");
 			String cacheNamePrefix = line.getOptionValue("cache-name");
 
-			retriever = new EMLBuilder(useCache, cacheNamePrefix);
+			builder = new EMLBuilder(useCache, cacheNamePrefix);
 
-			retriever.verbose = line.hasOption("v");
-			if (retriever.verbose) {
+			verbose = line.hasOption("v");
+			if (verbose) {
 				System.out.println("DDX URL: " + ddxURL);
 			}
 			
 			if (line.hasOption("r")) {
-				if (retriever.verbose) {
-					System.out.println("EML: "
-							+ retriever.getCachedEMLDoc(ddxURL));
+				if (verbose) {
+					System.out.println("EML: " + builder.getCachedEMLDoc(ddxURL));
 				} 
 				else {
-					System.out.println(retriever.getCachedEMLDoc(ddxURL));
+					System.out.println(builder.getCachedEMLDoc(ddxURL));
 				}
 			} 
 			else if (line.hasOption("p")) {
-				Enumeration<String> emls = retriever.EMLCache.getLastVisitedKeys();
+				Enumeration<String> emls = builder.EMLCache.getLastVisitedKeys();
 				while (emls.hasMoreElements()) {
 					ddxURL = emls.nextElement();
-					if (retriever.verbose) {
+					if (verbose) {
 						System.out.println("DDX URL: " + ddxURL);
 						System.out.println("EML: "
-								+ retriever.EMLCache.getCachedResponse(ddxURL));
+								+ builder.EMLCache.getCachedResponse(ddxURL));
 					} 
 					else {
-						System.out.println(retriever.EMLCache.getCachedResponse(ddxURL));
+						System.out.println(builder.EMLCache.getCachedResponse(ddxURL));
 					}
 				}
 			} 
 			else {
 				DDXRetriever ddxSource = new DDXRetriever(true, cacheNamePrefix);
-				if (retriever.verbose) {
+				if (verbose) {
 					System.out.println("EML: "
-							+ retriever.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
+							+ builder.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
 				} 
 				else {
-					System.out.println(retriever.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
+					System.out.println(builder.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
 				}
 			}
 
 			// save the cache if neither the 'no-cache' nor read-cache options
 			// were used.
 			if (! (line.hasOption("n") && line.hasOption("r")))
-				retriever.EMLCache.saveState();
+				builder.EMLCache.saveState();
 
 		}
 		catch (ParseException exp) {
@@ -234,47 +229,71 @@ public class EMLBuilder {
 	 * DDX's URL as the key for the cache entry. If caching is not on, ignore
 	 * the DDX URL and don't use the cache.
 	 * 
-	 * @param DDXURL Use this as the key when caching the EML
+	 * @param ddxUrl Use this as the key when caching the EML
 	 * @param ddxString Build EML from this document
-	 * @return
+	 * @return The EML document
 	 * @throws Exception 
 	 */
-	public String getEML(String DDXURL, String ddxString) throws Exception {
+	public String getEML(String ddxUrl, String ddxString) throws Exception {
+
+		String params[] = new String[4];
+		
+		// '.' finds the start of the '.ddx. extension
+		String dataset_url = ddxUrl.substring(0, ddxUrl.lastIndexOf('.'));
+		// '/' + 1 finds the start of the filename
+		String filename = dataset_url.substring(ddxUrl.lastIndexOf('/') + 1);
+		
+		// Build the params
+		params[0] = "filename";
+		params[1] = filename;
+		params[2] = "dataset_url";
+		params[3] = dataset_url;
+		
+		return getEML(ddxUrl, ddxString, params);
+	}
+	
+	/**
+	 * This version takes a varying number of parameters. 
+	 * 
+	 * @param ddxUrl Use this as the key when caching the EML
+	 * @param ddxString Build EML from this document
+	 * @param params Array element pairs: name1, value1, name2, value2, ...
+	 * @return The EML document
+	 * @throws Exception
+	 */
+	public String getEML(String ddxUrl, String ddxString, String[] params) throws Exception {
 		// Get the EML document
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		XdmNode ddxXdm = null;
+		
 		try {
 			ddxXdm = transformer.build(new StreamSource(new ByteArrayInputStream(ddxString.getBytes("UTF-8"))));
-			
-			// '.' finds the start of the '.ddx. extension
-			String dataset_url = DDXURL.substring(0, DDXURL.lastIndexOf('.'));
-			// '/' + 1 finds the start of the filename
-			String filename = dataset_url.substring(DDXURL.lastIndexOf('/') + 1);
-				
+							
 			// Set parameters
-			transformer.setParameter("filename", filename);
-			transformer.setParameter("dataset_url", dataset_url);
-
+			for (int i = 0; i < params.length; i += 2) {
+				log.debug("Setting parameter named: " + params[i]);
+				transformer.setParameter(params[i], params[i+1]);
+			}
+			
 			transformer.transform(ddxXdm, os);
 		} 
 		catch (Exception e) {
-			log.error("While trying to transform the DDX at " + DDXURL);
+			log.error("While trying to transform the DDX: " + ddxString);
 			log.error("I got the following error: " + e.getMessage());
-			log.debug("The DDX value is: " + ddxString);
 			return "";
-			//throw e;
 		}
 		finally {
 			// Clear parameters
-			transformer.clearParameter("filename");
-			transformer.clearParameter("dataset_url");			
+			for (int i = 0; i < params.length; i += 2) {
+				transformer.clearParameter(params[i]);
+			}
 		}
 		
 		String eml = os.toString();
 		
 		if (EMLCache != null) {
-			EMLCache.setLastVisited(DDXURL, date.getTime());
-			EMLCache.setCachedResponse(DDXURL, eml);
+			EMLCache.setLastVisited(ddxUrl, date.getTime());
+			EMLCache.setCachedResponse(ddxUrl, eml);
 		}
 		
 		return eml;

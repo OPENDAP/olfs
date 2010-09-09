@@ -28,7 +28,7 @@ saxon 9. -->
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 
-    <xsl:variable name="ddx2eml_version">3.1.0</xsl:variable>
+    <xsl:variable name="ddx2eml_version">3.2.0</xsl:variable>
 
     <xsl:template match="@*|text()"/>
     <xsl:template match="*"/>
@@ -49,7 +49,7 @@ saxon 9. -->
                 <xsl:call-template name="coverage"/>
                 <xsl:call-template name="contact"/>  
                 
-                <xsl:call-template name="grid_entity_information"/>
+                <xsl:call-template name="entity_information"/>
             </dataset>
         </eml:eml>
     </xsl:template>
@@ -57,7 +57,11 @@ saxon 9. -->
     <xsl:template name="abstract">
         <abstract>
             <para>This URL contains the following DAP Grid variables:
-                 <xsl:for-each select="dap:Grid">
+                <xsl:for-each select="dap:Grid">
+                    <xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>)
+                </xsl:for-each>
+                
+                <xsl:for-each select="dap:Array">
                     <xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>)
                 </xsl:for-each>
             </para>
@@ -243,19 +247,19 @@ saxon 9. -->
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="grid_entity_information">
-        <xsl:for-each select="dap:Grid">
+    <xsl:template name="entity_information">
+        
             <!--xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>) -->
 
         <otherEntity>
             <entityName>
                 <!-- The name identifies the entity in the dataset: file name, name of database table, etc. -->
-                <xsl:value-of select="fn:normalize-space(@name)"/>
+                <xsl:value-of select="$filename"/>
             </entityName>
             <entityDescription>
                 <!-- Text generally describing the entity, its type, and
                     relevant information about the data in the entity. -->
-                <xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/>
+                This data set is referenced by a single URL.
             </entityDescription>
             <physical>
                 <objectName>
@@ -277,7 +281,7 @@ saxon 9. -->
                 <distribution>
                     <online>
                         <url>
-                            <xsl:value-of select="$dataset_url"/>?<xsl:value-of select="fn:normalize-space(@name)"/>
+                            <xsl:value-of select="$dataset_url"/>
                         </url>
                     </online>
                 </distribution>
@@ -288,7 +292,7 @@ saxon 9. -->
             <entityType>Online data accessible using DAP 2.0</entityType>
             
         </otherEntity>
-        </xsl:for-each>
+        
     </xsl:template>
 
 </xsl:stylesheet>

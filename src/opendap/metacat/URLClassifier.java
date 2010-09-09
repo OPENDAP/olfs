@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -26,13 +28,24 @@ public class URLClassifier {
 	
 	private List<URLGroup> groups = null;
 	
-	private DDXRetriever ddxSource;
+	private DDXRetriever ddxRetriever;
 	
     private static Logger log = LoggerFactory.getLogger(URLClassifier.class);
 
 	public URLClassifier(String cacheName) throws Exception {
-		ddxSource = new DDXRetriever(true, cacheName);
+		ddxRetriever = new DDXRetriever(true, cacheName);
 		groups = new ArrayList<URLGroup>();
+	}
+
+	public class URLGroups implements Iterable<URLGroup> {
+		@Override
+		public Iterator<URLGroup> iterator() {
+			return groups.iterator();
+		}
+	}
+	
+	public URLGroups getUrlGroups() {
+		return new URLGroups();
 	}
 
 	public static void main(String args[]) {
@@ -59,24 +72,32 @@ public class URLClassifier {
 		ps.println("Starting classification: " + (new Date()).toString());
 		
 		try {
-			int numberOfUrls = classifier.assignUrlsToInitialGroups();
-			
-			ps.println("Completed pass 1: " + (new Date()).toString());
-			
-			classifier.lookForDates();
-			
-			ps.println("Completed pass 2: " + (new Date()).toString());
-			
-			ps.println("Number of URLs processed: " + new Integer(numberOfUrls).toString());
-			classifier.printClassifications(ps);
-			classifier.printCompleteClassifications(ps);
-			
-			
+			classifier.classifyURLs(ps);
 		} 
 		catch (Exception e) {
 			System.err.println("Could not open the output file: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	public int classifyURLs(PrintStream ps) throws Exception {
+		int numberOfUrls = assignUrlsToInitialGroups(ddxRetriever.getCache().getLastVisitedKeys());
+		
+		if (ps != null)
+			ps.println("Completed pass 1: " + (new Date()).toString());
+		
+		lookForDates();
+		
+		if (ps != null) {
+			ps.println("Completed pass 2: " + (new Date()).toString());
+
+			ps.println("Number of URLs processed: " + new Integer(numberOfUrls).toString());
+
+			printClassifications(ps);
+			printCompleteClassifications(ps);
+		}
+		
+		return numberOfUrls;
 	}
 	
 	/**
@@ -85,9 +106,7 @@ public class URLClassifier {
 	 * @return The number of URLs processed
 	 * @throws Exception If the URLComponents object cannot be built
 	 */
-	public int assignUrlsToInitialGroups() throws Exception {
-
-    	Enumeration<String> ddxURLs = ddxSource.getCache().getLastVisitedKeys();
+	public int assignUrlsToInitialGroups(Enumeration<String> ddxURLs) throws Exception {
     	
 		// Special case for the first URLGroup (because using 'for' with an
 		// iterator fails when the iterator instance is null
@@ -154,77 +173,6 @@ public class URLClassifier {
 		}
 	}
 	
-	/**
-	 * This pass through the groups looks for adjacent Equivalence patterns
-	 * that have been identified as parts of dates and combine them. In
-	 * particular, it looks for year/month, year/month/day and year/daynum.
-	 * The Equivalences for the group in question are modified.
-	 */
-	/*
-	private void mergeAdjacentDates() {
-		for (URLGroup group : groups) {
-
-			Equivalence current = null, previous = null;
-			Equivalences es = group.getEquivalences();
-			if (es.iterator().hasNext())
-				current = es.iterator().next();
-			while (es.iterator().hasNext()) {
-				previous = current;
-				current = es.iterator().next();
-				
-				if (previous.getDateClassification().size() > 0
-					&& current.getDateClassification().size() > 0) {
-					// merge adjacent date equivalences
-				}
-			}
-			
-			
-		}
-	}
-	*/
-	/*
-	private void mergeAdjacentDates_no() {
-		for (URLGroup group : groups) {
-			Equivalences equivs = group.getEquivalences();
-
-			HashMap<DatePart, Equivalence> found = new HashMap<DatePart, Equivalence>();
-
-			// This makes some redundant tests, but that clarifies the sate
-			// machine a bit. See notes, p83, 8/20/2010
-			for (Equivalence e: equivs) {
-				if (found.size() == 0) {
-					if (e.hasDateClassification(DatePart.year)) {
-						found.put(DatePart.year, e);
-					}
-				}
-				else if (found.size() == 1 && found.containsKey(DatePart.year)) {
-					if (e.hasDateClassification(DatePart.month)) {
-						found.put(DatePart.month, e);
-					}
-					else if (e.hasDateClassification(DatePart.daynum)) {
-						found.put(DatePart.daynum, e);
-					}
-				}
-				else if (found.size() == 2 && found.containsKey(DatePart.year) && found.containsKey(DatePart.month)) {
-					if (e.hasDateClassification(DatePart.day)) {
-						found.put(DatePart.day, e); // At this point found holds a YMD date
-					}
-					else {
-						// At this point found holds a YM date and the current 
-						// equivalence is not a day, so we have found two adjacent 
-						// date nodes to merge
-					}
-				}
-				else if (found.size() == 2 && found.containsKey(DatePart.year) && found.containsKey(DatePart.month)) {
-					if (e.hasDateClassification(DatePart.day)) {
-						found.put(DatePart.day, e); // At this point found holds a YMD date
-					}
-				}
-			}
-		}
-	}
-	*/
-	
 	private void printClassifications(PrintStream ps, boolean print_urls, boolean print_all_urls, boolean print_histogram) {
 		Integer i = 0;
 		for(URLGroup group: groups) {
@@ -254,15 +202,7 @@ public class URLClassifier {
 			if (print_urls) {
 				// Find the Equivalence with the most date parts; then sort and
 				// print
-				Equivalences equivs = group.getEquivalences();
-				Equivalence date = null;
-				int maxNumDateParts = 0;
-				for (Equivalence e : equivs) {
-					if (e.getNumberDateClassifications() > maxNumDateParts) {
-						maxNumDateParts = e.getNumberDateClassifications();
-						date = e;
-					}
-				}
+				Equivalence date = group.getDateEquivalence();
 
 				// Either print the sorted URLs or just print them
 				if (date != null) {
@@ -303,5 +243,58 @@ public class URLClassifier {
 
 	public void printCompleteClassifications(PrintStream ps) {
 		printClassifications(ps, true, false, true);
+	}
+	
+	/**
+	 * This pass through the groups looks for adjacent Equivalence patterns
+	 * that have been identified as parts of dates and combine them. In
+	 * particular, it looks for year/month, year/month/day and year/daynum.
+	 * 
+	 * @note Not used
+	 */
+	@SuppressWarnings("unused")
+	private void mergeAdjacentDates() {
+		for (URLGroup group : groups) {
+			Equivalences equivs = group.getEquivalences();
+
+			HashMap<DatePart, Equivalence> found = new HashMap<DatePart, Equivalence>();
+
+			// This makes some redundant tests, but that clarifies the state
+			// machine a bit. See notes, p83, 8/20/2010
+			for (Equivalence e: equivs) {
+				if (found.size() == 0) {
+					if (e.hasDateClassification(DatePart.year)) {
+						found.put(DatePart.year, e);
+					}
+				}
+				else if (found.size() == 1 && found.containsKey(DatePart.year)) {
+					if (e.hasDateClassification(DatePart.month)) {
+						found.put(DatePart.month, e);
+						// At this point we don't know if this is the whole
+						// sequence to merge or not. See later state.
+					}
+					else if (e.hasDateClassification(DatePart.daynum)) {
+						found.put(DatePart.daynum, e);
+						// Found Year/DayNum
+					}
+				}
+				else if (found.size() == 2 && found.containsKey(DatePart.year) && found.containsKey(DatePart.month)) {
+					if (e.hasDateClassification(DatePart.day)) {
+						found.put(DatePart.day, e); 
+						// At this point found holds a YMD date
+					}
+					else {
+						// At this point found holds a YM date and the current 
+						// equivalence is not a day, so we have found YM
+					}
+				}
+				else if (found.size() == 2 && found.containsKey(DatePart.year) && found.containsKey(DatePart.month)) {
+					if (e.hasDateClassification(DatePart.day)) {
+						found.put(DatePart.day, e); 
+						// At this point found holds a YMD date
+					}
+				}
+			}
+		}
 	}
 }
