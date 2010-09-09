@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -178,7 +177,7 @@ public class RdfImporter {
         long inferStartTime, inferEndTime;
         inferStartTime = new Date().getTime();
 
-        String importURL = null;
+        String documentURL = null;
         RepositoryConnection con = null;
         int skipCount = 0;
         String contentType = "";
@@ -194,23 +193,23 @@ public class RdfImporter {
             log.debug("addNeededRDFDocuments(): rdfDocs.size=" + rdfDocs.size());
             skipCount = 0;
             while (!rdfDocs.isEmpty()) {
-                importURL = rdfDocs.remove(0);
+                documentURL = rdfDocs.remove(0);
 
                 try {
 
 
-                    log.debug("addNeededRDFDocuments(): Checking import URL: " + importURL);
+                    log.debug("addNeededRDFDocuments(): Checking import URL: " + documentURL);
 
-                    if (urlsToBeIgnored.contains(importURL)) {
-                        log.error("addNeededRDFDocuments(): Previous server error, Skipping " + importURL);
+                    if (urlsToBeIgnored.contains(documentURL)) {
+                        log.error("addNeededRDFDocuments(): Previous server error, Skipping " + documentURL);
                     } else {
 
-                        URL myurl = new URL(importURL);
+                        URL myurl = new URL(documentURL);
 
 
                         int rsCode;
                         hc = (HttpURLConnection) myurl.openConnection();
-                        log.debug("addNeededRDFDocuments(): Connected to import URL: " + importURL);
+                        log.debug("addNeededRDFDocuments(): Connected to import URL: " + documentURL);
 
                         rsCode = hc.getResponseCode();
                         contentType = hc.getContentType();
@@ -221,48 +220,48 @@ public class RdfImporter {
 
                         if (rsCode == -1) {
                             log.error("addNeededRDFDocuments(): Unable to get an HTTP status code for resource "
-                                    + importURL + " WILL NOT IMPORT!");
-                            urlsToBeIgnored.add(importURL);
+                                    + documentURL + " WILL NOT IMPORT!");
+                            urlsToBeIgnored.add(documentURL);
 
                         } else if (rsCode != 200) {
-                            log.error("addNeededRDFDocuments(): Error!  HTTP status code " + rsCode + " Skipping importURL " + importURL);
-                            urlsToBeIgnored.add(importURL);
+                            log.error("addNeededRDFDocuments(): Error!  HTTP status code " + rsCode + " Skipping documentURL " + documentURL);
+                            urlsToBeIgnored.add(documentURL);
                         } else {
 
-                            log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + importURL + " )");
+                            log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + documentURL + " )");
                             //@todo make this a more robust
-                            String transformFile = getXsltStylesheet(repository, importURL);
+                            String transformFile = getXsltStylesheet(repository, documentURL);
                             log.debug("addNeededRDFDocuments(): Transformation =  " + transformFile);
                             if (transformFile != null){
                                 
                                 ByteArrayInputStream inStream;
-                                log.info("addNeededRDFDocuments(): Transforming " + importURL+" with "+transformFile);
+                                log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+transformFile);
 
                                 inStream = transform(importIS,transformFile);
 
-                                log.info("addNeededRDFDocuments(): Finished transforming RDFa " + importURL);
+                                log.info("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
 
-                                importUrl(con, importURL, contentType, inStream);
+                                importUrl(con, documentURL, contentType, inStream);
 
                                 addedDocument = true;  
-                            }else if(importURL.endsWith(".owl") || importURL.endsWith(".rdf")) {
+                            }else if(documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
 
-                                importUrl(con, importURL, contentType, importIS);
+                                importUrl(con, documentURL, contentType, importIS);
 
                                 addedDocument = true;
 
 
-                            } else if (importURL.endsWith(".xsd")) {
+                            } else if (documentURL.endsWith(".xsd")) {
 
                                 transformFile = "xsl/xsd2owl.xsl";
 
                                 ByteArrayInputStream inStream;
-                                log.info("addNeededRDFDocuments(): Transforming  '" + importURL+"' with "+transformFile);
+                                log.info("addNeededRDFDocuments(): Transforming  '" + documentURL +"' with "+transformFile);
                                 inStream = transform(importIS,resourceDir+transformFile);
 
-                                log.info("addNeededRDFDocuments(): Finished transforming URL " + importURL);
+                                log.info("addNeededRDFDocuments(): Finished transforming URL " + documentURL);
 
-                                importUrl(con, importURL, contentType, inStream);
+                                importUrl(con, documentURL, contentType, inStream);
 
                                 addedDocument = true;
 
@@ -276,14 +275,14 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                    importUrl(con, importURL, contentType, importIS);
-                                    log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + importURL);
+                                    importUrl(con, documentURL, contentType, importIS);
+                                    log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
                                     addedDocument = true;
 
                                 } else {
-                                    log.warn("addNeededRDFDocuments(): SKIPPING Import URL '" + importURL + "' It does not appear to reference a " +
+                                    log.warn("addNeededRDFDocuments(): SKIPPING Import URL '" + documentURL + "' It does not appear to reference a " +
                                             "document that I know how to process.");
-                                    urlsToBeIgnored.add(importURL); //skip this file
+                                    urlsToBeIgnored.add(documentURL); //skip this file
                                     skipCount++;
 
                                 }
@@ -295,9 +294,9 @@ public class RdfImporter {
 
                 } catch (Exception e) {
                     log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
-                    if (importURL != null){
-                        log.warn("addNeededRDFDocuments(): SKIPPING Import URL '"+importURL+"' Because bad things happened when we tried to get it.");
-                        urlsToBeIgnored.add(importURL); //skip this file
+                    if (documentURL != null){
+                        log.warn("addNeededRDFDocuments(): SKIPPING Import URL '"+ documentURL +"' Because bad things happened when we tried to get it.");
+                        urlsToBeIgnored.add(documentURL); //skip this file
                     }
                 } finally {
                     if (importIS != null)
