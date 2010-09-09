@@ -377,24 +377,21 @@ public class RdfImporter {
      * Compile and execute a simple transformation that applies a style sheet to
      * an input stream, and serializing the result to an OutPutStream
      *
-     * @param sourceURL
+     * @param sourceDocument
      * @return ByteArrayInputStream
      * @throws net.sf.saxon.s9api.SaxonApiException
      * @throws IOException 
      */
-    public ByteArrayInputStream transform(StreamSource sourceURL, String xsltFileName)
+    public ByteArrayInputStream transform(StreamSource sourceDocument, String xsltFileName)
             throws SaxonApiException, IOException {
         log.debug("transform(): Executing XSL Transform Operation.");
         log.debug("transform(): XSL Transform Filename: " + xsltFileName);
 
-        String doc = sourceURL.getSystemId();
+        String doc = sourceDocument.getSystemId();
         if (doc == null)
-            doc = sourceURL.getPublicId();
-
+            doc = sourceDocument.getPublicId();
         if (doc == null)
-            doc = "StreamSource";
-
-
+            doc = "is an input stream";
         log.debug("transform(): Document to transform: " + doc);
 
 
@@ -402,13 +399,13 @@ public class RdfImporter {
         XsltCompiler comp = proc.newXsltCompiler();
         XsltExecutable exp = null;
         if (xsltFileName.startsWith("http://")) {
-            URL myurl = new URL(xsltFileName);
-            HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
-            exp = comp.compile(new StreamSource(hc.getInputStream()));
+            //URL myurl = new URL(xsltFileName);
+            //HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
+            exp = comp.compile(new StreamSource(xsltFileName));
         } else {
             exp = comp.compile(new StreamSource(new File(xsltFileName)));
         }
-        XdmNode source = proc.newDocumentBuilder().build(sourceURL);
+        XdmNode source = proc.newDocumentBuilder().build(sourceDocument);
         Serializer out = new Serializer();
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -418,7 +415,7 @@ public class RdfImporter {
         trans.setInitialContextNode(source);
         trans.setDestination(out);
         trans.transform();
-        log.info(outStream.toString());
+        //log.info("transform(): Transformed Document: \n"+outStream.toString());
         log.debug("transform(): XSL Transform complete.");
         return new ByteArrayInputStream(outStream.toByteArray());
 
