@@ -74,11 +74,11 @@ public class Request {
 
         String contextName = _request.getContextPath();
 
-        String docsService = contextName + "/webstart/";
+        String webStartService = contextName + "/webstart/";
 
-        log.debug("getDocsServiceLocalID(): "+docsService);
+        log.debug("getWebStartServiceLocalID(): "+webStartService);
 
-        return docsService;
+        return webStartService;
 
     }
 
@@ -105,7 +105,7 @@ public class Request {
 
 
     /**
-     * Returns the full source name for this request. This is essentially the same as the value
+     * Returns the relativeURL name for this request. This is essentially the same as the value
      * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
      * is null then the full source name is "/".
      * @return The relative URL = _request.getPathInfo()

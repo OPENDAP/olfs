@@ -16,6 +16,12 @@ H3 {
     background-color:#527CC1;
     font-size:14px;
     }
+H4 {
+    font-family:Tahoma,Arial,sans-serif;
+    color:white;
+    background-color:#527CC1;
+    font-size:12px;
+    }
 BODY {
     font-family:Tahoma,Arial,sans-serif;
     color:black;
@@ -39,10 +45,36 @@ HR {
 .uuid {
     font-size: 9px;color:#2A54B9
 }
+.small_bold {
+    font-size: 10px;
+    font-weight: bold
+}
+.small_italic {
+    font-size: 10px;
+    font-style: italic
+}
 .small {
     font-size: 10px;
 }
+.medium_bold {
+    font-size: 14px;
+    font-weight: bold
+}
+.medium {
+    font-size: 14px;
+}
+.large {
+    font-size: 18px;
+}
+.small_black {
+    font-size: 10px;
+    color    : black;
+}
 .dark {
+    font-weight: bold
+}
+
+.bold {
     font-weight: bold
 }
 

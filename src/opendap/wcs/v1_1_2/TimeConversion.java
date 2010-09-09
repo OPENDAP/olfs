@@ -144,7 +144,7 @@ public class TimeConversion {
 
         epoch = new Date((long)1139961600*1000);
 
-        System.out.println("SOurce Time: "+epoch+" Converted Time: "+convertTime(epoch, timeUnits));
+        System.out.println("Source Time: "+epoch+" Converted Time: "+convertTime(epoch, timeUnits));
         gc.setTime(epoch);
         showTime(gc);
     }

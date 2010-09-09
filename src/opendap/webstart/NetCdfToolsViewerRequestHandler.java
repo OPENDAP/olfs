@@ -1,5 +1,6 @@
 package opendap.webstart;
 
+import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
@@ -22,6 +23,7 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
     private String HTTP = "http://";
 
     private String _serviceId = "ToolsUI";
+    private String _applicationName = "NetCDF Tools User Interface";
     private String _jnlpFileName = _serviceId+".jnlp";
 
 
@@ -42,29 +44,22 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
     }
 
 
+    public String getApplicationName(){
+        return _applicationName;
+    }
+    public String getServiceId(){
+        return _serviceId;
+    }
 
-    public boolean datasetCanBeViewed(String serviceId, String query) {
-        log.debug("Checking request. serviceId:"+serviceId+"   query: "+query);
-        if(_serviceId.equalsIgnoreCase(serviceId))
+
+
+    public boolean datasetCanBeViewed(Document ddx) {
             return true;
-        else
-            return false;
-    }
-
-    public String getViewerLinkHtml(String context, String datasetURI) {
-
-        return "<a href='" + context + "/webstart/netcdfToolsUI.jnlp?url=" + datasetURI + "'>IDV</a>";
     }
 
 
-    public String getJnlpForDataset(String query) {
 
-        String queryStart = "dataset=";
-
-        String datasetUrl = "";
-        if(query.startsWith(queryStart)){
-            datasetUrl = query.substring(queryStart.length(),query.length());
-        }
+    public String getJnlpForDataset(String datasetUrl) {
 
 
 

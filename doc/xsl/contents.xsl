@@ -39,6 +39,10 @@
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
 
+    <xsl:variable name="besPrefix">
+            <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
+    </xsl:variable>
+    
 
     <xsl:template match="bes:response">
         <html>
@@ -247,7 +251,20 @@
                 var pageUrl = location.href;
                 var index = pageUrl.lastIndexOf("/")+1;
                 var collectionUrl = pageUrl.substring(0,index);
+                var relativeUrl = location.pathname
+                var dapService = '<xsl:value-of select="$dapService"/>'
+                datasetID = relativeUrl.substring(dapService.length)
+                var index = datasetID.indexOf("contents.html")
+                if(index>0){
+                    datasetID = datasetID.substring(0,index)
+                }
+                datasetID = datasetID  + '<xsl:value-of select="../@name"/>"'
 
+
+
+
+                <!--
+                
                 document.write('&#60;A HREF="'+'<xsl:value-of select="$webStartService"/>'+'idv?dataset=' +
                 collectionUrl+'<xsl:value-of select="../@name"/>"' +
                 '&#62;IDV&#60;/A&#62; ');
@@ -255,6 +272,15 @@
                 document.write('&#60;A HREF="'+'<xsl:value-of select="$webStartService"/>'+'ToolsUI?dataset=' +
                 collectionUrl + '<xsl:value-of select="../@name"/>"' +
                 '&#62;ToolsUI&#60;/A&#62; ');
+
+                document.write('&#60;A HREF="'+'<xsl:value-of select="$webStartService"/>'+'viewers?dataset=' +
+                collectionUrl + '<xsl:value-of select="../@name"/>"' +
+                '&#62;Viewers&#60;/A&#62; ');
+                -->
+
+                document.write('&#60;A HREF="'+'<xsl:value-of select="$webStartService"/>'+'viewers?dapService='+dapService+'&#38;datasetID=' +
+                datasetID +
+                '&#62;Viewers&#60;/A&#62; ');
 
             // </xsl:comment></script>
         </td>

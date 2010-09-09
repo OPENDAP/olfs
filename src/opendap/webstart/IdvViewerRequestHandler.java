@@ -1,10 +1,14 @@
 package opendap.webstart;
 
 import opendap.bes.BesXmlAPI;
+import opendap.namespaces.DAP;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.filter.ElementFilter;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class IdvViewerRequestHandler extends JwsHandler {
@@ -14,6 +18,7 @@ public class IdvViewerRequestHandler extends JwsHandler {
     private Element config;
 
     private String _serviceId = "idv";
+    private String _applicationName = "Integrated Data Viewer";
     private String _jnlpFileName = _serviceId+".jnlp";
 
     public void init(Element config, String resourcesDirectory) {
@@ -32,31 +37,28 @@ public class IdvViewerRequestHandler extends JwsHandler {
 
     }
 
-
-
-    public boolean datasetCanBeViewed(String serviceId, String query) {
-        log.debug("Checking request. serviceId:"+serviceId+"   query: "+query);
-        if(_serviceId.equalsIgnoreCase(serviceId))
-            return true;
-        else
-            return false;
+    public String getApplicationName(){
+        return _applicationName;
     }
 
-    public String getViewerLinkHtml(String context, String datasetURI) {
-
-        return "<a href='" + context + "/webstart/idv.jnlp?url=" + datasetURI + "'>IDV</a>";
+    public String getServiceId(){
+        return _serviceId;
     }
 
 
-    public String getJnlpForDataset(String query) {
 
-        String queryStart = "dataset=";
+    public boolean datasetCanBeViewed(Document ddx) {
 
-        String datasetUrl = "";
-        if(query.startsWith(queryStart)){
-            datasetUrl = query.substring(queryStart.length(),query.length());
-        }
+        Element dataset = ddx.getRootElement();
 
+        Iterator i = dataset.getDescendants(new ElementFilter("Grid", DAP.DAPv32_NS));
+
+        return i.hasNext();
+    }
+
+
+
+    public String getJnlpForDataset(String datasetUrl) {
 
         String  jnlp = "";
 

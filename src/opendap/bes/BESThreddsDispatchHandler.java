@@ -175,8 +175,6 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
 
-            // showCatalogToThreddsCatalog.setParameter("dapService",);
-
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
             String threddsCatalogID = oreq.getDapServiceLocalID() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;

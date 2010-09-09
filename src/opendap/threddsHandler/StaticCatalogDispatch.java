@@ -67,7 +67,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     Transformer catalogToHtmlTransform = null;
     ReentrantLock catalogToHtmlTransformLock;
 
-    String datasetToHtmlTransformFile = "/docs/xsl/dataset.xsl";
+    String datasetToHtmlTransformFile = "/docs/xsl/threddsDatasetDetail.xsl";
     Transformer datasetToHtmlTransform = null;
     ReentrantLock datasetToHtmlTransformLock;
 

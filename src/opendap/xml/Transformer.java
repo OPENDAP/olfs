@@ -248,6 +248,10 @@ public class Transformer {
 
     }
 
+    public void setParameter(String name, XdmNode value) throws SaxonApiException {
+        setParameter(new QName(name), value);
+    }
+
 
     public void setImportXMLParameter(String name, String importFile) throws SaxonApiException {
         // Build the remoteHost parameter to pass into the XSLT
