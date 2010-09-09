@@ -181,7 +181,8 @@ public class RdfImporter {
         RepositoryConnection con = null;
         int skipCount = 0;
         String contentType = "";
-        HttpURLConnection hc = null;
+        HttpURLConnection httpConnection = null;
+
         InputStream importIS = null;
         boolean addedDocument = false;
 
@@ -208,12 +209,11 @@ public class RdfImporter {
 
 
                         int rsCode;
-                        hc = (HttpURLConnection) myurl.openConnection();
+                        httpConnection = (HttpURLConnection) myurl.openConnection();
                         log.debug("addNeededRDFDocuments(): Connected to import URL: " + documentURL);
 
-                        rsCode = hc.getResponseCode();
-                        contentType = hc.getContentType();
-                        importIS = hc.getInputStream();
+                        rsCode = httpConnection.getResponseCode();
+                        contentType = httpConnection.getContentType();
 
                         log.debug("addNeededRDFDocuments(): Got HTTP status code: " + rsCode);
                         log.debug("addNeededRDFDocuments(): Got Content Type:     " + contentType);
@@ -237,7 +237,7 @@ public class RdfImporter {
                                 ByteArrayInputStream inStream;
                                 log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+transformFile);
 
-                                inStream = transform(importIS,transformFile);
+                                inStream = transform(new StreamSource(documentURL),transformFile);
 
                                 log.info("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
 
@@ -245,6 +245,9 @@ public class RdfImporter {
 
                                 addedDocument = true;  
                             }else if(documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
+
+                                importIS = httpConnection.getInputStream();
+
 
                                 importUrl(con, documentURL, contentType, importIS);
 
@@ -257,7 +260,7 @@ public class RdfImporter {
 
                                 ByteArrayInputStream inStream;
                                 log.info("addNeededRDFDocuments(): Transforming  '" + documentURL +"' with "+transformFile);
-                                inStream = transform(importIS,resourceDir+transformFile);
+                                inStream = transform(new StreamSource(documentURL),resourceDir+transformFile);
 
                                 log.info("addNeededRDFDocuments(): Finished transforming URL " + documentURL);
 
@@ -305,8 +308,8 @@ public class RdfImporter {
                         } catch (IOException e) {
                             log.error("addNeededRDFDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
                         }
-                    if (hc != null)
-                        hc.disconnect();
+                    if (httpConnection != null)
+                        httpConnection.disconnect();
 
                 }
             }
