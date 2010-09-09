@@ -439,16 +439,7 @@ public class RdfImporter {
         try {
             con = repository.getConnection();
             f = repository.getValueFactory();  
-            String queryString = "SELECT xslt "
-                + "FROM {<" + importUrl+ ">} rdfcache:" + Terms.hasXsltTransformation + "{xslt}, "
-                + "[{xslt} dcterm:" + Terms.isReplacedBy + "{newxslt}] " 
-                + "WHERE newxslt=NULL "
-                + "using namespace "
-                + "dcterm = <" +Terms.dcTermNamespace+ ">, "
-                + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
-            
-            log.debug("Query for transformation file: " + queryString);
-            
+                        
             String hasTran = Terms.rdfCacheNamespace + Terms.hasXsltTransformation;
             
             URI sbj = f.createURI(importUrl);
