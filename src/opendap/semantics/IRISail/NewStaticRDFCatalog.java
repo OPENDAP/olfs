@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
-//
+// This file is part of the "OPeNDAP Web Coverage Service Project."
 //
 // Copyright (c) 2010 OPeNDAP, Inc.
+//
 // Authors:
 //     Haibo Liu  <haibo@iri.columbia.edu>
 //     Nathan David Potter  <ndp@opendap.org>
