@@ -212,14 +212,13 @@ public class RdfImporter {
      *
      */
     private boolean addNeededRDFDocuments(Repository repository, Vector<String> rdfDocs) {
-        URI uriaddress;
         long inferStartTime, inferEndTime;
         inferStartTime = new Date().getTime();
 
-        String documentURL = null;
+        String documentURL;
         RepositoryConnection con = null;
-        int skipCount = 0;
-        String contentType = "";
+        int skipCount;
+        String contentType;
         HttpURLConnection httpConnection = null;
 
         InputStream importIS = null;
@@ -268,16 +267,18 @@ public class RdfImporter {
                         } else {
 
                             log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + documentURL + " )");
-                            //@todo make this a more robust
+
+
                             String transformToRdfUrl = RepositoryOps.getUrlForTransformToRdf(repository, documentURL);
-                            log.debug("addNeededRDFDocuments(): Transformation =  " + transformToRdfUrl);
+                            log.debug("addNeededRDFDocuments(): Repository returned a transformation to RDF:  " + transformToRdfUrl+ " for document: "+documentURL);
+
+
                             if (transformToRdfUrl != null){
                                 
-                                InputStream inStream;
                                 log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+ transformToRdfUrl);
 
                                 Transformer t = new Transformer(transformToRdfUrl);
-                                inStream = t.transform(documentURL);
+                                InputStream inStream = t.transform(documentURL);
 
                                 log.info("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
 
@@ -285,7 +286,24 @@ public class RdfImporter {
 
                                 addedDocument = true;
 
-                            }else if(documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
+                            } else if (documentURL.endsWith(".xsd")) {
+                                // XML Schema Document has known transform.
+                                
+                                transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
+
+                                log.info("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformToRdfUrl);
+
+                                Transformer t = new Transformer(transformToRdfUrl);
+                                InputStream inStream = t.transform(documentURL);
+
+                                log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
+
+                                importUrl(con, documentURL, contentType, inStream);
+
+                                addedDocument = true;
+
+                            } else if(documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
+                                // OWL is RDF and so is the repository - no transform needed.
 
                                 importIS = httpConnection.getInputStream();
 
@@ -294,51 +312,26 @@ public class RdfImporter {
                                 addedDocument = true;
 
 
-                            } else if (documentURL.endsWith(".xsd")) { // XML Schema Document
-                                
-                                transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
-
-
-                                log.info("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformToRdfUrl);
-
-                                InputStream inStream;
-
-                                Transformer t = new Transformer(new StreamSource(transformToRdfUrl));
-                                inStream = t.transform(new StreamSource(documentURL));
-
-                                //inStream = transform(new StreamSource(documentURL),localResourceDir+transformToRdfUrl);
-
-                                log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
-
-                                importUrl(con, documentURL, contentType, inStream);
-
-                                addedDocument = true;
-
-                            } else {
-
-
-
-                                if ((contentType != null) &&
+                            } else if ((contentType != null) &&
                                         (contentType.equalsIgnoreCase("text/plain") ||
                                                 contentType.equalsIgnoreCase("text/xml") ||
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                    importUrl(con, documentURL, contentType, importIS);
-                                    log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
-                                    
-                                    addedDocument = true;
+                                importUrl(con, documentURL, contentType, importIS);
+                                log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
 
-                                } else {
-                                    log.warn("addNeededRDFDocuments(): SKIPPING Import URL '" + documentURL + "' It does not appear to reference a " +
-                                            "document that I know how to process.");
-                                    urlsToBeIgnored.add(documentURL); //skip this file
-                                    skipCount++;
+                                addedDocument = true;
 
-                                }
+                            } else {
+                                log.warn("addNeededRDFDocuments(): SKIPPING Import URL '" + documentURL + "' It does not appear to reference a " +
+                                        "document that I know how to process.");
+                                urlsToBeIgnored.add(documentURL); //skip this file
+                                skipCount++;
 
-                                log.info("addNeededRDFDocuments(): Total non owl/xsd files skipped: " + skipCount);
                             }
+
+                            log.info("addNeededRDFDocuments(): Total non owl/xsd files skipped: " + skipCount);
                         }
                     } // while (!rdfDocs.isEmpty()
 
