@@ -1,13 +1,14 @@
 package opendap.semantics.IRISail;
 
 import net.sf.saxon.s9api.*;
+import opendap.xml.Transformer;
+import org.jdom.output.XMLOutputter;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
@@ -33,20 +34,30 @@ public class RdfImporter {
     private HashSet<String> urlsToBeIgnored;
     private Vector<String> imports;
 
-    private String resourceDir;
+    private String localResourceDir;
 
 
     public RdfImporter(String resourceDir) {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         urlsToBeIgnored = new HashSet<String>();
         imports = new Vector<String>();
-        this.resourceDir = resourceDir;
+        this.localResourceDir = resourceDir;
     }
 
     public void reset() {
         urlsToBeIgnored.clear();
         imports.clear();
     }
+
+    public String getLocalResourceDirUrl(){
+
+        if(localResourceDir.startsWith("file:"))
+            return localResourceDir;
+
+        return "file:"+ localResourceDir;
+
+    }
+
 
     /**
      * ****************************************
@@ -171,6 +182,8 @@ public class RdfImporter {
      *
      * @param repository
      * @param rdfDocs
+     * @return
+     *
      */
     private boolean addNeededRDFDocuments(Repository repository, Vector<String> rdfDocs) {
         URI uriaddress;
@@ -230,14 +243,15 @@ public class RdfImporter {
 
                             log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + documentURL + " )");
                             //@todo make this a more robust
-                            String transformFile = getXsltStylesheet(repository, documentURL);
-                            log.debug("addNeededRDFDocuments(): Transformation =  " + transformFile);
-                            if (transformFile != null){
+                            String transformFileUrl = RepositoryOps.getTransformToRdfUri(repository, documentURL);
+                            log.debug("addNeededRDFDocuments(): Transformation =  " + transformFileUrl);
+                            if (transformFileUrl != null){
                                 
-                                ByteArrayInputStream inStream;
-                                log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+transformFile);
+                                InputStream inStream;
+                                log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+transformFileUrl);
 
-                                inStream = transform(new StreamSource(documentURL),transformFile);
+                                Transformer t = new Transformer(transformFileUrl);
+                                inStream = t.transform(documentURL);
 
                                 log.info("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
 
@@ -254,15 +268,21 @@ public class RdfImporter {
                                 addedDocument = true;
 
 
-                            } else if (documentURL.endsWith(".xsd")) {
+                            } else if (documentURL.endsWith(".xsd")) { // XML Schema Document
+                                
+                                transformFileUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
 
-                                transformFile = "xsl/xsd2owl.xsl";
 
-                                ByteArrayInputStream inStream;
-                                log.info("addNeededRDFDocuments(): Transforming  '" + documentURL +"' with "+transformFile);
-                                inStream = transform(new StreamSource(documentURL),resourceDir+transformFile);
+                                log.info("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformFileUrl);
 
-                                log.info("addNeededRDFDocuments(): Finished transforming URL " + documentURL);
+                                InputStream inStream;
+
+                                Transformer t = new Transformer(new StreamSource(transformFileUrl));
+                                inStream = t.transform(new StreamSource(documentURL));
+
+                                //inStream = transform(new StreamSource(documentURL),localResourceDir+transformFileUrl);
+
+                                log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
 
                                 importUrl(con, documentURL, contentType, inStream);
 
@@ -363,114 +383,29 @@ public class RdfImporter {
 
 
 
-    /**
-     * Take file to transform and the style sheet to apply, return transformed file as 
-     * ByteArrayInputStream
-     * @param is
-     * @param xsltFileName
-     * @return
-     * @throws SaxonApiException
-     * @throws IOException
-     */
-    public ByteArrayInputStream transform(InputStream is, String xsltFileName) throws SaxonApiException, IOException {
-        return transform(new StreamSource(is),xsltFileName);
-    }
 
-    /**
-     * Compile and execute a simple transformation that applies a style sheet to
-     * an input stream, and serializing the result to an OutPutStream
-     *
-     * @param sourceDocument
-     * @return ByteArrayInputStream
-     * @throws net.sf.saxon.s9api.SaxonApiException
-     * @throws IOException 
-     */
-    public ByteArrayInputStream transform(StreamSource sourceDocument, String xsltFileName)
-            throws SaxonApiException, IOException {
-        log.debug("transform(): Executing XSL Transform Operation.");
-        log.debug("transform(): XSL Transform Filename: " + xsltFileName);
-
-        String doc = sourceDocument.getSystemId();
-        if (doc == null)
-            doc = sourceDocument.getPublicId();
-        if (doc == null)
-            doc = "is an input stream";
-        log.debug("transform(): Document to transform: " + doc);
+    public static void main(String[] args) throws Exception {
 
 
-        Processor proc = new Processor(false);
-        XsltCompiler comp = proc.newXsltCompiler();
-        XsltExecutable exp = null;
-        if (xsltFileName.startsWith("http://")) {
-            //URL myurl = new URL(xsltFileName);
-            //HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
-            exp = comp.compile(new StreamSource(xsltFileName));
-        } else {
-            exp = comp.compile(new StreamSource(new File(xsltFileName)));
-        }
-        XdmNode source = proc.newDocumentBuilder().build(sourceDocument);
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        out.setOutputStream(outStream);
-        XsltTransformer trans = exp.load();
-        trans.setInitialContextNode(source);
-        trans.setDestination(out);
-        trans.transform();
-        //log.info("transform(): Transformed Document: \n"+outStream.toString());
-        log.debug("transform(): XSL Transform complete.");
-        return new ByteArrayInputStream(outStream.toByteArray());
+        StreamSource httpSource = new StreamSource("http://schemas.opengis.net/wcs/1.1/wcsAll.xsd");
+        StreamSource fileSource = new StreamSource("file:/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl");
+
+
+        StreamSource transform = fileSource;
+        StreamSource document = httpSource;
+
+
+        XMLOutputter xmlo = new XMLOutputter();
+        xmlo.output(Transformer.getTransformedDocument(document,transform),System.out);
+
+
+
 
 
     }
 
-    /**
-     * Return URL of the transformation file.
-     * @param importUrl-the file to transform
-     * @param repository-the repository instance
-     * @return xsltTransformationFileUrl-Url of the transformation stylesheet
-     */
-    private String getXsltStylesheet(Repository repository, String importUrl){
-        RepositoryConnection con = null;
-        String xsltTransformationFileUrl = null;
-        ValueFactory f = null;
-        RepositoryResult<Statement> statements = null;
-        
-        try {
-            con = repository.getConnection();
-            f = repository.getValueFactory();  
-                        
-            String hasTran = Terms.rdfCacheNamespace + Terms.hasXsltTransformation;
-            
-            URI sbj = f.createURI(importUrl);
-            URI prd = f.createURI(hasTran);
-            statements = con.getStatements((Resource)sbj, prd, null,true);
-            
-            while (statements.hasNext()){
-                Statement s = statements.next();
-                xsltTransformationFileUrl= s.getObject().stringValue();
-                log.debug("Transformation file= " + xsltTransformationFileUrl);
-            }
-        } catch (RepositoryException e) {
-            log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
-                    +e.getMessage());
-        }finally {
-            try {
-                statements.close();
-            } catch (RepositoryException e) {
-                log.error("Caught a RepositoryException while closing statements! in getXsltTransformation Msg: "
-                        +e.getMessage());
-            }
-           
-            try {
-                con.close();
-            } catch (RepositoryException e) {
-                log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
-                        + e.getMessage());
-            }
-        }
-        
-        return xsltTransformationFileUrl;
-    }
+
+
+
+
 }

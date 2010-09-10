@@ -48,8 +48,8 @@ public class Terms {
     public static final String serqlTextType                 = "serql_text";
     public static final String serqlTextTypeUri              = rdfCacheNamespace + serqlTextType;
     
-    public static final String hasXsltTransformation         = "hasXsltTransformation";
-    public static final String hasXsltTransformationUri      = rdfCacheNamespace + hasXsltTransformation;
+    public static final String hasXslTransformToRdf          = "hasXslTransformToRdf";
+    public static final String hasXslTransformToRdfUri       = rdfCacheNamespace + hasXslTransformToRdf;
     
     public static final String dcTermNamespace               = "http://purl.org/dc/terms/";
     public static final String isReplacedBy                  = "isReplacedBy";

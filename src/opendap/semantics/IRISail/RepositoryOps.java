@@ -1477,4 +1477,61 @@ public class RepositoryOps {
 
         return changedRdfDocuments;
     }
+
+    /**
+     * Return URL of the transformation file.
+     * @param importUrl-the file to transform
+     * @param repository-the repository instance
+     * @return xsltTransformationFileUrl-Url of the transformation stylesheet
+     */
+    public static String getTransformToRdfUri(Repository repository, String importUrl){
+        RepositoryConnection con = null;
+        String xsltTransformationFileUrl = null;
+        ValueFactory valueFactory;
+        RepositoryResult<Statement> statements = null;
+
+        try {
+            con = repository.getConnection();
+            valueFactory = repository.getValueFactory();
+
+
+            // Get all of the statements in the repository that
+            statements =
+                    con.getStatements(
+                            valueFactory.createURI(importUrl),
+                            valueFactory.createURI(Terms.hasXslTransformToRdfUri),
+                            null,
+                            true);
+
+            while (statements.hasNext()){
+                if(xsltTransformationFileUrl!=null){
+                    log.error("getTransformToRdfUri(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
+                }
+                Statement s = statements.next();
+                xsltTransformationFileUrl= s.getObject().stringValue();
+                log.debug("Found Transformation file= " + xsltTransformationFileUrl);
+            }
+        } catch (RepositoryException e) {
+            log.error("Caught a RepositoryException in getXsltTransformation Msg: "
+                    +e.getMessage());
+        }finally {
+            try {
+                if(statements!=null)
+                    statements.close();
+            } catch (RepositoryException e) {
+                log.error("Caught a RepositoryException while closing statements! in getXsltTransformation Msg: "
+                        +e.getMessage());
+            }
+
+            try {
+                if(con!=null)
+                    con.close();
+            } catch (RepositoryException e) {
+                log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
+                        + e.getMessage());
+            }
+        }
+
+        return xsltTransformationFileUrl;
+    }
 }

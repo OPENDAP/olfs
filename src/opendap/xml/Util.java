@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -82,6 +83,13 @@ public class Util {
             throw new IOException(msg);
         }
 
+        SAXBuilder sb = new SAXBuilder();
+        return sb.build(f);
+    }
+
+    public static Document getDocument(InputStream f)throws IOException, JDOMException{
+
+        String msg;
         SAXBuilder sb = new SAXBuilder();
         return sb.build(f);
     }

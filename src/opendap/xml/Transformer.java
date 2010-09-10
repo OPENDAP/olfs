@@ -46,6 +46,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.transform.XSLTransformer;
@@ -188,6 +189,52 @@ public class Transformer {
         return proc;
     }
 
+    public void transform(Source inputDocumentSource,  StreamSource transformDocumentSource, OutputStream os) throws SaxonApiException {
+
+        Transformer t = new Transformer(transformDocumentSource);
+
+        out.setOutputStream(os);
+        transform.setSource(inputDocumentSource);
+        transform.setDestination(out);
+        transform.transform();
+
+    }
+
+
+    public static ByteArrayInputStream transform(Source inputDocumentSource,  StreamSource transformDocumentSource) throws SaxonApiException {
+
+        Transformer t = new Transformer(transformDocumentSource);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        t.transform(inputDocumentSource,baos);
+
+        return new ByteArrayInputStream(baos.toByteArray());
+
+    }
+
+
+    public static Document getTransformedDocument(Source inputDocumentSource,  StreamSource transformDocumentSource) throws SaxonApiException, IOException, JDOMException {
+
+        Transformer t = new Transformer(transformDocumentSource);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        t.transform(inputDocumentSource,baos);
+
+        SAXBuilder sb =  new SAXBuilder();
+
+        Document result = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+        log.debug("Transform complete.");
+
+        return result;
+
+    }
+
+
+
+
     public XPathCompiler newXPathCompiler(){
         return proc.newXPathCompiler();
     }
@@ -204,6 +251,36 @@ public class Transformer {
         transform.setSource(s);
         transform.setDestination(out);
         transform.transform();
+    }
+
+    public InputStream  transform(Source s) throws SaxonApiException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        out.setOutputStream(os);
+        transform.setSource(s);
+        transform.setDestination(out);
+        transform.transform();
+        ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
+
+        log.debug("Transformed document is "+os.size()+" bytes.");
+
+        return bis;
+
+    }
+
+
+    public InputStream  transform(String inputDocumentUrl) throws SaxonApiException {
+        StreamSource s = new StreamSource(inputDocumentUrl);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        out.setOutputStream(os);
+        transform.setSource(s);
+        transform.setDestination(out);
+        transform.transform();
+        ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
+
+        log.debug("Transformed document is "+os.size()+" bytes.");
+
+        return bis;
+
     }
 
 
