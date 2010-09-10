@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *  A local SailRepository. The state (up/down) of the repository is
- *  recorded by <code>isRepositoryDown</code>
+ *  recorded by <code>isRepositoryDown</code>.
  *
  */
 public class IRISailRepository extends SailRepository {
