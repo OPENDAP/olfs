@@ -6,7 +6,7 @@
 // Authors:
 //     Nathan David Potter  <ndp@opendap.org>
 //     Haibo Liu  <haibo@iri.columbia.edu>
-//     Benno Blumenthal <benno@iri.columbia.edu>
+//     M. Benno Blumenthal <benno@iri.columbia.edu>
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
