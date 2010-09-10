@@ -1002,6 +1002,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return supportedCRSs;
     }
 
+    /**
+     * Get latitude coordinate Dap ID, given the coverage ID and field ID.
+     * @param con-connection to the repository
+     * @param coverageId
+     * @param fieldId
+     * @return coordinateDapI-latitude coordinate Dap Id
+     */
     private String getLatitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_latitude", coverageId, fieldId);
@@ -1011,6 +1018,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
+    /**
+     * Get longitude coordonate Dap ID, given the coverage ID and field ID.
+     * @param con-connection to the repository
+     * @param coverageId
+     * @param fieldId
+     * @return coordinateDapI-longitude coordinate Dap Id
+     */
     private String getLongitudeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getLongitudeCoordinateDapId(): Getting the DAP variable ID that represents the longitude coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_longitude", coverageId, fieldId);
@@ -1020,6 +1034,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
+    /**
+     * Get elevation coordinate ID, given the coverage ID and field ID.
+     * @param con-connection to the repository
+     * @param coverageId
+     * @param fieldId
+     * @return coordinateDapI-elevation coordinate Dap Id
+     */
     private String getElevationCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getElevationCoordinateDapId(): Getting the DAP variable ID that represents the elevation coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_elevation", coverageId, fieldId);
@@ -1029,6 +1050,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
+    /**
+     * Get time coordinate ID, given the coverage ID and field ID.
+     * @param con-connection to the repository
+     * @param coverageId
+     * @param fieldId
+     * @return coordinateDapI-time coordinate Dap Id
+     */
     private String getTimeCoordinateDapId(RepositoryConnection con, String coverageId, String fieldId) {
         //log.debug("getTimeCoordinateDapId(): Getting the DAP variable ID that represents the time coordinate for FieldID: " + fieldId);
         String qString = createCoordinateIdQuery("A_time", coverageId, fieldId);
@@ -1037,6 +1065,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return coordinateDapId;
     }
 
+    /**
+     * Get time units, given the coverage ID and field ID.
+     * @param con-connection to the repository
+     * @param coverageId
+     * @param fieldId
+     * @return coordinateUnit-time unit
+     */
     private String getTimeUnits(RepositoryConnection con, String coverageId, String fieldId) {
         String qString = createCoordinateUnitsQuery("A_time", coverageId, fieldId);
         String coordinateUnit = runQuery(con, qString, "unit");
@@ -1044,6 +1079,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return coordinateUnit;
     }
 
+    /**
+     * Evaluate the query string for getting coordinate Dap ID and units.
+     * @param con-connection to the repository
+     * @param qString-query string
+     * @param cidid-the search key used in the query string
+     * @return the coordinate dap ID or coordinate units
+     */
     private String runQuery(RepositoryConnection con, String qString, String cidid) {
         String coordinateDapId = null;
         try {
@@ -1075,6 +1117,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return coordinateDapId;
     }
 
+    /**
+     * Create the query string, given the coverage and field.
+     * @param coordinateName-A_latitude/longitude/elevation/time
+     * @param coverageStr
+     * @param fieldStr
+     * @return   query string
+     */
     private String createCoordinateIdQuery(String coordinateName, String coverageStr, String fieldStr) {
 
         String qString = "select cid,cidid " +
@@ -1093,6 +1142,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.debug("createCoordinateIdQuery: Built query string: '" + qString + "'");
         return qString;
     }
+
+    /**
+     * Create the query string for coordinate units, given the coverage and field.
+     * @param coordinateName
+     * @param coverageStr
+     * @param fieldStr
+     * @return
+     */
     private String createCoordinateUnitsQuery(String coordinateName, String coverageStr, String fieldStr) {
 
         String qString = "select cid,unit " +
@@ -1111,13 +1168,21 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.debug("createTimeUnitsQuery: Built query string: '" + qString + "'");
         return qString;
     }
-    
+
+    /**
+     * Get last modified time.
+     * @return
+     */
     public long getLastModified() {
 
         return _catalogLastModifiedTime;
     }
 
-
+    /**
+     * Update catalog cache from the repository by calling <code>ingestWcsCatalog(repository)</code>
+     * @param repository
+     * @throws InterruptedException
+     */
     private void updateCatalogCache(Repository repository) throws InterruptedException {
 
 
@@ -1165,7 +1230,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Get coverage ID and server URL from the repository.
+     * @param repo-repository
+     * @return coverageIDServer-hashmap of coverage ID and list of URLs of servers
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException
+     */
 
     private HashMap<String, Vector<String>> getCoverageIDServerURL(Repository repo) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
@@ -1190,8 +1262,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     /**
-     * @param con
-     * @return
+     * Get coverage ID and server URL through the connection to a repository.
+     * @param con-connection to a repository
+     * @return hashmap of coverage ID and list of URLs of servers
      * @throws RepositoryException
      * @throws MalformedQueryException
      * @throws QueryEvaluationException
@@ -1235,7 +1308,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-
+    /**
+     * Run <code>update()</code> which updates the repository and catalog cache.
+     */
     public void run() {
 
         try {
@@ -1293,6 +1368,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
+    /**
+     * Ingest supported format in the coverage document.
+     * @param coverages
+     * @throws MalformedURLException
+     */
     private void addSupportedFormats(Element coverages) throws MalformedURLException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -1336,6 +1416,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
+    /**
+     * Get supported formats from the dap server.
+     * @param dapServerUrl
+     * @return
+     */
     private Vector<Element> getWcsSupportedFormatElements(URL dapServerUrl) {
 
         Vector<Element> sfEs = new Vector<Element>();
