@@ -47,12 +47,11 @@ public class ConstructRuleEvaluator {
     }
 
 
-
-
-    /*
+     /**
      * Run all Construct queries and ingest resulting statements into repository
+     * @param repository-repository to use
+     * @throws RepositoryException
      */
-
     public  void runConstruct(Repository repository) throws RepositoryException {
 
         log.debug("-----------------------------------------------------------------");
@@ -180,14 +179,7 @@ public class ConstructRuleEvaluator {
                                 nonePostprocessSt++;
                                 stAdded++;
                             }
-                            /*
-                             * int nonePostprocessSt = 0; while
-                             * (graphResult.hasNext()) { Statement st =
-                             * graphResult.next(); con.add(st, context); //
-                             * log.debug("Added statement = " //
-                             * +st.toString()); toAdd.add(st); Added.add(st);
-                             * nonePostprocessSt++; }
-                             */
+
                             log.info("Complete adding " + nonePostprocessSt
                                     + " none-postprocess statements");
                             // log.debug("After processing default (NONE)
@@ -203,10 +195,7 @@ public class ConstructRuleEvaluator {
                             // con.add(toAdd, context);
                             log.info("Total added " + toAdd.size()
                                     + " statements.");
-                            /*
-                             * for(Statement sttoadd:toAdd){ log.debug("Add
-                             * statement: "+sttoadd.toString()); }
-                             */
+
                             stAdded = toAdd.size();
                         }
 
@@ -269,8 +258,10 @@ public class ConstructRuleEvaluator {
 
     }
 
-    /*
+    
+    /**
      * Find all Construct queries stored in the repository
+     * @param repository-repository to use
      */
     private void findConstruct(Repository repository) {
         TupleQueryResult result = null;
@@ -345,6 +336,9 @@ public class ConstructRuleEvaluator {
 
     }
 
+    /**
+     * functions called
+     */
     public enum FunctionTypes {
         None, getWcsID, Subtract, Join
     }
@@ -399,19 +393,14 @@ public class ConstructRuleEvaluator {
 
         Matcher xsd2owlMatcher = xsd2owlPattern.matcher(processedQueryString); // xsdToOwl:increment
 
-        //Pattern functionPattern = Pattern
-        //        .compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");// fn:name(abc)
+
         Pattern comma = Pattern.compile(",");
-
-
-        //Pattern p_fn = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\))");
 
         Pattern p_fn_className = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
                         Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
 
         Matcher functionMatcher = p_fn_className.matcher(processedQueryString);
 
-        //String expand = "";
         if (stringMatcher.find()) {
             postProcessFlag = ProcessingTypes.xsString;
             String vname = stringMatcher.group(1);
@@ -503,7 +492,7 @@ public class ConstructRuleEvaluator {
     }
 
     /***************************************************************************
-     * DropQuotes
+     * Drop quotes in statements generated from running a construct rule.
      *
      * @param graphResult
      * @param creatValue
@@ -567,7 +556,7 @@ public class ConstructRuleEvaluator {
 
 
     /***************************************************************************
-     * processing xs:string
+     * Process "xs:string" in statements generated from running a construct rule.
      *
      * @param graphResult
      * @param creatValue
@@ -620,7 +609,7 @@ public class ConstructRuleEvaluator {
 
 
     /***************************************************************************
-     * cast type
+     * Cast data type in statements generated from running a construct rule
      *
      * @param graphResult
      * @param creatValue
@@ -713,7 +702,7 @@ public class ConstructRuleEvaluator {
     }
 
     /***************************************************************************
-     * Increment number by 1   
+     * Increment number by 1 in statements generated from running a construct rule
      *
      * @param graphResult
      * @param creatValue
@@ -733,10 +722,8 @@ public class ConstructRuleEvaluator {
         String pproces4 = "(.+)";
         Pattern rproces4 = Pattern.compile(pproces4);
 
-        // String pproces4sub ="(.+)\"(\\d+)\"(.+)";
         String pproces4sub = "\"(\\d+)\"";
-        // pproces4= \"(\d+)\"
-        // String pproces4sub ="\\\"(\\d+)\\\"";
+
         Pattern rproces4psub = Pattern.compile(pproces4sub);
 
         String pproces4sub2 = "\\{\\s*\\{(\\w+)\\s*\\}\\s*(.+)\\{(\\w+)\\s*\\}\\s*\\}";
@@ -852,7 +839,7 @@ public class ConstructRuleEvaluator {
 
                 String className; // class name
                 String fnName; // function name
-                //if (prd.equals(myfn) && isSbjBn) {
+
                 if (prd.equals(myfn)) {
                     String functionImport = obj.stringValue();
                     int indexOfLastPoundSign = functionImport.lastIndexOf("#");
@@ -874,13 +861,7 @@ public class ConstructRuleEvaluator {
                     obj = st.getObject();
                     prd = st.getPredicate();
                     sbj = st.getSubject();
-                    //mbnode = bnode.matcher(sbj.toString());
-                    //log.debug(" sbjLastSt = " + targetSbj );
-                    //log.debug(" prdLastSt = " + targetPrd );
 
-                    //log.debug(" sbj = " + sbj );
-                    //log.debug(" prd = " + prd );
-                    //log.debug(" obj = " + obj );
                     if (myfnlist.equals(prd)) {
                         listnode = obj;
                     } else if (listnode.equals(sbj) && rdffirst.equals(prd)) {
@@ -951,6 +932,12 @@ public class ConstructRuleEvaluator {
                 + " statements are added.\n ");
     }
 
+    /**
+     * Invoke a method from a class.
+     * @param className
+     * @param methodName
+     * @return
+     */
     public Method getMethodForFunction(String className,
                                               String methodName) {
 
@@ -1001,6 +988,12 @@ public class ConstructRuleEvaluator {
 
     }
 
+    /**
+     *
+     * @param classInstance
+     * @param methodName
+     * @return
+     */
     public  Method getMethodForFunction(Object classInstance,
             String methodName) {
 
@@ -1034,6 +1027,11 @@ public class ConstructRuleEvaluator {
 
     }
 
+    /**
+     * 
+     * @param m
+     * @return
+     */
     public  String getProcessingMethodDescription(Method m) {
 
         String msg = "";
