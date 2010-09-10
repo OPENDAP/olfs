@@ -203,7 +203,7 @@ public class CoverageRequestProcessor {
 
                 String dapLatitude       = coverage.getLatitudeCoordinateDapId(fieldID);
                 String dapLongitude      = coverage.getLongitudeCoordinateDapId(fieldID);
-                String latLonBoundingBox =  subsetBB.getDapGeogridFunctionBoundingBox();
+                String latLonBoundingBox = subsetBB.getDapGeogridFunctionBoundingBox();
 
 
                 String dapElevation           = coverage.getElevationCoordinateDapId(fieldID);
