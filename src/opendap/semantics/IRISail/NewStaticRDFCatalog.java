@@ -67,7 +67,21 @@ import org.openrdf.repository.RepositoryException;
 import com.ontotext.trree.owlim_ext.SailImpl;
 
 /**
- * @ToDo
+ * This class is used to retrieve coverage descriptions of a data set. A Sesame-OWLIM RDF
+ * store is initialized and populated and an xml document of coverages of the served data sets
+ * is generated. This xml document is used to answer request posted by a client.
+ * The RDF store is updated periodically to make sure the information served is up to date.
+ * Care is taken to make sure the RDF store can be used by multiple users at the same time.
+ * </p>
+ * The RDF store is populated by importing and ingesting semantic inference rules and owl/xml
+ * schema files and rdf files describing data sets.
+ * The <code>doNotImportTheseUrls</code> is a string vector that holds
+ * URL of bad files that should not be imported.
+ * The <code>catalogCacheDirectory</code> holds the OWLIM persistent directory
+ * <code>owlim_storage_folder</code>, the coverage description document and the dump of the
+ * whole repository files in triple graph format.
+ * 
+ *
  */
 public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
@@ -224,7 +238,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         initialized = true;
     }
 
-
+    /**
+     * Update the repository, coverage description document, catalog and the repository dump file.
+     * @throws RepositoryException
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws JDOMException
+     */
     public void update() throws RepositoryException, InterruptedException, IOException, JDOMException {
 
         String filename;
@@ -276,7 +296,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Extract coverage description from the RDF store and update catalog cache.
+     * @throws InterruptedException
+     * @throws RepositoryException
+     */
     private void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
         long startTime, endTime;
         double elapsedTime;
@@ -305,7 +329,15 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Process the configration file passed in as the root element of an xml file.
+     * Set the catalog cache directory, resource path and the interval of running
+     * updating catalog thread.
+     *  
+     * @param config
+     * @param defaultCacheDirectory
+     * @param defaultResourcePath
+     */
     private void processConfig(Element config, String defaultCacheDirectory, String defaultResourcePath) {
 
         Element e;
@@ -402,6 +434,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         log.debug("shutdownRepository(): Repository shutdown complete.");
     }
 
+    /**
+     * Setup and initialize the repository. Set the OWLIM rule set, catalog cache directory and
+     * owlim storage directory.
+     * @return repository-a reference to the repository
+     * @throws RepositoryException
+     * @throws InterruptedException
+     */
     private Repository setupRepository() throws RepositoryException, InterruptedException {
 
 
@@ -475,7 +514,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Instantiates XMLfromRDF and build CoverageDescription XML from the repository.
+     * @param con-connection to the repository
+     * @throws InterruptedException
+     */
     private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) throws InterruptedException {
 
 
@@ -555,7 +598,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Retrieve the data set list and the import RDF files from the config file.
+     * @param configFile
+     * @return a String vector holding list of files to import
+     * @throws IOException
+     * @throws JDOMException
+     */
     private Vector<String> getRdfImports(URL configFile) throws IOException, JDOMException {
 
         Vector<String> rdfImports = new Vector<String>();
@@ -643,7 +692,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Ingest coverage description document into the WCS catalog.
+     * @param repository
+     * @throws Exception
+     */
     private void ingestWcsCatalog(Repository repository) throws Exception {
 
         log.info("Ingesting catalog from CoverageDescriptions Document built by the XMLFromRDF object...");
@@ -722,7 +775,12 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
+    /**
+     * Ingest individual coverage description element into the WCS catalog.
+     * @param cde-coverage description element
+     * @param lastModified
+     * @return
+     */
     private CoverageDescription ingestWcsCoverageDescription(Element cde, long lastModified) {
 
         CoverageDescription cd = null;
@@ -742,6 +800,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         return cd;
     }
 
+    /**
+     * Check if the coverage exists.
+     * @param id-coverage
+     * @return
+     */
     public boolean hasCoverage(String id) {
 
         log.debug("Looking for a coverage with ID: " + id);
