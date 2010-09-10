@@ -1,6 +1,5 @@
 package opendap.semantics.IRISail;
 
-import net.sf.saxon.s9api.*;
 import opendap.xml.Transformer;
 import org.jdom.output.XMLOutputter;
 import org.openrdf.model.*;
@@ -243,7 +242,7 @@ public class RdfImporter {
 
                             log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + documentURL + " )");
                             //@todo make this a more robust
-                            String transformFileUrl = RepositoryOps.getTransformToRdfUri(repository, documentURL);
+                            String transformFileUrl = RepositoryOps.getTransformToRdfUrl(repository, documentURL);
                             log.debug("addNeededRDFDocuments(): Transformation =  " + transformFileUrl);
                             if (transformFileUrl != null){
                                 
