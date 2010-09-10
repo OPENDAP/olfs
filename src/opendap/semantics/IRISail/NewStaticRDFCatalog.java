@@ -4,8 +4,8 @@
 // Copyright (c) 2010 OPeNDAP, Inc.
 //
 // Authors:
-//     Haibo Liu  <haibo@iri.columbia.edu>
 //     Nathan David Potter  <ndp@opendap.org>
+//     Haibo Liu  <haibo@iri.columbia.edu>
 //     Benno Blumenthal <benno@iri.columbia.edu>
 //
 // This library is free software; you can redistribute it and/or
