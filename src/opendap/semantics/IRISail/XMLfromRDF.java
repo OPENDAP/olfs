@@ -71,7 +71,12 @@ public class XMLfromRDF {
         "topprop = <"+topURI+">";
 	}
 
-    	
+    /**
+     * Start the process of building the document. First level children are retrieved through
+     * query zero and added to the document.
+     *
+      * @param topURI-searching phrase for the first level children
+     */
 	public void getXMLfromRDF(String topURI){
         TupleQueryResult result0 = null;
         try{
@@ -79,13 +84,12 @@ public class XMLfromRDF {
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, queryString0);
             
             result0 = tupleQuery.evaluate();
-            //log.debug("Qresult: "+result0.hasNext());
+
             List<String> bindingNames = result0.getBindingNames();
-            //log.debug(bindingNames.probeServletContext());
+
             while ( result0.hasNext()) {
                 BindingSet bindingSet = (BindingSet) result0.next();
-                //log.debug(bindingSet.probeServletContext());
-                                        
+
                 if (bindingSet.getValue("obj") != null 
                         && bindingSet.getValue("valueclass") != null){
                     
@@ -121,7 +125,7 @@ public class XMLfromRDF {
                     }
                                 
                     Element chd1 = new Element(parent,ns); //duplicated as the root
-                    //chd1.setText(valueOfobj.probeServletContext());
+                    
                     root.addContent(chd1);
                     this.addChildren(queryString1, chd1, con,doc);
                 } //if (bindingSet.getValue("topnameprop") 
@@ -142,25 +146,31 @@ public class XMLfromRDF {
             }
         }
     }
-	//private void addChildren(String qString, Element prt, String parentObjTypestr, RepositoryConnection con, Document doc){
+
+    /**
+     * Recursively retrieve children and add to the document.
+     *
+     * @param qString-query string for retrieving children
+     * @param prt-parent
+     * @param con-connection to the repository
+     * @param doc-the document to build
+     */
 	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc){
 		TupleQueryResult result = null;
 		boolean objisURI = false; //true if ojb is a URI/URL
-		//log.debug("Sesame2Builder "+qString);
 		
 		try{
 			TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);
 							
 			result = tupleQuery.evaluate();
-			//log.debug("Qresult: "+result.hasNext());
+
 			List<String> bindingNames = result.getBindingNames();
-			//log.debug(bindingNames.probeServletContext());
-			
+
 			SortedMap<String,BindingSet >   mapOrderObj   =   new TreeMap<String, BindingSet>();
 			
 			while ( result.hasNext()) {
 				BindingSet bindingSet = (BindingSet) result.next();
-				//log.debug("In try: "+bindingSet.probeServletContext());
+
 				Value valueOfnameprop;
 				Value valueOfobj;
 				Value valueOfvalueclass;
@@ -183,73 +193,63 @@ public class XMLfromRDF {
 					valueOfobjtype = (Value) bindingSet.getValue("objtype");
 					valueOfform = (Value) bindingSet.getValue("form");
 				}
-					/*
-					if(valueOforder != null){
-						log.debug(valueOforder.stringValue());
-					}else{
-						log.debug("NULL");
-					}
-					*/
+
 					String formtypestr = valueOfform.stringValue();
 					URI formtype = new URIImpl(formtypestr);
 					if(valueOfobjtype != null){ //have type description (element,attribute ...)
 						String uritypestr = valueOfobjtype.stringValue();
-						//log.debug("valueOfobjtype= "+valueOfobjtype.stringValue());
+
 						String parent,ns;
 						
 						if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
 							
 							int pl = valueOfnameprop.toString().lastIndexOf("#");
-							//log.debug("H4valueOfobjtype!=null valueOfnameprop3= "+valueOfnameprop.probeServletContext());
-							//log.debug("H4valueOfobjtype!=null pl= "+pl);
+
 							ns = valueOfnameprop.toString().substring(0,pl);
 							parent = valueOfnameprop.toString().substring(pl+1);
-							//log.debug("H4#valueOfobjtype!=null "+parent);
+
 						}else if(valueOfnameprop.toString().lastIndexOf("/") >= 0){
 							int pl = valueOfnameprop.toString().lastIndexOf("/");
 							ns = valueOfnameprop.toString().substring(0,pl);
 							parent = valueOfnameprop.toString().substring(pl+1);
-							//log.debug("H4/valueOfobjtype!=null "+parent);
+
 						}else{
 							parent = valueOfnameprop.toString();
 							ns = valueOfnameprop.toString();
-							//log.debug("H4valueOfobjtype!=null "+parent);
+
 						}
 												
 						URI uritype = new URIImpl(uritypestr); 
 						
-						//log.debug(formtypestr);
+
 						if(uritype.getLocalName().equalsIgnoreCase("attribute")){
 							URI urinameprop= new URIImpl(valueOfnameprop.stringValue());
 							if(formtype.getLocalName().equalsIgnoreCase("qualified")){
 							
 							Namespace attributeNS = Namespace.getNamespace("attributeNS",urinameprop.getNamespace());
-							//log.debug(formtype.probeServletContext());
-							
+
 							prt.setAttribute(urinameprop.getLocalName(),valueOfobj.stringValue(),attributeNS);
 							}
 							else{
 								prt.setAttribute(urinameprop.getLocalName(),valueOfobj.stringValue());	
 							}
-							//log.debug("IN attribute");
+
 						}else if(uritype.getLocalName().equalsIgnoreCase("simpleContent")){
-							//log.debug("In simpleContent: ");
+
 							prt.setText(valueOfobj.stringValue());
 						}
 						else{
-							//log.debug("In element: ");
-							//log.debug(valueOfobjtype.stringValue());
+
 							Element chd; 
 							if (valueOforder != null){//order matters
-								//String mapkey = valueOforder.stringValue()+"-"+valueOfobj.probeServletContext(); //key=0001-http
-								
+
 								String mapkeydigit = null;
                                 if (valueOforder.stringValue().length() == 1) mapkeydigit = "00" +valueOforder.stringValue();
                                 if (valueOforder.stringValue().length() == 2) mapkeydigit = "0" +valueOforder.stringValue();
                                 if (valueOforder.stringValue().length() == 3) mapkeydigit = valueOforder.stringValue();
-                                //String mapkey = valueOforder.stringValue()+"-"+valueOfobj.stringValue(); //key=0001-http
+
                                 String mapkey = mapkeydigit+"-"+valueOfnameprop.stringValue()+valueOfobj.stringValue(); //key=0001-http
-								//log.debug("mapkey= "+mapkey);
+
 								mapOrderObj.put(mapkey,bindingSet);	
 							}else{//order does not matter
 								if(formtype.getLocalName().equalsIgnoreCase("unqualified")){
@@ -279,20 +279,19 @@ public class XMLfromRDF {
 						if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
 							
 							int pl = valueOfnameprop.toString().lastIndexOf("#");
-							//log.debug("H4valueOfobjtype=null valueOfnameprop3= "+valueOfnameprop.probeServletContext());
-							//log.debug("H4valueOfobjtype=null pl= "+pl);
+
 							ns = valueOfnameprop.toString().substring(0,pl);
 							parent = valueOfnameprop.toString().substring(pl+1);
-							//log.debug("H4#valueOfobjtype=null "+parent);
+
 						}else if(valueOfnameprop.toString().lastIndexOf("/") >= 0){
 							int pl = valueOfnameprop.toString().lastIndexOf("/");
 							ns = valueOfnameprop.toString().substring(0,pl);
 							parent = valueOfnameprop.toString().substring(pl+1);
-							//log.debug("H4/valueOfobjtype=null "+parent);
+
 						}else{
 							parent = valueOfnameprop.toString();
 							ns = valueOfnameprop.toString();
-							//log.debug("H4valueOfobjtype=null "+parent);
+
 						}
 						Element chd;
 						if(formtype.getLocalName().equalsIgnoreCase("unqualified")){
@@ -310,7 +309,7 @@ public class XMLfromRDF {
 						}
 						else{
 							objisURI = true;	
-							//log.debug("objisURI ? "+objisURI);
+
 						}
 						if (objisURI){
 							addChildren(queryStringc, chd, con,doc);
@@ -409,6 +408,13 @@ public class XMLfromRDF {
 		
 		
 	}//void addChildren
+
+    /**
+     * Create the SeRQLquery string using the parent (URI) and the parent class (URI).
+     * @param parentstr
+     * @param parentclassstr
+     * @return  a SeRQL query string
+     */
 	private String createQueryString(String parentstr, Value parentclassstr){
 		String queryStringc;
 		String objURI = parentstr.substring(0, 7);
