@@ -948,7 +948,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     private String getTimeUnits(RepositoryConnection con, String coverageId, String fieldId) {
-        String qString = createCoordinateIdQuery("A_time", coverageId, fieldId);
+        String qString = createCoordinateUnitsIdQuery("A_time", coverageId, fieldId);
         String coordinateUnit = runQuery(con, qString, "unit");
         log.debug("getTimeUnits(): '" + coordinateUnit + "' is the units of the time coordinate for FieldID: " + fieldId);
         return coordinateUnit;
@@ -980,6 +980,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             }
         } catch (Exception e) {
             log.error("runQuery(): Query FAILED. Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+            log.error("query is: "+ qString);
         }
         return coordinateDapId;
     }
