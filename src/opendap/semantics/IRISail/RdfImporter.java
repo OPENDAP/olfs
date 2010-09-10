@@ -243,11 +243,11 @@ public class RdfImporter {
 
                                 importUrl(con, documentURL, contentType, inStream);
 
-                                addedDocument = true;  
+                                addedDocument = true;
+
                             }else if(documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
 
                                 importIS = httpConnection.getInputStream();
-
 
                                 importUrl(con, documentURL, contentType, importIS);
 
@@ -280,6 +280,7 @@ public class RdfImporter {
                                         ) {
                                     importUrl(con, documentURL, contentType, importIS);
                                     log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
+                                    
                                     addedDocument = true;
 
                                 } else {
