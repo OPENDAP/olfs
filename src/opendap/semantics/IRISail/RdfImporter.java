@@ -242,14 +242,14 @@ public class RdfImporter {
 
                             log.debug("addNeededRDFDocuments(): Import URL appears valid ( " + documentURL + " )");
                             //@todo make this a more robust
-                            String transformFileUrl = RepositoryOps.getTransformToRdfUrl(repository, documentURL);
-                            log.debug("addNeededRDFDocuments(): Transformation =  " + transformFileUrl);
-                            if (transformFileUrl != null){
+                            String transformToRdfUrl = RepositoryOps.getUrlForTransformToRdf(repository, documentURL);
+                            log.debug("addNeededRDFDocuments(): Transformation =  " + transformToRdfUrl);
+                            if (transformToRdfUrl != null){
                                 
                                 InputStream inStream;
-                                log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+transformFileUrl);
+                                log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+ transformToRdfUrl);
 
-                                Transformer t = new Transformer(transformFileUrl);
+                                Transformer t = new Transformer(transformToRdfUrl);
                                 inStream = t.transform(documentURL);
 
                                 log.info("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
@@ -269,17 +269,17 @@ public class RdfImporter {
 
                             } else if (documentURL.endsWith(".xsd")) { // XML Schema Document
                                 
-                                transformFileUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
+                                transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
 
 
-                                log.info("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformFileUrl);
+                                log.info("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformToRdfUrl);
 
                                 InputStream inStream;
 
-                                Transformer t = new Transformer(new StreamSource(transformFileUrl));
+                                Transformer t = new Transformer(new StreamSource(transformToRdfUrl));
                                 inStream = t.transform(new StreamSource(documentURL));
 
-                                //inStream = transform(new StreamSource(documentURL),localResourceDir+transformFileUrl);
+                                //inStream = transform(new StreamSource(documentURL),localResourceDir+transformToRdfUrl);
 
                                 log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
 

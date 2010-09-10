@@ -1484,7 +1484,7 @@ public class RepositoryOps {
      * @param repository-the repository instance
      * @return xsltTransformationFileUrl-Url of the transformation stylesheet
      */
-    public static String getTransformToRdfUrl(Repository repository, String importUrl){
+    public static String getUrlForTransformToRdf(Repository repository, String importUrl){
         RepositoryConnection con = null;
         String xsltTransformationFileUrl = null;
         ValueFactory valueFactory;
@@ -1505,7 +1505,7 @@ public class RepositoryOps {
 
             while (statements.hasNext()){
                 if(xsltTransformationFileUrl!=null){
-                    log.error("getTransformToRdfUrl(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
+                    log.error("getUrlForTransformToRdf(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
                 }
                 Statement s = statements.next();
                 xsltTransformationFileUrl= s.getObject().stringValue();
