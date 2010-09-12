@@ -46,11 +46,17 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Aug 5, 2010
- * Time: 12:05:46 PM
- * To change this template use File | Settings | File Templates.
+ * This class is used to populate the repository. A particular URL is only imported once. Bad URLs
+ * are skipped. The string vector <code>imports</code>  tracks all documents that are imported
+ * into the repository. The string hashset <code> urlsToBeIgnored</code> is used to track bad urls
+ * that are skipped. The method <code>importReferencedRdfDocs</code> repeatedly calls method
+ * <code>findNeededRDFDocuments</code> and <code>addNeededDocuments</code> until no new needed
+ * RDF documents are found.
+ * The method <code>findNeededRDFDocuments</code> queries the repository and passes those RDF
+ * docuemts to <code>addNeededDocuments</code> which in turn adds them into the repository.
+ *
+ *
+ *
  */
 public class RdfImporter {
 
@@ -87,7 +93,7 @@ public class RdfImporter {
 
     /**
      * ****************************************
-     * Update repository. Find and import documents into the repository.
+     * Find and import all needed RDF documents into the repository.
      *
      * @param repository
      * @param doNotImportUrls
@@ -122,7 +128,7 @@ public class RdfImporter {
 
 
     /**
-     * Find all rdfcache:RDFDocuments that are referenced by existing documents in the repository.
+     * Find all RDF documents that are referenced by existing documents in the repository.
      *
      * @param repository
      * @param rdfDocs
@@ -204,11 +210,11 @@ public class RdfImporter {
 
 
     /**
-     * Add the each of the RDF documents whose URL's are in the passed Vector to the Repository.
+     * Add each of the RDF documents whose URL's are in the passed Vector to the Repository.
      *
      * @param repository
-     * @param rdfDocs
-     * @return
+     * @param rdfDocs-holds RDF documents to import
+     * @return true if one or more RDF document is added into the repository
      *
      */
     private boolean addNeededRDFDocuments(Repository repository, Vector<String> rdfDocs) {
@@ -377,7 +383,16 @@ public class RdfImporter {
 
     }
 
-
+    /**
+     * Add individual RDF document into the repository.
+     * @param con-connection to the repository
+     * @param importURL-URL of RDF document to import
+     * @param contentType-Content type of the RDF document
+     * @param importIS-Input stream from of the RDF document
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws RepositoryException
+     */
     private void importUrl(RepositoryConnection con, String importURL, String contentType, InputStream importIS) throws IOException, RDFParseException, RepositoryException {
 
         if (!this.imports.contains(importURL)) { // not in the repository yet
