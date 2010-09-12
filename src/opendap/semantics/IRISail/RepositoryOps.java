@@ -51,9 +51,20 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * This is a repository maintenance class that is used to update the repository in use.
- * A startingpoint
- * is a top RDF document which
+ * This class is the major class that manipulates and maintains the repository up to date.
+ * Startingpoint statements are introduced in the repository here; documents or data sets
+ * no longer to be served anymore is also deleted from the repository here.
+ * </p>
+ * A startingpoint associates with two kind of concepts,
+ * one is the startingpoint statement and the other is the content
+ * of the startingpoint. e.g. "x http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+ * http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingpoints" is a startingpoint
+ * statement. "x" is the URL of the RDF document of a startingpoint.
+ * A startingpoint is a URL pointing to a top RDF document or a dataset to serve.
+ * To add a startingpoint into the repository, first the startingpoint statement
+ * is added then the actual content is added using class <code>RdfImporter</code> later.
+ * 
+ *
  */
 public class RepositoryOps {
 
