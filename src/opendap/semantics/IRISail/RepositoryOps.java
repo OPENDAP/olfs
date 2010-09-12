@@ -1,3 +1,29 @@
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "OPeNDAP Web Coverage Service Project."
+//
+// Copyright (c) 2010 OPeNDAP, Inc.
+//
+// Authors:
+//     Haibo Liu  <haibo@iri.columbia.edu>
+//     Nathan David Potter  <ndp@opendap.org>
+//     M. Benno Blumenthal <benno@iri.columbia.edu>
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
 import org.openrdf.model.*;
@@ -25,11 +51,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Jul 21, 2010
- * Time: 4:57:24 PM
- * To change this template use File | Settings | File Templates.
+ * This is a repository maintenance class that is used to update the repository in use.
+ * A startingpoint
+ * is a top RDF document which
  */
 public class RepositoryOps {
 
@@ -38,7 +62,7 @@ public class RepositoryOps {
 
 
     /**
-     * Remove the startingpoint statement.
+     * Remove the startingpoint statement from the repository.
      * @param repo
      * @param startingPointUrls
      */
@@ -69,10 +93,10 @@ public class RepositoryOps {
     }
 
     /**
-     * Remove the startingpoint statement.
-     * @param con An open connection to the repository from which the staring points will be dropped.
-     * @param valueFactory A ValueFactory object for making URI and Name valued objects.
-     * @param startingPointUrls A list of starting point URLs to drop from the repository.
+     * Remove the startingpoint statement from the repository.
+     * @param con-An open connection to the repository from which the staring points will be dropped.
+     * @param valueFactory-A ValueFactory object for making URI and Name valued objects.
+     * @param startingPointUrls-A list of starting point URLs to drop from the repository.
      */
     public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
 
