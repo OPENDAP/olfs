@@ -100,7 +100,7 @@
 
             <xsl:copy-of select="$webStartAppsLinks"/>
 
-            <xsl:call-template name="DatasetDetail"/>
+            <!-- xsl:call-template name="DatasetDetail"/ -->
 
 
 
@@ -158,20 +158,33 @@
 
     <xsl:template name="DatasetDetail">
         <h3>Dataset Details</h3>
+        <xsl:comment><xsl:copy/></xsl:comment>
         <table border="0">
-            <tr><td align="left"><font class="medium_bold">Global Attributes:</font></td><td/></tr>
+            <tr><td align="right"><font class="medium_bold">Global Attributes:</font></td><td/></tr>
             <tr><td/>
             <td>
-                <xsl:apply-templates select="." mode="AttributeTextBox">
+                <xsl:call-template  name="AttributeTextBox">
                     <xsl:with-param name="boxID" select="'globalatt_text'"/>
-                </xsl:apply-templates>
+                </xsl:call-template>
 
             </td>
             </tr>
             <tr><td/><td><hr/></td></tr>
 
-            <tr><td align="left"><font class="medium_bold">Variables:</font></td><td/></tr>
-            <xsl:apply-templates />
+            <tr><td align="right"><font class="medium_bold">Variables:</font></td><td/></tr>
+
+            <xsl:for-each select="dap:*[not(dap:Attribute)]">
+
+                <xsl:comment><xsl:value-of select="local-name()"/>(<xsl:value-of select="@name"/>)</xsl:comment>
+                <tr>
+                    <td></td>
+                    <td>
+
+                        <xsl:apply-templates select="."/>
+                            
+                    </td>
+                </tr>
+            </xsl:for-each>
 
         </table>
           
@@ -179,14 +192,13 @@
 
 
 
+
     <xsl:template match="dap:Grid">
-        <tr>
             <td align="right" valign="top"><font class="medium_bold"><xsl:value-of select="@name"/>: </font></td>
             <td align="left">
                 <xsl:apply-templates mode="Grid">
                 </xsl:apply-templates>
             </td>
-        </tr>
     </xsl:template>
 
 
@@ -198,18 +210,18 @@
 
 
     <xsl:template match="dap:Array">
-        <tr>
-            <td align="right" valign="top"><font class="medium_bold"><xsl:value-of select="@name"/>: </font></td>
-            <td>
+        <dl>
+            <dt valign="top"><font class="medium_bold"><xsl:value-of select="@name"/>: </font></dt>
+            <dd>
                 <font class="small_italic">Array of <xsl:apply-templates mode="ArrayTypeDescription"/></font><font class="medium"><xsl:apply-templates select="dap:dimension"/></font>
                 <br/>
                 <font class="small">Metadata:</font>
-                <br/>
                 <xsl:apply-templates select="." mode="AttributeTextBox">
                     <xsl:with-param name="boxID" select="concat(@name,'_text')"/>
                 </xsl:apply-templates>
-            </td>
-        </tr>
+            </dd>
+        </dl>
+                
     </xsl:template>
 
     <xsl:template match="dap:Array" mode="Grid">
@@ -223,18 +235,72 @@
     </xsl:template>
 
 
+    <xsl:template match="dap:Map">
 
+        <tr>
+            <td align="right" valign="top"><font class="medium_bold"><xsl:value-of select="@name"/>: </font></td>
+            <td>
+                <font class="small_italic">Map of <xsl:apply-templates mode="ArrayTypeDescription"/></font><font class="medium"><xsl:apply-templates select="dap:dimension"/></font>
+                <br/>
+                <font class="small">Metadata:</font>
+                <xsl:apply-templates select="." mode="AttributeTextBox">
+                    <xsl:with-param name="boxID" select="concat(@name,'_text')"/>
+                </xsl:apply-templates>
+            </td>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="dap:Structure">
+        <xsl:comment>Structure <xsl:value-of select="@name"/> Start</xsl:comment>
+        <dl>
+            <dt align="left" valign="top">
+                <font class="medium_bold"><xsl:value-of select="@name"/>:
+                </font>
+            </dt>
+            <dd>
+                <font class="small_italic">Is a Structure</font>
+                <br/>
+                <font class="small">Metadata:</font>
+                <xsl:call-template name="AttributeTextBox">
+                    <xsl:with-param name="boxID" select="concat(@name,'_text')"/>
+                </xsl:call-template>
+
+                <xsl:comment>Structure <xsl:value-of select="@name"/> Applying Templates</xsl:comment>
+                <xsl:apply-templates  />
+                <xsl:comment>Structure <xsl:value-of select="@name"/> Done</xsl:comment>
+
+            </dd>
+        </dl>
+
+    </xsl:template>
 
     
-    <xsl:template match="dap:Map">
-    </xsl:template>
 
     <xsl:template match="dap:dimension">
         [<xsl:value-of select="@name"/>=<xsl:value-of select="@size"/>]
     </xsl:template>
 
-    <xsl:template match="dap:Structure">
-        Structure <xsl:value-of select="@name"/>
+
+
+
+
+
+
+    <xsl:template match="dap:Sequence">
+        <tr>
+            <td align="right" valign="top"><font class="medium_bold"><xsl:value-of select="@name"/>: </font></td>
+            <td>
+                <font class="small_italic">Sequence</font>
+                <br/>
+                <font class="small">Metadata:</font>
+                <xsl:apply-templates select="." mode="AttributeTextBox">
+                    <xsl:with-param name="boxID" select="concat(@name,'_text')"/>
+                </xsl:apply-templates>
+            </td>
+            <table>
+                <xsl:apply-templates/>
+            </table>
+        </tr>
     </xsl:template>
 
 
@@ -292,23 +358,34 @@
 
 
 
-    <xsl:template match="*" mode="AttributeTextBox">
+    <xsl:template  name="AttributeTextBox">
         <xsl:param name="boxID"/>
 
+        <xsl:choose>
+            <xsl:when test="dap:Attribute">
+                <br/>
+                <textarea name="{$boxID}" rows="5" cols="70">
+                    <xsl:for-each select="dap:Attribute">
+                        <xsl:apply-templates select="." mode="AttributeText"/>
+                    </xsl:for-each>
 
-        <textarea name="{$boxID}" rows="5" cols="70">
-            <xsl:for-each select="dap:Attribute">
-                <xsl:apply-templates select="." mode="AttributeList"/>
-            </xsl:for-each>
-        </textarea>
+                </textarea>
+
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- textarea name="{$boxID}" rows="1" cols="70">No Metadata found.</textarea-->
+                <font class="small_italic"> No Metadata found.</font>
+            </xsl:otherwise>
+        </xsl:choose>
+
 
     </xsl:template>
 
-    <xsl:template match="dap:Attribute" mode="AttributeList">
+    <xsl:template match="dap:Attribute" mode="AttributeText">
         <xsl:param name="ParentName" />
         <xsl:choose>
             <xsl:when test="dap:Attribute">
-                <xsl:apply-templates mode="AttributeList">
+                <xsl:apply-templates mode="AttributeText">
                     <xsl:with-param name="ParentName" select="concat($ParentName,@name,'.')"/>
                 </xsl:apply-templates>
             </xsl:when>
