@@ -50,8 +50,8 @@ import java.util.regex.Pattern;
   * The inferred statements are added into the repository. The inference rules are run
   * repeatedly until no rules generate any new statements.
   * <p/>
-  * The <code>constructQuery</code> holds the inference rules.
-  * The <code>constructContext</code> holds inference rule and its ID pares.  
+  * The <code>constructQuery</code> is a String Vector holds the inference rules.
+  * The <code>constructContext</code> is a Hash Map holds pairs of inference rules and its ID.  
   */
 public class ConstructRuleEvaluator {
 
