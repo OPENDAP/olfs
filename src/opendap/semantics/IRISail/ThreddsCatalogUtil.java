@@ -52,8 +52,7 @@ import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 
 /**
- * Created by IntelliJ IDEA. User: ndp Date: Dec 1, 2009 Time: 7:37:51 AM To
- * change this template use File | Settings | File Templates.
+ * This class is a thredds catalog utility. 
  */
 public class ThreddsCatalogUtil {
 
