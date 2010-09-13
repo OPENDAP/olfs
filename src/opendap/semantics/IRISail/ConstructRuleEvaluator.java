@@ -45,7 +45,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
  /**
-  * This class is used to run external inference rules on an OWLIM-Sesame 2 repository.
+  * This class is used to run external inference rules on an Sesame-OWLIM repository.
   * The inference rules are written in SeRQL.
   * The inferred statements are added into the repository. The inference rules are run
   * repeatedly until no rules generate any new statements.
