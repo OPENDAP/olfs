@@ -149,10 +149,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     }
 
-
-    /*******************************************************/
-    /*******************************************************/
-
     /**
      * @param args Command line arguments
      */
@@ -208,7 +204,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     /**
-     * ***************************************************
+     * 
      */
     public void init(URL configFile, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
 
