@@ -1009,10 +1009,40 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * @return coordinateDapI-latitude coordinate Dap Id
      */
     private String getDapGridId(RepositoryConnection con, String coverageId, String fieldId) {
-        return "";
+        //log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
+        String qString = createDapGridIdQuery(coverageId, fieldId);
+        String dapGridId = runQuery(con, qString, "gridid");
+        //log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
+        return dapGridId;
 
     }
 
+     private String createDapGridIdQuery(String coverageStr, String fieldStr) {
+
+        String qString = "select grid, gridid " +
+                "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
+                "{field} wcs:Identifier {fieldid}, " +
+                "{grid} cf2wcs:hasPart {field} ; rdf:type {dapns:Grid} ; dap:localId {gridid} " +
+                "WHERE covid= \"" + coverageStr + "\" " +
+                "AND fieldid=\"" + fieldStr + "\" " +
+                "UNION " +
+                "select field, gridid " +
+                "FROM " +
+                "{cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
+                "{field} wcs:Identifier {fieldid} ; rdf:type {dapns:Grid} ; dap:localId {gridid} " +
+                "WHERE covid= \"" + coverageStr + "\" " +
+                "AND fieldid=\"" + fieldStr + "\" " +
+                "USING NAMESPACE " +
+                "wcs=<http://www.opengis.net/wcs/1.1#>, " +
+                "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
+                "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, " +
+                "cf2wcs=<http://iridl.ldeo.columbia.edu/ontologies/cf2wcs.owl#>, " +
+                "dapns=<http://xml.opendap.org/ns/DAP/3.2#>, " +
+                "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>";
+
+        log.debug("createDapGridIdQuery: Built query string: '" + qString + "'");
+        return qString;
+    }
     /**
      * Get latitude coordinate Dap ID, given the coverage ID and field ID.
      * @param con-connection to the repository
