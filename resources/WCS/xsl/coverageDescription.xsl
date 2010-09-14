@@ -216,13 +216,10 @@
 
 
     <xsl:template match="wcs:Field">
-        <li>field:
-        <xsl:value-of select="wcs:Identifier"/>
-        <div class="medium">
+        <li>field: <font class="medium_bold"> <xsl:value-of select="wcs:Identifier"/></font>
         <ul>
             <xsl:apply-templates mode="simple"/>
         </ul>
-        </div>
         </li>
     </xsl:template>
 

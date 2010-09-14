@@ -740,6 +740,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                         for (String fieldID : coverageDescription.getFieldIDs()) {
                             log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
 
+                            dapVariableID = getDapGridId(con, coverageID, fieldID);
+                            coverageDescription.setDapGridId(fieldID, dapVariableID);
+
                             dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
                             coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
 
@@ -996,6 +999,18 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         return supportedCRSs;
+    }
+
+    /**
+     * Get the Dap Id of the dap Grid variable associated with the passed WCS filed ID.
+     * @param con-connection to the repository
+     * @param coverageId
+     * @param fieldId
+     * @return coordinateDapI-latitude coordinate Dap Id
+     */
+    private String getDapGridId(RepositoryConnection con, String coverageId, String fieldId) {
+        return "";
+
     }
 
     /**

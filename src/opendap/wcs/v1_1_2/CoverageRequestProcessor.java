@@ -100,10 +100,6 @@ public class CoverageRequestProcessor {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-
-        if( !req.getCoverageID().startsWith("/") )
-            requestURL += "/";
-
         requestURL += req.getCoverageID() + ".dods"+"?"+getDapProjection(req);
 
         return requestURL;
@@ -114,11 +110,8 @@ public class CoverageRequestProcessor {
     public static String getNetcdfDataAccessURL(GetCoverageRequest req) throws WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
-
-        if( !req.getCoverageID().startsWith("/") )
-            requestURL += "/";
-
-        requestURL +=  req.getCoverageID() + ".nc"+"?"+getDapProjection(req);
+        
+        requestURL +=  ".nc"+"?"+getDapProjection(req);
 
         return requestURL;
     }
@@ -132,7 +125,7 @@ public class CoverageRequestProcessor {
         if( !req.getCoverageID().startsWith("/") )
             requestURL += "/";
         
-        requestURL +=   req.getCoverageID() + ".ddx";
+        requestURL +=   ".ddx";
         //requestURL +=  "/" + req.getCoverageID() + ".ddx"+"?"+getDapProjection(req);
 
         return requestURL;

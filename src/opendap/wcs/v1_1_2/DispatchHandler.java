@@ -173,7 +173,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         serviceConfig = sb.build(serviceConfigUrl).getRootElement();
         
 
-        WcsCatalog catalog;
+        WcsCatalog catalog = null;
 
 
         Element catalogConfig = serviceConfig.getChild("WcsCatalog");
@@ -213,32 +213,41 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
             } catch (ClassNotFoundException e) {
-                msg = "Cannot find class: " + catalogClass;
+                msg = "Cannot instantiate class: " + catalogClass +
+                        "  Caught "+e.getClass().getName()+
+                        "  Message: "+e.getMessage();
                 log.error(msg);
                 throw new ServletException(msg, e);
-            } catch (InstantiationException e) {
-                msg = "Cannot instantiate class: " + catalogClass;
+
+            
+            } catch (ExceptionInInitializerError e){
+                msg = "Cannot instantiate class: " + catalogClass +
+                        "  Caught "+e.getClass().getName()+
+                        "  Message: "+e.getMessage();
                 log.error(msg);
                 throw new ServletException(msg, e);
-            } catch (IllegalAccessException e) {
-                msg = "Cannot access class: " + catalogClass;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + catalogClass + " to "+ WcsCatalog.class.getName();
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (Exception e) {
-                msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+
+
+            } catch(LinkageError e){
+                msg = "Cannot instantiate class: " + catalogClass +
+                        "  Caught "+e.getClass().getName()+
+                        "  Message: "+e.getMessage();
                 log.error(msg);
                 throw new ServletException(msg, e);
 
             }
 
-            log.debug("Initializing instance of a WcsCatalog interface implementation:" + catalogClass);
 
 
+
+            if(catalog == null){
+                msg = "Cannot instantiate class: " + catalogClass +  " Reason unknown.";
+                log.error(msg);
+                throw new ServletException(msg);
+
+            }
             
+            log.debug("Initializing instance of a WcsCatalog interface implementation:" + catalogClass);
 
 
             String defautCatalogCacheDir = _serviceContentPath + catalog.getClass().getSimpleName()+"/";

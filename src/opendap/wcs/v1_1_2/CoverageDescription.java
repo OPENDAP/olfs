@@ -50,6 +50,7 @@ public class CoverageDescription {
 
     private File myFile;
 
+    private HashMap<String,String> _dapGridId;
     private HashMap<String,String> _latitudeCoordinateDapId;
     private HashMap<String,String> _longitudeCoordinateDapId;
     private HashMap<String,String> _elevationCoordinateDapId;
@@ -61,6 +62,7 @@ public class CoverageDescription {
     public CoverageDescription(Element cd, long lastModified) throws WcsException{
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
+        _dapGridId = new HashMap<String,String>();
         _latitudeCoordinateDapId = new HashMap<String,String>();
         _longitudeCoordinateDapId = new HashMap<String,String>();
         _elevationCoordinateDapId = new HashMap<String,String>();
@@ -306,6 +308,13 @@ public class CoverageDescription {
     }
 
 
+    public String getDapGridId(String fieldID){
+        return _dapGridId.get(fieldID);
+    }
+
+    public String setDapGridId(String fieldID, String dapGridId){
+        return _dapGridId.put(fieldID,dapGridId);
+    }
 
     public String getLatitudeCoordinateDapId(String fieldID) {
         return _latitudeCoordinateDapId.get(fieldID);
