@@ -194,6 +194,11 @@ public class CoverageRequestProcessor {
                             WcsException.INVALID_PARAMETER_VALUE,"ows:Identifier");
 
 
+                String dapGrid           = coverage.getDapGridId(fieldID);
+
+                dapGrid = fieldID.substring(0,fieldID.indexOf("."));
+
+
                 String dapLatitude       = coverage.getLatitudeCoordinateDapId(fieldID);
                 String dapLongitude      = coverage.getLongitudeCoordinateDapId(fieldID);
                 String latLonBoundingBox = subsetBB.getDapGeogridFunctionBoundingBox();
@@ -223,7 +228,7 @@ public class CoverageRequestProcessor {
 
                 // Full query.
                 proj += "geogrid(" +
-                            fieldID + "," +
+                            dapGrid + "," +
                             dapLatitude + "," +
                             dapLongitude + "," +
                             latLonBoundingBox +
