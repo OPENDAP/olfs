@@ -1012,7 +1012,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         //log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         String qString = createDapGridIdQuery(coverageId, fieldId);
         String dapGridId = runQuery(con, qString, "gridid");
-        //log.debug("getLatitudeCoordinateDapId(): '" + coordinateDapId + "' is the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
+        log.debug("getDapGridId(): '" + dapGridId + "' is the DAP variable Grid ID that represents the latitude coordinate for FieldID: " + fieldId);
         return dapGridId;
 
     }
