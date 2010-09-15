@@ -171,6 +171,7 @@
     <property name="build.dist" location="${build.dir}/dist"/>
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.src" location="${build.dir}/src"/>
 
 
     <!-- Libraries -->
@@ -261,6 +262,7 @@
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.lib}"/>
         <mkdir dir="${build.run}"/>
+        <mkdir dir="${build.src}"/>
 
         <filter token="HyraxVersion" value="${VERSION}"/>
 
@@ -420,6 +422,50 @@
         </war>
 
         <delete file="${build.dist}/index.html"/>
+
+    </target>
+
+
+    <target
+            name="doc"
+            depends="clean,init"
+            description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
+            unless="JavaDocIsUpToDate"
+            >
+        <copy todir="${build.src}" filtering="false" >
+            <fileset dir="${src.dir}">
+                <exclude name="hao/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/dap/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/bes/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/coreServlet/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/experiments/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/io/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/logging/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/metacat/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/namespaces/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/ppt/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/soap/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/thredds/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/threddsHandler/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/wcsGateway/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/wcs/gatewayClient/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/webstart/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/xml/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+            </fileset>
+        </copy>
+
+        <javadoc destdir="${build.doc}/javadoc"
+                 Author="true"
+                 Verbose="true"
+                 Version="true"
+                 failonerror="true"
+                >
+            <classpath refid="compile.classpath"/>
+
+            <packageset dir="${build.src}" defaultexcludes="yes"/>
+
+
+        </javadoc>
 
     </target>
 
