@@ -328,6 +328,7 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
+                                importIS = httpConnection.getInputStream();
                                 importUrl(con, documentURL, contentType, importIS);
                                 log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
 
