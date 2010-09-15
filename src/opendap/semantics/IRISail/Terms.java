@@ -26,6 +26,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * This class holds all terms defined in this package.
  */
@@ -56,7 +58,7 @@ public class Terms {
     public static final String startingPointsContext         = "startingPoints";
     public static final String startingPointsContextUri      = rdfCacheNamespace + startingPointsContext;
 
-    public static final String startingPointType = "StartingPoint";
+    public static final String startingPointType             = "StartingPoint";
     public static final String startingPointContextUri       = rdfCacheNamespace + startingPointType;
 
     public static final String functionsContext              = "myfn";
@@ -86,4 +88,14 @@ public class Terms {
     public static final String isReplacedByUri               = dcTermNamespace + isReplacedBy;
     
     public static final String rdfType                       = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+
+
+    public static final ConcurrentHashMap<String,String> localResources;
+    static {
+        localResources = new ConcurrentHashMap<String,String>();
+        localResources.put("http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl", "xsl/xsd2owl.xsl");
+
+    }
+
+
 }
