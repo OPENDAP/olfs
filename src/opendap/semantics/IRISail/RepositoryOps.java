@@ -69,7 +69,7 @@ import java.util.*;
 public class RepositoryOps {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
-    public static boolean flushRepositoryOnDrop = false;
+    public static boolean flushRepositoryOnDrop = true;
 
 
     /**
