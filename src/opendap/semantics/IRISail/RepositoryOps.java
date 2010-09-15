@@ -52,19 +52,18 @@ import java.util.*;
 
 /**
  * This class is the major class that manipulates and maintains the repository up to date.
- * Using this class startingpoint statements are introduced in the repository; documents
+ * Using this class StartingPoint statements are introduced in the repository; documents
  * or data sets no longer to be served anymore is deleted from the repository.
  * </p>
- * A startingpoint associates with two kind of concepts,
- * one is the startingpoint statement and the other is the content
- * of the startingpoint. e.g. "x http://www.w3.org/1999/02/22-rdf-syntax-ns#type
- * http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingpoints" is a startingpoint
- * statement. "x" is the URL of the RDF document of a startingpoint.
- * A startingpoint is a top RDF document or a data set to serve.
- * To add a startingpoint into the repository, first the startingpoint statement
- * is added then the actual content is added later using class <code>RdfImporter</code>.
- * 
+ * The repository consists of StartingPoint RDF document and RDF documents needed by those
+ * StartingPoints. When introducing a StartingPoint into the repository, two things need to
+ * be added. One is the StartingPoint statement and the other is the content of the
+ * StartingPoint RDF document. e.g. "x rdf:type rdfcache:StartingPoint" is a StartingPoint
+ * statement. "x" is the URL of the RDF document of a StartingPoint.
+ * The startingpoint statement is added using this class then the actual content is
+ * added later using class <code>RdfImporter</code>.
  *
+ * rdfcache = <http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>
  */
 public class RepositoryOps {
 
