@@ -30,7 +30,15 @@ package opendap.semantics.IRISail;
  * This class holds all terms defined in this package.
  */
 public class Terms {
+
+    /**
+     * A comment
+     */
     public static final String internalStartingPoint         = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+
+    /**
+     * Another Comment
+     */
     public static final String rdfCacheNamespace             = internalStartingPoint+"#";
 
     public static final String lastModifiedContext           = "last_modified";
