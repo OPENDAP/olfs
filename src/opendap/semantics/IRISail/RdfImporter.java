@@ -315,9 +315,7 @@ public class RdfImporter {
                             } else if(documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
                                 // OWL is RDF and so is the repository - no transform needed.
 
-                                importIS = httpConnection.getInputStream();
-
-                                importUrl(con, documentURL, contentType, importIS);
+                                importUrl(con, documentURL, contentType);
 
                                 addedDocument = true;
 
@@ -328,8 +326,7 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
-                                importIS = httpConnection.getInputStream();
-                                importUrl(con, documentURL, contentType, importIS);
+                                importUrl(con, documentURL, contentType);
                                 log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
 
                                 addedDocument = true;
@@ -409,6 +406,37 @@ public class RdfImporter {
 
 
             con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) importUri);
+            RepositoryOps.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
+            RepositoryOps.setContentTypeContext(importURL, contentType, con, valueFactory); //
+
+            log.info("Finished importing URL " + importURL);
+            imports.add(importURL);
+        }
+        else {
+            log.error("Import URL '"+importURL+"' already has been imported! SKIPPING!");
+        }
+    }
+    /**
+     * Add individual RDF document into the repository.
+     * @param con-connection to the repository
+     * @param importURL-URL of RDF document to import
+     * @param contentType-Content type of the RDF document
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws RepositoryException
+     */
+    private void importUrl(RepositoryConnection con, String importURL, String contentType) throws IOException, RDFParseException, RepositoryException {
+
+        if (!this.imports.contains(importURL)) { // not in the repository yet
+
+            log.info("Importing URL " + importURL);
+
+            ValueFactory valueFactory = con.getValueFactory();
+            URI importUri = new URIImpl(importURL);
+            URL url = new URL(importURL);
+
+
+            con.add(url, importURL, RDFFormat.RDFXML, (Resource) importUri);
             RepositoryOps.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
             RepositoryOps.setContentTypeContext(importURL, contentType, con, valueFactory); //
 
