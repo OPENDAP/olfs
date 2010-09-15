@@ -282,9 +282,8 @@ public class RdfImporter {
                                 log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+ transformToRdfUrl);
 
                                 if(Terms.localResources.containsKey(transformToRdfUrl)){
-
                                     transformToRdfUrl = getLocalResourceDirUrl() + Terms.localResources.get(transformToRdfUrl);
-                                    log.debug("addNeededRDFDocuments(): Transform URL has local code based copy: "+transformToRdfUrl);
+                                    log.debug("addNeededRDFDocuments(): Transform URL has local copy: "+transformToRdfUrl);
                                 }
 
 
