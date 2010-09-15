@@ -275,11 +275,10 @@ public class RdfImporter {
 
 
                             String transformToRdfUrl = RepositoryOps.getUrlForTransformToRdf(repository, documentURL);
-                            log.debug("addNeededRDFDocuments(): Repository returned a transformation to RDF:  " + transformToRdfUrl+ " for document: "+documentURL);
 
 
                             if (transformToRdfUrl != null){
-                                
+
                                 log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+ transformToRdfUrl);
 
                                 Transformer t = new Transformer(transformToRdfUrl);
