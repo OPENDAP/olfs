@@ -294,8 +294,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     /**
      * Extract coverage description from the RDF store and update catalog cache.
-     * @throws InterruptedException
-     * @throws RepositoryException
+     * @throws InterruptedException - if the process is interrupted.
+     * @throws RepositoryException - if a problem occurs when setting up the repository.
      */
     private void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
         long startTime, endTime;
@@ -330,9 +330,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Set the catalog cache directory, resource path and the interval of running
      * updating catalog thread.
      *  
-     * @param config
-     * @param defaultCacheDirectory
-     * @param defaultResourcePath
+     * @param config - the root element of the configuration file.
+     * @param defaultCacheDirectory - the default location on disk to store the repository and its dump
+     * files.
+     * @param defaultResourcePath - the default directory for the transform style sheets and other local
+     * files.  
      */
     private void processConfig(Element config, String defaultCacheDirectory, String defaultResourcePath) {
 
@@ -433,9 +435,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /**
      * Setup and initialize the repository. Set the OWLIM rule set, catalog cache directory and
      * owlim storage directory.
-     * @return repository-a reference to the repository
-     * @throws RepositoryException
-     * @throws InterruptedException
+     * @return repository - a reference to the repository
+     * @throws RepositoryException - if cannot setup the repository.
+     * @throws InterruptedException - if the process is interrupted.
      */
     private Repository setupRepository() throws RepositoryException, InterruptedException {
 
@@ -513,7 +515,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /**
      * Instantiates XMLfromRDF and build CoverageDescription XML from the repository.
      * @param con-connection to the repository
-     * @throws InterruptedException
+     * @throws InterruptedException - if the process is interrupted.
      */
     private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) throws InterruptedException {
 
@@ -597,9 +599,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     /**
      * Retrieve the data set list and the import RDF files from the config file.
      * @param configFile
-     * @return a String vector holding list of files to import
-     * @throws IOException
-     * @throws JDOMException
+     * @return a String vector holding list of files to import.
+     * @throws IOException - if reading the configure file fails.
+     * @throws JDOMException - if fail to create a JDOM element. 
      */
     private Vector<String> getRdfImports(URL configFile) throws IOException, JDOMException {
 
