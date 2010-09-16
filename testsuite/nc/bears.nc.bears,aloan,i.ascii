@@ -5,3 +5,4 @@ bears.bears[bears.i=20], "uis", "hab", "le"
 aloan.j, 2, 4, 6
 aloan.aloan[aloan.i=10], 3, 4, 5
 aloan.aloan[aloan.i=20], 6, 7, 1e+12
+i, 10, 20

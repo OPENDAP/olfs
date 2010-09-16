@@ -13,4 +13,5 @@ Dataset {
         Int32 i[i = 2];
         Float32 j[j = 3];
     } aloan;
+    Int32 i[i = 2];
 } bears.nc;

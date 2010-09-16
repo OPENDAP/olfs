@@ -64,7 +64,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="GranulePointer" type="Container">
             <Attribute name="Value" type="String">
-                <value>3B42.980909.5.HDF</value>
+                <value>&quot;3B42.980909.5.HDF&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -75,7 +75,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="ShortName" type="Container">
             <Attribute name="Value" type="String">
-                <value>Surface Rain from Geostationary Satellites C</value>
+                <value>&quot;Surface Rain from Geostationary Satellites C&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -108,7 +108,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="SpatialCoverageType" type="Container">
             <Attribute name="Value" type="String">
-                <value>Horizontal</value>
+                <value>&quot;Horizontal&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -119,7 +119,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="EllipsoidName" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -152,7 +152,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="OrbitalModelName" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -339,7 +339,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="LatitudeResolution" type="Container">
             <Attribute name="Value" type="String">
-                <value>1deg</value>
+                <value>&quot;1deg&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -350,7 +350,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="LongitudeResolution" type="Container">
             <Attribute name="Value" type="String">
-                <value>1deg</value>
+                <value>&quot;1deg&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -361,7 +361,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="GeographicCoordinateUnits" type="Container">
             <Attribute name="Value" type="String">
-                <value>Decimal Degrees</value>
+                <value>&quot;Decimal Degrees&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -372,7 +372,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="TemporalRangeType" type="Container">
             <Attribute name="Value" type="String">
-                <value>Continuous Range</value>
+                <value>&quot;Continuous Range&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -383,7 +383,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="QualityAssuranceParameterName" type="Container">
             <Attribute name="Value" type="String">
-                <value>ScienceQualityFlag</value>
+                <value>&quot;ScienceQualityFlag&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -394,7 +394,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="QualityAssuranceParameterValue" type="Container">
             <Attribute name="Value" type="String">
-                <value>NOT BEING INVESTIGATED</value>
+                <value>&quot;NOT BEING INVESTIGATED&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -405,7 +405,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="ReprocessingActual" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -416,7 +416,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="BrowsePointer" type="Container">
             <Attribute name="Value" type="String">
-                <value>3B42_BR.980909.5.BRO</value>
+                <value>&quot;3B42_BR.980909.5.BRO&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -427,7 +427,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="ScienceContact" type="Container">
             <Attribute name="Value" type="String">
-                <value>George Huffman</value>
+                <value>&quot;George Huffman&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -493,7 +493,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="SensorAlignment" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -504,7 +504,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="SensorAlignmentChannelOffsets" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -515,7 +515,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="ScanPathModel" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -526,7 +526,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="ScanPathModelParam" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -537,7 +537,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="EphemerisFileID" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -572,7 +572,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="AlgorithmVersion" type="Container">
             <Attribute name="Value" type="String">
-                <value>4.51</value>
+                <value>&quot;4.51&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -594,7 +594,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="ToolkitVersion" type="Container">
             <Attribute name="Value" type="String">
-                <value>5.6</value>
+                <value>&quot;5.6&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -627,7 +627,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="PercentOfBadOrMissingPixels" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -638,7 +638,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="MaximumValidValueofChannel" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -649,7 +649,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="MinimumValidValueofChannel" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -660,7 +660,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="MinMaxUnits" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -704,7 +704,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="AlgorithmID" type="Container">
             <Attribute name="Value" type="String">
-                <value>3B42m2</value>
+                <value>&quot;3B42m2&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -715,7 +715,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="DataAccuracy" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -726,7 +726,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="InputFiles" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -737,7 +737,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="DateOfGenerationOfInputFiles" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -748,7 +748,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="DataCenterSourceOfInputFiles" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -781,7 +781,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="SolarChannelGains" type="Container">
             <Attribute name="Value" type="String">
-                <value>(-9999.9,-9999.9,-9999.9,-9999.9)</value>
+                <value>&quot;(-9999.9,-9999.9,-9999.9,-9999.9)&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -792,7 +792,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="TMIRolloverCoef" type="Container">
             <Attribute name="Value" type="String">
-                <value>(-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9)</value>
+                <value>&quot;(-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9)&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -947,11 +947,11 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         <Attribute name="LeapSecondsFlag" type="Container">
             <Attribute name="Value" type="String">
                 <value>Data_Location</value>
-                <value>Error processing EOS attributes</value>
-                <value>Error processing EOS attributes</value>
+                <value>&quot;Error processing EOS attributes&quot;</value>
+                <value>&quot;Error processing EOS attributes&quot;</value>
             </Attribute>
             <Attribute name="PGE" type="String">
-                <value>Error processing EOS attributes</value>
+                <value>&quot;Error processing EOS attributes&quot;</value>
             </Attribute>
             <Attribute name="Mandatory" type="String">
                 <value>FALSE</value>
@@ -959,7 +959,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="RadarSiteName" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -970,7 +970,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="RadarCity" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -981,7 +981,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="RadarState" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -992,7 +992,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="RadarCountry" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -1146,7 +1146,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="RuntimeOptions" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -1157,7 +1157,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="AnomalyFlag" type="Container">
             <Attribute name="Value" type="String">
-                <value>NOT EMPTY</value>
+                <value>&quot;NOT EMPTY&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>
@@ -1190,7 +1190,7 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         </Attribute>
         <Attribute name="TotalQualityCode" type="Container">
             <Attribute name="Value" type="String">
-                <value>NULL</value>
+                <value>&quot;NULL&quot;</value>
             </Attribute>
             <Attribute name="Data_Location" type="String">
                 <value>PGE</value>

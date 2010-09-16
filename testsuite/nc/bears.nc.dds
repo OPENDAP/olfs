@@ -34,5 +34,7 @@ Dataset {
         Int32 i[i = 2];
         Float32 j[j = 3];
     } cross;
+    Int32 i[i = 2];
+    Float32 j[j = 3];
     Int16 l[l = 3];
 } bears.nc;
