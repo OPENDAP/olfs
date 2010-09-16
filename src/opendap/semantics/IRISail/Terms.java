@@ -164,8 +164,13 @@ public class Terms {
      * it contains.  It is used to suppress searching and loading the contained documents.
      */
     public static final String isContainedByContextUri       = rdfCacheNamespace + isContainedByContext;
-
+    /**
+     * is the local name of the property that casts the type of the subject.
+     */
     public static final String reTypeToContext               = "reTypeTo";
+    /**
+     * is the URI of the property that casts the type of the subject.
+     */
     public static final String reTypeToContextUri            = rdfCacheNamespace + reTypeToContext;
 
     /**
@@ -233,13 +238,14 @@ public class Terms {
      */
     public static final String rdfType                       = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
-    public static final ConcurrentHashMap<String,String> localResources;
-    static {
     /**
      * is a hashmap which maps URIs to the corresponding local resource file.  It insures that
      * the code base is used to hold the version of that file that is used by the code
      * rather than depending on the web.
      */
+    public static final ConcurrentHashMap<String,String> localResources;
+
+    static {
         localResources = new ConcurrentHashMap<String,String>();
         localResources.put("http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl", "xsl/xsd2owl.xsl");
         localResources.put("http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/RDFa2RDFXML.xsl", "xsl/RDFa2RDFXML.xsl");
