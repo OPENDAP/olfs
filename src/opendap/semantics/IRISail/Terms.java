@@ -29,7 +29,7 @@ package opendap.semantics.IRISail;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class holds all terms defined in this package.  The strings frequently come
+ * This class holds all terms defined in this package.  The strings are frequently defined
 in pairs, e.g. lastModifiedContext and lastModifiedContextUri, where the first
 the local name, and the second has the namespace prepended to make a
 complete URI.
@@ -115,27 +115,104 @@ public class Terms {
      * in the repository even if they are not needed by another document.
      */
     public static final String startingPointContextUri       = rdfCacheNamespace + startingPointType;
-
+    /**
+     * is the local name of the property used to hold the function name in an external function call.
+     * External function calls from serql_text construct statements
+     * are implemented by creating a blank node that contains the information
+     * necessary for the function call -- when that blank node is passed back from sesame
+     * that information is used to make the function call, at which point the results of
+     * the function replace the blank node.
+     */
     public static final String functionsContext              = "myfn";
+    /**
+     * is the URI of the property used to hold the function name in an external function call.
+     * External function calls from serql_text construct statements
+     * are implemented by creating a blank node that contains the information
+     * necessary for the function call -- when that blank node is passed back from sesame
+     * that information is used to make the function call, at which point the results of
+     * the function replace the blank node.
+     */
     public static final String functionsContextUri           = rdfCacheNamespace + functionsContext;
 
+    /**
+     * is the local name of the property used to hold the function argument list
+     * in an external function call.
+     * External function calls from serql_text construct statements
+     * are implemented by creating a blank node that contains the information
+     * necessary for the function call -- when that blank node is passed back from sesame
+     * that information is used to make the function call, at which point the results of
+     * the function replace the blank node.
+     */
     public static final String listContext                   = "mylist";
+    /**
+     * is the URI of the property used to hold the function argument list
+     * in an external function call.
+     * External function calls from serql_text construct statements
+     * are implemented by creating a blank node that contains the information
+     * necessary for the function call -- when that blank node is passed back from sesame
+     * that information is used to make the function call, at which point the results of
+     * the function replace the blank node.
+     */
     public static final String listContextUri                = rdfCacheNamespace + listContext;
-
+    /**
+     * is the local name of the property that connects a containing document to the documents
+     * it contains.  It is used to suppress searching and loading the contained documents.
+     */
     public static final String isContainedByContext          = "isContainedBy";
+    /**
+     * is the URI of the property that connects a containing document to the documents
+     * it contains.  It is used to suppress searching and loading the contained documents.
+     */
     public static final String isContainedByContextUri       = rdfCacheNamespace + isContainedByContext;
 
     public static final String reTypeToContext               = "reTypeTo";
     public static final String reTypeToContextUri            = rdfCacheNamespace + reTypeToContext;
 
-
+    /**
+     * is the local name of the property that connects documents to the other documents
+     * that they require.  It is transitive, and in particular it is used to find the
+     * other documents that the rdfcache:StartingPoint(s) depend on; those documents are also
+     * included in the repository.  For example, owl:imports implies rdfcache:dependsOn, so all
+     * owl ontology documents referenced by StartingPoints (directly or indirectly), are read in.
+     */
     public static final String dependsOnContext              = "dependsOn";
+    /**
+     * is the URI of the property that connects documents to the other documents
+     * that they require.  It is transitive, and in particular it is used to find the
+     * other documents that the rdfcache:StartingPoint(s) depend on; those documents are also
+     * included in the repository.  For example, owl:imports implies rdfcache:dependsOn, so all
+     * owl ontology documents referenced by StartingPoints (directly or indirectly), are read in.
+     */
     public static final String dependsOnContextUri           = rdfCacheNamespace + dependsOnContext;
-        
+    /**
+     * is the local name of the property that connects a rdfcache:ConstructRule to its
+     * SeRQL construct statement.  These rules are executed and added to the repository
+     * in the ExternalInferencing phase of the semantic processing.
+     */
     public static final String serqlTextType                 = "serql_text";
+    /**
+     * is the URI of the property that connects a rdfcache:ConstructRule to its
+     * SeRQL construct statement.  These rules are executed and added to the repository
+     * in the ExternalInferencing phase of the semantic processing.
+     */
     public static final String serqlTextTypeUri              = rdfCacheNamespace + serqlTextType;
-    
+    /**
+     * is the local name of the property that connects a document to the XSL transform
+     * that converts it to RDF.  The codes checks for this property so that XML files can
+     * be interpreted as RDF and included in the repository.  OWL-based logic in some of
+     * the ontologies insure that members of certain classes have this property set, and
+     * rdf:range properties of certain import statements insure that class membership is
+     * established by the import statement itself.
+     */
     public static final String hasXslTransformToRdf          = "hasXslTransformToRdf";
+    /**
+     * is the URI of the property that connects a document to the XSL transform
+     * that converts it to RDF.  The codes checks for this property so that XML files can
+     * be interpreted as RDF and included in the repository.  OWL-based logic in some of
+     * the ontologies insure that members of certain classes have this property set, and
+     * rdf:range properties of certain import statements insure that class membership is
+     * established by the import statement itself.
+     */
     public static final String hasXslTransformToRdfUri       = rdfCacheNamespace + hasXslTransformToRdf;
     
     public static final String dcTermNamespace               = "http://purl.org/dc/terms/";
