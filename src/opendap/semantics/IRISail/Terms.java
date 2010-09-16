@@ -214,16 +214,32 @@ public class Terms {
      * established by the import statement itself.
      */
     public static final String hasXslTransformToRdfUri       = rdfCacheNamespace + hasXslTransformToRdf;
-    
+    /**
+     * is the namespace for Dublin Core (dc) Terms.
+     */
     public static final String dcTermNamespace               = "http://purl.org/dc/terms/";
+    /**
+     * is the local name for the dc term which connotes that one document has been superceded
+     * by a replacement.
+     */
     public static final String isReplacedBy                  = "isReplacedBy";
+    /**
+     * is the URI for the dc term which connotes that one document has been superceded
+     * by a replacement.
+     */
     public static final String isReplacedByUri               = dcTermNamespace + isReplacedBy;
-    
+    /**
+     * is the URI for the RDF property <b>type</b>, which connotes class membership.
+     */
     public static final String rdfType                       = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
-
 
     public static final ConcurrentHashMap<String,String> localResources;
     static {
+    /**
+     * is a hashmap which maps URIs to the corresponding local resource file.  It insures that
+     * the code base is used to hold the version of that file that is used by the code
+     * rather than depending on the web.
+     */
         localResources = new ConcurrentHashMap<String,String>();
         localResources.put("http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl", "xsl/xsd2owl.xsl");
         localResources.put("http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/RDFa2RDFXML.xsl", "xsl/RDFa2RDFXML.xsl");
