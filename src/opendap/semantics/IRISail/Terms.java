@@ -29,10 +29,7 @@ package opendap.semantics.IRISail;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class holds all terms defined in this package.  
- * The strings are frequently defined
- * in pairs, e.g. lastModified and lastModifiedUri, where the first
- * the local name, and the second has the namespace prepended to make a complete URI.
+ * This class holds the semantic terms used in this package.  
  */
 public class Terms {
 
