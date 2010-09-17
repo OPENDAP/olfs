@@ -509,20 +509,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         response.setHeader("Content-Description", "HTML wcs:DescribeCoverage");
 
 
-
-
-        /*
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document coverageDescriptionPage = transformer.transform(coverageDescription);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        xmlo.output(coverageDescriptionPage, response.getWriter());
-
-        */
-
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",serviceUrl);
 
@@ -551,20 +537,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
-        
-
-
-/*
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-        Document capabilitiesPage = transformer.transform(capabilitiesDoc);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        xmlo.output(capabilitiesPage, response.getWriter());
-*/
-
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",serviceUrl);

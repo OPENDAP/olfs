@@ -75,10 +75,13 @@
                     <xsl:when test="ows:Title">
                         <h2>
                             WCS Coverage: <br/><xsl:value-of select="ows:Title"></xsl:value-of>
+                            <font class="small"><a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}">XML</a></font>
                         </h2>
                     </xsl:when>
                     <xsl:otherwise>
-                        <h1>WCS Coverage Description</h1>
+                        <h1>WCS Coverage Description
+                            <font class="small"><a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}">XML</a></font>
+                        </h1>
                     </xsl:otherwise>
                 </xsl:choose>
 
@@ -89,6 +92,7 @@
 
                 <br/>
                 <span class="medium">Coverage ID:</span><span class="mediumDark"><xsl:value-of select="wcs:Identifier" /></span>
+
 
 
 
