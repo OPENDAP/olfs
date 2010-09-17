@@ -302,20 +302,25 @@
 
         <copy todir="${build.src}" filtering="true">
           <fileset dir="${src.dir}">
-
               <!-- include all the java files -->
-              <include name="opendap/**/*.java"/>
+              <include name="opendap/**"/>
+
+          
+              <!-- Exclude the old hao code  -->
+              <exclude name="hao/**"/>
+
 
               <!-- Exclude the experimental code  -->
-              <exclude name="opendap/experiments/**/*.java"/>
+              <exclude name="opendap/experiments/**"/>
 
               <!-- Exclude the Metacat code  -->
-              <exclude name="opendap/metacat/**/*.java"/>
+              <exclude name="opendap/metacat/**"/>
 
               <!-- Exclude the WCS and semantics code  -->
-              <exclude name="opendap/wcsGateway/**"/>
-              <exclude name="opendap/wcs/**"/>
-              <exclude name="opendap/semantics/**"/>
+                <exclude name="opendap/wcsGateway/**"/>
+                <exclude name="opendap/wcs/**"/>
+                <exclude name="opendap/semantics/**"/>
+                
 
           </fileset>
 
@@ -487,8 +492,12 @@
                 <exclude name="**/*.ipr"/>
                 <exclude name="**/*.iws"/>
 
-                <!-- Exclude the THREDDS jnlp apps -->
-                <exclude name="resources/THREDDS/**"/>
+                <!-- Exclude the old hao code  -->
+                <exclude name="src/hao/**"/>
+
+
+                <!-- Exclude the Metacat code -->
+                <exclude name="src/opendap/metacat/**"/>
 
                 <!-- Exclude the WCS and semantics code  -->
                 <exclude name="wcs-build.xml"/>

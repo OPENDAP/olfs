@@ -301,7 +301,7 @@ public class Transformer {
         currentParameters.remove(qname);
 
     }
-    public void clearAllParameters() throws SaxonApiException {
+    public void clearAllParameters() {
 
         QName qname;
 
@@ -468,7 +468,17 @@ public class Transformer {
             if(!file.canRead()){
                 throw new IOException("Cannot read file: "+ s);
             }
-            doc = parser.build(new FileInputStream(file));
+
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(file);
+                doc = parser.build(fis);
+            }
+            finally {
+                if(fis!=null){
+                    fis.close();
+                }
+            }
 
             return doc;
 
@@ -477,7 +487,7 @@ public class Transformer {
     }
 
 
-
+    /*
     private static String getXSLTImpl(){
 
         String str = "SystemProperty javax.xml.transform.TransformerFactory: \n";
@@ -507,7 +517,7 @@ public class Transformer {
         return str;
 
     }
-
+    */
     public static void saxonXsltTransform(String srcDocUri, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
 
 

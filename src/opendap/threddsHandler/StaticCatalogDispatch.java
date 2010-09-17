@@ -252,10 +252,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
             return;
         }
-        InputStream catDocIs = request.getResponseBodyAsStream();
 
+        InputStream catDocIs = null;
 
         try {
+            catDocIs = request.getResponseBodyAsStream();
             datasetToHtmlTransformLock.lock();
             datasetToHtmlTransform.reloadTransformIfRequired();
 
@@ -348,10 +349,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + remoteCatalog);
             return;
         }
-        InputStream catDocIs = request.getResponseBodyAsStream();
+        InputStream catDocIs = null;
 
 
         try {
+            catDocIs = request.getResponseBodyAsStream();
             catalogToHtmlTransformLock.lock();
             catalogToHtmlTransform.reloadTransformIfRequired();
 
