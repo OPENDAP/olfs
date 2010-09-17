@@ -182,7 +182,7 @@ public class Terms {
      * is the dc term which connotes that one document has been superceded
      * by a replacement.
      */
-    public static final SemanticResource isReplacedBy = new SemanticResource(rdfCacheNamespace,"isReplacedBy");
+    public static final SemanticResource isReplacedBy = new SemanticResource(dcTermsNamespace,"isReplacedBy");
    
 
     /**
