@@ -1220,8 +1220,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
     /**
-     * Get last modified time.
-     * @return
+     * Get the last modified time of the catalog.
+     * @return  the last modified time of the catalog.
      */
     public long getLastModified() {
 
