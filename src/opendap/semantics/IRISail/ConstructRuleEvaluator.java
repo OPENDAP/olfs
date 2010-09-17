@@ -127,7 +127,7 @@ public class ConstructRuleEvaluator {
                 String constructURL = this.constructContext.get(qstring);
 
                 //URI uriaddress = new URIImpl(constructURL);
-                URI uriaddress = new URIImpl(Terms.externalInferencingContextUri);
+                URI uriaddress = new URIImpl(Terms.externalInferencingContext.getUri());
                 Resource[] context = new Resource[1];
                 context[0] = uriaddress;
 
@@ -303,7 +303,7 @@ public class ConstructRuleEvaluator {
             con = repository.getConnection();
             String queryString = "SELECT queries, contexts "
                     + "FROM "
-                    + "{contexts} rdfcache:"+Terms.hasSerqlConstructQuery +" {queries} "
+                    + "{contexts} rdfcache:"+Terms.hasSerqlConstructQuery.getLocalId() +" {queries} "
                     + "using namespace "
                     + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
@@ -388,7 +388,7 @@ public class ConstructRuleEvaluator {
                 .compile("iridl:dropquotes\\(([^)]+)\\)");
         Pattern minusPattern = Pattern.compile("MINUS.*( using)?");
 
-        Pattern rdfCachePattern = Pattern.compile("rdfcache:"+Terms.reTypeToContext);
+        Pattern rdfCachePattern = Pattern.compile("rdfcache:"+Terms.reTypeToContext.getLocalId());
         Pattern xsd2owlPattern = Pattern
                 .compile("xsd2owl:increment\\(([^)]+)\\)");
 
@@ -447,7 +447,7 @@ public class ConstructRuleEvaluator {
 
         } else if (rdfcacheMatcher.find()) {
             postProcessFlag = ProcessingTypes.RetypeTo;
-            log.info("Will postprocess rdfcache:"+Terms.reTypeToContext);
+            log.info("Will postprocess rdfcache:"+Terms.reTypeToContext.getLocalId());
 
         } else if (xsd2owlMatcher.find()) {
             postProcessFlag = ProcessingTypes.Increment;
@@ -486,8 +486,8 @@ public class ConstructRuleEvaluator {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                expand += "}  <"+ Terms.callFunctionUri +"> {" + fn + ":" + functionName
-                        + "} ; <"+ Terms.withArgumentsUri +"> {} rdf:first {";
+                expand += "}  <"+ Terms.callFunction.getUri() +"> {" + fn + ":" + functionName
+                        + "} ; <"+ Terms.withArguments.getUri() +"> {} rdf:first {";
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
@@ -662,7 +662,7 @@ public class ConstructRuleEvaluator {
         String pproces3sub = "(.+)";
         Pattern rproces3sub = Pattern.compile(pproces3sub);
 
-        String pproces3subsub1 = "<"+ Terms.reTypeToContextUri +"> <([^>]+)>";
+        String pproces3subsub1 = "<"+ Terms.reTypeToContext.getUri() +"> <([^>]+)>";
         String pproces3subsub2 = "([^ ]+) <http://www.w3.org/1999/02/22-rdf-syntax-ns#value> (\"(.+)\")\\^\\^";
 
         Pattern rproces3subsub1 = Pattern.compile(pproces3subsub1);
@@ -832,8 +832,8 @@ public class ConstructRuleEvaluator {
         URI rdffirst = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
         URI rdfrest = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
         URI endList = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
-        URI myfn = creatValue.createURI(Terms.callFunctionUri);
-        URI myfnlist = creatValue.createURI(Terms.withArgumentsUri);
+        URI myfn = creatValue.createURI(Terms.callFunction.getUri());
+        URI myfnlist = creatValue.createURI(Terms.withArguments.getUri());
 
         FunctionTypes functionTypeFlag = FunctionTypes.None;
         Value objLastSt = null;

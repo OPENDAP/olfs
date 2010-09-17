@@ -141,13 +141,13 @@ public class RdfImporter {
             con = repository.getConnection();
 
             String queryString = "(SELECT doc "
-                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
+                    + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
                     + "union "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOn +" {doc}) "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc}) "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModified +" {lastmod} "
+                    + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext.getLocalId()+" {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
 
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";

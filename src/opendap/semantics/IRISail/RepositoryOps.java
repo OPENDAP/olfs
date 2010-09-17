@@ -113,9 +113,9 @@ public class RepositoryOps {
 
 
         URI startingPointValue;
-        URI isa = valueFactory.createURI(Terms.rdfType);
-        URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
-        URI startingPointType = valueFactory.createURI(Terms.startingPointTypeUri);
+        URI isa = valueFactory.createURI(Terms.rdfType.getUri());
+        URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContext.getUri());
+        URI startingPointType = valueFactory.createURI(Terms.StartingPoint.getUri());
 
 
 
@@ -203,7 +203,7 @@ public class RepositoryOps {
         boolean hasInternalStaringPoint = false;
 
         String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
+            + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
             + "WHERE doc = <" + startingPointUrl + "> "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -262,9 +262,9 @@ public class RepositoryOps {
     public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint) {
 
         URI startingPointUri;
-        URI isa = valueFactory.createURI(Terms.rdfType);
-        URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
-        URI startingPointContext = valueFactory.createURI(Terms.startingPointTypeUri);
+        URI isa = valueFactory.createURI(Terms.rdfType.getUri());
+        URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContext.getUri());
+        URI startingPointContext = valueFactory.createURI(Terms.StartingPoint.getUri());
 
 
         try {
@@ -528,7 +528,7 @@ public class RepositoryOps {
         log.debug("Finding StartingPoints in the repository ...");
 
         String queryString = "SELECT doc "
-            + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
+            + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
@@ -770,7 +770,7 @@ public class RepositoryOps {
 
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
-                  + "rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModified +" {lastmod} "
+                  + "rdfcache:"+Terms.cacheContext.getLocalId()+" {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
                   + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -905,7 +905,7 @@ public class RepositoryOps {
         String queryString = "SELECT DISTINCT id, lmt "
                 + "FROM "
                 + "{cd} wcs:Identifier {id}; "
-                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModified +" {lmt} "
+                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
                 + "using namespace "
                 + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";
@@ -968,8 +968,8 @@ public class RepositoryOps {
     public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
 
         URI s = valueFactory.createURI(importURL);
-        URI contentTypeContext = valueFactory.createURI(Terms.contentTypeUri);
-        URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
+        URI contentTypeContext = valueFactory.createURI(Terms.contentType.getUri());
+        URI cacheContext = valueFactory.createURI(Terms.cacheContext.getUri());
 
         Literal o = valueFactory.createLiteral(contentType);
 
@@ -1011,8 +1011,8 @@ public class RepositoryOps {
         // log.debug(importURL);
         // log.debug("lastmodified " + ltmod);
         URI s = valueFactory.createURI(importURL);
-        URI p = valueFactory.createURI(Terms.lastModifiedUri);
-        URI cont = valueFactory.createURI(Terms.cacheContextUri);
+        URI p = valueFactory.createURI(Terms.lastModified.getUri());
+        URI cont = valueFactory.createURI(Terms.cacheContext.getUri());
         URI sxd = valueFactory.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
         Literal o = valueFactory.createLiteral(ltmod, sxd);
 
@@ -1240,7 +1240,7 @@ public class RepositoryOps {
             for (String drop : dropList) {
                 log.info("Dropping context URI: " + drop);
                 URI contextToDrop = valueFactory.createURI(drop);
-                URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
+                URI cacheContext = valueFactory.createURI(Terms.cacheContext.getUri());
 
                 log.info("Removing context: " + contextToDrop);
                 con.clear(contextToDrop);
@@ -1288,10 +1288,10 @@ public class RepositoryOps {
             con = repository.getConnection();
 
             String queryString = "select distinct crule from context crule {} prop {} "
-                    + "WHERE crule != rdfcache:"+Terms.cacheContext+" "
-                    + "AND crule != rdfcache:"+Terms.startingPointsContext+" "
-                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
-                    + "{crule} rdfcache:"+Terms.lastModified +" {time}) "
+                    + "WHERE crule != rdfcache:"+Terms.cacheContext.getLocalId()+" "
+                    + "AND crule != rdfcache:"+Terms.startingPointsContext.getLocalId()+" "
+                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
+                    + "{crule} rdfcache:"+Terms.lastModified.getLocalId() +" {time}) "
                     + "using namespace "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -1371,15 +1371,15 @@ public class RepositoryOps {
         try {
 
             String queryString = "(SELECT doc "
-                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
-                    + "{doc} rdfcache:"+Terms.lastModified +" {lmt} "
+                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
+                    + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
                     //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"}) "
+                    + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}) "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOn +" {doc} "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -1449,8 +1449,8 @@ public class RepositoryOps {
 
         try {
             String queryString = "SELECT doc,lastmod "
-                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
-                    + "{doc} rdfcache:"+Terms.lastModified +" {lastmod} "
+                    + "FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
+                    + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -1533,7 +1533,7 @@ public class RepositoryOps {
             statements =
                     con.getStatements(
                             valueFactory.createURI(importUrl),
-                            valueFactory.createURI(Terms.hasXslTransformToRdfUri),
+                            valueFactory.createURI(Terms.hasXslTransformToRdf.getUri()),
                             null,
                             true);
 
