@@ -303,7 +303,7 @@ public class ConstructRuleEvaluator {
             con = repository.getConnection();
             String queryString = "SELECT queries, contexts "
                     + "FROM "
-                    + "{contexts} rdfcache:"+Terms.serqlTextType+" {queries} "
+                    + "{contexts} rdfcache:"+Terms.hasSerqlConstructQuery +" {queries} "
                     + "using namespace "
                     + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
@@ -486,8 +486,8 @@ public class ConstructRuleEvaluator {
                 String fn = functionMatcher.group(2);
                 String functionName = functionMatcher.group(3);
 
-                expand += "}  <"+ Terms.functionsContextUri +"> {" + fn + ":" + functionName
-                        + "} ; <"+ Terms.listContextUri +"> {} rdf:first {";
+                expand += "}  <"+ Terms.callFunctionUri +"> {" + fn + ":" + functionName
+                        + "} ; <"+ Terms.withArgumentsUri +"> {} rdf:first {";
                 for (String element : splittedStr) {
                     i++;
                     if (i < splittedStr.length) {
@@ -832,8 +832,8 @@ public class ConstructRuleEvaluator {
         URI rdffirst = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first");
         URI rdfrest = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest");
         URI endList = creatValue.createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil");
-        URI myfn = creatValue.createURI(Terms.functionsContextUri);
-        URI myfnlist = creatValue.createURI(Terms.listContextUri);
+        URI myfn = creatValue.createURI(Terms.callFunctionUri);
+        URI myfnlist = creatValue.createURI(Terms.withArgumentsUri);
 
         FunctionTypes functionTypeFlag = FunctionTypes.None;
         Value objLastSt = null;

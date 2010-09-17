@@ -144,10 +144,10 @@ public class RdfImporter {
                     + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"} "
                     + "union "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOnContext+" {doc}) "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOn +" {doc}) "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
+                    + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModified +" {lastmod} "
 
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";

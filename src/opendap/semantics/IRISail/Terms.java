@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class holds all terms defined in this package.  
  * The strings are frequently defined
- * in pairs, e.g. lastModifiedContext and lastModifiedContextUri, where the first
+ * in pairs, e.g. lastModified and lastModifiedUri, where the first
  * the local name, and the second has the namespace prepended to make a complete URI.
  */
 public class Terms {
@@ -42,41 +42,57 @@ public class Terms {
      * It is always a rdfcache:StartingPoint, consequently it is always
      * included in the repository.
      */
-    public static final String internalStartingPoint         = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+    public static final String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+
 
     /**
      * is the namespace used for the classes and properties used by the persistent RDF cache.
      * The internalStartingPoint has to include the owl document that defines these classes/properties.
      */
-    public static final String rdfCacheNamespace             = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#";
+    public static final String rdfCacheNamespace = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#";
+
+
     /**
-     * is the local name of the property used to hold the last_modified time of a document.
-     * The code uses the cacheContext to hold the last_modified time of each document read in
+     * is the local name of the property used to hold the last modified time of a document.
+     * The code uses the cacheContext to hold the last modified time of each document read in
      */
-    public static final String lastModifiedContext           = "last_modified";
+    public static final String lastModified = "last_modified";
+
+
     /**
-     * is the URI of the property used to hold the last_modified time of a document.
-     * The code uses the cacheContext to hold the last_modified time of each document read in
+     * is the URI of the property used to hold the last modified time of a document.
+     * The code uses the cacheContext to hold the last modified time of each document read in
      */
-    public static final String lastModifiedContextUri        = rdfCacheNamespace + lastModifiedContext;
+    public static final String lastModifiedUri = rdfCacheNamespace + lastModified;
+
+
     /**
      * is the local name of the context used to hold information the code keeps on each document read in.
      */
-    public static final String cacheContext                  = "cachecontext";
+    public static final String cacheContext = "cachecontext";
+
+
     /**
      * is the URI of the context used to hold information the code keeps on each document read in.
      */
-    public static final String cacheContextUri               = rdfCacheNamespace + cacheContext;
+    public static final String cacheContextUri = rdfCacheNamespace + cacheContext;
+
+
     /**
      * is the local name of the property used to hold the content-type of a document.
      * The code uses the cacheContext to hold the content-type of each document read in.
      */
-    public static final String contentTypeContext            = "Content-Type";
+    public static final String contentType = "Content-Type";
+
+
     /**
+     * is the URI of the property used to hold the content-type of a document.
      * is the URI of the property used to hold the content-type of a document.
      * The code uses the cacheContext to hold the content-type of each document read in.
      */
-    public static final String contentTypeContextUri         = rdfCacheNamespace + contentTypeContext;
+    public static final String contentTypeUri         = rdfCacheNamespace + contentType;
+
+
     /**
      * is the local name of the context used to hold the externalInferencing.
      * The code can be easily changed to use the URI of each rule to hold the rule's output
@@ -84,6 +100,8 @@ public class Terms {
      * external inferencing.
      */
     public static final String externalInferencingContext    = "externalInferencing";
+
+
     /**
      * is the URI of the context used to hold the externalInferencing.
      * The code can be easily changed to use the URI of each rule to hold the rule's output
@@ -91,30 +109,40 @@ public class Terms {
      * external inferencing.
      */
     public static final String externalInferencingContextUri = rdfCacheNamespace + externalInferencingContext;
+
+
     /**
      * is the local name of the context used to hold the {doc} rdf:type {rdfcache:StartingPoint} statements.
      * There are two classes of documents in the repository:  StartingPoints, and documents needed
      * (directly or indirectly) by the StartingPoints. This context holds the statements which declare
      * that the rdfcache:StartingPoint documents are in that class.
      */
-    public static final String startingPointsContext         = "startingPoints";
+    public static final String startingPointsContext = "startingPoints";
+
+
     /**
      * is the URI of the context used to hold the {doc} rdf:type {rdfcache:StartingPoint} statements.
      * There are two classes of documents in the repository:  StartingPoints, and documents needed
      * (directly or indirectly) by the StartingPoints. This context holds the statements which declare
      * that the rdfcache:StartingPoint documents are in that class.
      */
-    public static final String startingPointsContextUri      = rdfCacheNamespace + startingPointsContext;
+    public static final String startingPointsContextUri = rdfCacheNamespace + startingPointsContext;
+
+
     /**
      * is the local name of the Class that holds the StartingPoints, i.e. the documents that are included
      * in the repository even if they are not needed by another document.
      */
-    public static final String startingPointType             = "StartingPoint";
+    public static final String startingPointType = "StartingPoint";
+
+
     /**
      * is the URI of the Class that holds the StartingPoints, i.e. the documents that are included
      * in the repository even if they are not needed by another document.
      */
-    public static final String startingPointContextUri       = rdfCacheNamespace + startingPointType;
+    public static final String startingPointUri = rdfCacheNamespace + startingPointType;
+
+
     /**
      * is the local name of the property used to hold the function name in an external function call.
      * External function calls from serql_text construct statements
@@ -123,7 +151,9 @@ public class Terms {
      * that information is used to make the function call, at which point the results of
      * the function replace the blank node.
      */
-    public static final String functionsContext              = "myfn";
+    public static final String callFunction = "myfn";
+
+
     /**
      * is the URI of the property used to hold the function name in an external function call.
      * External function calls from serql_text construct statements
@@ -132,7 +162,8 @@ public class Terms {
      * that information is used to make the function call, at which point the results of
      * the function replace the blank node.
      */
-    public static final String functionsContextUri           = rdfCacheNamespace + functionsContext;
+    public static final String callFunctionUri = rdfCacheNamespace + callFunction;
+
 
     /**
      * is the local name of the property used to hold the function argument list
@@ -143,7 +174,9 @@ public class Terms {
      * that information is used to make the function call, at which point the results of
      * the function replace the blank node.
      */
-    public static final String listContext                   = "mylist";
+    public static final String withArguments = "mylist";
+
+
     /**
      * is the URI of the property used to hold the function argument list
      * in an external function call.
@@ -153,25 +186,34 @@ public class Terms {
      * that information is used to make the function call, at which point the results of
      * the function replace the blank node.
      */
-    public static final String listContextUri                = rdfCacheNamespace + listContext;
+    public static final String withArgumentsUri = rdfCacheNamespace + withArguments;
+
+
     /**
      * is the local name of the property that connects a containing document to the documents
      * it contains.  It is used to suppress searching and loading the contained documents.
      */
-    public static final String isContainedByContext          = "isContainedBy";
+    public static final String isContainedBy = "isContainedBy";
+
+
     /**
      * is the URI of the property that connects a containing document to the documents
      * it contains.  It is used to suppress searching and loading the contained documents.
      */
-    public static final String isContainedByContextUri       = rdfCacheNamespace + isContainedByContext;
+    public static final String isContainedByUri = rdfCacheNamespace + isContainedBy;
+
+
     /**
      * is the local name of the property that casts the type of the subject.
      */
-    public static final String reTypeToContext               = "reTypeTo";
+    public static final String reTypeToContext = "reTypeTo";
+
+
     /**
      * is the URI of the property that casts the type of the subject.
      */
-    public static final String reTypeToContextUri            = rdfCacheNamespace + reTypeToContext;
+    public static final String reTypeToContextUri = rdfCacheNamespace + reTypeToContext;
+
 
     /**
      * is the local name of the property that connects documents to the other documents
@@ -180,7 +222,9 @@ public class Terms {
      * included in the repository.  For example, owl:imports implies rdfcache:dependsOn, so all
      * owl ontology documents referenced by StartingPoints (directly or indirectly), are read in.
      */
-    public static final String dependsOnContext              = "dependsOn";
+    public static final String dependsOn = "dependsOn";
+
+
     /**
      * is the URI of the property that connects documents to the other documents
      * that they require.  It is transitive, and in particular it is used to find the
@@ -188,19 +232,25 @@ public class Terms {
      * included in the repository.  For example, owl:imports implies rdfcache:dependsOn, so all
      * owl ontology documents referenced by StartingPoints (directly or indirectly), are read in.
      */
-    public static final String dependsOnContextUri           = rdfCacheNamespace + dependsOnContext;
+    public static final String dependsOnUri = rdfCacheNamespace + dependsOn;
+
+
     /**
      * is the local name of the property that connects a rdfcache:ConstructRule to its
      * SeRQL construct statement.  These rules are executed and added to the repository
      * in the ExternalInferencing phase of the semantic processing.
      */
-    public static final String serqlTextType                 = "serql_text";
+    public static final String hasSerqlConstructQuery = "serql_text";
+
+
     /**
      * is the URI of the property that connects a rdfcache:ConstructRule to its
      * SeRQL construct statement.  These rules are executed and added to the repository
      * in the ExternalInferencing phase of the semantic processing.
      */
-    public static final String serqlTextTypeUri              = rdfCacheNamespace + serqlTextType;
+    public static final String hasSerqlConstructQueryUri = rdfCacheNamespace + hasSerqlConstructQuery;
+
+
     /**
      * is the local name of the property that connects a document to the XSL transform
      * that converts it to RDF.  The codes checks for this property so that XML files can
@@ -210,6 +260,8 @@ public class Terms {
      * established by the import statement itself.
      */
     public static final String hasXslTransformToRdf          = "hasXslTransformToRdf";
+
+
     /**
      * is the URI of the property that connects a document to the XSL transform
      * that converts it to RDF.  The codes checks for this property so that XML files can
@@ -219,24 +271,35 @@ public class Terms {
      * established by the import statement itself.
      */
     public static final String hasXslTransformToRdfUri       = rdfCacheNamespace + hasXslTransformToRdf;
+
+
     /**
      * is the namespace for Dublin Core (dc) Terms.
      */
     public static final String dcTermNamespace               = "http://purl.org/dc/terms/";
+
+
     /**
      * is the local name for the dc term which connotes that one document has been superceded
      * by a replacement.
      */
     public static final String isReplacedBy                  = "isReplacedBy";
+
+
     /**
      * is the URI for the dc term which connotes that one document has been superceded
      * by a replacement.
      */
     public static final String isReplacedByUri               = dcTermNamespace + isReplacedBy;
+
+
     /**
      * is the URI for the RDF property <b>type</b>, which connotes class membership.
      */
     public static final String rdfType                       = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+
+
+
 
     /**
      * is a hashmap which maps URIs to the corresponding local resource file.  It insures that

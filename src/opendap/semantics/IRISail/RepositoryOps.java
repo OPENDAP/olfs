@@ -115,7 +115,7 @@ public class RepositoryOps {
         URI startingPointValue;
         URI isa = valueFactory.createURI(Terms.rdfType);
         URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
-        URI startingPointType = valueFactory.createURI(Terms.startingPointContextUri);
+        URI startingPointType = valueFactory.createURI(Terms.startingPointTypeUri);
 
 
 
@@ -264,7 +264,7 @@ public class RepositoryOps {
         URI startingPointUri;
         URI isa = valueFactory.createURI(Terms.rdfType);
         URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContextUri);
-        URI startingPointContext = valueFactory.createURI(Terms.startingPointContextUri);
+        URI startingPointContext = valueFactory.createURI(Terms.startingPointTypeUri);
 
 
         try {
@@ -770,7 +770,7 @@ public class RepositoryOps {
 
 
         String queryString = "SELECT doc,lastmod FROM CONTEXT "
-                  + "rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
+                  + "rdfcache:"+Terms.cacheContext+" {doc} rdfcache:"+Terms.lastModified +" {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
                   + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -905,7 +905,7 @@ public class RepositoryOps {
         String queryString = "SELECT DISTINCT id, lmt "
                 + "FROM "
                 + "{cd} wcs:Identifier {id}; "
-                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModifiedContext+" {lmt} "
+                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModified +" {lmt} "
                 + "using namespace "
                 + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";
@@ -968,7 +968,7 @@ public class RepositoryOps {
     public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
 
         URI s = valueFactory.createURI(importURL);
-        URI contentTypeContext = valueFactory.createURI(Terms.contentTypeContextUri);
+        URI contentTypeContext = valueFactory.createURI(Terms.contentTypeUri);
         URI cacheContext = valueFactory.createURI(Terms.cacheContextUri);
 
         Literal o = valueFactory.createLiteral(contentType);
@@ -1011,7 +1011,7 @@ public class RepositoryOps {
         // log.debug(importURL);
         // log.debug("lastmodified " + ltmod);
         URI s = valueFactory.createURI(importURL);
-        URI p = valueFactory.createURI(Terms.lastModifiedContextUri);
+        URI p = valueFactory.createURI(Terms.lastModifiedUri);
         URI cont = valueFactory.createURI(Terms.cacheContextUri);
         URI sxd = valueFactory.createURI("http://www.w3.org/2001/XMLSchema#dateTime");
         Literal o = valueFactory.createLiteral(ltmod, sxd);
@@ -1291,7 +1291,7 @@ public class RepositoryOps {
                     + "WHERE crule != rdfcache:"+Terms.cacheContext+" "
                     + "AND crule != rdfcache:"+Terms.startingPointsContext+" "
                     + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
-                    + "{crule} rdfcache:"+Terms.lastModifiedContext+" {time}) "
+                    + "{crule} rdfcache:"+Terms.lastModified +" {time}) "
                     + "using namespace "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -1372,14 +1372,14 @@ public class RepositoryOps {
 
             String queryString = "(SELECT doc "
                     + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
-                    + "{doc} rdfcache:"+Terms.lastModifiedContext+" {lmt} "
+                    + "{doc} rdfcache:"+Terms.lastModified +" {lmt} "
                     //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
                     + "MINUS "
                     + "SELECT doc "
                     + "FROM {doc} rdf:type {rdfcache:"+Terms.startingPointType +"}) "
                     + "MINUS "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOnContext+" {doc} "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.startingPointType +"}; rdfcache:"+Terms.dependsOn +" {doc} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -1450,7 +1450,7 @@ public class RepositoryOps {
         try {
             String queryString = "SELECT doc,lastmod "
                     + "FROM CONTEXT rdfcache:"+Terms.cacheContext+" "
-                    + "{doc} rdfcache:"+Terms.lastModifiedContext+" {lastmod} "
+                    + "{doc} rdfcache:"+Terms.lastModified +" {lastmod} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
