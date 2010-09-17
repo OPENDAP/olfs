@@ -94,7 +94,7 @@ public class Terms {
 
 
     /**
-     * is the Class that holds the StartingPoints, i.e. the documents that are included
+     * is the Class that holds the <b>StartingPoint</b>s which are the documents that are included
      * in the repository even if they are not needed by another document.
      */
     public static final SemanticResource StartingPoint = new SemanticResource(rdfCacheNamespace,"StartingPoint");
