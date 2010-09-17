@@ -186,7 +186,8 @@ public class Terms {
    
 
     /**
-     * is the URI for the RDF property <b>type</b>, which connotes class membership.
+     * is the RDF property <b>type</b>, which connotes class membership.
+     * This is abbreviated "a" in turtle notation.
      */
     public static final SemanticResource rdfType = new SemanticResource("http://www.w3.org/1999/02/22-rdf-syntax-ns#","type");
 
