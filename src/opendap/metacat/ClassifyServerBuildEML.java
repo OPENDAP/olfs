@@ -1,12 +1,12 @@
 package opendap.metacat;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import opendap.metacat.Equivalence.SortedValues;
 import opendap.metacat.URLClassifier.URLGroups;
@@ -60,6 +60,8 @@ public class ClassifyServerBuildEML {
 		options.addOption("r", "catalog-root", true, "The root catalog");
 		options.addOption("m", "metacat-url", true, "Metacat instance");
 		
+		options.addOption("o", "output", false, "Write eml files using the cache name and a counter.");
+		
 		try {
 		    CommandLine line = parser.parse( options, args );
 
@@ -85,6 +87,9 @@ public class ClassifyServerBuildEML {
 		    	if (verbose)
 		    		log.info("Metacat URL set to: " + metacatUrl);
 		    }
+		    
+		    boolean output = line.hasOption("output");
+		    Integer output_counter = 0;
 		    
 		    // Build objects
 		    URLClassifier urlClassifier = new URLClassifier(cacheName);
@@ -170,6 +175,12 @@ public class ClassifyServerBuildEML {
 			    		if (verbose)
 			    			log.info("(" + infoLogSdf.format(new Date()) + ") EML: " + emlDoc);
 			    		
+			    		if (output) {
+			    			output_counter++;
+			    			FileWriter fw = new FileWriter(cacheName + "_" + output_counter.toString());
+			    			fw.write(emlDoc);
+			    			fw.close();
+			    		}
 			    		if (metacat != null)
 			    			insertEML(metacat, verbose, ddxUrl, emlDoc);
 			    		}
