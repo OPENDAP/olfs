@@ -25,7 +25,7 @@
         </rollingPolicy>
         
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>20MB</MaxFileSize>
+            <MaxFileSize>1024MB</MaxFileSize>
         </triggeringPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>${InfoFormat}</Pattern>
@@ -43,7 +43,7 @@
         </rollingPolicy>
 
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>20MB</MaxFileSize>
+            <MaxFileSize>1MB</MaxFileSize>
         </triggeringPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>${DebugFormat}</Pattern>

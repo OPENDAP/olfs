@@ -186,9 +186,10 @@ Unlike
             
             <xsl:variable name="start_date" select="fn:substring-before($date_range, ' ')"/>
             <xsl:variable name="end_date" select="fn:substring-after($date_range, ' ')"/>
+            <!-- 
             <xsl:comment> start date: <xsl:value-of select="$start_date"/></xsl:comment>
             <xsl:comment> end date: <xsl:value-of select="$end_date"/></xsl:comment>
-
+            -->
             <temporalCoverage>
                 <rangeOfDates>
                     <beginDate>
@@ -246,7 +247,7 @@ Unlike
         <xsl:variable name="first" select="fn:substring-before($url_date_file, ' ')"/>
         <xsl:variable name="rest" select="fn:substring-after($url_date_file, ' ')"/>
 
-        <xsl:comment>first: <xsl:value-of select="$first"/></xsl:comment>
+        <!-- <xsl:comment>first: <xsl:value-of select="$first"/></xsl:comment> -->
         
         <!-- Now separate the tuple's parts -->
         <xsl:variable name="dataset_url" select="fn:substring-before($first, '*')"/>
@@ -273,11 +274,11 @@ Unlike
         <xsl:param name="filename"/>
         <xsl:param name="dataset_url"/>
         <xsl:param name="date"/>
-
+        <!--
         <xsl:comment> filename: <xsl:value-of select="$filename"/></xsl:comment>
         <xsl:comment> dataset_url: <xsl:value-of select="$dataset_url"/></xsl:comment>
         <xsl:comment> date: <xsl:value-of select="$date"/></xsl:comment>
-        
+        -->
         <otherEntity>
             <entityName>
                 <!-- The name identifies the entity in the dataset: file name, name of database table, etc. -->

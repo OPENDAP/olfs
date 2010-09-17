@@ -596,6 +596,66 @@
         </jar>
 
     </target>
+	
+    <!-- ************************************************************** -->
+	    
+    <target name="BuildClassifyServerBuildEML" depends="compile" description="">
+
+        <copy file="${resources.dir}/metacat/logback.xml" todir="${build.libexec}/"/>
+        <copy file="${resources.dir}/metacat/classify_and_build_eml.sh" todir="${build.run}/"/>
+
+        <copy file="${resources.dir}/metacat/ddx2eml-3.2.xsl" todir="${build.run}/"/>
+        <copy file="${resources.dir}/metacat/many_ddx2eml-1.0.xsl" todir="${build.run}/"/>
+
+        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+
+        <!-- Used for metacat -->
+        <copy file="${lib.dir}/${metacat.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${nceas-utilities.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${httpclient.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${servlet-api.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${catalina.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${xalan.lib}" todir="${build.lib}/"/>
+
+        <copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
+
+        <jar destfile="${build.libexec}/ClassifyServerBuildEML.jar">
+            <!-- manifest="${resources.dir}/META-INF/DapIngest.MANIFEST.MF" -->
+            <fileset dir="${build.classes}">
+                <include name="opendap/**/*.class" />
+            </fileset>
+            <!-- This adds the file to the jar at the top level. Using fileset
+                    dir="..." and an <include .../> element adds the directory
+                    structure, too -->
+            <fileset file="resources/metacat/logback.xml" />
+
+            <!-- define MANIFEST.MF -->
+            <manifest>
+                <attribute name="Built-By" value="ant" />
+                <attribute name="Main-Class" value="opendap.metacat.ClassifyServerBuildEML" />
+                <!--section name="common">
+                  <attribute name="Specification-Title" value="${component.name}" />
+                  <attribute name="Specification-Version" value="${component.version}" />
+                  <attribute name="Specification-Vendor" value="${component.vendor}" />
+                  <attribute name="Implementation-Title" value="${component.name}" />
+                  <attribute name="Implementation-Version" value="${component.version} ${TODAY}" />
+                  <attribute name="Implementation-Vendor" value="${component.vendor}" />
+                </section-->
+
+                <!-- finally, use the magically generated libs path -->
+                <attribute name="Class-Path" value="${crawlers_libs.jar}" />
+            </manifest>
+        </jar>
+
+    </target>
 
 	<!-- ************************************************************** -->
 
