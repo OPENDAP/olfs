@@ -94,9 +94,9 @@ public class RdfImporter {
     /**
      * Find and import all needed RDF documents into the repository.
      *
-     * @param repository
-     * @param doNotImportUrls
-     * @return
+     * @param repository - the RDF store.
+     * @param doNotImportUrls - a Vector of String holds bad URLs.
+     * @return true if added new RDF document, otherwise false.
      */
     public boolean importReferencedRdfDocs(Repository repository, Vector<String> doNotImportUrls) {
 
@@ -129,12 +129,12 @@ public class RdfImporter {
     /**
      * Find all RDF documents that are referenced by existing documents in the repository.
      *
-     * @param repository
-     * @param rdfDocs
+     * @param repository - the RDF store.
+     * @param rdfDocs - URLs of new needed RDF documents.
      */
     private void findNeededRDFDocuments(Repository repository, Vector<String> rdfDocs) {
         TupleQueryResult result = null;
-        List<String> bindingNames;
+
         RepositoryConnection con = null;
 
         try {
@@ -211,9 +211,9 @@ public class RdfImporter {
     /**
      * Add each of the RDF documents whose URL's are in the passed Vector to the Repository.
      *
-     * @param repository
-     * @param rdfDocs-holds RDF documents to import
-     * @return true if one or more RDF document is added into the repository
+     * @param repository - RDF store.
+     * @param rdfDocs - holds RDF documents to import.
+     * @return true if one or more RDF document is added into the repository.
      *
      */
     private boolean addNeededRDFDocuments(Repository repository, Vector<String> rdfDocs) {
@@ -387,13 +387,13 @@ public class RdfImporter {
 
     /**
      * Add individual RDF document into the repository.
-     * @param con-connection to the repository
-     * @param importURL-URL of RDF document to import
-     * @param contentType-Content type of the RDF document
-     * @param importIS-Input stream from of the RDF document
-     * @throws IOException
-     * @throws RDFParseException
-     * @throws RepositoryException
+     * @param con - connection to the repository.
+     * @param importURL - URL of RDF document to import.
+     * @param contentType - content type of the RDF document.
+     * @param importIS - input stream from of the RDF document.
+     * @throws IOException - if read importIS error.
+     * @throws RDFParseException - if parse importIS error.
+     * @throws RepositoryException - if repository error.
      */
     private void importUrl(RepositoryConnection con, String importURL, String contentType, InputStream importIS) throws IOException, RDFParseException, RepositoryException {
 
@@ -418,12 +418,12 @@ public class RdfImporter {
     }
     /**
      * Add individual RDF document into the repository.
-     * @param con-connection to the repository
-     * @param importURL-URL of RDF document to import
-     * @param contentType-Content type of the RDF document
-     * @throws IOException
-     * @throws RDFParseException
-     * @throws RepositoryException
+     * @param con - connection to the repository
+     * @param importURL - URL of RDF document to import
+     * @param contentType - Content type of the RDF document
+     * @throws IOException - if read url error.
+     * @throws RDFParseException - if parse url content error.
+     * @throws RepositoryException - if repository error.
      */
     private void importUrl(RepositoryConnection con, String importURL, String contentType) throws IOException, RDFParseException, RepositoryException {
 
