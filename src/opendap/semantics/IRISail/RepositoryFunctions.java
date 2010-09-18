@@ -40,9 +40,9 @@ public class RepositoryFunctions {
     /***************************************************************************
      * function join to concatenate strings
      *
-     * @param RDFList-strings to concatenate
-     * @param createValue-a ValueFactory from the repository
-     * @return
+     * @param RDFList - strings to concatenate.
+     * @param createValue - a ValueFactory from the repository.
+     * @return Value object.
      */
     public static Value join(List<String> RDFList, ValueFactory createValue) {
         int i = 0;
@@ -72,8 +72,8 @@ public class RepositoryFunctions {
     /**
      * @todo
      * Extract the local name of the RDF list
-     * @param RDFList
-     * @param createValue
+     * @param RDFList - String list of to be concatenated.
+     * @param createValue - a ValueFactory from the repository.
      * @return
      */
     public static Value localName(List<String> RDFList, ValueFactory createValue) {
