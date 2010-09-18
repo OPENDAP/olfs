@@ -73,8 +73,8 @@ public class RepositoryOps {
 
     /**
      * Remove the startingpoint statement from the repository.
-     * @param repo
-     * @param startingPointUrls
+     * @param repo - the repository.
+     * @param startingPointUrls - list of StartingPoint.
      */
     public static void dropStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
@@ -142,8 +142,8 @@ public class RepositoryOps {
 
     /**
      * Add startingpoint statements into the repository.
-     * @param repo
-     * @param startingPointUrls
+     * @param repo - the repository.
+     * @param startingPointUrls - list of StartingPoint.
      */
     public static void addStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
@@ -176,9 +176,9 @@ public class RepositoryOps {
      *
      *
      *
-     * @param con
-     * @param valueFactory
-     * @param startingPointUrls
+     * @param con - connection to the repository.
+     * @param valueFactory - ValueFactory from the repository.
+     * @param startingPointUrls - list of StartingPoint.
      */
     public static void addStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
 
@@ -191,12 +191,12 @@ public class RepositoryOps {
 
     /**
      * Test if a startingpoint is alread in the repository. Return true if it is already in.
-     * @param con
-     * @param startingPointUrl
-     * @return
-     * @throws RepositoryException
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
+     * @param con - connection to the repository.
+     * @param startingPointUrl - a StartingPoint.
+     * @return true if the statement is in the repository.
+     * @throws RepositoryException - if repository error.
+     * @throws MalformedQueryException - if malformed query.
+     * @throws QueryEvaluationException - if evaluate query error.
      */
     public static boolean startingPointExists( RepositoryConnection con, String startingPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
         TupleQueryResult result;
@@ -222,8 +222,8 @@ public class RepositoryOps {
 
     /**
      * Add startingPoint statement into the repository.
-     * @param repo
-     * @param startingPointUrl
+     * @param repo - repository.
+     * @param startingPointUrl - a StartingPoint.
      */
     public static void addStartingPoint(Repository repo, String startingPointUrl) {
         RepositoryConnection con = null;
@@ -255,9 +255,9 @@ public class RepositoryOps {
      * Adds the passed  starting point to the repository.
      *
      *
-     * @param con
-     * @param valueFactory
-     * @param startingPoint
+     * @param con - connection to the repository.
+     * @param valueFactory - ValueFactory from the repository.
+     * @param startingPoint - a StartingPoint.
      */
     public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint) {
 
@@ -293,10 +293,10 @@ public class RepositoryOps {
 
 
     /**
-     *
-     * @param repo
-     * @param startingPointUrls
-     * @return
+     * Find StartingPoints that are no longer StartingPoint in the repository.
+     * @param repo - repository.
+     * @param startingPointUrls - list of StartingPoint.
+     * @return A Vector of URL Strings of StartingPoint.
      */
     public static Vector<String> findChangedStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
@@ -324,11 +324,11 @@ public class RepositoryOps {
 
 
     /**
-     * Return a list of old StartingPoint that is no longer a StartingPoint.
+     * Return a list of old StartingPoints that are no longer StartingPoints.
      *
-     * @param con
-     * @param startingPointsUrls
-     * @return
+     * @param con - connection to the repository.
+     * @param startingPointsUrls - list of Strings of StartingPoints.
+     * @return - A Vector of URL Strings of StartingPoint.
      */
     public static   Vector<String> findChangedStartingPoints(RepositoryConnection con, Vector<String> startingPointsUrls) {
         Vector<String> result;
@@ -366,9 +366,9 @@ public class RepositoryOps {
 
     /**
      * Return a list of startingPoint which is not in the repository yet.
-     * @param repo
-     * @param startingPointUrls
-     * @return
+     * @param repo - repository.
+     * @param startingPointUrls - list of StartingPoints.
+     * @return - Vector of new StartingPoint URLs.
      */
     public static Vector<String> findNewStartingPoints(Repository repo, Vector<String> startingPointUrls) {
         RepositoryConnection con = null;
@@ -448,10 +448,10 @@ public class RepositoryOps {
 
     /**
      * Return all startingPoints in the repository. 
-     * @param repo
-     * @return
-     * @throws MalformedQueryException
-     * @throws QueryEvaluationException
+     * @param repo -repository.
+     * @return Vector of Strings of All StartingPoints.
+     * @throws MalformedQueryException - if malformed query.
+     * @throws QueryEvaluationException - if evaluate query erroe.
      */
     public static Vector<String> findAllStartingPoints(Repository repo) throws MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
@@ -516,11 +516,11 @@ public class RepositoryOps {
 
     /**
      * Return all startingPoints as  TupleQueryResult.
-     * @param con
-     * @return TupleQueryResult
-     * @throws QueryEvaluationException
-     * @throws MalformedQueryException
-     * @throws RepositoryException
+     * @param con - connection to the repository.
+     * @return TupleQueryResult - Tuple query result.
+     * @throws QueryEvaluationException - if evalute query error.
+     * @throws MalformedQueryException - malformed query.
+     * @throws RepositoryException - if repository error.
      */
     private static TupleQueryResult queryForStartingPoints(RepositoryConnection con) throws QueryEvaluationException, MalformedQueryException, RepositoryException {
         TupleQueryResult result;
@@ -543,7 +543,7 @@ public class RepositoryOps {
 
     /**
      * Wipe out the whole repository.
-     * @param owlse2
+     * @param owlse2 - repository.
      */
     public static void clearRepository(Repository owlse2) {
 
@@ -574,8 +574,8 @@ public class RepositoryOps {
 
     /**
      * Write the repository content to a plain ASCII file in N-triples, Trix or trig format depending the file name sufix.
-     * @param con
-     * @param filename
+     * @param con - connection to the repository.
+     * @param filename - file to hold the repository dump.
      */
     public static void dumpRepository(RepositoryConnection con, String filename) {
 
@@ -622,8 +622,8 @@ public class RepositoryOps {
 
     /**
      * Write the repository content to a plain ASCII file in N-triples, Trix or trig format depending the file name sufix.
-     * @param owlse2
-     * @param filename
+     * @param owlse2 - repository.
+     * @param filename - file to hold the repository.
      */
     public static void dumpRepository(Repository owlse2, String filename) {
 
@@ -653,8 +653,8 @@ public class RepositoryOps {
 
     /**
      * Return all contexts in the repository as a space separated string.
-     * @param repository
-     * @return
+     * @param repository - the repository.
+     * @return a String of all contexts.
      */
     public static String showContexts(Repository repository){
         RepositoryConnection con = null;
@@ -685,8 +685,8 @@ public class RepositoryOps {
 
     /**
      * Return all contexts in the repository as a separated string.
-     * @param con
-     * @return
+     * @param con - connection to the repository.
+     * @return a String of all contexts.
      */
     public static String showContexts(RepositoryConnection con){
 
@@ -709,9 +709,9 @@ public class RepositoryOps {
     /**
      * Return true if import context is newer.
      *
-     * @param con
-     * @param importURL
-     * @return Boolean
+     * @param con - connection to the repository.
+     * @param importURL - String of import URL.
+     * @return Boolean - true if the import URL is changed.
      */
     public static Boolean olderContext(RepositoryConnection con, String importURL) {
         Boolean oldLMT = false;
@@ -759,9 +759,9 @@ public class RepositoryOps {
      * against the repository on contexts.
      *
      *
-     * @param con
-     * @param urlstring
-     * @return
+     * @param con - connection to the repository.
+     * @param urlstring - an URL String.
+     * @return last modified time of the file.
      */
     public static String getLastModifiedTime(RepositoryConnection con, String urlstring) {
         TupleQueryResult result = null;
@@ -816,8 +816,8 @@ public class RepositoryOps {
 
     /**
      * Set last_modified_time of a context.
-     * @param urlstring
-     * @return
+     * @param urlstring - the URL of the context.
+     * @return  the last modified time as a String.
      */
     public static String getLTMODContext(String urlstring) {
         String ltmodstr = "";
@@ -838,8 +838,8 @@ public class RepositoryOps {
 
     /**
      * Convert Date to last_modified_time
-     * @param date
-     * @return
+     * @param date - a Date object represents the last modified time of the context.
+     * @return a string of time.
      */
     public static String getLastModifiedTimeString(Date date) {
         return getLastModifiedTimeString(date.getTime());
@@ -847,8 +847,8 @@ public class RepositoryOps {
 
     /**
      * Convert time in long  to last_modified_time
-     * @param epochTime
-     * @return
+     * @param epochTime - time in seconds.
+     * @return a string of time.
      */
     public static String getLastModifiedTimeString(long epochTime) {
         String ltmodstr;
@@ -864,7 +864,7 @@ public class RepositoryOps {
      * repository, keyed by the context name.
      * @param repository The repository from which to harvest the contexts and their associated last
      * modified times.
-     * @return
+     * @return a Hash containing last modified times of each context
      */
     public static HashMap<String, String> getLastModifiedTimesForContexts(Repository repository) {
         RepositoryConnection con = null;
@@ -895,7 +895,7 @@ public class RepositoryOps {
      * repository, keyed by the context name.
      * @param con A connection to the repoistory from which to harvest the contexts and their associated last
      * modified times.
-     * @return
+     * @return a HashMap of last modified times and context pair.
      */
     public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) {
         TupleQueryResult result = null;
@@ -960,10 +960,10 @@ public class RepositoryOps {
      * Insert a statement declaring the content type of the document.
      *
      *
-     * @param importURL
-     * @param contentType
-     * @param con
-     * @param valueFactory
+     * @param importURL - import URL.
+     * @param contentType - Content-Type of the file.
+     * @param con - connection to the repository.
+     * @param valueFactory - ValueFactory from the repository.
      */
     public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
 
@@ -988,9 +988,9 @@ public class RepositoryOps {
     /**
      * Set last_modified_time of the URI in the repository.
      *
-     * @param importURL
-     * @param con
-     * @param valueFactory
+     * @param importURL - import URL.
+     * @param con - connection to the repository.
+     * @param valueFactory - from the repository.
      */
     public static void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) {
         String ltmod = getLTMODContext(importURL);
@@ -998,13 +998,12 @@ public class RepositoryOps {
     }
 
     /**
-     * Set last_modified_time of the URI in the repository.
+     * Set last_modified_time of the import file in the repository.
      *
-     *
-     * @param importURL
-     * @param ltmod
-     * @param con
-     * @param valueFactory
+     * @param importURL - URL of the import file.
+     * @param ltmod - last modified time.
+     * @param con - connection to the repository.
+     * @param valueFactory - ValueFactory from the Repository.
      */
     public  static void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) {
 
@@ -1222,9 +1221,9 @@ public class RepositoryOps {
 
     /**
      * Remove contexts from the repository.
-     * @param repository
-     * @param dropList
-     * @throws InterruptedException
+     * @param repository - the repository.
+     * @param dropList - list of RDF files to delete from the repository.
+     * @throws InterruptedException - if the process interrrupted.
      */
     public static void dropContexts(Repository repository, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
@@ -1357,8 +1356,8 @@ public class RepositoryOps {
 
     /**
      * Return a list of files not needed any more in the repository.
-     * @param con
-     * @return
+     * @param con - connection to the repository.
+     * @return list of RDF documents to delete from the repository.
      */
     static Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
         TupleQueryResult result = null;
@@ -1437,8 +1436,8 @@ public class RepositoryOps {
     
     /**
      * Return a list of files changed in the repository since last update.
-     * @param con
-     * @return
+     * @param con - connection to the repository.
+     * @return list of RDF documents that changed.
      */
     static Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
         TupleQueryResult result = null;
