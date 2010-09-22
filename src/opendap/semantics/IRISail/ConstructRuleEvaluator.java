@@ -144,7 +144,7 @@ public class ConstructRuleEvaluator {
                             + " (construct rules pass #" + runNbr + ")");
 
                     graphResult = graphQuery.evaluate();
-                    GraphQueryResult graphResultStCount = graphQuery.evaluate();
+
                     log.info("Completed querying. ");
 
                      //log.debug("After evaluating construct rules:\n " +
@@ -203,8 +203,8 @@ public class ConstructRuleEvaluator {
 
                             con.add(graphResult, context);
                             int nonePostprocessSt = 0;
-                            while (graphResultStCount.hasNext()) {
-                                graphResultStCount.next();
+                            while (graphResult.hasNext()) {
+                                graphResult.next();
                                 nonePostprocessSt++;
                                 stAdded++;
                             }
