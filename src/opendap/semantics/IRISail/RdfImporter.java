@@ -86,7 +86,7 @@ public class RdfImporter {
         if(localResourceDir.startsWith("file:"))
             return localResourceDir;
 
-        return "file:"+ localResourceDir;
+        return "file://"+ localResourceDir;
 
     }
 
