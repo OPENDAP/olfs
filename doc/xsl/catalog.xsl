@@ -41,20 +41,15 @@
 
 
     
-    <xsl:variable name="besPrefix">        
-            <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
-    </xsl:variable>
-    
-    <xsl:variable name="besDapService">
+    <xsl:variable name="besPrefix">
         <xsl:choose>
-            <xsl:when test="$besPrefix!='/'">
-                <xsl:value-of select="concat($dapService,$besPrefix)"/>
+            <xsl:when test="/bes:response/bes:showCatalog/bes:dataset/@prefix!='/'">
+                <xsl:value-of select="concat(/bes:response/bes:showCatalog/bes:dataset/@prefix,'/')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="$dapService"/>                               
+                <xsl:value-of select="/bes:response/bes:showCatalog/bes:dataset/@prefix"/>
             </xsl:otherwise>
         </xsl:choose>
-
     </xsl:variable>
 
 
@@ -64,8 +59,8 @@
      -->
     <xsl:template match="bes:showCatalog">
         <thredds:catalog>
-            <thredds:service name="dap" serviceType="OPeNDAP" base="{$besDapService}"/>
-            <thredds:service name="file" serviceType="HTTPServer" base="{$besDapService}"/>
+            <thredds:service name="dap" serviceType="OPeNDAP" base="{$dapService}"/>
+            <thredds:service name="file" serviceType="HTTPServer" base="{$dapService}"/>
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -88,6 +83,8 @@
     <xsl:template match="bes:dataset">
 
 
+
+
         <xsl:choose>
             <xsl:when test="bes:dataset">
                 <!--
@@ -97,33 +94,43 @@
                 fail if the bes changes this arrangement
                 -->
 
-                <xsl:variable name="ID">
+                <xsl:variable name="name">
                     <xsl:choose>
-                        <xsl:when test="starts-with(@name,'/')">
-                            <xsl:value-of select="concat($besDapService,substring(@name,2))"/>
+                        <xsl:when test="@name='/'" >
+                            <xsl:value-of select="@prefix" />
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="concat($besDapService,@name)"/>
+                            <xsl:value-of select="concat($besPrefix,@name)" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                
+                <xsl:variable name="ID">
+                    <xsl:choose>
+                        <xsl:when test="$name='/'" >
+                            <xsl:value-of select="concat($dapService,$name)" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="concat($dapService,$name,'/')" />
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
 
-                <thredds:dataset name="{@name}" ID="{$ID}">
+                <thredds:dataset name="{$name}" ID="{$ID}">
                     <xsl:apply-templates />
                 </thredds:dataset>
             </xsl:when>
 
             <xsl:otherwise>
                 <!-- It's not a top level dataset... -->
-
-
+                
                 <xsl:variable name="ID">
                     <xsl:choose>
                         <xsl:when test="../@name='/'">
-                            <xsl:value-of select="$besDapService"/><xsl:value-of select="@name" />
+                            <xsl:value-of select="concat($dapService,$besPrefix,@name)" />
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="$besDapService"/><xsl:value-of select="../@name" />/<xsl:value-of select="@name" />
+                            <xsl:value-of select="concat($dapService,$besPrefix,../@name,'/',@name)" />
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
@@ -159,11 +166,11 @@
 
         <xsl:variable name="urlPath">
             <xsl:choose>
-                <xsl:when test="../@name='/'">
-                    <xsl:value-of select="@name" />
+                <xsl:when test="../@name='/'" >
+                    <xsl:value-of select="concat($besPrefix,@name)" />
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="../@name" />/<xsl:value-of select="@name" />
+                    <xsl:value-of select="concat($besPrefix,../@name,'/',@name)" />
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>

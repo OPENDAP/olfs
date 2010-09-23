@@ -58,7 +58,7 @@
     </xsl:variable>
    
     <xsl:template match="wsApp" mode="WebStartLinks">
-        <li><a href="{$webStartService}{@id}?dapService={$dapService}&#38;datasetID={$datasetID}"><xsl:value-of select="@applicationName"/></a></li>
+        <li><a href="{$webStartService}/{@id}?dapService={$dapService}&#38;datasetID={$datasetID}"><xsl:value-of select="@applicationName"/></a></li>
     </xsl:template>
 
 
@@ -131,7 +131,7 @@
             <h1><font size="0">OPeNDAP Hyrax <font class="small">(<xsl:value-of select="$HyraxVersion"/>)</font>
 
                 <br/>
-                <a href='{$docsService}'>Documentation</a>
+                <a href='{$docsService}/'>Documentation</a>
                 </font>
             </h1>
 
