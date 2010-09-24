@@ -410,6 +410,7 @@
             
             <zipfileset dir="${resources.dir}/WCS" prefix="">
                 <include name="**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
 
 
