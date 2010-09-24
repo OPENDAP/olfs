@@ -33,12 +33,13 @@
                 xmlns:ows="http://www.opengis.net/ows/1.1"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
-    <xsl:import href="../docs/xsl/version.xsl" />
     <xsl:param name="ServicePrefix" />
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
 
+
+    <xsl:variable name="WcsServiceVersion">1.0.0</xsl:variable>
 
     <xsl:template match="/wcs:Capabilities">
         <html>
@@ -76,10 +77,13 @@
 
                 <!-- img alt="OPeNDAP Logo" src='../docs/images/logo.gif'/ -->
 
-                <xsl:element name="img">
-                    <xsl:attribute name="alt">OPeNDAP Logo</xsl:attribute>
-                    <xsl:attribute name="src"><xsl:value-of select="$ServicePrefix"/>/docs/images/logo.gif</xsl:attribute>
-                </xsl:element>
+                <table border="0" width="90%"><tr>
+
+                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+
+                    <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
+
+                </tr></table>
 
                 <xsl:choose>
                     <xsl:when test="ows:ServiceIdentification/ows:Title">
@@ -108,7 +112,7 @@
                 <!--                       Terminus Links                   -->
                 <!--                                                        -->
                 <!--                                                        -->
-                <h2 align="left">Hyrax WCS Test Pages</h2>
+                <h2 align="left">OPeNDAP WCS Test Pages</h2>
                 <div class= "medium">
                 <ul>
                     <li>
@@ -164,8 +168,8 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax -
-                    <xsl:value-of select="$HyraxVersion"/> (WCS Prototype)
+                <h3>OPeNDAP WCS Service -
+                    <xsl:value-of select="$WcsServiceVersion"/>
                     <span class="uuid">
                         ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
                     </span>
@@ -397,6 +401,7 @@
 
     <xsl:template match="ows:Abstract">
         <xsl:value-of select="."/>
+        <br/>
         <br/>
     </xsl:template>
 

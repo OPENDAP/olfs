@@ -63,8 +63,11 @@ HR {
 .medium {
     font-size: 14px;
 }
-.large {
-    font-size: 18px;
+.xlarge {
+    font-size: 24px;
+}
+.xxlarge {
+    font-size: 36px;
 }
 .small_black {
     font-size: 10px;

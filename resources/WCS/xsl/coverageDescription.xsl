@@ -33,11 +33,12 @@
                 xmlns:ows="http://www.opengis.net/ows/1.1"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
-    <xsl:import href="../docs/xsl/version.xsl"/>
     <xsl:param name="ServicePrefix" />
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
+
+    <xsl:variable name="WcsServiceVersion">1.0.0</xsl:variable>
 
 
 
@@ -56,7 +57,7 @@
                         </title>
                     </xsl:when>
                     <xsl:otherwise>
-                        <title>OPeNDAP Hyrax: WCS Capabilities</title>
+                        <title>OPeNDAP: Web Coverage Service</title>
                     </xsl:otherwise>
                 </xsl:choose>
             </head>
@@ -67,10 +68,13 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <xsl:element name="img">
-                    <xsl:attribute name="alt">OPeNDAP Logo</xsl:attribute>
-                    <xsl:attribute name="src"><xsl:value-of select="$ServicePrefix"/>/docs/images/logo.gif</xsl:attribute>
-                </xsl:element>
+                <table border="0" width="90%"><tr>
+
+                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+
+                    <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
+                    
+                </tr></table>
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <h2>
@@ -79,9 +83,9 @@
                         </h2>
                     </xsl:when>
                     <xsl:otherwise>
-                        <h1>WCS Coverage Description
-                            <font class="small"><a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}">XML</a></font>
-                        </h1>
+                        <h2><font class="small">wcs:</font>Coverage Description
+                            <a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}"><font class="small">XML</font></a>
+                        </h2>
                     </xsl:otherwise>
                 </xsl:choose>
 
@@ -90,8 +94,11 @@
                     <xsl:apply-templates select="ows:Keywords"/>
                 </div>
 
-                <br/>
-                <span class="medium">Coverage ID:</span><span class="mediumDark"><xsl:value-of select="wcs:Identifier" /></span>
+                <dl>
+                    <dt><span class="medium">wcs:Identifier</span><br/></dt>
+                    <dd><span class="medium_bold"><xsl:value-of select="wcs:Identifier" /></span></dd>
+                </dl>
+
 
 
 
@@ -129,9 +136,7 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP Hyrax -
-                    <xsl:value-of select="$HyraxVersion"/>(WCS Prototype)
-                    <br/>
+                <h3>OPeNDAP WCS Service - <xsl:value-of select="$WcsServiceVersion"/><br/>
                     <span class="uuid">
                         ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
                     </span>
@@ -233,7 +238,7 @@
         <xsl:choose>
             <xsl:when test="*">
                 <li>
-                    <em><xsl:value-of select="./local-name()"/>:
+                    <em><xsl:value-of select="local-name()"/>:
                     </em>
                 </li>
                 <ul>
@@ -242,7 +247,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <li>
-                    <em><xsl:value-of select="./local-name()"/>:
+                    <em><xsl:value-of select="local-name()"/>:
                     </em>
                     <xsl:value-of select="."/>
                 </li>
