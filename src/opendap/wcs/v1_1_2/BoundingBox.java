@@ -34,6 +34,9 @@ import opendap.coreServlet.Scrub;
 
 /**
  *
+ * This class represents a ows:BoundingBox with additional properties and methods to
+ * allow it to produce DAP constraint expressions that use the geogrid server side function
+ * in Hyrax 1.6.2 and later.
  *
 **/
 public class BoundingBox {
@@ -45,7 +48,8 @@ public class BoundingBox {
     private URI crs;
 
     /**
-     *
+     * Builds a BoundingBox from the passed corner positions.
+     * 
      * @param lowerCorner   Lower corner array [Minumum Longitude, Minimum Latitude, ...]
      * @param upperCorner   Upper corner array [Maximum Longitude, Maximum Latitude, ...]
      * @param crs A URI for the cooridinate reference system.

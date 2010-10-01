@@ -38,7 +38,7 @@ import java.util.Iterator;
 public class Keywords {
 
     private Vector<LanguageString> keywords;
-    private Vector<CodeString>     types;
+    private Vector<CodeStringAttribute>     types;
 
     public Keywords(){
         keywords = null;
@@ -46,19 +46,19 @@ public class Keywords {
 
     }
 
-    public Keywords(LanguageString[] keywords, CodeString[] types){
+    public Keywords(LanguageString[] keywords, CodeStringAttribute[] types){
         this.keywords = new Vector<LanguageString>();
         for(LanguageString keyword: keywords)
             this.keywords.add(keyword);
 
-        this.types = new Vector<CodeString>();
-        for(CodeString type: types)
+        this.types = new Vector<CodeStringAttribute>();
+        for(CodeStringAttribute type: types)
             this.types.add(type);
 
     }
 
 
-    public Keywords(Vector<LanguageString> keywords, Vector<CodeString> types){
+    public Keywords(Vector<LanguageString> keywords, Vector<CodeStringAttribute> types){
         this.keywords = keywords;
         this.types = types;
     }
@@ -82,19 +82,19 @@ public class Keywords {
     }
 
 
-    public void addType(CodeString type){
+    public void addType(CodeStringAttribute type){
         types.add(type);
     }
 
-    public CodeString[] getTypesArray(){
+    public CodeStringAttribute[] getTypesArray(){
 
-        CodeString[] array = new  CodeString[types.size()];
+        CodeStringAttribute[] array = new CodeStringAttribute[types.size()];
 
         return types.toArray(array);
 
     }
 
-    public Iterator<CodeString> getTypesIterator(){
+    public Iterator<CodeStringAttribute> getTypesIterator(){
         return types.iterator();
     }
 
@@ -111,7 +111,7 @@ public class Keywords {
             keywordsElement.addContent(e);
         }
 
-        for(CodeString type: types){
+        for(CodeStringAttribute type: types){
             e = new Element("Type",WCS.OWS_NS);
             e.setText(type.getValue());
             e.setAttribute("codeSpace",type.getValue());

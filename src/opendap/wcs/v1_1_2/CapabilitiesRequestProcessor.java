@@ -31,16 +31,23 @@ import java.util.Iterator;
 import opendap.coreServlet.Scrub;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Jan 12, 2010
- * Time: 2:02:03 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * This class houses methods that return the wcs:Capabilities response for the service.
+ *
+ *
  */
 public class CapabilitiesRequestProcessor {
 
 
-
+    /**
+     * Queries the CatalogWrapper for all of the components of the wcs:Capablitites response.
+     * and returns the complete wcs:Capabilities document.
+     *
+     * @param serviceUrl The service URL of the WCS service. Used to build the service URLs that appear in the
+     * OperationsMetadata section of the wcs:Capabilities response document.
+     * @return The complete wcs:Capabilities document, suitable for serialization to a requesting client.
+     * @throws WcsException When bad things happen.
+     */
     public static Document getFullCapabilitiesDocument(String serviceUrl) throws WcsException {
 
         Element capabilities = new Element("Capabilities", WCS.WCS_NS);
@@ -61,6 +68,18 @@ public class CapabilitiesRequestProcessor {
     }
 
 
+    /**
+     * Evaluates the passed GetCapabilitiesRequest object and builds the appropriate wcs:Capabilities document.
+     * by query the CatalogWrapper for all the requestd components of the wcs:Capablitites response.
+     *
+     *
+     *
+     * @param req The client service request as a GetCapabilitiesRequest object
+     * @param serviceUrl The service URL of the WCS service. Used to build the service URLs that appear in the
+     * OperationsMetadata section of the wcs:Capabilities response document.
+     * @return The wcs:Capabilities document with the componets requested by the client.
+     * @throws WcsException  When bad things happen.
+     */
     public static Document processGetCapabilitiesRequest(GetCapabilitiesRequest req, String serviceUrl) throws WcsException {
 
         Element capabilities = new Element("Capabilities",WCS.WCS_NS);
@@ -112,6 +131,12 @@ public class CapabilitiesRequestProcessor {
     }
 
 
+    /**
+     * Returns the wcs:UpdateSequence for the catalog. This is currently taken to be the String representation of the
+     * catalogs last modified time in seconds since 1/1/1970
+     * @return Returns the wcs:UpdateSequence for the catalog. This is currently taken to be the String representation of the
+     * catalogs last modified time in seconds since 1/1/1970
+     */
     public static String getUpdateSequence(){
 
         return CatalogWrapper.getLastModified()+"";
@@ -119,6 +144,12 @@ public class CapabilitiesRequestProcessor {
     }
 
 
+    /**
+     * Returns the wcs:Contents section of the wcs:Capabilities response.
+     *
+     * @return Returns the wcs:Contents section of the wcs:Capabilities response.
+     * @throws WcsException   When bad things happen.
+     */
     public static Element getContents() throws WcsException {
 
         Element contents = new Element("Contents",WCS.WCS_NS);
@@ -144,8 +175,8 @@ public class CapabilitiesRequestProcessor {
             }
 
         }else {
-            cs = new Element("OnlineResource",WCS.WCS_NS);
-            XLink xlink = new XLink(XLink.Type.SIMPLE,"http://www.google.com",null,null,null,null,null,null,null,null);
+            cs = new Element("OtherSource",WCS.WCS_NS);
+            XLink xlink = new XLink(XLink.Type.SIMPLE,"http://www.google.com",null,null,"No Coverages found. You could try Google...",null,null,null,null,null);
             cs.setAttributes(xlink.getAttributes());
         }
 

@@ -24,13 +24,13 @@
 package opendap.wcs.v1_1_2;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Feb 9, 2009
- * Time: 5:35:53 PM
- * To change this template use File | Settings | File Templates.
+ * Represents a WCS codeString attribute.
  */
-public class CodeString {
+public class CodeStringAttribute {
+
+
+    private String codeSpace;
+    private String value;
 
     public String getValue() {
         return value;
@@ -40,7 +40,6 @@ public class CodeString {
         this.value = value;
     }
 
-    private String value;
 
     public String getCodeSpace() {
         return codeSpace;
@@ -50,9 +49,8 @@ public class CodeString {
         this.codeSpace = codeSpace;
     }
 
-    private String codeSpace;
 
-    public CodeString(String s, String codeSpace){
+    public CodeStringAttribute(String s, String codeSpace){
         value = s;
         this.codeSpace = codeSpace;
     }

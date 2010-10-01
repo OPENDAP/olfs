@@ -222,8 +222,8 @@ public class CatalogWrapper {
 
     public static long getLastModified(){
 
-        return -1;
-        //return _catalogImpl.getLastModified();
+        //return -1;
+        return _catalogImpl.getLastModified();
     }
 
 

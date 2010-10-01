@@ -29,11 +29,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
+ * Represents a wcs:Coverage object. A wcs:Coverage object is part of a response to a wcs:GetCoverageRequest
  *
- * User: ndp
- * Date: Feb 6, 2009
- * Time: 9:03:42 AM
- * To change this template use File | Settings | File Templates.
+ *
+ *
+ *
+ *
+ *
  */
 
 
@@ -110,13 +112,6 @@ public class Coverage {
     public Coverage()throws WcsException {
         init();
     }
-
-
-
-
-
-
-
 
     public  Element getCoverageElement() throws WcsException {
 

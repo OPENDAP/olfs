@@ -34,9 +34,9 @@ import java.util.*;
 import java.io.*;
 
 /**
- * User: ndp
- * Date: Oct 15, 2008
- * Time: 9:56:41 PM
+ * An implementation of a wcs:CoverageDescription object. This implementation includes methods that assist in the
+ * creation of DAP constraint expressions to retrieve coverage data as NetCDF.
+ *
  */
 public class CoverageDescription {
 
@@ -44,7 +44,6 @@ public class CoverageDescription {
 
     private Logger log;
 
-    private BoundingBox _bbox;
 
     private long lastModified;
 
@@ -58,7 +57,12 @@ public class CoverageDescription {
     private HashMap<String,String> _timeUnits;
 
 
-
+    /**
+     * Builds the CoverageDescription object from a wcs:CoverageDescription element.
+     * @param cd A wcs:CoverageDescription element
+     * @param lastModified The last modified time of coverage.
+     * @throws WcsException  When bad things happen.
+     */
     public CoverageDescription(Element cd, long lastModified) throws WcsException{
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -77,6 +81,14 @@ public class CoverageDescription {
         this.lastModified = lastModified;
     }
 
+    /**
+     * Builds the CoverageDescription object from a wcs:CoverageDescription element that is stored as the root
+     * element in a local File.
+     * @param cdFile The file containing the wcs:CoverageDescription element.
+     * @throws IOException When the file cannot be read.
+     * @throws JDOMException When the file cannot be parsed.
+     * @throws WcsException When the file contains an incorrect wcs:CoverageDescription
+     */
     public CoverageDescription(File cdFile) throws IOException, JDOMException, WcsException {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         myCD = ingestCoverageDescription(cdFile);
@@ -109,28 +121,39 @@ public class CoverageDescription {
 
     }
 
-
+    /**
+     * Returns the last modified time of the Coverage.
+     * @return Returns the last modified time of the Coverage.
+     *
+     */
     public long lastModified() {
 
         try {
             if (myFile != null && lastModified < myFile.lastModified()) {
                 myCD = ingestCoverageDescription(myFile);
-                ;
                 lastModified = myFile.lastModified();
             }
         }
         catch (Exception e) {
-            log.error("Failed to update CoverageDescription from file " +
-                    myFile.getAbsoluteFile());
-        }
-        finally {
-            return lastModified;
 
+            String msg ="Failed to update CoverageDescription from file ";
+
+            if(myFile != null){
+                msg += myFile.getAbsoluteFile();
+            }
+            log.error(msg);
         }
+
+        return lastModified;
 
     }
 
 
+    /**
+     * Checks the Coverage to see if it's range contains a particular field.
+     * @param fieldID The value of the wcs:Identifier for the wcs:Field in question.
+     * @return True if the Field is present, false otherwise.
+     */
     public boolean hasField(String fieldID){
         Element range =  myCD.getChild("Range",WCS.WCS_NS);
 
@@ -151,30 +174,53 @@ public class CoverageDescription {
     }
 
 
-
-
-
-
+    /**
+     *
+     * @return Returns the ows:Titles (if any) associated with this CoverageDescription.
+     */
     public List getTitles(){
         return cloneElementList(myCD.getChildren("Title",WCS.OWS_NS));
     }
 
+    /**
+     *
+     * @return Returns the ows:Abstracts (if any) associated with this CoverageDescription.
+     */
     public List getAbstracts(){
         return cloneElementList(myCD.getChildren("Abstract",WCS.OWS_NS));
     }
 
+    /**
+     *
+     * @return Returns the ows:KeyWords (if any) associated with this CoverageDescription.
+     */
     public List getKeywords(){
         return cloneElementList(myCD.getChildren("KeyWords",WCS.OWS_NS));
     }
 
+
+    /**
+     *
+     * @return Returns the value of the unique wcs:Identifier associated with this CoverageDescription.
+     */
     public String getIdentifier(){
         Element wcsIdentifier =  myCD.getChild("Identifier",WCS.WCS_NS);
         return wcsIdentifier.getText();
     }
+
+    /**
+     *
+     * @return Returns the unique wcs:Identifier associated with this CoverageDescription.
+     */
     public Element getIdentifierElement(){
         return (Element) myCD.getChild("Identifier",WCS.WCS_NS).clone();
     }
 
+    /**
+     *
+     * @return Returns the BoundingBox  associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public BoundingBox getBoundingBox() throws WcsException {
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
@@ -182,12 +228,23 @@ public class CoverageDescription {
         return new BoundingBox(boundingBox);
     }
 
+    /**
+     *
+     * @return Returns the ows:BoundingBox element associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public Element getBoundingBoxElement() throws WcsException {
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
         return  (Element) spatialDomain.getChild("BoundingBox",WCS.OWS_NS).clone();
     }
 
+
+    /**
+     *
+     * @return Returns the GridCRS object associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public GridCRS getGridCRS() throws WcsException {
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
@@ -197,18 +254,33 @@ public class CoverageDescription {
         return new GridCRS(gridCRS);
     }
 
+
+    /**
+     *
+     * @return Returns the GridCRS element associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public Element getGridCRSElement() throws WcsException {
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
         return  (Element) spatialDomain.getChild("GridCRS",WCS.WCS_NS).clone();
     }
 
+    /**
+     * @return Returns the gml:_CoordinateOperation element associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public Element get_CoordinateOperationElement(){
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
         return  (Element) spatialDomain.getChild("_CoordinateOperation",WCS.GML_NS).clone();
     }
 
+    /**
+     *
+     * @return Returns the wcs:ImageCRS element associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public Element getImageCRSElement() throws WcsException {
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
@@ -216,32 +288,50 @@ public class CoverageDescription {
     }
 
 
+    /**
+     * @return Returns the wcs:Polygon elements associated with the SpatialDomain of this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public List getPolygonElements() throws WcsException {
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         Element spatialDomain = domain.getChild("SpatialDomain",WCS.WCS_NS);
         return  cloneElementList(spatialDomain.getChildren("Polygon",WCS.GML_NS));
     }
 
+    /**
+     * @return Returns the wcs:TemporalDomain element associated with the Domain of this CoverageDescription.
+     */
     public Element getTemporalDomainElement(){
         Element domain =  myCD.getChild("Domain",WCS.WCS_NS);
         return  (Element) domain.getChild("TemporalDomain",WCS.WCS_NS).clone();
     }
 
+    /**
+     * @return Returns the wcs:Range element associated with this CoverageDescription.
+     */
     public Element getRangeElement(){
         return  (Element) myCD.getChild("Range",WCS.WCS_NS).clone();
     }
 
+    /**
+     *
+     * @return Returns the wcs:SupportedCRS elements associated with this CoverageDescription.
+     */
     public List getSupportedCrsElements(){
         return  cloneElementList(myCD.getChildren("SupportedCRS",WCS.WCS_NS));
     }
 
+    /**
+     *
+     * @return Returns the wcs:SupportedFormat elements associated with this CoverageDescription.
+     */
     public List<Element> getSupportedFormatElements(){
 
         return  cloneElementList(myCD.getChildren("SupportedFormat",WCS.WCS_NS));
     }
 
-    private List<Element> cloneElementList(List<Element> list){
-        ArrayList newList = new ArrayList<Element>();
+    private List<Element> cloneElementList(List list){
+        ArrayList<Element> newList = new ArrayList<Element>();
 
         Iterator i = list.iterator();
         Element e;
@@ -255,8 +345,11 @@ public class CoverageDescription {
     }
 
 
-
-
+    /**
+     *
+     * @return Returns the wcs:CoverageSummary element that represents this CoverageDescription.
+     * @throws WcsException When bad things happen.
+     */
     public Element getCoverageSummary() throws WcsException {
 
         Element e;
@@ -303,19 +396,38 @@ public class CoverageDescription {
     }
 
 
+    /**
+     *
+     * @return Returns the wcs:CoverageDescription element that represents this CoverageDescription.
+     */
     public Element getElement(){
         return (Element) myCD.clone();
     }
 
 
-    public String getDapGridId(String fieldID){
+    /**
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @return  Returns the DAP local ID for he DAP Grid variable data array  that is associated by the wcs:Identifier
+     */
+    public String getDapGridArrayId(String fieldID){
         return _dapGridId.get(fieldID);
     }
 
-    public String setDapGridId(String fieldID, String dapGridId){
+    /**
+     * Sets the value of the DAP local ID for he DAP Grid variable data array  that is associated by the wcs:Identifier
+     * @param fieldID
+     * @param dapGridId
+     * @return
+     */
+    public String setDapGridArrayId(String fieldID, String dapGridId){
         return _dapGridId.put(fieldID,dapGridId);
     }
 
+    /**
+     * 
+     * @param fieldID
+     * @return
+     */
     public String getLatitudeCoordinateDapId(String fieldID) {
         return _latitudeCoordinateDapId.get(fieldID);
 
