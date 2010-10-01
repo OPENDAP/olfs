@@ -42,9 +42,9 @@ import org.slf4j.Logger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 import java.io.File;
@@ -54,7 +54,6 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -96,7 +95,11 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
     private ReentrantReadWriteLock _catalogLock; // Protects coverages.
     private HashMap<String, Vector<String>> coverageIDServer;
-    private ConcurrentHashMap<String, CoverageDescription> coverages;
+    //private ConcurrentHashMap<String, CoverageDescription> coverages;
+
+    private ConcurrentSkipListMap<String, CoverageDescription> coverages;
+
+
 
     private Thread catalogUpdateThread;
     private long firstUpdateDelay;
@@ -128,7 +131,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         timeOfLastUpdate = 0;
 
         _catalogLock = new ReentrantReadWriteLock();
-        coverages = new ConcurrentHashMap<String, CoverageDescription>();
+        //coverages = new ConcurrentHashMap<String, CoverageDescription>();
+        coverages = new ConcurrentSkipListMap<String, CoverageDescription>();
 
         _repositoryLock = new ReentrantReadWriteLock();
 
@@ -269,7 +273,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                 log.info("updateCatalog(): Repository has been changed!");
 
                 log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
-                extractCoverageDescrptionsFromRepository(repository);
+                extractCoverageDescriptionsFromRepository(repository);
 
                 filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
                 log.info("updateCatalog(): Dumping CoverageDescriptions Document to: " + filename);
@@ -306,7 +310,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         startTime = new Date().getTime();
         Repository repository = setupRepository();
         try {
-            extractCoverageDescrptionsFromRepository(repository);
+            extractCoverageDescriptionsFromRepository(repository);
             updateCatalogCache(repository);
         }
         finally {
@@ -484,7 +488,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
 
 
-    private void extractCoverageDescrptionsFromRepository(Repository repository) throws RepositoryException, InterruptedException {
+    private void extractCoverageDescriptionsFromRepository(Repository repository) throws RepositoryException, InterruptedException {
         RepositoryConnection con = null;
 
 
@@ -493,7 +497,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             con = repository.getConnection();
             log.info("Repository connection has been opened.");
 
-            extractCoverageDescrptionsFromRepository(con);
+            extractCoverageDescriptionsFromRepository(con);
 
         }
         finally {
@@ -517,25 +521,25 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * @param con-connection to the repository
      * @throws InterruptedException - if the process is interrupted.
      */
-    private void extractCoverageDescrptionsFromRepository(RepositoryConnection con) throws InterruptedException {
+    private void extractCoverageDescriptionsFromRepository(RepositoryConnection con) throws InterruptedException {
 
 
         ProcessingState.checkState();
         try {
             //retrieve XML from the RDF store.
-            log.info("extractCoverageDescrptionsFromRepository() - Extracting CoverageDescriptions from repository.");
-            log.info("extractCoverageDescrptionsFromRepository() - Building CoverageDescription XML from repository.");
+            log.info("extractCoverageDescriptionsFromRepository() - Extracting CoverageDescriptions from repository.");
+            log.info("extractCoverageDescriptionsFromRepository() - Building CoverageDescription XML from repository.");
             buildDoc = new XMLfromRDF(con, "CoverageDescriptions", "http://www.opengis.net/wcs/1.1#CoverageDescription");
             buildDoc.getXMLfromRDF("http://www.opengis.net/wcs/1.1#CoverageDescription"); //build a JDOM doc by querying against the RDF store
 
             // Next we update the  cached maps  of datasetUrl/serverIDs and datasetUrl/wcsID
             // held in the CoverageIDGenerator so that subsequent calls to the CoverageIdGenerator
             // create new IDs correctly.
-            log.info("extractCoverageDescrptionsFromRepository() - Updating CoverageIdGenerator Id Caches.");
+            log.info("extractCoverageDescriptionsFromRepository() - Updating CoverageIdGenerator Id Caches.");
             HashMap<String, Vector<String>> coverageIdToServerMap = getCoverageIDServerURL(con);
             CoverageIdGenerator.updateIdCaches(coverageIdToServerMap);
         } catch (Exception e) {
-            log.error("extractCoverageDescrptionsFromRepository():  Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+            log.error("extractCoverageDescriptionsFromRepository():  Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
         ProcessingState.checkState();
 
@@ -743,7 +747,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
                             log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
 
                             dapVariableID = getDapGridId(con, coverageID, fieldID);
-                            coverageDescription.setDapGridId(fieldID, dapVariableID);
+                            coverageDescription.setDapGridArrayId(fieldID, dapVariableID);
 
                             dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
                             coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
@@ -830,7 +834,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catalogReadlock.lock();
             log.debug("_catalogLock ReadLock Acquired.");
 
-            CoverageDescription cd = coverages.get(id);
+            CoverageDescription cd ;//= coverages.get(id);
+            cd = coverages.get(id);
 
             if (cd == null)
                 return null;
@@ -885,9 +890,6 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         ArrayList<Element> coverageSummaries = new ArrayList<Element>();
 
-        Enumeration e;
-
-        CoverageDescription cd;
 
 
         Lock lock = _catalogLock.readLock();
@@ -896,12 +898,21 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             lock.lock();
             log.debug("_catalogLock ReadLock Acquired.");
             // Get all of the unique formats.
+
+
+            /*
             e = coverages.elements();
             while (e.hasMoreElements()) {
                 cd = (CoverageDescription) e.nextElement();
                 coverageSummaries.add(cd.getCoverageSummary());
 
             }
+            */
+
+            for(CoverageDescription cd : coverages.values()){
+                coverageSummaries.add(cd.getCoverageSummary());
+            }
+
         }
         finally {
             lock.unlock();
@@ -919,10 +930,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         ArrayList<Element> supportedFormats = new ArrayList<Element>();
         HashMap<String, Element> uniqueFormats = new HashMap<String, Element>();
 
-        Enumeration enm;
+        Collection<CoverageDescription> enm;
         Element e;
         Iterator i;
-        CoverageDescription cd;
 
 
         Lock lock = _catalogLock.readLock();
@@ -933,9 +943,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
             // Get all of the unique formats.
-            enm = coverages.elements();
-            while (enm.hasMoreElements()) {
-                cd = (CoverageDescription) enm.nextElement();
+
+
+            for(CoverageDescription cd : coverages.values()) {
 
                 i = cd.getSupportedFormatElements().iterator();
 
@@ -964,10 +974,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         ArrayList<Element> supportedCRSs = new ArrayList<Element>();
         HashMap<String, Element> uniqueCRSs = new HashMap<String, Element>();
 
-        Enumeration enm;
         Element e;
         Iterator i;
-        CoverageDescription cd;
 
 
         Lock lock = _catalogLock.readLock();
@@ -977,12 +985,8 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             log.debug("_catalogLock ReadLock Acquired.");
 
             // Get all of the unique formats.
-            enm = coverages.elements();
-            while (enm.hasMoreElements()) {
-                cd = (CoverageDescription) enm.nextElement();
-
+            for(CoverageDescription cd : coverages.values()) {
                 i = cd.getSupportedCrsElements().iterator();
-
                 while (i.hasNext()) {
                     e = (Element) i.next();
                     uniqueCRSs.put(e.getTextTrim(), e);
@@ -1014,7 +1018,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         //log.debug("getLatitudeCoordinateDapId(): Getting the DAP variable ID that represents the latitude coordinate for FieldID: " + fieldId);
         String qString = createDapGridIdQuery(coverageId, fieldId);
         String dapGridId = runQuery(con, qString, "gridid");
-        log.debug("getDapGridId(): '" + dapGridId + "' is the DAP variable Grid ID that represents the latitude coordinate for FieldID: " + fieldId);
+        log.debug("getDapGridArrayId(): '" + dapGridId + "' is the DAP variable Grid ID that represents the latitude coordinate for FieldID: " + fieldId);
         return dapGridId;
 
     }
