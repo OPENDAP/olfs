@@ -406,68 +406,150 @@ public class CoverageDescription {
 
 
     /**
+     * Gets the DAP local ID for the DAP Grid variable data array  that is associated by the wcs:Identifier
+     * for the wcs:Field
      * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @return  Returns the DAP local ID for he DAP Grid variable data array  that is associated by the wcs:Identifier
+     * @return  Returns the DAP local ID for the DAP Grid variable data array  that is associated by the wcs:Identifier
      */
     public String getDapGridArrayId(String fieldID){
         return _dapGridId.get(fieldID);
     }
 
     /**
-     * Sets the value of the DAP local ID for he DAP Grid variable data array  that is associated by the wcs:Identifier
-     * @param fieldID
-     * @param dapGridId
-     * @return
+     * Sets the DAP local ID for the Grid variable data array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @param  dapGridId The DAP Variable ID of the Grid variable data array that is associated with the wcs:Field's
+     * wcs:Identifier represented by filedID.
      */
     public String setDapGridArrayId(String fieldID, String dapGridId){
         return _dapGridId.put(fieldID,dapGridId);
     }
 
     /**
-     * 
-     * @param fieldID
-     * @return
+     * Gets the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @return  Returns the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
      */
     public String getLatitudeCoordinateDapId(String fieldID) {
         return _latitudeCoordinateDapId.get(fieldID);
 
     }
+
+
+    /**
+     * Sets the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @param  dapVariableID The DAP Variable ID of the Latitude coordinate map that is associated with the wcs:Field's
+     * wcs:Identifier represented by filedID.
+     */
     public void setLatitudeCoordinateDapId(String fieldID, String dapVariableID) {
         _latitudeCoordinateDapId.put(fieldID,dapVariableID);
 
     }
 
+    /**
+     * Gets the DAP local ID for the Longitude coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @return  Returns the DAP local ID for the Longitude coordinate map array that is associated by the wcs:Identifier
+     */
     public String getLongitudeCoordinateDapId(String fieldID) {
         return _longitudeCoordinateDapId.get(fieldID);
     }
+
+    /**
+     * Sets the DAP local ID for the Longitude coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @param  dapVariableID The DAP Variable ID of the Longitude coordinate map that is associated with the wcs:Field's
+     * wcs:Identifier represented by filedID.
+     */
     public void setLongitudeCoordinateDapId(String fieldID, String dapVariableID) {
         _longitudeCoordinateDapId.put(fieldID,dapVariableID);
     }
 
+
+
+    /**
+     * Gets the DAP local ID for the Elevation coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @return  Returns the DAP local ID for the Elevation coordinate map array that is associated by the wcs:Identifier
+     */
     public String getElevationCoordinateDapId(String fieldID) {
         return _elevationCoordinateDapId.get(fieldID);
 
     }
+
+
+    /**
+     * Sets the DAP local ID for the Elevation coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @param  dapVariableID The DAP Variable ID of the Elevation coordinate map that is associated with the wcs:Field's
+     * wcs:Identifier represented by filedID.
+     */
     public void setElevationCoordinateDapId(String fieldID, String dapVariableID) {
         _elevationCoordinateDapId.put(fieldID,dapVariableID);
 
     }
 
+    /**
+     * Gets the DAP local ID for the Time coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @return  Returns the DAP local ID for the Time coordinate map array that is associated by the wcs:Identifier
+     */
     public String getTimeCoordinateDapId(String fieldID) {
         return _timeCoordinateDapId.get(fieldID);
     }
+
+
+    /**
+     * Sets the DAP local ID for the Time coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @param  dapVariableID The DAP Variable ID of the Time coordinate map that is associated with the wcs:Field's
+     * wcs:Identifier represented by filedID.
+     */
     public void setTimeCoordinateDapId(String fieldID, String dapVariableID) {
         _timeCoordinateDapId.put(fieldID,dapVariableID);
     }
 
+
+
+    /**
+     * Sets the time units string for DAP local ID for the Time coordinate map array that is associated
+     * by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @param  timeUnits The time units string for the DAP Variable ID of the Time coordinate map that
+     * is associated with the wcs:Field's
+     * wcs:Identifier represented by filedID.
+     */
     public void setTimeUnits(String fieldID, String timeUnits) {
         _timeUnits.put(fieldID,timeUnits);
     }
+
+    /**
+     * Gets the time units string for the Time coordinate map array that is associated by the wcs:Identifier
+     * for the wcs:Field
+     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
+     * @return  Returns the time units string for DAP local ID for the Time coordinate map array that
+     * is associated by the wcs:Identifier
+     */
     public String getTimeUnits(String fieldID) {
         return _timeUnits.get(fieldID);
     }
 
 
+    /**
+     * Gets the wcs:Identifier of each wcs:Field in this wcs:Coverage.
+     * @return An array of strings containing the values of each wcs:Identifier of each wcs:Field in this wcs:Coverage.
+     */
     public String[] getFieldIDs(){
         Vector<String> fIDs = new Vector<String>();
         Element field, identifier;

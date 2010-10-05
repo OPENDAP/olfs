@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.*;
 import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BesXmlAPI;
@@ -541,6 +541,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",serviceUrl);
 
+
+        t.setParameter("ServerIDs",getServerIDs(t.getDocumentBuilder()));
+
         XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
 
         t.transform(capDoc,response.getOutputStream());
@@ -548,6 +551,29 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
     }
+
+
+    private XdmNode getServerIDs(DocumentBuilder build) throws SaxonApiException {
+
+
+        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
+        nodeString += "<ServerIDs>";
+
+        String serverID;
+        for(String serverURL: CoverageIdGenerator.getServerURLs()){
+            serverID  = CoverageIdGenerator.getServerID(serverURL);
+            nodeString += "<server id='"+serverID+"' url='"+serverURL+"' />";
+        }
+
+        nodeString += "</ServerIDs>";
+
+        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
+
+        return build.build(new StreamSource(reader));
+    }
+
+
+
 
     public void sendConfigurationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 

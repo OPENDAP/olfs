@@ -1,3 +1,27 @@
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+//
+//
+// Copyright (c) 2010 OPeNDAP, Inc.
+// Author: Nathan David Potter  <ndp@opendap.org>
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
+
 package opendap.wcs.v1_1_2;
 
 import org.openrdf.model.Value;
@@ -10,25 +34,94 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: Jun 24, 2010
- * Time: 9:18:20 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * <p>
+ * This class contains the machinery to build globally unique (within this WcsService) coverage ID strings
+ * for different DAP datasets that are being served as WCS Coverages. The DAP datasets are identified by their
+ * URL. This implementation removes the protocol and server information from the DAP URL and replaces it with a
+ * simple string (S1, S2, S3, etc...)
+ * </p>
+ * <p>
+ * An alternate implementation might build a hash string for each URL.
+ * </p>
+ *
+ *
+ *
  */
 public class CoverageIdGenerator {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(CoverageIdGenerator.class);
 
-    private static ConcurrentHashMap<String, String> serverIDs = new ConcurrentHashMap<String,String>();
+    /**
+     * Keeps track of the Server ID prefixes by associating them with a the server's URL.<br/>
+     * key: ServerURL<br/>
+     * value: serverID<br/>
+     *
+     */
+    private static ConcurrentSkipListMap<String, String> serverIDs = new ConcurrentSkipListMap<String,String>();
+
+    /**
+     * Keeps track of the WCS ID strings
+     *  by associating them with a the server's URL.<br/>
+     * key: datasetURL<br/>
+     * value: wcsID<br/>
+     *
+     */
     private static ConcurrentHashMap<String, String> wcsIDs = new ConcurrentHashMap<String,String>();
 
+
+    /**
+     * Used to make static methods thread safe.
+     */
     private static ReentrantLock genLock = new  ReentrantLock();
 
 
+    /**
+     * Get the collection of DAP server URLs that are mapped to a serverID string.
+     * @return A sorted ascending list of serverURLs as an Array.
+     */
+    public static Vector<String> getServerURLs(){
+        return new Vector<String>(serverIDs.keySet().descendingSet());
+    }
+
+
+    /**
+     *
+     * Get the server ID associated with the pass severURL
+     * 
+     * @param serverURL
+     * @return The Server ID
+     */
+    public static String getServerID(String serverURL){
+        return serverIDs.get(serverURL);
+    }
+
+    /**
+     * Returns the server ID strings for all of the DAP datasets that have been ingested as coverages.
+     * @return
+     */
+    public static String[] getServerIDs(){
+        return serverIDs.values().toArray(new String[ serverIDs.size()]);
+    }
+
+
+    /**
+     * Decomposes a URL and returns just the protocol and server sections.<br/>
+     * For Example: <br/>
+     * <code>http://localhost:8080/opendap/data/nc/fnoc1.nc</code><br/>
+     * Becomes:</br>
+     * <code>http://localhost:8080</code><br/>
+     * <br/>
+     *
+     *
+     *
+     * @param url The URL to decompose.
+     * @return  A string containing the protocol and server parts of the URL.
+     */
     private static String getServerUrlString(URL url) {
 
         String baseURL = null;
@@ -61,7 +154,8 @@ public class CoverageIdGenerator {
 
 
     /***************************************************************************
-     * function getWcsID
+     * This wraps the getWcsID function for use as a processing function by the
+     * semantic catalog code.
      *
      * @param RDFList
      * @param createValue
@@ -143,7 +237,10 @@ public class CoverageIdGenerator {
         return wcsID;
     }
 
-
+    /**
+     * Ingests the passed HasMap into the internal caches of server ID, dataset URL, and WCS ID.
+     * @param coverageIDServer
+     */
     public static void updateIdCaches(HashMap<String, Vector<String>> coverageIDServer){
 
         try {

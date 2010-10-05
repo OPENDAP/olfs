@@ -34,12 +34,13 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:param name="ServicePrefix" />
+    <xsl:param name="ServerIDs" />
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
 
 
-    <xsl:variable name="WcsServiceVersion">1.0.0</xsl:variable>
+    <xsl:variable name="WcsServiceVersion">1.1</xsl:variable>
 
     <xsl:template match="/wcs:Capabilities">
         <html>
@@ -225,15 +226,20 @@
     <xsl:template match="wcs:Contents">
         <h3>Available Coverages</h3>
         <pre>
+
+
             <table border="0" width="100%">
                 <tr>
-                    <th align="left">Name</th>
+                    <th align="left">Identifier</th>
                     <!-- <th align="center">Description</th> -->
                     <th align="center">Lat/Lon Envelope</th>
                 </tr>
                 <xsl:apply-templates select="wcs:CoverageSummary"/>
             </table>
 
+
+            <xsl:call-template name="ServerIDs"/>
+            
 
             <table border="0" width="100%">
                 <tr>
@@ -446,6 +452,28 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+
+
+    <xsl:template name="ServerIDs">
+
+            <table border="0" >
+                <tr>
+                    <th class="small" align="center">Server ID</th>
+                    <!-- <th align="center">Description</th> -->
+                    <th class="small" align="center">Server URL</th>
+                </tr>
+                <xsl:for-each select="$ServerIDs/ServerIDs/server">
+                    <tr>
+                        <td class="small" align="center"><xsl:value-of select="@id"/></td>
+                        <td class="small" align="left"><xsl:value-of select="@url"/></td>
+                    </tr>
+                </xsl:for-each>
+            </table>
+
+    </xsl:template>
+
+
 
 
 
