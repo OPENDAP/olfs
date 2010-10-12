@@ -74,6 +74,17 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 	<xsl:variable name="targetNamespace">
 		<xsl:value-of select="/xsd:schema/@targetNamespace"/>
 	</xsl:variable>
+	<xsl:variable name="targetNamespaceDelimited">
+               <xsl:choose>
+               <xsl:when test="not(ends-with(/xsd:schema/@targetNamespace,'#') or ends-with(/xsd:schema/@targetNamespace,'/')or ends-with(/xsd:schema/@targetNamespace,':'))">
+		<xsl:value-of select="/xsd:schema/@targetNamespace"/>
+                <xsl:text disable-output-escaping="yes">#</xsl:text>
+               </xsl:when>
+               <xsl:otherwise>
+		<xsl:value-of select="/xsd:schema/@targetNamespace"/>
+               </xsl:otherwise>
+               </xsl:choose>
+	</xsl:variable>
 	<xsl:variable name="elementFormDefault">
 	<xsl:choose>
 	<xsl:when test="/xsd:schema/@elementFormDefault">
@@ -113,18 +124,10 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			<xsl:text disable-output-escaping="yes">&#09;&lt;!ENTITY </xsl:text>
 			<xsl:value-of select="name()"/>
 			<xsl:text disable-output-escaping="yes"> '</xsl:text>
-			<xsl:choose>
-				<xsl:when test=". = $targetNamespace">
-	                                 <xsl:value-of select="."/>
-					<xsl:text disable-output-escaping="yes">#</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
 					<xsl:value-of select="."/>
-					<xsl:if test="not(contains(.,'#'))">
+			               <xsl:if test="not(ends-with(.,'#') or ends-with(.,'/')or ends-with(.,':'))">
 						<xsl:text disable-output-escaping="yes">#</xsl:text>
 					</xsl:if>
-				</xsl:otherwise>
-			</xsl:choose>
 			<xsl:text disable-output-escaping="yes">'&gt;&#10;</xsl:text>
 		</xsl:for-each>
 		<xsl:text disable-output-escaping="yes">]&gt;&#10;</xsl:text>
@@ -183,10 +186,10 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 
 		        <!-- defines {groupname}MinOccurs0 so it can be used for references to the group which have MinOccurs0 -->
                         <xsl:for-each select="//xsd:group[@name]">
-	                     <owl:Class rdf:about="{$targetNamespace}#{@name}MinOccurs0">
-				<xsd2owl:isConstrainedBy rdf:resource="{$targetNamespace}#{@name}" />
+	                     <owl:Class rdf:about="{$targetNamespaceDelimited}{@name}MinOccurs0">
+				<xsd2owl:isConstrainedBy rdf:resource="{$targetNamespaceDelimited}{@name}" />
 				<owl:unionOf rdf:parseType="Collection">
-				<rdf:Description rdf:about="{$targetNamespace}#{@name}" />
+				<rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}" />
 				<owl:Class>
 					<owl:intersectionOf  rdf:parseType="Collection">
 					<xsl:for-each select=".//xsd:element[@ref]">
@@ -221,7 +224,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 					<xsl:when test="xo:allDatatype(//xsd:element[@name=$currentName and (ancestor::xsd:complexType or ancestor::xsd:group)] | 
 										 //xsd:attribute[@name=$currentName and (ancestor::xsd:complexType or ancestor::xsd:attributeGroup)], 
 										 //xsd:complexType[@name], namespace::*)">
-						<owl:DatatypeProperty rdf:about="{$targetNamespace}#{@name}">
+						<owl:DatatypeProperty rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -230,7 +233,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<rdfs:comment><xsl:value-of select="xsd:annotation/xsd:documentation"/></rdfs:comment>
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 				</owl:DatatypeProperty>
 					</xsl:when>
@@ -238,7 +241,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 					<xsl:when test="xo:allObjectype(//xsd:element[@name=$currentName and (ancestor::xsd:complexType or ancestor::xsd:group)] | 
 										 //xsd:attribute[@name=$currentName and (ancestor::xsd:complexType or ancestor::xsd:attributeGroup)],
 										 //xsd:simpleType[@name], namespace::*)">
-						<owl:ObjectProperty rdf:about="{$targetNamespace}#{@name}">
+						<owl:ObjectProperty rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -248,16 +251,16 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:complexType">
 				<xsl:if test="ancestor::xsd:complexType/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 				<xsl:if test="not(ancestor::xsd:complexType/@name) and ancestor::xsd:element/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				</xsl:if>
 				</xsl:if>
 				</owl:ObjectProperty>
 					</xsl:when>
 					<xsl:otherwise>
-						<rdf:Property rdf:about="{$targetNamespace}#{@name}">
+						<rdf:Property rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -267,10 +270,10 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:complexType">
 				<xsl:if test="ancestor::xsd:complexType/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 				<xsl:if test="not(ancestor::xsd:complexType/@name) and ancestor::xsd:element/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				</xsl:if>
 				</xsl:if>
 				</rdf:Property>
@@ -290,17 +293,17 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
         		<!- Match simpleType definitions ->
 			<xsl:for-each select="//xsd:simpleType">
 				<xsl:if test="@name">
-					<owl:Class rdf:about="{$targetNamespace}#{@name}"/>
+					<owl:Class rdf:about="{$targetNamespaceDelimited}{@name}"/>
 				</xsl:if>
 				<xsl:if test="not(@name)">
 					<xsl:choose>
 						<!- If it is an anonymous simpleType embeded in a element definition generate
 						a rdf:ID derived from the element definition name ->
 						<xsl:when test="parent::xsd:element[@name]">
-							<owl:Class rdf:about="{$targetNamespace}#{parent::xsd:element/@name}Range"/>
+							<owl:Class rdf:about="{$targetNamespaceDelimited}{parent::xsd:element/@name}Range"/>
 						</xsl:when>
 						<xsl:when test="parent::xsd:attribute[@name]">
-							<owl:Class rdf:about="{$targetNamespace}#{parent::xsd:attribute/@name}Range"/>
+							<owl:Class rdf:about="{$targetNamespaceDelimited}{parent::xsd:attribute/@name}Range"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<owl:Class/>
@@ -319,7 +322,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		<xsl:choose>
 			<xsl:when test="xo:isDatatype(.,//xsd:simpleType[@name],namespace::*) and 
 							 not(xo:isObjectype(.,//xsd:complexType[@name],namespace::*))">
-				<owl:DatatypeProperty rdf:about="{$targetNamespace}#{@name}">
+				<owl:DatatypeProperty rdf:about="{$targetNamespaceDelimited}{@name}">
 				    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -329,13 +332,13 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:if>
 					<xsl:call-template name="processElemDef"/>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 				</owl:DatatypeProperty>
 			</xsl:when>
 			<xsl:when test="xo:isObjectype(.,//xsd:complexType[@name],namespace::*) and 
 							not(xo:isDatatype(.,//xsd:simpleType[@name],namespace::*))">
-				<owl:ObjectProperty rdf:about="{$targetNamespace}#{@name}">
+				<owl:ObjectProperty rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -344,13 +347,13 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<rdfs:comment><xsl:value-of select="xsd:annotation/xsd:documentation"/></rdfs:comment>
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-				<rdfs:domainContains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+				<rdfs:domainContains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 					<xsl:call-template name="processElemDef"/>
 				</owl:ObjectProperty>
 			</xsl:when>
 			<xsl:otherwise>
-				<rdf:Property rdf:about="{$targetNamespace}#{@name}">
+				<rdf:Property rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -393,7 +396,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		its name from the name of the element using the embededType param value -->
 	<xsl:template name="processComplexType" match="xsd:complexType|xsd:group|xsd:attributeGroup">
 		<xsl:if test="@name">
-			<owl:Class rdf:about="{$targetNamespace}#{@name}">
+			<owl:Class rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 		<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -408,16 +411,16 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			<xsl:choose>
 				<xsl:when test="child::xsd:group[@ref and (@minOccurs=0) ]">
 					<owl:Class rdf:about="{xo:rdfUri(child::xsd:group/@ref, namespace::*)}MinOccurs0" >
-	                                 <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+	                                 <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
                                         </owl:Class>
 				</xsl:when>
 				<xsl:when test="child::xsd:group[@ref]">
 					<owl:Class rdf:about="{xo:rdfUri(child::xsd:group/@ref, namespace::*)}" >
-	                                 <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+	                                 <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
                                         </owl:Class>
 				</xsl:when>
 				<xsl:when test="parent::xsd:element[@name] and child::*">
-					<owl:Class rdf:about="{$targetNamespace}#{../@name}TacitType">
+					<owl:Class rdf:about="{$targetNamespaceDelimited}{../@name}TacitType">
 				<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			             <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
 				</xsl:if>
@@ -447,10 +450,10 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<owl:Restriction>
                                         <xsl:choose>
 					<xsl:when test="ancestor::xsd:complexType/@name">
-                                	<xsd2owl:isSimpleContentOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                	<xsd2owl:isSimpleContentOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 					</xsl:when>
 					<xsl:when test="ancestor::xsd:element/@name">
-                                	<xsd2owl:isSimpleContentOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                	<xsd2owl:isSimpleContentOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 					</xsl:when>
                                         </xsl:choose>
 				<owl:onProperty rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#value"/>
@@ -489,7 +492,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 						<xsl:if test="parent::xsd:extension">
 							<rdf:Description rdf:about="{xo:rdfUri(parent::xsd:extension/@base, namespace::*)}">
 	<xsl:if test="ancestor::xsd:complexType/@name">
-            <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+            <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 	</xsl:if>
 </rdf:Description>
 						</xsl:if>
@@ -506,7 +509,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 						<xsl:if test="parent::xsd:extension">
 							<rdf:Description rdf:about="{xo:rdfUri(parent::xsd:extension/@base, namespace::*)}">
 	<xsl:if test="ancestor::xsd:complexType/@name">
-            <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+            <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 	</xsl:if>
 </rdf:Description>
 						</xsl:if>
@@ -538,7 +541,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:for-each>
 						<xsl:for-each select="child::xsd:element[@name]">
  				<owl:Restriction>
-				  <owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+				  <owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				  <owl:cardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="1"/>
 				  </owl:cardinality>
@@ -557,7 +560,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:for-each>
 						<xsl:for-each select="child::xsd:element[@name]">
  				<owl:Restriction>
-				  <owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+				  <owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				  <owl:cardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="1"/>
 				  </owl:cardinality>
@@ -591,7 +594,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		        	<xsl:for-each select="child::xsd:element[@name]">
 				<rdfs:subClassOf>
                         	 <owl:Restriction>
-				  <owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+				  <owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				  <owl:minCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="0"/>
 				  </owl:minCardinality>
@@ -623,7 +626,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 	                      <xsl:for-each select="child::xsd:element[@name and @type]">
 				<rdfs:subClassOf>
                         	 <owl:Restriction>
-				  <owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+				  <owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 			          <owl:allValuesFrom rdf:resource="{xo:rangeUri(., //xsd:simpleType[@name], namespace::*)}"/>
                                     <xsl:choose>
                                     <xsl:when test="ancestor::xsd:group/@name">
@@ -651,7 +654,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 	</xsl:template>
 <xsl:template name="processSimpleType" match="xsd:simpleType">
 <xsl:if test="@name">
-					<owl:Class rdf:about="{$targetNamespace}#{@name}">
+					<owl:Class rdf:about="{$targetNamespaceDelimited}{@name}">
 			    <rdfs:isDefinedBy rdf:resource=""/>
 				<xsl:if test="xsd:annotation/xsd:documentation/@source">
 			   <rdfs:seeAlso rdf:resource="{xsd:annotation/xsd:documentation/@source}" />
@@ -699,10 +702,10 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			</xsl:call-template>
 				  </xsl:when>
 			          <xsl:when test="ancestor::xsd:element/@name">
-                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				  </xsl:when>
                                 </xsl:choose>
-			<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+			<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 			<owl:allValuesFrom rdf:resource="{xo:rangeUri(., //xsd:simpleType[@name], namespace::*)}"/>
 		</owl:Restriction>
 		<xsl:call-template name="localCardinality">
@@ -733,7 +736,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			<xsl:with-param name="targetns" select="$targetNamespace" />
 			</xsl:call-template>
 				</xsl:if>
-			<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+			<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 			<xsl:choose>
 				<xsl:when test="count(./xsd:simpleType)>0">
 					<owl:allValuesFrom rdf:resource="{xo:newRangeUri(., $baseEntity)}"/>
@@ -784,7 +787,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			</xsl:call-template>
 				</xsl:if>
 			          <xsl:if test="ancestor::xsd:element/@name">
-                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				  </xsl:if>
 				<owl:onProperty rdf:resource="{$property}"/>
 				<owl:cardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
@@ -801,7 +804,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			</xsl:call-template>
 				</xsl:if>
 			          <xsl:if test="ancestor::xsd:element/@name">
-                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				  </xsl:if>
 				<owl:onProperty rdf:resource="{$property}"/>
 				<owl:minCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
@@ -819,7 +822,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			</xsl:call-template>
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:element/@name">
-                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				</xsl:if>
 		<xsl:if test="$minOccurs='0' and $forceRestriction">
 				<xsd2owl:propertyIsA rdf:resource="&amp;xsd;element" />
@@ -840,7 +843,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			</xsl:call-template>
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:element/@name">
-                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                   <xsd2owl:isQualifiedElementOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				</xsl:if>
 				<owl:onProperty rdf:resource="{$property}"/>
 				<owl:minCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
@@ -890,9 +893,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		</xsl:variable>
                 <xsl:if test="$minOccurs=$maxOccurs">
 			<owl:Restriction>
-				<owl:onProperty rdf:resource="{$targetNamespace}#{$property}"/>
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{$property}"/>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-                                <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 				<owl:cardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="$minOccurs"/>
@@ -901,9 +904,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		</xsl:if>
 		<xsl:if test="($minOccurs!='0') and ($minOccurs!=$maxOccurs)">
 			<owl:Restriction>
-				<owl:onProperty rdf:resource="{$targetNamespace}#{$property}"/>
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{$property}"/>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-                                <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
 				<owl:minCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="$minOccurs"/>
@@ -913,9 +916,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		<xsl:if test="($maxOccurs!='unbounded') and ($minOccurs!=$maxOccurs)">
 			<owl:Restriction>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-                                <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
-				<owl:onProperty rdf:resource="{$targetNamespace}#{$property}"/>
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{$property}"/>
 				<owl:maxCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="$maxOccurs"/>
 				</owl:maxCardinality>
@@ -926,9 +929,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		<xsl:if test="$minOccurs='0' and $maxOccurs='unbounded' and $forceRestriction">
 			<owl:Restriction>
 				<xsl:if test="ancestor::xsd:complexType/@name">
-                                <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:if>
-				<owl:onProperty rdf:resource="{$targetNamespace}#{$property}"/>
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{$property}"/>
 				<owl:minCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">
 					<xsl:value-of select="$minOccurs"/>
 				</owl:minCardinality>
@@ -943,25 +946,25 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:complexType/@name">
 				<xsl:choose>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
                                 </xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
@@ -971,29 +974,29 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:element/@name">
 				<xsl:choose>
 				<xsl:when test="@ref">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
                                 </xsl:when>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
                                 </xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
@@ -1003,29 +1006,29 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:attributeGroup/@name">
 				<xsl:choose>
 				<xsl:when test="@ref">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
                                 </xsl:when>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
                                 </xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
@@ -1045,7 +1048,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			<xsl:with-param name="targetns" select="$targetNamespace" />
 			</xsl:call-template>
 				</xsl:if>
-					<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+					<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 					<owl:cardinality rdf:datatype="&amp;xsd;nonNegativeInteger">1</owl:cardinality>
 				</owl:Restriction>
 			</rdfs:subClassOf>
@@ -1053,7 +1056,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 	        <xsl:otherwise>
 			<rdfs:subClassOf>
 				<owl:Restriction>
-					<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+					<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 					<owl:maxCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">1</owl:maxCardinality>
 				</owl:Restriction>
 			</rdfs:subClassOf>
@@ -1074,35 +1077,35 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:complexType/@name">
 				<xsl:choose>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
 				<xsl:if test="ancestor::xsd:attributeGroup/@name">
 				<xsl:choose>
 				<xsl:when test="@ref">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				</xsl:when>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
@@ -1128,28 +1131,28 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:complexType/@name">
 				<xsl:choose>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
@@ -1160,28 +1163,28 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:attributeGroup/@name">
 				<xsl:choose>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+                                <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespace}#{ancestor::xsd:attributeGroup/@name}" />
+                                <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespace}#{@name}">
+                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
 					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
@@ -1194,7 +1197,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			</rdfs:subClassOf>
 			<rdfs:subClassOf>
 			<owl:Restriction>
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				<owl:maxCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">1</owl:maxCardinality>
 			</owl:Restriction>
 			</rdfs:subClassOf>
@@ -1202,7 +1205,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 		<!--
 		<rdfs:subClassOf>
 			<owl:Restriction>
-				<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 				<owl:allValuesFrom rdf:resource="{xo:newRangeUri(., $baseEntity)}"/>
 			</owl:Restriction>
 		</rdfs:subClassOf>
@@ -1216,7 +1219,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 			<xsl:with-param name="targetns" select="$targetNamespace" />
 			</xsl:call-template>
 				</xsl:if>
-					<owl:onProperty rdf:resource="{$targetNamespace}#{@name}"/>
+					<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
 					<owl:minCardinality rdf:datatype="&amp;xsd;nonNegativeInteger">1</owl:minCardinality>
 				</owl:Restriction>
 			</rdfs:subClassOf>
@@ -1228,12 +1231,12 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 <xsl:choose>
 <xsl:when test="@ref and (@minOccurs=0)">
 		<owl:Class rdf:about="{xo:rdfUri(@ref, namespace::*)}MinOccurs0" >
-	            <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+	            <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 	        </owl:Class>
 	</xsl:when>
 	<xsl:otherwise>
                 <owl:Class rdf:about="{xo:rdfUri(@ref, namespace::*)}" >
-	            <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+	            <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 	        </owl:Class>
 	</xsl:otherwise>
 </xsl:choose>
@@ -1262,10 +1265,10 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                          <rdf:Description rdf:about="{xo:rdfUri(@ref, namespace::*)}" >
 <xsl:choose>
 			          <xsl:when test="ancestor::xsd:complexType/@name">
-	            <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:complexType/@name}" />
+	            <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 </xsl:when>
 			          <xsl:when test="ancestor::xsd:element/@name">
-                   <xsd2owl:constrains rdf:resource="{$targetNamespace}#{ancestor::xsd:element/@name}TacitType" />
+                   <xsd2owl:constrains rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
  </xsl:when>
                                 </xsl:choose>
 	        </rdf:Description>
