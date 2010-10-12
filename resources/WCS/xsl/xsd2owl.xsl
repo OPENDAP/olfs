@@ -575,13 +575,13 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                     <xsl:when test="ancestor::xsd:group/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:group/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
                                     </xsl:when>
                                     <xsl:when test="ancestor::xsd:complexType/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:complexType/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
                                     </xsl:when>
                                     </xsl:choose>
@@ -611,13 +611,13 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                     <xsl:when test="ancestor::xsd:group/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:group/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
                                     </xsl:when>
                                     <xsl:when test="ancestor::xsd:complexType/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:complexType/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
                                     </xsl:when>
                                     </xsl:choose>
@@ -632,13 +632,13 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                     <xsl:when test="ancestor::xsd:group/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:group/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
                                     </xsl:when>
                                     <xsl:when test="ancestor::xsd:complexType/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:complexType/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
                                     </xsl:when>
                                     </xsl:choose>
@@ -857,16 +857,16 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 <xsl:param name="targetns" />
 				<xsl:choose>
 				<xsl:when test="@form = 'qualified'">
-                                <xsd2owl:isQualifiedElementOf rdf:resource="{$targetns}#{$name}" />
+                                <xsd2owl:isQualifiedElementOf rdf:resource="{$targetns}{$name}" />
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
-                                <xsd2owl:isUnqualifiedElementOf rdf:resource="{$targetns}#{$name}" />
+                                <xsd2owl:isUnqualifiedElementOf rdf:resource="{$targetns}{$name}" />
 				</xsl:when>
 				<xsl:when test="$elementFormDefault = 'qualified'">
-                                <xsd2owl:isQualifiedElementOf rdf:resource="{$targetns}#{$name}" />
+                                <xsd2owl:isQualifiedElementOf rdf:resource="{$targetns}{$name}" />
 				</xsl:when>
 				<xsl:when test="$elementFormDefault = 'unqualified'">
-                                <xsd2owl:isUnqualifiedElementOf rdf:resource="{$targetns}#{$name}" />
+                                <xsd2owl:isUnqualifiedElementOf rdf:resource="{$targetns}{$name}" />
 				</xsl:when>
 				</xsl:choose>
 	</xsl:template>
@@ -1045,7 +1045,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:complexType/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:complexType/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
 				</xsl:if>
 					<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
@@ -1216,7 +1216,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				<xsl:if test="ancestor::xsd:complexType/@name">
 			<xsl:call-template name="isElementOf">
 			<xsl:with-param name="name" select="ancestor::xsd:complexType/@name" />
-			<xsl:with-param name="targetns" select="$targetNamespace" />
+			<xsl:with-param name="targetns" select="$targetNamespaceDelimited" />
 			</xsl:call-template>
 				</xsl:if>
 					<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}"/>
