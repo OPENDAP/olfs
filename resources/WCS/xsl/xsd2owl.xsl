@@ -51,7 +51,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 27) attributeGroup improvement
 28) 25) broke nested sequences: this is fixed.
 -->
-<xsl:stylesheet version="2.0" xmlns:xo="http://rhizomik.net/redefer/xsl/xsd2owl-functions.xsl" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdr="http://www.w3.org/2001/XMLSchema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:xsd2owl="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#">
+<xsl:stylesheet version="2.0" xmlns:xo="http://rhizomik.net/redefer/xsl/xsd2owl-functions.xsl" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsdr="http://www.w3.org/2001/XMLSchema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:xsd2owl="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#" xmlns:crosswalk="http://iridl.ldeo.columbia.edu/ontologies/iricrosswalk.owl#">
 
 	<xsl:import href="xsd2owl-functions.xsl"/>
 	<xsl:output media-type="text/xml" version="1.0" encoding="UTF-8" indent="yes" use-character-maps="owl"/>
@@ -951,11 +951,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 </xsl:when>
 				<xsl:when test="@form = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
                                 <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
@@ -963,11 +961,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
@@ -983,11 +979,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 </xsl:when>
 				<xsl:when test="@form = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
                                 <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
@@ -995,11 +989,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
@@ -1015,11 +1007,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 </xsl:when>
 				<xsl:when test="@form = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
                                 <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
@@ -1027,11 +1017,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
@@ -1137,11 +1125,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
@@ -1151,12 +1137,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
-
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
@@ -1169,12 +1152,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="@form = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
-
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'qualified'">
                                 <xsd2owl:isQualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
@@ -1183,12 +1163,9 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
 				</xsl:when>
 				<xsl:when test="$attributeFormDefault = 'unqualified'">
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
-				<owl:onProperty>
-                                  <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
-				  </rdf:Description>
-                                </owl:onProperty>        
-
+				<owl:onProperty rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="{$targetNamespaceDelimited}{@name}" />
+				<crosswalk:makesThesePropertiesEquivalent rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				</xsl:when>
 				</xsl:choose>
 				</xsl:if>
