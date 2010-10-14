@@ -953,7 +953,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
@@ -965,7 +965,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
@@ -985,7 +985,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
@@ -997,7 +997,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:element/@name}TacitType" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
@@ -1017,7 +1017,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
@@ -1029,7 +1029,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 				</xsl:when>
@@ -1139,7 +1139,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 
@@ -1153,7 +1153,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:complexType/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 
@@ -1171,7 +1171,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 
@@ -1185,7 +1185,7 @@ pairwise owl:disjointWith (see http://www.w3.org/TR/owl-ref/)
                                 <xsd2owl:isUnqualifiedAttributeOf rdf:resource="{$targetNamespaceDelimited}{ancestor::xsd:attributeGroup/@name}" />
 				<owl:onProperty>
                                   <rdf:Description rdf:about="{$targetNamespaceDelimited}{@name}">
-					<owl:equivalentProperty rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
+					<xsd2owl:superPropertyOf rdf:resource="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#{@name}" />
 				  </rdf:Description>
                                 </owl:onProperty>        
 
