@@ -25,7 +25,7 @@ License: http://rhizomik.upf.edu/redefer/xsd2owl.xsl.rdf
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:sequence select="
-							if (contains($namespaces[name()=''],'#')) then
+							if (ends-with($namespaces[name()=''],'#') or ends-with($namespaces[name()=''],'/') or ends-with($namespaces[name()=''],':')) then
 								concat($namespaces[name()=''],$uriRef)
 							else
 								concat($namespaces[name()=''],'#',$uriRef)"/>
