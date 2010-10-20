@@ -86,10 +86,11 @@
 
                         <!-- Convert the attributes to elements -->
                         <xsl:for-each
-                                select="@*[generate-id(.) != generate-id(../@rdf:about)
-                                and generate-id(.) != generate-id(../@rdfx:about)
-                                and generate-id(.) != generate-id(../@rdf:ID)
-                                and generate-id(.) != generate-id(../@rdfx:ID)
+                                select="@*[
+                                generate-id(.) != generate-id(../@rdf:about)  and
+                                generate-id(.) != generate-id(../@rdfx:about) and
+                                generate-id(.) != generate-id(../@rdf:ID)     and
+                                generate-id(.) != generate-id(../@rdfx:ID)
                                 ]">
                             <xsl:variable name="attNamespace">
                                 <xsl:call-template name="getConvertedNamespace"/>
