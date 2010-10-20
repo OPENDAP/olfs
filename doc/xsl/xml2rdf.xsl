@@ -62,6 +62,17 @@
                 <!-- That means it's an rdf:Resource -->
                 <xsl:element name="{local-name()}" namespace="{$myElementNamespace}">
                     <rdf:Description>
+                        <xsl:if test="@rdf:ID">
+                            <xsl:attribute name="rdf:ID">
+                                <xsl:value-of select="@rdf:ID"/>
+                            </xsl:attribute>
+                        </xsl:if>
+                        <xsl:if test="@rdfx:ID">
+                            <xsl:attribute name="rdf:ID">
+                                <xsl:value-of select="@rdfx:ID"/>
+                            </xsl:attribute>
+                        </xsl:if>
+
                         <xsl:if test="@rdf:about">
                             <xsl:attribute name="rdf:about">
                                 <xsl:value-of select="@rdf:about"/>
@@ -75,7 +86,11 @@
 
                         <!-- Convert the attributes to elements -->
                         <xsl:for-each
-                                select="@*[generate-id(.) != generate-id(../@rdf:about) and generate-id(.) != generate-id(../@rdfx:about) ]">
+                                select="@*[generate-id(.) != generate-id(../@rdf:about)
+                                and generate-id(.) != generate-id(../@rdfx:about)
+                                and generate-id(.) != generate-id(../@rdf:ID)
+                                and generate-id(.) != generate-id(../@rdfx:ID)
+                                ]">
                             <xsl:variable name="attNamespace">
                                 <xsl:call-template name="getConvertedNamespace"/>
                             </xsl:variable>
