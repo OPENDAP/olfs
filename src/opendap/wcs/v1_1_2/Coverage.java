@@ -37,10 +37,6 @@ import java.net.URISyntaxException;
  *
  *
  */
-
-
-
-
 public class Coverage {
 
 

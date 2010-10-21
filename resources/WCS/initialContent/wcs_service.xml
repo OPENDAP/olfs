@@ -33,14 +33,11 @@
         <ResourcePath>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/webapps/opendap/WCS/</ResourcePath> 
         -->
 
-        <RdfImport>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</RdfImport>
-
-
         <dataset>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
         <dataset>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
         <dataset>http://test.opendap.org:8080/opendap/ioos/mday_joinExist.ncml.ddx</dataset>
-        
-        
+
+
         <!--
         <dataset>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
         <dataset>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
@@ -57,6 +54,25 @@
         <RdfImport>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</RdfImport>\
                 <RdfImport>http://schemas.opengis.net/wcs/1.1/wcsAll.xsd</RdfImport>
         -->
+        <!--
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/1km/declouded_1km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/1km/raw_1km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/6km/declouded_6km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northeast_Pacific/6km/raw_6km_aggregated.ncml</dataset>
+
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/1km/declouded_1km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/1km/raw_1km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/6km/declouded_6km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Pacific/6km/raw_6km_aggregated.ncml</dataset>
+
+
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/1km/declouded_1km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/1km/raw_1km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/6km/declouded_6km_aggregated.ncml</dataset>
+        <dataset>http://satdat1.gso.uri.edu/opendap/Pathfinder/Northwest_Atlantic/6km/raw_6km_aggregated.ncml</dataset>
+
+        -->
+
 
     </WcsCatalog>
 </WcsService>

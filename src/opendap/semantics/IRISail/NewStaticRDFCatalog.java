@@ -109,6 +109,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
     private URL _configFile;
+    private String _semanticPreloadFile;
 
 
     private String catalogCacheDirectory;
@@ -165,6 +166,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
 
         NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
+        String semanticPreloadFile = "http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl";
 
 
         try {
@@ -187,7 +189,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catalog.overrideBackgroundUpdates = true;
 
             startTime = new Date().getTime();
-            catalog.init(configFileUrl, catalog.catalogCacheDirectory, catalog.resourcePath);
+            catalog.init(configFileUrl, semanticPreloadFile, catalog.resourcePath,catalog.catalogCacheDirectory);
             endTime = new Date().getTime();
 
             elapsedTime = (endTime - startTime) / 1000.0;
@@ -206,11 +208,28 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     }
     /*******************************************************/
 
+    /**
+     *
+     * @param configFile
+     * @param defaultResourcePath
+     * @param defaultCacheDirectory
+     * @throws Exception
+     */
+     public void init(URL configFile, String defaultResourcePath, String defaultCacheDirectory) throws Exception {
+        init( configFile,  null, defaultResourcePath,  defaultCacheDirectory);
+
+    }
+
 
     /**
-     * 
+     *
+     * @param configFile
+     * @param semanticPreloadFile
+     * @param defaultResourcePath
+     * @param defaultCacheDirectory
+     * @throws Exception
      */
-    public void init(URL configFile, String defaultCacheDirectory, String defaultResourcePath) throws Exception {
+    public void init(URL configFile, String semanticPreloadFile, String defaultResourcePath, String defaultCacheDirectory) throws Exception {
 
         if (initialized)
             return;
@@ -218,11 +237,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         backgroundUpdates = false;
 
         _configFile = configFile;
+        _semanticPreloadFile = semanticPreloadFile;
 
 
         SAXBuilder sb = new SAXBuilder();
         Element configFileRoot = sb.build(configFile).getRootElement();
         Element catalogConfig = configFileRoot.getChild("WcsCatalog");
+
 
         processConfig(catalogConfig, defaultCacheDirectory, defaultResourcePath);
 
@@ -237,6 +258,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         initialized = true;
     }
+
 
     /**
      * Update the repository, coverage description document, catalog and the repository dump file.
@@ -258,8 +280,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             repositoryWriteLock.lock();
 
+
+
             log.debug("updateRepository(): Getting starting points (RDF imports).");
             Vector<String> startingPoints = getRdfImports(_configFile);
+
+            if(_semanticPreloadFile!=null)
+                startingPoints.add(_semanticPreloadFile);
 
             log.info("updateCatalog(): Updating Repository...");
             repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);

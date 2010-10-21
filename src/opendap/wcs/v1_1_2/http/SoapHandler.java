@@ -21,9 +21,11 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.wcs.v1_1_2;
+package opendap.wcs.v1_1_2.http;
 
 import opendap.coreServlet.ReqInfo;
+import opendap.wcs.v1_1_2.DispatchHandler;
+import opendap.wcs.v1_1_2.XmlRequestHandler;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
@@ -46,7 +48,7 @@ import java.util.List;
  * Time: 9:00:41 AM
  * To change this template use File | Settings | File Templates.
  */
-public class SoapHandler extends XmlRequestHandler  {
+public class SoapHandler extends XmlRequestHandler {
 
 
     public SoapHandler() {

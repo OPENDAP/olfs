@@ -25,6 +25,9 @@ package opendap.wcs.v1_1_2;
 
 import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
+import opendap.wcs.v1_1_2.http.FormHandler;
+import opendap.wcs.v1_1_2.http.PostHandler;
+import opendap.wcs.v1_1_2.http.SoapHandler;
 import org.jdom.Element;
 import org.slf4j.Logger;
 

@@ -21,20 +21,17 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.wcs.v1_1_2;
+package opendap.wcs.v1_1_2.http;
 
+import opendap.wcs.v1_1_2.*;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-
-import opendap.coreServlet.ReqInfo;
 
 /**
  * Created by IntelliJ IDEA.
