@@ -28,7 +28,8 @@ import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BesXmlAPI;
 import opendap.bes.BESError;
-import opendap.wcs.v1_1_2.http.KvpHandler;
+import opendap.wcs.v1_1_2.http.*;
+import opendap.wcs.v1_1_2.http.Util;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
@@ -362,7 +363,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        String serviceURL = getServiceUrlString(request,_prefix);
+        String serviceURL = opendap.wcs.v1_1_2.http.Util.getServiceUrlString(request,_prefix);
         String query      = request.getQueryString();
 
         boolean isWcsEndPoint = false;
@@ -496,7 +497,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/coverageDescription.xsl");
         log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = getServiceUrlString(request,_prefix);
+        String serviceUrl = Util.getServiceUrlString(request,_prefix);
         log.debug("sendDescribeCoveragePage()  serviceUrl: "+serviceUrl);
 
         String id = request.getQueryString();
@@ -530,7 +531,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/capabilities.xsl");
         log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = getServiceUrlString(request,_prefix);
+        String serviceUrl = Util.getServiceUrlString(request,_prefix);
         log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
 
         Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl);
@@ -577,7 +578,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     public void sendConfigurationPage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String serviceUrl = getServiceUrlString(request,_prefix);
+        String serviceUrl = Util.getServiceUrlString(request,_prefix);
         String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, _prefix + "/xsl/capabilitiesForm.xsl");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
@@ -661,7 +662,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
                                   HttpServletResponse response) throws IOException {
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
-        String serviceUrl = getServiceUrlString(request,_prefix);
+        String serviceUrl = Util.getServiceUrlString(request,_prefix);
 
         String url = Scrub.completeURL(request.getRequestURL().toString());
         String query = Scrub.completeURL(request.getQueryString());
@@ -888,33 +889,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
     }
-    /***************************************************************************/
-
-
-
-
-    public static String getServiceUrlString(HttpServletRequest request, String prefix){
-        String serviceURL = ReqInfo.getServiceUrl(request);
-
-        if (!prefix.equals("")) {
-            if (!serviceURL.endsWith("/")) {
-                if (prefix.startsWith("/"))
-                    serviceURL += prefix;
-                else
-                    serviceURL += "/" + prefix;
-
-            } else {
-                if (prefix.startsWith("/"))
-                    serviceURL += serviceURL.substring(0, serviceURL.length() - 1) + prefix;
-                else
-                    serviceURL += prefix;
-
-            }
-        }
-        return serviceURL;
-
-    }
-
 
 
 }

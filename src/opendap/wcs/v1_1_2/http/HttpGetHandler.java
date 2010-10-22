@@ -45,27 +45,25 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
     private static final String _coveragesTerminus = "/coverages";
 
-    private String _form;
-    private String _configurationForm;
     private String _testPath;
     private String _xmlEchoPath;
-    private String _coveragesPath;
     private String _describeCoveragePath;
-    private String _serviceContentPath;
     private String _contextPath;
     private String _resourcePath;
-    private String _defaultWcsServiceConfigFilename = "wcs_service.xml";
-    private String _serviceConfigFilename;
-    private URL    _serviceConfigUrl;
+
+    private boolean _enableUpdateUrl;
+
+
     private static final int GET_CAPABILITIES   = 0;
     private static final int DESCRIBE_COVERAGE  = 1;
     private static final int GET_COVERAGE       = 2;
 
 
-    public HttpGetHandler()  {
+    public HttpGetHandler(boolean enableUpdateUrl)  {
 
         super();
 
+        _enableUpdateUrl = enableUpdateUrl;
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
 
@@ -74,8 +72,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void init(HttpServlet dispatchServlet, Element e) throws ServletException {
 
         init(dispatchServlet);
-
-        // throw new ServletException("This specialization uses a different configuration pattern ");
 
     }
 
@@ -87,44 +83,30 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         String resourcePath = ServletUtil.getSystemPath(dispatchServlet, "/");
 
-        String contentPath = ServletUtil.getContentPath(dispatchServlet);
 
-        init(contextPath, resourcePath, contentPath);
+        init(contextPath, resourcePath);
 
     }
 
 
 
-    public void init(String contextPath, String resourcePath, String contentPath) throws ServletException {
+    public void init(String contextPath, String resourcePath) throws ServletException {
 
 
         if (_initialized) return;
 
 
-
-
-        String msg;
-
         _testPath              = "test";
-        _form                  = "form";
-        _configurationForm     = "config";
         _xmlEchoPath           = "echoXML";
-        _coveragesPath         = _coveragesTerminus;
         _describeCoveragePath  = "describeCoverage";
 
 
         _resourcePath = resourcePath;
-
         log.debug("_resourcePath: "+_resourcePath);
 
-        _serviceContentPath = contentPath;
-        if(!_serviceContentPath.endsWith("/"))
-            _serviceContentPath += "/";
 
         _contextPath = contextPath;
-
-        log.debug("_serviceContentPath: "+_serviceContentPath);
-
+        log.debug("_contextPath: "+_contextPath);
 
         _initialized = true;
         log.info("Initialized. ");
@@ -199,7 +181,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                         sendDescribeCoveragePage(request, response);
                         log.info("Returned WCS Describe Coverage Presentation Page.");
                     }
-                    else if(relativeURL.equals("update()")){
+                    else if(_enableUpdateUrl && relativeURL.equals("update()")){
                         log.info("Updating catalog.");
                         update(request, response);
                         log.info("Catalog update complete.");

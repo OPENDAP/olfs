@@ -24,7 +24,6 @@
 package opendap.wcs.v1_1_2.http;
 
 import opendap.coreServlet.ReqInfo;
-import opendap.wcs.v1_1_2.DispatchHandler;
 import opendap.wcs.v1_1_2.XmlRequestHandler;
 import org.jdom.Element;
 import org.jdom.Document;
@@ -64,7 +63,7 @@ public class SoapHandler extends XmlRequestHandler {
 
     public void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String serviceUrl = DispatchHandler.getServiceUrlString(request,_prefix);
+        String serviceUrl = Util.getServiceUrlString(request,_prefix);
         String dataAccessBase = ReqInfo.getServiceUrl(request);
 
         // Parse the XML doc into a Document object.

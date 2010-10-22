@@ -39,6 +39,7 @@
 
     <xsl:strip-space elements="*"/>
 
+    <xsl:decimal-format name="CoordinateFormatter" />
 
     <xsl:variable name="WcsServiceVersion">1.1</xsl:variable>
 
@@ -232,9 +233,21 @@
                 <tr>
                     <th align="left">Identifier</th>
                     <!-- <th align="center">Description</th> -->
-                    <th align="center">Lat/Lon Envelope</th>
+                    <th align="center">Lat/Lon Envelope<br/>[lowerLon,lowerLat] [upperLon,upperLat]</th>
                 </tr>
-                <xsl:apply-templates select="wcs:CoverageSummary"/>
+                <xsl:choose>
+                    <xsl:when test="wcs:CoverageSummary">
+                        <xsl:apply-templates select="wcs:CoverageSummary"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <tr>
+                            <td align="left"><span class="bold_italic">No Coverages Found</span></td>
+                            <!-- <th align="center">Description</th> -->
+                            <td align="center">[] []</td>
+                        </tr>
+
+                    </xsl:otherwise>
+                </xsl:choose>
             </table>
 
 
@@ -307,8 +320,25 @@
 
 
     <xsl:template match="ows:WGS84BoundingBox">
-        <span class="small" align="left">lowerCorner:</span>[<xsl:value-of select="ows:LowerCorner"/>]<br/>
-        <span class="small" align="left">upperCorner:</span>[<xsl:value-of select="ows:UpperCorner"/>]
+
+        <xsl:variable name="numberFormat">+000.00;-000.00</xsl:variable>
+        <xsl:variable name="lowerLon">
+            <xsl:value-of select="format-number(number(substring-before(ows:LowerCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
+        </xsl:variable>
+
+        <xsl:variable name="lowerLat">
+            <xsl:value-of select="format-number(number(substring-after(ows:LowerCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
+        </xsl:variable>
+
+        <xsl:variable name="upperLon">
+            <xsl:value-of select="format-number(number(substring-before(ows:UpperCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
+        </xsl:variable>
+
+        <xsl:variable name="upperLat">
+            <xsl:value-of select="format-number(number(substring-after(ows:UpperCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
+        </xsl:variable>
+
+        [<xsl:value-of select="concat($lowerLon,',',$lowerLat)"/>] [<xsl:value-of select="concat($upperLon,',',$upperLat)"/>]
 
     </xsl:template>
 
@@ -463,12 +493,23 @@
                     <!-- <th align="center">Description</th> -->
                     <th class="small" align="center">Server URL</th>
                 </tr>
-                <xsl:for-each select="$ServerIDs/ServerIDs/server">
-                    <tr>
-                        <td class="small" align="center"><xsl:value-of select="@id"/></td>
-                        <td class="small" align="left"><xsl:value-of select="@url"/></td>
-                    </tr>
-                </xsl:for-each>
+
+                <xsl:choose>
+                    <xsl:when test="$ServerIDs/ServerIDs/server">
+                        <xsl:for-each select="$ServerIDs/ServerIDs/server">
+                            <tr>
+                                <td class="small" align="center"><xsl:value-of select="@id"/></td>
+                                <td class="small" align="left"><xsl:value-of select="@url"/></td>
+                            </tr>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <tr>
+                            <td class="small" align="center">-</td>
+                            <td class="small" align="center">-</td>
+                        </tr>
+                    </xsl:otherwise>
+                </xsl:choose>
             </table>
 
     </xsl:template>

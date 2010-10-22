@@ -55,6 +55,11 @@ public class Servlet extends HttpServlet {
         String semanticPreload = this.getInitParameter("SemanticPreload");
         log.debug("semanticPreload: "+semanticPreload);
 
+        boolean enableUpdateUrl = false;
+        String s = this.getInitParameter("EnableUpdateUrl");
+        enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
+        log.debug("enableUpdateUrl: "+enableUpdateUrl);
+
 
 
         String serviceContentPath = contentPath;
@@ -69,7 +74,7 @@ public class Servlet extends HttpServlet {
 
 
         // Build Handler Objects
-        httpGetService = new HttpGetHandler();
+        httpGetService = new HttpGetHandler(enableUpdateUrl);
         formService = new FormHandler();
         wcsPostService = new PostHandler();
         wcsSoapService = new SoapHandler();

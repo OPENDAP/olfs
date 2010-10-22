@@ -34,7 +34,12 @@
             <param-value>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</param-value>
         </init-param>
 
-        <load-on-startup>1</load-on-startup>     x
+        <init-param>
+            <param-name>EnableUpdateUrl</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <load-on-startup>1</load-on-startup> 
 
     </servlet>
 

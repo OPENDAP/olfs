@@ -24,7 +24,6 @@
 package opendap.wcs.v1_1_2.http;
 
 import opendap.coreServlet.ReqInfo;
-import opendap.wcs.v1_1_2.DispatchHandler;
 import opendap.wcs.v1_1_2.WCS;
 import opendap.wcs.v1_1_2.XmlRequestHandler;
 import org.jdom.Document;
@@ -66,7 +65,7 @@ public class FormHandler extends XmlRequestHandler {
                                        HttpServletResponse response) throws IOException {
 
         String dataAccessBase = ReqInfo.getServiceUrl(request);
-        String serviceUrl = DispatchHandler.getServiceUrlString(request,_prefix);
+        String serviceUrl = Util.getServiceUrlString(request,_prefix);
         BufferedReader  sis = request.getReader();
         ServletOutputStream os = response.getOutputStream();
         int length;

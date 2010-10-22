@@ -60,6 +60,10 @@ HR {
     font-size: 14px;
     font-weight: bold
 }
+.medium_normal {
+    font-size: 14px;
+    font-weight: normal
+}
 .medium {
     font-size: 14px;
 }
@@ -74,10 +78,22 @@ HR {
     color    : black;
 }
 .dark {
-    font-weight: bold
+    font-weight: bold;
+}
+.normal {
+    font-weight: normal
 }
 
 .bold {
-    font-weight: bold
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.bold_italic {
+    font-weight: bold;
+    font-style: italic;
 }
 
