@@ -3,7 +3,7 @@ package opendap.wcs.v1_1_2.http;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
-import opendap.semantics.IRISail.NewStaticRDFCatalog;
+import opendap.semantics.wcs.StaticRdfCatalog;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -121,7 +121,7 @@ public class Servlet extends HttpServlet {
 
         URL serviceConfigUrl = getServiceConfigurationUrl(serviceContentPath,configFileName);
 
-        NewStaticRDFCatalog semanticCatalog = new NewStaticRDFCatalog();
+        StaticRdfCatalog semanticCatalog = new StaticRdfCatalog();
 
         log.info("Using "+semanticCatalog.getClass().getName()+" WCS catalog implementation.");
 

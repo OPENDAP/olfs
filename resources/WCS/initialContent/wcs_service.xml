@@ -25,11 +25,11 @@
 /////////////////////////////////////////////////////////////////////////////
 -->
 <WcsService>
-    <WcsCatalog className="opendap.semantics.IRISail.NewStaticRDFCatalog">
+    <WcsCatalog className="opendap.semantics.wcs.StaticRdfCatalog">
         <useUpdateCatalogThread updateInterval="28800" firstUpdateDelay="10"/>
 
         <!--
-        <CacheDirectory>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/content/WCS/NewStaticRDFCatalog/</CacheDirectory>
+        <CacheDirectory>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/content/WCS/StaticRdfCatalog/</CacheDirectory>
         <ResourcePath>/Users/ndp/OPeNDAP/Projects/Hyrax/swdev/trunk/apache-tomcat-6.0.26/webapps/opendap/WCS/</ResourcePath> 
         -->
 

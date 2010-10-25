@@ -25,9 +25,10 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.semantics.IRISail;
+package opendap.semantics.wcs;
 
 import opendap.logging.LogUtil;
+import opendap.semantics.IRISail.*;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -83,7 +84,7 @@ import com.ontotext.trree.owlim_ext.SailImpl;
  * 
  *
  */
-public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
+public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
 
     private Logger log;
@@ -125,7 +126,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
     private boolean initialized;
 
 
-    public NewStaticRDFCatalog() {
+    public StaticRdfCatalog() {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         catalogUpdateInterval = 20 * 60 * 1000; // 20 minutes worth of milliseconds
@@ -169,7 +170,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         LogUtil.initLogging(workingDir);
 
 
-        NewStaticRDFCatalog catalog = new NewStaticRDFCatalog();
+        StaticRdfCatalog catalog = new StaticRdfCatalog();
         String semanticPreloadFile = "http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl";
 
 
