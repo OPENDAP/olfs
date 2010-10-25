@@ -201,7 +201,7 @@ public class ConstructRuleEvaluator {
 
                             process_fn(graphResult, creatValue, Added, toAdd,
                                     con, context);// postpocessing Join,
-                                                  // subtract, getWcsID
+
                             break;
                         case NONE:
                         default:
@@ -374,13 +374,7 @@ public class ConstructRuleEvaluator {
 
     }
 
-    /**
-     * functions called
-     */
-    public enum FunctionTypes {
-        None, getWcsID, Subtract, Join
-    }
-
+   
     /***************************************************************************
      * Convert construct queries into legal SeRQL queries
      *
@@ -845,8 +839,6 @@ public class ConstructRuleEvaluator {
         URI myfn = creatValue.createURI(Terms.callFunction.getUri());
         URI myfnlist = creatValue.createURI(Terms.withArguments.getUri());
 
-        FunctionTypes functionTypeFlag = FunctionTypes.None;
-        Value objLastSt = null;
 
         URI prdLastSt = null;
         Resource sbjLastSt = null;
@@ -941,7 +933,6 @@ public class ConstructRuleEvaluator {
 
             } //if (prd.equals(myfn))
 
-            objLastSt = st.getObject();
             prdLastSt = st.getPredicate();
             sbjLastSt = st.getSubject();
 
