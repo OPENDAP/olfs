@@ -93,7 +93,7 @@ public class ConstructRuleEvaluator {
 
         Boolean modelChanged = true;
         int runNbr = 0;
-        int runNbrMax = 20;
+        int runNbrMax = 99;
         long startTime, endTime;
         startTime = new Date().getTime();
 
@@ -107,7 +107,8 @@ public class ConstructRuleEvaluator {
          //log.debug("Before running the construct rules:\n " +
          //opendap.coreServlet.Util.getMemoryReport());
         con = repository.getConnection();
-
+        ValueFactory creatValue = repository.getValueFactory(); //moved from line 159
+        
         while (modelChanged && runNbr < runNbrMax) {
 
             runNbr++;
@@ -130,9 +131,14 @@ public class ConstructRuleEvaluator {
                 URI uriaddress = new URIImpl(Terms.externalInferencingContext.getUri());
                 Resource[] context = new Resource[1];
                 context[0] = uriaddress;
-
+                
+                
                 String processedQueryString = convertSWRLQueryToSeasameQuery(qstring);
-
+                if(runNbr == 1){
+                log.info("Original construct: " + qstring);
+                log.info("Processed construct: " + processedQueryString);
+                }
+                
                 try {
                      //log.debug("Prior to making new repository connection:\n "
                      //+ opendap.coreServlet.Util.getMemoryReport());
@@ -140,22 +146,22 @@ public class ConstructRuleEvaluator {
                     GraphQuery graphQuery = con.prepareGraphQuery(
                             QueryLanguage.SERQL, processedQueryString);
 
-                    log.info("Querying the repository. PASS #" + queryTimes
-                            + " (construct rules pass #" + runNbr + ")");
+                    //log.info("Querying the repository. PASS #" + queryTimes
+                    //        + " (construct rules pass #" + runNbr + ")");
 
                     graphResult = graphQuery.evaluate();
-
+                    GraphQueryResult graphResultCopy = graphResult;
                     log.info("Completed querying. ");
 
                      //log.debug("After evaluating construct rules:\n " +
                      //opendap.coreServlet.Util.getMemoryReport());
 
-                    log.info("Post processing query result and adding statements ... ");
+                    //log.info("Post processing query result and adding statements ... ");
 
                     if (graphResult.hasNext()) {
                         modelChanged = true;
 
-                        ValueFactory creatValue = repository.getValueFactory();
+                       // ValueFactory creatValue = repository.getValueFactory();
 
                         switch (postProcessFlag) {
 
@@ -199,18 +205,20 @@ public class ConstructRuleEvaluator {
                             break;
                         case NONE:
                         default:
-                            log.info("Adding none-postprocess statements ...");
+                            log.info("Adding not postprocessed statements ...");
 
-                            con.add(graphResult, context);
+                            //con.add(graphResult, context);
                             int nonePostprocessSt = 0;
-                            while (graphResult.hasNext()) {
-                                graphResult.next();
+                            con.add(graphResult, context);
+                            
+                            while (graphResultCopy.hasNext()) {
+                                graphResultCopy.next();
                                 nonePostprocessSt++;
                                 stAdded++;
                             }
-
-                            log.info("Complete adding " + nonePostprocessSt
-                                    + " none-postprocess statements");
+                            //con.add(graphResult, context);
+                            log.info("Complete adding "
+                                    + " not postprocessed statements");
                             // log.debug("After processing default (NONE)
                             // case:\n " +
                             // opendap.coreServlet.Util.getMemoryReport());
@@ -218,19 +226,14 @@ public class ConstructRuleEvaluator {
                             break;
                         }
 
-                        // log.info("Adding statements ...");
-                        stAdded = 0;
+                                               
                         if (toAdd != null) {
-                            // con.add(toAdd, context);
-                            log.info("Total added " + toAdd.size()
-                                    + " statements.");
-
-                            stAdded = toAdd.size();
+                            stAdded += toAdd.size();
                         }
 
-                    } // if (graphResult != null
+                    } // if (graphResult.hasNext
                     else {
-                        log.debug("No query result!");
+                        log.debug("The construct rule returns no statements!");
                     }
 
                 } catch (QueryEvaluationException e) {
@@ -259,21 +262,27 @@ public class ConstructRuleEvaluator {
                 ruleEndTime = new Date().getTime();
                 double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
 
-                //log.debug("Processed construct rule : " + processedQueryString);
                 log.debug("Construct rule " + ruleNumber + " takes " + ruleTime
                         + " seconds in loop " + runNbr + " added " + stAdded
                         + " statements");
 
                 totalStAdded = totalStAdded + stAdded;
                 totalStAddedIn1Pass = totalStAddedIn1Pass+ stAdded;
+                con.commit();
             } // for(String qstring
-            log.info("Completed pass " + runNbr + " of Construct evaluation"+"Queried the repository " +
-                    queryTimes + " times" + " added " + totalStAddedIn1Pass + " statements");
+            
+            log.info("Completed pass " + runNbr + " of Construct evaluation, "+"queried the repository " +
+                    ruleNumber + " times" + " added " + totalStAddedIn1Pass + " statements");
             log.info("Queried the repository " + queryTimes + " times");
 
             findConstruct(repository);
         } // while (modelChanged
-
+        
+        //the construct rules run too many times 
+        if (runNbr >= runNbrMax){
+            log.warn("The construct rules have executed to the maxmum times allowed!");
+        }
+        
         try {
             con.close();
         } catch (RepositoryException e) {
@@ -332,7 +341,7 @@ public class ConstructRuleEvaluator {
 
                 }
             } else {
-                log.debug("No query result!");
+                log.debug("No Construct rules found in the repository!");
             }
         } catch (QueryEvaluationException e) {
             log.error("Caught an QueryEvaluationException! Msg: "
@@ -396,7 +405,7 @@ public class ConstructRuleEvaluator {
         Pattern rproces4psub2 = Pattern.compile(pproces4sub2);
 
         String processedQueryString = queryString;
-        log.info("Original construct: " + queryString);
+        //log.info("Original construct: " + queryString);
         Matcher mreifStr = rproces4psub2.matcher(processedQueryString);
 
         Boolean hasReified = false;
@@ -515,7 +524,7 @@ public class ConstructRuleEvaluator {
 
         }
 
-        log.info("Processed construct: " + processedQueryString);
+        //log.info("Processed construct: " + processedQueryString);
         return processedQueryString;
 
     }
@@ -614,17 +623,18 @@ public class ConstructRuleEvaluator {
             Value obj = st.getObject();
             URI prd = st.getPredicate();
             Resource sbj = st.getSubject();
-            String statementStr = obj.toString();
+            String statementStr = obj.stringValue();
             Matcher m = rproces1.matcher(statementStr);
-            if (m.find()) {
+            /*if (m.find()) {
                 String vname = m.group(1);
                 String replaceStr = vname
                         + "^^<http://www.w3.org/2001/XMLSchema#string> .";
                 statementStr = m.replaceAll(replaceStr);
                 // log.debug("postprocess1 statementStr=" +statementStr);
                 // log.debug("vnam=" +vname);
-            }
-            Value stStr = creatValue.createLiteral(statementStr);
+            }*/
+            URI dataType = creatValue.createURI("http://www.w3.org/2001/XMLSchema#string");
+            Value stStr = creatValue.createLiteral(statementStr, dataType);
             Statement stToAdd = new StatementImpl(sbj, prd, stStr);
 
             toAdd.add(stToAdd);

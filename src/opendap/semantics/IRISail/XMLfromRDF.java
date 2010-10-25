@@ -73,26 +73,117 @@ public class XMLfromRDF {
      */
 	public XMLfromRDF(RepositoryConnection con, String rootElementStr, String topURI) {
 		this.log = LoggerFactory.getLogger(getClass());
-		URI uri = new URIImpl(topURI);
-		//int pl = topURI.lastIndexOf("#");
-		//String ns = topURI.substring(0,pl);
-		//Namespace topURINS = Namespace.getNamespace(ns);
-        Namespace  topURINS = Namespace.getNamespace(uri.getNamespace());
-		this.root = new Element(rootElementStr,topURINS);
+		//URI uri = new URIImpl(topURI);
+		int pl = topURI.lastIndexOf("#");
+		String ns = topURI.substring(0,pl);
+		
+		this.root = new Element(rootElementStr,ns);
 		this.doc = new Document(root);
 		this.con = con;
 
-		this.queryString0 = "SELECT DISTINCT topprop:, obj, valueclass "+
+		this.queryString0 = "SELECT DISTINCT topprop:, obj, valueclass, targetns "+
 		"FROM "+
 		"{containerclass} rdfs:subClassOf {} owl:onProperty {topprop:}; owl:allValuesFrom {valueclass}, "+
-		"{subject} topprop: {obj} rdf:type {valueclass} "+
+		"{subject} topprop: {obj} rdf:type {valueclass}, "+
+		"[{topprop:} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
 		"using namespace "+
         "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
         "owl = <http://www.w3.org/2002/07/owl#>, "+
         "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
+        "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, " +
         "topprop = <"+topURI+">";
 	}
+	
+	/**
+     * Constructor, sets the repository connection. Query string will be passed in through
+     * getXMLfromRDF(String, String). 
+     * @param con-connection to the repository.
+     * 
+     */
+    public XMLfromRDF(RepositoryConnection con) {
+        this.log = LoggerFactory.getLogger(getClass());
+        
+        this.con = con;
+        
+    }
+    /**
+     * Start the process of building the document. First level children are retrieved through
+     * query zero and added to the document.
+     *
+      * @param topURI-searching phrase for the first level children
+     */
 
+	public void getXMLfromRDF(String topURI, String serfqString0){
+	    
+        TupleQueryResult result0 = null;
+        try{
+            log.debug("queryString0: " +serfqString0);
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, serfqString0);
+            
+            result0 = tupleQuery.evaluate();
+
+            while ( result0.hasNext()) {
+                BindingSet bindingSet = (BindingSet) result0.next();
+
+                if (bindingSet.getValue("element") != null 
+                        && bindingSet.getValue("uri") != null 
+                        && bindingSet.getValue("class") != null){
+                    
+                    Value valueOfElement = (Value) bindingSet.getValue("element");
+                    Value valueOfUri = (Value) bindingSet.getValue("uri");
+                    
+                    Value valueOfClass = (Value) bindingSet.getValue("class");
+                   
+                    String queryString1 = createQueryString(valueOfUri.stringValue(), valueOfClass);
+                    String parent,ns;
+                    log.debug("queryString1: " +queryString1);                                    
+                    if (topURI.lastIndexOf("#") >= 0){
+                                
+                        int pl = topURI.lastIndexOf("#");
+                        ns = topURI.substring(0,pl);
+                        parent = topURI.substring(pl+1);
+
+                    }else if(topURI.lastIndexOf("/") >= 0){
+                        int pl = topURI.lastIndexOf("/");
+                        ns = topURI.substring(0,pl);
+                        parent = topURI.substring(pl+1);
+
+                    }else{
+                        parent = topURI;
+                        ns = topURI;
+
+                    }
+                    URI uri = new URIImpl(valueOfElement.toString());
+                    Value targetNS = (Value) bindingSet.getValue("targetns");
+                    ns = uri.getNamespace();
+                    if(targetNS != null){
+                        ns = targetNS.stringValue();
+                    }
+                    this.root = new Element(uri.getLocalName(),ns);
+                    this.doc = new Document(root);
+                    
+                    this.addChildren(queryString1, root, con,doc);
+                } //if (bindingSet.getValue("topnameprop") 
+            } //while ( result0.hasNext())
+        }catch ( QueryEvaluationException e){
+            log.error(e.getMessage());
+        }catch (RepositoryException e){
+            log.error(e.getMessage());
+        }catch (MalformedQueryException e) {
+            log.error(e.getMessage());
+        }finally{
+            if(result0!=null){
+                try {
+                    result0.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+	
     /**
      * Start the process of building the document. First level children are retrieved through
      * query zero and added to the document.
@@ -107,8 +198,7 @@ public class XMLfromRDF {
             
             result0 = tupleQuery.evaluate();
 
-            List<String> bindingNames = result0.getBindingNames();
-
+            
             while ( result0.hasNext()) {
                 BindingSet bindingSet = (BindingSet) result0.next();
 
@@ -117,11 +207,10 @@ public class XMLfromRDF {
                     
                     Value valueOfobj = (Value) bindingSet.getValue("obj");
                     Value valueOfobjtype = (Value) bindingSet.getValue("objtype");
-
                     Value valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
-
-                    
+                   
                     String uritypestr;
+                    
                     if (valueOfobjtype!= null){uritypestr= valueOfobjtype.stringValue();}
                     else{
                         uritypestr= "nullstring";   
@@ -145,8 +234,12 @@ public class XMLfromRDF {
                         ns = topURI;
 
                     }
-                                
-                    Element chd1 = new Element(parent,ns); //duplicated as the root
+                    Value targetNS = (Value) bindingSet.getValue("targetns");
+                    if(targetNS != null){
+                        ns = targetNS.stringValue();
+                    }
+                    
+                    Element chd1 = new Element(parent,ns); //first level children
                     
                     root.addContent(chd1);
                     this.addChildren(queryString1, chd1, con,doc);
@@ -185,8 +278,6 @@ public class XMLfromRDF {
 			TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);
 							
 			result = tupleQuery.evaluate();
-
-			List<String> bindingNames = result.getBindingNames();
 
 			SortedMap<String,BindingSet >   mapOrderObj   =   new TreeMap<String, BindingSet>();
 			
@@ -240,7 +331,10 @@ public class XMLfromRDF {
 							ns = valueOfnameprop.toString();
 
 						}
-												
+						Value targetNS = (Value) bindingSet.getValue("targetns");
+	                    if(targetNS != null){
+	                        ns = targetNS.stringValue();
+	                    }						
 						URI uritype = new URIImpl(uritypestr); 
 						
 
@@ -383,7 +477,10 @@ public class XMLfromRDF {
 					ns = valueOfnameprop.toString();
 				}
 					
-				
+				Value targetNS = (Value) bindingSet.getValue("targetns");
+                if(targetNS != null){
+                    ns = targetNS.stringValue();
+                }
 				Element chd;
 				String formtypestr = valueOfform.stringValue();
 				URI formtype = new URIImpl(formtypestr);
@@ -442,7 +539,7 @@ public class XMLfromRDF {
 		String objURI = parentstr.substring(0, 7);
 		
 		if (objURI.equalsIgnoreCase("http://")){
-			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form "+
+			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
 			"FROM "+
 			"{parent:} nameprop {obj}, "+
 			"{parentclass:} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
@@ -451,17 +548,19 @@ public class XMLfromRDF {
 			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, "+
 			"{parentclass:} rdfs:subClassOf {} subprop {restriction}, "+
 			"[{parentclass:} xsd2owl:uses {nameprop},{{parentclass:} xsd2owl:uses {nameprop}} "+
-			"xsd2owl:useCount {order1}] "+
+			"xsd2owl:useCount {order1}], "+
+			"[{nameprop} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
 			"using namespace "+
 			      "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
 			      "owl = <http://www.w3.org/2002/07/owl#>, "+
 			      "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
+			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, "+
 			      "parent = <" + parentstr + ">," +
 			      "parentclass = <"+ parentclassstr + ">";     
 					
 		}
 		else{
-			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form "+
+			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
 			"FROM "+
 			"{" + parentstr + "} nameprop {obj}, "+
 			"{parentclass:} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
@@ -470,18 +569,19 @@ public class XMLfromRDF {
 			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, "+
 			"{parentclass:} rdfs:subClassOf {} subprop {restriction}, "+
 			"[{parentclass:} xsd2owl:uses {nameprop},{{parentclass:} xsd2owl:uses {nameprop}} "+
-			"xsd2owl:useCount {order1}] "+
+			"xsd2owl:useCount {order1}], "+
+			"[{nameprop} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
 			"using namespace "+
 			      "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
 			      "owl = <http://www.w3.org/2002/07/owl#>, "+
 			      "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
+			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, " +
 			      "parentclass = <"+ parentclassstr + ">"; 
 			
 		}
 		return queryStringc;
 	}
-	
-	public void printDoc(){
+    public void printDoc(){
 		XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat() );
 		try {
 			outputter.output(this.doc, System.out);

@@ -26,6 +26,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 
@@ -53,8 +54,7 @@ public class RepositoryFunctions {
         }
         for (i = 1; i < RDFList.size() - 1; i++) {
             targetObj += RDFList.get(i) + RDFList.get(0); // rdfList.get(0) +
-            // separator
-            // log.debug("Component("+i+")= " + RDFList.get(i));
+            
         }
 
         targetObj += RDFList.get(i); // last component no separator
@@ -84,14 +84,18 @@ public class RepositoryFunctions {
       
             targetObj = RDFList.get(0); // rdfList.get(0) +
             targetObj = targetObj.substring(targetObj.indexOf("#")+1);
-           
-
-        
-        
-
-        return createValue.createLiteral(targetObj);
+      
+            return createValue.createLiteral(targetObj);
     }
 
-
+    public static Value cast (List<String> RDFList, ValueFactory createValue) {
+       
+       String  label = RDFList.get(0); 
+       String dataType = RDFList.get(1);
+       URI dataTypeUri = createValue.createURI(dataType);
+            return createValue.createLiteral(label, dataTypeUri);
+           
+           
+    }
     
 }

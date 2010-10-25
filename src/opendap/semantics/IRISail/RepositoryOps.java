@@ -33,9 +33,13 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.sail.SailRepository;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.rio.trig.TriGWriter;
 import org.openrdf.rio.trix.TriXWriter;
+import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +73,44 @@ public class RepositoryOps {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
     public static boolean flushRepositoryOnDrop = false;
-
+    public static boolean dropWithMemoryStore = false;
+ 
+     
+    public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) {
+        RepositoryConnection con = null;
+        ValueFactory valueFactory;
+        try {
+            con = repo.getConnection();
+            con.setAutoCommit(false);
+            
+            long beforeDrop = new Date().getTime();
+            
+            log.debug("In dropStartingPointsAndContexts AutoCommit = " + con.isAutoCommit());
+            valueFactory = repo.getValueFactory();
+            RepositoryOps.dropStartingPoints(con, valueFactory, startingPointUrls);
+            RepositoryOps.dropContexts(con, valueFactory, dropList);
+            con.commit();
+            long AfterDrop = new Date().getTime();
+            double elapsedTime = (AfterDrop - beforeDrop) / 1000.0;
+            log.debug("In dropStartingPointsAndContexts drop takes " + elapsedTime +"seconds");
+            con.setAutoCommit(true);
+        } catch (RepositoryException e) {
+           log.error("Caught RepositoryException in dropStartingPointsAndContexts. Msg: "
+                   + e.getMessage()); 
+        } catch (InterruptedException e) {
+            log.error("Caught InterruptedException in dropStartingPointsAndContexts. Msg: "
+                    + e.getMessage());  
+        }finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                            + e.getMessage());
+                }
+            }
+        }
+    }
 
     /**
      * Remove the startingpoint statement from the repository.
@@ -132,7 +173,7 @@ public class RepositoryOps {
 
 
         } catch (RepositoryException e) {
-            log.error("In addStartingPoints, caught an RepositoryException! Msg: "
+            log.error("In dropStartingPoints, caught an RepositoryException! Msg: "
                     + e.getMessage());
 
         }
@@ -190,7 +231,7 @@ public class RepositoryOps {
     }
 
     /**
-     * Test if a startingpoint is alread in the repository. Return true if it is already in.
+     * Test if a StartingPoint is already in the repository. Return true if it is already in.
      * @param con - connection to the repository.
      * @param startingPointUrl - a StartingPoint.
      * @return true if the statement is in the repository.
@@ -556,8 +597,7 @@ public class RepositoryOps {
         catch (RepositoryException e) {
             log.error("Failed to open repository connection. Msg: "+e.getMessage());
         } finally {
-            log.debug("Closing repository connection.");
-
+            
             if(con!=null){
                 try {
                     con.close();  //close connection first
@@ -636,8 +676,7 @@ public class RepositoryOps {
         catch (RepositoryException e) {
             log.error("Failed to open repository connection. Msg: "+e.getMessage());
         } finally {
-            log.debug("Closing repository connection.");
-
+            
             if(con!=null){
                 try {
                     con.close();  //close connection first
@@ -668,7 +707,7 @@ public class RepositoryOps {
             msg = "Failed to open repository connection. Msg: "+e.getMessage();
             log.error(msg);
         } finally {
-            log.debug("Closing repository connection.");
+            //log.debug("Closing repository connection.");
 
             if(con!=null){
                 try {
@@ -719,6 +758,9 @@ public class RepositoryOps {
         String oldltmod = getLastModifiedTime(con, importURL); // LMT from repository
 
         if (oldltmod.isEmpty()) {
+            log.debug("In  olderContext ...");
+            log.debug("URI " + importURL);
+            log.debug("lastmodified is empty!");
             oldLMT = true;
             return oldLMT;
         }
@@ -741,7 +783,7 @@ public class RepositoryOps {
             if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
                 // context
 
-                log.info("Import context is newer: " + importURL);
+                log.info("Import context is newer! Will update.");
                 oldLMT = true;
             }
         } catch (ParseException e) {
@@ -751,7 +793,51 @@ public class RepositoryOps {
         return oldLMT;
     }
 
+    /**
+     * Return true if import context is newer.
+     *
+     * @param oldltmod - last modified time from the repository.
+     * @param importURL - String of import URL.
+     * @return Boolean - true if the import URL is changed.
+     */
+    public static Boolean olderContext(String oldltmod, String importURL) {
+        Boolean oldLMT = false;
 
+        if (oldltmod.isEmpty()) {
+            log.debug("In  olderContext ...");
+            log.debug("URI " + importURL);
+            log.debug("lastmodified is empty!");
+            oldLMT = true;
+            return oldLMT;
+        }
+        String oltd = oldltmod.substring(0, 10) + " "
+                + oldltmod.substring(11, 19);
+        String ltmod = getLTMODContext(importURL);
+
+        String ltd = ltmod.substring(0, 10) + " " + ltmod.substring(11, 19);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd hh:mm:ss");
+        Date ltdparseDate;
+        try {
+            ltdparseDate = dateFormat.parse(ltd);
+            log.debug("In  olderContext ...");
+            log.debug("URI " + importURL);
+            log.debug("lastmodified    " + ltdparseDate.toString());
+            Date oldltdparseDate = dateFormat.parse(oltd);
+            log.debug("oldlastmodified " + oldltdparseDate.toString());
+
+            if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
+                // context
+
+                log.info("Import context is newer! Will update.");
+                oldLMT = true;
+            }
+        } catch (ParseException e) {
+            log.error("Caught an ParseException! Msg: " + e.getMessage());
+
+        }
+        return oldLMT;
+    }
 
 
     /**
@@ -790,7 +876,7 @@ public class RepositoryOps {
                 // }
                 valueOfY =  bindingSet.getValue("lastmod");
                 ltmodstr = valueOfY.stringValue();
-                // log.debug("Y:" + valueOfY.stringValue());
+                //log.debug("last modified time:" + valueOfY.stringValue());
 
             }
 
@@ -815,7 +901,7 @@ public class RepositoryOps {
     }
 
     /**
-     * Set last_modified_time of a context.
+     * Get last_modified_time of a context through the http connection.
      * @param urlstring - the URL of the context.
      * @return  the last modified time as a String.
      */
@@ -825,7 +911,7 @@ public class RepositoryOps {
             URL myurl = new URL(urlstring);
             HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
             long ltmod = hc.getLastModified();
-            // log.debug("lastModified: "+ltmod);
+            //log.debug(urlstring + " lastModified: "+ltmod);
             ltmodstr = getLastModifiedTimeString(ltmod);
         } catch (MalformedURLException e) {
             log.error("Caught a MalformedQueryException! Msg: "
@@ -1038,9 +1124,12 @@ public class RepositoryOps {
      * @return Returns true if the update results in changes to the repository.
      * @throws InterruptedException If the thread of execution is interrupted.
      * @throws RepositoryException  When there are problems working with the repository.
+     * @throws IOException if MemoryStore SailRepository error.
+     * @throws RDFParseException if parse the repository dump error.
      */
-    public static boolean updateSemanticRepository(Repository repository, Vector<String> startingPointUrls, Vector<String> doNotImportTheseUrls, String resourceDir)
-            throws InterruptedException, RepositoryException {
+    public static boolean updateSemanticRepository(Repository repository, Vector<String> startingPointUrls, Vector<String> doNotImportTheseUrls, 
+            String resourceDir, String catalogCacheDirectory)
+            throws InterruptedException, RepositoryException, RDFParseException, IOException {
 
 
         Vector<String> dropList = new Vector<String>();
@@ -1072,6 +1161,7 @@ public class RepositoryOps {
                     startingPointsToDrop = findChangedStartingPoints(con, startingPointUrls);
                     dropList.addAll(startingPointsToDrop);
                     dropList.addAll(findChangedRDFDocuments(con));
+                   
                 }
             } catch (RepositoryException e) {
                 log.error("Caught RepositoryException updateSemanticRepository(Vector<String> startingPointUrls)" +
@@ -1091,8 +1181,9 @@ public class RepositoryOps {
 
 
             if (!dropList.isEmpty()) {
-
-
+                log.debug("Add external inferencing contexts to dropList");
+                dropList.addAll(findExternalInferencingContexts(repository));
+                
                 if(flushRepositoryOnDrop){
                     log.warn("Repository content has been changed! Flushing Repository!");
 
@@ -1100,50 +1191,68 @@ public class RepositoryOps {
 
 
                     String filename =  "PostRepositoryClear.trig";
-                    log.debug("Dumping Semantic Repository to: " + filename);
+                    
                     dumpRepository(repository, filename);
 
-
+                    //repository is empty, find all StartingPoint 
                     newStartingPoints = findNewStartingPoints(repository, startingPointUrls);
 
 
+                }else if(dropWithMemoryStore){
+                    log.warn("Repository content has been changed! Do drop with MemoryStore!");
+                    
+                    Repository memRepository = setupMemoryStoreSailRepository();
+                    
+                    log.warn("Flushing MemoryStoreRepository!");
+                    clearRepository(memRepository); //make sure memory store is empty
+                    RepositoryConnection conMem = memRepository.getConnection();
+                    RepositoryConnection conOwlim = repository.getConnection();
+                    
+                    log.debug("Loading Owlim Repository to MemoryStore");
+                    conMem.add(conOwlim.getStatements(null, null, null, false));
+                              
+                    //String filename = catalogCacheDirectory + "PriorToDropStartingPointsMemRepository.trig";
+                    //log.debug("Dumping MemoryRepository to: " + filename);
+                    //dumpRepository(memRepository, filename);
+
+                    log.debug("Dropping StartingPoint and contexts from MemoryStore ...");
+                    
+                    dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
+                    //log.debug(showContexts(memRepository));
+
+
+                    //filename = catalogCacheDirectory + "PostDropContextsRepository.nt";
+                    //log.debug("Dumping MemoryRepository to: " + filename);
+                    //dumpRepository(memRepository, filename);
+                    
+                    //filename = catalogCacheDirectory + "PostDropContextsRepository.trig";
+                    //log.debug("Dumping MemoryRepository to: " + filename);
+                    //dumpRepository(memRepository, filename);
+                    
+                    log.warn("Flushing OwlimRepository!");
+                    clearRepository(repository);
+                    
+                    //filename = catalogCacheDirectory + "PostRepositoryClear.trig";
+                    //log.debug("Dumping OwlimRepository to: " + filename);
+                    //dumpRepository(repository, filename);
+                    
+                    log.debug("Reloading MemoryStore back to Owlim Repository");
+                    conOwlim.add(conMem.getStatements(null, null, null, true));
+                    
+                    //log.debug("Reloading " + filename +" back to Owlim Repository");
+                    //loadRepositoryFromTrigFile(repository, filename);
+                    conOwlim.close();
+                    conMem.close();                    
+                    memRepository.shutDown();
                 }
                 else {
-
-                    log.debug("Add external inferencing contexts to dropList");
-                    dropList.addAll(findExternalInferencingContexts(repository));
-
-                    String filename =  "PriorToDropStartingPointsRepository.trig";
-                    log.debug("Dumping Semantic Repository to: " + filename);
-                    dumpRepository(repository, filename);
-
-                    log.debug("Dropping starting points ...");
-                    dropStartingPoints(repository, startingPointsToDrop);
-                    log.debug("Finished dropping starting points.");
-
-                    ProcessingState.checkState();
-
-                    filename =  "PostDropStartingPointsRepository.trig";
-                    log.debug("Dumping Semantic Repository to: " + filename);
-                    dumpRepository(repository, filename);
-
-                    log.debug(showContexts(repository));
-
-                    log.debug("Dropping contexts.");
-                    dropContexts(repository, dropList);
-                    log.debug(showContexts(repository));
-
-
-
-                    filename =  "PostDropContextsRepository.trig";
-                    log.debug("Dumping Semantic Repository to: " + filename);
-                    dumpRepository(repository, filename);
+                    dropStartingPointsAndContexts(repository, startingPointsToDrop, dropList); 
 
                 }
                 
                 modelChanged = true;
 
-            }
+            }//if (!dropList.isEmpty()) 
 
             ProcessingState.checkState();
 
@@ -1232,7 +1341,8 @@ public class RepositoryOps {
 
         try {
             con = repository.getConnection();
-
+            con.setAutoCommit(false);
+            log.debug("In dropContexts AutoCommit = " + con.isAutoCommit());
             log.info("Deleting contexts in drop list ...");
             ValueFactory valueFactory = repository.getValueFactory();
 
@@ -1251,7 +1361,7 @@ public class RepositoryOps {
 
                 ProcessingState.checkState();
             }
-
+            con.commit();
         } catch (RepositoryException e) {
             log.error("Caught RepositoryException! Msg: " + e.getMessage());
         }
@@ -1267,7 +1377,44 @@ public class RepositoryOps {
         log.debug("Finished dropping changed RDFDocuments and external inferencing contexts.");
 
     }
+    /**
+     * Drop contexts through a connection.
+     * @param con
+     * @param valueFactory
+     * @param dropList
+     * @throws InterruptedException
+     */
+    public static void dropContexts(RepositoryConnection con, ValueFactory valueFactory, Vector<String> dropList) throws InterruptedException {
+       
+        log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
 
+        try {
+           
+            log.info("Deleting contexts in drop list ...");
+            
+            for (String drop : dropList) {
+                log.info("Dropping context URI: " + drop);
+                URI contextToDrop = valueFactory.createURI(drop);
+                URI cacheContext = valueFactory.createURI(Terms.cacheContext.getUri());
+
+                log.info("Removing context: " + contextToDrop);
+                con.clear(contextToDrop);
+
+                log.info("Removing last_modified: " + contextToDrop);
+                con.remove(contextToDrop, null, null, cacheContext); // remove last_modified
+
+                log.info("Finished removing context: " + contextToDrop);
+
+                ProcessingState.checkState();
+            }
+
+        } catch (RepositoryException e) {
+            log.error("In dropContexts caught RepositoryException! Msg: " + e.getMessage());
+        
+        }
+        log.debug("Finished dropping changed RDFDocuments and external inferencing contexts.");
+
+    }
     /**
      * Locate all of the of the contexts generated by externbal inferencing (construct rule) activities.
      *
@@ -1468,15 +1615,15 @@ public class RepositoryOps {
 
                     Value firstValue = bindingSet.getValue("doc");
                     String importURL = firstValue.stringValue();
-                    // Value secondtValue = bindingSet.getValue("lastmod");
+                    Value secondtValue = bindingSet.getValue("lastmod");
                     // log.debug("DOC: " + importURL);
                     // log.debug("LASTMOD: " + secondtValue.stringValue());
 
-                    if (olderContext(con, importURL) && !changedRdfDocuments.contains(importURL)) {
+                    if (olderContext(secondtValue.stringValue(), importURL) && !changedRdfDocuments.contains(importURL)) {
 
                         changedRdfDocuments.add(importURL);
 
-                        log.debug("Found changed RDF document: " + importURL);
+                        log.debug("Add to changedRdfDocuments list: " + importURL);
 
                     }
                 }
@@ -1567,4 +1714,75 @@ public class RepositoryOps {
 
         return xsltTransformationFileUrl;
     }
+    
+    /**
+     * Setup and initialize a MemoryStore SailRepository. 
+     * @return repository - a reference to the repository
+     * @throws RepositoryException - if cannot setup the repository.
+     * @throws InterruptedException - if the process is interrupted.
+     */
+    private static Repository setupMemoryStoreSailRepository() throws RepositoryException, InterruptedException {
+
+
+        log.info("Setting up MemoryStroe SialRepository.");
+
+        
+        log.info("Configuring Semantic Repository.");
+        String catalogCacheDirectory = "./";
+        File storageDir = new File(catalogCacheDirectory + "MemoryStore"); //define local copy of repository
+        MemoryStore memStore = new MemoryStore(storageDir);
+        memStore.setPersist(true);
+        memStore.setSyncDelay(1000L);
+        
+        Repository repository = new SailRepository(memStore); 
+        
+        log.info("Intializing Semantic Repository.");
+
+        // Initialize repository
+        repository.initialize(); //needed
+
+        log.info("Semantic Repository Ready.");
+
+
+        ProcessingState.checkState();
+
+
+        return repository;
+
+    }
+    
+    public static void loadRepositoryFromTrigFile(Repository repo, String rdfFileName) throws RepositoryException, IOException, RDFParseException {
+
+
+        RepositoryConnection con = null;
+
+        try {
+            con = repo.getConnection();
+
+            if(rdfFileName.startsWith("http://")){
+                URL rdfUrl = new URL(rdfFileName);
+                con.add(rdfUrl, null, RDFFormat.TRIG);
+            }
+            else {
+                File rdfFile = new File(rdfFileName);
+                con.add(rdfFile, null, RDFFormat.TRIG);
+            }
+            con.commit();
+        }
+        finally {
+            if (con != null) {
+                try {
+                    con.close();  //close connection first
+                }
+                catch (RepositoryException e) {
+                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
+                }
+            }
+        }
+
+
+    }
+
+    
+
 }

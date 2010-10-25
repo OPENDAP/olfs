@@ -28,6 +28,11 @@
 package opendap.semantics.IRISail;
 
 import opendap.xml.Transformer;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.URIImpl;
@@ -44,6 +49,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class is used to populate the repository. A particular URL is only imported once. Bad URLs
@@ -144,7 +151,10 @@ public class RdfImporter {
                     + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
                     + "union "
                     + "SELECT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc}) "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc}, "
+                    + "[ {doc} rdfcache:isReplacedBy {newdoc}],"
+                    + "[{doc} rdfcache:isContainedBy {cont},{tp2} rdfcache:dependsOn {cont}; rdf:type {rdfcache:StartingPoint}]"
+                    + " WHERE cont=NULL AND newdoc=NULL) "
                     + "MINUS "
                     + "SELECT doc "
                     + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext.getLocalId()+" {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
@@ -242,7 +252,7 @@ public class RdfImporter {
                 try {
 
 
-                    log.debug("addNeededRDFDocuments(): Checking import URL: " + documentURL);
+                    log.info("addNeededRDFDocuments(): Checking import URL: " + documentURL);
 
                     if (urlsToBeIgnored.contains(documentURL)) {
                         log.error("addNeededRDFDocuments(): Previous server error, Skipping " + documentURL);
@@ -326,11 +336,27 @@ public class RdfImporter {
                                                 contentType.equalsIgnoreCase("application/xml") ||
                                                 contentType.equalsIgnoreCase("application/rdf+xml"))
                                         ) {
+                                log.debug("before getGrddlTransform "); 
+                                String grddlTransformUrl = getGrddlTransform(documentURL);
+                                log.debug("after getGrddlTransform ");
+                                //log.debug("transform = " + grddlTransformUrl); 
+                                if(!grddlTransformUrl.isEmpty()){
+                                    log.debug("transform = " + grddlTransformUrl); 
+                                Transformer t = new Transformer(grddlTransformUrl);
+                                InputStream inStream = t.transform(documentURL); 
+
+                                log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
+
+                                importUrl(con, documentURL, contentType, inStream);
+
+                                addedDocument = true;
+                                }else{ 
+                                log.info("Add to repository without transforming! "+ documentURL);   
                                 importUrl(con, documentURL, contentType);
                                 log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
 
                                 addedDocument = true;
-
+                                }
                             } else {
                                 log.warn("addNeededRDFDocuments(): SKIPPING Import URL '" + documentURL + "' It does not appear to reference a " +
                                         "document that I know how to process.");
@@ -444,10 +470,35 @@ public class RdfImporter {
             imports.add(importURL);
         }
         else {
-            log.error("Import URL '"+importURL+"' already has been imported! SKIPPING!");
+            log.error("Import URL '"+importURL+"' has already been imported! SKIPPING!");
         }
     }
-
+    /**
+     * This method returns URL of GRDDL transform stylesheet. It parses the xml file
+     * and returns the full URL of the attribute transformation.   
+     * @param importUrl
+     * @return
+     * @throws IOException
+     * @throws JDOMException 
+     */
+    private String getGrddlTransform(String importUrl) throws IOException, JDOMException {
+       
+        SAXBuilder builder = new SAXBuilder();
+        String grddlTransformUrl ="";
+        try{
+           
+        Document doc = builder.build(importUrl);
+        
+        Element xmlRoot = doc.getRootElement();
+        
+        org.jdom.Namespace ns = xmlRoot.getNamespace("grddl");
+        
+        grddlTransformUrl = xmlRoot.getAttributeValue("transformation",ns);
+        
+       }finally{
+        return grddlTransformUrl;
+    }
+    }
 
 
 

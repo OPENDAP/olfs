@@ -61,6 +61,7 @@ import java.util.Vector;
 import org.openrdf.model.Value;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFParseException;
 
 
 import com.ontotext.trree.owlim_ext.SailImpl;
@@ -162,6 +163,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         double elapsedTime;
 
         String workingDir = System.getProperty("user.dir");
+        if (!workingDir.endsWith("/")){
+            workingDir =  workingDir+"/";
+        }
         LogUtil.initLogging(workingDir);
 
 
@@ -172,7 +176,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
         try {
 
             catalog.resourcePath = workingDir;
-            catalog.catalogCacheDirectory = workingDir;
+            catalog.catalogCacheDirectory = workingDir + "/repositorycache/";
 
             String configFileName;
 
@@ -189,7 +193,13 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
             catalog.overrideBackgroundUpdates = true;
 
             startTime = new Date().getTime();
+
+            
+           // catalog.init(configFileUrl, catalog.catalogCacheDirectory, catalog.resourcePath);
+
             catalog.init(configFileUrl, semanticPreloadFile, catalog.resourcePath,catalog.catalogCacheDirectory);
+
+            
             endTime = new Date().getTime();
 
             elapsedTime = (endTime - startTime) / 1000.0;
@@ -258,6 +268,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         initialized = true;
     }
+    
 
 
     /**
@@ -266,8 +277,9 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * @throws InterruptedException
      * @throws IOException
      * @throws JDOMException
+     * @throws RDFParseException 
      */
-    public void update() throws RepositoryException, InterruptedException, IOException, JDOMException {
+    public void update() throws RepositoryException, InterruptedException, IOException, JDOMException, RDFParseException {
 
         String filename;
         boolean repositoryChanged;
@@ -284,14 +296,25 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
             log.debug("updateRepository(): Getting starting points (RDF imports).");
             Vector<String> startingPoints = getRdfImports(_configFile);
-
+            
+            filename = catalogCacheDirectory + "beforeupdateSemanticRepository.nt";
+            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+            RepositoryOps.dumpRepository(repository, filename);
+            filename = catalogCacheDirectory + "beforeupdateSemanticRepository.trig";
+            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+            RepositoryOps.dumpRepository(repository, filename);
+            
             if(_semanticPreloadFile!=null)
                 startingPoints.add(_semanticPreloadFile);
 
             log.info("updateCatalog(): Updating Repository...");
-            repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, resourcePath);
-
-            filename = catalogCacheDirectory + "owlimHorstRepository.trig";
+            repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, 
+                    resourcePath, catalogCacheDirectory);
+            
+            filename = catalogCacheDirectory + "afterupdateSemanticRepository.nt";
+            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+            RepositoryOps.dumpRepository(repository, filename);
+            filename = catalogCacheDirectory + "afterupdateSemanticRepository.trig";
             log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
             RepositoryOps.dumpRepository(repository, filename);
 
@@ -327,8 +350,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * Extract coverage description from the RDF store and update catalog cache.
      * @throws InterruptedException - if the process is interrupted.
      * @throws RepositoryException - if a problem occurs when setting up the repository.
+     * @throws IOException 
+     * @throws RDFParseException 
      */
-    private void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException {
+    private void loadWcsCatalogFromRepository() throws InterruptedException, RepositoryException, RDFParseException, IOException {
         long startTime, endTime;
         double elapsedTime;
         log.info("#############################################");
@@ -469,8 +494,10 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
      * @return repository - a reference to the repository
      * @throws RepositoryException - if cannot setup the repository.
      * @throws InterruptedException - if the process is interrupted.
+     * @throws IOException 
+     * @throws RDFParseException 
      */
-    private Repository setupRepository() throws RepositoryException, InterruptedException {
+    private Repository setupRepository() throws RepositoryException, InterruptedException, RDFParseException, IOException {
 
 
         log.info("Setting up Semantic Repository.");
@@ -490,12 +517,14 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         // Choose the operational ruleset
         String ruleset;
-        ruleset = "owl-horst";
-        //ruleset = "owl-max";
+        ruleset = "owl-horst-optimized";
+        //ruleset = "owl-max-optimized";
 
         owlimSail.setParameter("ruleset", ruleset);
         //owlimSail.setParameter("ruleset", "owl-max");
-        //owlimSail.setParameter("partialRDFs", "false");
+        
+        //owlimSail.setParameter("partialRDFs", "true");
+        
         log.debug("Semantic Repository 'ruleset' set to: " + ruleset);
 
 
@@ -503,7 +532,7 @@ public class NewStaticRDFCatalog implements WcsCatalog, Runnable {
 
         // Initialize repository
         repository.initialize(); //needed
-
+        
         log.info("Semantic Repository Ready.");
 
 

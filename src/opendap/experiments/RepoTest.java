@@ -38,8 +38,8 @@ public class RepoTest {
     static String startingPointsContext = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#startingPoints";
 
     
-    static String rdfInputFile = "http://scm.opendap.org/svn/trunk/olfs/src/opendap/experiments/test.trig";
-    
+    //static String rdfInputFile = "http://scm.opendap.org/svn/trunk/olfs/src/opendap/experiments/test.trig";
+    static String rdfInputFile = "/data/haibo/workspace/olfstrunk/repositorycache-2f-horst/owlimHorstRepository.trig";  
     static DualPrinter dp;
 
 
