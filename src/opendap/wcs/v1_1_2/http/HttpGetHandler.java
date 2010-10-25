@@ -203,17 +203,21 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     public void update(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        ServletOutputStream sos = response.getOutputStream();
+
+        sos.println("<html><body><hr/><hr/><hr/>");
+        sos.println("Updating catalog...");
+        sos.flush();
 
         Date startTime = new Date();
         CatalogWrapper.update();
         Date endTime = new Date();
 
         double elapsedTime = (endTime.getTime() - startTime.getTime())/1000.0;
-        ServletOutputStream sos = response.getOutputStream();
 
-        sos.println("<html><body><h3>");
-        sos.println("WCS Catalog update completed in "+elapsedTime+" seconds");        
-        sos.println("</h3></body></html>");
+
+        sos.println("<h3>WCS Catalog update completed in "+elapsedTime+" seconds.</h3>");
+        sos.println("</body></html>");
 
     }
 

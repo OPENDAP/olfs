@@ -233,7 +233,7 @@
                 <tr>
                     <th align="left">Identifier</th>
                     <!-- <th align="center">Description</th> -->
-                    <th align="center">Lat/Lon Envelope<br/>[lowerLon,lowerLat] [upperLon,upperLat]</th>
+                    <th align="center">Lat/Lon Envelope<br/>[&#160;lwrLon,&#160;&#160;lwrLat]&#160;[&#160;uprLon,&#160;&#160;uprLat]</th>
                 </tr>
                 <xsl:choose>
                     <xsl:when test="wcs:CoverageSummary">
@@ -338,7 +338,7 @@
             <xsl:value-of select="format-number(number(substring-after(ows:UpperCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
         </xsl:variable>
 
-        [<xsl:value-of select="concat($lowerLon,',',$lowerLat)"/>] [<xsl:value-of select="concat($upperLon,',',$upperLat)"/>]
+        [<xsl:value-of select="concat($lowerLon,', ',$lowerLat)"/>] [<xsl:value-of select="concat($upperLon,', ',$upperLat)"/>]
 
     </xsl:template>
 
