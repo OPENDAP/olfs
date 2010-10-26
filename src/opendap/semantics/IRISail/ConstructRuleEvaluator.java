@@ -114,7 +114,9 @@ public class ConstructRuleEvaluator {
             runNbr++;
             modelChanged = false;
             totalStAddedIn1Pass = 0;
+            if(runNbr == 1){
             log.info("Total construct rule number =  " + this.constructQuery.size());
+            }
             //log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
             //        + " \n" + opendap.coreServlet.Util.getMemoryReport());
             int ruleNumber = 0;
@@ -135,8 +137,8 @@ public class ConstructRuleEvaluator {
                 
                 String processedQueryString = convertSWRLQueryToSeasameQuery(qstring);
                 if(runNbr == 1){
-                log.info("Original construct: " + qstring);
-                log.info("Processed construct: " + processedQueryString);
+                log.debug("Original construct: " + qstring);
+                log.debug("Processed construct: " + processedQueryString);
                 }
                 
                 try {
@@ -146,17 +148,9 @@ public class ConstructRuleEvaluator {
                     GraphQuery graphQuery = con.prepareGraphQuery(
                             QueryLanguage.SERQL, processedQueryString);
 
-                    //log.info("Querying the repository. PASS #" + queryTimes
-                    //        + " (construct rules pass #" + runNbr + ")");
-
                     graphResult = graphQuery.evaluate();
                     GraphQueryResult graphResultCopy = graphResult;
-                    log.info("Completed querying. ");
-
-                     //log.debug("After evaluating construct rules:\n " +
-                     //opendap.coreServlet.Util.getMemoryReport());
-
-                    //log.info("Post processing query result and adding statements ... ");
+                    log.debug("Completed querying. ");
 
                     if (graphResult.hasNext()) {
                         modelChanged = true;
@@ -205,24 +199,22 @@ public class ConstructRuleEvaluator {
                             break;
                         case NONE:
                         default:
-                            log.info("Adding not postprocessed statements ...");
+                            log.debug("Adding not postprocessed statements ...");
 
-                            //con.add(graphResult, context);
-                            int nonePostprocessSt = 0;
-                            con.add(graphResult, context);
                             
+                            con.add(graphResult, context);
+                           /*****
+                            * iterator cannot be reset, count fails
+                            int nonePostprocessSt = 0;
                             while (graphResultCopy.hasNext()) {
                                 graphResultCopy.next();
                                 nonePostprocessSt++;
                                 stAdded++;
                             }
-                            //con.add(graphResult, context);
-                            log.info("Complete adding "
+                           
+                            log.debug("Complete adding "+nonePostprocessSt
                                     + " not postprocessed statements");
-                            // log.debug("After processing default (NONE)
-                            // case:\n " +
-                            // opendap.coreServlet.Util.getMemoryReport());
-
+                            */
                             break;
                         }
 
@@ -246,7 +238,7 @@ public class ConstructRuleEvaluator {
                 } catch (MalformedQueryException e) {
                     log.error("Caught MalformedQueryException! Msg: "
                             + e.getMessage());
-                    log.debug("MalformedQuery: " + processedQueryString);
+                    log.error("MalformedQuery: " + processedQueryString);
                 } finally {
                     if (graphResult != null) {
                         try {
@@ -291,7 +283,7 @@ public class ConstructRuleEvaluator {
         endTime = new Date().getTime();
         double totaltime = (endTime - startTime) / 1000.0;
         log.info("In construct for " + totaltime + " seconds");
-        log.info("Total number of statements added in construct: "
+        log.info("Total number of post processed statements added in construct: "
                 + totalStAdded + " \n");
 
     }
@@ -370,7 +362,7 @@ public class ConstructRuleEvaluator {
             }
         }
 
-        log.info("Number of constructs identified:  " + constructQuery.size());
+        log.debug("Number of constructs identified:  " + constructQuery.size());
 
     }
 
@@ -399,12 +391,12 @@ public class ConstructRuleEvaluator {
         Pattern rproces4psub2 = Pattern.compile(pproces4sub2);
 
         String processedQueryString = queryString;
-        //log.info("Original construct: " + queryString);
+        
         Matcher mreifStr = rproces4psub2.matcher(processedQueryString);
 
         Boolean hasReified = false;
 
-        if (mreifStr.find()) {
+        if (mreifStr.find()) {  //reified statements
             String reifstr = " {} rdf:type {rdf:Statement} ; "
                     + " rdf:subject {" + mreifStr.group(1) + "} ;"
                     + " rdf:predicate {" + mreifStr.group(2) + "} ;"
@@ -413,7 +405,7 @@ public class ConstructRuleEvaluator {
             processedQueryString = mreifStr.replaceFirst(reifstr);
 
             hasReified = true;
-            // log.info("query string has reified statements = " + hasReified);
+           
         }
 
         Matcher stringMatcher = stringPattern.matcher(processedQueryString); // xs:string
@@ -437,7 +429,7 @@ public class ConstructRuleEvaluator {
             postProcessFlag = ProcessingTypes.xsString;
             String vname = stringMatcher.group(1);
             processedQueryString = stringMatcher.replaceAll(vname);
-            log.info("Will postprocess xs:string(" + vname + ")");
+            log.debug("Will postprocess xs:string(" + vname + ")");
 
         } else if (dropquotesMatcher.find()) {
             postProcessFlag = ProcessingTypes.DropQuotes;
@@ -446,19 +438,17 @@ public class ConstructRuleEvaluator {
             Matcher m23 = minusPattern.matcher(processedQueryString);
             String vname2 = m23.group(1);
             processedQueryString = m23.replaceFirst(vname2);
-            log.info("Will postprocess iridl:dropquotes(" + vname + ")");
+            log.debug("Will postprocess iridl:dropquotes(" + vname + ")");
 
         } else if (rdfcacheMatcher.find()) {
             postProcessFlag = ProcessingTypes.RetypeTo;
-            log.info("Will postprocess rdfcache:"+Terms.reTypeToContext.getLocalId());
+            log.debug("Will postprocess rdfcache:"+Terms.reTypeToContext.getLocalId());
 
         } else if (xsd2owlMatcher.find()) {
             postProcessFlag = ProcessingTypes.Increment;
             String vname = xsd2owlMatcher.group(1);
 
             processedQueryString = xsd2owlMatcher.replaceAll(vname);
-
-            // log.info("processedQueryString = " + processedQueryString);
 
         }
         else if (functionMatcher.find()) {
@@ -499,12 +489,12 @@ public class ConstructRuleEvaluator {
                         }else{
                             expand += element;
                         }
-                        log.info("element " + i + " = " + element);
+                        log.debug("element " + i + " = " + element);
                     } else {
                         expand += element + "} ; rdf:rest {rdf:nil";
-                        log.info("element " + i + " = " + element);
+                        log.debug("element " + i + " = " + element);
                     }
-                    log.info("Will postprocess fn:" + functionMatcher.group(3));
+                    log.debug("Will postprocess fn:" + functionMatcher.group(3));
                 }
 
 
@@ -518,7 +508,6 @@ public class ConstructRuleEvaluator {
 
         }
 
-        //log.info("Processed construct: " + processedQueryString);
         return processedQueryString;
 
     }

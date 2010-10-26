@@ -244,7 +244,7 @@ public class RdfImporter {
             con = repository.getConnection();
             
 
-            log.debug("addNeededRDFDocuments(): rdfDocs.size=" + rdfDocs.size());
+            log.info("addNeededRDFDocuments(): rdfDocs.size=" + rdfDocs.size());
             skipCount = 0;
             while (!rdfDocs.isEmpty()) {
                 documentURL = rdfDocs.remove(0);
@@ -252,7 +252,7 @@ public class RdfImporter {
                 try {
 
 
-                    log.info("addNeededRDFDocuments(): Checking import URL: " + documentURL);
+                    log.debug("addNeededRDFDocuments(): Checking import URL: " + documentURL);
 
                     if (urlsToBeIgnored.contains(documentURL)) {
                         log.error("addNeededRDFDocuments(): Previous server error, Skipping " + documentURL);
@@ -289,7 +289,7 @@ public class RdfImporter {
 
                             if (transformToRdfUrl != null){
 
-                                log.info("addNeededRDFDocuments(): Transforming " + documentURL +" with "+ transformToRdfUrl);
+                                log.debug("addNeededRDFDocuments(): Transforming " + documentURL +" with "+ transformToRdfUrl);
 
                                 if(Terms.localResources.containsKey(transformToRdfUrl)){
                                     transformToRdfUrl = getLocalResourceDirUrl() + Terms.localResources.get(transformToRdfUrl);
@@ -300,7 +300,7 @@ public class RdfImporter {
                                 Transformer t = new Transformer(transformToRdfUrl);
                                 InputStream inStream = t.transform(documentURL);
 
-                                log.info("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
+                                log.debug("addNeededRDFDocuments(): Finished transforming RDFa " + documentURL);
 
                                 importUrl(con, documentURL, contentType, inStream);
 
@@ -311,12 +311,12 @@ public class RdfImporter {
                                 
                                 transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
 
-                                log.info("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformToRdfUrl);
+                                log.debug("addNeededRDFDocuments(): Transforming Schema Document'" + documentURL +"' with '"+ transformToRdfUrl);
 
                                 Transformer t = new Transformer(transformToRdfUrl);
                                 InputStream inStream = t.transform(documentURL);
 
-                                log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
+                                log.debug("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
 
                                 importUrl(con, documentURL, contentType, inStream);
 
@@ -345,15 +345,15 @@ public class RdfImporter {
                                 Transformer t = new Transformer(grddlTransformUrl);
                                 InputStream inStream = t.transform(documentURL); 
 
-                                log.info("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
+                                log.debug("addNeededRDFDocuments(): Finished transforming Xml Schema Document: '" + documentURL+"'");
 
                                 importUrl(con, documentURL, contentType, inStream);
 
                                 addedDocument = true;
                                 }else{ 
-                                log.info("Add to repository without transforming! "+ documentURL);   
+                                log.debug("Add to repository without transforming! "+ documentURL);   
                                 importUrl(con, documentURL, contentType);
-                                log.info("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
+                                log.debug("addNeededRDFDocuments(): Imported non owl/xsd from " + documentURL);
 
                                 addedDocument = true;
                                 }
@@ -365,7 +365,7 @@ public class RdfImporter {
 
                             }
 
-                            log.info("addNeededRDFDocuments(): Total non owl/xsd files skipped: " + skipCount);
+                            log.debug("addNeededRDFDocuments(): Total non owl/xsd files skipped: " + skipCount);
                         }
                     } // while (!rdfDocs.isEmpty()
 
@@ -425,7 +425,7 @@ public class RdfImporter {
 
         if (!this.imports.contains(importURL)) { // not in the repository yet
 
-            log.info("Importing URL " + importURL);
+            log.debug("Importing URL " + importURL);
 
             ValueFactory valueFactory = con.getValueFactory();
             URI importUri = new URIImpl(importURL);
@@ -435,7 +435,7 @@ public class RdfImporter {
             RepositoryOps.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
             RepositoryOps.setContentTypeContext(importURL, contentType, con, valueFactory); //
 
-            log.info("Finished importing URL " + importURL);
+            log.debug("Finished importing URL " + importURL);
             imports.add(importURL);
         }
         else {
@@ -455,7 +455,7 @@ public class RdfImporter {
 
         if (!this.imports.contains(importURL)) { // not in the repository yet
 
-            log.info("Importing URL " + importURL);
+            log.debug("Importing URL " + importURL);
 
             ValueFactory valueFactory = con.getValueFactory();
             URI importUri = new URIImpl(importURL);
@@ -466,7 +466,7 @@ public class RdfImporter {
             RepositoryOps.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
             RepositoryOps.setContentTypeContext(importURL, contentType, con, valueFactory); //
 
-            log.info("Finished importing URL " + importURL);
+            log.debug("Finished importing URL " + importURL);
             imports.add(importURL);
         }
         else {

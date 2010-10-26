@@ -73,7 +73,7 @@ public class RepositoryOps {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
     public static boolean flushRepositoryOnDrop = false;
-    public static boolean dropWithMemoryStore = false;
+    public static boolean dropWithMemoryStore = true;
  
      
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) {
@@ -1208,14 +1208,14 @@ public class RepositoryOps {
                     RepositoryConnection conMem = memRepository.getConnection();
                     RepositoryConnection conOwlim = repository.getConnection();
                     
-                    log.debug("Loading Owlim Repository to MemoryStore");
+                    log.info("Loading Owlim Repository to MemoryStore");
                     conMem.add(conOwlim.getStatements(null, null, null, false));
                               
                     //String filename = catalogCacheDirectory + "PriorToDropStartingPointsMemRepository.trig";
                     //log.debug("Dumping MemoryRepository to: " + filename);
                     //dumpRepository(memRepository, filename);
 
-                    log.debug("Dropping StartingPoint and contexts from MemoryStore ...");
+                    log.info("Dropping StartingPoint and contexts from MemoryStore ...");
                     
                     dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
                     //log.debug(showContexts(memRepository));
@@ -1236,7 +1236,7 @@ public class RepositoryOps {
                     //log.debug("Dumping OwlimRepository to: " + filename);
                     //dumpRepository(repository, filename);
                     
-                    log.debug("Reloading MemoryStore back to Owlim Repository");
+                    log.info("Reloading MemoryStore back to Owlim Repository");
                     conOwlim.add(conMem.getStatements(null, null, null, true));
                     
                     //log.debug("Reloading " + filename +" back to Owlim Repository");
@@ -1259,9 +1259,9 @@ public class RepositoryOps {
 
             if (!newStartingPoints.isEmpty()) {
 
-                log.debug("Adding new starting points ...");
+                log.info("Adding new starting points ...");
                 addStartingPoints(repository, newStartingPoints);
-                log.debug("Finished adding new starting points.");
+                log.info("Finished adding new starting points.");
 
                 log.debug(showContexts(repository));
                 modelChanged = true;
@@ -1270,7 +1270,7 @@ public class RepositoryOps {
 
             ProcessingState.checkState();
 
-            log.debug("Checking for referenced documents that are not already in the repository.");
+            log.info("Checking for referenced documents that are not already in the repository.");
             boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
             if(foundNewDocuments){
                 modelChanged = true;
@@ -1281,16 +1281,16 @@ public class RepositoryOps {
 
             if (modelChanged) {
 
-                log.debug("Updating repository ...");
+                log.info("Updating repository ...");
                 ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
 
                 while (modelChanged) {
-                    log.debug("Repository changes detected.");
+                    log.info("Repository changes detected.");
                     log.debug(showContexts(repository));
 
                     log.debug("Running construct rules ...");
                     constructRuleEvaluator.runConstruct(repository);
-                    log.debug("Finished running construct rules.");
+                    log.info("Finished running construct rules.");
 
                     ProcessingState.checkState();
 
@@ -1304,7 +1304,7 @@ public class RepositoryOps {
                 repositoryHasBeenChanged = true;
 
             } else {
-                log.debug("Repository update complete. No changes detected, rules not rerun..");
+                log.info("Repository update complete. No changes detected, rules not rerun..");
                 log.debug(showContexts(repository));
 
             }
@@ -1317,8 +1317,8 @@ public class RepositoryOps {
         }
 
 
-        long elapsedTime = new Date().getTime() - startTime.getTime();
-        log.info("Imports Evaluated. Elapsed time: " + elapsedTime + "ms");
+        double elapsedTime = (new Date().getTime() - startTime.getTime())/1000.0;
+        log.info("Imports Evaluated. Elapsed time: " + elapsedTime + " seconds");
 
         log.info("updateSemanticRepository() End.");
         log.info("-----------------------------------------------------------------------");
@@ -1374,7 +1374,7 @@ public class RepositoryOps {
                         + e.getMessage());
             }
         }
-        log.debug("Finished dropping changed RDFDocuments and external inferencing contexts.");
+        log.info("Finished dropping changed RDFDocuments and external inferencing contexts.");
 
     }
     /**
@@ -1461,7 +1461,7 @@ public class RepositoryOps {
                     }
                 }
             } else {
-                log.debug("No construct rule found!");
+                log.info("No construct rule found!");
             }
         } catch (QueryEvaluationException e) {
             log.error("Caught an QueryEvaluationException! Msg: "
@@ -1485,8 +1485,7 @@ public class RepositoryOps {
             try {
                 con.close();
             } catch (RepositoryException e) {
-                log
-                        .error("Caught RepositoryException! in dropExternalInferencing() Msg: "
+                log.error("Caught RepositoryException! in dropExternalInferencing() Msg: "
                                 + e.getMessage());
             }
 
@@ -1512,7 +1511,7 @@ public class RepositoryOps {
         Vector<String> unneededRdfDocs = new Vector<String>();
 
 
-        log.debug("Locating unneeded RDF files left over from last update ...");
+        log.info("Locating unneeded RDF files left over from last update ...");
 
         try {
 
@@ -1591,7 +1590,7 @@ public class RepositoryOps {
         //List<String> bindingNames;
         Vector<String> changedRdfDocuments = new Vector<String>();
 
-        log.debug("Locating changeded files ...");
+        log.info("Locating changeded files ...");
 
         try {
             String queryString = "SELECT doc,lastmod "
@@ -1628,7 +1627,7 @@ public class RepositoryOps {
                     }
                 }
             } else {
-                log.debug("No query result!");
+                log.info("No query result!");
             }
         } catch (QueryEvaluationException e) {
             log.error("Caught an QueryEvaluationException! Msg: "
@@ -1775,7 +1774,7 @@ public class RepositoryOps {
                     con.close();  //close connection first
                 }
                 catch (RepositoryException e) {
-                    System.err.println("Failed to close repository connection. Msg: " + e.getMessage());
+                    log.error("Failed to close repository connection. Msg: " + e.getMessage());
                 }
             }
         }
