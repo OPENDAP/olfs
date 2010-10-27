@@ -104,10 +104,10 @@ public class URLGroup {
 		
 		// Initialize the Vector of Equivalences for this group
 		int i = 0;
-		Lexemes ce = pc.getLexemes();
-		while (ce.hasMoreElements()) {
-			Lexeme c = ce.nextElement();
-			equivalences.add(new Equivalence(i++, c));
+		Lexemes lexemes = pc.getLexemes();
+		while (lexemes.hasMoreElements()) {
+			Lexeme lexeme = lexemes.nextElement();
+			equivalences.add(new Equivalence(i++, lexeme));
 		}
 
 		add(url);
