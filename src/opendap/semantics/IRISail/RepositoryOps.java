@@ -73,7 +73,7 @@ public class RepositoryOps {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
     public static boolean flushRepositoryOnDrop = false;
-    public static boolean dropWithMemoryStore = true;
+    public static boolean dropWithMemoryStore   = false;
  
      
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) {
@@ -87,8 +87,8 @@ public class RepositoryOps {
             
             log.debug("In dropStartingPointsAndContexts AutoCommit = " + con.isAutoCommit());
             valueFactory = repo.getValueFactory();
-            RepositoryOps.dropStartingPoints(con, valueFactory, startingPointUrls);
-            RepositoryOps.dropContexts(con, valueFactory, dropList);
+            dropStartingPoints(con, valueFactory, startingPointUrls);
+            dropContexts(con, valueFactory, dropList);
             con.commit();
             long AfterDrop = new Date().getTime();
             double elapsedTime = (AfterDrop - beforeDrop) / 1000.0;
@@ -169,7 +169,6 @@ public class RepositoryOps {
                 log.info("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                         + "> " + "<" + startingPointType + "> " + "<" + startingPointsContext + "> )");
             }
-            con.commit();
 
 
         } catch (RepositoryException e) {
@@ -979,7 +978,7 @@ public class RepositoryOps {
     /**
      * Returns a Hash containing last modified times of each context (URI) in the
      * repository, keyed by the context name.
-     * @param con A connection to the repoistory from which to harvest the contexts and their associated last
+     * @param con A connection to the repository from which to harvest the contexts and their associated last
      * modified times.
      * @return a HashMap of last modified times and context pair.
      */

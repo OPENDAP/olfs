@@ -64,7 +64,7 @@ public class SoapHandler extends XmlRequestHandler {
     public void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String serviceUrl = Util.getServiceUrlString(request,_prefix);
-        String dataAccessBase = ReqInfo.getServiceUrl(request);
+        String dataAccessBase = Util.getServiceUrl(request);
 
         // Parse the XML doc into a Document object.
         SAXBuilder sb = new SAXBuilder();
@@ -91,7 +91,7 @@ public class SoapHandler extends XmlRequestHandler {
             for (Object soapContent : soapContents) {
                 clientReq = (Element) soapContent;
 
-                wcsResponse = getWcsResponse(serviceUrl, dataAccessBase, this, clientReq);
+                wcsResponse = getWcsResponse(serviceUrl, this, clientReq);
                 wre = wcsResponse.getRootElement();
                 wre.detach();
                 responseBody.addContent(wre);

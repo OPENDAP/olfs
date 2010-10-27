@@ -37,5 +37,5 @@ import org.jdom.Element;
 public interface WcsResponder {
         Document getCapabilities(Element getCapabilitiesRequest, String serviceUrl) throws WcsException;
         Document describeCoverage(Element describeCoverageRequest) throws WcsException;
-        Document getCoverage(Element getCoverageRequest, String urlBase) throws WcsException;
+        Document getCoverage(Element getCoverageRequest) throws WcsException;
 }

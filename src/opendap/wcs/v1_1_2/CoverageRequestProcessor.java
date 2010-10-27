@@ -51,7 +51,7 @@ public class CoverageRequestProcessor {
      * @throws WcsException When a wcs:Coverages response document cannot be
      * constructed for the passed request.
      */
-    public static Document processCoverageRequest(GetCoverageRequest req, String urlBase) throws WcsException {
+    public static Document processCoverageRequest(GetCoverageRequest req) throws WcsException {
 
 
         String id = req.getCoverageID();

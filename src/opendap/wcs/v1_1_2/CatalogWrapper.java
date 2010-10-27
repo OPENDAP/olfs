@@ -58,6 +58,9 @@ public class CatalogWrapper {
     private static File opsMetadataFile;
     private static AtomicReference<Element> operationsMetadata    = new AtomicReference<Element>();
 
+    
+    private static String _defaultServiceUrl= "http://your.domain.name:8080/opendap/WCS";
+
 
     private static WcsCatalog _catalogImpl;
 
@@ -231,7 +234,6 @@ public class CatalogWrapper {
 
 
 
-    private static String _defaultServiceUrl= "http://your.domain.name:8080/opendap/WCS";
 
 
 
@@ -269,7 +271,7 @@ public class CatalogWrapper {
             post =  (Element)i.next();
             href = post.getAttributeValue("href",WCS.XLINK_NS);
             if(href.startsWith(_defaultServiceUrl)){
-                href = href.replaceFirst(_defaultServiceUrl,serviceUrl);
+                href = href.replaceFirst(_defaultServiceUrl+"/",serviceUrl);
             }
             post.setAttribute("href",href,WCS.XLINK_NS);
         }

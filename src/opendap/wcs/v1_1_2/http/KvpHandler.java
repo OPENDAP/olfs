@@ -66,7 +66,7 @@ public class KvpHandler {
                     break;
 
                 case WCS.GET_COVERAGE:
-                    wcsResponse = getCoverage(keyValuePairs, dataAccessBase);
+                    wcsResponse = getCoverage(keyValuePairs);
                     break;
 
                 default:
@@ -127,11 +127,11 @@ public class KvpHandler {
      * @param keyValuePairs    Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document getCoverage(HashMap<String,String> keyValuePairs, String urlBase) throws WcsException {
+    public static Document getCoverage(HashMap<String,String> keyValuePairs) throws WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
 
-            return CoverageRequestProcessor.processCoverageRequest(req,urlBase);
+            return CoverageRequestProcessor.processCoverageRequest(req);
     }
 
 

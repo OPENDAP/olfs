@@ -43,16 +43,13 @@ public interface WcsCatalog {
 
     /**
      * Initializes the catalog. The config element passed should be a WcsCatalog
-     * Element (associated with no namespace) and will (typically) be retrived
+     * Element (associated with no namespace) and will (typically) be retrieved
      * from a configuration file at runtime. The contents of the WcsCatalog
-     * element may be any valid XML. This cerates a mechanism that allows
+     * element may be any valid XML. This creates a mechanism that allows
      * implementations of this interface to ingest configuration information
      * specific to the implementation.
-     *
-     * In Hyrax this element is included in the Handler defintion for the
-     * openda.wcs.v1_1_2.DispatchHandler.
-     *
-     * This method is intended to be calle donly once, and should protect it's
+     *     *
+     * This method is intended to be called only once, and should protect it's
      * self from multiple calls.
      *
      *

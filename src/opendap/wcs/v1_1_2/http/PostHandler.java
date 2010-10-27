@@ -67,7 +67,7 @@ public class PostHandler extends XmlRequestHandler {
     public void handleWcsRequest(HttpServletRequest request,
                                        HttpServletResponse response) throws IOException {
 
-        String dataAccessBase = ReqInfo.getServiceUrl(request);
+        String dataAccessBase = Util.getServiceUrl(request);
         String serviceUrl = Util.getServiceUrlString(request,_prefix);
         BufferedReader  sis = request.getReader();
         ServletOutputStream os = response.getOutputStream();
@@ -97,7 +97,7 @@ public class PostHandler extends XmlRequestHandler {
 
             response.setContentType("text/xml");
 
-            Document wcsResponse = getWcsResponse(serviceUrl,dataAccessBase,this,baos);
+            Document wcsResponse = getWcsResponse(serviceUrl,this,baos);
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 

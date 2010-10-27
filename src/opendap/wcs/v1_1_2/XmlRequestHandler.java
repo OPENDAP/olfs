@@ -169,15 +169,15 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
 
 
-    public Document getCoverage( Element reqElem, String urlBase) throws WcsException {
+    public Document getCoverage( Element reqElem) throws WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(reqElem);
 
-        return CoverageRequestProcessor.processCoverageRequest(req,urlBase);
+        return CoverageRequestProcessor.processCoverageRequest(req);
     }
 
 
-    public Document getWcsResponse(String serviceUrl, String dataAccessBase, WcsResponder wcsResponder, Element wcsRequest) {
+    public Document getWcsResponse(String serviceUrl, WcsResponder wcsResponder, Element wcsRequest) {
 
 
         try {
@@ -195,7 +195,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
                 case WCS.GET_COVERAGE:
                     //@todo The URL passed here is used to construct data access URLs for the WCS response.
                     // The serviceURL + localID will produce the access URL.
-                    wcsResponse = wcsResponder.getCoverage(wcsRequest, dataAccessBase);
+                    wcsResponse = wcsResponder.getCoverage(wcsRequest);
                     break;
 
                 default:
@@ -217,7 +217,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
     }
 
-    public Document getWcsResponse(String serviceUrl, String dataAccessBase, WcsResponder responder, InputStream reqDoc)  {
+    public Document getWcsResponse(String serviceUrl, WcsResponder responder, InputStream reqDoc)  {
 
         try {
 
@@ -231,7 +231,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
                 throw new WcsException(e.getMessage(), WcsException.INVALID_PARAMETER_VALUE,"WCS Request Document");
             }
 
-            return getWcsResponse(serviceUrl, dataAccessBase, responder,requestDoc.getRootElement());
+            return getWcsResponse(serviceUrl, responder,requestDoc.getRootElement());
 
 
         }

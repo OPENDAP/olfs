@@ -140,13 +140,13 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                                        boolean sendResponse)
             throws Exception {
 
-        String dataAccessBase = ReqInfo.getServiceUrl(request);
+        String dataAccessBase = Util.getServiceUrl(request);
         String relativeURL = ReqInfo.getRelativeUrl(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
-        String serviceURL = getServiceUrlString(request);
+        String serviceURL = Util.getServiceUrl(request);
         String query      = request.getQueryString();
 
         boolean isWcsEndPoint = false;
@@ -231,7 +231,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String xsltDoc = _resourcePath+ "xsl/coverageDescription.xsl";
         log.debug("sendDescribeCoveragePage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = getServiceUrlString(request);
+        String serviceUrl = Util.getServiceUrl(request);
         log.debug("sendDescribeCoveragePage()  serviceUrl: "+serviceUrl);
 
         String id = request.getQueryString();
@@ -265,7 +265,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String xsltDoc =  _resourcePath + "xsl/capabilities.xsl";
         log.debug("sendCapabilitesPresentationPage()  xsltDoc: "+xsltDoc);
 
-        String serviceUrl = getServiceUrlString(request);
+        String serviceUrl = Util.getServiceUrl(request);
         log.debug("sendCapabilitesPresentationPage()  serviceUrl: "+serviceUrl);
 
         Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl);
@@ -372,7 +372,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                                   HttpServletResponse response) throws IOException {
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
-        String serviceUrl = getServiceUrlString(request);
+        String serviceUrl = Util.getServiceUrl(request);
 
         String url = Scrub.completeURL(request.getRequestURL().toString());
         String query = Scrub.completeURL(request.getQueryString());
@@ -509,23 +509,13 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         page += "    <h3>The WCS response: </h3>";
         page += "    <pre>";
 
-        Document wcsResponse = KvpHandler.getCoverage(keyValuePairs,ReqInfo.getServiceUrl(req));
+        Document wcsResponse = KvpHandler.getCoverage(keyValuePairs);
 
         page += xmlo.outputString(wcsResponse).replaceAll("<","&lt;").replaceAll(">","&gt;");
         page += "    </pre>";
 
 
         return page;
-    }
-
-
-
-
-
-
-    public static String getServiceUrlString(HttpServletRequest request){
-        return ReqInfo.getServiceUrl(request);
-
     }
 
 

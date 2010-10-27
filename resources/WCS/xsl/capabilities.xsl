@@ -148,7 +148,7 @@
                 <br/>
                 A WCS response will be returned.
 
-                <form action="{$ServicePrefix}/form" method="post">
+                <form action="{$ServicePrefix}form" method="post">
                     <p>
                         <textarea name="WCS_QUERY" rows="20" cols="80">Insert your WCS query here...</textarea>
                     </p>

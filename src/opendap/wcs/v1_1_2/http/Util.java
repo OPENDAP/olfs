@@ -18,7 +18,7 @@ public class Util {
 
 
     public static String getServiceUrlString(HttpServletRequest request, String prefix){
-        String serviceURL = ReqInfo.getServiceUrl(request);
+        String serviceURL = getServiceUrl(request);
 
         if (!prefix.equals("")) {
             if (!serviceURL.endsWith("/")) {
@@ -38,4 +38,10 @@ public class Util {
         return serviceURL;
 
     }
+
+    public static String getServiceUrl(HttpServletRequest request){
+        return ReqInfo.getServiceUrl(request);
+    }
+
+
 }
