@@ -45,7 +45,7 @@ public class Equivalence {
 	private List<DatePart> dateClassification;
 	
 	private Map<String, Integer> valueOccurrences; // Occurrences of a given string
-	private Map<String, ParsedURL> valueURLs; // Mapping between values for thi equivalence and specific URLs
+	private Map<String, ParsedURL> valueURLs; // Mapping between values for this equivalence and specific URLs
 	
 	/**
 	 * Make a new Equivalence. This does not add a URL to the Equivalence, it

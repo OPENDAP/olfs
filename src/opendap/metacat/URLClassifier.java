@@ -209,14 +209,14 @@ public class URLClassifier {
 					SortedValues sc = date.getSortedValues();
 					if (print_all_urls) {
 						for (DateString comp : sc) {
-							ps.println("\t" + date.getParsedURL(comp.getDate()).getTheURL());
+							ps.println("\t" + date.getParsedURL(comp.getDateString()).getTheURL());
 						}
 					} 
 					else { // Just print the first and last URL
 						DateString first = sc.get(0);
 						DateString last = sc.get(sc.size() - 1);
-						ps.println("\t" + date.getParsedURL(first.getDate()).getTheURL());
-						ps.println("\t" + date.getParsedURL(last.getDate()).getTheURL());
+						ps.println("\t" + date.getParsedURL(first.getDateString()).getTheURL());
+						ps.println("\t" + date.getParsedURL(last.getDateString()).getTheURL());
 					}
 				}				
 				else {

@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
@@ -82,12 +83,14 @@ public class DDXCrawler {
 		// create the Options
 		Options options = new Options();
 		
-		options.addOption("t", "use-thredds-cache", false, "Use cached thredds catalogs");
+		options.addOption("t", "read-from-thredds-cache", false, "Use only cached thredds catalogs");
 		options.addOption("f", "fetch-ddx", false, "Fetch ddx responses");
-		options.addOption("d", "cache-ddx", false, "Cache ddx responses");
+		options.addOption("T", "dont-cache-thredds", false, "Do not Cache THREDDS responses");
+		options.addOption("d", "dont-cache-ddx", false, "Do not Cache ddx responses");
 		options.addOption("p", "print-ddx", false, "Print the DDX responses");
 		options.addOption("v", "verbose", false, "Verbose output");
 		options.addOption("R", "restore", false, "Restore the crawl from a saved state file");
+		options.addOption("h", "help", false, "Print online help");
 		
 		options.addOption("n", "cache-name", true, "Use this to set a prefix for the cache name");
 		options.addOption("r", "catalog-root", true, "Use this as the root catalog");
@@ -96,24 +99,43 @@ public class DDXCrawler {
 		    // parse the command line arguments
 		    CommandLine line = parser.parse( options, args );
 
+			if (line.hasOption("help")) {
+				HelpFormatter formatter = new HelpFormatter();
+				formatter.printHelp("ddx_crawler [options] --catalog-root <catalog.xml url>", options);
+				return;
+			}
+		    
+			if (!line.hasOption("catalog-root"))
+				throw new Exception("Must provide catalog-root (-r).");
+			
 		    String catalogURL = line.getOptionValue("catalog-root");
 		    System.out.println("Catalog Root: " + catalogURL);
 		    
-		    crawler.cacheNamePrefix = line.getOptionValue("cache-name");
+		    if (line.hasOption("cache-name")) {
+		    	crawler.cacheNamePrefix = line.getOptionValue("cache-name");
+		    }
+		    else {
+		    	int start = catalogURL.indexOf("//") + 2;
+		    	crawler.cacheNamePrefix = catalogURL.substring(start, catalogURL.indexOf('/', start));
+		    }
+		    
 		    System.out.println("Cache name: " + crawler.cacheNamePrefix);
 		    
 		    crawler.verbose = line.hasOption("verbose");
 		    crawler.printDDX = line.hasOption("print-ddx");
 		    crawler.fetchDDX = line.hasOption("fetch-ddx");
 		    
-		    boolean useDDXCache = line.hasOption("cache-ddx");
-		    boolean readFromThreddsCache = line.hasOption("use-thredds-cache");
+		    // By default this code caches the THREDDS and DDX URLs and 
+		    // documents (if the latter are being accessed).
+		    boolean useThreddsCache = !line.hasOption("dont-cache-thredds");;
+		    boolean useDDXCache = !line.hasOption("dont-cache-ddx");
+		    boolean readFromThreddsCache = line.hasOption("read-from-thredds-cache");
 		    boolean restoreState = line.hasOption("restore");
 		    
 			// In this program, the ThreddsCatalogUtils _always_ writes to the cache
 			// when it reads a new document. The readFromThreddsCache determines
 			// if a cached catalog is preferred over a network read.
-		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(true, crawler.cacheNamePrefix, readFromThreddsCache);
+		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(useThreddsCache, crawler.cacheNamePrefix, readFromThreddsCache);
 		    crawler.ddxRetriever = new DDXRetriever(useDDXCache, crawler.cacheNamePrefix);
 
 			crawler.crawlCatalog(catalogURL, System.out, restoreState);
@@ -136,78 +158,22 @@ public class DDXCrawler {
 
 		ThreddsCrawlerEnumeration catalogs = null;
 		
+		// If restoreState is false, start a new crawl from the catalogURL
+		// but if it's true, initialize the TCU using the saved state (see
+		// 'else' below).
 		try {
-			if (!restoreState)
-				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration(catalogURL);
-			else 
-				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration();
-			
-			Vector<String> DDXURLs = null;
-
 			if (!restoreState) {
-				log.debug("About to get DDX URLS from: [" + catalogURL + "]");
-				++catalogsVisited;
-				if (verbose)
-					ps.println("Root catalog: " + catalogURL);
-
-				// First get references to any DDX objects at the top level
-				DDXURLs = threddsCatalogUtil.getDDXUrls(catalogURL);
-				for (String DDXURL : DDXURLs) {
-					++DDXsVisited;
-					if (fetchDDX) {
-						String ddx = ddxRetriever.getDDXDoc(DDXURL);
-						if (ddx == null)
-							log.error("No DDX returned from: " + DDXURL);
-						else if (verbose) {
-							ps.println("Top URL: " + DDXURL);
-							if (printDDX)
-								ps.println("DDX: " + ddx);
-						}
-					}
-					else {
-						// Just save the URL without the expensive DDX retrieval
-						// Set the LMT to zero so 
-						ddxRetriever.getCache().setLastVisited(DDXURL, 0);
-						if (verbose)
-							ps.println("Top URL: " + DDXURL);
-					}
-				}
+				crawlOneCatalogUrl(ps, catalogURL);
+				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration(catalogURL);
+			}
+			else {
+				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration();
 			}
 
 			while (catalogs.hasMoreElements()) {
 				String childURL = catalogs.nextElement();
-				log.debug("About to get DDX URLS from: " + childURL);
-				++catalogsVisited;
-				if (verbose)
-					ps.println("catalog: " + childURL);
-
-				DDXURLs = threddsCatalogUtil.getDDXUrls(childURL);
-				for (String DDXURL : DDXURLs) {
-					++DDXsVisited;
-					if (fetchDDX) {
-						String ddx = ddxRetriever.getDDXDoc(DDXURL);
-						if (ddx == null)
-							log.error("No DDX returned from: " + DDXURL);
-						else if (verbose) {
-							ps.println("URL: " + DDXURL);
-							if (printDDX)
-								ps.println("DDX: " + ddx);
-							/*
-							 * if(DDXURL.equals(
-							 * "http://test.opendap.org:8080/opendap/hyrax/data/oaflux/daily/lhsh_oaflux_1981.nc.ddx"
-							 * ) && !restoreState) throw new
-							 * Exception("simulated error!");
-							 */
-						}
-					}
-					else {
-						// Just save the URL without the expensive DDX retrieval
-						// Set the LMT to zero so
-						ddxRetriever.getCache().setLastVisited(DDXURL, 0);
-						if (verbose)
-							ps.println("Top URL: " + DDXURL);
-					}
-				}
+				
+				crawlOneCatalogUrl(ps, childURL);
 			}
 		}
 		catch (Exception e) {
@@ -218,6 +184,46 @@ public class DDXCrawler {
 		finally {
 			threddsCatalogUtil.saveCatalogCache();
 			ddxRetriever.saveDDXCache();
+		}
+	}
+
+	private void crawlOneCatalogUrl(PrintStream ps, String catalogURL) throws Exception {
+		log.debug("About to get DDX URLS from: " + catalogURL);
+		++catalogsVisited;
+		if (verbose)
+			ps.println("catalog: " + catalogURL);
+
+		Vector<String> DDXURLs = threddsCatalogUtil.getDDXUrls(catalogURL);
+		for (String DDXURL : DDXURLs) {
+			++DDXsVisited;
+			if (fetchDDX) {
+				String ddx = ddxRetriever.getDDXDoc(DDXURL);
+				if (ddx == null)
+					log.error("No DDX returned from: " + DDXURL);
+				else if (verbose) {
+					ps.println("URL: " + DDXURL);
+					if (printDDX)
+						ps.println("DDX: " + ddx);
+					/*
+					 * This was used to simulate an error in mid-crawl so the 
+					 * restore option could be tested.
+					 * 
+					 * if(DDXURL.equals(
+					 * "http://test.opendap.org:8080/opendap/hyrax/data/oaflux/daily/lhsh_oaflux_1981.nc.ddx"
+					 * ) && !restoreState) throw new
+					 * Exception("simulated error!");
+					 */
+				}
+			}
+			else {
+				// Just save the URL without the expensive DDX retrieval
+				// Set the LMT to zero so that it is cached in the URL cache
+				// but if we need the document it will be retrieved without
+				// first checking the DB.
+				ddxRetriever.getCache().setLastVisited(DDXURL, 0);
+				if (verbose)
+					ps.println("DDX URL: " + DDXURL);
+			}
 		}
 	}
 }

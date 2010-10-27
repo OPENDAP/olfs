@@ -56,7 +56,6 @@ public class DDXRetriever {
 
 	/// Use the cache.
 	private boolean useCache;
-	//private String namePrefix;
 	
     // The DDXCache that holds both the DDXs LMT and the XML/text
     private ResponseCachePostgres DDXCache = null;

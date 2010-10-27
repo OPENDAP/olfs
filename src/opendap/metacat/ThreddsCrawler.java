@@ -109,7 +109,7 @@ public class ThreddsCrawler {
 		    else if (line.hasOption( "r")) {
 		    	if (crawler.verbose)
 		    		System.out.println("Reading from cache, no network accesses");
-		    	crawler.crawlCatalogCache(System.out, line.hasOption( "p"));
+		    	crawler.crawlCatalogCache(System.out, line.hasOption("p"));
 		    	if (crawler.verbose)
 		    		System.out.println("Read " + new Integer(crawler.catalogsVisited).toString() + " catalogs.");
 		    }

@@ -100,7 +100,6 @@ public class ResponseCachePostgres {
     private static Logger log = LoggerFactory.getLogger(ResponseCachePostgres.class);
 
     public class ResponseCacheKeysEnumeration implements Enumeration<String> {
-    	//private Enumeration<String> e = null;
     	ResultSet rs = null;
     	PreparedStatement ps = null;
     	
@@ -228,7 +227,7 @@ public class ResponseCachePostgres {
     	saveState();
     }
     
-    /** For the cache to save its state now. 
+    /** Force the cache to save its state now. 
      * 
      * @TODO Determine if this is needed.
      * @throws Exception

@@ -14,8 +14,8 @@ public class DateString implements Comparable<DateString> {
 
     private static Logger log = LoggerFactory.getLogger(DateString.class);
 
-	String theDate;
-	GregorianCalendar calendar;
+	private String theDate;
+	private GregorianCalendar calendar;
 	
 	public DateString(String d, List<DatePart> dps) {
 		theDate = d;
@@ -23,7 +23,7 @@ public class DateString implements Comparable<DateString> {
 	}
 	
 	public String getDateString() {
-		return theDate;
+		return calendar.toString();
 	}
 	
 	public Date getDate() {
