@@ -1209,37 +1209,17 @@ public class RepositoryOps {
                     
                     log.info("Loading Owlim Repository to MemoryStore");
                     conMem.add(conOwlim.getStatements(null, null, null, false));
-                              
-                    //String filename = catalogCacheDirectory + "PriorToDropStartingPointsMemRepository.trig";
-                    //log.debug("Dumping MemoryRepository to: " + filename);
-                    //dumpRepository(memRepository, filename);
-
+                    
                     log.info("Dropping StartingPoint and contexts from MemoryStore ...");
                     
                     dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
-                    //log.debug(showContexts(memRepository));
-
-
-                    //filename = catalogCacheDirectory + "PostDropContextsRepository.nt";
-                    //log.debug("Dumping MemoryRepository to: " + filename);
-                    //dumpRepository(memRepository, filename);
-                    
-                    //filename = catalogCacheDirectory + "PostDropContextsRepository.trig";
-                    //log.debug("Dumping MemoryRepository to: " + filename);
-                    //dumpRepository(memRepository, filename);
                     
                     log.warn("Flushing OwlimRepository!");
                     clearRepository(repository);
                     
-                    //filename = catalogCacheDirectory + "PostRepositoryClear.trig";
-                    //log.debug("Dumping OwlimRepository to: " + filename);
-                    //dumpRepository(repository, filename);
-                    
                     log.info("Reloading MemoryStore back to Owlim Repository");
                     conOwlim.add(conMem.getStatements(null, null, null, true));
                     
-                    //log.debug("Reloading " + filename +" back to Owlim Repository");
-                    //loadRepositoryFromTrigFile(repository, filename);
                     conOwlim.close();
                     conMem.close();                    
                     memRepository.shutDown();

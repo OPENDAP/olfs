@@ -298,23 +298,14 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             log.debug("updateRepository(): Getting starting points (RDF imports).");
             Vector<String> startingPoints = getRdfImports(_configFile);
             
-            filename = catalogCacheDirectory + "beforeupdateSemanticRepository.nt";
-            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-            RepositoryOps.dumpRepository(repository, filename);
-            filename = catalogCacheDirectory + "beforeupdateSemanticRepository.trig";
-            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-            RepositoryOps.dumpRepository(repository, filename);
-            
+                        
             if(_semanticPreloadFile!=null)
                 startingPoints.add(_semanticPreloadFile);
 
             log.info("updateCatalog(): Updating Repository...");
             repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, 
                     resourcePath, catalogCacheDirectory);
-            
-            filename = catalogCacheDirectory + "afterupdateSemanticRepository.nt";
-            log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
-            RepositoryOps.dumpRepository(repository, filename);
+                        
             filename = catalogCacheDirectory + "afterupdateSemanticRepository.trig";
             log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
             RepositoryOps.dumpRepository(repository, filename);
