@@ -171,7 +171,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
 
         StaticRdfCatalog catalog = new StaticRdfCatalog();
-        String semanticPreloadFile = "http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl";
+        String semanticPreloadFile = "http://xml.opendap.org/semantics/Dap_To_Wcs-1.1.owl";
 
 
         try {

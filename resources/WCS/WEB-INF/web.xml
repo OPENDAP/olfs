@@ -22,7 +22,7 @@
         
         <init-param>
             <param-name>SemanticPreload</param-name>
-            <param-value>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</param-value>
+            <param-value>http://xml.opendap.org/semantics/Dap_To_Wcs-1.1.owl</param-value>
         </init-param>
 
         <init-param>
