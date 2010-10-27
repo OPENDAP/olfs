@@ -24,7 +24,6 @@
 package opendap.wcs.v1_1_2.http;
 
 import opendap.wcs.v1_1_2.WCS;
-import opendap.wcs.v1_1_2.XmlRequestHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;

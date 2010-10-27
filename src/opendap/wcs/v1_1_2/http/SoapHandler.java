@@ -23,8 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2.http;
 
-import opendap.coreServlet.ReqInfo;
-import opendap.wcs.v1_1_2.XmlRequestHandler;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;

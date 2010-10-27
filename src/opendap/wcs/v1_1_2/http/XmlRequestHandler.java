@@ -21,8 +21,9 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.wcs.v1_1_2;
+package opendap.wcs.v1_1_2.http;
 
+import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
@@ -76,19 +77,6 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
         Element e = _config.getChild("prefix");
         if(e!=null)
             _prefix = e.getTextTrim();
-/*
-        if(_prefix.equals("/")){
-            msg = "Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 <prefix>  " +
-                    "child element whose value may not be equal to \"/\"";
-            log.error(msg);
-            throw new Exception(msg);
-        }
-*/
-
-        //if(!_prefix.startsWith("/"))
-        //    _prefix = "/" + _prefix;
 
         if(_prefix.startsWith("/"))
             _prefix = _prefix.substring(1, _prefix.length());
