@@ -132,6 +132,13 @@ public class DDXCrawler {
 		    boolean readFromThreddsCache = line.hasOption("read-from-thredds-cache");
 		    boolean restoreState = line.hasOption("restore");
 		    
+		    if (crawler.verbose) {
+		    	System.out.println("useThreddsCache: " + useThreddsCache);
+		    	System.out.println("useDDXCache: " + useDDXCache);
+		    	System.out.println("readFromThreddsCache: " + readFromThreddsCache);
+		    	System.out.println("restoreState: " + restoreState);
+		    }
+		    
 			// In this program, the ThreddsCatalogUtils _always_ writes to the cache
 			// when it reads a new document. The readFromThreddsCache determines
 			// if a cached catalog is preferred over a network read.
