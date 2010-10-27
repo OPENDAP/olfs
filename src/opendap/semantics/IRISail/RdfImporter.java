@@ -147,16 +147,16 @@ public class RdfImporter {
         try {
             con = repository.getConnection();
 
-            String queryString = "(SELECT doc "
+            String queryString = "(SELECT distinct doc "
                     + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
                     + "union "
-                    + "SELECT doc "
+                    + "SELECT DISTINCT doc "
                     + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc}, "
                     + "[ {doc} rdfcache:isReplacedBy {newdoc}],"
                     + "[{doc} rdfcache:isContainedBy {cont},{tp2} rdfcache:dependsOn {cont}; rdf:type {rdfcache:StartingPoint}]"
                     + " WHERE cont=NULL AND newdoc=NULL) "
                     + "MINUS "
-                    + "SELECT doc "
+                    + "SELECT DISTINCT doc "
                     + "FROM CONTEXT "+"rdfcache:"+Terms.cacheContext.getLocalId()+" {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
 
                     + "USING NAMESPACE "

@@ -242,7 +242,7 @@ public class RepositoryOps {
         TupleQueryResult result;
         boolean hasInternalStaringPoint = false;
 
-        String queryString = "SELECT doc "
+        String queryString = "SELECT DISTINCT doc "
             + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
             + "WHERE doc = <" + startingPointUrl + "> "
             + "USING NAMESPACE "
@@ -567,7 +567,7 @@ public class RepositoryOps {
 
         log.debug("Finding StartingPoints in the repository ...");
 
-        String queryString = "SELECT doc "
+        String queryString = "SELECT DISTINCT doc "
             + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
@@ -854,7 +854,7 @@ public class RepositoryOps {
         URI uriaddress = new URIImpl(urlstring);
 
 
-        String queryString = "SELECT doc,lastmod FROM CONTEXT "
+        String queryString = "SELECT DISTINCT doc,lastmod FROM CONTEXT "
                   + "rdfcache:"+Terms.cacheContext.getLocalId()+" {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
                   + "where doc=<" + uriaddress + ">"
                   + "USING NAMESPACE "
@@ -1415,7 +1415,7 @@ public class RepositoryOps {
             String queryString = "select distinct crule from context crule {} prop {} "
                     + "WHERE crule != rdfcache:"+Terms.cacheContext.getLocalId()+" "
                     + "AND crule != rdfcache:"+Terms.startingPointsContext.getLocalId()+" "
-                    + "AND NOT EXISTS (SELECT time FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
+                    + "AND NOT EXISTS (SELECT DISTINCT time FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
                     + "{crule} rdfcache:"+Terms.lastModified.getLocalId() +" {time}) "
                     + "using namespace "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
@@ -1494,15 +1494,15 @@ public class RepositoryOps {
 
         try {
 
-            String queryString = "(SELECT doc "
+            String queryString = "(SELECT DISTINCT doc "
                     + "FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
                     + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
                     //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
                     + "MINUS "
-                    + "SELECT doc "
+                    + "SELECT DISTINCT doc "
                     + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}) "
                     + "MINUS "
-                    + "SELECT doc "
+                    + "SELECT DISTINCT doc "
                     + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
@@ -1572,7 +1572,7 @@ public class RepositoryOps {
         log.info("Locating changeded files ...");
 
         try {
-            String queryString = "SELECT doc,lastmod "
+            String queryString = "SELECT DISTINCT doc,lastmod "
                     + "FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
                     + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lastmod} "
                     + "USING NAMESPACE "
