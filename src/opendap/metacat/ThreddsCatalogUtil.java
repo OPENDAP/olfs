@@ -43,6 +43,8 @@ import java.io.StringReader;
 
 import java.util.EmptyStackException;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.HashMap;
@@ -70,7 +72,17 @@ public class ThreddsCatalogUtil {
 	
 	private XMLOutputter xmlo = null;
 	
+	// This cache holds both the URLs (in a ConcurrentHashMap) and the response
+	// documents (in Postgres). Both of these are maintained as persistent
+	// entities
 	private ResponseCachePostgres TCCache = null;
+	
+	// This holds a record of the URLs visited by this crawl - it is used to
+	// prevent loops during the crawl.
+	private Set<String> alreadySeen = null;
+	
+	// This is the 'current thredds catalog,' all operations are performed on it
+	//private Document doc = null;
 	
 	private Logger log = LoggerFactory.getLogger(ThreddsCatalogUtil.class);
 
@@ -94,14 +106,18 @@ public class ThreddsCatalogUtil {
 	*/
 	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
-
+		alreadySeen = new HashSet<String>();
+		
 		if (writeToCache || readFromCache) {
+			if (writeToCache && readFromCache)
+				throw new Exception("Only one of \"write to cache\" and \"read from cache\" may be set.");
+			
 			log.debug("Configuring caching in ThreddsCatalogUtil.");
 			
 			this.writeToCache = writeToCache;
 			this.readFromCache = readFromCache;
 			
-			TCCache = new ResponseCachePostgres(namePrefix + "TC", "thredds_responses");
+			TCCache = new ResponseCachePostgres(namePrefix + "_THREDDS", "thredds_responses");
 		}
 	}
 	
@@ -109,7 +125,7 @@ public class ThreddsCatalogUtil {
 	 * Implements a modified depth-first traversal of a thredds catalog. The
 	 * catalog is treated as a tree-like structure, but since it is really a
 	 * directed graph, catalog URLs are cached and the same URL is neither
-	 * returned or 'crawled' twice. The traversal is like a depth-first
+	 * returned nor 'crawled' twice. The traversal is like a depth-first
 	 * traversal, but instead of recurring all the way to the leaf nodes of the
 	 * pseudo-tree, it descends as it returns nodes. The seed URL is used to
 	 * initialize the stack of child nodes and then nextElement() both returns
@@ -152,10 +168,13 @@ public class ThreddsCatalogUtil {
 				for (String URL : URLs) {
 					log.debug("About to push " + URL);
 					if (writeToCache) {
-						if (!TCCache.isVisited(URL)) {
-							log.debug("URL (" + URL + ") not yet visitied; pushed on stack");
-							TCCache.setLastVisited(URL, 1);
+						if (!alreadySeen.contains(URL)) {
+							log.debug("URL (" + URL + ") not yet visited; pushed on stack");
+							alreadySeen.add(URL);
 							childURLs.push(URL);
+						}
+						else {
+							log.debug("URL (" + URL + ") already visited; not pushed onto stack");
 						}
 					}
 					else {
@@ -342,6 +361,16 @@ public class ThreddsCatalogUtil {
 	}
 	
 	/**
+	 * Set the current THREDDS Catalog to be the catalog at this URL.
+	 * @param URL
+	 * @throws Exception
+	 */
+	/*
+	public void setCatalog(String URL) throws Exception {
+		setDocument(URL);
+	}
+	*/
+	/**
 	 * Return all of the DDX urls to data sources referenced by the given
 	 * thredds catalog. The thredds catalog is referenced using a URL which
 	 * either be accessed or read from a the cache, depending on how the
@@ -351,8 +380,9 @@ public class ThreddsCatalogUtil {
 	 * @return A Vector of strings, each element a DDX URL.
 	 */
 	public Vector<String> getDDXUrls(String catalogUrlString) throws Exception {
-
-		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString,SERVICE.OPeNDAP);
+		log.debug("Entering getDDXUrls");
+		
+		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString, SERVICE.OPeNDAP);
 		String url;
 
 		for (int i = 0; i < datasetUrls.size(); i++) {
@@ -419,6 +449,7 @@ public class ThreddsCatalogUtil {
      *         will be empty.
      */
     public Vector<String> getCatalogRefURLs(String catalogUrlString) throws Exception {
+		log.debug("Entering getCatalogRefURLs");
 
         Vector<String> catalogURLs = new Vector<String>();
 
@@ -600,7 +631,7 @@ public class ThreddsCatalogUtil {
 	 *         will be empty.
 	 */
 	
-	public Vector<String> getDataAccessURLs(String catalogUrlString, SERVICE service) throws Exception {
+	private Vector<String> getDataAccessURLs(String catalogUrlString, SERVICE service) throws Exception {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
@@ -648,6 +679,7 @@ public class ThreddsCatalogUtil {
 		
 		try {
 			SAXBuilder sb = new SAXBuilder();
+			
 			if (readFromCache) {
 				log.debug("Read " + docUrlString + " from the the cache.");
 				
@@ -658,13 +690,28 @@ public class ThreddsCatalogUtil {
 				doc = sb.build(new StringReader(docString));
 			}
 			else {
-				URL docUrl = new URL(docUrlString);
+				// TODO Read from cache if available?
+				if (TCCache.isVisited(docUrlString)) {
+					log.debug("Retrieving XML Document from cache: " + docUrlString);
 
-				log.debug("Retrieving XML Document: " + docUrlString);
+					String text = TCCache.getCachedResponse(docUrlString);
 
-				doc = sb.build(docUrl);
-				log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
+					doc = sb.build(new StringReader(text));
+					log.debug("Cached XML Document: \n" + xmlo.outputString(doc));
+				}
+				else {
+					URL docUrl = new URL(docUrlString);
+
+					log.debug("Retrieving XML Document: " + docUrlString);
+
+					doc = sb.build(docUrl);
+					log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
+				}
+				
 				if (writeToCache) {
+					log.debug("Caching " + docUrlString);
+					// TODO cache the URL in 'Visited' cache here? Add LMT
+					TCCache.setLastVisited(docUrlString, 1);
 					TCCache.setCachedResponse(docUrlString, xmlo.outputString(doc));
 				}
 			}
@@ -680,7 +727,6 @@ public class ThreddsCatalogUtil {
 		}
 		
 		return doc;
-
 	}
 
 	private String getCatalogURL(String catalogUrlString, String href)

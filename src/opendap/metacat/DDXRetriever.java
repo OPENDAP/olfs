@@ -72,7 +72,7 @@ public class DDXRetriever {
 		// persistent form and will cause the cache to be written when 
 		// the DDXCache instance is collected.
 		if (useCache)
-			DDXCache = new ResponseCachePostgres(namePrefix + "DDX", "ddx_responses");
+			DDXCache = new ResponseCachePostgres(namePrefix + "_DDX", "ddx_responses");
 	}
 	
 	/**

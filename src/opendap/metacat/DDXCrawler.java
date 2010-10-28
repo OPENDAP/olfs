@@ -31,6 +31,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,13 +170,10 @@ public class DDXCrawler {
 		// but if it's true, initialize the TCU using the saved state (see
 		// 'else' below).
 		try {
-			if (!restoreState) {
-				crawlOneCatalogUrl(ps, catalogURL);
+			if (!restoreState)
 				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration(catalogURL);
-			}
-			else {
+			else
 				catalogs = (ThreddsCrawlerEnumeration) threddsCatalogUtil.getCatalogEnumeration();
-			}
 
 			while (catalogs.hasMoreElements()) {
 				String childURL = catalogs.nextElement();
@@ -208,9 +206,9 @@ public class DDXCrawler {
 				if (ddx == null)
 					log.error("No DDX returned from: " + DDXURL);
 				else if (verbose) {
-					ps.println("URL: " + DDXURL);
+					ps.println("DDX: " + DDXURL);
 					if (printDDX)
-						ps.println("DDX: " + ddx);
+						ps.println(ddx);
 					/*
 					 * This was used to simulate an error in mid-crawl so the 
 					 * restore option could be tested.
@@ -229,7 +227,7 @@ public class DDXCrawler {
 				// first checking the DB.
 				ddxRetriever.getCache().setLastVisited(DDXURL, 0);
 				if (verbose)
-					ps.println("DDX URL: " + DDXURL);
+					ps.println("DDX: " + DDXURL);
 			}
 		}
 	}
