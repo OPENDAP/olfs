@@ -1297,9 +1297,8 @@ public class RepositoryOps {
 
 
         double elapsedTime = (new Date().getTime() - startTime.getTime())/1000.0;
-        log.info("Imports Evaluated. Elapsed time: " + elapsedTime + " seconds");
-
-        log.info("updateSemanticRepository() End.");
+        
+        log.info("updateSemanticRepository() End. Elapsed time: " + elapsedTime + " seconds");
         log.info("-----------------------------------------------------------------------");
 
 
