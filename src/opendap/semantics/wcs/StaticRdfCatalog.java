@@ -1235,7 +1235,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                     coordinateDapId = firstValue.stringValue();
                 }
             } else {
-                log.error("No query result!");
+                log.debug("No query result!");
 
             }
         } catch (Exception e) {
