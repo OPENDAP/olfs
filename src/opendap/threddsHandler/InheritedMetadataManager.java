@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
- * This class provides is a singleton designed to manage the various inheritied metadata objects propogated into the
+ * This class provides is a singleton designed to manage the various inherited metadata objects propagated into the
  * THREDDS catalog system by THREDDS datasetScan elements.
  * User: ndp
  * Date: Jun 28, 2010
