@@ -292,6 +292,7 @@
             <src path="${src.dir}"/>
             <include name="opendap/wcs/v1_1_2/**/*.java"/>
             <include name="opendap/semantics/**/*.java"/>
+            <include name="opendap/coreServlet/DocServlet.java"/>
 
         </javac>
 
