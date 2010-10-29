@@ -218,9 +218,12 @@ public class ResponseCachePostgres {
 			pgTable = cacheName.replace('.', '_') + "_" + tableName;
 			
 			if (makeNewCache) {
-				// If the pgTable exists, drop it
+				// If the pgTable exists, drop it. Except that this doesn't check
+				// for existence, it just drops the table and throws away any error
+				// that results from the table not being there in the first place.
 				// DROP TABLE pgTable
-				// Make a new table that's empty
+				// Make a new table. This gives the code an empty table in the DB
+				// which is much faster than a table filled up with stuff.
 				// CREATE TABLE pgTable(key SERIAL PRIMARY KEY, url VARCHAR(256), doc TEXT);
 				Statement pg = pgCache.createStatement();
 				try {

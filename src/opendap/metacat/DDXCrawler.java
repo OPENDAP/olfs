@@ -75,7 +75,18 @@ public class DDXCrawler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+		/*
+		 * This is how one might handler ctrl-c and similar stuff; I have yet 
+		 * to work out the details, however.
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		      @Override
+		      public void run() {
+		    	  log.debug("In custom shutdown handler");
+					crawler.threddsCatalogUtil.saveCatalogCache();
+					crawler.ddxRetriever.saveDDXCache();
+		      }
+		    });
+		*/
 		DDXCrawler crawler = new DDXCrawler();
 		
 		// create the command line parser
@@ -84,10 +95,10 @@ public class DDXCrawler {
 		// create the Options
 		Options options = new Options();
 		
-		options.addOption("t", "read-from-thredds-cache", false, "Use only cached thredds catalogs");
+		options.addOption("t", "read-from-thredds-cache", false, "Use only cached THREDDS catalogs; do not read from the network.");
 		options.addOption("f", "fetch-ddx", false, "Fetch ddx responses");
-		options.addOption("T", "dont-cache-thredds", false, "Do not Cache THREDDS responses");
-		options.addOption("d", "dont-cache-ddx", false, "Do not Cache ddx responses");
+		options.addOption("T", "dont-cache-thredds", false, "Do not cache THREDDS responses");
+		options.addOption("d", "dont-cache-ddx", false, "Do not cache DDX responses");
 		options.addOption("p", "print-ddx", false, "Print the DDX responses");
 		options.addOption("v", "verbose", false, "Verbose output");
 		options.addOption("R", "restore", false, "Restore the crawl from a saved state file");
@@ -164,6 +175,18 @@ public class DDXCrawler {
 			System.err.println("Error : " + e.getMessage());
 			e.printStackTrace();
 		}
+		finally {
+			try {
+				log.debug("In DDXCrawler.main finally, saving cache files");
+				
+				crawler.threddsCatalogUtil.saveCatalogCache();
+				crawler.ddxRetriever.saveDDXCache();
+			}
+			catch (Exception e) {
+				System.err.println("Error saving cache files: " + e.getLocalizedMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void crawlCatalog(String catalogURL, PrintStream ps, boolean restoreState) throws Exception {
@@ -186,14 +209,17 @@ public class DDXCrawler {
 			}
 		}
 		catch (Exception e) {
-			log.debug("Error: " + e.getLocalizedMessage());
-			catalogs.saveState();
+			log.debug("Error (saving crawl state): " + e.getLocalizedMessage());
+			//catalogs.saveState();
 			throw new Exception(e);
 		}
 		finally {
+			catalogs.saveState();
+		}
+		/*finally {
 			threddsCatalogUtil.saveCatalogCache();
 			ddxRetriever.saveDDXCache();
-		}
+		}*/
 	}
 
 	private void crawlOneCatalogUrl(PrintStream ps, String catalogURL) throws Exception {

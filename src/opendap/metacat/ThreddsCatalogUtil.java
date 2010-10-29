@@ -41,6 +41,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StringReader;
 
+import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -99,11 +100,6 @@ public class ThreddsCatalogUtil {
 	 * @param readFromCache Arrange for the TCU class to read Thredds catalogs
 	 * from the postgres cache.
 	 */
-	/*
-	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) {
-		this(writeToCache, namePrefix, readFromCache, false);
-	}
-	*/
 	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 		alreadySeen = new HashSet<String>();
@@ -149,7 +145,7 @@ public class ThreddsCatalogUtil {
 		private Stack<String> childURLs;
 		
 		// Name for the saved stack - see saveState() below.
-		private String savedStateName = "TCU.Stack";
+		private static final String savedStateName = "TCU.Stack";
 
 		ThreddsCrawlerEnumeration(String catalogURL) throws Exception {
 			childURLs = new Stack<String>();
@@ -215,27 +211,29 @@ public class ThreddsCatalogUtil {
 		}
 		
 		public void saveState() throws Exception {
-			FileOutputStream fos;
-			ObjectOutputStream oos = null;
-	    	try {
-	    		fos = new FileOutputStream(savedStateName);
-	    		oos = new ObjectOutputStream(fos);
+			if (!childURLs.empty()) {
+				FileOutputStream fos;
+				ObjectOutputStream oos = null;
+				try {
+					fos = new FileOutputStream(savedStateName);
+					oos = new ObjectOutputStream(fos);
 
-	    		oos.writeObject(childURLs);
-	    	}
-	    	catch (FileNotFoundException e) {
-				throw new Exception("ThreddsCrawlerEnumeration.saveState: File not found", e);
-	    	}
-	    	catch (SecurityException e) {
-				throw new Exception("ThreddsCrawlerEnumeration.saveState: Security", e);
-	    	}	
-	    	catch (java.io.IOException e) {
-				throw new Exception("ThreddsCrawlerEnumeration.saveState: I/O", e);
-	    	}
-	    	finally {
-	    		if (oos != null)
-	    			oos.close();
-	    	}
+					oos.writeObject(childURLs);
+				}
+				catch (FileNotFoundException e) {
+					throw new Exception("ThreddsCrawlerEnumeration.saveState: File not found", e);
+				}
+				catch (SecurityException e) {
+					throw new Exception("ThreddsCrawlerEnumeration.saveState: Security", e);
+				}
+				catch (java.io.IOException e) {
+					throw new Exception("ThreddsCrawlerEnumeration.saveState: I/O", e);
+				}
+				finally {
+					if (oos != null)
+						oos.close();
+				}
+			}
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -695,7 +693,7 @@ public class ThreddsCatalogUtil {
 				doc = sb.build(new StringReader(docString));
 			}
 			else {
-				// TODO Read from cache if available?
+				// Read from cache if available
 				if (TCCache.isVisited(docUrlString)) {
 					log.debug("Retrieving XML Document from cache: " + docUrlString);
 					String text = TCCache.getCachedResponse(docUrlString);
@@ -709,8 +707,9 @@ public class ThreddsCatalogUtil {
 					log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
 					if (writeToCache) {
 						log.debug("Caching " + docUrlString);
-						// TODO cache the URL in 'Visited' cache here? Add LMT
-						TCCache.setLastVisited(docUrlString, 1);
+						// cache the URL in 'Visited' cache here? Add LMT
+						Date date = new Date();
+						TCCache.setLastVisited(docUrlString, date.getTime());
 						TCCache.setCachedResponse(docUrlString, xmlo.outputString(doc));
 					}
 				}
