@@ -325,7 +325,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                 updateCatalogCache(repository);
 
             } else {
-                log.info("updateCatalog(): The repository was unchanged, nothing else to do.");
+                log.info("updateCatalog(): The repository was unchanged. Update complete.");
             }
 
 
