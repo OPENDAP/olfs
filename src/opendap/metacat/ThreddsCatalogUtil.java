@@ -117,7 +117,12 @@ public class ThreddsCatalogUtil {
 			this.writeToCache = writeToCache;
 			this.readFromCache = readFromCache;
 			
-			TCCache = new ResponseCachePostgres(namePrefix + "_THREDDS", "thredds_responses");
+			// if writeToCache is true, then passing that as the first parameter
+			// to ResponseCachePostgres will force it to make a new, empty, cache.
+			// Using smaller caches is more efficient. At teh same time, if it's
+			// false, the old caches (database and hash map) will be used in 
+			// read-only mode.
+			TCCache = new ResponseCachePostgres(writeToCache, namePrefix + "_THREDDS", "thredds_responses");
 		}
 	}
 	
@@ -693,26 +698,21 @@ public class ThreddsCatalogUtil {
 				// TODO Read from cache if available?
 				if (TCCache.isVisited(docUrlString)) {
 					log.debug("Retrieving XML Document from cache: " + docUrlString);
-
 					String text = TCCache.getCachedResponse(docUrlString);
-
 					doc = sb.build(new StringReader(text));
 					log.debug("Cached XML Document: \n" + xmlo.outputString(doc));
 				}
 				else {
 					URL docUrl = new URL(docUrlString);
-
 					log.debug("Retrieving XML Document: " + docUrlString);
-
 					doc = sb.build(docUrl);
 					log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
-				}
-				
-				if (writeToCache) {
-					log.debug("Caching " + docUrlString);
-					// TODO cache the URL in 'Visited' cache here? Add LMT
-					TCCache.setLastVisited(docUrlString, 1);
-					TCCache.setCachedResponse(docUrlString, xmlo.outputString(doc));
+					if (writeToCache) {
+						log.debug("Caching " + docUrlString);
+						// TODO cache the URL in 'Visited' cache here? Add LMT
+						TCCache.setLastVisited(docUrlString, 1);
+						TCCache.setCachedResponse(docUrlString, xmlo.outputString(doc));
+					}
 				}
 			}
 		}

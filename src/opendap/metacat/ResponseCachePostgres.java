@@ -99,6 +99,22 @@ public class ResponseCachePostgres {
 	
     private static Logger log = LoggerFactory.getLogger(ResponseCachePostgres.class);
 
+	final static String VisitedName = "_Visited.save";
+    
+    private String cacheBaseName;
+    
+    // This hash map is used to prevent reading Responses when a previous crawl
+    // has already done it. Use the last modified date to determine newness.
+    // This hash map will be written to disk so that the record of Responses can
+    // span individual runs.
+    private ConcurrentHashMap<String, Long> responsesVisited;
+    
+    private String pgUrl = "jdbc:postgresql://localhost:5432/crawl_cache:";
+    private String pgTable;
+    private String pgUsername = "metacat";
+    private String pgPassword = "metacat";
+    private Connection pgCache = null;
+        
     public class ResponseCacheKeysEnumeration implements Enumeration<String> {
     	ResultSet rs = null;
     	PreparedStatement ps = null;
@@ -167,40 +183,72 @@ public class ResponseCachePostgres {
 		}
 	}
     
-	final static String VisitedName = "_Visited.save";
+    public ResponseCachePostgres(String cacheName, String tableName) throws Exception {
+    	this(true, cacheName, tableName);
+    }
     
-    private String cacheBaseName;
-    
-    // This hash map is used to prevent reading Responses when a previous crawl
-    // has already done it. Use the last modified date to determine newness.
-    // This hash map will be written to disk so that the record of Responses can
-    // span individual runs.
-    private ConcurrentHashMap<String, Long> responsesVisited;
-    
-    private String pgUrl = "jdbc:postgresql://localhost:5432/crawl_cache:";
-    private String pgTable;
-    private String pgUsername = "metacat";
-    private String pgPassword = "metacat";
-    private Connection pgCache = null;
-        
     /** Build an instance of ResponseCachePostgres. 
      *
      * @param cacheName The basename to use for the 'visited' cache.
      * @param tableName The name for the Postgres table in the 'crawl_cache'
      * database where responses should be stored.
      */
-    public ResponseCachePostgres(String cacheName, String tableName) throws Exception {
+    public ResponseCachePostgres(boolean makeNewCache, String cacheName, String tableName) throws Exception {
 
     	cacheBaseName = cacheName;
     	
     	responsesVisited = new ConcurrentHashMap<String, Long>();
-    	
-    	log.debug("Configuring the Postgres data base as cache using table: " + tableName);
+    	// If we are making a new cache, then don't bother restoring the old
+    	// visited caches - they will be overwritten when this exits.
+		if (!makeNewCache) {
+			try {
+				restoreVisitedState();
+			}
+			catch (Exception e) {
+				log.info("Could not read the 'visited' cache from disk.");
+			}
+		}
+
+		log.debug("Configuring the Postgres data base as cache using table: " + tableName);
 		try {
 			Class.forName("org.postgresql.Driver");
+			// The pgUrl contains the name of the database within postgres.
 			pgCache = DriverManager.getConnection(pgUrl, pgUsername, pgPassword);
+			//String sqlCacheName = cacheName.replace('.', '_');
+			pgTable = cacheName.replace('.', '_') + "_" + tableName;
+			
+			if (makeNewCache) {
+				// If the pgTable exists, drop it
+				// DROP TABLE pgTable
+				// Make a new table that's empty
+				// CREATE TABLE pgTable(key SERIAL PRIMARY KEY, url VARCHAR(256), doc TEXT);
+				Statement pg = pgCache.createStatement();
+				try {
+					try {
+						String drop_table = "DROP TABLE " + pgTable;
+						pg.executeUpdate(drop_table);
+					}
+					catch (SQLException e) {
+						// ignored
+						log.debug("Caught a sql exception when dropping table " + pgTable + " an expected error when the table does not exist");
+					}
 
-			pgTable = tableName;
+					String create_table = "CREATE TABLE " + pgTable + "(key SERIAL PRIMARY KEY, url VARCHAR(256), doc TEXT)";
+					pg.executeUpdate(create_table);
+				}
+				catch (SQLException e) {
+					log.error("Caching: Could not access the database/cache.", e);
+					throw new Exception("SQLException: " + e.getMessage());
+				}
+				finally {
+					try {
+						pg.close();
+					}
+					catch (SQLException e) {
+						log.error("Cache read: Could not close the prepared statement.", e);
+					}
+				}
+			}
 		}
 		catch (ClassNotFoundException e) {
 			log.error("Could not load Postgres JDBC driver: " + e.getMessage());
@@ -209,13 +257,6 @@ public class ResponseCachePostgres {
 		catch (SQLException e) {
 			log.error("SQLException: " + e.getMessage());
 			throw new Exception("SQLException: " + e.getMessage());
-		}
-    	
-    	try {
-    		restoreVisitedState();
-    	}
-    	catch (Exception e) {
-    		log.info("Could not read the 'visited' cache from disk.");
 		}
     }
     	

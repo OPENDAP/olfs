@@ -739,16 +739,28 @@
 
 	</target>
 
+    <target name="runPrintVisitedCache" depends="compile">
+
+        <copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
+
+        <java classname="opendap.metacat.PrintVisitedCache" fork="true" dir="${build.run}">
+            <!--arg line="- -catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" /-->
+            <arg line="test.opendap.org_TC"/>
+            <arg line="thredds_responses" />
+            <classpath refid="classpath" />
+        </java>
+
+    </target>
+
 	<target name="runDDXCrawlerTest" depends="compile">
 
 		<copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
 
 		<java classname="opendap.metacat.DDXCrawler" fork="true" dir="${build.run}">
 			<!--arg line="- -catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" /-->
-			<arg line="--catalog-root=http://test.opendap.org/opendap/catalog.xml"/>
-			<arg line="--cache-name=ddx_urls_only" />
+			<arg line="--catalog-root=http://test.opendap.org/dap/data/catalog.xml"/>
 			<arg line="--verbose" />
-			<arg line="--cache-ddx" />
+			<arg line="--read-from-thredds-cache" />
 			<classpath refid="classpath" />
 		</java>
 

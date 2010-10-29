@@ -128,13 +128,17 @@ public class DDXCrawler {
 		    
 		    // By default this code caches the THREDDS and DDX URLs and 
 		    // documents (if the latter are being accessed).
-		    boolean useThreddsCache = !line.hasOption("dont-cache-thredds");;
+		    boolean writeThreddsCache = !line.hasOption("dont-cache-thredds");;
 		    boolean useDDXCache = !line.hasOption("dont-cache-ddx");
 		    boolean readFromThreddsCache = line.hasOption("read-from-thredds-cache");
 		    boolean restoreState = line.hasOption("restore");
 		    
+		    // If reading from the thredds cache; don't also write to it!
+		    if (readFromThreddsCache)
+		    	writeThreddsCache = false;
+		    
 		    if (crawler.verbose) {
-		    	System.out.println("useThreddsCache: " + useThreddsCache);
+		    	System.out.println("writeThreddsCache: " + writeThreddsCache);
 		    	System.out.println("useDDXCache: " + useDDXCache);
 		    	System.out.println("readFromThreddsCache: " + readFromThreddsCache);
 		    	System.out.println("restoreState: " + restoreState);
@@ -143,7 +147,7 @@ public class DDXCrawler {
 			// In this program, the ThreddsCatalogUtils _always_ writes to the cache
 			// when it reads a new document. The readFromThreddsCache determines
 			// if a cached catalog is preferred over a network read.
-		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(useThreddsCache, crawler.cacheNamePrefix, readFromThreddsCache);
+		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(writeThreddsCache, crawler.cacheNamePrefix, readFromThreddsCache);
 		    crawler.ddxRetriever = new DDXRetriever(useDDXCache, crawler.cacheNamePrefix);
 
 			crawler.crawlCatalog(catalogURL, System.out, restoreState);

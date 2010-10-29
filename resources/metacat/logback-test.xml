@@ -71,36 +71,16 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
     
-    <logger name="opendap.metacat" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
-    </logger>
-
-    <logger name="opendap.metacat.DateString" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
+    <logger name="opendap.metacat.DDXCrawler" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
     </logger>
     
-    <logger name="opendap.metacat.URLClassifier" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
+    <logger name="opendap.metacat.ResponseCachePostgres" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
     </logger>
     
-    <logger name="opendap.metacat.ClassifyServerBuildEML" level="DEBUG">
-        <appender-ref ref="InfoLog"/>
-    </logger>
-    
-    <logger name="opendap.metacat.ResponseCachePostgres" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
-    </logger>
-    
-    <logger name="opendap.metacat.URLGroup" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
-    </logger>
-    
-    <logger name="opendap.metacat.ResponseCachePostgres" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
-    </logger>
-    
-    <logger name="opendap.metacat.ThreddsCatalogUtil" level="ERROR">
-        <appender-ref ref="ErrorLog"/>
+    <logger name="opendap.metacat.ThreddsCatalogUtil" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
     </logger>
     
 </configuration>
