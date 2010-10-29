@@ -27,6 +27,7 @@
 
 package opendap.semantics.wcs;
 
+import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
 import opendap.semantics.IRISail.*;
 import opendap.wcs.v1_1_2.*;
@@ -213,7 +214,6 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         } catch (Exception e) {
             catalog.log.error("Caught " + e.getClass().getName() + " in main(): "
                     + e.getMessage());
-            e.printStackTrace();
         }
 
     }
@@ -331,7 +331,12 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
         }
         finally {
-            shutdownRepository(repository);
+            try {
+                shutdownRepository(repository);
+            }
+            catch(RepositoryException e){
+                log.error("Caught "+e.getClass().getName()+"  Message: "+e.getMessage());
+            }
             repositoryWriteLock.unlock();
 
         }
@@ -358,7 +363,12 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             updateCatalogCache(repository);
         }
         finally {
-            shutdownRepository(repository);
+            try {
+                shutdownRepository(repository);
+            }
+            catch(RepositoryException e){
+                log.error("Caught "+e.getClass().getName()+"  Message: "+e.getMessage());
+            }
         }
         endTime = new Date().getTime();
         elapsedTime = (endTime - startTime) / 1000.0;
@@ -392,14 +402,17 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         //########################################################
         //  Process Catalog Cache Directory.
         //
+        defaultCacheDirectory = Scrub.fileName(defaultCacheDirectory);
+
         catalogCacheDirectory = defaultCacheDirectory;
         e = config.getChild("CacheDirectory");
         if (e != null)
-            catalogCacheDirectory = e.getTextTrim();
+            catalogCacheDirectory = Scrub.fileName(e.getTextTrim());
         if (catalogCacheDirectory != null &&
                 catalogCacheDirectory.length() > 0 &&
                 !catalogCacheDirectory.endsWith("/"))
             catalogCacheDirectory += "/";
+
 
         file = new File(catalogCacheDirectory);
         if (!file.exists()) {
@@ -425,6 +438,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         //########################################################
         //  Process Resource Path.
         //
+        defaultResourcePath = Scrub.fileName(defaultResourcePath);          
         resourcePath = defaultResourcePath;
         e = config.getChild("ResourcePath");
         if (e != null)
@@ -500,7 +514,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
 
         log.info("Configuring Semantic Repository.");
-        File storageDir = new File(catalogCacheDirectory); //define local copy of repository
+        File storageDir = new File(Scrub.fileName(catalogCacheDirectory)); //define local copy of repository
         owlimSail.setDataDir(storageDir);
         log.debug("Semantic Repository Data directory set to: " + catalogCacheDirectory);
         // prepare config
@@ -598,21 +612,25 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
     private void dumpCoverageDescriptionsDocument(String filename) {
         //print out the XML
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+        FileOutputStream fos = null;
 
-
-        /* #####################################################
-        Why is this being written out?
-        Is this a diagnostic? purely for diagnostic purposes (HB Dec032009)
-        Or is this file used later by some other part of the software? No. (HB Dec032009)
-        Can we remove this??? Yes, once we are happy with the JDom Doc retrieval (HB Dec032009)
-        */
+        filename = Scrub.fileName(filename);
         try {
-            FileOutputStream fos = new FileOutputStream(filename);
+            fos = new FileOutputStream(filename);
             outputter.output(buildDoc.getDoc(), fos);
         } catch (IOException e1) {
-            e1.printStackTrace();
+            log.error("dumpCoverageDescriptionsDocument(): Failed to dump wcs:CovergaeDescriptions document.  Message: "+ e1.getMessage());
         }
-        /* ############################################## */
+        finally {
+            if(fos!=null){
+                try {
+                    fos.close();
+                }
+                catch(Exception e){
+                    log.error("dumpCoverageDescriptionsDocument(): "+ e.getMessage());
+                }
+            }
+        }
 
 
     }
@@ -823,8 +841,15 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             }
         }
         finally {
-            if (con != null)
-                con.close();
+            if (con != null) {
+                try {
+                    log.info("Closing repository connection.");
+                    con.close();
+                }
+                catch (Exception e) {
+                    log.error("Caught " + e.getClass().getName() + " Message: " + e.getMessage());
+                }
+            }
         }
 
     }
@@ -1319,8 +1344,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         catch (Exception e) {
             log.error("updateCatalogCache() has a problem: " +
                     e.getMessage() +
-                    " biffCount: " + (++biffCount));
-            e.printStackTrace();
+                    " This is failure number " + (++biffCount));
         }
         finally {
             catalogWriteLock.unlock();

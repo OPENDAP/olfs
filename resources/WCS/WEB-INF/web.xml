@@ -40,19 +40,6 @@
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
     </servlet>
 
-    
-
-
-
-    <servlet-mapping>
-        <servlet-name>wcs</servlet-name>
-        <url-pattern>/WCS</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>wcs</servlet-name>
-        <url-pattern>/WCS/*</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>wcs</servlet-name>

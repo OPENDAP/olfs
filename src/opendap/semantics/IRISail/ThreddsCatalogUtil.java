@@ -216,7 +216,7 @@ public class ThreddsCatalogUtil {
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		try {
 			Options options = createCmdLineOptions();
@@ -257,14 +257,8 @@ public class ThreddsCatalogUtil {
 
 			// tcc.crawlTest(System.out,"http://motherlode.ucar.edu:8080/thredds/idd/satellite.xml",false);
 		}
-		catch (ParseException e) {
-			System.err.println("Failed to parse command line! Msg: "
-					+ e.getMessage());
-		}
-		catch (Exception e) {
-			System.err.println("Error : " + e.getMessage());
-			e.printStackTrace();
-		}
+        finally{;}
+
 	}
 
 	private static Options createCmdLineOptions() {
@@ -344,7 +338,7 @@ public class ThreddsCatalogUtil {
 				xmlo.output(doc, ps);
 			}
 			catch (IOException e) {
-				ps.println(e.getMessage());
+				log.error(e.getMessage());
 			}
 			ps.println("\n");
 		}
@@ -625,7 +619,6 @@ public class ThreddsCatalogUtil {
 		catch (Exception e) {
 			log.error("Unable to load THREDDS catalog: " + catalogUrlString
 					+ " msg: " + e.getMessage());
-			e.printStackTrace();
 		}
 
 		return serviceURLs;

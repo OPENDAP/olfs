@@ -122,7 +122,7 @@ public class CSVSplitter
     if ( !(tokens.isEmpty() && strtok.length()==0) ) {
       tokens.add(strtok);
     }
-    return tokens.toArray(new String[0]);
+    return tokens.toArray(new String[tokens.size()]);
   }
  
   private String asString(StringBuilder token) {
@@ -131,11 +131,7 @@ public class CSVSplitter
   }
  
   public static void main(String[] args) {
-    try {
       usageExample();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
  
   private static void usageExample() {

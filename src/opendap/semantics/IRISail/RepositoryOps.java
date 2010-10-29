@@ -618,11 +618,11 @@ public class RepositoryOps {
      * @param filename - file to hold the repository dump.
      */
     public static void dumpRepository(RepositoryConnection con, String filename) {
-
+        FileOutputStream myFileOutputStream = null;
         // export repository to an n-triple file
         try {
-            log.info("Dumping repository to: '"+filename+"'");
-            FileOutputStream myFileOutputStream = new FileOutputStream(Scrub.fileName(filename));
+            log.info("dumpRepository(): Dumping repository to: '"+filename+"'");
+            myFileOutputStream = new FileOutputStream(Scrub.fileName(filename));
             if (filename.endsWith(".nt")) {
 
                 NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
@@ -651,10 +651,19 @@ public class RepositoryOps {
                 myTriGWriter.endRDF();
 
             }
-            log.info("Completed dumping explicit statements");
+            log.info("dumpRepository(): Completed dumping explicit statements");
 
         } catch (Exception e) {
-            log.error("Failed to dump repository! msg: "+e.getMessage());
+            log.error("dumpRepository(): Failed to dump repository! msg: "+e.getMessage());
+        }
+        finally {
+            if(myFileOutputStream != null){
+                try {
+                    myFileOutputStream.close();
+                } catch (IOException e) {
+                    log.error("dumpRepository(): Failed to close file when dumping repository. msg: "+e.getMessage());
+                }
+            }
         }
 
     }
@@ -1029,12 +1038,13 @@ public class RepositoryOps {
             log.error("Caught a MalformedQueryException! Msg: "
                     + e.getMessage());
         } finally {
-            try {
-                if(result!=null)
+            if (result != null) {
+                try {
                     result.close();
-            } catch (QueryEvaluationException e) {
-                log.error("Caught a QueryEvaluationException! Msg: "
-                        + e.getMessage());
+                }
+                catch(Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
             }
         }
 
@@ -1442,31 +1452,23 @@ public class RepositoryOps {
             } else {
                 log.info("No construct rule found!");
             }
-        } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
-                    + e.getMessage());
-
-        } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
 
         finally {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
-                    log.error("Caught a QueryEvaluationException! Msg: "
-                            + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
             if(con!=null){
                 try {
                     con.close();
-                } catch (RepositoryException e) {
-                    log.error("Caught RepositoryException! in dropExternalInferencing() Msg: "
-                                    + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
@@ -1532,23 +1534,16 @@ public class RepositoryOps {
             } else {
                 log.debug("No query result!");
             }
-        } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
-                    + e.getMessage());
-
-        } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
 
         finally {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
-                    log.error("Caught a QueryEvaluationException! Msg: "
-                            + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
 
@@ -1609,23 +1604,16 @@ public class RepositoryOps {
             } else {
                 log.info("No query result!");
             }
-        } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
-                    + e.getMessage());
-
-        } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
-        } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
 
         finally {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
-                    log.error("Caught a QueryEvaluationException! Msg: "
-                            + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
 
@@ -1670,24 +1658,24 @@ public class RepositoryOps {
                 xsltTransformationFileUrl= s.getObject().stringValue();
                 log.debug("Found Transformation file= " + xsltTransformationFileUrl);
             }
-        } catch (RepositoryException e) {
-            log.error("Caught a RepositoryException in getXsltTransformation Msg: "
-                    +e.getMessage());
-        }finally {
-            try {
-                if(statements!=null)
+        } catch (Exception e) {
+            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        }
+        finally {
+            if (statements != null) {
+                try {
                     statements.close();
-            } catch (RepositoryException e) {
-                log.error("Caught a RepositoryException while closing statements! in getXsltTransformation Msg: "
-                        +e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
             }
 
-            try {
-                if(con!=null)
+            if (con != null) {
+                try {
                     con.close();
-            } catch (RepositoryException e) {
-                log.error("Caught a RepositoryException! in getXsltTransformation Msg: "
-                        + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
             }
         }
 

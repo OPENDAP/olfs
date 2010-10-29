@@ -1,6 +1,7 @@
 package opendap.wcs.v1_1_2.http;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import opendap.semantics.wcs.StaticRdfCatalog;
@@ -166,7 +167,8 @@ public class Servlet extends HttpServlet {
             serviceConfigFilename = _serviceContentPath + configFileName;
         }
 
-
+        serviceConfigFilename = Scrub.fileName(serviceConfigFilename);
+        
         log.info("Using WCS Service configuration file: "+serviceConfigFilename);
 
         File configFile = new File(serviceConfigFilename);
@@ -249,7 +251,7 @@ public class Servlet extends HttpServlet {
 
 
 
-    public void doGet(HttpServletRequest req, HttpServletResponse resp){
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             httpGetService.handleRequest(req, resp);
         }
@@ -271,7 +273,13 @@ public class Servlet extends HttpServlet {
             }
         }
         finally{
-            this.destroy();
+            try{ this.destroy();}
+            catch(Throwable e){
+                try{ log.error(e.getMessage());}
+                catch(Throwable e2){
+                    // Do nothing.
+                }
+            }
         }
     }
 
@@ -311,7 +319,13 @@ public class Servlet extends HttpServlet {
             }
         }
         finally{
-            this.destroy();
+            try{ this.destroy();}
+            catch(Throwable e){
+                try{ log.error(e.getMessage());}
+                catch(Throwable e2){
+                    // Do nothing.
+                }
+            }
         }
     }
 

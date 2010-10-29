@@ -176,7 +176,7 @@ public class XMLfromRDF {
                 try {
                     result0.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
         }
@@ -256,7 +256,7 @@ public class XMLfromRDF {
                 try {
                     result0.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
         }
@@ -514,13 +514,11 @@ public class XMLfromRDF {
 		}catch (MalformedQueryException e) {
 			log.error(e.getMessage());
 		} finally {
-            if (result != null) {
+            if(result!=null){
                 try {
-
                     result.close();
-
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
 		}
@@ -581,14 +579,7 @@ public class XMLfromRDF {
 		}
 		return queryStringc;
 	}
-    public void printDoc(){
-		XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat() );
-		try {
-			outputter.output(this.doc, System.out);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}	
-	}
+
 	public Document getDoc(){
 		return this.doc;
 	}

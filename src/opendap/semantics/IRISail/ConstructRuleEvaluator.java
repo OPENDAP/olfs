@@ -243,9 +243,8 @@ public class ConstructRuleEvaluator {
                     if (graphResult != null) {
                         try {
                             graphResult.close();
-                        } catch (QueryEvaluationException e) {
-                            log.error("Caught a QueryEvaluationException! Msg: "
-                                            + e.getMessage());
+                        } catch (Exception e) {
+                            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                         }
                     }
 
@@ -348,17 +347,15 @@ public class ConstructRuleEvaluator {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
-                    log.error("Caught a QueryEvaluationException! Msg: "
-                            + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
             if(con!=null){
                 try {
                     con.close();
-                } catch (RepositoryException e) {
-                    log.error("Caught a RepositoryException! Msg: "
-                            + e.getMessage());
+                } catch (Exception e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
@@ -874,8 +871,7 @@ public class ConstructRuleEvaluator {
                 //int statementNbr = 1;
                 while (graphResult.hasNext() && !isEndList) {
                     st = graphResult.next();
-                    // statementNbr++;
-                    // log.debug("Current statement " + statementNbr + ": " + st);
+                    // log.debug("Current statement " + statementNbr++ + ": " + st);
                     obj = st.getObject();
                     prd = st.getPredicate();
                     sbj = st.getSubject();
