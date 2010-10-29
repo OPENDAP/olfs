@@ -52,7 +52,7 @@ public class XLink {
     Vector<Attribute> attributes = new Vector<Attribute>();
 
 
-    public static final HashSet<String> showValues = new HashSet();
+    public static final HashSet<String> showValues = new HashSet<String>();
     static {
         showValues.add("new");
         showValues.add("replace");
@@ -61,7 +61,7 @@ public class XLink {
         showValues.add("none");
     }
 
-    public static final HashSet<String> actuateValues = new HashSet();
+    public static final HashSet<String> actuateValues = new HashSet<String>();
     static {
         showValues.add("onLoad");
         showValues.add("onRequest");

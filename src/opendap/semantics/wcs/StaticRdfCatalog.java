@@ -711,18 +711,18 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                 // Passing false means no caching but also no exception.
                 // Maybe there's a better way to code the TCU ctor?
                 tcu = new ThreddsCatalogUtil();
+                Vector<String> datasetURLs = tcu.getDataAccessURLs(catalogURL, ThreddsCatalogUtil.SERVICE.OPeNDAP, recurse);
+
+                for (String dataset : datasetURLs) {
+                    dataset += ".rdf";
+                    rdfImports.add(dataset);
+                    log.info("Added dataset reference " + dataset + " to RDF imports list.");
+                }
             }
             catch (Exception e1) {
                 log.debug("ThreddsCatalogUtil exception: " + e1.getMessage());
             }
 
-            Vector<String> datasetURLs = tcu.getDataAccessURLs(catalogURL, ThreddsCatalogUtil.SERVICE.OPeNDAP, recurse);
-
-            for (String dataset : datasetURLs) {
-                dataset += ".rdf";
-                rdfImports.add(dataset);
-                log.info("Added dataset reference " + dataset + " to RDF imports list.");
-            }
 
         }
 
@@ -766,14 +766,15 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         RepositoryConnection con = null;
 
 
-        List<Element> coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
+        List coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
 
         try {
 
             con = repository.getConnection();
             lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
 
-            for (Element cde : coverageDescriptions) {
+            for (Object o : coverageDescriptions) {
+                Element cde = (Element) o;
 
                 idElement = cde.getChild("Identifier", WCS.WCS_NS);
 

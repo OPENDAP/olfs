@@ -344,7 +344,6 @@ public class ConstructRuleEvaluator {
         } catch (MalformedQueryException e) {
             log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
         }
-
         finally {
             if (result != null) {
                 try {
@@ -354,11 +353,13 @@ public class ConstructRuleEvaluator {
                             + e.getMessage());
                 }
             }
-            try {
-                con.close();
-            } catch (RepositoryException e) {
-                log.error("Caught a RepositoryException! Msg: "
-                        + e.getMessage());
+            if(con!=null){
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error("Caught a RepositoryException! Msg: "
+                            + e.getMessage());
+                }
             }
         }
 
@@ -964,7 +965,7 @@ public class ConstructRuleEvaluator {
 
 
         try {
-            Class methodContext = Class.forName(className);
+            Class<?> methodContext = Class.forName(className);
             log.debug("getMethodForFunction() - Located java class: "
                     + className);
 
@@ -1013,7 +1014,7 @@ public class ConstructRuleEvaluator {
 
         Method method;
 
-        Class methodContext = classInstance.getClass();
+        Class<?> methodContext = classInstance.getClass();
         String className = methodContext.getName();
 
 

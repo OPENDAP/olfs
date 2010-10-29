@@ -204,12 +204,15 @@ public class RdfImporter {
                 }
             }
 
-            try {
-                con.close();
-            } catch (RepositoryException e) {
-                log.error("Caught a RepositoryException! in findNeededRDFDocuments() Msg: "
-                        + e.getMessage());
+            if(con!=null){
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error("Caught a RepositoryException! in findNeededRDFDocuments() Msg: "
+                            + e.getMessage());
+                }
             }
+
         }
 
         log.info("Number of needed files identified:  "
@@ -482,24 +485,20 @@ public class RdfImporter {
      * @throws JDOMException 
      */
     private String getGrddlTransform(String importUrl) throws IOException, JDOMException {
-       
+
         SAXBuilder builder = new SAXBuilder();
-        String grddlTransformUrl ="";
-        try{
-           
+        String grddlTransformUrl = "";
+
         Document doc = builder.build(importUrl);
-        
+
         Element xmlRoot = doc.getRootElement();
-        
+
         org.jdom.Namespace ns = xmlRoot.getNamespace("grddl");
-        
-        grddlTransformUrl = xmlRoot.getAttributeValue("transformation",ns);
-        
-       }finally{
+
+        grddlTransformUrl = xmlRoot.getAttributeValue("transformation", ns);
+
         return grddlTransformUrl;
     }
-    }
-
 
 
     public static void main(String[] args) throws Exception {

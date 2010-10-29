@@ -156,12 +156,11 @@
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
-    <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
+    <property name="WCS.dir" location="${resources.dir}/WCS"/>
+    <property name="initialContent.dir" location="${WCS.dir}/initialContent"/>
+    <property name="WebInfResources.dir" location="${WCS.dir}/WEB-INF"/>
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
-    <property name="THREDDSResources.dir" location="${resources.dir}/THREDDS"/>
-    <property name="WCS.dir" location="${resources.dir}/WCS"/>
 
 
     <!-- Build Directories -->
@@ -272,15 +271,12 @@
 
 
 
-
-
-
     <target
             name="compile"
             depends="init"
-            description="Compiles the OLFS."
+            description="Compiles the Web Coverage Service."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
@@ -290,17 +286,16 @@
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}">
 
+            <compilerarg value="-Xlint:unchecked"/> 
             <classpath refid="compile.classpath"/>
 
             <src path="${src.dir}"/>
-            <include name="opendap/**/*.java"/>
-            <exclude name="opendap/experiments/**/*.java"/>
-            <exclude name="opendap/metacat/**/*.java"/>
+            <include name="opendap/wcs/v1_1_2/**/*.java"/>
+            <include name="opendap/semantics/**/*.java"/>
 
         </javac>
 
     </target>
-
 
 
 
@@ -430,20 +425,16 @@
     <target
             name="doc"
             depends="clean,init"
-            description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
+            description="Builds JavaDoc for the WCS Service software packages, if missing or out of date."
             unless="JavaDocIsUpToDate"
             >
         <copy todir="${build.src}" filtering="false" >
             <fileset dir="${src.dir}">
                 <exclude name="hao/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/dap/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/bes/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/coreServlet/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/experiments/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/io/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/logging/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/metacat/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/namespaces/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/ppt/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/soap/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/thredds/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
@@ -451,7 +442,6 @@
                 <exclude name="opendap/wcsGateway/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/wcs/gatewayClient/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/webstart/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/xml/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
             </fileset>
         </copy>
 
@@ -478,29 +468,6 @@
             Semantic Web targets
 
     -->
-    <target
-            name="compileSW"
-            depends="init"
-            description="Compiles the semanticWeb."
-            >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <classpath refid="compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/semantics/**/*.java"/>
-
-        </javac>
-
-    </target>
 
     <target  name="test" depends="compile">
 
@@ -508,7 +475,8 @@
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
         <copy file="${resources.dir}/WEB-INF/logback-test.xml" tofile="${build.run}/logback-test.xml"/>
 
-        <java classname="opendap.semantics.wcs.StaticRdfCatalog             fork="true"
+        <java classname="opendap.semantics.wcs.StaticRdfCatalog"
+              fork="true"
               maxmemory="1024m"
               dir="${build.run}"
                 >

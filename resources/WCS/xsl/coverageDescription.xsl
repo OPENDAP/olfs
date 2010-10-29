@@ -53,7 +53,7 @@
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <title>
-                            <xsl:value-of select="ows:Title"></xsl:value-of>
+                            <xsl:value-of select="ows:Title"/>
                         </title>
                     </xsl:when>
                     <xsl:otherwise>
@@ -78,13 +78,13 @@
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <h2>
-                            WCS Coverage: <br/><xsl:value-of select="ows:Title"></xsl:value-of>
-                            <font class="small"><a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}">XML</a></font>
+                            WCS Coverage: <br/><xsl:value-of select="ows:Title"/>
+                            <span class="small"><a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}">XML</a></span>
                         </h2>
                     </xsl:when>
                     <xsl:otherwise>
-                        <h2><font class="small">wcs:</font>Coverage Description
-                            <a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}"><font class="small">XML</font></a>
+                        <h2><span class="small">wcs:</span>Coverage Description
+                            <a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}"><span class="small">XML</span></a>
                         </h2>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -129,9 +129,7 @@
                 <!--                                                        -->
                 <hr size="1" noshade="noshade"/>
                 <div class="small" align="right">
-                    Hyrax development sponsored by<a href='http://www.nsf.gov/'>NSF</a>,<a href='http://www.nasa.gov/'>
-                    NASA</a>, and
-                    <a href='http://www.noaa.gov/'>NOAA</a>
+                    OPeNDAP WCS Service development sponsored by <a href='http://www.ioos.gov/'>IOOS</a>
                 </div>
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
@@ -225,7 +223,7 @@
 
 
     <xsl:template match="wcs:Field">
-        <li>field: <font class="medium_bold"> <xsl:value-of select="wcs:Identifier"/></font>
+        <li>field: <span class="medium_bold"> <xsl:value-of select="wcs:Identifier"/></span>
         <ul>
             <xsl:apply-templates mode="simple"/>
         </ul>

@@ -26,6 +26,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
+import opendap.coreServlet.Scrub;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
@@ -619,10 +620,9 @@ public class RepositoryOps {
     public static void dumpRepository(RepositoryConnection con, String filename) {
 
         // export repository to an n-triple file
-        File outrps = new File(filename); // hard copy of repository
         try {
             log.info("Dumping repository to: '"+filename+"'");
-            FileOutputStream myFileOutputStream = new FileOutputStream(outrps);
+            FileOutputStream myFileOutputStream = new FileOutputStream(Scrub.fileName(filename));
             if (filename.endsWith(".nt")) {
 
                 NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
@@ -888,11 +888,12 @@ public class RepositoryOps {
             log.error("Caught a MalformedQueryException! Msg: "
                     + e.getMessage());
         } finally {
-            try {
-                result.close();
-
-            } catch (Exception e) {
-                log.error("Caught an Exception! Msg: " + e.getMessage());
+            if(result!=null) {
+                try {
+                    result.close();
+                } catch (Exception e) {
+                    log.error("Caught an Exception! Msg: " + e.getMessage());
+                }
             }
         }
 
@@ -1460,13 +1461,14 @@ public class RepositoryOps {
                             + e.getMessage());
                 }
             }
-            try {
-                con.close();
-            } catch (RepositoryException e) {
-                log.error("Caught RepositoryException! in dropExternalInferencing() Msg: "
-                                + e.getMessage());
+            if(con!=null){
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error("Caught RepositoryException! in dropExternalInferencing() Msg: "
+                                    + e.getMessage());
+                }
             }
-
         }
 
         log.info("Located "

@@ -53,16 +53,13 @@
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>docs/css/contents.css</xsl:attribute>
                 </xsl:element>
 
-
-                <!-- link rel='stylesheet' href='$ServicePrefix/docs/css/contents.css'
-                      type='text/css'/ -->
                 <xsl:choose>
                     <xsl:when test="ows:ServiceIdentification/ows:Title">
                         <title>
-                            <xsl:value-of select="ows:ServiceIdentification/ows:Title"></xsl:value-of>
+                            <xsl:value-of select="ows:ServiceIdentification/ows:Title"/>
                         </title>
                     </xsl:when>
                     <xsl:otherwise>
@@ -81,7 +78,7 @@
 
                 <table border="0" width="90%"><tr>
 
-                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'docs/images/logo.gif')}" /></td>
 
                     <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
 
@@ -90,7 +87,7 @@
                 <xsl:choose>
                     <xsl:when test="ows:ServiceIdentification/ows:Title">
                         <h1>
-                            <xsl:value-of select="ows:ServiceIdentification/ows:Title"></xsl:value-of>
+                            <xsl:value-of select="ows:ServiceIdentification/ows:Title"/>
                         </h1>
                     </xsl:when>
                     <xsl:otherwise>
@@ -118,13 +115,13 @@
                 <div class= "medium">
                 <ul>
                     <li>
-                        <a href="{$ServicePrefix}/test">KVP Test Page</a>
+                        <a href="{$ServicePrefix}test">KVP Test Page</a>
                         - Parses a KVP request and returns a page
                         reporting any problems.
                     </li>
                     <br/>
                     <li>
-                        <a href="{$ServicePrefix}/echoXML">Return KVP as XML</a>
+                        <a href="{$ServicePrefix}echoXML">Return KVP as XML</a>
                         - Translates a KVP encoded request into
                         an XML encoded version of the request.
                     </li>
@@ -163,9 +160,7 @@
                 <!--                                                        -->
                 <hr size="1" noshade="noshade"/>
                 <div class="small" align="right">
-                    Hyrax development sponsored by<a href='http://www.nsf.gov/'>NSF</a>,<a href='http://www.nasa.gov/'>
-                    NASA</a>, and
-                    <a href='http://www.noaa.gov/'>NOAA</a>
+                    OPeNDAP WCS Service development sponsored by <a href='http://www.ioos.gov/'>IOOS</a>
                 </div>
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
@@ -243,7 +238,7 @@
                         <tr>
                             <td align="left"><span class="bold_italic">No Coverages Found</span></td>
                             <!-- <th align="center">Description</th> -->
-                            <td align="center">[] []</td>
+                            <td align="center">[----.--, ----.--] [----.--, ----.--]</td>
                         </tr>
 
                     </xsl:otherwise>
@@ -296,7 +291,7 @@
             <td align="left">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcs:Identifier"/>
+                        <xsl:value-of select="$ServicePrefix"/>describeCoverage?<xsl:value-of select="wcs:Identifier"/>
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="ows:Title">
