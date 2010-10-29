@@ -159,7 +159,7 @@
     <property name="WCS.dir" location="${resources.dir}/WCS"/>
     <property name="initialContent.dir" location="${WCS.dir}/initialContent"/>
     <property name="WebInfResources.dir" location="${WCS.dir}/WEB-INF"/>
-    <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
+    <property name="distributionResources.dir"  location="${WCS.dir}/distribution"/>
 
 
 
@@ -308,11 +308,11 @@
             description="Builds source distribution"
             >
 
-        <tar destfile="${build.dist}/olfs-${VERSION}-src.tgz"
+        <tar destfile="${build.dist}/wcs-${VERSION}-src.tgz"
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="olfs-${VERSION}-src">
+            <zipfileset dir="." prefix="wcs-${VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
                 <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
@@ -332,7 +332,7 @@
             depends="server"
             description="Packages the war file into tar file with a release related name.">
 
-        <copy file="${distributionResources.dir}/WarFileReadMe"
+        <copy file="${distributionResources.dir}/README"
               tofile="${build.dist}/README"/>
 
         <tar destfile="${build.dist}/wcs-${VERSION}-webapp.tgz"
