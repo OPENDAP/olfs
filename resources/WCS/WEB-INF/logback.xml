@@ -63,10 +63,16 @@
 
 
 
-    <!-- OPeNDAP Hyrax Logging -->
+    <!-- OPeNDAP WCS Logging -->
+    <logger name="opendap.semantics.wcs.StaticRdfCatalog" level="info" >
+        <appender-ref ref="stdout"/>
+    </logger>
+
     <logger name="opendap" level="error" >
         <appender-ref ref="ErrorLog"/>
     </logger>
+
+
 
 
     <!-- Access/Performance Logging -->
