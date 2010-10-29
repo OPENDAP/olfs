@@ -240,6 +240,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(!collectionName.endsWith("/"))
             collectionName += "/";
 
+        while(!collectionName.equals("/") && collectionName.startsWith("/"))
+            collectionName = collectionName.substring(1);
+
         log.debug("collectionName:  "+collectionName);
 
 

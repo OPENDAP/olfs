@@ -16,28 +16,28 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
     </Attribute>
 
     <Grid name="bears">
-        <Attribute name="act" type="String">
-            <value>text string\\012\\011123</value>
-        </Attribute>
-        <Attribute name="acs" type="Int16">
-            <value>-40</value>
-        </Attribute>
-        <Attribute name="acl" type="Int32">
-            <value>17000</value>
-        </Attribute>
-        <Attribute name="acf" type="Float32">
-            <value>-2.000000000</value>
-            <value>1.000000000</value>
-            <value>0.000000000</value>
-        </Attribute>
-        <Attribute name="acd" type="Float64">
-            <value>-1.0000000000000000</value>
-            <value>0.75000000000000000</value>
-        </Attribute>
-        <Attribute name="string_length" type="Int32">
-            <value>3</value>
-        </Attribute>
         <Array name="bears">
+            <Attribute name="act" type="String">
+                <value>text string\\012\\011123</value>
+            </Attribute>
+            <Attribute name="acs" type="Int16">
+                <value>-40</value>
+            </Attribute>
+            <Attribute name="acl" type="Int32">
+                <value>17000</value>
+            </Attribute>
+            <Attribute name="acf" type="Float32">
+                <value>-2.000000000</value>
+                <value>1.000000000</value>
+                <value>0.000000000</value>
+            </Attribute>
+            <Attribute name="acd" type="Float64">
+                <value>-1.0000000000000000</value>
+                <value>0.75000000000000000</value>
+            </Attribute>
+            <Attribute name="string_length" type="Int32">
+                <value>3</value>
+            </Attribute>
             <String/>
             <dimension name="i" size="2"/>
             <dimension name="j" size="3"/>
@@ -77,6 +77,25 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <dimension name="j" size="3"/>
         </Array>
         <Map name="i">
+            <Attribute name="attr1" type="String">
+                <value>1</value>
+            </Attribute>
+            <Attribute name="attr2" type="String">
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+                <value>4</value>
+            </Attribute>
+            <Attribute name="i_1" type="Container">
+                <Attribute name="attr3_1" type="String">
+                    <value>17</value>
+                </Attribute>
+                <Attribute name="attr3_2" type="Float64">
+                    <value>19</value>
+                    <value>23</value>
+                    <value>27</value>
+                </Attribute>
+            </Attribute>
             <Int32/>
             <dimension name="i" size="2"/>
         </Map>
@@ -92,6 +111,25 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <dimension name="j" size="3"/>
         </Array>
         <Map name="i">
+            <Attribute name="attr1" type="String">
+                <value>1</value>
+            </Attribute>
+            <Attribute name="attr2" type="String">
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+                <value>4</value>
+            </Attribute>
+            <Attribute name="i_1" type="Container">
+                <Attribute name="attr3_1" type="String">
+                    <value>17</value>
+                </Attribute>
+                <Attribute name="attr3_2" type="Float64">
+                    <value>19</value>
+                    <value>23</value>
+                    <value>27</value>
+                </Attribute>
+            </Attribute>
             <Int32/>
             <dimension name="i" size="2"/>
         </Map>
@@ -107,6 +145,25 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <dimension name="j" size="3"/>
         </Array>
         <Map name="i">
+            <Attribute name="attr1" type="String">
+                <value>1</value>
+            </Attribute>
+            <Attribute name="attr2" type="String">
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+                <value>4</value>
+            </Attribute>
+            <Attribute name="i_1" type="Container">
+                <Attribute name="attr3_1" type="String">
+                    <value>17</value>
+                </Attribute>
+                <Attribute name="attr3_2" type="Float64">
+                    <value>19</value>
+                    <value>23</value>
+                    <value>27</value>
+                </Attribute>
+            </Attribute>
             <Int32/>
             <dimension name="i" size="2"/>
         </Map>
@@ -122,6 +179,25 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <dimension name="j" size="3"/>
         </Array>
         <Map name="i">
+            <Attribute name="attr1" type="String">
+                <value>1</value>
+            </Attribute>
+            <Attribute name="attr2" type="String">
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+                <value>4</value>
+            </Attribute>
+            <Attribute name="i_1" type="Container">
+                <Attribute name="attr3_1" type="String">
+                    <value>17</value>
+                </Attribute>
+                <Attribute name="attr3_2" type="Float64">
+                    <value>19</value>
+                    <value>23</value>
+                    <value>27</value>
+                </Attribute>
+            </Attribute>
             <Int32/>
             <dimension name="i" size="2"/>
         </Map>
@@ -130,6 +206,33 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <dimension name="j" size="3"/>
         </Map>
     </Grid>
+    <Array name="i">
+        <Attribute name="attr1" type="String">
+            <value>1</value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <value>1</value>
+            <value>2</value>
+            <value>3</value>
+            <value>4</value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <value>17</value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <value>19</value>
+                <value>23</value>
+                <value>27</value>
+            </Attribute>
+        </Attribute>
+        <Int32/>
+        <dimension name="i" size="2"/>
+    </Array>
+    <Array name="j">
+        <Float32/>
+        <dimension name="j" size="3"/>
+    </Array>
     <Array name="l">
         <Int16/>
         <dimension name="l" size="3"/>

@@ -53,7 +53,7 @@
                 <xsl:element name="link">
                     <xsl:attribute name="rel">stylesheet</xsl:attribute>
                     <xsl:attribute name="type">text/css</xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>docs/css/contents.css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
                 </xsl:element>
 
                 <xsl:choose>
@@ -78,7 +78,7 @@
 
                 <table border="0" width="90%"><tr>
 
-                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'docs/images/logo.gif')}" /></td>
+                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
 
                     <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
 
@@ -115,13 +115,13 @@
                 <div class= "medium">
                 <ul>
                     <li>
-                        <a href="{$ServicePrefix}test">KVP Test Page</a>
+                        <a href="{$ServicePrefix}/test">KVP Test Page</a>
                         - Parses a KVP request and returns a page
                         reporting any problems.
                     </li>
                     <br/>
                     <li>
-                        <a href="{$ServicePrefix}echoXML">Return KVP as XML</a>
+                        <a href="{$ServicePrefix}/echoXML">Return KVP as XML</a>
                         - Translates a KVP encoded request into
                         an XML encoded version of the request.
                     </li>
@@ -145,7 +145,7 @@
                 <br/>
                 A WCS response will be returned.
 
-                <form action="{$ServicePrefix}form" method="post">
+                <form action="{$ServicePrefix}/form" method="post">
                     <p>
                         <textarea name="WCS_QUERY" rows="20" cols="80">Insert your WCS query here...</textarea>
                     </p>
@@ -291,7 +291,7 @@
             <td align="left">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="$ServicePrefix"/>describeCoverage?<xsl:value-of select="wcs:Identifier"/>
+                        <xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcs:Identifier"/>
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="ows:Title">

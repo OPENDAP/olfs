@@ -271,7 +271,7 @@ public class CatalogWrapper {
             post =  (Element)i.next();
             href = post.getAttributeValue("href",WCS.XLINK_NS);
             if(href.startsWith(_defaultServiceUrl)){
-                href = href.replaceFirst(_defaultServiceUrl+"/",serviceUrl);
+                href = href.replaceFirst(_defaultServiceUrl,serviceUrl);
             }
             post.setAttribute("href",href,WCS.XLINK_NS);
         }

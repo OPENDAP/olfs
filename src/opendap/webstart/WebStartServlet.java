@@ -313,7 +313,7 @@ public class WebStartServlet extends HttpServlet {
 
 
         log.debug(opendap.coreServlet.Util.showRequest(req, reqNumber.get()));
-        log.debug(opendap.coreServlet.Util.probeRequest(this, req));
+        //log.debug(opendap.coreServlet.Util.probeRequest(this, req));
 
 
         Request dapRequest = new Request(this,req);
@@ -363,21 +363,26 @@ public class WebStartServlet extends HttpServlet {
             }
 
 
-            String applicationName = req.getPathInfo();
+            String applicationID = req.getPathInfo();
                  
 
-            // Condition applicationName.
-            if (applicationName != null)
+            // Condition applicationID.
+            if (applicationID != null)
             {
-                while (applicationName != null && applicationName.startsWith("/")) { // Strip leading slashes
-                    applicationName = applicationName.substring(1, applicationName.length());
+                while (applicationID != null && applicationID.startsWith("/")) { // Strip leading slashes
+                    applicationID = applicationID.substring(1, applicationID.length());
                 }
-                if (applicationName.equals(""))
-                    applicationName = null;
+                if (applicationID.equals(""))
+                    applicationID = null;
             }
 
+            if(applicationID == null){
+                log.error("No applicationID found in WebStart request.");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
 
-            if (applicationName.equals("viewers")) {
+            if (applicationID.equals("viewers")) {
 
                 resp.setContentType("text/html");
                 sendDatasetPage(dapRequest.getWebStartServiceLocalID(),dapRequest.getDocsServiceLocalID(), dapService, besDatasetId, ddx, resp.getOutputStream());
@@ -387,7 +392,7 @@ public class WebStartServlet extends HttpServlet {
                 String dataAccessURL = serverURL+dapService+besDatasetId;
 
                 // Attempt to locate the application...
-                JwsHandler jwsHandler = jwsHandlers.get(applicationName);
+                JwsHandler jwsHandler = jwsHandlers.get(applicationID);
 
                 if (jwsHandler != null) {
 
@@ -406,7 +411,7 @@ public class WebStartServlet extends HttpServlet {
                     pw.print(jnlpContent);
 
                 } else {
-                    log.error("Unable to locate a Java WebStart handler to respond to: '" + applicationName + "?" + query + "'");
+                    log.error("Unable to locate a Java WebStart handler to respond to: '" + applicationID + "?" + query + "'");
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }

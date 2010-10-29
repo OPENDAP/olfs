@@ -350,6 +350,92 @@ DODS_EXTRA.Unlimited_Dimension: TIME
 <h3><a href="opendap_form_help.html#dataset_variables" target="help">Variables:</a></h3>
 <td><script type="text/javascript">
 <!--
+org_opendap_COADSX = new dods_var("COADSX", "org_opendap_COADSX", 1);
+DODS_URL.add_dods_var(org_opendap_COADSX);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_COADSX"
+onclick="org_opendap_COADSX.handle_projection_change(get_org_opendap_COADSX) "  onfocus="describe_projection()">
+<font size="+1">COADSX</font></b>: Array of 64 bit Reals [COADSX = 0..179]<br>
+
+COADSX:<input type="text" name="org_opendap_COADSX_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_COADSX.add_dim(180);
+// -->
+</script>
+<br>
+
+<textarea name="COADSX_attr" rows="5" cols="70">
+units: degrees_east
+modulo:  
+point_spacing: even
+</textarea>
+
+
+<p><p>
+
+<tr><td><td>
+
+<script type="text/javascript">
+<!--
+org_opendap_COADSY = new dods_var("COADSY", "org_opendap_COADSY", 1);
+DODS_URL.add_dods_var(org_opendap_COADSY);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_COADSY"
+onclick="org_opendap_COADSY.handle_projection_change(get_org_opendap_COADSY) "  onfocus="describe_projection()">
+<font size="+1">COADSY</font></b>: Array of 64 bit Reals [COADSY = 0..89]<br>
+
+COADSY:<input type="text" name="org_opendap_COADSY_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_COADSY.add_dim(90);
+// -->
+</script>
+<br>
+
+<textarea name="COADSY_attr" rows="5" cols="70">
+units: degrees_north
+point_spacing: even
+</textarea>
+
+
+<p><p>
+
+<tr><td><td>
+
+<script type="text/javascript">
+<!--
+org_opendap_TIME = new dods_var("TIME", "org_opendap_TIME", 1);
+DODS_URL.add_dods_var(org_opendap_TIME);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_TIME"
+onclick="org_opendap_TIME.handle_projection_change(get_org_opendap_TIME) "  onfocus="describe_projection()">
+<font size="+1">TIME</font></b>: Array of 64 bit Reals [TIME = 0..11]<br>
+
+TIME:<input type="text" name="org_opendap_TIME_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_TIME.add_dim(12);
+// -->
+</script>
+<br>
+
+<textarea name="TIME_attr" rows="5" cols="70">
+units: hour since 0000-01-01 00:00:00
+time_origin: 1-JAN-0000 00:00:00
+modulo:  
+</textarea>
+
+
+<p><p>
+
+<tr><td><td>
+
+<script type="text/javascript">
+<!--
 org_opendap_SST = new dods_var("SST", "org_opendap_SST", 1);
 DODS_URL.add_dods_var(org_opendap_SST);
 // -->
@@ -378,11 +464,19 @@ org_opendap_SST.add_dim(180);
 </script>
 <br>
 <textarea name="SST_attr" rows="5" cols="70">
-missing_value: -9.999999790e+33
-_FillValue: -9.999999790e+33
-long_name: SEA SURFACE TEMPERATURE
-history: From coads_climatology
-units: Deg C
+SST.missing_value: -9.999999790e+33
+SST._FillValue: -9.999999790e+33
+SST.long_name: SEA SURFACE TEMPERATURE
+SST.history: From coads_climatology
+SST.units: Deg C
+TIME.units: hour since 0000-01-01 00:00:00
+TIME.time_origin: 1-JAN-0000 00:00:00
+TIME.modulo:  
+COADSY.units: degrees_north
+COADSY.point_spacing: even
+COADSX.units: degrees_east
+COADSX.modulo:  
+COADSX.point_spacing: even
 </textarea>
 
 
@@ -420,11 +514,19 @@ org_opendap_AIRT.add_dim(180);
 </script>
 <br>
 <textarea name="AIRT_attr" rows="5" cols="70">
-missing_value: -9.999999790e+33
-_FillValue: -9.999999790e+33
-long_name: AIR TEMPERATURE
-history: From coads_climatology
-units: DEG C
+AIRT.missing_value: -9.999999790e+33
+AIRT._FillValue: -9.999999790e+33
+AIRT.long_name: AIR TEMPERATURE
+AIRT.history: From coads_climatology
+AIRT.units: DEG C
+TIME.units: hour since 0000-01-01 00:00:00
+TIME.time_origin: 1-JAN-0000 00:00:00
+TIME.modulo:  
+COADSY.units: degrees_north
+COADSY.point_spacing: even
+COADSX.units: degrees_east
+COADSX.modulo:  
+COADSX.point_spacing: even
 </textarea>
 
 
@@ -462,11 +564,19 @@ org_opendap_UWND.add_dim(180);
 </script>
 <br>
 <textarea name="UWND_attr" rows="5" cols="70">
-missing_value: -9.999999790e+33
-_FillValue: -9.999999790e+33
-long_name: ZONAL WIND
-history: From coads_climatology
-units: M/S
+UWND.missing_value: -9.999999790e+33
+UWND._FillValue: -9.999999790e+33
+UWND.long_name: ZONAL WIND
+UWND.history: From coads_climatology
+UWND.units: M/S
+TIME.units: hour since 0000-01-01 00:00:00
+TIME.time_origin: 1-JAN-0000 00:00:00
+TIME.modulo:  
+COADSY.units: degrees_north
+COADSY.point_spacing: even
+COADSX.units: degrees_east
+COADSX.modulo:  
+COADSX.point_spacing: even
 </textarea>
 
 
@@ -504,11 +614,19 @@ org_opendap_VWND.add_dim(180);
 </script>
 <br>
 <textarea name="VWND_attr" rows="5" cols="70">
-missing_value: -9.999999790e+33
-_FillValue: -9.999999790e+33
-long_name: MERIDIONAL WIND
-history: From coads_climatology
-units: M/S
+VWND.missing_value: -9.999999790e+33
+VWND._FillValue: -9.999999790e+33
+VWND.long_name: MERIDIONAL WIND
+VWND.history: From coads_climatology
+VWND.units: M/S
+TIME.units: hour since 0000-01-01 00:00:00
+TIME.time_origin: 1-JAN-0000 00:00:00
+TIME.modulo:  
+COADSY.units: degrees_north
+COADSY.point_spacing: even
+COADSX.units: degrees_east
+COADSX.modulo:  
+COADSX.point_spacing: even
 </textarea>
 
 

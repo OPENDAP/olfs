@@ -16,7 +16,21 @@
 <h3>Variables in this Dataset</h3>
 <center>
 <table>
-<tr><td align=right valign=top><b>SST</b>:</td>
+<tr><td align=right valign=top><b>COADSX</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSX = 0..179]<br>units: degrees_east<br>
+modulo:  <br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>COADSY</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [COADSY = 0..89]<br>units: degrees_north<br>
+point_spacing: even<br>
+</td>
+</tr><tr><td align=right valign=top><b>TIME</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [TIME = 0..11]<br>units: hour since 0000-01-01 00:00:00<br>
+time_origin: 1-JAN-0000 00:00:00<br>
+modulo:  <br>
+</td>
+</tr><tr><td align=right valign=top><b>SST</b>:</td>
 <td align=left valign=top>Grid<br>missing_value: -9.999999790e+33<br>
 _FillValue: -9.999999790e+33<br>
 long_name: SEA SURFACE TEMPERATURE<br>

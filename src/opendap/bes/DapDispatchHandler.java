@@ -976,7 +976,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String contentDisposition = " attachment; filename=" +downloadFileName;
 
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition",contentDisposition);
+        response.setHeader("Content-Disposition",Scrub.fileName(contentDisposition));
 
         Version.setOpendapMimeHeaders(request,response);
 

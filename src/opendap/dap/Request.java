@@ -48,7 +48,7 @@ public class Request {
         String contextName = _request.getContextPath();
         String servletName = _request.getServletPath();
 
-        String dapService = contextName + servletName + "/";
+        String dapService = contextName + servletName;
 
         log.debug("getDapServiceLocalID(): "+dapService);
 
@@ -61,7 +61,7 @@ public class Request {
 
         String contextName = _request.getContextPath();
 
-        String docsService = contextName + "/docs/";
+        String docsService = contextName + "/docs";
 
         log.debug("getDocsServiceLocalID(): "+docsService);
 
@@ -74,7 +74,7 @@ public class Request {
 
         String contextName = _request.getContextPath();
 
-        String webStartService = contextName + "/webstart/";
+        String webStartService = contextName + "/webstart";
 
         log.debug("getWebStartServiceLocalID(): "+webStartService);
 
