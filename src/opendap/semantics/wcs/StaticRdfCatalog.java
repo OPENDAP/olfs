@@ -325,7 +325,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                 updateCatalogCache(repository);
 
             } else {
-                log.info("updateCatalog(): The repository was unchanged. Update complete.");
+                log.info("updateCatalog(): The repository was unchanged.");
             }
 
 
@@ -339,7 +339,10 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             }
             repositoryWriteLock.unlock();
 
+            log.info("updateCatalog(): Catalog update complete.");
         }
+        
+
 
     }
 
@@ -1445,13 +1448,15 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             int updateCounter = 0;
             long startTime, endTime;
             long elapsedTime, sleepTime;
-            //Thread thread = Thread.currentThread();
+            Thread thread = Thread.currentThread();
+            
 
 
             log.info("************* STARTING CATALOG UPDATE THREAD.");
+            thread.setName("catalogUpdate-"+thread.getName());
             try {
-                log.info("************* CATALOG UPDATE THREAD sleeping for " + firstUpdateDelay / 1000.0 + " seconds.");
-                Thread.sleep(firstUpdateDelay);
+                log.info("************* CATALOG UPDATE THREAD starting in " + firstUpdateDelay / 1000.0 + " seconds. Sleeping now...");
+                thread.sleep(firstUpdateDelay);
 
             } catch (InterruptedException e) {
                 log.warn("Caught Interrupted Exception.");
