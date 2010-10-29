@@ -835,20 +835,19 @@ public class ConstructRuleEvaluator {
 
         Statement oldSt = null;
         while (graphResult.hasNext()) {
-            Statement st = graphResult.next();
-            Statement newSt = null;
 
+            Statement st = graphResult.next();
+            URI prd = st.getPredicate();
             Value obj = st.getObject();
+
+            // listnode is  equal to endList until a list is found. While a list is being parsed/processed it is
+            // set to the current list node. After the list is processed it is set back to endList
             Value listnode = endList;
 
-            URI prd = st.getPredicate();
             Resource sbj;
-
             URI targetPrd;
-
             Resource targetSbj;
-
-
+            Statement newSt = null;
             Method func = null;
 
 
