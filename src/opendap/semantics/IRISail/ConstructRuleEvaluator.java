@@ -839,15 +839,14 @@ public class ConstructRuleEvaluator {
             Statement newSt = null;
 
             Value obj = st.getObject();
-            Value listnode = null;
+            Value listnode = endList;
 
             URI prd = st.getPredicate();
-            Resource sbj = st.getSubject();
+            Resource sbj;
 
+            URI targetPrd;
 
-            URI targetPrd = null;
-
-            Resource targetSbj = null;
+            Resource targetSbj;
 
 
             Method func = null;
@@ -873,12 +872,11 @@ public class ConstructRuleEvaluator {
                 }
                 Boolean isEndList = endList.equals(obj);
                 List<String> rdfList = new ArrayList<String>();
-                int statementNbr = 1;
+                //int statementNbr = 1;
                 while (graphResult.hasNext() && !isEndList) {
                     st = graphResult.next();
-                    statementNbr++;
-                    // log.debug("Current statement " + statementNbr + ": " +
-                    // st);
+                    // statementNbr++;
+                    // log.debug("Current statement " + statementNbr + ": " + st);
                     obj = st.getObject();
                     prd = st.getPredicate();
                     sbj = st.getSubject();
