@@ -1,4 +1,26 @@
 
+This package contains software that crawls OPeNDAP servers and builds 
+different kinds of metadata records. There are main() methods for almost all 
+of the classes, although most are intended for simple testing only. To run the
+crawler, etc., use the shell scripts that the ant build file 
+(reap_crawler_build.xml) uses with the 'build' targets. These make executable
+jar files that include a control file for the logging system.
+
+Current shell commands provided:
+
+ddx_crawler.sh: Based on DDXCrawler, this will crawl a server, fetching each
+THREDDS catalog and caching it in POSTGRES. The URLs that reference all the
+catalogs are stored in a ConcurrentHashMap (just 'map' from now on) which is
+made persistent using its 'Serializable' interface. The ddx_crawler command
+also extracts all of the DDX URLs from the catalogs and stores those in a
+second map. Optionally, ddx_crawler will fetch all of those referenced DDX
+objects and store those in POSTGRES, too. This command can also replay a crawl
+using cached data and, if the feature is fixed, it can recover from problems
+and resume a crawl. This works now if the crawl is interrupted by an Exception,
+but support for CNTL-c and the like is missing.
+
+-------------------------------------------------------------------------------
+
 URLs into servers that we should index for the ocean use case:
 
 http://data.nodc.noaa.gov/opendap/ghrsst/
