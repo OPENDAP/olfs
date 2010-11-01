@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2010 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
+// Author: James Gallagher  <jgallagher@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 
 package opendap.metacat;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -38,7 +39,12 @@ import org.slf4j.LoggerFactory;
  * @author jimg
  *
  */
-public class ParsedURL {
+public class ParsedURL implements Serializable {
+	/**
+	 * This is used to ensure that when a ParsedURL is deserialized, the 
+	 * correct class definition is used.
+	 */
+	private static final long serialVersionUID = 1L;
 	private String machine;
 	private String[] components;
 	private String theURL;

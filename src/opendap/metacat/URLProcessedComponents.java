@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2010 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
+// Author: James Gallagher  <jgallagher@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,18 @@
 
 package opendap.metacat;
 
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
 
-public class URLProcessedComponents {
-	public class Lexeme {
+public class URLProcessedComponents implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	public class Lexeme implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private String value;
 		private boolean pattern;
 		

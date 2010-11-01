@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 
-    <property name="logdir" value="DapIngest"/>
+    <property name="logdir" value="metacat"/>
     
     <property name="ErrorFormat" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
     <property name="DebugFormat" value="[%thread] [%file:%line] %msg%n"/>
@@ -69,5 +69,8 @@
     <logger name="opendap" level="ERROR">
         <appender-ref ref="ErrorLog"/>
     </logger>
-
+    <logger name="opendap.metacat.DDXCrawler" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    
 </configuration>

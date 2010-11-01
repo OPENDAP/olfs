@@ -745,7 +745,7 @@
 
         <java classname="opendap.metacat.PrintVisitedCache" fork="true" dir="${build.run}">
             <!--arg line="- -catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" /-->
-            <arg line="test.opendap.org_TC"/>
+            <arg line="test.opendap.org_THREDDS"/>
             <arg line="thredds_responses" />
             <classpath refid="classpath" />
         </java>
@@ -760,7 +760,7 @@
 			<!--arg line="- -catalog-root=http://test.opendap.org:8080/opendap/data/catalog.xml" /-->
 			<arg line="--catalog-root=http://test.opendap.org/dap/data/catalog.xml"/>
 			<arg line="--verbose" />
-			<arg line="--read-from-thredds-cache" />
+			<!--arg line="- -read-from-thredds-cache" /-->
 			<classpath refid="classpath" />
 		</java>
 

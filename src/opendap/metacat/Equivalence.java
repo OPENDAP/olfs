@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2010 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
+// Author: James Gallagher  <jgallagher@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 
 package opendap.metacat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,9 +57,11 @@ import opendap.metacat.URLProcessedComponents.Lexeme;
  * @author jimg
  * 
  */
-public class Equivalence {
+public class Equivalence implements Serializable {
 	
-    private static Logger log = LoggerFactory.getLogger(Equivalence.class);
+	private static final long serialVersionUID = 1L;
+
+	private static Logger log = LoggerFactory.getLogger(Equivalence.class);
 
 	private int patternPosition;	// Which of the URL's components
 	private String componentValue; // This is the string used to encode the pattern (eg 'dddd')

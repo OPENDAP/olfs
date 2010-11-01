@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2010 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
+// Author: James Gallagher  <jgallagher@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
