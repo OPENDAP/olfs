@@ -262,6 +262,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
         if (backgroundUpdates && !overrideBackgroundUpdates) {
             catalogUpdateThread = new Thread(this);
+            catalogUpdateThread.setName("CatalogUpdate"+catalogUpdateThread.getName());
             catalogUpdateThread.start();
         } else {
             update();
@@ -310,6 +311,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
             RepositoryOps.dumpRepository(repository, filename);
 
+            ProcessingState.checkState();
 
             if (repositoryChanged) {
                 log.info("updateCatalog(): Repository has been changed!");
@@ -317,9 +319,13 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                 log.info("updateCatalog(): Extracting CoverageDescriptions from the Repository...");
                 extractCoverageDescriptionsFromRepository(repository);
 
+                ProcessingState.checkState();
+
                 filename = catalogCacheDirectory + "coverageXMLfromRDF.xml";
                 log.info("updateCatalog(): Dumping CoverageDescriptions Document to: " + filename);
                 dumpCoverageDescriptionsDocument(filename);
+
+                ProcessingState.checkState();
 
                 log.info("updateCatalog(): Updating catalog cache....");
                 updateCatalogCache(repository);
@@ -639,35 +645,6 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
     }
 
 
-    public void destroy() {
-
-
-        log.debug("destroy(): Attempting to aquire WriteLock from _catalogLock and _repositoryLock.");
-
-        ReentrantReadWriteLock.WriteLock catLock = _catalogLock.writeLock();
-        ReentrantReadWriteLock.WriteLock reposLock = _repositoryLock.writeLock();
-
-
-        try {
-            ProcessingState.stopProcessing();
-            if (catalogUpdateThread != null) {
-                log.debug("destroy() Current thread '" + Thread.currentThread().getName() + "' Interrupting catalogUpdateThread '" + catalogUpdateThread + "'");
-                catalogUpdateThread.interrupt();
-                log.debug("destroy(): catalogUpdateThread '" + catalogUpdateThread + "' interrupt() called.");
-            }
-            catLock.lock();
-            reposLock.lock();
-            log.debug("destroy(): WriteLocks Aquired.");
-
-        }
-        finally {
-            catLock.unlock();
-            reposLock.unlock();
-            log.debug("destroy(): Released WriteLock for _catalogLock and _repositoryLock.");
-            log.debug("destroy(): Complete.");
-        }
-
-    }
 
     /**
      * Retrieve the data set list and the import RDF files from the config file.
@@ -1221,7 +1198,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         String coordinateDapId = null;
         try {
 
-            TupleQueryResult result = null;
+            TupleQueryResult result;
 
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);
 
@@ -1438,67 +1415,6 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
     }
 
 
-    /**
-     * Run <code>update()</code> which updates the repository and catalog cache.
-     */
-    public void run() {
-
-        try {
-            ProcessingState.enableProcessing();
-            int updateCounter = 0;
-            long startTime, endTime;
-            long elapsedTime, sleepTime;
-            Thread thread = Thread.currentThread();
-            
-
-
-            log.info("************* STARTING CATALOG UPDATE THREAD.");
-            thread.setName("catalogUpdate-"+thread.getName());
-            try {
-                log.info("************* CATALOG UPDATE THREAD starting in " + firstUpdateDelay / 1000.0 + " seconds. Sleeping now...");
-                thread.sleep(firstUpdateDelay);
-
-            } catch (InterruptedException e) {
-                log.warn("Caught Interrupted Exception.");
-                ProcessingState.stopProcessing();
-            }
-
-
-            while (ProcessingState.continueProcessing()) {
-
-                try {
-
-                    startTime = new Date().getTime();
-                    try {
-                        update();
-                    } catch (Exception e) {
-                        log.error("Catalog Update FAILED!!! Caught " + e.getClass().getName() + "  Message: " + e.getMessage());
-                    }
-                    endTime = new Date().getTime();
-                    elapsedTime = (endTime - startTime);
-                    updateCounter++;
-                    log.debug("Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
-
-                    sleepTime = catalogUpdateInterval - elapsedTime;
-                    if (ProcessingState.continueProcessing() && sleepTime > 0) {
-                        log.debug("Catalog Update thread sleeping for " + sleepTime / 1000.0 + " seconds.");
-                        Thread.sleep(sleepTime);
-                    }
-
-                } catch (InterruptedException e) {
-                    log.warn("Caught Interrupted Exception.");
-                    ProcessingState.stopProcessing();
-
-                }
-            }
-        }
-        finally {
-            destroy();
-        }
-        log.info("************* EXITING CATALOG UPDATE THREAD.");
-
-
-    }
 
     /**
      * Ingest supported format in the coverage document.
@@ -1506,8 +1422,6 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
      * @throws MalformedURLException - if the URL of server ID is malformed. 
      */
     private void addSupportedFormats(Element coverages) throws MalformedURLException {
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Element coverageDescription;
         Element identifierElem;
@@ -1570,6 +1484,114 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
     }
 
+
+
+    /**
+     * This is the "main()" method of the catalog update thread. It runs the
+     * <code>update()</code> which updates the repository and catalog cache. and then
+     * sleeps
+     */
+    public void run() {
+
+        ProcessingState.enableProcessing();
+        int updateCounter = 0;
+        long startTime, endTime;
+        long elapsedTime, sleepTime;
+        Thread thread = Thread.currentThread();
+
+
+
+        log.info("run(): ************* CATALOG UPDATE THREAD.("+thread.getName()+") HAS BEEN STARTED.");
+        try {
+            log.info("run(): ************* CATALOG UPDATE THREAD ("+thread.getName()+") will commence in " +
+                    firstUpdateDelay / 1000.0 + " seconds. Sleeping now...");
+            Thread.sleep(firstUpdateDelay);
+
+        } catch (InterruptedException e) {
+            log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
+            ProcessingState.stopProcessing();
+        }
+
+
+        while (ProcessingState.continueProcessing()) {
+
+            try {
+
+                startTime = new Date().getTime();
+                try {
+                    update();
+                } catch (Exception e) {
+                    log.error("run(): Catalog Update FAILED!!! Caught " + e.getClass().getName() +
+                            "  Message: " + e.getMessage());
+                }
+                endTime = new Date().getTime();
+                elapsedTime = (endTime - startTime);
+                updateCounter++;
+                log.info("run(): Completed catalog update " + updateCounter + " in " + elapsedTime / 1000.0 + " seconds.");
+
+                sleepTime = catalogUpdateInterval - elapsedTime;
+                if (ProcessingState.continueProcessing() && sleepTime > 0) {
+                    log.info("run(): "+thread.getName()+" sleeping for " + sleepTime / 1000.0 + " seconds.");
+                    Thread.sleep(sleepTime);
+                }
+
+            } catch (InterruptedException e) {
+                log.warn("run(): "+thread.getName()+" caught InterruptedException. Stopping...");
+                ProcessingState.stopProcessing();
+
+            }
+        }
+
+        log.info("run(): ************* CATALOG UPDATE THREAD.("+Thread.currentThread().getName()+") IS EXITING.");
+
+
+    }
+
+    public void destroy() {
+
+
+        log.info("destroy(): Attempting to acquire WriteLock from _catalogLock and _repositoryLock.");
+
+        ReentrantReadWriteLock.WriteLock catLock = _catalogLock.writeLock();
+        ReentrantReadWriteLock.WriteLock reposLock = _repositoryLock.writeLock();
+
+        Thread thisThread = Thread.currentThread();
+
+        try {
+            catLock.lock();
+            reposLock.lock();
+            log.info("destroy(): WriteLocks Aquired.");
+
+            ProcessingState.stopProcessing();
+            
+            if (catalogUpdateThread != null) {
+                while(catalogUpdateThread.isAlive()){
+                    log.info("destroy() Current thread '" + Thread.currentThread().getName() + "' Interrupting catalogUpdateThread '" + catalogUpdateThread + "'");
+                    catalogUpdateThread.interrupt();
+                    log.info("destroy(): catalogUpdateThread '" + catalogUpdateThread.getName() + "' interrupt() called.");
+
+                    try {
+                        log.info("destroy(): Waiting for '" + catalogUpdateThread.getName() + "' to stop...");
+                        catalogUpdateThread.join();
+                        log.info("destroy(): '" + catalogUpdateThread.getName() + "' has stopped.");
+
+                    } catch (InterruptedException e) {
+                        log.error("destroy(): Caught InterruptedException while waiting for  '" + catalogUpdateThread.getName() + "' to finish...");
+                    }
+                }
+
+            }
+
+        }
+        finally {
+            catalogUpdateThread = null;
+            catLock.unlock();
+            reposLock.unlock();
+            log.info("destroy(): Released WriteLock for _catalogLock and _repositoryLock.");
+            log.info("destroy(): Complete.");
+        }
+
+    }
 
 
 

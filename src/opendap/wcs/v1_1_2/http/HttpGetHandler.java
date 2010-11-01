@@ -130,6 +130,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
     public void destroy() {
+        log.info("Shutting down catalog.");
         CatalogWrapper.destroy();
         log.info("Destroy Complete");
     }

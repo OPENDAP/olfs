@@ -58,9 +58,30 @@ public class ServletUtil {
      * @return  A String containing the content path (aka the peristent content path) for the web application.
      */
     public static String getContentPath(HttpServlet servlet) {
+      return getContentPath(servlet.getServletContext());
+    }
+
+
+    /**
+     * Returns the path to the "Content" directory for the OLFS. This is the location that the OLFS uses to
+     * keep service related content such as:
+     *   <ui>
+     *     <li>Configuration information</li>
+     *     <li>THREDDS catalog files.</li>
+     *     <li>Log files</li>
+     *   </ui>
+     *
+     * Things here will not be overwritten when the server is upgraded. (Although some upgrades may require that
+     * content in this directory be modifed before the upgrade can work.) Thus this directory is also referred to
+     * as the "peristent content path" or "peristent content directory" in other parts of the documenttion.
+     *
+     * @param sc  The ServletContext for this servlet that is running.
+     * @return  A String containing the content path (aka the peristent content path) for the web application.
+     */
+    public static String getContentPath(ServletContext sc) {
         String contentPath="FAILED_To_Determine_Content_Path!";
-        String tmpContentPath = "../../content" + getContextPath( servlet ) + "/";
-        String filename =  Scrub.fileName(getRootPath(servlet) + tmpContentPath);
+        String tmpContentPath = "../../content" + sc.getContextPath() + "/";
+        String filename =  Scrub.fileName(getRootPath(sc) + tmpContentPath);
 
         File cf = new File( filename );
         try{
@@ -90,9 +111,31 @@ public class ServletUtil {
      * runtime.
      *
      * @param servlet
-     * @return Returns the path to the web applications "context" directory 
+     * @return Returns the path to the web applications "context" directory
      */
     public static String getContextPath( HttpServlet servlet ) {
+      return getContextPath(servlet.getServletContext());
+    }
+
+
+    /**
+     * Returns the path to the web applications "context" directory as defined by the value of the
+     * web appications &lt;initParameter&gt; ContextPath. This directory is where the web application is unpacked. It
+     * contains:
+     * <ui>
+     *   <li> All of the libraries (jar files, class files, etc.).</li>
+     *   <li> Initial content used to bootstrap a new installation.</li>
+     *   <li> XSL, HTML, CSS, XML, nad other documents.</li>
+     *   <li> Images.</li>
+     *   <li> Other resources bundled with the web application</li>
+     * </ui>
+     * Code in many DispatchHandlers uses this path string to locate required files for use during
+     * runtime.
+     *
+     * @param sc
+     * @return Returns the path to the web applications "context" directory
+     */
+    public static String getContextPath( ServletContext sc ) {
 /*
       if ( contextPath == null ) {
         ServletContext servletContext = servlet.getServletContext();
@@ -105,14 +148,22 @@ public class ServletUtil {
       }
       return contextPath;
 */
-      String contextPath = servlet.getServletContext().getContextPath();
+      String contextPath = sc.getContextPath();
       log.debug("context path: '"+contextPath+"'");
 
-      return servlet.getServletContext().getContextPath();
+      return contextPath;
     }
+
+
+
+
 
     public static String getSystemPath(HttpServlet servlet, String path) {
         ServletContext sc = servlet.getServletContext();
+        return getSystemPath(sc,path);
+    }
+
+    public static String getSystemPath(ServletContext sc, String path) {
         String spath = sc.getRealPath(path);
         spath = spath.replace('\\', '/');
         return spath;
@@ -120,7 +171,10 @@ public class ServletUtil {
 
 
     public static String getRootPath(HttpServlet servlet) {
-      ServletContext sc = servlet.getServletContext();
+      return getRootPath( servlet.getServletContext());
+    }
+
+    public static String getRootPath(ServletContext sc) {
       String rootPath = sc.getRealPath("/");
       rootPath = rootPath.replace('\\','/');
       return rootPath;

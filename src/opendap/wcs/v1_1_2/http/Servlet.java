@@ -1,5 +1,6 @@
 package opendap.wcs.v1_1_2.http;
 
+import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -120,7 +121,7 @@ public class Servlet extends HttpServlet {
 
         if (_initialized) return;
 
-        URL serviceConfigUrl = getServiceConfigurationUrl(serviceContentPath,configFileName);
+        URL serviceConfigFile = getServiceConfigurationUrl(serviceContentPath,configFileName);
 
         StaticRdfCatalog semanticCatalog = new StaticRdfCatalog();
 
@@ -134,7 +135,7 @@ public class Servlet extends HttpServlet {
 
 
         try {
-            semanticCatalog.init(serviceConfigUrl, semanticPreload, resourcePath, defaultCatalogCacheDir);
+            semanticCatalog.init(serviceConfigFile, semanticPreload, resourcePath, defaultCatalogCacheDir);
         } catch (Exception e) {
             log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
             throw new ServletException(e);
@@ -331,6 +332,18 @@ public class Servlet extends HttpServlet {
 
 
 
+    public void destroy() {
+
+        LogUtil.logServerShutdown("destroy()");
+
+        httpGetService.destroy();
+        formService.destroy();
+        wcsPostService.destroy();
+        wcsSoapService.destroy();
+
+
+        super.destroy();
+    }
 
 
 

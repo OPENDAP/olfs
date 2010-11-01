@@ -343,6 +343,8 @@ public class CatalogWrapper {
 
         _catalogImpl.destroy();
 
+        _catalogImpl = null;
+
         log.info("Destroy Complete");
     }
 
