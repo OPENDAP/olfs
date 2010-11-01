@@ -136,15 +136,13 @@ public class DocServlet extends HttpServlet {
 
 
 
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-            throws IOException, ServletException {
+    public void doGet(HttpServletRequest request,  HttpServletResponse response) {
 
 
-        String contextPath = ServletUtil.getContextPath(this);
-        String servletName = "/" + this.getServletName();
 
         try {
+            String contextPath = ServletUtil.getContextPath(this);
+            String servletName = "/" + this.getServletName();
 
             LogUtil.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
 
@@ -251,7 +249,12 @@ public class DocServlet extends HttpServlet {
                 OPeNDAPException.anyExceptionHandler(t, response);
             }
             catch(Throwable t2) {
-                log.error("BAD THINGS HAPPENED!", t2);
+                try {
+                    log.error("BAD THINGS HAPPENED!", t2);
+                }
+                catch(Throwable t3){
+                    // Never mind we can't manage anything sensible at this point....
+                }
             }
         }
     }
