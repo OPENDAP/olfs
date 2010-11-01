@@ -135,7 +135,6 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         timeOfLastUpdate = 0;
 
         _catalogLock = new ReentrantReadWriteLock();
-        //coverages = new ConcurrentHashMap<String, CoverageDescription>();
         coverages = new ConcurrentSkipListMap<String, CoverageDescription>();
 
         _repositoryLock = new ReentrantReadWriteLock();
