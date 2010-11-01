@@ -133,9 +133,9 @@
 
     <!-- Libraries -->
 
-    <property name="slf4j.lib"            value="slf4j-api-1.5.8.jar"/>
-    <property name="logback-core.lib"     value="logback-core-0.9.16.jar"/>
-    <property name="logback-classic.lib"  value="logback-classic-0.9.16.jar"/>
+    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
 
 
 
