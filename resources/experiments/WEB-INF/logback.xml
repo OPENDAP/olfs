@@ -9,10 +9,12 @@
 
 
 
+
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>${FORMAT}</Pattern>
-        </layout>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <pattern>${FORMAT}</pattern>
+        </encoder>
+
     </appender>
 
 
@@ -28,9 +30,12 @@
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <MaxFileSize>5MB</MaxFileSize>
         </triggeringPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>${FORMAT}</Pattern>
-        </layout>
+
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <pattern>${FORMAT}</pattern>
+        </encoder>
+
     </appender>
 
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -41,9 +46,10 @@
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
 
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] [%X{SOURCE}]  %X{request} %m%n</Pattern>
-        </layout>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] [%X{SOURCE}]  %X{request} %m%n</pattern>
+        </encoder>
+
     </appender>
 
 
@@ -55,9 +61,11 @@
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
 
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%d{dd/MMM/yyyy:HH:mm:ss}] [request %X{ID}]      %m</Pattern>
-        </layout>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{dd/MMM/yyyy:HH:mm:ss}] [request %X{ID}]      %m</pattern>
+        </encoder>
+
     </appender>
 
 

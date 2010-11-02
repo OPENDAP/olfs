@@ -26,7 +26,7 @@
 -->
 <WcsService>
     <WcsCatalog>
-        <useUpdateCatalogThread updateInterval="28800" firstUpdateDelay="10"/>
+        <useUpdateCatalogThread updateInterval="28800" firstUpdateDelay="3"/>
 
         <dataset>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
         <dataset>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
