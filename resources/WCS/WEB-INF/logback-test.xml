@@ -163,9 +163,8 @@
     </logger>
 -->
 
-    <!--root>
-     <level value="ALL"/>
-     <appender-ref ref="Stdout"/>
-   </root -->
+    <root level="error">
+        <appender-ref ref="ErrorLog"/>
+    </root>
 
 </configuration>

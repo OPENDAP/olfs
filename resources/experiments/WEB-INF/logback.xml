@@ -88,10 +88,8 @@
 
 
 
-    <!--
     <root level="error">
-     <appender-ref ref="ErrorLog"/>
-   </root>
-   -->
+        <appender-ref ref="ErrorLog"/>
+    </root>
 
 </configuration>
