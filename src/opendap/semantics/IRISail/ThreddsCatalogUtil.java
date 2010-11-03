@@ -63,9 +63,8 @@ public class ThreddsCatalogUtil {
 	/**
 	 * Constructor.
 	 * 
-	 * @throws Exception
 	 */
-	public ThreddsCatalogUtil() throws Exception {
+	public ThreddsCatalogUtil() {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 	}
 	
@@ -91,19 +90,25 @@ public class ThreddsCatalogUtil {
 		// This holds catalogs not yet seen by the user of the Enumeration
 		private Stack<String> childURLs;
 
-		threddsCrawlerEnumeration(String catalogURL) throws Exception {
+		threddsCrawlerEnumeration(String catalogURL) {
 			childURLs = new Stack<String>();
 	    	childURLs.push(catalogURL);
 		}
 		
 		private void recur(String catalogURL) {
-			Vector<String> URLs = getCatalogRefURLs(catalogURL, false);
-			if (URLs != null) {
-				for (String URL : URLs) {
-					childURLs.push(URL);
-				}
-			}
-		}
+            try {
+			    Vector<String> URLs = getCatalogRefURLs(catalogURL, false);
+                if (URLs != null) {
+                    for (String URL : URLs) {
+                        childURLs.push(URL);
+                    }
+                }
+            } catch (InterruptedException e) {
+
+                log.error("recur(): Caught InterruptedException returning with recursion incomplete!");
+
+            }
+        }
 		
 		@Override
 		public boolean hasMoreElements() {
@@ -286,7 +291,7 @@ public class ThreddsCatalogUtil {
 	}
 	
 	public void crawlTest(PrintStream ps, String catalogURLString,
-			boolean recurse) {
+			boolean recurse)  throws InterruptedException {
 		Vector<String> datasetURLs;
 		Vector<String> catalogURLs;
 
@@ -329,7 +334,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	public void printDDXDocuments(PrintStream ps, String catalogUrlString,
-			boolean recurse) {
+			boolean recurse)  throws InterruptedException {
 
 		Vector<Document> ddxDocs = getDDXDocuments(catalogUrlString, recurse);
 
@@ -346,7 +351,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	public Vector<Element> getDDXRootElements(String catalogUrlString,
-			boolean recurse) {
+			boolean recurse)  throws InterruptedException {
 
 		Vector<Element> ddxRootElements = new Vector<Element>();
 		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
@@ -360,7 +365,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	public Vector<Document> getDDXDocuments(String catalogUrlString,
-			boolean recurse) {
+			boolean recurse)  throws InterruptedException {
 
 		Vector<Document> ddxDocs = new Vector<Document>();
 		Vector<String> ddxUrls = getDDXUrls(catalogUrlString, recurse);
@@ -373,7 +378,7 @@ public class ThreddsCatalogUtil {
 
 	}
 
-	public Vector<String> getDDXUrls(String catalogUrlString, boolean recurse) {
+	public Vector<String> getDDXUrls(String catalogUrlString, boolean recurse)  throws InterruptedException {
 
 		Vector<String> datasetUrls = getDataAccessURLs(catalogUrlString,
 				SERVICE.OPeNDAP, recurse);
@@ -405,7 +410,7 @@ public class ThreddsCatalogUtil {
 	 *         THREDDS catalog document.
 	 */
 	private Vector<String> getCatalogRefURLs(String catalogUrlString,
-			Element catalog, boolean recurse) {
+			Element catalog, boolean recurse)  throws InterruptedException {
 
 		Vector<String> catalogURLs = new Vector<String>();
 
@@ -457,7 +462,7 @@ public class ThreddsCatalogUtil {
      *         will be empty.
      */
     public Vector<String> getCatalogRefURLs(String catalogUrlString,
-            boolean recurse) {
+            boolean recurse) throws InterruptedException {
 
         Vector<String> catalogURLs = new Vector<String>();
 
@@ -495,7 +500,7 @@ public class ThreddsCatalogUtil {
 	 *         that tree
 	 * @throws Exception Thrown if the cache cannot be configured
 	 */
-	public Enumeration<String> getCatalogEnumeration(String topCatalog) throws Exception {
+	public Enumeration<String> getCatalogEnumeration(String topCatalog)  throws InterruptedException {
 		return new threddsCrawlerEnumeration(topCatalog);
 	}
 
@@ -510,11 +515,11 @@ public class ThreddsCatalogUtil {
 	 * @throws Exception
 	 *             Thrown if the cache cannot be configured
 	 */
-	public Enumeration<String> getCatalogURLs(String topCatalog) throws Exception {
+	public Enumeration<String> getCatalogURLs(String topCatalog)  throws InterruptedException {
 		return new threddsCrawlerEnumeration(topCatalog);
 	}
 	
-	public static String getUrlInfo(URL url) {
+	public static String getUrlInfo(URL url)  throws InterruptedException{
 		String info = "URL:\n";
 
 		info += "    getHost():         " + url.getHost() + "\n";
@@ -531,7 +536,7 @@ public class ThreddsCatalogUtil {
 		return info;
 	}
 
-	private String getServerUrlString(URL url) {
+	private String getServerUrlString(URL url)  throws InterruptedException{
 
 		String baseURL = null;
 
@@ -559,7 +564,7 @@ public class ThreddsCatalogUtil {
 
 	}
 
-	private String getServerUrlString(String url) throws MalformedURLException {
+	private String getServerUrlString(String url)  throws InterruptedException, MalformedURLException {
 
 		URL u = new URL(url);
 
@@ -568,7 +573,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private Vector<String> getDataAccessURLs(String catalogUrlString,
-			Element catalog, SERVICE service, boolean recurse) {
+			Element catalog, SERVICE service, boolean recurse)  throws InterruptedException {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
@@ -615,13 +620,13 @@ public class ThreddsCatalogUtil {
 				}
 			}
 
-		}
-		catch (Exception e) {
-			log.error("Unable to load THREDDS catalog: " + catalogUrlString
-					+ " msg: " + e.getMessage());
-		}
+		} catch (MalformedURLException e) {
+            log.error("Unable to load THREDDS catalog: " + catalogUrlString
+                    + " msg: " + e.getMessage());
+            
+        }
 
-		return serviceURLs;
+        return serviceURLs;
 	}
 
 	/**
@@ -677,7 +682,7 @@ public class ThreddsCatalogUtil {
 	 */
 
 	public Vector<String> getDataAccessURLs(String catalogUrlString,
-			SERVICE service, boolean recurse) {
+			SERVICE service, boolean recurse)  throws InterruptedException {
 
 		Vector<String> serviceURLs = new Vector<String>();
 
@@ -697,7 +702,7 @@ public class ThreddsCatalogUtil {
 	 *            The URL of the document to retrieve
 	 * @return The Document
 	 */
-	private Element getDocumentRoot(String docUrlString) {
+	private Element getDocumentRoot(String docUrlString)  throws InterruptedException {
 
 		Element docRoot = null;
 
@@ -719,7 +724,7 @@ public class ThreddsCatalogUtil {
 	 *            The URL of the document to retrieve.
 	 * @return The Document
 	 */
-	private Document getDocument(String docUrlString) {
+	private Document getDocument(String docUrlString)  throws InterruptedException {
 
 		Document doc = null;
 		try {
@@ -752,7 +757,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private String getCatalogURL(String catalogUrlString, String href)
-			throws MalformedURLException {
+			 throws InterruptedException,  MalformedURLException {
 
 		if (href.startsWith("/")) {
 			href = getServerUrlString(catalogUrlString) + href;
@@ -773,7 +778,7 @@ public class ThreddsCatalogUtil {
 
 	}
 
-	private HashMap<String, Element> collectServices(Element threddsCatalog) {
+	private HashMap<String, Element> collectServices(Element threddsCatalog)  throws InterruptedException {
 		HashMap<String, Element> services = new HashMap<String, Element>();
 
 		Iterator i = threddsCatalog.getDescendants(new ElementFilter(
@@ -790,7 +795,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private HashMap<String, Element> collectServices(Element threddsCatalog,
-			SERVICE s) {
+			SERVICE s)  throws InterruptedException {
 
 		HashMap<String, Element> services = collectServices(threddsCatalog);
 		HashMap<String, Element> childSrvcs;
@@ -827,7 +832,7 @@ public class ThreddsCatalogUtil {
 
 	private void collectDatasetAccessUrls(Element dataset,
 			HashMap<String, Element> services, String inheritedServiceName,
-			String baseServerURL, Vector<String> datasetURLs) {
+			String baseServerURL, Vector<String> datasetURLs)  throws InterruptedException {
 
 		String urlPath;
 		String serviceName;
@@ -894,7 +899,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private Vector<String> getAccessURLs(Element access,
-			HashMap<String, Element> services, String baseServerURL) {
+			HashMap<String, Element> services, String baseServerURL)  throws InterruptedException {
 		String serviceName = access.getAttributeValue("serviceName");
 		String urlPath = access.getAttributeValue("urlPath");
 
@@ -903,7 +908,7 @@ public class ThreddsCatalogUtil {
 	}
 
 	private Vector<String> getAccessURLs(String urlPath, String serviceName,
-			HashMap<String, Element> services, String baseServerURL) {
+			HashMap<String, Element> services, String baseServerURL) throws InterruptedException  {
 
 		Vector<String> accessURLs = new Vector<String>();
 		String access, base, serviceType, sname;

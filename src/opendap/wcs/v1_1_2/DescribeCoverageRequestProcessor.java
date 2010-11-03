@@ -36,7 +36,7 @@ import opendap.coreServlet.Scrub;
  */
 public class DescribeCoverageRequestProcessor {
 
-    public static Document processDescribeCoveragesRequest(DescribeCoverageRequest req) throws WcsException {
+    public static Document processDescribeCoveragesRequest(DescribeCoverageRequest req)  throws InterruptedException, WcsException {
 
 
         Element coverageDescriptions = new Element("CoverageDescriptions",WCS.WCS_NS);

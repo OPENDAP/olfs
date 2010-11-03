@@ -273,15 +273,6 @@ public class Servlet extends HttpServlet {
             	}
             }
         }
-        finally{
-            try{ this.destroy();}
-            catch(Throwable e){
-                try{ log.error(e.getMessage());}
-                catch(Throwable e2){
-                    // Do nothing.
-                }
-            }
-        }
     }
 
 
@@ -317,15 +308,6 @@ public class Servlet extends HttpServlet {
             	catch(Throwable t3){
                     // It's boned now.. Leave it be.
             	}
-            }
-        }
-        finally{
-            try{ this.destroy();}
-            catch(Throwable e){
-                try{ log.error(e.getMessage());}
-                catch(Throwable e2){
-                    // Do nothing.
-                }
             }
         }
     }

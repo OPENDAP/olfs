@@ -370,7 +370,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     public void testWcsRequest(HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException {
+                                  HttpServletResponse response) throws InterruptedException, IOException {
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
         String serviceUrl = Util.getServiceUrl(request);
@@ -442,7 +442,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
-    public String getCapabilitiesTestPage(String serviceUrl, HashMap<String,String> keyValuePairs) throws WcsException {
+    public String getCapabilitiesTestPage(String serviceUrl, HashMap<String,String> keyValuePairs) throws InterruptedException, WcsException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
@@ -467,7 +467,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
-    public String describeCoverageTestPage(HashMap<String,String> keyValuePairs) throws WcsException {
+    public String describeCoverageTestPage(HashMap<String,String> keyValuePairs) throws InterruptedException, WcsException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
@@ -495,7 +495,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
 
-    public String getCoverageTestPage(HttpServletRequest req, HashMap<String,String> keyValuePairs) throws WcsException {
+    public String getCoverageTestPage(HttpServletRequest req, HashMap<String,String> keyValuePairs) throws InterruptedException, WcsException {
 
         GetCoverageRequest getCoverageRequest = new GetCoverageRequest(keyValuePairs);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

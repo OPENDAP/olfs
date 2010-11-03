@@ -71,7 +71,7 @@ public class XMLfromRDF {
      * @param rootElementStr-the outer wrapper of the document.
      * @param topURI-the top element in the document.
      */
-	public XMLfromRDF(RepositoryConnection con, String rootElementStr, String topURI) {
+	public XMLfromRDF(RepositoryConnection con, String rootElementStr, String topURI) throws InterruptedException {
 		this.log = LoggerFactory.getLogger(getClass());
 		//URI uri = new URIImpl(topURI);
 		int pl = topURI.lastIndexOf("#");
@@ -94,18 +94,6 @@ public class XMLfromRDF {
         "topprop = <"+topURI+">";
 	}
 	
-	/**
-     * Constructor, sets the repository connection. Query string will be passed in through
-     * getXMLfromRDF(String, String). 
-     * @param con-connection to the repository.
-     * 
-     */
-    public XMLfromRDF(RepositoryConnection con) {
-        this.log = LoggerFactory.getLogger(getClass());
-        
-        this.con = con;
-        
-    }
     /**
      * Start the process of building the document. First level children are retrieved through
      * query zero and added to the document.
@@ -113,7 +101,7 @@ public class XMLfromRDF {
       * @param topURI-searching phrase for the first level children
      */
 
-	public void getXMLfromRDF(String topURI, String serfqString0){
+	public void getXMLfromRDF(String topURI, String serfqString0)  throws InterruptedException{
 	    
         TupleQueryResult result0 = null;
         try{
@@ -175,8 +163,9 @@ public class XMLfromRDF {
             if(result0!=null){
                 try {
                     result0.close();
-                } catch (Exception e) {
-                    log.error(e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+
                 }
             }
         }
@@ -190,7 +179,7 @@ public class XMLfromRDF {
      *
       * @param topURI-searching phrase for the first level children
      */
-	public void getXMLfromRDF(String topURI){
+	public void getXMLfromRDF(String topURI)  throws InterruptedException{
         TupleQueryResult result0 = null;
         try{
             log.debug("queryString0: " +queryString0);
@@ -255,7 +244,7 @@ public class XMLfromRDF {
             if(result0!=null){
                 try {
                     result0.close();
-                } catch (Exception e) {
+                } catch (QueryEvaluationException e) {
                     log.error(e.getMessage());
                 }
             }
@@ -270,7 +259,7 @@ public class XMLfromRDF {
      * @param con-connection to the repository
      * @param doc-the document to build
      */
-	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc){
+	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc)  throws InterruptedException{
 		TupleQueryResult result = null;
 		boolean objisURI = false; //true if ojb is a URI/URL
 		
@@ -517,7 +506,7 @@ public class XMLfromRDF {
             if(result!=null){
                 try {
                     result.close();
-                } catch (Exception e) {
+                } catch (QueryEvaluationException e) {
                     log.error(e.getMessage());
                 }
             }
@@ -532,7 +521,7 @@ public class XMLfromRDF {
      * @param parentclassstr
      * @return  a SeRQL query string
      */
-	private String createQueryString(String parentstr, Value parentclassstr){
+	private String createQueryString(String parentstr, Value parentclassstr)  throws InterruptedException{
 		String queryStringc;
 		String objURI = parentstr.substring(0, 7);
 		

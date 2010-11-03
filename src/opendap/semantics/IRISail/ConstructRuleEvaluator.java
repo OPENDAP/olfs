@@ -77,222 +77,233 @@ public class ConstructRuleEvaluator {
 
 
      /**
-     * Run all Construct queries and ingest resulting statements into repository
-     * @param repository-repository to use
-     * @throws RepositoryException
-     */
-    public  void runConstruct(Repository repository) throws RepositoryException {
+      * Run all Construct queries and ingest resulting statements into repository
+      *
+      * @param repository-repository to use
+      * @throws RepositoryException
+      */
+     public void runConstruct(Repository repository) throws InterruptedException, RepositoryException {
 
-        log.debug("-----------------------------------------------------------------");
-        log.debug("------------------- Entering runConstruct() ---------------------");
-        log.debug("-----------------------------------------------------------------");
+         log.debug("-----------------------------------------------------------------");
+         log.debug("------------------- Starting runConstruct() ---------------------");
+         log.debug("-----------------------------------------------------------------");
 
-        GraphQueryResult graphResult = null;
-        RepositoryConnection con = null;
-        Vector<Statement> Added = new Vector<Statement>();
+         GraphQueryResult graphResult = null;
+         RepositoryConnection con = null;
+         Vector<Statement> Added = new Vector<Statement>();
 
-        Boolean modelChanged = true;
-        int runNbr = 0;
-        int runNbrMax = 99;
-        long startTime, endTime;
-        startTime = new Date().getTime();
+         Boolean modelChanged = true;
+         int runNbr = 0;
+         int runNbrMax = 99;
+         long startTime, endTime;
+         startTime = new Date().getTime();
 
-        int queryTimes = 0;
-        long ruleStartTime, ruleEndTime;
-        int totalStAdded = 0; // number of statements added
-        int totalStAddedIn1Pass = 0; // number of statements added in 1 PASS
+         int queryTimes = 0;
+         long ruleStartTime, ruleEndTime;
+         int totalStAdded = 0; // number of statements added
+         int totalStAddedIn1Pass = 0; // number of statements added in 1 PASS
 
-        findConstruct(repository);
+         findConstruct(repository);
 
          //log.debug("Before running the construct rules:\n " +
          //opendap.coreServlet.Util.getMemoryReport());
-        con = repository.getConnection();
-        ValueFactory creatValue = repository.getValueFactory(); //moved from line 159
-        
-        while (modelChanged && runNbr < runNbrMax) {
 
-            runNbr++;
-            modelChanged = false;
-            totalStAddedIn1Pass = 0;
-            if(runNbr == 1){
-            log.info("Total construct rule number =  " + this.constructQuery.size());
-            }
-            //log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
-            //        + " \n" + opendap.coreServlet.Util.getMemoryReport());
-            int ruleNumber = 0;
-            for (String qstring : this.constructQuery) {
-                ruleNumber++;
-                queryTimes++;
-                ruleStartTime = new Date().getTime();
-                int stAdded = 0; // track statements added by each rule
 
-                Vector<Statement> toAdd = new Vector<Statement>();
-                String constructURL = this.constructContext.get(qstring);
+         try {
+             con = repository.getConnection();
+             ValueFactory creatValue = repository.getValueFactory(); //moved from line 159
 
-                //URI uriaddress = new URIImpl(constructURL);
-                URI uriaddress = new URIImpl(Terms.externalInferencingContext.getUri());
-                Resource[] context = new Resource[1];
-                context[0] = uriaddress;
-                
-                
-                String processedQueryString = convertSWRLQueryToSeasameQuery(qstring);
-                if(runNbr == 1){
-                log.debug("Original construct: " + qstring);
-                log.debug("Processed construct: " + processedQueryString);
-                }
-                
-                try {
-                     //log.debug("Prior to making new repository connection:\n "
-                     //+ opendap.coreServlet.Util.getMemoryReport());
-                    log.debug("Original construct rule ID: " + constructURL);
-                    GraphQuery graphQuery = con.prepareGraphQuery(
-                            QueryLanguage.SERQL, processedQueryString);
+             while (modelChanged && runNbr < runNbrMax ) {
 
-                    graphResult = graphQuery.evaluate();
-                    GraphQueryResult graphResultCopy = graphResult;
-                    log.debug("Completed querying. ");
+                 runNbr++;
+                 modelChanged = false;
+                 totalStAddedIn1Pass = 0;
+                 if (runNbr == 1) {
+                     log.info("runConstruct(): Total number of construct rule(s): " + this.constructQuery.size());
+                 }
+                 //log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
+                 //        + " \n" + opendap.coreServlet.Util.getMemoryReport());
+                 int ruleNumber = 0;
+                 for (String qstring : this.constructQuery) {
+                     ruleNumber++;
+                     queryTimes++;
+                     ruleStartTime = new Date().getTime();
+                     int stAdded = 0; // track statements added by each rule
 
-                    if (graphResult.hasNext()) {
-                        modelChanged = true;
+                     Vector<Statement> toAdd = new Vector<Statement>();
+                     String constructURL = this.constructContext.get(qstring);
 
-                       // ValueFactory creatValue = repository.getValueFactory();
+                     //URI uriaddress = new URIImpl(constructURL);
+                     URI uriaddress = new URIImpl(Terms.externalInferencingContext.getUri());
+                     Resource[] context = new Resource[1];
+                     context[0] = uriaddress;
 
-                        switch (postProcessFlag) {
 
-                        case xsString:
-                            process_xsString(graphResult, creatValue, Added,
-                                    toAdd, con, context);
-                            //log.debug("After processing xs:string:\n "
-                            //        + opendap.coreServlet.Util
-                            //                .getMemoryReport());
-                            break;
+                     String processedQueryString = convertSWRLQueryToSeasameQuery(qstring);
+                     if (runNbr == 1) {
+                         log.debug("runConstruct(): Original construct: " + qstring);
+                         log.debug("runConstruct(): Processed construct: " + processedQueryString);
+                     }
 
-                        case DropQuotes:
-                            process_DropQuotes(graphResult, creatValue, Added,
-                                    toAdd, con, context);
-                            //log.debug("After processing DropQuotes:\n "
-                            //        + opendap.coreServlet.Util
-                            //                .getMemoryReport());
-                            break;
+                     try {
+                         //log.debug("Prior to making new repository connection:\n "
+                         //+ opendap.coreServlet.Util.getMemoryReport());
+                         log.debug("runConstruct(): Original construct rule ID: " + constructURL);
+                         GraphQuery graphQuery = con.prepareGraphQuery(
+                                 QueryLanguage.SERQL, processedQueryString);
 
-                        case RetypeTo:
-                            process_RetypeTo(graphResult, creatValue, Added,
-                                    toAdd, con, context);
-                            //log.debug("After processing RetypeTo:\n "
-                            //        + opendap.coreServlet.Util
-                            //                .getMemoryReport());
-                            break;
+                         graphResult = graphQuery.evaluate();
+                         log.debug("runConstruct(): Completed querying. ");
 
-                        case Increment:
-                            process_Increment(graphResult, creatValue, Added,
-                                    toAdd, con, context);
-                            //log.debug("After processing Increment:\n "
-                            //        + opendap.coreServlet.Util
-                            //                .getMemoryReport());
-                            break;
+                         ProcessController.checkState();
 
-                        case Function:
+                         if (graphResult.hasNext()) {
+                             modelChanged = true;
 
-                            process_fn(graphResult, creatValue, Added, toAdd,
-                                    con, context);// postpocessing Join,
+                             // ValueFactory creatValue = repository.getValueFactory();
 
-                            break;
-                        case NONE:
-                        default:
-                            log.debug("Adding not postprocessed statements ...");
+                             switch (postProcessFlag) {
 
-                            
-                            con.add(graphResult, context);
-                           /*****
-                            * iterator cannot be reset, count fails
-                            int nonePostprocessSt = 0;
-                            while (graphResultCopy.hasNext()) {
-                                graphResultCopy.next();
-                                nonePostprocessSt++;
-                                stAdded++;
-                            }
-                           
-                            log.debug("Complete adding "+nonePostprocessSt
-                                    + " not postprocessed statements");
-                            */
-                            break;
-                        }
+                                 case xsString:
+                                     process_xsString(graphResult, creatValue, Added,
+                                             toAdd, con, context);
+                                     //log.debug("After processing xs:string:\n "
+                                     //        + opendap.coreServlet.Util
+                                     //                .getMemoryReport());
+                                     break;
 
-                                               
-                        if (toAdd != null) {
-                            stAdded += toAdd.size();
-                        }
+                                 case DropQuotes:
+                                     process_DropQuotes(graphResult, creatValue, Added,
+                                             toAdd, con, context);
+                                     //log.debug("After processing DropQuotes:\n "
+                                     //        + opendap.coreServlet.Util
+                                     //                .getMemoryReport());
+                                     break;
 
-                    } // if (graphResult.hasNext
-                    else {
-                        log.debug("The construct rule returns no statements!");
-                    }
+                                 case RetypeTo:
+                                     process_RetypeTo(graphResult, creatValue, Added,
+                                             toAdd, con, context);
+                                     //log.debug("After processing RetypeTo:\n "
+                                     //        + opendap.coreServlet.Util
+                                     //                .getMemoryReport());
+                                     break;
 
-                } catch (QueryEvaluationException e) {
-                    log.error("Caught an QueryEvaluationException! Msg: "
-                            + e.getMessage());
+                                 case Increment:
+                                     process_Increment(graphResult, creatValue, Added,
+                                             toAdd, con, context);
+                                     //log.debug("After processing Increment:\n "
+                                     //        + opendap.coreServlet.Util
+                                     //                .getMemoryReport());
+                                     break;
 
-                } catch (RepositoryException e) {
-                    log.error("Caught RepositoryException! Msg: "
-                            + e.getMessage());
-                } catch (MalformedQueryException e) {
-                    log.error("Caught MalformedQueryException! Msg: "
-                            + e.getMessage());
-                    log.error("MalformedQuery: " + processedQueryString);
-                } finally {
-                    if (graphResult != null) {
-                        try {
-                            graphResult.close();
-                        } catch (Exception e) {
-                            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
-                        }
-                    }
+                                 case Function:
 
-                }
+                                     process_fn(graphResult, creatValue, Added, toAdd,
+                                             con, context);// postpocessing Join,
 
-                ruleEndTime = new Date().getTime();
-                double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
+                                     break;
+                                 case NONE:
+                                 default:
+                                     log.debug("runConstruct(): No post-processed statements to add...");
 
-                log.debug("Construct rule " + ruleNumber + " takes " + ruleTime
-                        + " seconds in loop " + runNbr + " added " + stAdded
-                        + " statements");
 
-                totalStAdded = totalStAdded + stAdded;
-                totalStAddedIn1Pass = totalStAddedIn1Pass+ stAdded;
-                con.commit();
-            } // for(String qstring
-            
-            log.info("Completed pass " + runNbr + " of Construct evaluation, "+"queried the repository " +
-                    ruleNumber + " times" + " added " + totalStAddedIn1Pass + " statements");
-            log.info("Queried the repository " + queryTimes + " times");
+                                     con.add(graphResult, context);
+                                     /*****
+                                      * iterator cannot be reset, count fails
+                                      int nonePostprocessSt = 0;
+                                      while (graphResultCopy.hasNext()) {
+                                      graphResultCopy.next();
+                                      nonePostprocessSt++;
+                                      stAdded++;
+                                      }
 
-            findConstruct(repository);
-        } // while (modelChanged
-        
-        //the construct rules run too many times 
-        if (runNbr >= runNbrMax){
-            log.warn("The construct rules have executed to the maxmum times allowed!");
-        }
-        
-        try {
-            con.close();
-        } catch (RepositoryException e) {
-            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
-        }
-        endTime = new Date().getTime();
-        double totaltime = (endTime - startTime) / 1000.0;
-        log.info("In construct for " + totaltime + " seconds");
-        log.info("Total number of post processed statements added in construct: "
-                + totalStAdded + " \n");
+                                      log.debug("Complete adding "+nonePostprocessSt
+                                      + " not postprocessed statements");
+                                      */
+                                     break;
+                             }
 
-    }
+
+                             if (toAdd != null) {
+                                 stAdded += toAdd.size();
+                             }
+
+                         } // if (graphResult.hasNext
+                         else {
+                             log.debug("runConstruct(): The construct rule returned no statements.");
+                         }
+
+                     } catch (QueryEvaluationException e) {
+                         log.error("runConstruct(): Caught an QueryEvaluationException! Msg: " + e.getMessage());
+                     } catch (RepositoryException e) {
+                         log.error("runConstruct(): Caught RepositoryException! Msg: "+ e.getMessage());
+                     } catch (MalformedQueryException e) {
+                         log.error("runConstruct(): MalformedQuery: " + processedQueryString);
+                     } finally {
+                         if (graphResult != null) {
+                             try {
+                                 graphResult.close();
+                             } catch (QueryEvaluationException e) {
+                                 log.error("runConstruct(): Caught an " + e.getClass().getName() + " Msg: " + e.getMessage());
+
+                             }
+                         }
+
+                     }
+
+                     ruleEndTime = new Date().getTime();
+                     double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
+
+                     log.debug("runConstruct(): Construct rule " + ruleNumber + " takes " + ruleTime
+                             + " seconds in loop " + runNbr + " added " + stAdded
+                             + " statements");
+
+                     totalStAdded = totalStAdded + stAdded;
+                     totalStAddedIn1Pass = totalStAddedIn1Pass + stAdded;
+                     con.commit();
+
+                 } // for(String qstring
+
+                 log.info("runConstruct(): Completed pass " + runNbr + "  " +
+                         "Queried the repository " + ruleNumber + " times" + " added " + totalStAddedIn1Pass + " statements. Total Repository Queries: " + queryTimes);
+                 ProcessController.checkState();
+
+                 findConstruct(repository);
+             } // while (modelChanged
+
+             //the construct rules run too many times
+             if (runNbr >= runNbrMax) {
+                 log.warn("runConstruct(): The construct rules have executed to the maximum number times allowed!");
+             }
+         }
+         finally {
+
+             if (con != null) {
+                 try {
+                     con.close();
+                 } catch (RepositoryException e) {
+                     log.error("runConstruct(): Caught a RepositoryException! Msg: " + e.getMessage());
+                 }
+             }
+             endTime = new Date().getTime();
+             double totaltime = (endTime - startTime) / 1000.0;
+             log.info("runConstruct(): Summary: ");
+             log.info("runConstruct(): Queried the repository " + queryTimes + " times");
+             log.info("runConstruct(): Added " + totalStAdded + " post processed statement(s) in " + totaltime + " seconds.");
+             log.debug("-----------------------------------------------------------------");
+             log.debug("------------------- Leaving runConstruct() ---------------------");
+             log.debug("-----------------------------------------------------------------");
+         }
+
+
+     }
 
     
     /**
      * Find all Construct queries stored in the repository
      * @param repository-repository to use
      */
-    private void findConstruct(Repository repository) {
+    private void findConstruct(Repository repository)  throws InterruptedException{
         TupleQueryResult result = null;
         RepositoryConnection con = null;
         List<String> bindingNames;
@@ -347,15 +358,15 @@ public class ConstructRuleEvaluator {
             if (result != null) {
                 try {
                     result.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("runConstruct(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
             if(con!=null){
                 try {
                     con.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (RepositoryException e) {
+                    log.error("runConstruct(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
@@ -371,7 +382,7 @@ public class ConstructRuleEvaluator {
      * @param queryString
      * @return
      */
-    private String convertSWRLQueryToSeasameQuery(String queryString) {
+    private String convertSWRLQueryToSeasameQuery(String queryString)  throws InterruptedException{
 
         postProcessFlag = ProcessingTypes.NONE;
 
@@ -525,7 +536,7 @@ public class ConstructRuleEvaluator {
     private static void process_DropQuotes(GraphQueryResult graphResult,
             ValueFactory creatValue, Vector<Statement> Added,
             Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
+            Resource[] context)  throws InterruptedException, QueryEvaluationException,
             RepositoryException {
 
         // pproces2 =\"\\\"([^\\]+)\\\"\"(\^\^[^>]+>)? \.
@@ -590,7 +601,7 @@ public class ConstructRuleEvaluator {
     public static void process_xsString(GraphQueryResult graphResult,
             ValueFactory creatValue, Vector<Statement> Added,
             Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
+            Resource[] context)  throws InterruptedException, QueryEvaluationException,
             RepositoryException {
 
         // pproces1 = (\"[^"]+\")\s+\.
@@ -644,7 +655,7 @@ public class ConstructRuleEvaluator {
     private void process_RetypeTo(GraphQueryResult graphResult,
             ValueFactory creatValue, Vector<Statement> Added,
             Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
+            Resource[] context)  throws InterruptedException, QueryEvaluationException,
             RepositoryException {
 
         // pproces3 =\"\\\"([^\\]+)\\\"\"\^\^
@@ -736,7 +747,7 @@ public class ConstructRuleEvaluator {
     private void process_Increment(GraphQueryResult graphResult,
             ValueFactory creatValue, Vector<Statement> Added,
             Vector<Statement> toAdd, RepositoryConnection con,
-            Resource[] context) throws QueryEvaluationException,
+            Resource[] context)  throws InterruptedException, QueryEvaluationException,
             RepositoryException {
 
         String pproces4 = "(.+)";
@@ -814,7 +825,7 @@ public class ConstructRuleEvaluator {
     private void process_fn(GraphQueryResult graphResult,
                              ValueFactory creatValue, Vector<Statement> Added,
                              Vector<Statement> toAdd, RepositoryConnection con,
-                             Resource[] context) throws QueryEvaluationException,
+                             Resource[] context)  throws InterruptedException, QueryEvaluationException,
             RepositoryException {
 
         log.debug("Processing fn statements.");
@@ -952,7 +963,7 @@ public class ConstructRuleEvaluator {
      * @return
      */
     public Method getMethodForFunction(String className,
-                                              String methodName) {
+                                              String methodName)  throws InterruptedException{
 
         Method method;
 
@@ -1003,7 +1014,7 @@ public class ConstructRuleEvaluator {
 
     
     public  Method getMethodForFunction(Object classInstance,
-            String methodName) {
+            String methodName)  throws InterruptedException{
 
         Method method;
 
@@ -1036,7 +1047,7 @@ public class ConstructRuleEvaluator {
     }
 
 
-    public  String getProcessingMethodDescription(Method m) {
+    public  String getProcessingMethodDescription(Method m)  throws InterruptedException {
 
         String msg = "";
 

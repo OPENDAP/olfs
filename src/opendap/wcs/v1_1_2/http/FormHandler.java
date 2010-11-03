@@ -60,7 +60,7 @@ public class FormHandler extends XmlRequestHandler {
     }
 
     public void handleWcsRequest(HttpServletRequest request,
-                                       HttpServletResponse response) throws IOException {
+                                       HttpServletResponse response) throws InterruptedException, IOException {
 
         String serviceUrl = Util.getServiceUrlString(request,_prefix);
         BufferedReader  sis = request.getReader();

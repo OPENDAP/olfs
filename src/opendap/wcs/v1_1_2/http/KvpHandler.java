@@ -46,7 +46,7 @@ public class KvpHandler {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(KvpHandler.class);
 
 
-    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, String query, ServletOutputStream os) throws IOException {
+    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, String query, ServletOutputStream os) throws InterruptedException, IOException {
 
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
@@ -90,7 +90,6 @@ public class KvpHandler {
         }
 
 
-
     }
 
 
@@ -102,7 +101,7 @@ public class KvpHandler {
      * @param keyValuePairs   Key Value Pairs from WCS URL
      * @throws WcsException When bad things happen.
      */
-    public static Document getCapabilities(HashMap<String,String> keyValuePairs, String serviceUrl) throws WcsException {
+    public static Document getCapabilities(HashMap<String,String> keyValuePairs, String serviceUrl)  throws InterruptedException, WcsException {
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
 
             return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
@@ -114,7 +113,7 @@ public class KvpHandler {
      * @param keyValuePairs     Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document describeCoverage(HashMap<String,String> keyValuePairs ) throws WcsException {
+    public static Document describeCoverage(HashMap<String,String> keyValuePairs )  throws InterruptedException, WcsException {
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
 
             return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
@@ -127,7 +126,7 @@ public class KvpHandler {
      * @param keyValuePairs    Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document getCoverage(HashMap<String,String> keyValuePairs) throws WcsException {
+    public static Document getCoverage(HashMap<String,String> keyValuePairs)  throws InterruptedException, WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
 

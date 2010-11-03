@@ -139,7 +139,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
 
 
-    public Document getCapabilities(Element reqElem, String serviceUrl) throws WcsException {
+    public Document getCapabilities(Element reqElem, String serviceUrl) throws InterruptedException, WcsException {
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(reqElem);
 
             return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
@@ -148,7 +148,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
 
 
-    public Document describeCoverage(Element reqElem) throws WcsException {
+    public Document describeCoverage(Element reqElem) throws InterruptedException, WcsException {
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(reqElem);
 
             return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
@@ -157,7 +157,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
 
 
-    public Document getCoverage( Element reqElem) throws WcsException {
+    public Document getCoverage( Element reqElem) throws InterruptedException, WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(reqElem);
 
@@ -165,7 +165,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
     }
 
 
-    public Document getWcsResponse(String serviceUrl, WcsResponder wcsResponder, Element wcsRequest) {
+    public Document getWcsResponse(String serviceUrl, WcsResponder wcsResponder, Element wcsRequest) throws InterruptedException {
 
 
         try {
@@ -205,7 +205,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
     }
 
-    public Document getWcsResponse(String serviceUrl, WcsResponder responder, InputStream reqDoc)  {
+    public Document getWcsResponse(String serviceUrl, WcsResponder responder, InputStream reqDoc) throws InterruptedException {
 
         try {
 

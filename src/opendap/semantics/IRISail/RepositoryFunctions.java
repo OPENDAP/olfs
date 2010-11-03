@@ -45,7 +45,7 @@ public class RepositoryFunctions {
      * @param createValue - a ValueFactory from the repository.
      * @return Value object.
      */
-    public static Value join(List<String> RDFList, ValueFactory createValue) {
+    public static Value join(List<String> RDFList, ValueFactory createValue) throws InterruptedException {
         int i = 0;
         boolean joinStrIsURL = false;
         String targetObj = "";
@@ -76,7 +76,7 @@ public class RepositoryFunctions {
      * @param createValue - a ValueFactory from the repository.
      * @return
      */
-    public static Value localName(List<String> RDFList, ValueFactory createValue) {
+    public static Value localName(List<String> RDFList, ValueFactory createValue) throws InterruptedException {
        
         
         String targetObj = "";
@@ -88,7 +88,7 @@ public class RepositoryFunctions {
             return createValue.createLiteral(targetObj);
     }
 
-    public static Value cast (List<String> RDFList, ValueFactory createValue) {
+    public static Value cast (List<String> RDFList, ValueFactory createValue)  throws InterruptedException{
        
        String  label = RDFList.get(0); 
        String dataType = RDFList.get(1);

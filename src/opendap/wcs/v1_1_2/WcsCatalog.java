@@ -24,7 +24,11 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.rio.RDFParseException;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
@@ -73,7 +77,7 @@ public interface WcsCatalog {
      * @return true if the catalog contains the a wcs:Coverage wher the
      * value wcs:Identifer is equal to the passed string.
      */
-    public boolean hasCoverage(String coverageId);
+    public boolean hasCoverage(String coverageId) throws InterruptedException;
 
 
 
@@ -88,7 +92,7 @@ public interface WcsCatalog {
      * catalog does not contain a matching Coverage.
      * @throws WcsException When the bad things happen.
      */
-    public CoverageDescription getCoverageDescription(String coverageId) throws WcsException;
+    public CoverageDescription getCoverageDescription(String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -103,7 +107,7 @@ public interface WcsCatalog {
      * catalog does not contain a matching Coverage.
      * @throws WcsException When the bad things happen.
      */
-    public Element getCoverageDescriptionElement(String coverageId) throws WcsException;
+    public Element getCoverageDescriptionElement(String coverageId) throws InterruptedException,  WcsException;
 
 
 
@@ -120,7 +124,7 @@ public interface WcsCatalog {
      * the catalog. The list may be empty.
      * @throws WcsException When the bad things happen.
      */
-    public List<Element> getCoverageDescriptionElements() throws WcsException;
+    public List<Element> getCoverageDescriptionElements() throws InterruptedException, WcsException;
 
 
 
@@ -143,7 +147,7 @@ public interface WcsCatalog {
      * catalog does not contain a matching Coverage.
      * @throws WcsException When the bad things happen.
      */
-    public Element getCoverageSummaryElement(String coverageId) throws WcsException;
+    public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
 
 
 
@@ -162,7 +166,7 @@ public interface WcsCatalog {
      * found in the catalog. The list may be empty.
      * @throws WcsException When the bad things happen.
      */
-    public List<Element> getCoverageSummaryElements() throws WcsException;
+    public List<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
 
 
 
@@ -194,7 +198,7 @@ public interface WcsCatalog {
      *
      * @return The list of unique wcs:SupportedFormat Elements in the catalog.
      */
-    public List<Element> getSupportedFormatElements();
+    public List<Element> getSupportedFormatElements() throws InterruptedException;
 
 
 
@@ -233,7 +237,7 @@ public interface WcsCatalog {
      *
      * @return The list of unique wcs:SupportedFormat Elements in the catalog.
      */
-    public List<Element> getSupportedCrsElements();
+    public List<Element> getSupportedCrsElements() throws InterruptedException;
 
 
 
@@ -299,7 +303,7 @@ public interface WcsCatalog {
      * @param coverageID
      * @return  The base data access URL for this coverage. Null otherwise.
      */
-    public String getDataAccessUrl(String coverageID);
+    public String getDataAccessUrl(String coverageID) throws InterruptedException;
 
 
 

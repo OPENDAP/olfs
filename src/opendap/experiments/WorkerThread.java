@@ -75,19 +75,29 @@ public class WorkerThread implements Runnable, ServletContextListener {
     public void run() {
         log.debug("In run() method.");
 
-        long sleepTime= 20000;
+        long sleepTime= 20;
 
         Thread thread = Thread.currentThread();
         try {
             while(true && !thread.isInterrupted()){
-                log.info(thread.getName()+": Sleeping for: "+sleepTime/1000.0+" seconds");
+                log.info(thread.getName()+": Sleeping for: "+sleepTime+" seconds");
 
-                Thread.sleep(sleepTime);
-                log.info(thread.getName()+": Sleep timer expired. Resetting to: "+sleepTime/1000.0+" seconds");
+                napTime(sleepTime);
+                log.info(thread.getName()+": Resetting to: "+sleepTime/1000.0+" seconds");
+
             }
         } catch (InterruptedException e) {
-            log.debug(thread.getName()+" was interrupted.");
+            log.warn(thread.getName()+" was interrupted.");
+        } catch (Exception e) {
+            log.error(thread.getName()+" Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
         }
+    }
+
+
+    public void napTime(long intervalInSeconds) throws Exception {
+        Thread.sleep(intervalInSeconds * 1000);
+        log.info(Thread.currentThread().getName()+": Sleep timer expired.");
+
     }
 
 

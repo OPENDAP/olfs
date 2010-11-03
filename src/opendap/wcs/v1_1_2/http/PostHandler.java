@@ -63,7 +63,7 @@ public class PostHandler extends XmlRequestHandler {
 
 
     public void handleWcsRequest(HttpServletRequest request,
-                                       HttpServletResponse response) throws IOException {
+                                       HttpServletResponse response) throws InterruptedException, IOException {
 
         String dataAccessBase = Util.getServiceUrl(request);
         String serviceUrl = Util.getServiceUrlString(request,_prefix);

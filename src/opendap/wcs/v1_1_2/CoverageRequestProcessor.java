@@ -51,7 +51,7 @@ public class CoverageRequestProcessor {
      * @throws WcsException When a wcs:Coverages response document cannot be
      * constructed for the passed request.
      */
-    public static Document processCoverageRequest(GetCoverageRequest req) throws WcsException {
+    public static Document processCoverageRequest(GetCoverageRequest req)  throws InterruptedException, WcsException {
 
 
         String id = req.getCoverageID();
@@ -96,7 +96,7 @@ public class CoverageRequestProcessor {
 
 
 
-    public static String getDapDataAccessURL(GetCoverageRequest req) throws WcsException {
+    public static String getDapDataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
@@ -107,7 +107,7 @@ public class CoverageRequestProcessor {
 
 
 
-    public static String getNetcdfDataAccessURL(GetCoverageRequest req) throws WcsException {
+    public static String getNetcdfDataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
         
@@ -118,7 +118,7 @@ public class CoverageRequestProcessor {
 
 
 
-    public static String getMetadataAccessURL(GetCoverageRequest req) throws WcsException {
+    public static String getMetadataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
 
@@ -133,7 +133,7 @@ public class CoverageRequestProcessor {
 
 
 
-    private static String getDapProjection(GetCoverageRequest req) throws WcsException {
+    private static String getDapProjection(GetCoverageRequest req)  throws InterruptedException, WcsException {
 
         String proj=null;
 

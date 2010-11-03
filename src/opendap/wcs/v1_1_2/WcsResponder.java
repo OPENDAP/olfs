@@ -35,7 +35,7 @@ import org.jdom.Element;
  * To change this template use File | Settings | File Templates.
  */
 public interface WcsResponder {
-        Document getCapabilities(Element getCapabilitiesRequest, String serviceUrl) throws WcsException;
-        Document describeCoverage(Element describeCoverageRequest) throws WcsException;
-        Document getCoverage(Element getCoverageRequest) throws WcsException;
+        Document getCapabilities(Element getCapabilitiesRequest, String serviceUrl) throws WcsException, InterruptedException;
+        Document describeCoverage(Element describeCoverageRequest) throws WcsException, InterruptedException;
+        Document getCoverage(Element getCoverageRequest) throws WcsException, InterruptedException;
 }

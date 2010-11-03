@@ -48,7 +48,7 @@ public class CapabilitiesRequestProcessor {
      * @return The complete wcs:Capabilities document, suitable for serialization to a requesting client.
      * @throws WcsException When bad things happen.
      */
-    public static Document getFullCapabilitiesDocument(String serviceUrl) throws WcsException {
+    public static Document getFullCapabilitiesDocument(String serviceUrl)  throws InterruptedException, WcsException {
 
         Element capabilities = new Element("Capabilities", WCS.WCS_NS);
 
@@ -80,7 +80,7 @@ public class CapabilitiesRequestProcessor {
      * @return The wcs:Capabilities document with the componets requested by the client.
      * @throws WcsException  When bad things happen.
      */
-    public static Document processGetCapabilitiesRequest(GetCapabilitiesRequest req, String serviceUrl) throws WcsException {
+    public static Document processGetCapabilitiesRequest(GetCapabilitiesRequest req, String serviceUrl)  throws InterruptedException, WcsException {
 
         Element capabilities = new Element("Capabilities",WCS.WCS_NS);
 
@@ -150,7 +150,7 @@ public class CapabilitiesRequestProcessor {
      * @return Returns the wcs:Contents section of the wcs:Capabilities response.
      * @throws WcsException   When bad things happen.
      */
-    public static Element getContents() throws WcsException {
+    public static Element getContents()  throws InterruptedException, WcsException {
 
         Element contents = new Element("Contents",WCS.WCS_NS);
         Element cs;

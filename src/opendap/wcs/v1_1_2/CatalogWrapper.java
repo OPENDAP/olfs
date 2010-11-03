@@ -91,39 +91,39 @@ public class CatalogWrapper {
 
 
 
-    public static String getDataAccessUrl(String coverageID){
+    public static String getDataAccessUrl(String coverageID) throws InterruptedException {
         return _catalogImpl.getDataAccessUrl(coverageID);
     }
 
 
-    public static boolean hasCoverage(String id) {
+    public static boolean hasCoverage(String id) throws InterruptedException {
         return _catalogImpl.hasCoverage(id);
 
     }
 
-    public static CoverageDescription getCoverageDescription(String id) throws WcsException{
+    public static CoverageDescription getCoverageDescription(String id) throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageDescription(id);
 
     }
 
-    public static Element getCoverageDescriptionElement(String id) throws WcsException{
+    public static Element getCoverageDescriptionElement(String id)  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageDescriptionElement(id);
     }
 
 
-    public static Element getCoverageSummaryElement(String id) throws WcsException{
+    public static Element getCoverageSummaryElement(String id)  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElement(id);
     }
 
-    public static List<Element> getCoverageSummaryElements() throws WcsException{
+    public static List<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElements();
     }
 
-    public static List<Element> getSupportedFormatElements() {
+    public static List<Element> getSupportedFormatElements() throws InterruptedException {
         return _catalogImpl.getSupportedFormatElements();
     }
 
-    public static List<Element> getSupportedCrsElements() {
+    public static List<Element> getSupportedCrsElements() throws InterruptedException {
         return _catalogImpl.getSupportedCrsElements();
     }
 

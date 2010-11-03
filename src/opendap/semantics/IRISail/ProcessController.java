@@ -34,10 +34,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * This class is used to track the state of a thread updating the repository.
  * It makes sure that the clients get current information from the repository.
  */
-public class ProcessingState {
+public class ProcessController {
 
-    static Logger log = LoggerFactory.getLogger(ProcessingState.class);
+    static Logger log = LoggerFactory.getLogger(ProcessController.class);
 
+    static AtomicBoolean currentlyProcessing;
+    static {
+        currentlyProcessing = new AtomicBoolean();
+        currentlyProcessing.set(false);
+    }
     static AtomicBoolean stopWorking;
     static{
         stopWorking = new AtomicBoolean();
@@ -73,10 +78,19 @@ public class ProcessingState {
 
     public static void checkState() throws InterruptedException{
         Thread thread = Thread.currentThread();
-        if(thread.isInterrupted()){
+        if(thread.isInterrupted() || stopWorking.get()){
             interruptProcessing();
         }
+        log.debug("checkState(): "+thread.getName()+ " has not been interrupted.");
+
     }
 
+    public static boolean isCurrentlyProcessing(){
+        return currentlyProcessing.get();
+    }
+
+    public static void setProcessingState(boolean running){
+        currentlyProcessing.set(running);
+    }
 
 }

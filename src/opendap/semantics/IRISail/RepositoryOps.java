@@ -36,6 +36,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 import org.openrdf.rio.ntriples.NTriplesWriter;
 import org.openrdf.rio.trig.TriGWriter;
@@ -45,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -77,7 +79,7 @@ public class RepositoryOps {
     public static boolean dropWithMemoryStore   = false;
  
      
-    public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) {
+    public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
         try {
@@ -86,21 +88,23 @@ public class RepositoryOps {
             
             long beforeDrop = new Date().getTime();
             
-            log.debug("In dropStartingPointsAndContexts AutoCommit = " + con.isAutoCommit());
+            log.debug("dropStartingPointsAndContexts(): AutoCommit = " + con.isAutoCommit());
             valueFactory = repo.getValueFactory();
             dropStartingPoints(con, valueFactory, startingPointUrls);
             dropContexts(con, valueFactory, dropList);
             con.commit();
             long AfterDrop = new Date().getTime();
             double elapsedTime = (AfterDrop - beforeDrop) / 1000.0;
-            log.debug("In dropStartingPointsAndContexts drop takes " + elapsedTime +"seconds");
+            log.info("dropStartingPointsAndContexts(): Drop operations took " + elapsedTime +"seconds");
             con.setAutoCommit(true);
         } catch (RepositoryException e) {
-           log.error("Caught RepositoryException in dropStartingPointsAndContexts. Msg: "
-                   + e.getMessage()); 
+           log.error("dropStartingPointsAndContexts(): Caught RepositoryException in dropStartingPointsAndContexts. Msg: "
+                   + e.getMessage());
         } catch (InterruptedException e) {
-            log.error("Caught InterruptedException in dropStartingPointsAndContexts. Msg: "
-                    + e.getMessage());  
+            log.error("dropStartingPointsAndContexts(): Caught InterruptedException in dropStartingPointsAndContexts. Msg: "
+                    + e.getMessage());
+            ProcessController.checkState();
+
         }finally {
             if (con != null) {
                 try {
@@ -113,36 +117,6 @@ public class RepositoryOps {
         }
     }
 
-    /**
-     * Remove the startingpoint statement from the repository.
-     * @param repo - the repository.
-     * @param startingPointUrls - list of StartingPoint.
-     */
-    public static void dropStartingPoints(Repository repo, Vector<String> startingPointUrls) {
-        RepositoryConnection con = null;
-        ValueFactory valueFactory;
-
-        try {
-            con = repo.getConnection();
-            valueFactory = repo.getValueFactory();
-            RepositoryOps.dropStartingPoints(con, valueFactory, startingPointUrls);
-        }
-        catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
-                    + e.getMessage());
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
-                            + e.getMessage());
-                }
-            }
-        }
-
-
-    }
 
     /**
      * Remove the startingpoint statement from the repository.
@@ -150,7 +124,7 @@ public class RepositoryOps {
      * @param valueFactory-A ValueFactory object for making URI and Name valued objects.
      * @param startingPointUrls-A list of starting point URLs to drop from the repository.
      */
-    public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
+    public static void dropStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls)throws InterruptedException  {
 
 
 
@@ -167,13 +141,13 @@ public class RepositoryOps {
                 startingPointValue = valueFactory.createURI(startingPoint);
                 con.remove(startingPointValue, isa, startingPointType, startingPointsContext);
 
-                log.info("Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
+                log.info("dropStartingPoints(): Removed starting point " + startingPoint + " from the repository. (N-Triple: <" + startingPointValue + "> <" + isa
                         + "> " + "<" + startingPointType + "> " + "<" + startingPointsContext + "> )");
             }
 
 
         } catch (RepositoryException e) {
-            log.error("In dropStartingPoints, caught an RepositoryException! Msg: "
+            log.error("dropStartingPoints(): In dropStartingPoints, caught an RepositoryException! Msg: "
                     + e.getMessage());
 
         }
@@ -186,7 +160,7 @@ public class RepositoryOps {
      * @param repo - the repository.
      * @param startingPointUrls - list of StartingPoint.
      */
-    public static void addStartingPoints(Repository repo, Vector<String> startingPointUrls) {
+    public static void addStartingPoints(Repository repo, Vector<String> startingPointUrls) throws InterruptedException {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
 
@@ -196,14 +170,14 @@ public class RepositoryOps {
             addStartingPoints(con, valueFactory, startingPointUrls);
         }
         catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
+            log.error("addStartingPoints(): "+e.getClass().getName()+": Failed to open repository connection. Msg: "
                     + e.getMessage());
         } finally {
             if (con != null) {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                    log.error("addStartingPoints(): "+e.getClass().getName()+": Failed to close repository connection. Msg: "
                             + e.getMessage());
                 }
             }
@@ -221,7 +195,7 @@ public class RepositoryOps {
      * @param valueFactory - ValueFactory from the repository.
      * @param startingPointUrls - list of StartingPoint.
      */
-    public static void addStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) {
+    public static void addStartingPoints(RepositoryConnection con, ValueFactory valueFactory, Vector<String> startingPointUrls) throws InterruptedException {
 
         log.debug("Adding StartingPoints...");
 
@@ -239,7 +213,7 @@ public class RepositoryOps {
      * @throws MalformedQueryException - if malformed query.
      * @throws QueryEvaluationException - if evaluate query error.
      */
-    public static boolean startingPointExists( RepositoryConnection con, String startingPointUrl) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+    public static boolean startingPointExists( RepositoryConnection con, String startingPointUrl)  throws InterruptedException,  RepositoryException, MalformedQueryException, QueryEvaluationException{
         TupleQueryResult result;
         boolean hasInternalStaringPoint = false;
 
@@ -266,7 +240,7 @@ public class RepositoryOps {
      * @param repo - repository.
      * @param startingPointUrl - a StartingPoint.
      */
-    public static void addStartingPoint(Repository repo, String startingPointUrl) {
+    public static void addStartingPoint(Repository repo, String startingPointUrl)throws InterruptedException {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
 
@@ -300,7 +274,7 @@ public class RepositoryOps {
      * @param valueFactory - ValueFactory from the repository.
      * @param startingPoint - a StartingPoint.
      */
-    public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint) {
+    public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint)throws InterruptedException {
 
         URI startingPointUri;
         URI isa = valueFactory.createURI(Terms.rdfType.getUri());
@@ -339,7 +313,7 @@ public class RepositoryOps {
      * @param startingPointUrls - list of StartingPoint.
      * @return A Vector of URL Strings of StartingPoint.
      */
-    public static Vector<String> findChangedStartingPoints(Repository repo, Vector<String> startingPointUrls) {
+    public static Vector<String> findChangedStartingPoints(Repository repo, Vector<String> startingPointUrls) throws InterruptedException{
         RepositoryConnection con = null;
 
         try {
@@ -347,14 +321,14 @@ public class RepositoryOps {
             return findChangedStartingPoints(con, startingPointUrls);
         }
         catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
+            log.error("findChangedStartingPoints(): "+e.getClass().getName()+": Failed to open repository connection. Msg: "
                     + e.getMessage());
         } finally {
             if (con != null) {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                    log.error("findChangedStartingPoints(): "+e.getClass().getName()+": Failed to close repository connection. Msg: "
                             + e.getMessage());
                 }
             }
@@ -371,7 +345,7 @@ public class RepositoryOps {
      * @param startingPointsUrls - list of Strings of StartingPoints.
      * @return - A Vector of URL Strings of StartingPoint.
      */
-    public static   Vector<String> findChangedStartingPoints(RepositoryConnection con, Vector<String> startingPointsUrls) {
+    public static   Vector<String> findChangedStartingPoints(RepositoryConnection con, Vector<String> startingPointsUrls)throws InterruptedException {
         Vector<String> result;
         Vector<String> changedStartingPoints = new Vector<String> ();
         log.debug("Checking if the old StartingPoint is still a StartingPoint ...");
@@ -391,16 +365,16 @@ public class RepositoryOps {
                 }
 
         } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
+            log.error("findChangedStartingPoints(): Caught an QueryEvaluationException! Msg: "
                     + e.getMessage());
-
         } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+            log.error("findChangedStartingPoints(): Caught RepositoryException! Msg: " + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+            log.error("findChangedStartingPoints(): Caught MalformedQueryException! Msg: " + e.getMessage());
         }
 
-        log.info("Located " + changedStartingPoints.size()+" starting points that have been changed.");
+        if(changedStartingPoints.size() >0)
+            log.info("findChangedStartingPoints(): Located " + changedStartingPoints.size()+" starting points that have been changed.");
         return changedStartingPoints;
     }
 
@@ -411,7 +385,7 @@ public class RepositoryOps {
      * @param startingPointUrls - list of StartingPoints.
      * @return - Vector of new StartingPoint URLs.
      */
-    public static Vector<String> findNewStartingPoints(Repository repo, Vector<String> startingPointUrls) {
+    public static Vector<String> findNewStartingPoints(Repository repo, Vector<String> startingPointUrls) throws InterruptedException {
         RepositoryConnection con = null;
 
         try {
@@ -419,14 +393,14 @@ public class RepositoryOps {
             return findNewStartingPoints(con, startingPointUrls);
         }
         catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
+            log.error("findNewStartingPoints(): "+e.getClass().getName()+": Failed to open repository connection. Msg: "
                     + e.getMessage());
         } finally {
             if (con != null) {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                    log.error("findNewStartingPoints(): "+e.getClass().getName()+": Failed to close repository connection. Msg: "
                             + e.getMessage());
                 }
             }
@@ -448,17 +422,17 @@ public class RepositoryOps {
      * @return All of the starting points in the passed startingPointUrls that are not already present in the repository.
      * If the internalStartingPoint is not present in the repository it will be returned too.
      */
-    public static  Vector<String> findNewStartingPoints(RepositoryConnection con, Vector<String> startingPointUrls) {
+    public static  Vector<String> findNewStartingPoints(RepositoryConnection con, Vector<String> startingPointUrls)throws InterruptedException {
         Vector<String> result;
         Vector<String> newStartingPoints = new Vector<String> ();
-        log.debug("Checking for new starting points...");
+        log.debug("findNewStartingPoints(): Checking for new starting points...");
 
         try {
 
             result = findAllStartingPoints(con);
 
             if(!result.contains(Terms.internalStartingPoint)){
-                log.debug("Internal StartingPoint not present in repository, adding to list.");
+                log.debug("findNewStartingPoints(): Internal StartingPoint not present in repository, adding to list.");
                 newStartingPoints.add(Terms.internalStartingPoint);
             }
 
@@ -473,16 +447,16 @@ public class RepositoryOps {
             }
 
         } catch (QueryEvaluationException e) {
-            log.error("Caught an QueryEvaluationException! Msg: "
+            log.error("findNewStartingPoints(): Caught an QueryEvaluationException! Msg: "
                     + e.getMessage());
 
         } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+            log.error("findNewStartingPoints(): Caught RepositoryException! Msg: " + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("Caught MalformedQueryException! Msg: " + e.getMessage());
+            log.error("findNewStartingPoints(): Caught MalformedQueryException! Msg: " + e.getMessage());
         }
 
-        log.info("Number of new StartingPoints: " + newStartingPoints.size());
+        log.info("findNewStartingPoints(): Number of new StartingPoints: " + newStartingPoints.size());
         return newStartingPoints;
     }
 
@@ -494,7 +468,7 @@ public class RepositoryOps {
      * @throws MalformedQueryException - if malformed query.
      * @throws QueryEvaluationException - if evaluate query erroe.
      */
-    public static Vector<String> findAllStartingPoints(Repository repo) throws MalformedQueryException, QueryEvaluationException {
+    public static Vector<String> findAllStartingPoints(Repository repo) throws InterruptedException, MalformedQueryException, QueryEvaluationException {
         RepositoryConnection con = null;
 
         try {
@@ -502,14 +476,14 @@ public class RepositoryOps {
             return findAllStartingPoints(con);
         }
         catch (RepositoryException e) {
-            log.error(e.getClass().getName()+": Failed to open repository connection. Msg: "
+            log.error("findNewStartingPoints(): "+e.getClass().getName()+": Failed to open repository connection. Msg: "
                     + e.getMessage());
         } finally {
             if (con != null) {
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error(e.getClass().getName()+": Failed to close repository connection. Msg: "
+                    log.error("findNewStartingPoints(): "+e.getClass().getName()+": Failed to close repository connection. Msg: "
                             + e.getMessage());
                 }
             }
@@ -525,7 +499,7 @@ public class RepositoryOps {
      * Find all starting points in the repository
      *
      */
-    public static Vector<String> findAllStartingPoints(RepositoryConnection con) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+    public static Vector<String> findAllStartingPoints(RepositoryConnection con) throws InterruptedException, RepositoryException, MalformedQueryException, QueryEvaluationException {
 
         Vector<String> startingPoints = new Vector <String> ();
 
@@ -534,7 +508,7 @@ public class RepositoryOps {
         if (result != null) {
 
             if (!result.hasNext()) {
-                log.debug("NEW repository!");
+                log.debug("findAllStartingPoints(): NEW repository!");
             }
 
             while (result.hasNext()) {
@@ -547,7 +521,7 @@ public class RepositoryOps {
 
             }
         } else {
-            log.debug("No query result!");
+            log.debug("findAllStartingPoints(): No query result!");
 
         }
         return startingPoints;
@@ -563,17 +537,17 @@ public class RepositoryOps {
      * @throws MalformedQueryException - malformed query.
      * @throws RepositoryException - if repository error.
      */
-    private static TupleQueryResult queryForStartingPoints(RepositoryConnection con) throws QueryEvaluationException, MalformedQueryException, RepositoryException {
+    private static TupleQueryResult queryForStartingPoints(RepositoryConnection con) throws InterruptedException, QueryEvaluationException, MalformedQueryException, RepositoryException {
         TupleQueryResult result;
 
-        log.debug("Finding StartingPoints in the repository ...");
+        log.debug("queryForStartingPoints(): Finding StartingPoints in the repository ...");
 
         String queryString = "SELECT DISTINCT doc "
             + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"} "
             + "USING NAMESPACE "
             + "rdfcache = <"+ Terms.rdfCacheNamespace+">";
 
-        log.debug("queryStartingPoints: " + queryString);
+        log.debug("queryForStartingPoints(): query='" + queryString+"'");
 
         TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,queryString);
 
@@ -586,7 +560,7 @@ public class RepositoryOps {
      * Wipe out the whole repository.
      * @param owlse2 - repository.
      */
-    public static void clearRepository(Repository owlse2) {
+    public static void clearRepository(Repository owlse2) throws InterruptedException{
 
         RepositoryConnection con = null;
 
@@ -595,7 +569,7 @@ public class RepositoryOps {
             con.clear();
         }
         catch (RepositoryException e) {
-            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+            log.error("clearRepository(): Failed to open repository connection. Msg: "+e.getMessage());
         } finally {
             
             if(con!=null){
@@ -603,7 +577,7 @@ public class RepositoryOps {
                     con.close();  //close connection first
                 }
                 catch(RepositoryException e){
-                    log.error("Failed to close repository connection. Msg: "+e.getMessage());
+                    log.error("clearRepository(): Failed to close repository connection. Msg: "+e.getMessage());
                 }
             }
         }
@@ -617,7 +591,7 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @param filename - file to hold the repository dump.
      */
-    public static void dumpRepository(RepositoryConnection con, String filename) {
+    public static void dumpRepository(RepositoryConnection con, String filename) throws InterruptedException {
         FileOutputStream myFileOutputStream = null;
         // export repository to an n-triple file
         try {
@@ -653,10 +627,15 @@ public class RepositoryOps {
             }
             log.info("dumpRepository(): Completed dumping explicit statements");
 
-        } catch (Exception e) {
-            log.error("dumpRepository(): Failed to dump repository! msg: "+e.getMessage());
         }
-        finally {
+
+        catch (RepositoryException e) {
+            log.error("dumpRepository(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (FileNotFoundException e) {
+            log.error("dumpRepository(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (RDFHandlerException e) {
+            log.error("dumpRepository(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } finally {
             if(myFileOutputStream != null){
                 try {
                     myFileOutputStream.close();
@@ -673,7 +652,7 @@ public class RepositoryOps {
      * @param owlse2 - repository.
      * @param filename - file to hold the repository.
      */
-    public static void dumpRepository(Repository owlse2, String filename) {
+    public static void dumpRepository(Repository owlse2, String filename) throws InterruptedException {
 
         RepositoryConnection con = null;
 
@@ -682,7 +661,7 @@ public class RepositoryOps {
             dumpRepository(con, filename);
         }
         catch (RepositoryException e) {
-            log.error("Failed to open repository connection. Msg: "+e.getMessage());
+            log.error("dumpRepository(): Failed to open repository connection. Msg: "+e.getMessage());
         } finally {
             
             if(con!=null){
@@ -690,7 +669,7 @@ public class RepositoryOps {
                     con.close();  //close connection first
                 }
                 catch(RepositoryException e){
-                    log.error("Failed to close repository connection. Msg: "+e.getMessage());
+                    log.error("dumpRepository(): Failed to close repository connection. Msg: "+e.getMessage());
                 }
             }
         }
@@ -703,7 +682,7 @@ public class RepositoryOps {
      * @param repository - the repository.
      * @return a String of all contexts.
      */
-    public static String showContexts(Repository repository){
+    public static String showContexts(Repository repository) throws InterruptedException {
         RepositoryConnection con = null;
         String msg;
 
@@ -712,7 +691,7 @@ public class RepositoryOps {
             msg =  showContexts(con);
         }
         catch (RepositoryException e) {
-            msg = "Failed to open repository connection. Msg: "+e.getMessage();
+            msg = "showContexts(): Failed to open repository connection. Msg: "+e.getMessage();
             log.error(msg);
         } finally {
             //log.debug("Closing repository connection.");
@@ -722,7 +701,7 @@ public class RepositoryOps {
                     con.close();  //close connection first
                 }
                 catch(RepositoryException e){
-                    log.error("Failed to close repository connection. Msg: "+e.getMessage());
+                    log.error("showContexts(): Failed to close repository connection. Msg: "+e.getMessage());
                 }
             }
         }
@@ -735,7 +714,7 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @return a String of all contexts.
      */
-    public static String showContexts(RepositoryConnection con){
+    public static String showContexts(RepositoryConnection con) throws InterruptedException {
 
         String msg = "\nRepository ContextIDs:\n";
         try {
@@ -746,7 +725,7 @@ public class RepositoryOps {
             }
 
         } catch (RepositoryException e) {
-            msg = "Failed to open repository connection. Msg: "+e.getMessage();
+            msg = "showContexts(): Failed to open repository connection. Msg: "+e.getMessage();
             log.error(msg);
         }
 
@@ -760,7 +739,7 @@ public class RepositoryOps {
      * @param importURL - String of import URL.
      * @return Boolean - true if the import URL is changed.
      */
-    public static Boolean olderContext(RepositoryConnection con, String importURL) {
+    public static Boolean olderContext(RepositoryConnection con, String importURL) throws InterruptedException{
         Boolean oldLMT = false;
 
         String oldltmod = getLastModifiedTime(con, importURL); // LMT from repository
@@ -808,13 +787,11 @@ public class RepositoryOps {
      * @param importURL - String of import URL.
      * @return Boolean - true if the import URL is changed.
      */
-    public static Boolean olderContext(String oldltmod, String importURL) {
+    public static Boolean olderContext(String oldltmod, String importURL) throws InterruptedException {
         Boolean oldLMT = false;
 
         if (oldltmod.isEmpty()) {
-            log.debug("In  olderContext ...");
-            log.debug("URI " + importURL);
-            log.debug("lastmodified is empty!");
+            log.debug("olderContext():  URI: '" + importURL+"' lastModified is empty!");
             oldLMT = true;
             return oldLMT;
         }
@@ -828,20 +805,18 @@ public class RepositoryOps {
         Date ltdparseDate;
         try {
             ltdparseDate = dateFormat.parse(ltd);
-            log.debug("In  olderContext ...");
-            log.debug("URI " + importURL);
-            log.debug("lastmodified    " + ltdparseDate.toString());
+            log.debug("olderContext(): URI: '" + importURL+"' lastModified: '"+ltdparseDate.toString()+"'");
             Date oldltdparseDate = dateFormat.parse(oltd);
-            log.debug("oldlastmodified " + oldltdparseDate.toString());
+            log.debug("olderContext(): oldLastModified " + oldltdparseDate.toString());
 
             if (ltdparseDate.compareTo(oldltdparseDate) > 0) {// if newer
                 // context
 
-                log.info("Import context is newer! Will update.");
+                log.info("olderContext(): Import context is newer! Will update.");
                 oldLMT = true;
             }
         } catch (ParseException e) {
-            log.error("Caught an ParseException! Msg: " + e.getMessage());
+            log.error("olderContext(): Caught an ParseException! Msg: " + e.getMessage());
 
         }
         return oldLMT;
@@ -857,7 +832,7 @@ public class RepositoryOps {
      * @param urlstring - an URL String.
      * @return last modified time of the file.
      */
-    public static String getLastModifiedTime(RepositoryConnection con, String urlstring) {
+    public static String getLastModifiedTime(RepositoryConnection con, String urlstring) throws InterruptedException {
         TupleQueryResult result = null;
         String ltmodstr = "";
         URI uriaddress = new URIImpl(urlstring);
@@ -889,19 +864,19 @@ public class RepositoryOps {
             }
 
         } catch (QueryEvaluationException e) {
-            log.error("Caught a QueryEvaluationException! Msg: "
+            log.error("getLastModifiedTime(): Caught a QueryEvaluationException! Msg: "
                     + e.getMessage());
         } catch (RepositoryException e) {
-            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTime(): Caught a RepositoryException! Msg: " + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("Caught a MalformedQueryException! Msg: "
+            log.error("getLastModifiedTime(): Caught a MalformedQueryException! Msg: "
                     + e.getMessage());
         } finally {
             if(result!=null) {
                 try {
                     result.close();
-                } catch (Exception e) {
-                    log.error("Caught an Exception! Msg: " + e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("getLastModifiedTime(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
@@ -914,7 +889,7 @@ public class RepositoryOps {
      * @param urlstring - the URL of the context.
      * @return  the last modified time as a String.
      */
-    public static String getLTMODContext(String urlstring) {
+    public static String getLTMODContext(String urlstring) throws InterruptedException {
         String ltmodstr = "";
         try {
             URL myurl = new URL(urlstring);
@@ -923,10 +898,10 @@ public class RepositoryOps {
             //log.debug(urlstring + " lastModified: "+ltmod);
             ltmodstr = getLastModifiedTimeString(ltmod);
         } catch (MalformedURLException e) {
-            log.error("Caught a MalformedQueryException! Msg: "
+            log.error("getLTMODContext(): Caught a MalformedQueryException! Msg: "
                     + e.getLocalizedMessage());
         } catch (IOException e) {
-            log.error("Caught an IOException! Msg: " + e.getMessage(), e);
+            log.error("getLTMODContext(): Caught an IOException! Msg: " + e.getMessage(), e);
         }
         return ltmodstr;
     }
@@ -936,7 +911,7 @@ public class RepositoryOps {
      * @param date - a Date object represents the last modified time of the context.
      * @return a string of time.
      */
-    public static String getLastModifiedTimeString(Date date) {
+    public static String getLastModifiedTimeString(Date date) throws InterruptedException {
         return getLastModifiedTimeString(date.getTime());
     }
 
@@ -945,7 +920,7 @@ public class RepositoryOps {
      * @param epochTime - time in seconds.
      * @return a string of time.
      */
-    public static String getLastModifiedTimeString(long epochTime) {
+    public static String getLastModifiedTimeString(long epochTime) throws InterruptedException {
         String ltmodstr;
         Timestamp ltmodsql = new Timestamp(epochTime);
         String ltmodstrraw = ltmodsql.toString();
@@ -961,7 +936,7 @@ public class RepositoryOps {
      * modified times.
      * @return a Hash containing last modified times of each context
      */
-    public static HashMap<String, String> getLastModifiedTimesForContexts(Repository repository) {
+    public static HashMap<String, String> getLastModifiedTimesForContexts(Repository repository) throws InterruptedException {
         RepositoryConnection con = null;
 
         try{
@@ -969,14 +944,14 @@ public class RepositoryOps {
             return getLastModifiedTimesForContexts(con);
         }
         catch (RepositoryException e) {
-            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
         }
         finally {
             if(con!=null){
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+                    log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
                 }
             }
         }
@@ -992,7 +967,7 @@ public class RepositoryOps {
      * modified times.
      * @return a HashMap of last modified times and context pair.
      */
-    public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) {
+    public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) throws InterruptedException {
         TupleQueryResult result = null;
         String ltmodstr = "";
         String idstr = "";
@@ -1030,20 +1005,19 @@ public class RepositoryOps {
 
             }
         } catch (QueryEvaluationException e) {
-            log.error("Caught a QueryEvaluationException! Msg: "
+            log.error("getLastModifiedTimesForContexts(): Caught a QueryEvaluationException! Msg: "
                     + e.getMessage());
         } catch (RepositoryException e) {
-            log.error("Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("Caught a MalformedQueryException! Msg: "
+            log.error("getLastModifiedTimesForContexts(): Caught a MalformedQueryException! Msg: "
                     + e.getMessage());
         } finally {
             if (result != null) {
                 try {
                     result.close();
-                }
-                catch(Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("getLastModifiedTimesForContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
@@ -1061,7 +1035,7 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @param valueFactory - ValueFactory from the repository.
      */
-    public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) {
+    public static void setContentTypeContext(String importURL, String contentType, RepositoryConnection con, ValueFactory valueFactory) throws InterruptedException {
 
         URI s = valueFactory.createURI(importURL);
         URI contentTypeContext = valueFactory.createURI(Terms.contentType.getUri());
@@ -1074,7 +1048,7 @@ public class RepositoryOps {
             con.add((Resource) s, contentTypeContext, (Value) o, (Resource) cacheContext);
 
         } catch (RepositoryException e) {
-            log.error("Caught an RepositoryException! Msg: "
+            log.error("setContentTypeContext(): Caught an RepositoryException! Msg: "
                     + e.getMessage());
 
         }
@@ -1088,7 +1062,7 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @param valueFactory - from the repository.
      */
-    public static void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) {
+    public static void setLTMODContext(String importURL, RepositoryConnection con,ValueFactory valueFactory) throws InterruptedException {
         String ltmod = getLTMODContext(importURL);
         setLTMODContext(importURL, ltmod, con, valueFactory);
     }
@@ -1101,7 +1075,7 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @param valueFactory - ValueFactory from the Repository.
      */
-    public  static void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) {
+    public  static void setLTMODContext(String importURL, String ltmod, RepositoryConnection con, ValueFactory valueFactory) throws InterruptedException {
 
         // log.debug(importURL);
         // log.debug("lastmodified " + ltmod);
@@ -1116,7 +1090,7 @@ public class RepositoryOps {
             con.add((Resource) s, p, (Value) o, (Resource) cont);
 
         } catch (RepositoryException e) {
-            log.error("Caught an RepositoryException! Msg: "
+            log.error("setLTMODContext(): Caught an RepositoryException! Msg: "
                     + e.getMessage());
 
         }
@@ -1151,8 +1125,8 @@ public class RepositoryOps {
 
 
         Date startTime = new Date();
-        log.info("-----------------------------------------------------------------------");
-        log.info("updateSemanticRepository() Start.");
+        log.debug("-----------------------------------------------------------------------");
+        log.debug("updateSemanticRepository(): Start.");
         log.debug(showContexts(repository));
         RepositoryConnection con = null;
         try {
@@ -1162,7 +1136,7 @@ public class RepositoryOps {
             try {
                 con = repository.getConnection();
                 if (con.isOpen()) {
-                    log.info("Connection is OPEN!");
+                    log.debug("updateSemanticRepository(): Connection is OPEN!");
 
 
                     newStartingPoints = findNewStartingPoints(con, startingPointUrls);
@@ -1174,15 +1148,15 @@ public class RepositoryOps {
                    
                 }
             } catch (RepositoryException e) {
-                log.error("Caught RepositoryException updateSemanticRepository(Vector<String> startingPointUrls)" +
+                log.error("updateSemanticRepository(): Caught RepositoryException. Msg: " +
                         e.getMessage());
             } finally {
                 if (con != null)
                     con.close();
-                log.info("Connection is Closed!");
+                log.debug("updateSemanticRepository(): Connection is Closed!");
             }
 
-            ProcessingState.checkState();
+            ProcessController.checkState();
 
             log.debug(showContexts(repository));
 
@@ -1191,11 +1165,11 @@ public class RepositoryOps {
 
 
             if (!dropList.isEmpty()) {
-                log.debug("Add external inferencing contexts to dropList");
+                log.debug("updateSemanticRepository(): Add external inferencing contexts to dropList");
                 dropList.addAll(findExternalInferencingContexts(repository));
                 
                 if(flushRepositoryOnDrop){
-                    log.warn("Repository content has been changed! Flushing Repository!");
+                    log.warn("updateSemanticRepository(): Repository content has been changed! Flushing Repository!");
 
                     clearRepository(repository);
 
@@ -1209,26 +1183,26 @@ public class RepositoryOps {
 
 
                 }else if(dropWithMemoryStore){
-                    log.warn("Repository content has been changed! Do drop with MemoryStore!");
+                    log.warn("updateSemanticRepository(): Repository content has been changed! Do drop with MemoryStore!");
                     
                     Repository memRepository = setupMemoryStoreSailRepository();
                     
-                    log.warn("Flushing MemoryStoreRepository!");
+                    log.warn("updateSemanticRepository(): Flushing MemoryStoreRepository!");
                     clearRepository(memRepository); //make sure memory store is empty
                     RepositoryConnection conMem = memRepository.getConnection();
                     RepositoryConnection conOwlim = repository.getConnection();
                     
-                    log.info("Loading Owlim Repository to MemoryStore");
+                    log.info("updateSemanticRepository(): Loading Owlim Repository to MemoryStore");
                     conMem.add(conOwlim.getStatements(null, null, null, false));
                     
-                    log.info("Dropping StartingPoint and contexts from MemoryStore ...");
+                    log.info("updateSemanticRepository(): Dropping StartingPoint and contexts from MemoryStore ...");
                     
                     dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
                     
-                    log.warn("Flushing OwlimRepository!");
+                    log.warn("updateSemanticRepository(): Flushing OwlimRepository!");
                     clearRepository(repository);
                     
-                    log.info("Reloading MemoryStore back to Owlim Repository");
+                    log.info("updateSemanticRepository(): Reloading MemoryStore back to Owlim Repository");
                     conOwlim.add(conMem.getStatements(null, null, null, true));
                     
                     conOwlim.close();
@@ -1244,64 +1218,62 @@ public class RepositoryOps {
 
             }//if (!dropList.isEmpty()) 
 
-            ProcessingState.checkState();
+            ProcessController.checkState();
 
 
             if (!newStartingPoints.isEmpty()) {
 
-                log.info("Adding new starting points ...");
+                log.info("updateSemanticRepository(): Adding new starting points ...");
                 addStartingPoints(repository, newStartingPoints);
-                log.info("Finished adding new starting points.");
+                log.info("updateSemanticRepository(): Finished adding new starting points.");
 
                 log.debug(showContexts(repository));
                 modelChanged = true;
 
             }
 
-            ProcessingState.checkState();
+            ProcessController.checkState();
 
-            log.info("Checking for referenced documents that are not already in the repository.");
+            log.info("updateSemanticRepository(): Checking for referenced documents that are not already in the repository.");
             boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
             if(foundNewDocuments){
                 modelChanged = true;
             }
 
-            ProcessingState.checkState();
+            ProcessController.checkState();
 
+            repositoryHasBeenChanged = modelChanged;
 
-            if (modelChanged) {
+            log.info("updateSemanticRepository(): Updating repository ...");
+            ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
 
-                log.info("Updating repository ...");
-                ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
+            boolean firstPass = true;
+            while (modelChanged || firstPass) {
 
-                while (modelChanged) {
-                    log.info("Repository changes detected.");
-                    log.debug(showContexts(repository));
+                firstPass = false;
 
-                    log.debug("Running construct rules ...");
-                    constructRuleEvaluator.runConstruct(repository);
-                    log.info("Finished running construct rules.");
+                log.info("updateSemanticRepository(): Running construct rules ...");
+                constructRuleEvaluator.runConstruct(repository);
+                log.info("updateSemanticRepository(): Finished running construct rules.");
 
-                    ProcessingState.checkState();
+                ProcessController.checkState();
 
-                    log.debug(showContexts(repository));
-                    modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
-                    
-                    ProcessingState.checkState();
-                }
-
-
-                repositoryHasBeenChanged = true;
-
-            } else {
-                log.info("Repository update complete. No changes detected, rules not rerun..");
                 log.debug(showContexts(repository));
+
+                modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
+                
+                repositoryHasBeenChanged = repositoryHasBeenChanged || modelChanged;
+
+                ProcessController.checkState();
 
             }
 
 
+
+
+
         } catch (RepositoryException e) {
-            log.error("Caught RepositoryException in main(): "
+            log.error("updateSemanticRepository(): Caught RepositoryException. Message:"
                     + e.getMessage());
 
         }
@@ -1309,8 +1281,8 @@ public class RepositoryOps {
 
         double elapsedTime = (new Date().getTime() - startTime.getTime())/1000.0;
         
-        log.info("updateSemanticRepository() End. Elapsed time: " + elapsedTime + " seconds");
-        log.info("-----------------------------------------------------------------------");
+        log.info("updateSemanticRepository() End. Elapsed time: " + elapsedTime + " seconds  repositoryHasBeenChanged: "+repositoryHasBeenChanged);
+        log.debug("-----------------------------------------------------------------------");
 
 
         return repositoryHasBeenChanged;
@@ -1326,44 +1298,26 @@ public class RepositoryOps {
     public static void dropContexts(Repository repository, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
 
-        log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
+        log.debug("dropContexts(): Dropping changed RDFDocuments and external inferencing contexts...");
 
         try {
             con = repository.getConnection();
             con.setAutoCommit(false);
-            log.debug("In dropContexts AutoCommit = " + con.isAutoCommit());
-            log.info("Deleting contexts in drop list ...");
-            ValueFactory valueFactory = repository.getValueFactory();
-
-            for (String drop : dropList) {
-                log.info("Dropping context URI: " + drop);
-                URI contextToDrop = valueFactory.createURI(drop);
-                URI cacheContext = valueFactory.createURI(Terms.cacheContext.getUri());
-
-                log.info("Removing context: " + contextToDrop);
-                con.clear(contextToDrop);
-
-                log.info("Removing last_modified: " + contextToDrop);
-                con.remove(contextToDrop, null, null, cacheContext); // remove last_modified
-
-                log.info("Finished removing context: " + contextToDrop);
-
-                ProcessingState.checkState();
-            }
+            dropContexts(con,con.getValueFactory(),dropList);
             con.commit();
         } catch (RepositoryException e) {
-            log.error("Caught RepositoryException! Msg: " + e.getMessage());
+            log.error("dropContexts(): Caught RepositoryException! Msg: " + e.getMessage());
         }
         finally {
             try {
                 if (con != null)
                     con.close();
             } catch (RepositoryException e) {
-                log.error("Caught RepositoryException! while closing connection: "
+                log.error("dropContexts(): Caught RepositoryException! while closing connection: "
                         + e.getMessage());
             }
         }
-        log.info("Finished dropping changed RDFDocuments and external inferencing contexts.");
+        log.info("dropContexts(): Finished dropping changed RDFDocuments and external inferencing contexts.");
 
     }
     /**
@@ -1374,34 +1328,34 @@ public class RepositoryOps {
      * @throws InterruptedException
      */
     public static void dropContexts(RepositoryConnection con, ValueFactory valueFactory, Vector<String> dropList) throws InterruptedException {
-       
-        log.debug("Dropping changed RDFDocuments and external inferencing contexts...");
+
+        log.debug("dropContexts(): Dropping changed RDFDocuments and external inferencing contexts...");
 
         try {
-           
-            log.info("Deleting contexts in drop list ...");
-            
+
+            log.info("dropContexts(): Deleting contexts in drop list ...");
+
             for (String drop : dropList) {
-                log.info("Dropping context URI: " + drop);
+                log.debug("dropContexts(): Dropping context URI: " + drop);
                 URI contextToDrop = valueFactory.createURI(drop);
                 URI cacheContext = valueFactory.createURI(Terms.cacheContext.getUri());
 
-                log.info("Removing context: " + contextToDrop);
+                log.debug("dropContexts(): Removing context: " + contextToDrop);
                 con.clear(contextToDrop);
 
-                log.info("Removing last_modified: " + contextToDrop);
+                log.debug("dropContexts(): Removing last_modified: " + contextToDrop);
                 con.remove(contextToDrop, null, null, cacheContext); // remove last_modified
 
-                log.info("Finished removing context: " + contextToDrop);
+                log.info("dropContexts(): Finished removing context: " + contextToDrop);
 
-                ProcessingState.checkState();
+                ProcessController.checkState();
             }
 
         } catch (RepositoryException e) {
-            log.error("In dropContexts caught RepositoryException! Msg: " + e.getMessage());
-        
+            log.error("dropContexts(): In dropContexts caught RepositoryException! Msg: " + e.getMessage());
+
         }
-        log.debug("Finished dropping changed RDFDocuments and external inferencing contexts.");
+        log.debug("dropContexts(): Finished dropping changed RDFDocuments and external inferencing contexts.");
 
     }
     /**
@@ -1410,14 +1364,14 @@ public class RepositoryOps {
      * @param repository The repository to operate on.
      * @return A lists of contexts that were generated by construct rules (i.e. external inferencing)
      */
-    static Vector<String> findExternalInferencingContexts(Repository repository) {
+    static Vector<String> findExternalInferencingContexts(Repository repository)throws InterruptedException  {
         RepositoryConnection con = null;
         TupleQueryResult result = null;
 
         //List<String> bindingNames;
         Vector<String> externalInferencing = new Vector<String>();
 
-        log.debug("Finding ExternalInferencing ...");
+        log.debug("findExternalInferencingContexts(): Finding ExternalInferencing ...");
 
         try {
             con = repository.getConnection();
@@ -1444,36 +1398,41 @@ public class RepositoryOps {
                     BindingSet bindingSet = result.next();
 
                     Value firstValue = bindingSet.getValue("crule");
-                    if (!externalInferencing.contains(firstValue.stringValue())) {
-                        externalInferencing.add(firstValue.stringValue());
-                        log.debug("Adding to external inferencing list: " + firstValue.toString());
+
+                    String contextUrl = firstValue.stringValue();
+                    if (!externalInferencing.contains(contextUrl)) {
+                        externalInferencing.add(contextUrl);
+                        log.debug("Adding to external inferencing list: " + contextUrl);
                     }
                 }
             } else {
-                log.info("No construct rule found!");
+                log.info("findExternalInferencingContexts(): No construct rule found!");
             }
-        } catch (Exception e) {
-            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
-
-        finally {
+        catch (RepositoryException e) {
+            log.error("findExternalInferencingContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (QueryEvaluationException e) {
+            log.error("findExternalInferencingContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("findExternalInferencingContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } finally {
             if (result != null) {
                 try {
                     result.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("findExternalInferencingContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
             if(con!=null){
                 try {
                     con.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (RepositoryException e) {
+                    log.error("findExternalInferencingContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
 
-        log.info("Located "
+        log.info("findExternalInferencingContexts(): Located "
                 + externalInferencing.size() + " context generated by external inferencing (construct rules).");
 
 
@@ -1487,13 +1446,13 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @return list of RDF documents to delete from the repository.
      */
-    static Vector<String> findUnneededRDFDocuments(RepositoryConnection con) {
+    static Vector<String> findUnneededRDFDocuments(RepositoryConnection con) throws InterruptedException {
         TupleQueryResult result = null;
         //List<String> bindingNames;
         Vector<String> unneededRdfDocs = new Vector<String>();
 
 
-        log.info("Locating unneeded RDF files left over from last update ...");
+        log.debug("findUnneededRDFDocuments(): Locating unneeded RDF files left over from last update ...");
 
         try {
 
@@ -1534,22 +1493,27 @@ public class RepositoryOps {
             } else {
                 log.debug("No query result!");
             }
-        } catch (Exception e) {
-            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
 
-        finally {
+        catch (RepositoryException e) {
+            log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (QueryEvaluationException e) {
+            log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } finally {
             if (result != null) {
                 try {
                     result.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
 
         }
 
-        log.info("Identified " + unneededRdfDocs.size() + " unneeded RDF documents.");
+        if(unneededRdfDocs.size()>0)
+            log.info("findUnneededRDFDocuments(): Identified " + unneededRdfDocs.size() + " unneeded RDF documents.");
         return unneededRdfDocs;
 
     }
@@ -1560,12 +1524,12 @@ public class RepositoryOps {
      * @param con - connection to the repository.
      * @return list of RDF documents that changed.
      */
-    static Vector<String> findChangedRDFDocuments(RepositoryConnection con) {
+    static Vector<String> findChangedRDFDocuments(RepositoryConnection con) throws InterruptedException {
         TupleQueryResult result = null;
         //List<String> bindingNames;
         Vector<String> changedRdfDocuments = new Vector<String>();
 
-        log.info("Locating changeded files ...");
+        log.debug("findChangedRDFDocuments(): Locating changed files ...");
 
         try {
             String queryString = "SELECT DISTINCT doc,lastmod "
@@ -1574,7 +1538,7 @@ public class RepositoryOps {
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
-            log.debug("queryChangedRDFDocuments: " + queryString);
+            log.debug("findChangedRDFDocuments(): query string '" + queryString+"'");
 
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
                     queryString);
@@ -1597,29 +1561,34 @@ public class RepositoryOps {
 
                         changedRdfDocuments.add(importURL);
 
-                        log.debug("Add to changedRdfDocuments list: " + importURL);
+                        log.debug("findChangedRDFDocuments(): Add to changedRdfDocuments list: " + importURL);
 
                     }
                 }
             } else {
-                log.info("No query result!");
+                log.info("findChangedRDFDocuments(): No query result!");
             }
-        } catch (Exception e) {
-            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
 
-        finally {
+        catch (RepositoryException e) {
+            log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (QueryEvaluationException e) {
+            log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        } finally {
             if (result != null) {
                 try {
                     result.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (QueryEvaluationException e) {
+                    log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
 
         }
 
-        log.info("Number of changed RDF documents detected:  "
+        if(changedRdfDocuments.size()>0)
+            log.info("findChangedRDFDocuments(): Number of changed RDF documents detected:  "
                 + changedRdfDocuments.size());
 
         return changedRdfDocuments;
@@ -1631,7 +1600,7 @@ public class RepositoryOps {
      * @param repository-the repository instance
      * @return xsltTransformationFileUrl-Url of the transformation stylesheet
      */
-    public static String getUrlForTransformToRdf(Repository repository, String importUrl){
+    public static String getUrlForTransformToRdf(Repository repository, String importUrl)throws InterruptedException {
         RepositoryConnection con = null;
         String xsltTransformationFileUrl = null;
         ValueFactory valueFactory;
@@ -1656,26 +1625,28 @@ public class RepositoryOps {
                 }
                 Statement s = statements.next();
                 xsltTransformationFileUrl= s.getObject().stringValue();
-                log.debug("Found Transformation file= " + xsltTransformationFileUrl);
+                log.debug("getUrlForTransformToRdf(): Found Transformation file= " + xsltTransformationFileUrl);
             }
-        } catch (Exception e) {
-            log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        }
+        catch (RepositoryException e) {
+            log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
         }
         finally {
             if (statements != null) {
                 try {
                     statements.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (RepositoryException e) {
+                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
 
             if (con != null) {
                 try {
                     con.close();
-                } catch (Exception e) {
-                    log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                } catch (RepositoryException e) {
+                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
+
             }
         }
 
@@ -1691,10 +1662,9 @@ public class RepositoryOps {
     private static Repository setupMemoryStoreSailRepository() throws RepositoryException, InterruptedException {
 
 
-        log.info("Setting up MemoryStroe SialRepository.");
 
         
-        log.info("Configuring Semantic Repository.");
+        log.info("setupMemoryStoreSailRepository(): Configuring Semantic Repository.");
         String catalogCacheDirectory = "./";
         File storageDir = new File(catalogCacheDirectory + "MemoryStore"); //define local copy of repository
         MemoryStore memStore = new MemoryStore(storageDir);
@@ -1703,22 +1673,22 @@ public class RepositoryOps {
         
         Repository repository = new SailRepository(memStore); 
         
-        log.info("Intializing Semantic Repository.");
+        log.info("setupMemoryStoreSailRepository(): Intializing Semantic Repository.");
 
         // Initialize repository
         repository.initialize(); //needed
 
-        log.info("Semantic Repository Ready.");
+        log.info("setupMemoryStoreSailRepository(): Semantic Repository Ready.");
 
 
-        ProcessingState.checkState();
+        ProcessController.checkState();
 
 
         return repository;
 
     }
     
-    public static void loadRepositoryFromTrigFile(Repository repo, String rdfFileName) throws RepositoryException, IOException, RDFParseException {
+    public static void loadRepositoryFromTrigFile(Repository repo, String rdfFileName) throws InterruptedException, RepositoryException, IOException, RDFParseException {
 
 
         RepositoryConnection con = null;
@@ -1742,7 +1712,7 @@ public class RepositoryOps {
                     con.close();  //close connection first
                 }
                 catch (RepositoryException e) {
-                    log.error("Failed to close repository connection. Msg: " + e.getMessage());
+                    log.error("loadRepositoryFromTrigFile(): Failed to close repository connection. Msg: " + e.getMessage());
                 }
             }
         }
