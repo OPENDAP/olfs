@@ -76,7 +76,7 @@ public class RepositoryOps {
 
     private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
     public static boolean flushRepositoryOnDrop = false;
-    public static boolean dropWithMemoryStore   = true;
+    public static boolean dropWithMemoryStore   = false;
  
      
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) throws InterruptedException {
