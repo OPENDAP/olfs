@@ -95,17 +95,16 @@ public class RepositoryOps {
             con.commit();
             long AfterDrop = new Date().getTime();
             double elapsedTime = (AfterDrop - beforeDrop) / 1000.0;
-            log.info("dropStartingPointsAndContexts(): Drop operations took " + elapsedTime +"seconds");
+
+            log.info("dropStartingPointsAndContexts(): Drop operations took " + elapsedTime +" seconds.");
+
             con.setAutoCommit(true);
+            
         } catch (RepositoryException e) {
            log.error("dropStartingPointsAndContexts(): Caught RepositoryException in dropStartingPointsAndContexts. Msg: "
                    + e.getMessage());
-        } catch (InterruptedException e) {
-            log.error("dropStartingPointsAndContexts(): Caught InterruptedException in dropStartingPointsAndContexts. Msg: "
-                    + e.getMessage());
-            ProcessController.checkState();
-
-        }finally {
+        } 
+        finally {
             if (con != null) {
                 try {
                     con.close();
