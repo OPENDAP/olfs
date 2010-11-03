@@ -1283,8 +1283,8 @@ public class RepositoryOps {
             while (modelChanged || firstPass) {
 
                 firstPass = false;
-
-                repositoryHasBeenChanged = repositoryHasBeenChanged || constructRuleEvaluator.runConstruct(repository);
+                
+                repositoryHasBeenChanged =  constructRuleEvaluator.runConstruct(repository) || repositoryHasBeenChanged;
 
                 ProcessController.checkState();
 
