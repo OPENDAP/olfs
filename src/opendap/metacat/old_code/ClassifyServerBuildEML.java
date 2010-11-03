@@ -20,7 +20,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.metacat;
+package opendap.metacat.old_code;
 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -30,6 +30,12 @@ import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import opendap.metacat.DDXRetriever;
+import opendap.metacat.DateString;
+import opendap.metacat.EMLBuilder;
+import opendap.metacat.Equivalence;
+import opendap.metacat.URLClassifier;
+import opendap.metacat.URLGroup;
 import opendap.metacat.Equivalence.SortedValues;
 import opendap.metacat.URLClassifier.URLGroups;
 
@@ -116,8 +122,8 @@ public class ClassifyServerBuildEML {
 		    // Build objects
 		    URLClassifier urlClassifier = new URLClassifier(cacheName);
     		DDXRetriever ddxRetriever = new DDXRetriever(true, cacheName);
-    		EMLBuilder simpleEmlBuilder = new EMLBuilder(false, "");
-    		EMLBuilder complexEmlBuilder = new EMLBuilder(false, "", "many_ddx2eml-1.0.xsl");
+    		EMLBuilder simpleEmlBuilder = new EMLBuilder(cacheName);
+    		EMLBuilder complexEmlBuilder = new EMLBuilder(cacheName, "many_ddx2eml-1.0.xsl");
     		
     		Metacat metacat = null;
     		if (useMetacat) {

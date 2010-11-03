@@ -20,7 +20,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.metacat;
+package opendap.metacat.old_code;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -56,6 +56,8 @@ import edu.ucsb.nceas.metacat.client.MetacatException;
 import edu.ucsb.nceas.metacat.client.MetacatFactory;
 import edu.ucsb.nceas.metacat.client.MetacatInaccessibleException;
 
+import opendap.metacat.DDXRetriever;
+import opendap.metacat.EMLBuilder;
 import opendap.metacat.ThreddsCatalogUtil;
 import opendap.metacat.ThreddsCatalogUtil.ThreddsCrawlerEnumeration;
 

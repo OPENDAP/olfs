@@ -27,6 +27,24 @@ Print the URLs in the DDX and THREDDS caches. This takes a cache-name (e.g.,
 test.opendap.org) and uses the read-only cache feature to open and list all
 of the URLs. It does not print the documents.
 
+ddx_retriever.sh:
+
+Get all of the DDX URLs that have been cached and/or read a DDX document 
+either from the cache or off the wire.
+
+url_classifier.sh:
+
+Given that a crawl has run its course and both the thredds and ddx caches are
+loaded with data, classify the URLs. This forms groups, which may each have
+only one member if no URLs could actually be grouped together,  and saves the
+result as a serialized URLGroups object. This object can be read and used
+by subsequent code to build different kinds of metadata documents.
+
+eml_writer.sh:
+
+Given the name of a URLGroups file built using URLClassifier, write an EML
+document for each group.
+
 -------------------------------------------------------------------------------
 
 URLs into servers that we should index for the ocean use case:

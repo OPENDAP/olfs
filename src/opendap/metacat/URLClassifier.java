@@ -23,17 +23,17 @@
 package opendap.metacat;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ import opendap.metacat.URLGroup.URLs;
  */
 public class URLClassifier {
 	
-	private List<URLGroup> groups = null;
+	private URLGroups groups = null;
 	
 	private DDXRetriever ddxRetriever;
 	
@@ -61,50 +61,64 @@ public class URLClassifier {
 		log.debug("Making DDXRetriever using cache name: " + cacheName);
 		
 		ddxRetriever = new DDXRetriever(cacheName);
-		groups = new ArrayList<URLGroup>();
-	}
-
-	public class URLGroups implements Iterable<URLGroup> {
-		@Override
-		public Iterator<URLGroup> iterator() {
-			return groups.iterator();
-		}
+		groups = new URLGroups();
 	}
 	
-	public URLGroups getUrlGroups() {
-		return new URLGroups();
-	}
-
 	public static void main(String args[]) {
 		URLClassifier classifier;
-		try {
-			classifier = new URLClassifier(args[0]);
-		}
-		catch (Exception e) {
-			System.err.println("Could not initialize ddx retriever: " + e.getLocalizedMessage());
-			return;
-		}
+
+		CommandLineParser parser = new PosixParser();
+
+		Options options = new Options();
+
+		options.addOption("v", "verbose", false, "Be verbose");
+		options.addOption("h", "help", false, "Usage information");
 		
-		PrintStream ps; 
+		options.addOption("c", "cache-name", true, "Cache name prefixes; read DDX URLs from cache files with this name prefix.");
+		options.addOption("o", "output", true, "Write files using this name as teh prefix.");
+		
+		boolean verbose;
+		String cacheName;
+		String output;
+		
 		try {
-			ps = new PrintStream("classifier_" + args[0] + ".txt");
+			CommandLine line = parser.parse(options, args);
+
+			if (line.hasOption("help")) {
+				HelpFormatter formatter = new HelpFormatter();
+				formatter.printHelp("url_classifier [options] --cache-name <name prefix>", options);
+				return;
+			}
+		    
+			verbose = line.hasOption("verbose");
+			cacheName = line.getOptionValue("cache-name");
+			output = line.getOptionValue("output");
+
+			if (cacheName == null || cacheName.isEmpty())
+				throw new Exception("--cache-name must be given");
+			if (output == null || output.isEmpty())
+				output = cacheName;
+
+			classifier = new URLClassifier(cacheName);
+
+			PrintStream ps = null;
+			if (verbose) {
+				ps = new PrintStream("classifier_" + output + ".txt");
+				ps.println("Classification for: " + output);
+				ps.println("Starting classification: " + (new Date()).toString());
+			}
+
+			classifier.classifyURLs(ps);
+
+			classifier.groups.saveState(output);
 		}
 		catch (FileNotFoundException e) {
-			System.err.println("Could not open the output file: " + e.getLocalizedMessage());
+			System.err.println("File error: " + e.getLocalizedMessage());
 			e.printStackTrace();
 			return;
 		}
-
-		ps.println("Classification for: " + args[0]);
-		ps.println("Starting classification: " + (new Date()).toString());
-		
-		try {
-			classifier.classifyURLs(ps);
-			
-			classifier.saveVisitedState(args[0]);
-		} 
 		catch (Exception e) {
-			System.err.println("Could not open the output file: " + e.getLocalizedMessage());
+			System.err.println("Error: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -248,7 +262,6 @@ public class URLClassifier {
 					} 
 					else { // Just print the first and last URL
 						DateString first = sc.get(0);
-						log.debug("First date: " + first.getDateString());
 						DateString last = sc.get(sc.size() - 1);
 						ps.println("\t" + date.getParsedURL(first.getDateString()).getTheURL());
 						ps.println("\t" + date.getParsedURL(last.getDateString()).getTheURL());
@@ -272,48 +285,25 @@ public class URLClassifier {
 		}
 	}
 
+	/**
+	 * Print simple information about a classification. Foreach group, print
+	 * the path components used to form the equivalence classes.
+	 * @param ps
+	 */
 	public void printClassifications(PrintStream ps) {
 		printClassifications(ps, false, false, false);
 	}
 
+	/**
+	 * Print more information about each classification. This sorts the URLs
+	 * in the group and prints the first and last ones. It also prints 
+	 * histogram information for each equivalence used to form the group.
+	 * @param ps
+	 */
 	public void printCompleteClassifications(PrintStream ps) {
 		printClassifications(ps, true, false, true);
 	}
-	
-    private void saveVisitedState(String groupsName) throws Exception {
-		FileOutputStream fos;
-		ObjectOutputStream oos = null;
-    	try {
-    		fos = new FileOutputStream(groupsName + ".ser");
-    		oos = new ObjectOutputStream(fos);
 
-    		oos.writeObject(groups);
-    	}
-    	catch (FileNotFoundException e) {
-			throw new Exception(
-					"URLClassifier: "
-							+ "Could not open the Groups file - file not found."
-							+ e.getMessage());
-    	}
-    	catch (SecurityException e) {
-			throw new Exception(
-					"URLClassifier: "
-							+ "Could not open the Groups file - permissions violation."
-							+ e.getMessage());
-    	}	
-    	catch (java.io.IOException e) {
-			throw new Exception(
-					"URLClassifier: "
-							+ "Generic Java I/O Exception."
-							+ e.getMessage());
-    	}
-    	finally {
-    		if (oos != null)
-    			oos.close();
-    	}
-    }
-
-	
 	/**
 	 * This pass through the groups looks for adjacent Equivalence patterns
 	 * that have been identified as parts of dates and combine them. In

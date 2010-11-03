@@ -4,6 +4,7 @@ import java.util.Enumeration;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
@@ -35,13 +36,20 @@ public class PrintVisitedCache {
 
 		// create the Options
 		Options options = new Options();
+		options.addOption("h", "help", false, "Usage information");
+		
 		options.addOption("d", "ddx-urls", false, "Print all of the cached DDX URLs.");
 		options.addOption("t", "thredds-urls", false, "Print all of the cached THREDDS URLs.");
 		options.addOption("n", "cache-name", true, "Use this as the cache base name.");
 
 		try {
 			CommandLine line = parser.parse( options, args );
-			
+			if (line.hasOption("help")) {
+				HelpFormatter formatter = new HelpFormatter();
+				formatter.printHelp("print_cached_urls [options] --cache-name <name prefix>", options);
+				return;
+			}
+		    
 			String cacheName = line.getOptionValue("cache-name");
 			if (line.hasOption("ddx-urls")) {
 				PrintVisitedCache printer = new PrintVisitedCache(cacheName + "_DDX", "ddx_responses");

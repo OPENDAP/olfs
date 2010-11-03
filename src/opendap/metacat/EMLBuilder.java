@@ -72,8 +72,12 @@ public class EMLBuilder {
 		this(false, "", ddx2emlDefault);
 	}
 
-	public EMLBuilder(boolean useCache, String namePrefix) throws Exception{
-		this(useCache, namePrefix, ddx2emlDefault);
+	public EMLBuilder(String namePrefix) throws Exception{
+		this(true, namePrefix, ddx2emlDefault);
+	}
+	
+	public EMLBuilder(String namePrefix, String xslt) throws Exception{
+		this(true, namePrefix, xslt);
 	}
 	
 	public EMLBuilder(boolean useCache, String namePrefix, String xslt) throws Exception{
@@ -103,6 +107,7 @@ public class EMLBuilder {
 	 * 
 	 * @param args
 	 */
+	/*
 	public static void main(String[] args) {
 		
 		boolean verbose = false;
@@ -133,7 +138,7 @@ public class EMLBuilder {
 			boolean useCache = !line.hasOption("n");
 			String cacheNamePrefix = line.getOptionValue("cache-name");
 
-			builder = new EMLBuilder(useCache, cacheNamePrefix);
+			builder = new EMLBuilder(cacheNamePrefix);
 
 			verbose = line.hasOption("v");
 			if (verbose) {
@@ -188,7 +193,7 @@ public class EMLBuilder {
 			e.printStackTrace();
 		}
 	}
-
+	*/
 	/**
 	 * Get the cache. Use the methods in ResponseCachePostgres to get information from
 	 * the cache. For this class the cache holds the LMTs and DDX for each URL

@@ -36,16 +36,16 @@ public class DateString implements Comparable<DateString> {
 
     private static Logger log = LoggerFactory.getLogger(DateString.class);
 
-	//private String theDate;
+	private String theDate;
 	private GregorianCalendar calendar;
 	
 	public DateString(String d, List<DatePart> dps) {
-		//theDate = d;
+		theDate = d;
 		calendar = getCalendar(d, dps);
 	}
 	
 	public String getDateString() {
-		return calendar.toString();
+		return theDate; //calendar.toString();
 	}
 	
 	public Date getDate() {
