@@ -76,7 +76,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
             } else {
                 log.info("shutDown(): Semantic Repository was already down.");
             }
-            log.debug("shutDown(): Repository shutdown complete.");
         }
 
 }
