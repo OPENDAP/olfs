@@ -89,7 +89,7 @@ public class ConstructRuleEvaluator {
       * @throws InterruptedException
       * @throws RepositoryException
       */
-     public int runConstruct(Repository repository) throws InterruptedException, RepositoryException {
+     public boolean  runConstruct(Repository repository) throws InterruptedException, RepositoryException {
 
          log.debug("-----------------------------------------------------------------");
          log.debug("------------------- Starting runConstruct() ---------------------");
@@ -114,6 +114,9 @@ public class ConstructRuleEvaluator {
 
          //log.debug("Before running the construct rules:\n " +
          //opendap.coreServlet.Util.getMemoryReport());
+
+
+         boolean repositoryChanged = false;
 
 
          try {
@@ -166,6 +169,7 @@ public class ConstructRuleEvaluator {
 
                          if (graphResult.hasNext()) {
                              modelChanged = true;
+                             repositoryChanged = repositoryChanged || modelChanged;
 
                              // ValueFactory creatValue = repository.getValueFactory();
 
@@ -299,9 +303,9 @@ public class ConstructRuleEvaluator {
              log.debug("-----------------------------------------------------------------");
              log.debug("------------------- Leaving runConstruct() ---------------------");
              log.debug("-----------------------------------------------------------------");
-             return totalStAdded;
          }
-
+         return repositoryChanged;
+         
 
      }
 

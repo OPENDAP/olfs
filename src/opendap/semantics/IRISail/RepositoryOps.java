@@ -1285,7 +1285,7 @@ public class RepositoryOps {
 
                 firstPass = false;
 
-                constructRuleStatements += constructRuleEvaluator.runConstruct(repository);
+                repositoryHasBeenChanged = repositoryHasBeenChanged || constructRuleEvaluator.runConstruct(repository);
 
                 ProcessController.checkState();
 
