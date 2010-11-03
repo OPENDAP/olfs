@@ -68,8 +68,8 @@ import opendap.namespaces.XLINK;
  */
 public class ThreddsCatalogUtil {
 
-	private boolean writeToCache = false;
-	private boolean readFromCache = false;
+	//private boolean writeToCache = false;
+	private boolean readOnly = false;
 	
 	private XMLOutputter xmlo = null;
 	
@@ -100,28 +100,17 @@ public class ThreddsCatalogUtil {
 	 * @param readFromCache Arrange for the TCU class to read Thredds catalogs
 	 * from the postgres cache.
 	 */
-	public ThreddsCatalogUtil(boolean writeToCache, String namePrefix, boolean readFromCache) throws Exception {
+	public ThreddsCatalogUtil(String namePrefix, boolean readOnly) throws Exception {
 		xmlo = new XMLOutputter(Format.getPrettyFormat());
 		alreadySeen = new HashSet<String>();
-		
-		if (writeToCache || readFromCache) {
-			if (writeToCache && readFromCache)
-				throw new Exception("Only one of \"write to cache\" and \"read from cache\" may be set.");
-			
-			log.debug("Configuring caching in ThreddsCatalogUtil.");
-			
-			this.writeToCache = writeToCache;
-			this.readFromCache = readFromCache;
-			
-			// if writeToCache is true, then passing that as the first parameter
-			// to ResponseCachePostgres will force it to make a new, empty, cache.
-			// Using smaller caches is more efficient. At teh same time, if it's
-			// false, the old caches (database and hash map) will be used in 
-			// read-only mode.
-			TCCache = new ResponseCachePostgres(writeToCache, namePrefix + "_THREDDS", "thredds_responses");
-		}
+
+		log.debug("Configuring caching in ThreddsCatalogUtil.");
+
+		this.readOnly = readOnly;
+
+		TCCache = new ResponseCachePostgres(readOnly, namePrefix + "_THREDDS", "thredds_responses");
 	}
-	
+
 	/**
 	 * Implements a modified depth-first traversal of a thredds catalog. The
 	 * catalog is treated as a tree-like structure, but since it is really a
@@ -168,7 +157,7 @@ public class ThreddsCatalogUtil {
 			if (URLs != null) {
 				for (String URL : URLs) {
 					log.debug("About to push " + URL);
-					if (writeToCache) {
+					if (!readOnly) {
 						if (!alreadySeen.contains(URL)) {
 							log.debug("URL (" + URL + ") not yet visited; pushed on stack");
 							alreadySeen.add(URL);
@@ -683,7 +672,7 @@ public class ThreddsCatalogUtil {
 		try {
 			SAXBuilder sb = new SAXBuilder();
 			
-			if (readFromCache) {
+			if (readOnly) {
 				log.debug("Read " + docUrlString + " from the the cache.");
 				
 				String docString = TCCache.getCachedResponse(docUrlString);
@@ -705,7 +694,7 @@ public class ThreddsCatalogUtil {
 					log.debug("Retrieving XML Document: " + docUrlString);
 					doc = sb.build(docUrl);
 					log.debug("Loaded XML Document: \n" + xmlo.outputString(doc));
-					if (writeToCache) {
+					if (!readOnly) {
 						log.debug("Caching " + docUrlString);
 						// cache the URL in 'Visited' cache here? Add LMT
 						Date date = new Date();

@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
-//import edu.ucsb.nceas.metacat.client.*;
-
 /**
  * Provide a cache for XML/HTTP response objects. This can hold both the DDX
  * XML/Text version of the response/object and the Last Modified Time (LMT). The
@@ -102,6 +100,7 @@ public class ResponseCachePostgres {
 	final static String VisitedName = "_Visited.save";
     
     private String cacheBaseName;
+    private boolean readOnly;
     
     // This hash map is used to prevent reading Responses when a previous crawl
     // has already done it. Use the last modified date to determine newness.
@@ -183,24 +182,40 @@ public class ResponseCachePostgres {
 		}
 	}
     
+	/**
+	 * Build an instance of ResponseCachePostgres. By default this cache
+	 * supports both reads and writes. It will zero-out any previously cached
+	 * responses.
+	 * 
+	 * @param cacheName
+	 *            The basename to use for the 'visited' cache.
+	 * @param tableName
+	 *            The name for the Postgres table in the 'crawl_cache' database
+	 *            where responses should be stored.
+	 * @see ResponseCachePostgres(boolean readOnly, String cacheName, String tableName)
+	 */
     public ResponseCachePostgres(String cacheName, String tableName) throws Exception {
-    	this(true, cacheName, tableName);
+    	this(false, cacheName, tableName);
     }
     
     /** Build an instance of ResponseCachePostgres. 
      *
+     * @param readOnly Is this cache object being created so that a client
+     * program can read previously cached data? If this is true, the client
+     * should never try to write to the cache.
      * @param cacheName The basename to use for the 'visited' cache.
      * @param tableName The name for the Postgres table in the 'crawl_cache'
      * database where responses should be stored.
      */
-    public ResponseCachePostgres(boolean makeNewCache, String cacheName, String tableName) throws Exception {
+    public ResponseCachePostgres(boolean readOnly, String cacheName, String tableName) throws Exception {
 
     	cacheBaseName = cacheName;
+    	this.readOnly = readOnly;
     	
     	responsesVisited = new ConcurrentHashMap<String, Long>();
     	// If we are making a new cache, then don't bother restoring the old
     	// visited caches - they will be overwritten when this exits.
-		if (!makeNewCache) {
+		if (readOnly) {
 			try {
 				restoreVisitedState();
 			}
@@ -217,7 +232,9 @@ public class ResponseCachePostgres {
 			//String sqlCacheName = cacheName.replace('.', '_');
 			pgTable = cacheName.replace('.', '_') + "_" + tableName;
 			
-			if (makeNewCache) {
+			if (!readOnly) {
+				// If this cache is to be written to, then make new tables!
+				//
 				// If the pgTable exists, drop it. Except that this doesn't check
 				// for existence, it just drops the table and throws away any error
 				// that results from the table not being there in the first place.
@@ -277,7 +294,8 @@ public class ResponseCachePostgres {
      * @throws Exception
      */
     public void saveState() throws Exception {
-    	saveVisitedState();
+    	if (!readOnly)
+    		saveVisitedState();
     	
     	if (pgCache != null) {
     		pgCache.close();
@@ -321,6 +339,9 @@ public class ResponseCachePostgres {
     }
     
     private void saveVisitedState() throws Exception {
+    	if (readOnly)
+    		throw new Exception("The ResponseCachePostgres was initialized as read-only but 'saveVisitedState()' was called.");
+    	
 		FileOutputStream fos;
 		ObjectOutputStream oos = null;
     	try {
@@ -361,6 +382,9 @@ public class ResponseCachePostgres {
     public void setCachedResponse(String URL, String doc) throws Exception {
 		log.debug("Caching " + URL + " in postgres.");
 
+    	if (readOnly)
+    		throw new Exception("The ResponseCachePostgres was initialized as read-only but 'setCachedResponse()' was called.");
+    	
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -498,7 +522,10 @@ public class ResponseCachePostgres {
      * @param URL The URL
      * @param d The Last modified time to be paired with the URL
      */
-    public void setLastVisited(String URL, long d) {
+    public void setLastVisited(String URL, long d) throws Exception {
+    	if (readOnly)
+    		throw new Exception("The ResponseCachePostgres was initialized as read-only but 'setLastVisited()' was called.");
+    
     	responsesVisited.put(URL, d);
     }
     

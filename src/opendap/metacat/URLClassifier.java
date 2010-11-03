@@ -23,6 +23,8 @@
 package opendap.metacat;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +57,10 @@ public class URLClassifier {
     private static Logger log = LoggerFactory.getLogger(URLClassifier.class);
 
 	public URLClassifier(String cacheName) throws Exception {
-		ddxRetriever = new DDXRetriever(true, cacheName);
+		// by default DDXRetriever uses a read-only cache
+		log.debug("Making DDXRetriever using cache name: " + cacheName);
+		
+		ddxRetriever = new DDXRetriever(cacheName);
 		groups = new ArrayList<URLGroup>();
 	}
 
@@ -95,6 +100,8 @@ public class URLClassifier {
 		
 		try {
 			classifier.classifyURLs(ps);
+			
+			classifier.saveVisitedState(args[0]);
 		} 
 		catch (Exception e) {
 			System.err.println("Could not open the output file: " + e.getLocalizedMessage());
@@ -103,10 +110,10 @@ public class URLClassifier {
 	}
 	
 	public int classifyURLs(PrintStream ps) throws Exception {
-		int numberOfUrls = assignUrlsToInitialGroups(ddxRetriever.getCache().getLastVisitedKeys());
+		int numberOfUrls = assignUrlsToInitialGroups(ddxRetriever.getCachedDDXURLs());
 		
 		if (ps != null)
-			ps.println("Completed pass 1: " + (new Date()).toString());
+			ps.println("Completed pass 1 (" + numberOfUrls + " URLs): " + (new Date()).toString());
 		
 		lookForDates();
 		
@@ -134,7 +141,10 @@ public class URLClassifier {
 		// iterator fails when the iterator instance is null
     	if (ddxURLs.hasMoreElements()) {
     		String ddxURL = ddxURLs.nextElement();
-			ParsedURL parsedUrl = new ParsedURL(ddxURL);
+
+    		log.debug("Processing URL: " + ddxURL);
+
+    		ParsedURL parsedUrl = new ParsedURL(ddxURL);
 			URLProcessedComponents classification = new URLProcessedComponents(parsedUrl);
 
     		URLGroup group = new URLGroup(parsedUrl, classification);
@@ -148,7 +158,9 @@ public class URLClassifier {
 			++numberOfUrls;
 			String ddxURL = ddxURLs.nextElement();
 
-			try {
+    		log.debug("Processing URL: " + ddxURL);
+
+    		try {
 				ParsedURL parsedUrl = new ParsedURL(ddxURL);
 				URLProcessedComponents classification = new URLProcessedComponents(parsedUrl);
 				String[] classificationLexemes = classification.getLexemeArray();
@@ -211,7 +223,7 @@ public class URLClassifier {
 					String dv = new Integer(e.getNumberOfValues()).toString();
 					ps.println("\tEquivalence class: "  + e.getPattern() + "; Total members: " + tm + "; Discreet values: " + dv);
 					if (e.getNumberDateClassifications() > 0) {
-						ps.print("\t\tFound a potentail date:");
+						ps.print("\t\tFound a potential date:");
 						for (DatePart dp: e.getDateClassifications())
 							ps.print(" " + dp.toString());		
 						ps.println();
@@ -236,6 +248,7 @@ public class URLClassifier {
 					} 
 					else { // Just print the first and last URL
 						DateString first = sc.get(0);
+						log.debug("First date: " + first.getDateString());
 						DateString last = sc.get(sc.size() - 1);
 						ps.println("\t" + date.getParsedURL(first.getDateString()).getTheURL());
 						ps.println("\t" + date.getParsedURL(last.getDateString()).getTheURL());
@@ -266,6 +279,40 @@ public class URLClassifier {
 	public void printCompleteClassifications(PrintStream ps) {
 		printClassifications(ps, true, false, true);
 	}
+	
+    private void saveVisitedState(String groupsName) throws Exception {
+		FileOutputStream fos;
+		ObjectOutputStream oos = null;
+    	try {
+    		fos = new FileOutputStream(groupsName + ".ser");
+    		oos = new ObjectOutputStream(fos);
+
+    		oos.writeObject(groups);
+    	}
+    	catch (FileNotFoundException e) {
+			throw new Exception(
+					"URLClassifier: "
+							+ "Could not open the Groups file - file not found."
+							+ e.getMessage());
+    	}
+    	catch (SecurityException e) {
+			throw new Exception(
+					"URLClassifier: "
+							+ "Could not open the Groups file - permissions violation."
+							+ e.getMessage());
+    	}	
+    	catch (java.io.IOException e) {
+			throw new Exception(
+					"URLClassifier: "
+							+ "Generic Java I/O Exception."
+							+ e.getMessage());
+    	}
+    	finally {
+    		if (oos != null)
+    			oos.close();
+    	}
+    }
+
 	
 	/**
 	 * This pass through the groups looks for adjacent Equivalence patterns

@@ -97,8 +97,8 @@ public class DDXCrawler {
 		
 		options.addOption("t", "read-from-thredds-cache", false, "Use only cached THREDDS catalogs; do not read from the network.");
 		options.addOption("f", "fetch-ddx", false, "Fetch ddx responses");
-		options.addOption("T", "dont-cache-thredds", false, "Do not cache THREDDS responses");
-		options.addOption("d", "dont-cache-ddx", false, "Do not cache DDX responses");
+		// options.addOption("T", "dont-cache-thredds", false, "Do not cache THREDDS responses");
+		// options.addOption("d", "dont-cache-ddx", false, "Do not cache DDX responses");
 		options.addOption("p", "print-ddx", false, "Print the DDX responses");
 		options.addOption("v", "verbose", false, "Verbose output");
 		options.addOption("R", "restore", false, "Restore the crawl from a saved state file");
@@ -139,18 +139,18 @@ public class DDXCrawler {
 		    
 		    // By default this code caches the THREDDS and DDX URLs and 
 		    // documents (if the latter are being accessed).
-		    boolean writeThreddsCache = !line.hasOption("dont-cache-thredds");;
-		    boolean useDDXCache = !line.hasOption("dont-cache-ddx");
+		    //boolean writeThreddsCache = true; // !line.hasOption("dont-cache-thredds");;
+		    //boolean useDDXCache = true; // !line.hasOption("dont-cache-ddx");
 		    boolean readFromThreddsCache = line.hasOption("read-from-thredds-cache");
 		    boolean restoreState = line.hasOption("restore");
 		    
 		    // If reading from the thredds cache; don't also write to it!
-		    if (readFromThreddsCache)
-		    	writeThreddsCache = false;
+		    //if (readFromThreddsCache)
+		    	//writeThreddsCache = false;
 		    
 		    if (crawler.verbose) {
-		    	System.out.println("writeThreddsCache: " + writeThreddsCache);
-		    	System.out.println("useDDXCache: " + useDDXCache);
+		    	//System.out.println("writeThreddsCache: " + writeThreddsCache);
+		    	//System.out.println("useDDXCache: " + useDDXCache);
 		    	System.out.println("readFromThreddsCache: " + readFromThreddsCache);
 		    	System.out.println("restoreState: " + restoreState);
 		    }
@@ -158,8 +158,8 @@ public class DDXCrawler {
 			// In this program, the ThreddsCatalogUtils _always_ writes to the cache
 			// when it reads a new document. The readFromThreddsCache determines
 			// if a cached catalog is preferred over a network read.
-		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(writeThreddsCache, crawler.cacheNamePrefix, readFromThreddsCache);
-		    crawler.ddxRetriever = new DDXRetriever(useDDXCache, crawler.cacheNamePrefix);
+		    crawler.threddsCatalogUtil = new ThreddsCatalogUtil(crawler.cacheNamePrefix, readFromThreddsCache);
+		    crawler.ddxRetriever = new DDXRetriever(false, crawler.cacheNamePrefix);
 
 			crawler.crawlCatalog(catalogURL, System.out, restoreState);
 			
@@ -239,15 +239,6 @@ public class DDXCrawler {
 					ps.println("DDX: " + DDXURL);
 					if (printDDX)
 						ps.println(ddx);
-					/*
-					 * This was used to simulate an error in mid-crawl so the 
-					 * restore option could be tested.
-					 * 
-					 * if(DDXURL.equals(
-					 * "http://test.opendap.org:8080/opendap/hyrax/data/oaflux/daily/lhsh_oaflux_1981.nc.ddx"
-					 * ) && !restoreState) throw new
-					 * Exception("simulated error!");
-					 */
 				}
 			}
 			else {
@@ -255,7 +246,7 @@ public class DDXCrawler {
 				// Set the LMT to zero so that it is cached in the URL cache
 				// but if we need the document it will be retrieved without
 				// first checking the DB.
-				ddxRetriever.getCache().setLastVisited(DDXURL, 0);
+				ddxRetriever.cacheDDXURL(DDXURL);
 				if (verbose)
 					ps.println("DDX: " + DDXURL);
 			}

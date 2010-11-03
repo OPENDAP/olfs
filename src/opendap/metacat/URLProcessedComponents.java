@@ -30,9 +30,6 @@ public class URLProcessedComponents implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public class Lexeme implements Serializable {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		private String value;
 		private boolean pattern;

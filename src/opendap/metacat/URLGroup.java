@@ -22,6 +22,7 @@
 
 package opendap.metacat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,9 +46,10 @@ import org.slf4j.LoggerFactory;
  * @author jimg
  *
  */
-public class URLGroup {
+public class URLGroup implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(URLGroup.class);
+	private static Logger log = LoggerFactory.getLogger(URLGroup.class);
 
 	private List<ParsedURL> urls;
 	private URLProcessedComponents processedComponents;

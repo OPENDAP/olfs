@@ -8,7 +8,9 @@ jar files that include a control file for the logging system.
 
 Current shell commands provided:
 
-ddx_crawler.sh: Based on DDXCrawler, this will crawl a server, fetching each
+ddx_crawler.sh: 
+
+Based on DDXCrawler, this will crawl a server, fetching each
 THREDDS catalog and caching it in POSTGRES. The URLs that reference all the
 catalogs are stored in a ConcurrentHashMap (just 'map' from now on) which is
 made persistent using its 'Serializable' interface. The ddx_crawler command
@@ -18,6 +20,12 @@ objects and store those in POSTGRES, too. This command can also replay a crawl
 using cached data and, if the feature is fixed, it can recover from problems
 and resume a crawl. This works now if the crawl is interrupted by an Exception,
 but support for CNTL-c and the like is missing.
+
+print_cached_urls.sh:
+
+Print the URLs in the DDX and THREDDS caches. This takes a cache-name (e.g.,
+test.opendap.org) and uses the read-only cache feature to open and list all
+of the URLs. It does not print the documents.
 
 -------------------------------------------------------------------------------
 

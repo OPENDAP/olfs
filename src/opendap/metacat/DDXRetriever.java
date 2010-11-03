@@ -43,9 +43,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** 
- * This class handles the task of getting a DDX given its URL. It will
- * test the returned document to see if it is well-formed and it will
- * cache the document. 
+ * Use this with crawlers to manage a collection of DDX responses and the URLs
+ * that reference them. This class can cache just the URLs, or both the URLs
+ * and the matching responses. It can perform conditional gets as well, using
+ * postgres (via ResponseCachePostgres) as a simple HTTP/1.1 cache.
  *  
  * @author jimg
  *
@@ -55,27 +56,27 @@ public class DDXRetriever {
     private static Logger log = LoggerFactory.getLogger(DDXRetriever.class);
 
 	/// Use the cache.
-	private boolean useCache;
+    // private boolean useCache;
+    private boolean readOnly;
 	
     // The DDXCache that holds both the DDXs LMT and the XML/text
     private ResponseCachePostgres DDXCache = null;
     
-	public DDXRetriever() throws Exception {
-		this(false, "");
+	public DDXRetriever(String cacheName) throws Exception {
+		this(true, cacheName);
 	}
 
-	public DDXRetriever(boolean useCache, String namePrefix)  throws Exception {
+	public DDXRetriever(boolean readOnly, String namePrefix)  throws Exception {
 		
-		this.useCache = useCache;
+		// this.useCache = useCache;
+		this.readOnly = readOnly;
 		
-		// The first parameter to DDXCache() restores the cache from its
-		// persistent form and will cause the cache to be written when 
-		// the DDXCache instance is collected.
-		if (useCache)
-			DDXCache = new ResponseCachePostgres(namePrefix + "_DDX", "ddx_responses");
+		DDXCache = new ResponseCachePostgres(readOnly, namePrefix + "_DDX", "ddx_responses");
 	}
 	
 	/**
+	 * This 'main' has many conflicting features/options. I've changed the 
+	 * function of this class considerably since it was written.
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -90,13 +91,11 @@ public class DDXRetriever {
 		// The default action is to read from the net, checking the cache and
 		// print the document to standard output.
 		
-		options.addOption("v", "verbose", false, "Print all of the DDXs");
+		options.addOption("v", "verbose", false, "Be verbose");
+		options.addOption("r", "read-only", false, "Only rad from the cache; no updates");
 		
-		options.addOption("r", "read-cache", false, "Read DDX from the cache");
-		options.addOption("n", "no-cache", false, "Do not cache DDXs. Ignored with -r or -p");
-		options.addOption("p", "print-cached", false, "Print all of the cached DDXs");
-		options.addOption("N", "cache-name", true, "Use this to set a prefix for the cache name.");
-		options.addOption("u", "ddx-url", true, "use this as the DDX URL");
+		options.addOption("n", "cache-name", true, "Use this to set a prefix for the cache name.");
+		options.addOption("d", "ddx-url", true, "Get and print the DDX using the referenced URL. If this is not given, print all of the DDX URLs in the named cache.");
 		
 		try {
 		    // parse the command line arguments
@@ -105,35 +104,39 @@ public class DDXRetriever {
 		    boolean verbose = line.hasOption("verbose");
 		    
 		    String ddxURL = line.getOptionValue("ddx-url");
-		    System.out.println("DDX URL: " + ddxURL);
+		    if (verbose && ddxURL != null && !ddxURL.isEmpty())
+		    	System.out.println("DDX URL: " + ddxURL);
 
-		    // This sets the useCache and namePrefix fields of the class
-		    String cacheName = line.getOptionValue("cache-name", "");
-		    log.debug("cacheName: " + cacheName);
-		    boolean useCache = !cacheName.isEmpty();
-		    retriever = new DDXRetriever(useCache, cacheName);
+		    String cacheName = line.getOptionValue("cache-name");
+		    if (cacheName != null && cacheName.isEmpty())
+		    	throw new Exception("--cache-name is required.");
+		    
+		    if (verbose)
+		    	System.out.println("cacheName: " + cacheName);
+		    
+		    boolean readOnly = line.hasOption("read-only");
+		    
+		    retriever = new DDXRetriever(readOnly, cacheName);
 
-		    if (line.hasOption("read-cache")) {
-		    	System.out.println("DDX: " + retriever.getCachedDDXDoc(ddxURL));
+		    if (ddxURL != null && !ddxURL.isEmpty()) {
+		    	System.out.println("DDX: " + retriever.getDDXDoc(ddxURL));
 		    }
-		    else if (line.hasOption("print-cached")) {
-		    	Enumeration<String> ddxs = retriever.DDXCache.getLastVisitedKeys();
+		    else {
+		    	Enumeration<String> ddxs = retriever.getCachedDDXURLs();
+		    	int i = 0;
 		    	while (ddxs.hasMoreElements()) {
+		    		++i;
 		    		ddxURL = ddxs.nextElement();
 		    		System.out.println("DDX URL: " + ddxURL);
 		    		if (verbose)
-		    			System.out.println("DDX: " + retriever.DDXCache.getCachedResponse(ddxURL));
+		    			System.out.println("DDX: " + retriever.getCachedDDXDoc(ddxURL));
 		    	}
-		    }
-		    else {
-		    	System.out.println("DDX: " + retriever.getDDXDoc(ddxURL));
+		    	System.out.println("Found " + i +" URLs");
 		    }
 		    
-			// Save the cache if the neither the 'no-cache' nor read-cache
-			// options were used (in the latter case, nothing was added to the
-			// cache).
-	    	if (!(line.hasOption("no-cache") && line.hasOption("read-cache")))
-	    		retriever.DDXCache.saveState();
+			// Save the cache if not read-only
+	    	if (!readOnly)
+	    		retriever.saveDDXCache();
 
 		}
 		catch( ParseException exp ) {
@@ -152,9 +155,11 @@ public class DDXRetriever {
 	 * each URL (the URLs are the keys).
 	 * @return The DDX cache.
 	 */
+	/*
 	public ResponseCachePostgres getCache() {
 		return DDXCache;
 	}
+	*/
 
     /** Simple method to test if the DDX will parse. Generally there's no 
      * need to call this but it'll be useful when developing the crawler.
@@ -226,7 +231,8 @@ public class DDXRetriever {
 		URL url = new URL(DDXURL);
 		URLConnection connection = url.openConnection();
 
-		if (useCache)
+		if (DDXCache.getLastVisited(DDXURL) != 0
+				&& DDXCache.getCachedResponse(DDXURL) != null)
 			connection.setIfModifiedSince(DDXCache.getLastVisited(DDXURL));
 
 		// Here's where we'd poke in a header to ask for the DAP3.2 DDX
@@ -245,7 +251,7 @@ public class DDXRetriever {
 			case 200:
 				ddx = convertStreamToString(httpConnection.getInputStream());
 				// Update the last visited and document caches
-				if (useCache) {
+				if (!readOnly) {
 					Date date = new Date();
 					DDXCache.setLastVisited(DDXURL, date.getTime());
 					DDXCache.setCachedResponse(DDXURL, ddx);
@@ -253,10 +259,9 @@ public class DDXRetriever {
 				break;
 
 			case 304:
-				if (useCache) {
-					ddx = DDXCache.getCachedResponse(DDXURL);
+				ddx = DDXCache.getCachedResponse(DDXURL);
+				if (!readOnly) {
 					// Update the last visited cache to now
-			
 					Date date = new Date();
 					DDXCache.setLastVisited(DDXURL, date.getTime());
 				}
@@ -274,6 +279,15 @@ public class DDXRetriever {
 		return ddx;
 	}
 	
+	public void cacheDDXURL(String ddxUrl) throws Exception {
+		Date date = new Date();
+		DDXCache.setLastVisited(ddxUrl, date.getTime());
+	}
+	
+	public Enumeration<String> getCachedDDXURLs() {
+		return DDXCache.getLastVisitedKeys();
+	}
+	
 	public String getCachedDDXDoc(String DDXURL) throws Exception {
 		if (DDXCache == null)
 			throw new Exception("Caching is off but I was asked to read from the cache.");
@@ -287,8 +301,8 @@ public class DDXRetriever {
 	}
 	
 	public void saveDDXCache() throws Exception {
-		if (DDXCache == null)
-			throw new Exception("Caching is off but I was asked to save the cache.");
+		if (readOnly)
+			throw new Exception("I was asked to save a read-only cache.");
 		DDXCache.saveState();
 	}
 }
