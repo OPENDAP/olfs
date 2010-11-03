@@ -82,7 +82,14 @@ public class ConstructRuleEvaluator {
       * @param repository-repository to use
       * @throws RepositoryException
       */
-     public void runConstruct(Repository repository) throws InterruptedException, RepositoryException {
+     /**
+      * 
+      * @param repository
+      * @return
+      * @throws InterruptedException
+      * @throws RepositoryException
+      */
+     public int runConstruct(Repository repository) throws InterruptedException, RepositoryException {
 
          log.debug("-----------------------------------------------------------------");
          log.debug("------------------- Starting runConstruct() ---------------------");
@@ -292,6 +299,7 @@ public class ConstructRuleEvaluator {
              log.debug("-----------------------------------------------------------------");
              log.debug("------------------- Leaving runConstruct() ---------------------");
              log.debug("-----------------------------------------------------------------");
+             return totalStAdded;
          }
 
 

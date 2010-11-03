@@ -82,6 +82,9 @@ public class RepositoryOps {
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
+
+
+
         try {
             con = repo.getConnection();
             con.setAutoCommit(false);
@@ -90,11 +93,40 @@ public class RepositoryOps {
             
             log.debug("dropStartingPointsAndContexts(): AutoCommit = " + con.isAutoCommit());
             valueFactory = repo.getValueFactory();
+
+
+            /*
+
+            log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
+            Thread.sleep(10000);
+            log.info("dropStartingPointsAndContexts(): Pausing for 2 seconds.");
+            Thread.sleep(4000);
+            */
+
             dropStartingPoints(con, valueFactory, startingPointUrls);
             dropContexts(con, valueFactory, dropList);
+
+            /*
+            log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
+            Thread.sleep(10000);
+            log.info("dropStartingPointsAndContexts(): Pausing for 2 seconds.");
+            Thread.sleep(4000);
+            */
+
+
+
+            log.info("dropStartingPointsAndContexts(): Calling commit.");
             con.commit();
+            log.info("dropStartingPointsAndContexts(): Returned from commit().");
             long AfterDrop = new Date().getTime();
             double elapsedTime = (AfterDrop - beforeDrop) / 1000.0;
+
+            /*
+            log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
+            Thread.sleep(10000);
+            log.info("dropStartingPointsAndContexts(): Pausing for 2 seconds.");
+            Thread.sleep(4000);
+            */
 
             log.info("dropStartingPointsAndContexts(): Drop operations took " + elapsedTime +" seconds.");
 
@@ -1246,14 +1278,14 @@ public class RepositoryOps {
             log.info("updateSemanticRepository(): Updating repository ...");
             ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
 
+            log.info("updateSemanticRepository(): Running construct rules ...");
+            int constructRuleStatements = 0;
             boolean firstPass = true;
             while (modelChanged || firstPass) {
 
                 firstPass = false;
 
-                log.info("updateSemanticRepository(): Running construct rules ...");
-                constructRuleEvaluator.runConstruct(repository);
-                log.info("updateSemanticRepository(): Finished running construct rules.");
+                constructRuleStatements += constructRuleEvaluator.runConstruct(repository);
 
                 ProcessController.checkState();
 
@@ -1266,6 +1298,11 @@ public class RepositoryOps {
                 ProcessController.checkState();
 
             }
+            log.info("updateSemanticRepository(): Construct rules add a total of "+
+                    constructRuleStatements+" statement(s) to the repository.");
+
+            if(constructRuleStatements>0)
+                repositoryHasBeenChanged = true;
 
 
 
