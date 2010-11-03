@@ -163,7 +163,7 @@ public class XMLfromRDF {
             if(result0!=null){
                 try {
                     result0.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
 
                 }
@@ -244,7 +244,7 @@ public class XMLfromRDF {
             if(result0!=null){
                 try {
                     result0.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error(e.getMessage());
                 }
             }
@@ -506,7 +506,7 @@ public class XMLfromRDF {
             if(result!=null){
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error(e.getMessage());
                 }
             }

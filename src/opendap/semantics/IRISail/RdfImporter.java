@@ -199,7 +199,7 @@ public class RdfImporter {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }

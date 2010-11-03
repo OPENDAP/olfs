@@ -212,9 +212,9 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            catalog.log.error("init(): Caught "+e.getClass().getName()+"  Message: "+e.getMessage());
         } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            catalog.log.error("init(): Caught "+e.getClass().getName()+"  Message: "+e.getMessage());
         }
 
     }
@@ -353,7 +353,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             try {
                 shutdownRepository(repository);
             }
-            catch(RepositoryException e){
+            catch(Exception e){
                 log.error("update(): Caught "+e.getClass().getName()+"  Message: "+e.getMessage());
             }
 
@@ -391,7 +391,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             try {
                 shutdownRepository(repository);
             }
-            catch(RepositoryException e){
+            catch(Exception e){
                 log.error("Caught "+e.getClass().getName()+"  Message: "+e.getMessage());
             }
         }

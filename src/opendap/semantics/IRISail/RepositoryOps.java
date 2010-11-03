@@ -874,7 +874,7 @@ public class RepositoryOps {
             if(result!=null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("getLastModifiedTime(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
@@ -1015,7 +1015,7 @@ public class RepositoryOps {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("getLastModifiedTimesForContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
@@ -1418,7 +1418,7 @@ public class RepositoryOps {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("findExternalInferencingContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
@@ -1504,7 +1504,7 @@ public class RepositoryOps {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
@@ -1579,7 +1579,7 @@ public class RepositoryOps {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("findChangedRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
@@ -1634,7 +1634,7 @@ public class RepositoryOps {
             if (statements != null) {
                 try {
                     statements.close();
-                } catch (RepositoryException e) {
+                } catch (Exception e) {
                     log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }

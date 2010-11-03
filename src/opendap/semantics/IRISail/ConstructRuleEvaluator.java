@@ -243,9 +243,8 @@ public class ConstructRuleEvaluator {
                          if (graphResult != null) {
                              try {
                                  graphResult.close();
-                             } catch (QueryEvaluationException e) {
-                                 log.error("runConstruct(): Caught an " + e.getClass().getName() + " Msg: " + e.getMessage());
-
+                             } catch (Exception e) {
+                                     log.error("runConstruct(): Caught an " + e.getClass().getName() + " Msg: " + e.getMessage());
                              }
                          }
 
@@ -358,7 +357,7 @@ public class ConstructRuleEvaluator {
             if (result != null) {
                 try {
                     result.close();
-                } catch (QueryEvaluationException e) {
+                } catch (Exception e) {
                     log.error("runConstruct(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
