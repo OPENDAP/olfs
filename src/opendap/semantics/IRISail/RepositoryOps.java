@@ -1279,7 +1279,6 @@ public class RepositoryOps {
             ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
 
             log.info("updateSemanticRepository(): Running construct rules ...");
-            int constructRuleStatements = 0;
             boolean firstPass = true;
             while (modelChanged || firstPass) {
 
@@ -1298,11 +1297,6 @@ public class RepositoryOps {
                 ProcessController.checkState();
 
             }
-            log.info("updateSemanticRepository(): Construct rules add a total of "+
-                    constructRuleStatements+" statement(s) to the repository.");
-
-            if(constructRuleStatements>0)
-                repositoryHasBeenChanged = true;
 
 
 
