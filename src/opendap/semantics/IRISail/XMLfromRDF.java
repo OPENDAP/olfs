@@ -27,14 +27,17 @@
 package opendap.semantics.IRISail;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.openrdf.model.URI;
@@ -75,8 +78,13 @@ public class XMLfromRDF {
 		this.log = LoggerFactory.getLogger(getClass());
 		//URI uri = new URIImpl(topURI);
 		int pl = topURI.lastIndexOf("#");
-		String ns = topURI.substring(0,pl);
-		
+		String ns;
+		if(pl > 0){
+		ns = topURI.substring(0,pl);
+		}else{
+		    pl = topURI.lastIndexOf("/");
+		    ns = topURI.substring(0,pl);
+		}
 		this.root = new Element(rootElementStr,ns);
 		this.doc = new Document(root);
 		this.con = con;
@@ -93,7 +101,18 @@ public class XMLfromRDF {
         "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, " +
         "topprop = <"+topURI+">";
 	}
-	
+    /**
+     * Constructor, sets the repository connection. Query string will be passed in through
+     * getXMLfromRDF(String, String). 
+     * @param con-connection to the repository.
+     * 
+     */
+    public XMLfromRDF(RepositoryConnection con) {
+        this.log = LoggerFactory.getLogger(getClass());
+        
+        this.con = con;
+        
+    }	
     /**
      * Start the process of building the document. First level children are retrieved through
      * query zero and added to the document.
@@ -149,6 +168,14 @@ public class XMLfromRDF {
                     }
                     this.root = new Element(uri.getLocalName(),ns);
                     this.doc = new Document(root);
+                    Map <String,String> docAttributes = new HashMap<String,String>();
+                    String type = "text/xsl";
+                    String href = "xsd2owl.xsl";
+                    docAttributes.put("type", type);
+                    docAttributes.put("href", href);
+                    ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet",docAttributes);
+                   
+                    this.doc.addContent(pi);
                     
                     this.addChildren(queryString1, root, con,doc);
                 } //if (bindingSet.getValue("topnameprop") 
