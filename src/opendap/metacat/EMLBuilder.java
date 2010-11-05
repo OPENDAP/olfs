@@ -25,7 +25,6 @@ package opendap.metacat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.xml.transform.stream.StreamSource;
 
@@ -34,11 +33,6 @@ import net.sf.saxon.s9api.XdmNode;
 
 import opendap.xml.Transformer;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +48,6 @@ public class EMLBuilder {
 
 	final static String ddx2emlDefault = "ddx2eml-3.2.xsl";
 	
-	// private String ddx2emlPath;
-
 	private static Logger log = LoggerFactory.getLogger(EMLBuilder.class);
 
 	// The EMLCache that holds both the DDXs LMT and the EML XML/text
@@ -64,8 +56,6 @@ public class EMLBuilder {
     // This is the transformer that takes the DDX and returns EML
     private Transformer transformer;
 
-    // private boolean verbose = false;
-    
     private Date date = new Date();
 
 	public EMLBuilder() throws Exception {
@@ -97,114 +87,6 @@ public class EMLBuilder {
 			EMLCache = new ResponseCachePostgres(namePrefix + "EML", "eml_responses");
 	}
 	
-	/**
-	 * Get EML from a DDX URL or from the local cache of previously built
-	 * EML documents. This 'main()' builds an instance of DDXRetreiver so that
-	 * it can either read the DDX from the net or get it from a cache (other
-	 * options not withstanding) but the classes other methods assume that 
-	 * the DDX will be accessed by the caller or a cached EML response is 
-	 * being requested.
-	 * 
-	 * @param args
-	 */
-	/*
-	public static void main(String[] args) {
-		
-		boolean verbose = false;
-		
-		EMLBuilder builder = null;
-
-		// create the command line parser
-		CommandLineParser parser = new PosixParser();
-
-		// create the Options
-		Options options = new Options();
-
-		// The default action is to read from the net, checking the cache and
-		// print the document to standard output.
-		options.addOption("r", "read-cache", false, "Read EML from the cache");
-		options.addOption("n", "no-cache", false, "Do not cache EMLs. Ignored with -r or -p");
-		options.addOption("p", "print-cached", false, "Print all of the cached EMLs");
-		options.addOption("v", "verbose", false, "Wordy output");
-		options.addOption("c", "cache-name", true, "Use this to set a prefix for the cache name.");
-		options.addOption("d", "ddx-url", true, "Use this as the DDX URL and build the EML from the associated DDX document.");
-
-		try {
-			// parse the command line arguments
-			CommandLine line = parser.parse(options, args);
-
-			String ddxURL = line.getOptionValue("ddx-url");
-
-			boolean useCache = !line.hasOption("n");
-			String cacheNamePrefix = line.getOptionValue("cache-name");
-
-			builder = new EMLBuilder(cacheNamePrefix);
-
-			verbose = line.hasOption("v");
-			if (verbose) {
-				System.out.println("DDX URL: " + ddxURL);
-			}
-			
-			if (line.hasOption("r")) {
-				if (verbose) {
-					System.out.println("EML: " + builder.getCachedEMLDoc(ddxURL));
-				} 
-				else {
-					System.out.println(builder.getCachedEMLDoc(ddxURL));
-				}
-			} 
-			else if (line.hasOption("p")) {
-				Enumeration<String> emls = builder.EMLCache.getLastVisitedKeys();
-				while (emls.hasMoreElements()) {
-					ddxURL = emls.nextElement();
-					if (verbose) {
-						System.out.println("DDX URL: " + ddxURL);
-						System.out.println("EML: "
-								+ builder.EMLCache.getCachedResponse(ddxURL));
-					} 
-					else {
-						System.out.println(builder.EMLCache.getCachedResponse(ddxURL));
-					}
-				}
-			} 
-			else {
-				DDXRetriever ddxSource = new DDXRetriever(true, cacheNamePrefix);
-				if (verbose) {
-					System.out.println("EML: "
-							+ builder.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
-				} 
-				else {
-					System.out.println(builder.getEML(ddxURL, ddxSource.getDDXDoc(ddxURL)));
-				}
-			}
-
-			// save the cache if neither the 'no-cache' nor read-cache options
-			// were used.
-			if (! (line.hasOption("n") && line.hasOption("r")))
-				builder.EMLCache.saveState();
-
-		}
-		catch (ParseException exp) {
-			System.err.println("Unexpected exception:" + exp.getMessage());
-		}
-
-		catch (Exception e) {
-			System.err.println("Error : " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-	*/
-	/**
-	 * Get the cache. Use the methods in ResponseCachePostgres to get information from
-	 * the cache. For this class the cache holds the LMTs and DDX for each URL
-	 * (the URLs are the keys).
-	 * 
-	 * @return The EML cache.
-	 */
-	public ResponseCachePostgres getCache() {
-		return EMLCache;
-	}
-
 	/**
 	 * Simple method to test if the EML will parse. Generally there's no need to
 	 * call this but it'll be useful when developing the crawler.
