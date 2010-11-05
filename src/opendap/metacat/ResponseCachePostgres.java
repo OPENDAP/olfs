@@ -97,7 +97,7 @@ public class ResponseCachePostgres {
 	
     private static Logger log = LoggerFactory.getLogger(ResponseCachePostgres.class);
 
-	final static String VisitedName = "_Visited.save";
+	final static String VisitedName = "_Visited.ser";
     
     private String cacheBaseName;
     private boolean readOnly;

@@ -542,6 +542,22 @@
 
     </target>
 
+    <target name="runNCMLWriter" depends="compile">
+
+        <copy file="${resources.dir}/metacat/logback-test.xml" todir="${build.classes}" />
+    	<copy file="${resources.dir}/metacat/many_ddx2ncml-1.0.xsl" todir="${build.run}" />
+    	
+        <java classname="opendap.metacat.NCMLWriter" fork="true" dir="${build.run}">
+            <jvmarg value="-Xms256m" />
+            <jvmarg value="-Xmx1024m" />
+            <arg line="--groups-name=satdat1_urls_only" />
+            <arg line="--verbose" />
+            <arg line="--output" />
+            <classpath refid="classpath" />
+        </java>
+
+    </target>
+
     <target name="runURLClassifier" depends="compile">
 
         <copy file="${resources.dir}/metacat/logback-test.xml" tofile="${build.classes}/logback-test.xml" />

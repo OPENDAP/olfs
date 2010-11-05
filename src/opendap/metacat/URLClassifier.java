@@ -56,12 +56,16 @@ public class URLClassifier {
 	
     private static Logger log = LoggerFactory.getLogger(URLClassifier.class);
 
-	public URLClassifier(String cacheName) throws Exception {
+	public URLClassifier(String cacheName, boolean readOnly) throws Exception {
 		// by default DDXRetriever uses a read-only cache
 		log.debug("Making DDXRetriever using cache name: " + cacheName);
 		
 		ddxRetriever = new DDXRetriever(cacheName);
-		groups = new URLGroups();
+		
+		if (readOnly)
+			groups = new URLGroups(cacheName); // This reads from .ser file
+		else
+			groups = new URLGroups();
 	}
 	
 	public static void main(String args[]) {
@@ -75,7 +79,8 @@ public class URLClassifier {
 		options.addOption("h", "help", false, "Usage information");
 		
 		options.addOption("c", "cache-name", true, "Cache name prefixes; read DDX URLs from cache files with this name prefix.");
-		options.addOption("o", "output", true, "Write files using this name as teh prefix.");
+		options.addOption("r", "read-only", false, "Just read an already-writen URLGroups file and print its contents.");
+		options.addOption("o", "output", true, "Write files using this name as the prefix.");
 		
 		boolean verbose;
 		String cacheName;
@@ -99,7 +104,11 @@ public class URLClassifier {
 			if (output == null || output.isEmpty())
 				output = cacheName;
 
-			classifier = new URLClassifier(cacheName);
+			boolean readOnly = line.hasOption("read-only");
+			if (readOnly)
+				verbose = true;
+			
+			classifier = new URLClassifier(cacheName, readOnly);
 
 			PrintStream ps = null;
 			if (verbose) {
@@ -108,9 +117,16 @@ public class URLClassifier {
 				ps.println("Starting classification: " + (new Date()).toString());
 			}
 
-			classifier.classifyURLs(ps);
+			if (!readOnly)
+				classifier.classifyURLs(ps);
 
-			classifier.groups.saveState(output);
+			if (ps != null) {
+				classifier.printClassifications(ps);
+				classifier.printCompleteClassifications(ps);
+			}
+			
+			if (!readOnly)
+				classifier.groups.saveState(output);
 		}
 		catch (FileNotFoundException e) {
 			System.err.println("File error: " + e.getLocalizedMessage());
@@ -135,9 +151,6 @@ public class URLClassifier {
 			ps.println("Completed pass 2: " + (new Date()).toString());
 
 			ps.println("Number of URLs processed: " + new Integer(numberOfUrls).toString());
-
-			printClassifications(ps);
-			printCompleteClassifications(ps);
 		}
 		
 		return numberOfUrls;
