@@ -75,7 +75,7 @@ public class XMLfromRDF {
      * @param topURI-the top element in the document.
      */
 	public XMLfromRDF(RepositoryConnection con, String rootElementStr, String topURI) throws InterruptedException {
-		this.log = LoggerFactory.getLogger(getClass());
+		log = LoggerFactory.getLogger(getClass());
 		//URI uri = new URIImpl(topURI);
 		int pl = topURI.lastIndexOf("#");
 		String ns;
@@ -85,11 +85,11 @@ public class XMLfromRDF {
 		    pl = topURI.lastIndexOf("/");
 		    ns = topURI.substring(0,pl);
 		}
-		this.root = new Element(rootElementStr,ns);
-		this.doc = new Document(root);
+		root = new Element(rootElementStr,ns);
+		doc = new Document(root);
 		this.con = con;
 
-		this.queryString0 = "SELECT DISTINCT topprop:, obj, valueclass, targetns "+
+		queryString0 = "SELECT DISTINCT topprop:, obj, valueclass, targetns "+
 		"FROM "+
 		"{containerclass} rdfs:subClassOf {} owl:onProperty {topprop:}; owl:allValuesFrom {valueclass}, "+
 		"{subject} topprop: {obj} rdf:type {valueclass}, "+
@@ -108,7 +108,7 @@ public class XMLfromRDF {
      * 
      */
     public XMLfromRDF(RepositoryConnection con) {
-        this.log = LoggerFactory.getLogger(getClass());
+        log = LoggerFactory.getLogger(getClass());
         
         this.con = con;
         
@@ -166,16 +166,17 @@ public class XMLfromRDF {
                     if(targetNS != null){
                         ns = targetNS.stringValue();
                     }
-                    this.root = new Element(uri.getLocalName(),ns);
-                    this.doc = new Document(root);
+                    root = new Element(uri.getLocalName(),ns);
+                    doc = new Document(root);
                     Map <String,String> docAttributes = new HashMap<String,String>();
                     String type = "text/xsl";
                     String href = "xsd2owl.xsl";
                     docAttributes.put("type", type);
                     docAttributes.put("href", href);
                     ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet",docAttributes);
-                   
-                    this.doc.addContent(pi);
+                    //doc.getContent().add( 0, pi );
+
+                    //doc.addContent(0, pi);
                     
                     this.addChildren(queryString1, root, con,doc);
                 } //if (bindingSet.getValue("topnameprop") 
@@ -453,7 +454,7 @@ public class XMLfromRDF {
 						
 			while (iterator.hasNext()) {
 		      Object key = iterator.next();
-		      BindingSet bindingSet = (BindingSet) mapOrderObj.get(key);
+		      BindingSet bindingSet = mapOrderObj.get(key);
 				
 				Value valueOfnameprop;
 				Value valueOfobj;
@@ -514,6 +515,8 @@ public class XMLfromRDF {
 				if (objURI.equalsIgnoreCase("\""))
 				{
 					chd.setText(valueOfobj.stringValue());
+					chd.getText();
+					
 				}
 				else{	
 								

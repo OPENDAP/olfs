@@ -1642,20 +1642,20 @@ public class RepositoryOps {
 
 
             // Get all of the statements in the repository that
+            
             statements =
                     con.getStatements(
                             valueFactory.createURI(importUrl),
                             valueFactory.createURI(Terms.hasXslTransformToRdf.getUri()),
-                            null,
-                            true);
-
+                            null, true);
+            statements.enableDuplicateFilter(); //memory intensive
             while (statements.hasNext()){
                 if(xsltTransformationFileUrl!=null){
                     log.error("getUrlForTransformToRdf(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
                 }
                 Statement s = statements.next();
                 xsltTransformationFileUrl= s.getObject().stringValue();
-                log.debug("getUrlForTransformToRdf(): Found Transformation file= " + xsltTransformationFileUrl);
+                log.debug("getUrlForTransformToRdf(): Found Transformation file = " + xsltTransformationFileUrl);
             }
         }
         catch (RepositoryException e) {
