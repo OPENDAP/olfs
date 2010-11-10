@@ -156,24 +156,56 @@ saxon 9. -->
                 
                 <boundingCoordinates>
                     <westBoundingCoordinate>
-                        <xsl:value-of
-                            select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='westernmost_longitude'])"
-                        />
+                        <xsl:choose>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='westernmost_longitude']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='westernmost_longitude'])"/>
+                            </xsl:when>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_leflon']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_leflon'])"/>
+                            </xsl:when>
+                            <xsl:otherwise> westBoundingCoordinate not found. ddx2eml version: <xsl:value-of
+                                select="$ddx2eml_version"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </westBoundingCoordinate>
                     <eastBoundingCoordinate>
-                        <xsl:value-of
-                            select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='easternmost_longitude'])"
-                        />
+                        <xsl:choose>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='easternmost_longitude']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='easternmost_longitude'])"/>
+                            </xsl:when>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_ritlon']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_ritlon'])"/>
+                            </xsl:when>
+                            <xsl:otherwise> eastBoundingCoordinate not found. ddx2eml version: <xsl:value-of
+                                select="$ddx2eml_version"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </eastBoundingCoordinate>
                     <northBoundingCoordinate>
-                        <xsl:value-of
-                            select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='northernmost_latitude'])"
-                        />
+                        <xsl:choose>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='northernmost_latitude']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='northernmost_latitude'])"/>
+                            </xsl:when>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_toplat']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_toplat'])"/>
+                            </xsl:when>
+                            <xsl:otherwise> northBoundingCoordinate not found. ddx2eml version: <xsl:value-of
+                                select="$ddx2eml_version"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </northBoundingCoordinate>
                     <southBoundingCoordinate>
-                        <xsl:value-of
-                            select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='southernmost_latitude'])"
-                        />
+                        <xsl:choose>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='southernmost_latitude']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='southernmost_latitude'])"/>
+                            </xsl:when>
+                            <xsl:when test="//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_botlat']">
+                                <xsl:value-of select="fn:normalize-space(//dap:Attribute[fn:matches(@name,'GLOBAL')]/dap:Attribute[@name='dsp_nav_earth_botlat'])"/>
+                            </xsl:when>
+                            <xsl:otherwise> southBoundingCoordinate not found. ddx2eml version: <xsl:value-of
+                                select="$ddx2eml_version"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </southBoundingCoordinate>
                 </boundingCoordinates>
             </geographicCoverage>
