@@ -496,7 +496,7 @@ public class RdfImporter {
      * and returns the full URL of the attribute transformation.
      *
      * @param importUrl
-     * @return
+     * @return URL of GRDDL transform stylesheet
      * @throws IOException
      * @throws JDOMException
      */
