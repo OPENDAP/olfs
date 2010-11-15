@@ -80,10 +80,11 @@ public class EMLWriter {
 		options.addOption("h", "help", false, "Usage information");
 		
 		options.addOption("n", "groups-name", true, "URLGroups name prefix");
-		options.addOption("o", "output", false, "Write eml files using the groupName name and a counter.");
+		options.addOption("o", "output", false, "Write eml files using the groupName/ddxURL.");
+		
+		options.addOption("d", "ddx-url", true, "Write EML for the dataset found at this (DDX) URL.");
 		// options.addOption("d", "dir", true, "Write eml files to this directory.");
 		
-
 		options.addOption("m", "metacat-url", true, "Metacat instance");
 		
 		try {
@@ -91,7 +92,7 @@ public class EMLWriter {
 
 			if (line.hasOption("help")) {
 				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp("EMLWriter [options] --groups-name <name prefix>", options);
+				formatter.printHelp("EMLWriter [options] [--groups-name <name prefix> | --ddx-url <url>]", options);
 				return;
 			}
 
@@ -100,11 +101,16 @@ public class EMLWriter {
 		    PrintStream ps = System.out;
 		    
 		    // Extract options
+		    String ddxURL = line.getOptionValue("ddx-url");
 		    String groupsName = line.getOptionValue("groups-name");
-		    if (groupsName == null || groupsName.isEmpty())
-		    	throw new Exception("The calssifier must have a URLGroups file name.");
-		    if (verbose)
-		    	ps.println("Groups file: " + groupsName);
+		    if (groupsName == null && ddxURL == null)
+		    	throw new Exception("EML Writter must have either a URLGroups file name or a DDX URL.");
+		    if (verbose) {
+		    	if (groupsName != null)
+		    		ps.println("Groups file: " + groupsName);
+		    	else
+		    		ps.println("DDX URL: " + ddxURL);
+		    }
 		    		    
 		    boolean useMetacat = false;
 		    String metacatUrl = line.getOptionValue("metacat-url");
@@ -127,96 +133,128 @@ public class EMLWriter {
     		if (useMetacat) {
     			metacat = ConnectToMetacat(verbose, metacatUrl, metacatUsername, metacatPassword);
     		}
-    		    		
-		    URLGroups groups = new URLGroups();
-		    groups.restoreState(groupsName);
-		    
-		    for (URLGroup group: groups) {
-	    		// getURLs() returns an instance of URLs, an Iterable object with instances of ParsedURL.
-		    	// For both the one-ddx and many-ddx cases use the first DDX, so grab it here
-	    		String ddxUrl = group.getURLs().get(0).getTheURL();
-	    		String ddxDoc = ddxRetriever.getDDXDoc(ddxUrl);
+    		    
+    		if (ddxURL != null) {
+	    		// Use a simple EML builder with the default DDX to EML xslt
+	    		if (verbose)
+	    			ps.println("Dataset DDX (one-to-one) (" + infoLogSdf.format(new Date()) + "): " + ddxURL);
 
-		    	// one URL group?
-		    	if (group.getURLs().size() == 1) {
-		    		// Use a simple EML builder with the default DDX to EML xslt
-		    		if (verbose)
-		    			ps.println("Dataset DDX (one-to-one) (" + infoLogSdf.format(new Date()) + "): " + ddxUrl);
+	    		String ddxDoc = ddxRetriever.getDDXDoc(ddxURL);
+	    		
+	    		String emlDoc = simpleEmlBuilder.getEML(ddxURL, ddxDoc);
 
-		    		String emlDoc = simpleEmlBuilder.getEML(ddxUrl, ddxDoc);
+	    		if (veryVerbose)
+	    			ps.println("(" + infoLogSdf.format(new Date()) + ") EML: " + emlDoc);
 
-		    		if (veryVerbose)
-		    			ps.println("(" + infoLogSdf.format(new Date()) + ") EML: " + emlDoc);
+	    		if (output) {
+	    			output_counter++;
+	    			FileWriter fw = new FileWriter(ddxURL + ".eml");
+	    			fw.write(emlDoc);
+	    			fw.close();
+	    		}
 
-		    		if (output) {
-		    			output_counter++;
-		    			FileWriter fw = new FileWriter(groupsName + "_" + output_counter.toString());
-		    			fw.write(emlDoc);
-		    			fw.close();
-		    		}
+	    		if (metacat != null)
+	    			insertEML(metacat, verbose, ddxURL, emlDoc);
+   			
+    		}
+			else if (groupsName != null) {
+				URLGroups groups = new URLGroups();
+				groups.restoreState(groupsName);
 
-		    		if (metacat != null)
-		    			insertEML(metacat, verbose, ddxUrl, emlDoc);
-		    	}
-		    	else {
-		    		// Otherwise we have a many-to-one kind of dataset
-		    		Equivalence dateEquiv = group.getDateEquivalence();
-		    		if (dateEquiv != null) {
-		    			// We have a many-to-one dataset with varying dates
-			    		if (verbose)
-			    			ps.println("Dataset DDX (many-to-one, date) (" + infoLogSdf.format(new Date()) + "): " + ddxUrl);
+				for (URLGroup group : groups) {
+					// getURLs() returns an instance of URLs, an Iterable object
+					// with instances of ParsedURL.
+					// For both the one-ddx and many-ddx cases use the first
+					// DDX, so grab it here
+					String ddxUrl = group.getURLs().get(0).getTheURL();
+					String ddxDoc = ddxRetriever.getDDXDoc(ddxUrl);
 
-		    			// Build the parameters to pass into the XSLT processor
-		    			String filename = ddxUrl.substring(ddxUrl.lastIndexOf('/') + 1);
-		    			
-		    			SortedValues sortedDates = dateEquiv.getSortedValues();
-						DateString first = sortedDates.get(0);
-						DateString last = sortedDates.get(sortedDates.size() - 1);
-						String dateRange = iso_8601_sdf.format(first.getDate()) + " " + iso_8601_sdf.format(last.getDate());
-						
-						String urlDateFileTuples = "";
-						for (DateString d : sortedDates) {
-							String date = iso_8601_sdf.format(d.getDate());
-							String url =  dateEquiv.getParsedURL(d.getDateString()).getTheURL();
-							url = url.substring(0, url.lastIndexOf('.'));
-							String file = url.substring(url.lastIndexOf('/') + 1);
-							
-							urlDateFileTuples += url + "*" + date + "*" + file + " ";
-						}
-						
-						String[] params = new String[6];
-						params[0] = "filename";
-						params[1] = filename;
-						params[2] = "date_range";
-						params[3] = dateRange;
-						params[4] = "url_date_file";
-						params[5] = urlDateFileTuples;
-						
+					// one URL group?
+					if (group.getURLs().size() == 1) {
+						// Use a simple EML builder with the default DDX to EML
+						// xslt
 						if (verbose)
-							ps.println("(" + infoLogSdf.format(new Date()) + ") Built parameters for xslt");
-						
-						// Get the EML
-						String emlDoc = complexEmlBuilder.getEML(ddxUrl, ddxDoc, params);
-			    		
-			    		if (veryVerbose)
-			    			ps.println("(" + infoLogSdf.format(new Date()) + ") EML: " + emlDoc);
-			    		
-			    		if (output) {
-			    			output_counter++;
-			    			FileWriter fw = new FileWriter(groupsName + "_" + output_counter.toString());
-			    			fw.write(emlDoc);
-			    			fw.close();
-			    		}
-			    		
-			    		if (metacat != null)
-			    			insertEML(metacat, verbose, ddxUrl, emlDoc);
-			    		}
-		    		else {
-		    			// ... with varying parameters other than date
-		    		}
-		    	}
-		    }
-		  
+							ps.println("Dataset DDX (one-to-one) (" + infoLogSdf.format(new Date()) + "): " + ddxUrl);
+
+						String emlDoc = simpleEmlBuilder.getEML(ddxUrl, ddxDoc);
+
+						if (veryVerbose)
+							ps.println("(" + infoLogSdf.format(new Date()) + ") EML: " + emlDoc);
+
+						if (output) {
+							output_counter++;
+							FileWriter fw = new FileWriter(groupsName + "_" + output_counter.toString());
+							fw.write(emlDoc);
+							fw.close();
+						}
+
+						if (metacat != null)
+							insertEML(metacat, verbose, ddxUrl, emlDoc);
+					}
+					else {
+						// Otherwise we have a many-to-one kind of dataset
+						Equivalence dateEquiv = group.getDateEquivalence();
+						if (dateEquiv != null) {
+							// We have a many-to-one dataset with varying dates
+							if (verbose)
+								ps.println("Dataset DDX (many-to-one, date) (" + infoLogSdf.format(new Date()) + "): " + ddxUrl);
+
+							// Build the parameters to pass into the XSLT
+							// processor
+							String filename = ddxUrl.substring(ddxUrl.lastIndexOf('/') + 1);
+
+							SortedValues sortedDates = dateEquiv.getSortedValues();
+							DateString first = sortedDates.get(0);
+							DateString last = sortedDates.get(sortedDates.size() - 1);
+							String dateRange = iso_8601_sdf.format(first.getDate()) + " " + iso_8601_sdf.format(last.getDate());
+
+							String urlDateFileTuples = "";
+							for (DateString d : sortedDates) {
+								String date = iso_8601_sdf.format(d.getDate());
+								String url = dateEquiv.getParsedURL(d.getDateString()).getTheURL();
+								url = url.substring(0, url.lastIndexOf('.'));
+								String file = url.substring(url.lastIndexOf('/') + 1);
+
+								urlDateFileTuples += url + "*" + date + "*" + file + " ";
+							}
+
+							String[] params = new String[6];
+							params[0] = "filename";
+							params[1] = filename;
+							params[2] = "date_range";
+							params[3] = dateRange;
+							params[4] = "url_date_file";
+							params[5] = urlDateFileTuples;
+
+							if (verbose)
+								ps.println("(" + infoLogSdf.format(new Date()) + ") Built parameters for xslt");
+
+							// Get the EML
+							String emlDoc = complexEmlBuilder.getEML(ddxUrl, ddxDoc, params);
+
+							if (veryVerbose)
+								ps.println("(" + infoLogSdf.format(new Date()) + ") EML: " + emlDoc);
+
+							if (output) {
+								output_counter++;
+								FileWriter fw = new FileWriter(groupsName + "_" + output_counter.toString());
+								fw.write(emlDoc);
+								fw.close();
+							}
+
+							if (metacat != null)
+								insertEML(metacat, verbose, ddxUrl, emlDoc);
+						}
+						else {
+							throw new Exception("EML Writer does not yet know how to process datasets that vary other than by date.");
+							// ... with varying parameters other than date
+						}
+					}
+				}
+			}
+			else {
+				throw new Exception("EML Writer requires either a URLGroup .ser file name or a DDX URL.");
+			}
 		}
 		catch(Exception e) {
 			System.err.println("Error: " + e.getLocalizedMessage());

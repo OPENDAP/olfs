@@ -127,6 +127,11 @@ public class URLProcessedComponents implements Serializable {
 
 				c.pattern = true;
 			}
+			// If comp is a single char, replace the char by 'c'.
+			else if (comp.matches("[A-Za-z]") && comp.length() == 1) {
+				c.value += 'c';
+				c.pattern = true;
+			}
 			// If comp is a sequence of chars followed by a sequence of digits,
 			// replace the digits by 'd'.
 			else if (comp.matches("[A-Za-z]+[0-9]+")) {

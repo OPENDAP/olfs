@@ -54,7 +54,20 @@ public class URLGroup implements Serializable {
 	private List<ParsedURL> urls;
 	private URLProcessedComponents processedComponents;
 	private Vector<Equivalence> equivalences;
-
+	
+	// These fields store information about the group that can be useful when
+	// building NCML files.
+	
+	// on second though... these don't really belong here.
+	
+	/*
+	/// Guess at the part of the URL that follows the servlet/context/cgi 
+	private String serverDataRoot = null;
+	/// What is the root directory of this dataset (essentially NCML's datasetScan)
+	private String datasetRoot = null;
+	/// Is this a time-series of files?
+	private boolean isTimeSeries = false;
+	*/
 	public class URLs implements Iterable<ParsedURL> {
 		private Iterator<ParsedURL> i = urls.iterator();
 
@@ -71,6 +84,18 @@ public class URLGroup implements Serializable {
 			return urls.size();
 		}
 	}
+	/*
+	public String getServerDataRoot() {
+		if (serverDataRoot == null) {
+			
+		}
+		return serverDataRoot;
+	}
+	
+	int serverNameEndPosition = findServerNameEnd(ddxUrl);
+	int dataRootPosition = findDataRoot(group);
+	int datasetScanPosition = findDatasetScan(group);
+	*/
 	
 	/**
 	 * Get an instance of the Iteration over the URLs in this group.
@@ -82,15 +107,14 @@ public class URLGroup implements Serializable {
 	}
 	
 	/**
-	 * How many URLs are in this groups?
+	 * How many URLs are in this group?
 	 * 
 	 * @return The number of URL in the group.
 	 */
-	/*
 	public int getNumberOfUrls() {
 		return urls.size();
 	}
-	*/
+
 	/**
 	 * An Enumeration of the equivalence classes that help define this group.
 	 * @author jimg

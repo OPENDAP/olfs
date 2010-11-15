@@ -33,6 +33,9 @@ import net.sf.saxon.s9api.XdmNode;
 
 import opendap.xml.Transformer;
 
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
