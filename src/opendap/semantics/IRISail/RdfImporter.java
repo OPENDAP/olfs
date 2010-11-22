@@ -45,6 +45,8 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 
+import javax.activation.FileDataSource;
+import javax.activation.FileTypeMap;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -178,8 +180,9 @@ public class RdfImporter {
 
                 if (!rdfDocs.contains(doc) && !imports.contains(doc)
                         && !urlsToBeIgnored.contains(doc)
-                        && doc.startsWith("http://")) {
-                    rdfDocs.add(doc);
+                    //    && doc.startsWith("http://")) {//local owl file not allowed
+                    ){ //local owl file allowed
+                        rdfDocs.add(doc);
 
                     log.debug("Adding to rdfDocs: " + doc);
                 }
@@ -235,8 +238,8 @@ public class RdfImporter {
         String documentURL;
         RepositoryConnection con = null;
         int skipCount;
-        String contentType;
-        HttpURLConnection httpConnection = null;
+        //String contentType;
+        //HttpURLConnection httpConnection = null;
 
         InputStream importIS = null;
         boolean addedDocument = false;
@@ -244,7 +247,7 @@ public class RdfImporter {
 
         try {
             con = repository.getConnection();
-
+            ValueFactory valueFactory = repository.getValueFactory();
 
             log.info("importRdfDocuments():  Adding " + rdfDocs.size()+" document(s).");
             skipCount = 0;
@@ -260,8 +263,12 @@ public class RdfImporter {
                         if (urlsToBeIgnored.contains(documentURL)) {
                             log.error("importRdfDocuments(): Previous server error, Skipping " + documentURL);
                         } else {
-
-                            URL myurl = new URL(documentURL);
+                            if(documentURL.startsWith("http://")){
+                                addedDocument = addHttpRdf(documentURL, con, valueFactory, skipCount);  
+                            }else if(documentURL.startsWith("file://")){
+                                addedDocument = addFileRdf(documentURL, con, valueFactory, skipCount);   
+                            }
+                          /*  URL myurl = new URL(documentURL);
 
 
                             int rsCode;
@@ -295,7 +302,7 @@ public class RdfImporter {
                                     log.debug("importRdfDocuments(): Transforming " + documentURL + " with " + transformToRdfUrl);
 
                                     if (Terms.localResources.containsKey(transformToRdfUrl)) {
-                                        transformToRdfUrl = getLocalResourceDirUrl() + Terms.localResources.get(transformToRdfUrl);
+                                        //transformToRdfUrl = getLocalResourceDirUrl() + Terms.localResources.get(transformToRdfUrl);
                                         log.debug("importRdfDocuments(): Transform URL has local copy: " + transformToRdfUrl);
                                     }
 
@@ -305,15 +312,15 @@ public class RdfImporter {
 
                                     log.debug("importRdfDocuments(): Finished transforming RDFa " + documentURL);
 
-                                    importUrl(con, documentURL, contentType, inStream);
+                                    importUrl(con, documentURL, contentType, inStream,transformToRdfUrl);
 
                                     addedDocument = true;
 
                                 } else if (documentURL.endsWith(".xsd")) {
                                     // XML Schema Document has known transform.
 
-                                    transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
-
+                                    //transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
+                                    transformToRdfUrl = "http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl";
                                     log.debug("importRdfDocuments(): Transforming Schema Document'" + documentURL + "' with '" + transformToRdfUrl);
 
                                     Transformer t = new Transformer(transformToRdfUrl);
@@ -321,7 +328,7 @@ public class RdfImporter {
 
                                     log.debug("importRdfDocuments(): Finished transforming Xml Schema Document: '" + documentURL + "'");
 
-                                    importUrl(con, documentURL, contentType, inStream);
+                                    importUrl(con, documentURL, contentType, inStream, transformToRdfUrl);
 
                                     addedDocument = true;
 
@@ -350,7 +357,7 @@ public class RdfImporter {
 
                                         log.debug("importRdfDocuments(): Finished transforming Xml Schema Document: '" + documentURL + "'");
 
-                                        importUrl(con, documentURL, contentType, inStream);
+                                        importUrl(con, documentURL, contentType, inStream, grddlTransformUrl);
 
                                         addedDocument = true;
                                     } else {
@@ -370,9 +377,10 @@ public class RdfImporter {
 
                                 log.debug("importRdfDocuments(): Total non owl/xsd files skipped: " + skipCount);
                             }
-                        } // while (!rdfDocs.isEmpty()
+                      */
+                        } //if (urlsToBeIgnored.contains(documentURL))
 
-                    } catch (RDFParseException e) {
+                    /*} catch (RDFParseException e) {
                         handleImportError(e,documentURL);
                     } catch (IOException e) {
                         handleImportError(e,documentURL);
@@ -380,19 +388,20 @@ public class RdfImporter {
                         handleImportError(e,documentURL);
                     } catch (JDOMException e) {
                         handleImportError(e,documentURL);
-                    } finally {
+                    */} finally {
                         if (importIS != null)
                             try {
                                 importIS.close();
                             } catch (IOException e) {
                                 log.error("importRdfDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
                             }
-                        if (httpConnection != null)
-                            httpConnection.disconnect();
+                       // if (httpConnection != null)
+                       //     httpConnection.disconnect();
 
                     }
-                }
-            }
+                } 
+            } // while (!rdfDocs.isEmpty()
+            log.debug("importRdfDocuments(): Total non owl/xsd files skipped: " + skipCount);
         }
         catch (RepositoryException e) {
             log.error("importRdfDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
@@ -417,6 +426,235 @@ public class RdfImporter {
 
     }
 
+    private boolean addFileRdf(String documentURL, RepositoryConnection con,
+            ValueFactory valueFactory, int skipCount) throws InterruptedException {
+       boolean addedDocument = false;
+        log.debug("importRdfDocuments(): Import URL appears valid ( " + documentURL + " )");
+        try{
+        String transformToRdfUrl = RepositoryOps.getUrlForTransformToRdf(con, valueFactory, documentURL);
+        FileDataSource fdSource = new FileDataSource(documentURL);
+        String contentType = fdSource.getContentType();
+        
+        if (transformToRdfUrl != null) {
+
+            log.debug("importRdfDocuments(): Transforming " + documentURL + " with " + transformToRdfUrl);
+
+            if (Terms.localResources.containsKey(transformToRdfUrl)) {
+                //transformToRdfUrl = getLocalResourceDirUrl() + Terms.localResources.get(transformToRdfUrl);
+                log.debug("importRdfDocuments(): Transform URL has local copy: " + transformToRdfUrl);
+            }
+
+
+            Transformer t = new Transformer(transformToRdfUrl);
+            InputStream inStream = t.transform(documentURL);
+            
+            log.debug("importRdfDocuments(): Finished transforming RDFa " + documentURL);
+
+            importUrl(con, documentURL, contentType, inStream,transformToRdfUrl);
+
+            addedDocument = true;
+
+        } else if (documentURL.endsWith(".xsd")) {
+            // XML Schema Document has known transform.
+
+            //transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
+            transformToRdfUrl = "http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl";
+            log.debug("importRdfDocuments(): Transforming Schema Document'" + documentURL + "' with '" + transformToRdfUrl);
+
+            Transformer t = new Transformer(transformToRdfUrl);
+            InputStream inStream = t.transform(documentURL);
+
+            log.debug("importRdfDocuments(): Finished transforming Xml Schema Document: '" + documentURL + "'");
+
+            importUrl(con, documentURL, contentType, inStream, transformToRdfUrl);
+
+            addedDocument = true;
+
+        } else if (documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
+            // OWL is RDF and so is the repository - no transform needed.
+
+            importUrl(con, documentURL, contentType);
+
+            addedDocument = true;
+
+
+        } else if ((contentType != null) &&
+                (contentType.equalsIgnoreCase("text/plain") ||
+                        contentType.equalsIgnoreCase("text/xml") ||
+                        contentType.equalsIgnoreCase("application/xml") ||
+                        contentType.equalsIgnoreCase("application/rdf+xml"))
+                ) {
+            log.debug("before getGrddlTransform ");
+            String grddlTransformUrl = getGrddlTransform(documentURL);
+            log.debug("after getGrddlTransform ");
+            //log.debug("transform = " + grddlTransformUrl);
+            if (grddlTransformUrl!=null && !grddlTransformUrl.isEmpty()) {
+                log.debug("transform = " + grddlTransformUrl);
+                Transformer t = new Transformer(grddlTransformUrl);
+                InputStream inStream = t.transform(documentURL);
+
+                log.debug("importRdfDocuments(): Finished transforming Xml Schema Document: '" + documentURL + "'");
+
+                importUrl(con, documentURL, contentType, inStream, grddlTransformUrl);
+
+                addedDocument = true;
+            } else {
+                log.debug("Add to repository without transforming! " + documentURL);
+                importUrl(con, documentURL, contentType);
+                log.debug("importRdfDocuments(): Imported non owl/xsd from " + documentURL);
+
+                addedDocument = true;
+            }
+        } else {
+            log.warn("importRdfDocuments(): SKIPPING Import URL '" + documentURL + "' It does not appear to reference a " +
+                    "document that I know how to process.");
+            urlsToBeIgnored.add(documentURL); //skip this file
+            skipCount++;
+
+        } 
+        } catch (RDFParseException e) {
+            handleImportError(e,documentURL);
+        } catch (IOException e) {
+            handleImportError(e,documentURL);
+        } catch (SaxonApiException e) {
+            handleImportError(e,documentURL);
+        } catch (JDOMException e) {
+            handleImportError(e,documentURL);
+        } catch (RepositoryException e) {
+            handleImportError(e,documentURL); 
+        }
+        return addedDocument;
+    }
+
+    private boolean addHttpRdf( String documentURL, RepositoryConnection con,ValueFactory valueFactory, int skipCount) throws InterruptedException{
+
+         
+        URL myurl;
+        HttpURLConnection httpConnection;
+        String contentType;
+        boolean addedDocument = false;
+        
+        int rsCode;
+        try { 
+            myurl = new URL(documentURL);    
+        httpConnection = (HttpURLConnection) myurl.openConnection();
+        log.debug("importRdfDocuments(): Connected to import URL: " + documentURL);
+
+        rsCode = httpConnection.getResponseCode();
+        contentType = httpConnection.getContentType();
+
+        log.debug("importRdfDocuments(): Got HTTP status code: " + rsCode);
+        log.debug("importRdfDocuments(): Got Content Type:     " + contentType);
+
+        if (rsCode == -1) {
+            log.error("importRdfDocuments(): Unable to get an HTTP status code for resource "
+                    + documentURL + " WILL NOT IMPORT!");
+            urlsToBeIgnored.add(documentURL);
+
+        } else if (rsCode != 200) {
+            log.error("importRdfDocuments(): Error!  HTTP status code " + rsCode + " Skipping documentURL " + documentURL);
+            urlsToBeIgnored.add(documentURL);
+        } else {
+
+            log.debug("importRdfDocuments(): Import URL appears valid ( " + documentURL + " )");
+
+
+            String transformToRdfUrl = RepositoryOps.getUrlForTransformToRdf(con, valueFactory, documentURL);
+
+
+            if (transformToRdfUrl != null) {
+
+                log.debug("importRdfDocuments(): Transforming " + documentURL + " with " + transformToRdfUrl);
+
+                if (Terms.localResources.containsKey(transformToRdfUrl)) {
+                    //transformToRdfUrl = getLocalResourceDirUrl() + Terms.localResources.get(transformToRdfUrl);
+                    log.debug("importRdfDocuments(): Transform URL has local copy: " + transformToRdfUrl);
+                }
+
+
+                Transformer t = new Transformer(transformToRdfUrl);
+                InputStream inStream = t.transform(documentURL);
+
+                log.debug("importRdfDocuments(): Finished transforming RDFa " + documentURL);
+
+                importUrl(con, documentURL, contentType, inStream,transformToRdfUrl);
+
+                addedDocument = true;
+
+            } else if (documentURL.endsWith(".xsd")) {
+                // XML Schema Document has known transform.
+
+                //transformToRdfUrl = getLocalResourceDirUrl() + "xsl/xsd2owl.xsl";
+                transformToRdfUrl = "http://scm.opendap.org/svn/trunk/olfs/resources/WCS/xsl/xsd2owl.xsl";
+                log.debug("importRdfDocuments(): Transforming Schema Document'" + documentURL + "' with '" + transformToRdfUrl);
+
+                Transformer t = new Transformer(transformToRdfUrl);
+                InputStream inStream = t.transform(documentURL);
+
+                log.debug("importRdfDocuments(): Finished transforming Xml Schema Document: '" + documentURL + "'");
+
+                importUrl(con, documentURL, contentType, inStream, transformToRdfUrl);
+
+                addedDocument = true;
+
+            } else if (documentURL.endsWith(".owl") || documentURL.endsWith(".rdf")) {
+                // OWL is RDF and so is the repository - no transform needed.
+
+                importUrl(con, documentURL, contentType);
+
+                addedDocument = true;
+
+
+            } else if ((contentType != null) &&
+                    (contentType.equalsIgnoreCase("text/plain") ||
+                            contentType.equalsIgnoreCase("text/xml") ||
+                            contentType.equalsIgnoreCase("application/xml") ||
+                            contentType.equalsIgnoreCase("application/rdf+xml"))
+                    ) {
+                log.debug("before getGrddlTransform ");
+                String grddlTransformUrl = getGrddlTransform(documentURL);
+                log.debug("after getGrddlTransform ");
+                //log.debug("transform = " + grddlTransformUrl);
+                if (grddlTransformUrl!=null && !grddlTransformUrl.isEmpty()) {
+                    log.debug("transform = " + grddlTransformUrl);
+                    Transformer t = new Transformer(grddlTransformUrl);
+                    InputStream inStream = t.transform(documentURL);
+
+                    log.debug("importRdfDocuments(): Finished transforming Xml Schema Document: '" + documentURL + "'");
+
+                    importUrl(con, documentURL, contentType, inStream, grddlTransformUrl);
+
+                    addedDocument = true;
+                } else {
+                    log.debug("Add to repository without transforming! " + documentURL);
+                    importUrl(con, documentURL, contentType);
+                    log.debug("importRdfDocuments(): Imported non owl/xsd from " + documentURL);
+
+                    addedDocument = true;
+                }
+            } else {
+                log.warn("importRdfDocuments(): SKIPPING Import URL '" + documentURL + "' It does not appear to reference a " +
+                        "document that I know how to process.");
+                urlsToBeIgnored.add(documentURL); //skip this file
+                skipCount++;
+
+            }
+
+            //log.debug("importRdfDocuments(): Total non owl/xsd files skipped: " + skipCount);
+        }
+        } catch (RDFParseException e) {
+            handleImportError(e,documentURL);
+        } catch (IOException e) {
+            handleImportError(e,documentURL);
+        } catch (SaxonApiException e) {
+            handleImportError(e,documentURL);
+        } catch (JDOMException e) {
+            handleImportError(e,documentURL);
+        } catch (RepositoryException e) {
+            handleImportError(e,documentURL); 
+        }
+  return addedDocument;
+    }
 
     private void handleImportError(Exception e, String documentURL) throws InterruptedException {
         log.error("importRdfDocuments(): Caught " + e.getClass().getName() + " Message: " + e.getMessage());
@@ -438,7 +676,7 @@ public class RdfImporter {
      * @throws RDFParseException   - if parse importIS error.
      * @throws RepositoryException - if repository error.
      */
-    private void importUrl(RepositoryConnection con, String importURL, String contentType, InputStream importIS) throws InterruptedException, IOException, RDFParseException, RepositoryException {
+    private void importUrl(RepositoryConnection con, String importURL, String contentType, InputStream importIS, String transformToRdfUrl) throws InterruptedException, IOException, RDFParseException, RepositoryException {
 
         if (!this.imports.contains(importURL)) { // not in the repository yet
 
@@ -446,12 +684,13 @@ public class RdfImporter {
 
             ValueFactory valueFactory = con.getValueFactory();
             URI importUri = new URIImpl(importURL);
-
-
+            
             con.add(importIS, importURL, RDFFormat.RDFXML, (Resource) importUri);
             RepositoryOps.setLTMODContext(importURL, con, valueFactory); // set last modified  time of the context
             RepositoryOps.setContentTypeContext(importURL, contentType, con, valueFactory); //
-
+            RepositoryOps.setLTMODContext(transformToRdfUrl, con, valueFactory);
+            
+            
             log.debug("Finished importing URL " + importURL);
             imports.add(importURL);
         } else {

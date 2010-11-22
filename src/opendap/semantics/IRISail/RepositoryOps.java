@@ -105,7 +105,8 @@ public class RepositoryOps {
 
             dropStartingPoints(con, valueFactory, startingPointUrls);
             dropContexts(con, valueFactory, dropList);
-
+            log.info("Remove uploadComplete statement!");
+            removeUploadComplete(con, valueFactory);
             /*
             log.info("dropStartingPointsAndContexts(): Pausing for 10 seconds.");
             Thread.sleep(10000);
@@ -306,7 +307,7 @@ public class RepositoryOps {
      * @param startingPoint - a StartingPoint.
      */
     public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint)throws InterruptedException {
-
+        File startingPointFile;
         URI startingPointUri;
         URI isa = valueFactory.createURI(Terms.rdfType.getUri());
         URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContext.getUri());
@@ -314,16 +315,20 @@ public class RepositoryOps {
 
 
         try {
-
+            startingPointUri = valueFactory.createURI(startingPoint);
             if (startingPoint.startsWith("http://")) { //make sure it's a url and read it in
-                startingPointUri = valueFactory.createURI(startingPoint);
+                //startingPointUri = valueFactory.createURI(startingPoint);
                 con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
-
 
                 log.info("addStartingPoint(): Added StartingPoint to the repository <" + startingPointUri + "> <" + isa
                         + "> " + "<" + startingPointContext + "> " + "<" + startingPointsContext + "> ");
             }
-            else {
+            else if(startingPoint.startsWith("file://")){
+                startingPointFile = new File(startingPoint);
+                con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
+                
+            }
+            else  {
                 log.error("addStartingPoint() - The startingPoint '"+startingPoint+"' does not appear to by a URL, skipping.");
             }
 
@@ -547,7 +552,7 @@ public class RepositoryOps {
 
                 Value firstValue = bindingSet.getValue("doc");
                 String startpoint = firstValue.stringValue();
-                //log.debug("StartingPoints: " + startpoint);
+                log.debug("StartingPoints: " + startpoint);
                 startingPoints.add(startpoint);
 
             }
@@ -916,18 +921,29 @@ public class RepositoryOps {
     }
 
     /**
-     * Get last_modified_time of a context through the http connection.
+     * Get last_modified_time of a context through the http connection/local file.
      * @param urlstring - the URL of the context.
      * @return  the last modified time as a String.
      */
     public static String getLTMODContext(String urlstring) throws InterruptedException {
         String ltmodstr = "";
+        HttpURLConnection hc;
+        URL myurl;
+        long ltmod;
+        File f;
         try {
-            URL myurl = new URL(urlstring);
-            HttpURLConnection hc = (HttpURLConnection) myurl.openConnection();
-            long ltmod = hc.getLastModified();
-            //log.debug(urlstring + " lastModified: "+ltmod);
+           if(urlstring.startsWith("http://")){
+            myurl = new URL(urlstring);
+            hc = (HttpURLConnection) myurl.openConnection();
+           
+            ltmod = hc.getLastModified();
+           }else{
+            f = new File(urlstring.substring(7)); //file://
+            ltmod = f.lastModified();
+           }
+            
             ltmodstr = getLastModifiedTimeString(ltmod);
+            
         } catch (MalformedURLException e) {
             log.error("getLTMODContext(): Caught a MalformedQueryException! Msg: "
                     + e.getLocalizedMessage());
@@ -1127,7 +1143,113 @@ public class RepositoryOps {
         }
 
     }
+    /**
+     * Introduce statement declaring upload_complete status of the repository.
+     *
+     * 
+     * @param repo - repository.
+     * 
+     */
+    public static void setUploadComplete(Repository repo) throws InterruptedException{
+        RepositoryConnection con = null;
+        try {
+            con = repo.getConnection();
+        
+        ValueFactory vf = con.getValueFactory();
+        setUploadComplete(con, vf);
+        } catch (RepositoryException e) {
+            log.error("setUploadComplete: Caught an RepositoryException! Msg: "
+                    + e.getMessage()); 
+        } finally{
+            if (con != null)
+                try {
+                    con.close();
+                } catch (RepositoryException e) {
+                    log.error("Caught RepositoryException, MSG:" +e.getMessage());
+                }
+            log.debug("SetUploadComplete: Connection is Closed!");   
+        }
+    }
+    /**
+     * Introduce statement declaring upload_complete status of the repository.
+     *
+     * 
+     * @param con - connection to the repository.
+     * @param valueFactory - ValueFactory from the Repository.
+     */
+    public  static void setUploadComplete(RepositoryConnection con, ValueFactory valueFactory) throws InterruptedException {
 
+        URI s = valueFactory.createURI(Terms.rdfCache.getUri());
+        URI p = valueFactory.createURI(Terms.uploadComplete.getUri());
+        URI cont = valueFactory.createURI(Terms.cacheContext.getUri());
+        boolean uploadComplete = true;
+        Literal o = valueFactory.createLiteral(uploadComplete);
+
+        try {
+            Statement st = valueFactory.createStatement(s, p, o, cont);
+            
+                if(! con.hasStatement(st, true, cont)){
+                    con.remove(st, (Resource) cont);
+                    con.add(st, (Resource) cont);
+                    log.info("Added uploadComplete statement.");
+                }
+       
+        } catch (RepositoryException e) {
+            log.error("setUploadComplete: Caught an RepositoryException! Msg: "
+                    + e.getMessage());
+
+        }
+
+    }
+    /**
+     * Remove statement declaring upload_complete status of the repository.
+     */
+    public  static void removeUploadComplete(Repository repo) throws InterruptedException{
+            RepositoryConnection con = null;
+            try {
+                con = repo.getConnection();
+            
+            ValueFactory vf = con.getValueFactory();
+            removeUploadComplete(con, vf);
+            } catch (RepositoryException e) {
+                log.error("setUploadComplete: Caught an RepositoryException! Msg: "
+                        + e.getMessage()); 
+            }finally{
+                if (con != null)
+                    try {
+                        con.close();
+                    } catch (RepositoryException e) {
+                        log.error("Caught RepositoryException, MSG:" +e.getMessage());
+                    }
+                log.debug("removeUploadComplete: Connection is Closed!");   
+            }
+    }
+    /**
+     * Remove statement declaring upload_complete status of the repository.
+     *
+     * 
+     * @param con - connection to the repository.
+     * @param valueFactory - ValueFactory from the Repository.
+     */
+    public  static void removeUploadComplete(RepositoryConnection con, ValueFactory valueFactory) throws InterruptedException {
+
+        URI s = valueFactory.createURI(Terms.rdfCache.getUri());
+        URI p = valueFactory.createURI(Terms.uploadComplete.getUri());
+        URI cont = valueFactory.createURI(Terms.cacheContext.getUri());
+        boolean uploadComplete = true;
+        Literal o = valueFactory.createLiteral(uploadComplete);
+        Statement st = valueFactory.createStatement(s, p, o, cont);
+        try {
+            if(con.hasStatement(st, true, cont)){
+                con.remove(st, (Resource) cont);
+            }
+        } catch (RepositoryException e) {
+            log.error("removeUploadComplete: Caught an RepositoryException! Msg: "
+                    + e.getMessage());
+
+        }
+
+    }   
     /**
      * Update the repository. Drop outdated files, add new files and run construct rules.
      * @param repository        The repository on which to operate.
@@ -1198,7 +1320,8 @@ public class RepositoryOps {
             if (!dropList.isEmpty()) {
                 log.debug("updateSemanticRepository(): Add external inferencing contexts to dropList");
                 dropList.addAll(findExternalInferencingContexts(repository));
-                
+                //log.info("Remove uploadComplete statement!");
+                //removeUploadComplete(repository);
                 if(flushRepositoryOnDrop){
                     log.warn("updateSemanticRepository(): Repository content has been changed! Flushing Repository!");
 
@@ -1297,10 +1420,8 @@ public class RepositoryOps {
                 ProcessController.checkState();
 
             }
-
-
-
-
+            //Add uploadComplete statement
+            setUploadComplete(repository);
 
         } catch (RepositoryException e) {
             log.error("updateSemanticRepository(): Caught RepositoryException. Message:"
@@ -1313,7 +1434,6 @@ public class RepositoryOps {
         
         log.info("updateSemanticRepository() End. Elapsed time: " + elapsedTime + " seconds  repositoryHasBeenChanged: "+repositoryHasBeenChanged);
         log.debug("-----------------------------------------------------------------------");
-
 
         return repositoryHasBeenChanged;
     }
@@ -1362,17 +1482,17 @@ public class RepositoryOps {
         log.debug("dropContexts(): Dropping changed RDFDocuments and external inferencing contexts...");
 
         try {
-
+            RepositoryResult<Resource> contextIds = con.getContextIDs();
             log.info("dropContexts(): Deleting contexts in drop list ...");
 
             for (String drop : dropList) {
                 log.debug("dropContexts(): Dropping context URI: " + drop);
                 URI contextToDrop = valueFactory.createURI(drop);
                 URI cacheContext = valueFactory.createURI(Terms.cacheContext.getUri());
-
-                log.debug("dropContexts(): Removing context: " + contextToDrop);
-                con.clear(contextToDrop);
-
+                //if(contextIds.asList().contains((Resource)contextToDrop)){ //in case wiping out whole repository
+                    log.debug("dropContexts(): Removing context: " + contextToDrop);
+                    con.clear(contextToDrop);
+                //}
                 log.debug("dropContexts(): Removing last_modified: " + contextToDrop);
                 con.remove(contextToDrop, null, null, cacheContext); // remove last_modified
 
@@ -1486,7 +1606,7 @@ public class RepositoryOps {
 
         try {
 
-            String queryString = "(SELECT DISTINCT doc "
+            String queryString = "((SELECT DISTINCT doc "
                     + "FROM CONTEXT rdfcache:"+Terms.cacheContext.getLocalId()+" "
                     + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
                     //+ "WHERE doc != <" + Terms.externalInferencingUri+"> "
@@ -1495,7 +1615,10 @@ public class RepositoryOps {
                     + "FROM {doc} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}) "
                     + "MINUS "
                     + "SELECT DISTINCT doc "
-                    + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc} "
+                    + "FROM {tp} rdf:type {rdfcache:"+Terms.StartingPoint.getLocalId() +"}; rdfcache:"+Terms.dependsOn.getLocalId() +" {doc}) "
+                    + "MINUS "
+                    + "SELECT DISTINCT doc "
+                    + "FROM {ts} rdfcache:"+Terms.hasXslTransformToRdf.getLocalId() +" {doc} "
                     + "USING NAMESPACE "
                     + "rdfcache = <" + Terms.rdfCacheNamespace + ">";
 
@@ -1506,7 +1629,7 @@ public class RepositoryOps {
 
             result = tupleQuery.evaluate();
 
-            if (result != null) {
+            if (result != null && result.hasNext()) {
                 //bindingNames = result.getBindingNames();
 
                 while (result.hasNext()) {
@@ -1516,12 +1639,12 @@ public class RepositoryOps {
                     if (!unneededRdfDocs.contains(firstValue.stringValue())) {
                         unneededRdfDocs.add(firstValue.stringValue());
 
-                        log.debug("Found unneeded RDF Document: "
+                        log.debug("Found unneeded RDF document: "
                                 + firstValue.toString());
                     }
                 }
             } else {
-                log.debug("No query result!");
+                log.debug("No unneeded RDF document found!");
             }
         }
 
@@ -1590,13 +1713,18 @@ public class RepositoryOps {
                     if (olderContext(secondtValue.stringValue(), importURL) && !changedRdfDocuments.contains(importURL)) {
 
                         changedRdfDocuments.add(importURL);
-
+                        Vector<String> needRetransform = null;
+                        
+                        needRetransform = getTransformedRdf(con ,importURL);
+                        if(needRetransform != null){
+                        changedRdfDocuments.addAll(needRetransform);
+                        }
                         log.debug("findChangedRDFDocuments(): Add to changedRdfDocuments list: " + importURL);
 
                     }
                 }
             } else {
-                log.info("findChangedRDFDocuments(): No query result!");
+                log.info("findChangedRDFDocuments(): No changed RDF document found!");
             }
         }
 
@@ -1623,6 +1751,69 @@ public class RepositoryOps {
 
         return changedRdfDocuments;
     }
+/**
+ * Find all Rdf documents that is transformed by the xsl style sheet.
+ * @param con - connection to the repository.
+ * @param importURL - String value of URI of xsl style sheet. 
+ * @return vector holding all transformed Rdf documents.
+ */
+    private static Vector<String> getTransformedRdf(RepositoryConnection con, String importURL) throws InterruptedException{
+        Vector <String> transformedRdf = new Vector<String>();
+        TupleQueryResult result = null;
+       try{ 
+        String lookforTransformed = "select rdfDoc " +
+                                    "from " +
+                                    "{rdfDoc} rdfcache:hasXslTransformToRdf " +
+                                    "{<"+importURL+">} "+
+                                    "using namespace " +
+                                    "rdfcache=<http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#>" ;
+        log.debug("queryforTransformedRdf: " + lookforTransformed);
+
+        TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,lookforTransformed);
+
+        result = tupleQuery.evaluate();
+
+        if (result != null && result.hasNext()) {
+            
+            while (result.hasNext()) {
+                BindingSet bindingSet = result.next();
+
+                Value docName = bindingSet.getValue("rdfDoc");
+                if (!transformedRdf.contains(docName.stringValue())) {
+                    transformedRdf.add(docName.stringValue());
+
+                    log.info("Add to droplist transformed RDF Document: "
+                            + docName.toString());
+                }
+            }
+        } else {
+            log.debug("No transformed RDF document found!");
+        }
+    }
+
+    catch (RepositoryException e) {
+        log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+    } catch (QueryEvaluationException e) {
+        log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+    } catch (MalformedQueryException e) {
+        log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+    } finally {
+        if (result != null) {
+            try {
+                result.close();
+            } catch (Exception e) {
+                log.error("findUnneededRDFDocuments(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+            }
+        }
+
+    }
+
+    if(transformedRdf.size()>0){
+        log.info("getTransformedRdf(): Identified " + transformedRdf.size() + " transformed RDF documents.");
+    }
+        return transformedRdf;
+    }
+
 
     /**
      * Return URL of the transformation file.
@@ -1682,7 +1873,114 @@ public class RepositoryOps {
 
         return xsltTransformationFileUrl;
     }
-    
+    /**
+     * Return URL of the transformation file.
+     * @param importUrl-the file to transform.
+     * @param con- connection to the repository.
+     * @return xsltTransformationFileUrl-Url of the transformation stylesheet.
+     */
+    public static String getUrlForTransformToRdf(RepositoryConnection con, ValueFactory valueFactory, String importUrl)throws InterruptedException {
+        
+        String xsltTransformationFileUrl = null;
+        
+        RepositoryResult<Statement> statements = null;
+
+        try {
+        
+            // Get all of the statements in the repository that
+            
+            statements = con.getStatements(valueFactory.createURI(importUrl),
+                          valueFactory.createURI(Terms.hasXslTransformToRdf.getUri()), null, true);
+            statements.enableDuplicateFilter(); //use more memory
+            while (statements.hasNext()){
+                if(xsltTransformationFileUrl!=null){
+                    log.error("getUrlForTransformToRdf(): Error!!! Found multiple XSL transforms associated with url: "+importUrl+" Lacking further instructions. DISCARDING: "+xsltTransformationFileUrl);
+                }
+                Statement s = statements.next();
+                xsltTransformationFileUrl= s.getObject().stringValue();
+                URI subj = new URIImpl(xsltTransformationFileUrl);
+                //URI pred = new URIImpl(Terms.isReplacedBy.getUri());
+                URI pred = new URIImpl("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#isReplacedBy");
+                Statement transformIsReplacedby = valueFactory.createStatement(subj,pred,null);
+                log.debug("getUrlForTransformToRdf(): St: "+transformIsReplacedby.toString());
+                if (con.hasStatement(subj, pred, null, true)){
+                    xsltTransformationFileUrl = null;  
+                    log.debug("Found replacedBy");
+                }
+                log.debug("getUrlForTransformToRdf(): Found Transformation file = " + xsltTransformationFileUrl);
+            }
+        }
+        catch (RepositoryException e) {
+            log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        }
+        finally {
+            if (statements != null) {
+                try {
+                    statements.close();
+                } catch (Exception e) {
+                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
+            }
+
+        }
+
+        return xsltTransformationFileUrl;
+    }
+    /**
+     * Return URL of the transformation file.
+     * @param importUrl-the file to transform.
+     * @param con- connection to the repository.
+     * @return xsltTransformationFileUrl-Url of the transformation stylesheet.
+     */
+    public static String getUrlForStyleSheet(RepositoryConnection con, ValueFactory valueFactory, String importUrl)throws InterruptedException {
+        
+        String styleSheetFileUrl = null;
+        
+        RepositoryResult<Statement> statements = null;
+
+        try {
+        
+            // Get all of the statements in the repository that
+            
+            statements = con.getStatements(valueFactory.createURI(importUrl),
+                          valueFactory.createURI("http://www.w3.org/1999/xhtml/vocab#stylesheet"), null, true);
+
+            statements.enableDuplicateFilter(); //use more memory
+            while (statements.hasNext()){
+                if(styleSheetFileUrl!=null){
+                    log.error("getUrlForStyleSheet(): Error!!! Found multiple stylesheet with url: "+importUrl+" Lacking further instructions. DISCARDING: "+styleSheetFileUrl);
+                }
+                Statement s = statements.next();
+                styleSheetFileUrl= s.getObject().stringValue();
+                URI subj = new URIImpl(styleSheetFileUrl);
+                
+                //URI pred = new URIImpl(Terms.isReplacedBy.getUri());
+                URI pred = new URIImpl("http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl#isReplacedBy");
+                Statement styleSheetIsReplacedby = valueFactory.createStatement(subj,pred,null);
+                log.debug("getUrlForTransformToRdf() looking for statement: "+styleSheetIsReplacedby.toString());
+                if (con.hasStatement(subj, pred, null,  true)){
+                    styleSheetFileUrl = null;  
+                    log.info(styleSheetFileUrl + " is replaced! Skip it.");
+                }
+                log.debug("getUrlForTransformToRdf(): Found Transformation file = " + styleSheetFileUrl);
+            }
+        }
+        catch (RepositoryException e) {
+            log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+        }
+        finally {
+            if (statements != null) {
+                try {
+                    statements.close();
+                } catch (Exception e) {
+                    log.error("getUrlForTransformToRdf(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
+            }
+
+        }
+
+        return styleSheetFileUrl;
+    } 
     /**
      * Setup and initialize a MemoryStore SailRepository. 
      * @return repository - a reference to the repository
@@ -1706,7 +2004,7 @@ public class RepositoryOps {
         log.info("setupMemoryStoreSailRepository(): Intializing Semantic Repository.");
 
         // Initialize repository
-        repository.initialize(); //needed
+        repository.initialize(); 
 
         log.info("setupMemoryStoreSailRepository(): Semantic Repository Ready.");
 

@@ -42,6 +42,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
@@ -120,7 +121,7 @@ public class XMLfromRDF {
       * @param topURI-searching phrase for the first level children
      */
 
-	public void getXMLfromRDF(String topURI, String serfqString0)  throws InterruptedException{
+	public void getXMLfromRDF(String topURI, String serfqString0, ValueFactory f )  throws InterruptedException{
 	    
         TupleQueryResult result0 = null;
         try{
@@ -170,14 +171,17 @@ public class XMLfromRDF {
                     doc = new Document(root);
                     Map <String,String> docAttributes = new HashMap<String,String>();
                     String type = "text/xsl";
-                    String href = "xsd2owl.xsl";
+                    String href = null;
+                    
+                    href=RepositoryOps.getUrlForStyleSheet(con, f, topURI);
+                    if(href != null){
                     docAttributes.put("type", type);
                     docAttributes.put("href", href);
                     ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet",docAttributes);
                     //doc.getContent().add( 0, pi );
 
-                    //doc.addContent(0, pi);
-                    
+                    doc.addContent(0, pi);
+                    }
                     this.addChildren(queryString1, root, con,doc);
                 } //if (bindingSet.getValue("topnameprop") 
             } //while ( result0.hasNext())
