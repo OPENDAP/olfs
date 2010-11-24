@@ -294,7 +294,7 @@
 
 	<!-- *********************** TARGETS *********************** -->
 	
-	<target name="all" depends="clean,compile" description="Builds lots of stuff." />
+	<target name="all" depends="clean,compile,executables" description="Builds lots of stuff." />
 
 	<target name="clean" description="Remove up ALL build products.">
 		<delete dir="${build.classes}" />
@@ -330,6 +330,10 @@
 		</javac>
 	</target>
 
+	<target name="executables" 
+		depends="BuildDDXCrawler,BuildPrintVisitedCache,BuildDDXRetriever,BuildURLClassifier,BuildEMLWriter,BuildNCMLWriter" 
+		description="Build all of the programs with their executable jar files and shell scripts" />
+	
 	<!-- ******************* Executable JAR files ******************* -->
 	
 	<!-- the DDX crawler just gets the DDX URLs so it runs much faster then
@@ -489,7 +493,9 @@
 
         <copy file="${resources.dir}/metacat/logback.xml" todir="${build.libexec}/" />
         <copy file="${resources.dir}/metacat/eml_writer.sh" todir="${build.run}/" />
-
+    	<copy file="${resources.dir}/metacat/ddx2eml-3.2.xsl" todir="${build.run}/" />
+        <copy file="${resources.dir}/metacat/many_ddx2eml-1.0.xsl" todir="${build.run}/" />
+    	
         <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
         <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
@@ -527,6 +533,42 @@
 
     </target>
 
+    <target name="BuildNCMLWriter" depends="compile" description="">
+
+        <copy file="${resources.dir}/metacat/logback.xml" todir="${build.libexec}/" />
+        <copy file="${resources.dir}/metacat/ncml_writer.sh" todir="${build.run}/" />
+        <copy file="${resources.dir}/metacat/many_ddx2ncml-1.0.xsl" todir="${build.run}/" />
+        
+        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${logback-core.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${jdom.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${commons-cli.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${commons-httpclient.lib}" todir="${build.lib}/" />
+
+        <copy file="${lib.dir}/${saxon-jdom.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon-s9api.lib}" todir="${build.lib}/" />
+        <copy file="${lib.dir}/${saxon.lib}" todir="${build.lib}/" />
+
+        <copy file="${lib.dir}/${postgres-jdbc.lib}" todir="${build.lib}/" />
+
+        <jar destfile="${build.libexec}/NCMLWriter.jar">
+            <fileset dir="${build.classes}">
+                <include name="opendap/**/*.class" />
+            </fileset>
+            <fileset file="resources/metacat/logback.xml" />
+
+            <!-- define MANIFEST.MF -->
+            <manifest>
+                <attribute name="Built-By" value="ant" />
+                <attribute name="Main-Class" value="opendap.metacat.NCMLWriter" />
+                <attribute name="Class-Path" value="${crawlers_libs.jar}" />
+            </manifest>
+
+        </jar>
+
+    </target>
+	
 	<!-- ************************ Tests ******************************* -->
 
     <target name="runEMLWriter" depends="compile">
@@ -550,6 +592,10 @@
         <java classname="opendap.metacat.NCMLWriter" fork="true" dir="${build.run}">
             <jvmarg value="-Xms256m" />
             <jvmarg value="-Xmx1024m" />
+        	
+        	<jvmarg value="-javaagent:/Users/jimg/src/jip-src-1.2/profile/profile.jar" />
+        	<jvmarg value="-Dprofile.properties=/Users/jimg/src/olfs/resources/metacat/profile.properties" />
+            
             <arg line="--groups-name=satdat1_urls_only" />
             <arg line="--verbose" />
             <arg line="--output" />

@@ -24,6 +24,8 @@ package opendap.metacat;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 import org.slf4j.Logger;
@@ -50,8 +52,9 @@ public class ParsedURL implements Serializable {
 	private String theURL;
 	
     private static Logger log = LoggerFactory.getLogger(ParsedURL.class);
+    List<String> fileExtensions = Collections.unmodifiableList(Arrays.asList("bz2", "gz", "Z", "nc", "hdf", "HDF", "h5"));
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		if (args.length < 1)
 			return;
 
@@ -95,11 +98,15 @@ public class ParsedURL implements Serializable {
 			// Break up the parts of a filename further by assuming that a
 			// component that either starts or ends with a series of digits
 			// might really be separate from a character sequence that the
-			// above 'parse' has left attached.
+			// above 'parse' has left attached. Note teh special hack
+			// to ferret out filename extensions.
 			Vector<String> sub_file_components = new Vector<String>();
 			
 			for (String comp: file_components) {
-				if (comp.matches("[A-za-z]+[0-9]+")) {
+				if (fileExtensions.contains(comp)) {
+					sub_file_components.add(comp);
+				}
+				else if (comp.matches("[A-za-z]+[0-9]+")) {
 					// gobble up the letters, push onto the vector
 					String first = new String(), rest = new String();
 					int j = 0;

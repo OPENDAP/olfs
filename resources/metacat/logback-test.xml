@@ -48,6 +48,11 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
 
+    <logger name="opendap.metacat.NCMLWriter" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    
+    <!-- 
     <logger name="opendap.metacat.DDXCrawler" level="DEBUG">
         <appender-ref ref="DebugLog"/>
     </logger>
@@ -67,6 +72,7 @@
     <logger name="opendap.metacat.ThreddsCatalogUtil" level="DEBUG">
         <appender-ref ref="DebugLog"/>
     </logger>
+    -->
     
     <root level="error">
         <appender-ref ref="ErrorLog"/>

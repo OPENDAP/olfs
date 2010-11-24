@@ -121,6 +121,13 @@ public class NCMLWriter {
 		    	count++;
 		    }
 		    
+		    // Look at each group and decide if it can be aggregated.
+		    /*
+		    for (URLGroup group: groups) {
+		    	
+		    }
+		    */
+		    
 		    if (verbose)
 		    	ps.println("(" + infoLogSdf.format(new Date()) + ") " + count.toString() + " groups.");
 		    

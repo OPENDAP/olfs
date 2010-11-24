@@ -13,11 +13,6 @@ saxon 9.
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:dap="http://xml.opendap.org/ns/DAP2">
 
-    <!-- The name of the file in the first URL for the dataset (the URL used
-        to get the DDX that is the template used to make the bulk of the EML
-        document -->
-    <xsl:param name="filename"/>
-
     <!-- The start and end date for the discrete URLs in the dataset. Passed
     as an individual param to simplify parsing -->
     <xsl:param name="date_range"/>
@@ -34,7 +29,19 @@ saxon 9.
 
     <xsl:template match="dap:Dataset">
         <netcdf title="joinNew Aggregation with explicit string coordValue.">
-            
+            <attribute type="Structure" name="NCML_Global">
+                <xsl:element name="attribute">
+                    <xsl:attribute name="type">String</xsl:attribute>
+                    <xsl:attribute name="name">startDate</xsl:attribute>
+                    <xsl:attribute name="value"><xsl:value-of select="fn:substring-before($date_range, ' ')"/></xsl:attribute>
+                </xsl:element>
+                
+                <xsl:element name="attribute">
+                    <xsl:attribute name="type">String</xsl:attribute>
+                    <xsl:attribute name="name">endDate</xsl:attribute>
+                    <xsl:attribute name="value"><xsl:value-of select="fn:substring-after($date_range, ' ')"/></xsl:attribute>
+                </xsl:element>
+            </attribute>
             <aggregation type="joinNew" dimName="time">
                 <!-- Choose variables for the aggreagation -->
                 <!-- 
@@ -64,7 +71,8 @@ saxon 9.
                 <!-- Add attributes for new 'time' coordinate variable -->
                 <variable name="time" type="string">
                     <!-- Metadata here will also show up in the Grid map -->
-                    <attribute name="units" type="string">ISO 8601</attribute>
+                    <!-- String _CoordinateAxisType "Time" -->
+                    <attribute name="_CoordinateAxisType" type="string">Time</attribute>
                 </variable>
                 
             </aggregation>

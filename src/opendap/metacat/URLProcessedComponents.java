@@ -23,7 +23,10 @@
 package opendap.metacat;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 public class URLProcessedComponents implements Serializable {
@@ -43,6 +46,8 @@ public class URLProcessedComponents implements Serializable {
 	}
 
 	private Vector<Lexeme> theClasses;
+	
+    List<String> fileExtensions = Collections.unmodifiableList(Arrays.asList("bz2", "gz", "Z", "nc", "hdf", "HDF", "h5"));
 	
 	// Testing only...
 	
@@ -73,13 +78,12 @@ public class URLProcessedComponents implements Serializable {
 		}
 	}
 	
+	public URLProcessedComponents(String url) throws Exception {
+		this(new ParsedURL(url));
+	}
 	
 	public URLProcessedComponents(ParsedURL url) {
 		buildEquivalenceClasses(url);
-	}
-	
-	public URLProcessedComponents(String url) throws Exception {
-		buildEquivalenceClasses(new ParsedURL(url));
 	}
 	
 	/**
@@ -109,6 +113,10 @@ public class URLProcessedComponents implements Serializable {
 					c.value += 'd';
 					
 				c.pattern = true;
+			}
+			else if (fileExtensions.contains(comp)) {
+				c.value = comp;
+				c.pattern = false;
 			}
 			// if comp is a string of digits followed by chars, replace each
 			// digit by a 'd' but keep the literal char data. Allow for a
