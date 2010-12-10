@@ -549,11 +549,11 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
         // Choose the operational ruleset
         String ruleset;
-        //ruleset = "owl-horst-optimized";
-        ruleset = "owl-max-optimized";
+        ruleset = "owl-horst-optimized";
+        //ruleset = "owl-max-optimized";
 
-        //owlimSail.setParameter("ruleset", ruleset);
-        owlimSail.setParameter("ruleset", "owl-max");
+        owlimSail.setParameter("ruleset", ruleset);
+        //owlimSail.setParameter("ruleset", "owl-max");
         
         //owlimSail.setParameter("partialRDFs", "true");
         
