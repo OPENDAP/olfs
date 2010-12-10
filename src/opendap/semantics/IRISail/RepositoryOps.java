@@ -45,6 +45,8 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ontotext.trree.owlim_ext.SailImpl;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -77,7 +79,7 @@ public class RepositoryOps {
     private static Logger log = LoggerFactory.getLogger(RepositoryOps.class);
     public static boolean flushRepositoryOnDrop = false;
     public static boolean dropWithMemoryStore   = false;
- 
+    public static boolean dropWithMemoryStoreDeleteDir  = false;
      
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
@@ -620,6 +622,25 @@ public class RepositoryOps {
 
 
     }
+    /**
+     * Delete repository directory
+     * @param path - path of the repository directory
+     * @return true if delete successful
+     */
+    public  static boolean deleteDirectory(File path) {
+        if( path.exists() ) {
+          File[] files = path.listFiles();
+          for(int i=0; i<files.length; i++) {
+             if(files[i].isDirectory()) {
+               deleteDirectory(files[i]);
+             }
+             else {
+               files[i].delete();
+             }
+          }
+        }
+        return( path.delete() );
+      }
 
 
     /**
@@ -1265,7 +1286,7 @@ public class RepositoryOps {
      * @throws RDFParseException if parse the repository dump error.
      */
     public static boolean updateSemanticRepository(Repository repository, Vector<String> startingPointUrls, Vector<String> doNotImportTheseUrls, 
-            String resourceDir, String catalogCacheDirectory)
+            String resourceDir, String catalogCacheDirectory, String loadfromtrig)
             throws InterruptedException, RepositoryException, RDFParseException, IOException {
 
 
@@ -1306,12 +1327,12 @@ public class RepositoryOps {
             } finally {
                 if (con != null)
                     con.close();
-                log.debug("updateSemanticRepository(): Connection is Closed!");
+                log.info("updateSemanticRepository(): Connection for finding findNewStartingPoints, findUnneededRDFDocuments and findChangedStartingPoints is Closed!");
             }
 
             ProcessController.checkState();
 
-            log.debug(showContexts(repository));
+            //log.debug(showContexts(repository));
 
 
             boolean modelChanged = false;
@@ -1357,6 +1378,39 @@ public class RepositoryOps {
                     clearRepository(repository);
                     
                     log.info("updateSemanticRepository(): Reloading MemoryStore back to Owlim Repository");
+                    conOwlim.add(conMem.getStatements(null, null, null, true));
+                    
+                    conOwlim.close();
+                    conMem.close();                    
+                    memRepository.shutDown();
+                }else if(dropWithMemoryStoreDeleteDir){
+                    log.warn("updateSemanticRepository(): Repository content has been changed! Do drop with MemoryStore!");
+                    
+                    Repository memRepository = setupMemoryStoreSailRepository();
+                    
+                    log.warn("updateSemanticRepository(): Flushing MemoryStoreRepository!");
+                    clearRepository(memRepository); //make sure memory store is empty
+                    RepositoryConnection conMem = memRepository.getConnection();
+                    RepositoryConnection conOwlim = repository.getConnection();
+                    
+                    log.info("updateSemanticRepository(): Loading Owlim Repository to MemoryStore");
+                    conMem.add(conOwlim.getStatements(null, null, null, false));
+                    
+                    log.info("updateSemanticRepository(): Dropping StartingPoint and contexts from MemoryStore ...");
+                    
+                    dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
+                    
+                    log.warn("updateSemanticRepository(): Deleting OwlimRepository!");
+                    //clearRepository(repository);
+                    conOwlim.close();
+                    repository.shutDown();
+                    
+                    File repoPath = new File(catalogCacheDirectory);
+                    deleteDirectory(repoPath);
+                    repository = setupOwlimSailRepository(catalogCacheDirectory, loadfromtrig);
+                    
+                    log.info("updateSemanticRepository(): Reloading MemoryStore back to Owlim Repository");
+                    conOwlim = repository.getConnection();
                     conOwlim.add(conMem.getStatements(null, null, null, true));
                     
                     conOwlim.close();
@@ -1438,6 +1492,65 @@ public class RepositoryOps {
         return repositoryHasBeenChanged;
     }
 
+    private static IRISailRepository setupOwlimSailRepository( String catalogCacheDirectory, String loadfromtrig) throws RepositoryException, InterruptedException, RDFParseException, IOException {
+
+
+        log.info("Setting up Semantic Repository.");
+
+        //OWLIM Sail Repository (inferencing makes this somewhat slow)
+        SailImpl owlimSail = new com.ontotext.trree.owlim_ext.SailImpl();
+        IRISailRepository repository = new IRISailRepository(owlimSail); //owlim inferencing
+
+
+
+        log.info("Configuring Semantic Repository.");
+        File storageDir = new File(catalogCacheDirectory); //define local copy of repository
+        owlimSail.setDataDir(storageDir);
+        log.debug("Semantic Repository Data directory set to: "+ catalogCacheDirectory);
+        // prepare config
+        String owlim_storage_folder ="owlim-storage";
+        owlimSail.setParameter("storage-folder", owlim_storage_folder);
+        log.debug("Semantic Repository 'storage-folder' set to: "+owlim_storage_folder);
+
+        // Choose the operational ruleset
+        String ruleset;
+        //ruleset = "owl-horst";
+        ruleset = "owl-max-optimized";
+
+        owlimSail.setParameter("ruleset", ruleset);
+        //owlimSail.setParameter("ruleset", "owl-max");
+        
+        // switches on few performance "optimizations of the RDFS and OWL inference
+        owlimSail.setParameter("partialRdfs", "true");
+        
+        log.info("Semantic Repository 'ruleset' set to: "+ ruleset);
+
+        log.info("Intializing Semantic Repository.");
+
+        // Initialize repository
+        repository.initialize(); //needed
+        
+        //trig file (full path) to load into the repository. This is a work around
+        //to the persistent bug in owlim
+        if (loadfromtrig != null){
+        String inTrigFile = loadfromtrig;
+        RepositoryOps.clearRepository(repository);
+        RepositoryOps.loadRepositoryFromTrigFile(repository, inTrigFile);
+        String filename = catalogCacheDirectory + "afterloadingfromtrigfile.trig";
+        log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
+        RepositoryOps.dumpRepository(repository, filename);
+        }
+        
+        log.info("Semantic Repository Ready.");
+
+        if(Thread.currentThread().isInterrupted())
+            throw new InterruptedException("Thread.currentThread.isInterrupted() returned 'true'.");
+
+        //owlse2 = repository;
+
+        return repository;
+
+    }
 
     /**
      * Remove contexts from the repository.
@@ -1993,8 +2106,8 @@ public class RepositoryOps {
 
         
         log.info("setupMemoryStoreSailRepository(): Configuring Semantic Repository.");
-        String catalogCacheDirectory = "./";
-        File storageDir = new File(catalogCacheDirectory + "MemoryStore"); //define local copy of repository
+        String workingDir = "./";
+        File storageDir = new File(workingDir + "MemoryStore"); //define local copy of repository
         MemoryStore memStore = new MemoryStore(storageDir);
         memStore.setPersist(true);
         memStore.setSyncDelay(1000L);
@@ -2032,7 +2145,7 @@ public class RepositoryOps {
                 File rdfFile = new File(rdfFileName);
                 con.add(rdfFile, null, RDFFormat.TRIG);
             }
-            con.commit();
+            //con.commit();
         }
         finally {
             if (con != null) {

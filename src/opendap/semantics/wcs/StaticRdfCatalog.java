@@ -317,8 +317,9 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                 startingPoints.add(_semanticPreloadFile);
 
             log.info("update(): Updating Repository...");
+            String loadfromtrig = null; //load repository from a trig file
             repositoryChanged = RepositoryOps.updateSemanticRepository(repository, startingPoints, doNotImportTheseUrls, 
-                    resourcePath, catalogCacheDirectory);
+                    resourcePath, catalogCacheDirectory, loadfromtrig);
                         
             filename = catalogCacheDirectory + "afterupdateSemanticRepository.trig";
             log.debug("updateRepository(): Dumping Semantic Repository to: " + filename);
@@ -548,11 +549,11 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
         // Choose the operational ruleset
         String ruleset;
-        ruleset = "owl-horst-optimized";
-        //ruleset = "owl-max-optimized";
+        //ruleset = "owl-horst-optimized";
+        ruleset = "owl-max-optimized";
 
-        owlimSail.setParameter("ruleset", ruleset);
-        //owlimSail.setParameter("ruleset", "owl-max");
+        //owlimSail.setParameter("ruleset", ruleset);
+        owlimSail.setParameter("ruleset", "owl-max");
         
         //owlimSail.setParameter("partialRDFs", "true");
         

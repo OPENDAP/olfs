@@ -107,9 +107,11 @@ public class ConstructRuleEvaluator {
 
          int queryTimes = 0;
          long ruleStartTime, ruleEndTime;
-         int totalStAdded = 0; // number of statements added
-         int totalStAddedIn1Pass = 0; // number of statements added in 1 PASS
-
+         int totalStAdded = 0; // number of postprocessed statements added
+         int totalStAddedIn1Pass = 0; // number of post processed statements added in 1 PASS
+         int notPostProcessed = 0; // number of postprocessed statements added
+         int notPostProcessed1Pass = 0; // number of postprocessed statements added in one pass
+         
          findConstruct(repository);
 
          //log.debug("Before running the construct rules:\n " +
@@ -128,6 +130,8 @@ public class ConstructRuleEvaluator {
                  runNbr++;
                  modelChanged = false;
                  totalStAddedIn1Pass = 0;
+                 notPostProcessed1Pass = 0;
+                 
                  if (runNbr == 1) {
                      log.info("runConstruct(): Total number of construct rule(s): " + this.constructQuery.size());
                  }
@@ -139,7 +143,8 @@ public class ConstructRuleEvaluator {
                      queryTimes++;
                      ruleStartTime = new Date().getTime();
                      int stAdded = 0; // track statements added by each rule
-
+                     int notPostProcessedAdded = 0; // track not post processed st by each rule
+                     
                      Vector<Statement> toAdd = new Vector<Statement>();
                      String constructURL = this.constructContext.get(qstring);
 
@@ -164,7 +169,7 @@ public class ConstructRuleEvaluator {
 
                          graphResult = graphQuery.evaluate();
                          log.debug("runConstruct(): Completed querying. ");
-
+                         
                          ProcessController.checkState();
 
                          if (graphResult.hasNext()) {
@@ -215,22 +220,11 @@ public class ConstructRuleEvaluator {
                                      break;
                                  case NONE:
                                  default:
-                                     log.debug("runConstruct(): No post-processed statements to add...");
-
+                                     log.debug("runConstruct(): Add statements without post-process ...");
 
                                      con.add(graphResult, context);
-                                     /*****
-                                      * iterator cannot be reset, count fails
-                                      int nonePostprocessSt = 0;
-                                      while (graphResultCopy.hasNext()) {
-                                      graphResultCopy.next();
-                                      nonePostprocessSt++;
-                                      stAdded++;
-                                      }
-
-                                      log.debug("Complete adding "+nonePostprocessSt
-                                      + " not postprocessed statements");
-                                      */
+                                     notPostProcessedAdded++;
+                                                                                                                
                                      break;
                              }
 
@@ -241,7 +235,7 @@ public class ConstructRuleEvaluator {
 
                          } // if (graphResult.hasNext
                          else {
-                             log.debug("runConstruct(): The construct rule returned no statements.");
+                             //log.debug("runConstruct(): The construct rule returned zero statements.");
                          }
 
                      } catch (QueryEvaluationException e) {
@@ -265,17 +259,21 @@ public class ConstructRuleEvaluator {
                      double ruleTime = (ruleEndTime - ruleStartTime) / 1000.0;
 
                      log.debug("runConstruct(): Construct rule " + ruleNumber + " takes " + ruleTime
-                             + " seconds in loop " + runNbr + " added " + stAdded
-                             + " statements");
+                             + " seconds in loop " + runNbr + " added " + stAdded+ " post processed statements and "
+                             + notPostProcessedAdded+" not post processed statements streams.");
 
                      totalStAdded = totalStAdded + stAdded;
                      totalStAddedIn1Pass = totalStAddedIn1Pass + stAdded;
+                     notPostProcessed1Pass = notPostProcessed1Pass + notPostProcessedAdded;
+                     notPostProcessed = notPostProcessed + notPostProcessed1Pass;
                      con.commit();
 
                  } // for(String qstring
 
                  log.info("runConstruct(): Completed pass " + runNbr + "  " +
-                         "Queried the repository " + ruleNumber + " times" + " added " + totalStAddedIn1Pass + " statements. Total Repository Queries: " + queryTimes);
+                         "Queried the repository " + ruleNumber + " times" + " added " + totalStAddedIn1Pass + 
+                         " post processed statements, and  "+ notPostProcessed1Pass + 
+                         " not post processed statements streams. Total Repository Queries: " + queryTimes);
                  ProcessController.checkState();
 
                  findConstruct(repository);
@@ -299,7 +297,7 @@ public class ConstructRuleEvaluator {
              double totaltime = (endTime - startTime) / 1000.0;
              log.info("runConstruct(): Summary: ");
              log.info("runConstruct(): Queried the repository " + queryTimes + " times");
-             log.info("runConstruct(): Added " + totalStAdded + " post processed statement(s) in " + totaltime + " seconds.");
+             log.info("runConstruct(): Added " + totalStAdded + " post processed statement(s) and "+notPostProcessed+ " not post processed statement(s) in " + totaltime + " seconds.");
              log.debug("-----------------------------------------------------------------");
              log.debug("------------------- Leaving runConstruct() ---------------------");
              log.debug("-----------------------------------------------------------------");
