@@ -1488,7 +1488,13 @@ public class RepositoryOps {
         
         log.info("updateSemanticRepository() End. Elapsed time: " + elapsedTime + " seconds  repositoryHasBeenChanged: "+repositoryHasBeenChanged);
         log.debug("-----------------------------------------------------------------------");
-
+        String filename = catalogCacheDirectory + "owlimMaxRepository.trig";
+        log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
+        RepositoryOps.dumpRepository(repository, filename);
+        filename = catalogCacheDirectory + "owlimMaxRepository.nt";
+        log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
+        RepositoryOps.dumpRepository(repository, filename);
+        
         return repositoryHasBeenChanged;
     }
 

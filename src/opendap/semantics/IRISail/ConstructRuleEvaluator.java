@@ -109,8 +109,8 @@ public class ConstructRuleEvaluator {
          long ruleStartTime, ruleEndTime;
          int totalStAdded = 0; // number of postprocessed statements added
          int totalStAddedIn1Pass = 0; // number of post processed statements added in 1 PASS
-         int notPostProcessed = 0; // number of postprocessed statements added
-         int notPostProcessed1Pass = 0; // number of postprocessed statements added in one pass
+         int notPostProcessed = 0; // number of not postprocessed statements added
+         int notPostProcessed1Pass = 0; // number of not  postprocessed statements added in one pass
          
          findConstruct(repository);
 
@@ -265,11 +265,11 @@ public class ConstructRuleEvaluator {
                      totalStAdded = totalStAdded + stAdded;
                      totalStAddedIn1Pass = totalStAddedIn1Pass + stAdded;
                      notPostProcessed1Pass = notPostProcessed1Pass + notPostProcessedAdded;
-                     notPostProcessed = notPostProcessed + notPostProcessed1Pass;
-                     con.commit();
+                     //notPostProcessed = notPostProcessed + notPostProcessed1Pass;
+                    // con.commit();
 
                  } // for(String qstring
-
+                 notPostProcessed = notPostProcessed + notPostProcessed1Pass;
                  log.info("runConstruct(): Completed pass " + runNbr + "  " +
                          "Queried the repository " + ruleNumber + " times" + " added " + totalStAddedIn1Pass + 
                          " post processed statements, and  "+ notPostProcessed1Pass + 
