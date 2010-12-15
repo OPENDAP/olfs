@@ -1401,19 +1401,20 @@ public class RepositoryOps {
                     dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
                     
                     log.warn("updateSemanticRepository(): Deleting OwlimRepository!");
-                    //clearRepository(repository);
+                              //clearRepository(repository);
                     conOwlim.close();
                     repository.shutDown();
                     
-                    File repoPath = new File(catalogCacheDirectory);
-                    deleteDirectory(repoPath);
-                    repository = setupOwlimSailRepository(catalogCacheDirectory, loadfromtrig);
+                    //File repoPath = new File(catalogCacheDirectory);
+                    //deleteDirectory(repoPath);
+                    //repository = setupOwlimSailRepository(catalogCacheDirectory, loadfromtrig);
+                    //
+                    //log.info("updateSemanticRepository(): Reloading MemoryStore back to Owlim Repository");
+                    //conOwlim = repository.getConnection();
+                    //conOwlim.add(conMem.getStatements(null, null, null, true));
+                    //
+                    //conOwlim.close();
                     
-                    log.info("updateSemanticRepository(): Reloading MemoryStore back to Owlim Repository");
-                    conOwlim = repository.getConnection();
-                    conOwlim.add(conMem.getStatements(null, null, null, true));
-                    
-                    conOwlim.close();
                     conMem.close();                    
                     memRepository.shutDown();
                 }

@@ -512,6 +512,7 @@ public class RdfImporter {
             skipCount++;
 
         } 
+        
         } catch (RDFParseException e) {
             handleImportError(e,documentURL);
         } catch (IOException e) {
@@ -642,6 +643,7 @@ public class RdfImporter {
 
             //log.debug("importRdfDocuments(): Total non owl/xsd files skipped: " + skipCount);
         }
+        httpConnection.disconnect();
         } catch (RDFParseException e) {
             handleImportError(e,documentURL);
         } catch (IOException e) {
