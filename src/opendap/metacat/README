@@ -3,8 +3,9 @@ This package contains software that crawls OPeNDAP servers and builds
 different kinds of metadata records. There are main() methods for almost all 
 of the classes, although most are intended for simple testing only. To run the
 crawler, etc., use the shell scripts that the ant build file 
-(reap_crawler_build.xml) uses with the 'build' targets. These make executable
-jar files that include a control file for the logging system.
+(reap_crawler_build.xml) uses with the 'build' targets. These scripts are the
+executables and use executable jar files that include a control file for the
+logging system.
 
 Current shell commands provided:
 
@@ -36,7 +37,7 @@ url_classifier.sh:
 
 Given that a crawl has run its course and both the thredds and ddx caches are
 loaded with data, classify the URLs. This forms groups, which may each have
-only one member if no URLs could actually be grouped together,  and saves the
+only one member if no URLs could actually be grouped together, and saves the
 result as a serialized URLGroups object. This object can be read and used
 by subsequent code to build different kinds of metadata documents.
 
@@ -44,6 +45,11 @@ eml_writer.sh:
 
 Given the name of a URLGroups file built using URLClassifier, write an EML
 document for each group.
+
+ncml_writer.sh:
+
+Same as above, but writes NCML for a group if it can. There are limitations
+on the kinds of NCML and on the things that the code will recognize.
 
 -------------------------------------------------------------------------------
 

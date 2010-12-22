@@ -68,6 +68,10 @@ public class URLGroups implements Iterable<URLGroup> {
 		return igroup;
 	}
 
+	public int size() {
+		return groups.size();
+	}
+	
 	public void add(URLGroup g) {
 		groups.add(g);
 	}

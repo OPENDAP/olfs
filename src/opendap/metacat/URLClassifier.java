@@ -140,6 +140,9 @@ public class URLClassifier {
 	}
 	
 	public int classifyURLs(PrintStream ps) throws Exception {
+		if (ps != null)
+			ps.println("Starting pass 1: " + (new Date()).toString());
+		
 		int numberOfUrls = assignUrlsToInitialGroups(ddxRetriever.getCachedDDXURLs());
 		
 		if (ps != null)
@@ -163,7 +166,7 @@ public class URLClassifier {
 	 * @throws Exception If the URLComponents object cannot be built
 	 */
 	public int assignUrlsToInitialGroups(Enumeration<String> ddxURLs) throws Exception {
-    	
+
 		// Special case for the first URLGroup (because using 'for' with an
 		// iterator fails when the iterator instance is null
     	if (ddxURLs.hasMoreElements()) {
@@ -186,7 +189,12 @@ public class URLClassifier {
 			String ddxURL = ddxURLs.nextElement();
 
     		log.debug("Processing URL: " + ddxURL);
-
+    		if (numberOfUrls % 10000 == 0) {
+    			log.info("Time " + (new Date()).toString());
+    			log.info("Processed " + numberOfUrls);
+    			log.info("Currently there are " + groups.size() + " groups");
+    		}
+    		
     		try {
 				ParsedURL parsedUrl = new ParsedURL(ddxURL);
 				URLProcessedComponents classification = new URLProcessedComponents(parsedUrl);
@@ -199,7 +207,7 @@ public class URLClassifier {
 					if (Arrays.equals(classificationLexemes, group.getClassifications().getLexemeArray())) {
 						group.add(parsedUrl);
 						found = true;
-						continue;
+						break;
 					}
 				}
 
