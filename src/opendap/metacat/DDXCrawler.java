@@ -178,9 +178,10 @@ public class DDXCrawler {
 		finally {
 			try {
 				log.debug("In DDXCrawler.main finally, saving cache files");
-				
-				crawler.threddsCatalogUtil.saveCatalogCache();
-				crawler.ddxRetriever.saveDDXCache();
+				if (crawler != null) {
+					crawler.threddsCatalogUtil.saveCatalogCache();
+					crawler.ddxRetriever.saveDDXCache();
+				}
 			}
 			catch (Exception e) {
 				System.err.println("Error saving cache files: " + e.getLocalizedMessage());

@@ -118,6 +118,19 @@ public class URLProcessedComponents implements Serializable {
 				c.value = comp;
 				c.pattern = false;
 			}
+			else if (comp.matches("[0-9]{2,}[A-Za-z]{3}[0-9]{2,}")) {
+				int j = 0;
+				while (j < comp.length()) {
+					 if (Character.isDigit(comp.charAt(j)))
+						 c.value += 'd';
+					 else
+						 c.value += 'c';
+					++j;
+				}
+
+				c.pattern = true;
+				
+			}
 			// if comp is a string of digits followed by chars, replace each
 			// digit by a 'd' but keep the literal char data. Allow for a
 			// trailing sequence of digits to follow the char data, but treat
@@ -141,8 +154,9 @@ public class URLProcessedComponents implements Serializable {
 				c.pattern = true;
 			}
 			// If comp is a sequence of chars followed by a sequence of digits,
-			// replace the digits by 'd'.
-			else if (comp.matches("[A-Za-z]+[0-9]+")) {
+			// replace the digits by 'd'. 
+			// Added optional digit prefix. jhrg 12/22/2010
+			else if (comp.matches("[0-9]*[A-Za-z]+[0-9]+")) {
 				int j = 0;
 				while (j < comp.length() && Character.isLetter(comp.charAt(j)))
 					c.value += comp.charAt(j++);

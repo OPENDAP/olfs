@@ -98,8 +98,8 @@ public class ParsedURL implements Serializable {
 			// Break up the parts of a filename further by assuming that a
 			// component that either starts or ends with a series of digits
 			// might really be separate from a character sequence that the
-			// above 'parse' has left attached. Note teh special hack
-			// to ferret out filename extensions.
+			// above 'parse' has left attached. Note the special hack
+			// to ferret out filename extensions and month names.
 			Vector<String> sub_file_components = new Vector<String>();
 			
 			for (String comp: file_components) {
@@ -125,7 +125,7 @@ public class ParsedURL implements Serializable {
 					int j = 0;
 					while (j < comp.length() && Character.isDigit(comp.charAt(j)))
 						first += comp.charAt(j++);
-					// ... now add the digits
+					// ... now add the chars
 					while(j < comp.length())
 						rest += comp.charAt(j++);
 					

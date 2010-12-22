@@ -97,6 +97,25 @@ public class URLGroup implements Serializable {
 	int datasetScanPosition = findDatasetScan(group);
 	*/
 	
+	public String toString() {
+		StringBuilder s = new StringBuilder(2048);
+		s.append("Number of URLs: ");
+		s.append(urls.size());
+		s.append("; ");
+		
+		s.append("First URL: ");
+		s.append(urls.get(0).getTheURL());
+		s.append("\n");
+		
+		Equivalences equivs = getEquivalences();
+		for (Equivalence e : equivs) {
+			s.append(e.getPattern());
+			s.append(" ");
+		}
+
+		return s.toString();
+	}
+	
 	/**
 	 * Get an instance of the Iteration over the URLs in this group.
 	 * 

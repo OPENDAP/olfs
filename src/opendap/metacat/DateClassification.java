@@ -22,7 +22,10 @@
 
 package opendap.metacat;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,8 @@ import opendap.metacat.Equivalence.Values;
 public class DateClassification {
 	
     private static Logger log = LoggerFactory.getLogger(DateClassification.class);
+    
+    private static List<String> months = Collections.unmodifiableList(Arrays.asList("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"));
 
     private final static int minimumYear = 1970;
 	private final static int minimumDayNum = 0;
@@ -134,6 +139,18 @@ public class DateClassification {
 		else if (isYearMonth(e)) {
 			e.addDateClassification(DatePart.year);
 			e.addDateClassification(DatePart.month);
+		}
+		else if (isDayMonthStringYear(e)) {
+			e.addDateClassification(DatePart.year);
+			e.addDateClassification(DatePart.month);
+			e.addDateClassification(DatePart.day);
+		}
+		else if (isDayMonthStringYearTime(e)) {
+			e.addDateClassification(DatePart.year);
+			e.addDateClassification(DatePart.month);
+			e.addDateClassification(DatePart.day);
+			e.addDateClassification(DatePart.hours);
+			e.addDateClassification(DatePart.minutes);
 		}
 	}
 	
@@ -341,6 +358,53 @@ public class DateClassification {
 		return true;
 	}
 
+	private static boolean isDayMonthStringYear(Equivalence e) {
+		if (!e.getPattern().equals("ddcccdddd")) // 2 digits, 3 chars, 4 digits
+			return false;
+		
+		Values c = e.getValues();
+		for (String sv: c) {
+			String dsv = sv.substring(0, 2);
+			if (!isValidDay(dsv))
+				return false;
+			String mssv = sv.substring(2, 5);
+			if (!isValidMonthString(mssv))
+				return false;
+			String ysv = sv.substring(5, 9);
+			if (!isValidYear(ysv))
+				return false;
+		}
+		
+		return true;		
+	}
+	
+	private static boolean isDayMonthStringYearTime(Equivalence e) {
+		if (!e.getPattern().equals("ddcccdddd")) // 2 digits, 3 chars, 4 digits, 4 digits
+			return false;
+		
+		Values c = e.getValues();
+		for (String sv: c) {
+			String dsv = sv.substring(0, 2);
+			if (!isValidDay(dsv))
+				return false;
+			String mssv = sv.substring(2, 5);
+			if (!isValidMonthString(mssv))
+				return false;
+			String ysv = sv.substring(5, 9);
+			if (!isValidYear(ysv))
+				return false;
+			String msv = sv.substring(9, 11);
+			if (!isValidHour(msv))
+				return false;
+			String ssv = sv.substring(11);
+			if (!isValidMinute(ssv))
+				return false;
+		}
+		
+		return true;
+		
+	}
+	
 	private static boolean isValidDay(String sv) {
 		int value = new Integer(sv).intValue();
 		return !(value < minimumDay || value > maximumDay);
@@ -356,6 +420,10 @@ public class DateClassification {
 		return !(value < minimumMonth || value > maximumMonth);
 	}
 
+	private static boolean isValidMonthString(String mv) {
+		return months.contains(mv);
+	}
+	
 	private static boolean isValidYear(String sv) {
 		int value = new Integer(sv).intValue();
 		return !(value < minimumYear || value > currentYear);

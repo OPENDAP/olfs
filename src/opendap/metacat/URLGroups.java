@@ -73,6 +73,8 @@ public class URLGroups implements Iterable<URLGroup> {
 	}
 	
 	public void add(URLGroup g) {
+		
+		log.info("New group: " + g.toString());
 		groups.add(g);
 	}
 	
