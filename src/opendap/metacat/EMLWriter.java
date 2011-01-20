@@ -148,7 +148,10 @@ public class EMLWriter {
 
 	    		if (output) {
 	    			output_counter++;
-	    			FileWriter fw = new FileWriter(ddxURL + ".eml");
+					String name = ddxURL + ".eml";
+					if (verbose)
+						ps.println("Writing " + name);
+	    			FileWriter fw = new FileWriter(name);
 	    			fw.write(emlDoc);
 	    			fw.close();
 	    		}
@@ -183,7 +186,10 @@ public class EMLWriter {
 
 						if (output) {
 							output_counter++;
-							FileWriter fw = new FileWriter(groupsName + "_" + output_counter.toString());
+							String name = groupsName + "_" + output_counter.toString() + ".eml";
+							if (verbose)
+								ps.println("Writing " + name);
+							FileWriter fw = new FileWriter(name);
 							fw.write(emlDoc);
 							fw.close();
 						}
@@ -237,7 +243,10 @@ public class EMLWriter {
 
 							if (output) {
 								output_counter++;
-								FileWriter fw = new FileWriter(groupsName + "_" + output_counter.toString());
+								String name = groupsName + "_" + output_counter.toString() + ".eml";
+								if (verbose)
+									ps.println("Writing " + name);
+								FileWriter fw = new FileWriter(name);
 								fw.write(emlDoc);
 								fw.close();
 							}
