@@ -46,7 +46,7 @@
     <logger name="opendap" level="ERROR">
         <appender-ref ref="ErrorLog"/>
     </logger>
-    
+    <!--
     <logger name="opendap.metacat.URLClassifier" level="INFO">
         <appender-ref ref="InfoLog"/>
     </logger>
@@ -54,5 +54,5 @@
     <logger name="opendap.metacat.URLGroups" level="INFO">
         <appender-ref ref="InfoLog"/>
     </logger>
-    
+    -->
 </configuration>
