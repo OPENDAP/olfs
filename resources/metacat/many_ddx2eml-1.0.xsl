@@ -8,10 +8,12 @@ Unlike
 
 <xsl:stylesheet exclude-result-prefixes="xs" version="2.0"
     xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_1_0/eml.xsd"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:dap="http://xml.opendap.org/ns/DAP2"
+    xmlns:fn="http://www.w3.org/2005/xpath-functions" 
+    xmlns:dap="http://xml.opendap.org/ns/DAP2"
     xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
 
     <!-- The name of the file in the first URL for the dataset (the URL used
@@ -221,22 +223,23 @@ Unlike
                 <xsl:value-of
                     select="fn:replace($date, '(\n|\s)*(\d{4}-\d{2}-\d{2}).*(\n|\s)*', '$2')"/>
             </xsl:when>
-            <xsl:otherwise>Unknown: <xsl:value-of select="$many_ddx2eml_version"/></xsl:otherwise>
+            <xsl:otherwise>Unknown iso 8601 date: <xsl:value-of select="$many_ddx2eml_version"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template name="iso8601-time">
         <xsl:param name="time"/>
+        <!-- xsl:comment>Raw param value to iso8601-time is: <xsl:value-of select="$time"/></xsl:comment -->
         <xsl:choose>
-            <xsl:when test="fn:matches($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(UTC|utc|Z)(\n|\s)*')">
+            <xsl:when test="fn:matches($time, '(\n|\s)*.*(UTC|utc|Z)(\d{2}:\d{2}:\d{2}).*(\n|\s)*')">
                 <xsl:value-of
-                    select="fn:replace($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2Z')"/>
+                    select="fn:replace($time, '(\n|\s)*.*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2Z')"/>
             </xsl:when>
-            <xsl:when test="fn:matches($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(\n|\s)*')">
+            <xsl:when test="fn:matches($time, '(\n|\s)*.*T(\d{2}:\d{2}:\d{2}).*(\n|\s)*')">
                 <xsl:value-of
-                    select="fn:replace($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2')"/>
+                    select="fn:replace($time, '(\n|\s)*.*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2')"/>
             </xsl:when>
-            <xsl:otherwise>Unknown: <xsl:value-of select="$many_ddx2eml_version"/></xsl:otherwise>
+            <xsl:otherwise>Unknown iso 8601 time: <xsl:value-of select="$many_ddx2eml_version"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
@@ -316,7 +319,7 @@ Unlike
 
             <coverage>
                 <temporalCoverage>
-                    <SingleDateTime>
+                    <singleDateTime>
                         <calendarDate>
                             <xsl:call-template name="iso8601-date">
                                 <xsl:with-param name="date" select="$date"/>
@@ -327,7 +330,7 @@ Unlike
                                 <xsl:with-param name="time" select="$date"/>
                             </xsl:call-template>
                         </time>
-                    </SingleDateTime>
+                    </singleDateTime>
                 </temporalCoverage>
             </coverage>
 

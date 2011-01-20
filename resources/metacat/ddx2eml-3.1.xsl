@@ -230,19 +230,20 @@ saxon 9. -->
 
     <xsl:template name="iso8601-time">
         <xsl:param name="time"/>
+        <!-- xsl:comment>Raw param value to iso8601-time is: <xsl:value-of select="$time"/></xsl:comment -->
         <xsl:choose>
-            <xsl:when test="fn:matches($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(UTC|utc|Z)(\n|\s)*')">
+            <xsl:when test="fn:matches($time, '(\n|\s)*.*(UTC|utc|Z)(\d{2}:\d{2}:\d{2}).*(\n|\s)*')">
                 <xsl:value-of
-                    select="fn:replace($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2Z')"/>
+                    select="fn:replace($time, '(\n|\s)*.*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2Z')"/>
             </xsl:when>
-            <xsl:when test="fn:matches($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(\n|\s)*')">
+            <xsl:when test="fn:matches($time, '(\n|\s)*.*T(\d{2}:\d{2}:\d{2}).*(\n|\s)*')">
                 <xsl:value-of
-                    select="fn:replace($time, '(\n|\s)*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2')"/>
+                    select="fn:replace($time, '(\n|\s)*.*(\d{2}:\d{2}:\d{2}).*(\n|\s)*', '$2')"/>
             </xsl:when>
-            <xsl:otherwise>Unknown: <xsl:value-of select="$ddx2eml_version"/></xsl:otherwise>
+            <xsl:otherwise>Unknown iso 8601 time: <xsl:value-of select="$ddx2eml_version"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
+    
     <xsl:template name="grid_entity_information">
         <xsl:for-each select="dap:Grid">
             <!--xsl:value-of select="fn:normalize-space(dap:Attribute[@name='long_name'])"/> (<xsl:value-of select="fn:normalize-space(@name)"/>) -->

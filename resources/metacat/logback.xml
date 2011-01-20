@@ -3,8 +3,6 @@
 
     <property name="logdir" value="metacat"/>
     
-    <property name="logdir" value="metacat"/>
-    
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -49,8 +47,12 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
     
-    <logger name="opendap.metacat.DDXCrawler" level="DEBUG">
-        <appender-ref ref="DebugLog"/>
+    <logger name="opendap.metacat.URLClassifier" level="INFO">
+        <appender-ref ref="InfoLog"/>
+    </logger>
+
+    <logger name="opendap.metacat.URLGroups" level="INFO">
+        <appender-ref ref="InfoLog"/>
     </logger>
     
 </configuration>
