@@ -35,6 +35,7 @@
         >
     <xsl:param name="ServicePrefix" />
     <xsl:param name="ServerIDs" />
+    <xsl:param name="UpdateIsRunning"/>
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
@@ -83,7 +84,20 @@
                     <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
 
                 </tr></table>
+                <xsl:if test="$UpdateIsRunning">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td align="right"><div class="small">
+                                <xsl:choose>
+                                    <xsl:when test="$UpdateIsRunning='true'">WCS catalog is currently being updated.</xsl:when>
+                                    <xsl:otherwise>WCS catalog is up to date.</xsl:otherwise>
+                                </xsl:choose>
+                            </div></td>
+                        </tr>
+                    </table>
 
+                </xsl:if>
+                
                 <xsl:choose>
                     <xsl:when test="ows:ServiceIdentification/ows:Title">
                         <h1>

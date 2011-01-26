@@ -6,6 +6,7 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
+import opendap.semantics.IRISail.ProcessController;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -206,21 +207,37 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void update(HttpServletRequest request, HttpServletResponse response) throws Exception{
         ServletOutputStream sos = response.getOutputStream();
 
-        sos.println("<html><body><hr/><hr/><hr/>");
-        sos.println("Updating catalog...");
-        sos.flush();
+        if(ProcessController.isCurrentlyProcessing()){
+            sos.println("<html><body><hr/><hr/>");
+            sos.println("<h3>Catalog is currently being updated...</h3>");
+            sos.println("<hr/><hr/></body></html>");
 
-        Date startTime = new Date();
-        CatalogWrapper.update();
-        Date endTime = new Date();
+        }
+        else {
+            sos.println("<html><body><hr/><hr/>");
+            sos.println("<h3>Last WCS Catalog update completed in "+ProcessController.getLastProcessingElapsedTime()/1000.0+" seconds.</h3>");
+            sos.println("<h3>Starting catalog update. This may take some time to complete...</h3>");
+            sos.println("<hr/><hr/></body></html>");
+            sos.flush();
 
-        double elapsedTime = (endTime.getTime() - startTime.getTime())/1000.0;
+            Thread updater = new Thread(new catalogUpdater());
+            updater.start();
 
+        }
 
-        sos.println("<h3>WCS Catalog update completed in "+elapsedTime+" seconds.</h3>");
-        sos.println("</body></html>");
 
     }
+    public class catalogUpdater implements Runnable {
+
+       public void run(){
+           try {
+           CatalogWrapper.update();
+           } catch (Exception e) {
+               log.error("catalogUpdater(): Caught "+e.getClass().getName()+" Message: "+e.getMessage());
+           }
+       }
+    }
+
 
 
 
@@ -247,12 +264,11 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",serviceUrl);
+        t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
         XdmNode descCover = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(coverageDescription).getBytes())));
 
         t.transform(descCover,response.getOutputStream());
-
-
 
 
 
@@ -276,9 +292,8 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",serviceUrl);
-
-
         t.setParameter("ServerIDs",getServerIDs(t.getDocumentBuilder()));
+        t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
         XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
 

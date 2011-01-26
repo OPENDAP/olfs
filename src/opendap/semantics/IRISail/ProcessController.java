@@ -25,10 +25,13 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
+import opendap.wcs.v1_1_2.CatalogWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class is used to track the state of a thread updating the repository.
@@ -39,9 +42,19 @@ public class ProcessController {
     static Logger log = LoggerFactory.getLogger(ProcessController.class);
 
     static AtomicBoolean currentlyProcessing;
+    static AtomicLong lastProcessingStart;
+    static AtomicLong lastProcessingEnd;
+
     static {
         currentlyProcessing = new AtomicBoolean();
         currentlyProcessing.set(false);
+
+        lastProcessingStart = new AtomicLong();
+        lastProcessingStart.set(new Date().getTime());
+
+        lastProcessingEnd = new AtomicLong();
+        lastProcessingEnd.set(new Date().getTime());
+
     }
     static AtomicBoolean stopWorking;
     static{
@@ -85,11 +98,22 @@ public class ProcessController {
 
     }
 
+    public static long getLastProcessingElapsedTime(){
+        return lastProcessingEnd.get() - lastProcessingStart.get();
+    }
+
+
     public static boolean isCurrentlyProcessing(){
         return currentlyProcessing.get();
     }
 
     public static void setProcessingState(boolean running){
+
+        if(running)
+            lastProcessingStart.set(new Date().getTime());
+        else
+            lastProcessingEnd.set(new Date().getTime());
+
         currentlyProcessing.set(running);
     }
 

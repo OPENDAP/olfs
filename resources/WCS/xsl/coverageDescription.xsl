@@ -34,6 +34,7 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:param name="ServicePrefix" />
+    <xsl:param name="UpdateIsRunning"/>
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
 
     <xsl:strip-space elements="*"/>
@@ -68,13 +69,28 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <table border="0" width="90%"><tr>
+                <table border="0" width="90%">
+                    <tr>
+                        <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                        <td align="center">
+                            <div  class="xlarge">Web Coverage Service</div>
+                        </td>
+                    </tr>
+                </table>
 
-                    <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                <xsl:if test="$UpdateIsRunning">
+                    <table border="0" width="100%">
+                        <tr>
+                            <td align="right"><div class="small">
+                                <xsl:choose>
+                                    <xsl:when test="$UpdateIsRunning='true'">WCS catalog is currently being updated.</xsl:when>
+                                    <xsl:otherwise>WCS catalog is up to date.</xsl:otherwise>
+                                </xsl:choose>
+                            </div></td>
+                        </tr>
+                    </table>
 
-                    <td align="center"><div  class="xlarge"> Web Coverage Service</div></td>
-                    
-                </tr></table>
+                </xsl:if>
                 <xsl:choose>
                     <xsl:when test="ows:Title">
                         <h2>
@@ -83,8 +99,12 @@
                         </h2>
                     </xsl:when>
                     <xsl:otherwise>
-                        <h2><span class="small">wcs:</span>Coverage Description
+                        <h2>
+                            <span align="left" class="small">wcs:</span>Coverage Description
                             <a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}"><span class="small">XML</span></a>
+
+                            <span class="small" align="right">fooo</span>
+
                         </h2>
                     </xsl:otherwise>
                 </xsl:choose>
