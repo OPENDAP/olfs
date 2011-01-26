@@ -124,8 +124,16 @@ public class Util {
         }
         else {
             String fname =  docUrlString;
-            if (docUrlString.startsWith("file://")){
-                fname =  docUrlString.substring(6,docUrlString.length());
+            if (docUrlString.startsWith("file:")){
+
+                fname =  docUrlString.substring(5,docUrlString.length());
+
+                if(fname.startsWith("/")){
+                    while(fname.startsWith("/")){
+                        fname =  fname.substring(1);
+                    }
+                    fname = "/" + fname;
+                }
             }
             File f = new File(fname);
 
