@@ -42,6 +42,12 @@
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
     </servlet>
 
+
+    <servlet>
+        <servlet-name>adminInterface</servlet-name>
+        <servlet-class>opendap.hai.AdminServlet</servlet-class>
+    </servlet>
+
     <servlet>
         <servlet-name>webstart</servlet-name>
 
@@ -80,6 +86,16 @@
     <servlet-mapping>
         <servlet-name>docs</servlet-name>
         <url-pattern>/docs/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>adminInterface</servlet-name>
+        <url-pattern>/hai</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>adminInterface</servlet-name>
+        <url-pattern>/hai/*</url-pattern>
     </servlet-mapping>
 
 
