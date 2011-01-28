@@ -585,15 +585,25 @@
         depends="clean,compile"
         description="Builds executable jar file of the hex encoder">
 
-        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
 
-        <jar destfile="${build.dist}/hexencoder.jar"
-             manifest="resources/META-INF/hexencoder.MANIFEST.MF">
+        <mkdir dir="${build.dist}/hexEncoder"/>
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/hexEncoder/${commons-cli.lib}"/>
+        <copy file="resources/hexEncoder/hexEncoder" tofile="${build.dist}/hexEncoder/hexEncoder"/>
+
+        <jar destfile="${build.dist}/hexEncoder/hexEncoder.jar"
+             manifest="resources/hexEncoder/hexEncoder.MANIFEST.MF">
             <fileset dir="${build.classes}">
                 <include name="opendap/gateway/EncodeDecode.class"/>
             </fileset>
         </jar>
 
+        <tar destfile="${build.dist}/hexEncoder.tgz"
+             compression="gzip"
+                >
+            <zipfileset dir="${build.dist}/hexEncoder"  />
+
+        </tar>
 
     </target>
 
