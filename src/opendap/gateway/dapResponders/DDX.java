@@ -50,7 +50,7 @@ public class DDX extends HttpResponder {
 
         log.debug("sendDDX() for dataset: " + dataSource);
 
-        response.setContentType("text/plain");
+        response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_ddx");
         // Commented because of a bug in the OPeNDAP C++ stuff...
