@@ -27,7 +27,7 @@ public class XmlData extends HttpResponder {
     }
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        throw new Exception("XML data response not yet implemented for this service.");
+        sendSomeStuff(response);
 
 
     }

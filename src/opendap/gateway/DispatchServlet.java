@@ -52,12 +52,10 @@ import opendap.gateway.dapResponders.*;
 public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
 
-
     private Logger log;
 
 
     private Document _config;
-
 
 
     private AtomicInteger reqNumber;
@@ -70,23 +68,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private Vector<HttpResponder> responders;
 
 
-
     public void init() {
 
-        if(isInitialized)
+        if (isInitialized)
             return;
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         isInitialized = false;
         reqNumber = new AtomicInteger(0);
-        systemPath = ServletUtil.getSystemPath(this,"");
+        systemPath = ServletUtil.getSystemPath(this, "");
 
         responders = new Vector<HttpResponder>();
-
-
-
-
 
 
         // dapResponders.add(new DDX(getMethod(,HttpServletRequest.class,HttpServletResponse.class)));
@@ -96,10 +89,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             _config = loadConfig();
 
         } catch (Exception e) {
-            log.error("init() Failed to load it's configuration! Caught "+e.getClass().getName()+" Message: "+e.getMessage());
+            log.error("init() Failed to load it's configuration! Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
-
-
 
 
         responders.add(new DDX(systemPath));
@@ -114,7 +105,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         responders.add(new Ascii(systemPath));
 
 
-
         responders.add(new DataDDX(systemPath));
         responders.add(new NetcdfFileOut(systemPath));
         responders.add(new XmlData(systemPath));
@@ -122,10 +112,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         responders.add(new GatewayForm(systemPath));
 
 
-
-        log.info("masterDispatchRegex=\""+getDispatchRegex()+"\"");
+        log.info("masterDispatchRegex=\"" + getDispatchRegex() + "\"");
         log.info("Initialized.");
-
 
 
         isInitialized = true;
@@ -137,7 +125,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      * OLFSConfigFileName.
      *
      * @throws javax.servlet.ServletException When the file is missing, unreadable, or fails
-     *                          to parse (as an XML document).
+     *                                        to parse (as an XML document).
      */
     private Document loadConfig() throws ServletException {
 
@@ -163,9 +151,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 // Parse the XML doc into a Document object.
                 SAXBuilder sb = new SAXBuilder();
                 return sb.build(fis);
-            }
-            finally {
-            	fis.close();
+            } finally {
+                fis.close();
             }
 
         } catch (FileNotFoundException e) {
@@ -186,18 +173,11 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     }
 
 
-
-
-
-
-
-
-
-    public Pattern getDispatchRegex(){
+    public Pattern getDispatchRegex() {
         String masterRegex = null;
 
-        for(HttpResponder p : responders){
-            if(masterRegex != null)
+        for (HttpResponder p : responders) {
+            if (masterRegex != null)
                 masterRegex += "|";
             else
                 masterRegex = "";
@@ -235,9 +215,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "GATEWAY_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
 
-        if(ReqInfo.isServiceOnlyRequest(req))
+        if (ReqInfo.isServiceOnlyRequest(req))
             return -1;
-
 
 
         try {
@@ -245,8 +224,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         } catch (Exception e) {
             return -1;
-        }
-        finally {
+        } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "GATEWAY_SERVICE_ACCESS");
 
         }
@@ -255,11 +233,10 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     }
 
 
-
     private boolean redirect(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
         if (req.getPathInfo() == null) {
-            res.sendRedirect(Scrub.urlContent(req.getRequestURI()+"/"));
+            res.sendRedirect(Scrub.urlContent(req.getRequestURI() + "/"));
             log.debug("Sent redirect to make the web page work!");
             return true;
         }
@@ -272,15 +249,12 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     }
 
 
-
-
     public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-            {
+                      HttpServletResponse response) {
 
         try {
 
-            LogUtil.logServerAccessStart(request, "GATEWAY_SERVICE_ACCESS","HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "GATEWAY_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -294,18 +268,17 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 DataSourceInfo dsi;
 
 
-
                 String requestURL = request.getRequestURL().toString();
 
-                for(HttpResponder r: responders){
-                    if(r.matches(requestURL)) {
-                        log.info("The request URL: "+requestURL+" matches " +
-                                "the pattern: \""+r.getPattern()+"\"");
+                for (HttpResponder r : responders) {
+                    if (r.matches(requestURL)) {
+                        log.info("The request URL: " + requestURL + " matches " +
+                                "the pattern: \"" + r.getPattern() + "\"");
 
                         //dsi = new BESDataSource(dataSource);
                         //if(dsi.isDataset()){
-                            r.respondToHttpRequest(request, response);
-                            return;
+                        r.respondToHttpRequest(request, response);
+                        return;
                         //}
 
                     }
@@ -313,26 +286,19 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-                            }
+            }
 
-        }
-        catch( Throwable t){
+        } catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, response);
-            }
-            catch(Throwable t2) {
+            } catch (Throwable t2) {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
-        }
-        finally {
+        } finally {
             RequestCache.endRequest();
-            LogUtil.logServerAccessEnd(0,-1,"GATEWAY_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(0, -1, "GATEWAY_SERVICE_ACCESS");
         }
     }
-
-
-
-
 
 
 }

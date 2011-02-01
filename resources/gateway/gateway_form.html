@@ -16,10 +16,24 @@
         // The ascii_button handler sends data to a new window. The user can then
         // save the data to a file.
 
+        /*
+                <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
+                <input type="button" value="Xml Data" onclick="xmlData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
+
+        */
+
+
         function ddx_button() {
             datasetID = getDatasetID();
             url = datasetID + ".ddx" ;
             window.open(url, "DDX");
+        }
+
+        function rdf_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".rdf" ;
+            window.open(url, "RDF");
         }
 
         function dds_button() {
@@ -34,10 +48,41 @@
             window.open(url, "DAS");
         }
 
+        function info_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".info";
+            window.open(url, "Dataset Information");
+        }
+
         function dataRequestForm_button() {
             datasetID = getDatasetID();
             url = datasetID + ".html";
             window.open(url, "Data Request Form");
+        }
+
+
+        function dap2data_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dods";
+            window.open(url, "DAP2 Binary Data");
+        }
+
+        function ascii_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".asc";
+            window.open(url, "ASCII Data");
+        }
+
+
+        function dataDDX_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dap";
+            window.open(url, "DAP4 Data DDX");
+        }
+        function xmlData_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".xdods";
+            window.open(url, "XML Data Response");
         }
 
         function getDatasetID(){
@@ -45,6 +90,14 @@
             document.forms[0].datasetID.value  = id;
             return id;
         }
+
+
+        function netcdfFileOut_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".nc";
+            window.open(url, "NetCDF File Out Response");
+        }
+
 
 
         function convertToHex(num) {
@@ -134,9 +187,16 @@
             <td align="right">DAP Responses</td>
             <td>
                 <input type="button" value="DDX" onclick="ddx_button()"/>
+                <input type="button" value="RDF" onclick="rdf_button()"/>
                 <input type="button" value="DDS" onclick="dds_button()"/>
                 <input type="button" value="DAS" onclick="das_button()"/>
+                <input type="button" value="INFO" onclick="info_button()"/>
                 <input type="button" value="Data Request Form" onclick="dataRequestForm_button()"/>
+                <input type="button" value="DAP2 Binary Data" onclick="dap2data_button()"/>
+                <input type="button" value="Ascii Data" onclick="ascii_button()"/>
+                <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
+                <input type="button" value="Xml Data" onclick="xmlData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
             </td>
 
         </tr>

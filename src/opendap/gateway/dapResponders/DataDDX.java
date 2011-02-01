@@ -16,10 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-
-
-
-
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 
 public class DataDDX extends HttpResponder {
@@ -37,11 +35,29 @@ public class DataDDX extends HttpResponder {
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        throw new Exception("DataDDX response not yet implemented for this service.");
+        sendSomeStuff(response);
 
 
 
     }
+
+    private void sendSomeStuff(HttpServletResponse response) throws Exception {
+
+        response.setContentType("text/html");
+
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
+        XMLOutputter xmlo = new XMLOutputter();
+
+
+        pw.println("<h2>DAP4 Data DDX Response</h2>");
+        pw.println("<p>This request is being handled by: "+getClass().getName()+"</p>");
+
+        pw.flush();
+
+
+    }
+
+
 
     /**
      * ************************************************************************

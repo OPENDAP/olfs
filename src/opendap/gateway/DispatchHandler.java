@@ -23,23 +23,20 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
+import opendap.gateway.dapResponders.*;
 import org.slf4j.Logger;
 import org.jdom.Element;
-import org.jdom.Document;
 import opendap.coreServlet.*;
-import opendap.bes.Version;
-import opendap.bes.BESError;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URISyntaxException;
 import java.net.URI;
 import java.util.List;
+import java.util.Vector;
 
 
 /**
@@ -58,6 +55,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private Element _config;
 
+    private Vector<String> trustedHosts;
+    private Vector<HttpResponder> responders;
 
 
 
@@ -67,8 +66,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
     public DispatchHandler() {
 
         super();
-
         log = org.slf4j.LoggerFactory.getLogger(getClass());
+        trustedHosts = new Vector<String>();
+        responders = new Vector<HttpResponder>();
         _initialized = false;
 
     }
@@ -88,24 +88,17 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         dataSourceUrl = HexAsciiEncoder.hexToString(dataSourceUrl);
 
-        boolean trusted = false;
+        return dataSourceUrl;
 
-        if(!_config.getChildren("trustedHost").isEmpty()){
-            String allowedHost;
-            for(Object o : _config.getChildren("trustedHost")){
-                allowedHost = ((Element)o).getTextTrim();
-                if(dataSourceUrl.startsWith(allowedHost))
-                    trusted = true;
-            }
+        /*
 
-        }
-        if(!trusted){
+        if(!isTrustedHost(dataSourceUrl){
             log.error("No trusted hosts found to match: "+dataSourceUrl);
             return null;
         }
         else
             return dataSourceUrl;
-
+        */
 
     }
 
@@ -193,8 +186,42 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         _config = config;
 
         ingestPrefix();
+        //ingestTrustedHosts(config);
 
-        hosts = config.getChildren("wcsHost");
+
+        responders.add(new DDX(systemPath));
+        responders.add(new DDS(systemPath));
+        responders.add(new DAS(systemPath));
+        responders.add(new RDF(systemPath));
+
+        responders.add(new HtmlDataRequestForm(systemPath));
+        responders.add(new DatasetInfoHtmlPage(systemPath));
+
+        responders.add(new Dap2Data(systemPath));
+        responders.add(new Ascii(systemPath));
+
+
+        responders.add(new DataDDX(systemPath));
+        responders.add(new NetcdfFileOut(systemPath));
+        responders.add(new XmlData(systemPath));
+
+        responders.add(new GatewayForm(systemPath));
+
+
+
+        _initialized = true;
+    }
+
+
+
+
+
+    private void ingestTrustedHosts(Element config) throws URISyntaxException, MalformedURLException {
+        String msg;
+        Element hostElem;
+        URL url;
+        URI uri;
+        List hosts = config.getChildren("trustedHost");
 
         if(hosts.isEmpty()){
             msg = "Configuration Warning: The <Handler> " +
@@ -204,42 +231,36 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
                     "may be accessed. This not recomended.";
 
             log.warn(msg);
-/*
-            msg = "Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 or more <wcsHost>  " +
-                    "child elements whose value should be the base URL " +
-                    "for the WCS services that may be accessed.";
-            log.error(msg);
-            throw new Exception(msg);
-*/
         }
         else {
 
             for (Object o : hosts) {
-                host = (Element) o;
+                hostElem = (Element) o;
+                String host = hostElem.getTextTrim();
 
-                url = new URL(host.getTextTrim());
+                url = new URL(host);
                 log.debug(urlInfo(url));
 
 
-                uri = new URI(host.getTextTrim());
+                uri = new URI(host);
                 log.debug(uriInfo(uri));
 
                 log.info("Adding " + url + " to allowed hosts list.");
+                trustedHosts.add(host);
             }
 
         }
-
-
-
-
-
-
-
-
-        _initialized = true;
     }
+
+    private boolean isTrustedHost(String url){
+
+        for(String trustedHost : trustedHosts){
+            if(url.startsWith(trustedHost))
+                return true;
+        }
+        return false;
+    }
+
 
 
     private void ingestPrefix() throws Exception{
@@ -306,7 +327,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
             if (relativeURL.startsWith(_prefix)) {
                 isMyRequest = true;
                 if (sendResponse) {
-                    sendDAPResponse(request, response);
+                    sendGatewayResponse(request, response);
                     log.info("Sent gateway Response");
                 }
             }
@@ -325,430 +346,46 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
     }
 
 
-
-
-
-    public void sendDAPResponse(HttpServletRequest request,
-                                HttpServletResponse response)
-            throws Exception {
-
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-        String wcsRequestURL = getDataSourceURL(request);
-
-
-        if(wcsRequestURL==null){
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
-
-
-        if ( // DDS Response?
-                requestSuffix.equalsIgnoreCase("dds")
-                ) {
-
-            sendDDS(request, response, wcsRequestURL);
-            log.info("Sent DDS");
-
-
-        } else if ( // DAS Response?
-                requestSuffix.equalsIgnoreCase("das")
-                ) {
-            sendDAS(request, response, wcsRequestURL);
-            log.info("Sent DAS");
-
-
-        } else if (  // DDX Response?
-                requestSuffix.equalsIgnoreCase("ddx")
-                ) {
-            sendDDX(request, response, wcsRequestURL);
-            log.info("Sent DDX");
-
-
-        } else if ( // DAP2 (aka .dods) Response?
-                requestSuffix.equalsIgnoreCase("dods")
-                ) {
-            sendDAP2Data(request, response, wcsRequestURL);
-            log.info("Sent DAP2 Data");
-
-
-        } else if (  // ASCII Data Response.
-                requestSuffix.equalsIgnoreCase("asc") ||
-                        requestSuffix.equalsIgnoreCase("ascii")
-                ) {
-            sendASCII(request, response, wcsRequestURL);
-            log.info("Sent ASCII");
-
-
-        } else if (  // Info Response?
-                requestSuffix.equalsIgnoreCase("info")
-                ) {
-            sendINFO(request, response, wcsRequestURL);
-            log.info("Sent Info");
-
-
-        } else if (  //HTML Request Form (aka The Interface From Hell) Response?
-                requestSuffix.equalsIgnoreCase("html") ||
-                        requestSuffix.equalsIgnoreCase("htm")
-                ) {
-            sendHTMLRequestForm(request, response, wcsRequestURL);
-            log.info("Sent HTML Request Form");
-
-
-        } else if (requestSuffix.equals("")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            log.info("Sent BAD URL (missing Suffix)");
-
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            log.info("Sent BAD URL - not an OPeNDAP request suffix.");
-        }
-
+    private String getName(HttpServletRequest req) {
+        return req.getPathInfo();
     }
 
-    private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
+
+
+    private void sendGatewayResponse(HttpServletRequest request,
+                                    HttpServletResponse response) throws Exception{
+
+
+        String name = getName(request);
+
+        log.debug("The client requested this: " + name);
 
         String relativeUrl = ReqInfo.getRelativeUrl(request);
+
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        log.debug("sendDDS() for dataset: " + dataSource);
-
-        response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
+        DataSourceInfo dsi;
 
 
+        String requestURL = request.getRequestURL().toString();
 
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+        for (HttpResponder r : responders) {
+            if (r.matches(requestURL)) {
+                log.info("The request URL: " + requestURL + " matches " +
+                        "the pattern: \"" + r.getPattern() + "\"");
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DDS,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.DAP2_ERRORS);
+                //dsi = new BESDataSource(dataSource);
+                //if(dsi.isDataset()){
+                r.respondToHttpRequest(request, response);
+                return;
+                //}
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-
-            String msg = new String(erros.toByteArray());
-            log.error("sendDDS() encounterd a BESError: "+msg);
-            os.write(msg.getBytes());
+            }
         }
 
-
-        os.flush();
-
-
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        log.info("Sent BAD URL - No responder matched the request..");
 
     }
-
-
-
-
-    private void sendDAS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
-
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        log.debug("sendDAS() for dataset: " + dataSource);
-
-        response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DAS,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.DAP2_ERRORS);
-
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("sendDAS() encounterd a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-
-        os.flush();
-
-
-
-    }
-
-
-
-    private void sendDDX(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
-
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
-
-        log.debug("sendDDX() for dataset: " + dataSource);
-
-        response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DDX,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        xmlBase,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.DAP2_ERRORS);
-
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encounterd a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-
-        os.flush();
-
-
-
-    }
-
-
-
-    private void sendDAP2Data(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
-
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        log.debug("sendDAP2Data() for dataset: " + dataSource);
-
-        response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DAP2,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.DAP2_ERRORS);
-
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("sendDAP2Data() encounterd a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-
-        os.flush();
-
-
-
-    }
-
-    private void sendASCII(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
-
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        log.debug("sendASCII() for dataset: " + dataSource);
-
-        response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.ASCII,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.XML_ERRORS);
-
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(systemPath,response);
-            log.error("sendASCII() encounterd a BESError: "+besError.getMessage());
-        }
-
-
-        os.flush();
-
-
-    }
-
-
-    private void sendINFO(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
-
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        log.debug("sendINFO() for dataset: " + dataSource);
-
-        response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_dds");
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.INFO_PAGE,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.XML_ERRORS);
-
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(systemPath,response);
-            log.error("sendINFO() encounterd a BESError: "+besError.getMessage());
-
-        }
-
-
-        os.flush();
-
-
-    }
-
-
-    private void sendHTMLRequestForm(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
-
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-        log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
-
-        response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
-        response.setHeader("Content-Description", "dods_form");
-
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-        log.debug("sendHTMLRequestForm(): Sending HTML Data Request Form For: "
-                + dataSource +
-                "    CE: '" + request.getQueryString() + "'");
-
-
-        OutputStream os = response.getOutputStream();
-
-        String url = request.getRequestURL().toString();
-
-        int suffix_start = url.lastIndexOf("." + requestSuffix);
-
-        url = url.substring(0, suffix_start);
-
-
-        log.debug("sendHTMLRequestForm(): HTML Form URL: " + url);
-
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.HTML_FORM,
-                                                        wcsRequestURL,
-                                                        null,
-                                                        xdap_accept,
-                                                        null,
-                                                        url,
-                                                        null,
-                                                        BesGatewayApi.XML_ERRORS);
-
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
-
-            BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
-
-            besError.sendErrorResponse(systemPath, response);
-
-
-            String msg = besError.getMessage();
-            log.error("sendHTMLRequestForm() encounterd a BESError: "+msg);
-        }
-
-        os.flush();
-
-
-
-
-    }
-
 
 
 
