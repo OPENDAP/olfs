@@ -37,7 +37,7 @@ public class GatewayForm extends HttpResponder {
 
         String contextPath = request.getContextPath();
 
-        String gatewayFormFile = _systemPath + "/resources/gateway/gateway_form.html";
+        String gatewayFormFile = _systemPath + "/gateway/gateway_form.html";
 
         String form = readFileAsString(gatewayFormFile);
 

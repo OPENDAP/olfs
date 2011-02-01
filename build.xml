@@ -161,6 +161,7 @@
     <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
+    <property name="GatewayResources.dir" location="${resources.dir}/gateway"/>
     <property name="WebStartResources.dir" location="${resources.dir}/WebStart"/>
     <property name="WCS.dir" location="${resources.dir}/WCS"/>
 
@@ -724,6 +725,7 @@
 
 
             <zipfileset dir="${WebStartResources.dir}" prefix="WebStart" />
+            <zipfileset dir="${GatewayResources.dir}" prefix="gateway" />
 
 
             <!--
