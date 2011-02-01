@@ -60,6 +60,7 @@ public class WcsDispatchHandler implements DispatchHandler {
     private Logger log;
     private boolean initialized;
     private HttpServlet dispatchServlet;
+    private String systemPath;
     private String prefix = "/wcs";
 
     public WcsDispatchHandler() {
@@ -241,6 +242,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         List children;
         dispatchServlet = servlet;
+        systemPath = ServletUtil.getSystemPath(servlet,"");
 
 
         Element e = config.getChild("prefix");
@@ -1185,7 +1187,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error("sendASCII() encounterd a BESError: "+besError.getMessage());
         }
 
@@ -1228,7 +1230,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error("sendINFO() encounterd a BESError: "+besError.getMessage());
 
         }
@@ -1287,7 +1289,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(systemPath,response);
 
 
             String msg = besError.getMessage();

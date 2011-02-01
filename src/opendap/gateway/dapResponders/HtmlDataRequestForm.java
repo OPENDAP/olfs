@@ -1,0 +1,105 @@
+package opendap.gateway.dapResponders;
+
+import opendap.bes.BESError;
+import opendap.bes.BesXmlAPI;
+import opendap.bes.Version;
+import opendap.coreServlet.ReqInfo;
+import opendap.gateway.BesGatewayApi;
+import opendap.gateway.HttpResponder;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: 1/29/11
+ * Time: 2:51 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class HtmlDataRequestForm extends HttpResponder {
+
+
+
+    Logger log;
+
+    public HtmlDataRequestForm(String sysPath){
+        super(sysPath, ".*\\.html?");
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
+    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String requestSuffix = ReqInfo.getRequestSuffix(request);
+
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+
+
+        log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
+
+        response.setContentType("text/html");
+        Version.setOpendapMimeHeaders(request,response);
+        response.setHeader("Content-Description", "dods_form");
+
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+        log.debug("sendHTMLRequestForm(): Sending HTML Data Request Form For: "
+                + dataSource +
+                "    CE: '" + request.getQueryString() + "'");
+
+
+        OutputStream os = response.getOutputStream();
+
+        String url = request.getRequestURL().toString();
+
+        int suffix_start = url.lastIndexOf("." + requestSuffix);
+
+        url = url.substring(0, suffix_start);
+
+
+        log.debug("sendHTMLRequestForm(): HTML Form URL: " + url);
+
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        Document reqDoc = BesGatewayApi.getRequestDocument(
+                                                        BesGatewayApi.HTML_FORM,
+                                                        dataSourceUrl,
+                                                        null,
+                                                        xdap_accept,
+                                                        null,
+                                                        url,
+                                                        null,
+                                                        BesGatewayApi.XML_ERRORS);
+
+        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+
+            besError.sendErrorResponse(_systemPath,response);
+
+
+            String msg = besError.getMessage();
+            log.error("sendHTMLRequestForm() encountered a BESError: "+msg);
+        }
+
+        os.flush();
+
+
+
+
+    }
+
+}

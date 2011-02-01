@@ -55,6 +55,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private boolean initialized;
 
     private HttpServlet dispatchServlet;
+    private String systemPath;
 
 
     public DirectoryDispatchHandler() {
@@ -73,6 +74,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(initialized) return;
 
         dispatchServlet = s;
+        systemPath = ServletUtil.getSystemPath(s,"");
 
 
 
@@ -256,7 +258,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-            String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
+            String xsltDoc = systemPath + "/docs/xsl/contents.xsl";
 
             Transformer transformer = new Transformer(xsltDoc);
 
@@ -272,7 +274,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error(besError.getMessage());
 
         }

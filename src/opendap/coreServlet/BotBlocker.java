@@ -63,14 +63,14 @@ public class BotBlocker implements DispatchHandler {
     /**
      * Since a constructor cannot be defined for an interface there needs to
      * be a way to initialize the objects state. The init() method is that way.
-     * The DispatchServlet that creates an instance of DispatchHandler will
+     * The DispatchHandler that creates an instance of DispatchHandler will
      * pass itself into it along with the XML element that declared the
      * DispatchHandler in the configuration file (usually olfs.xml). The
      * contents of this XML Element are not restricted and may (should?)
      * contain any required information for configuration not availableInChunk by
-     * interogating the DispatchServlet methods.
+     * interogating the DispatchHandler methods.
      *
-     * @param servlet This should be the DispatchServlet that creates the
+     * @param servlet This should be the DispatchHandler that creates the
      * instance of DispatychHandler that is being intialized.
      * @param config A JDOM Element objct containing the XML Element that
      * announced which implementation of DispatchHandler to use. It may (or

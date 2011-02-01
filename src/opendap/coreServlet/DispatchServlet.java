@@ -511,29 +511,11 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-
-    private boolean isServiceOnlyRequest(HttpServletRequest req){
-        String contextPath = req.getContextPath();
-        String servletPath = req.getServletPath();
-        String reqURI = req.getRequestURI();
-
-        String serviceName = contextPath + servletPath;
-
-        if (reqURI.equals(serviceName)) {
-            return true;
-        }
-        return false;
-
-    }
-
-
-
-
     private boolean redirectForServiceOnlyRequest(HttpServletRequest req,
                                                   HttpServletResponse res)
             throws IOException {
 
-        if (isServiceOnlyRequest(req)) {
+        if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
             String newURI = reqURI+"/";
             res.sendRedirect(Scrub.urlContent(newURI));
@@ -651,7 +633,7 @@ public class DispatchServlet extends HttpServlet {
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
 
-        if(isServiceOnlyRequest(req))
+        if(ReqInfo.isServiceOnlyRequest(req))
             return -1;
 
         try {

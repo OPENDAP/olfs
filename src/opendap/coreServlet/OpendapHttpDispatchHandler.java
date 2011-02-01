@@ -133,7 +133,7 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
      * The "info_cache_dir" directory specified in the [Server] section
      * of the DODSiniFile is the designated location for:
      * <ul>
-     * <li>".info" response override files.</li>
+     * <li>".info" response Animal files.</li>
      * <li>Server specific HTML* files.</li>
      * <li>Dataset specific HTML* files .</li>
      * </ul>

@@ -52,7 +52,10 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private Logger log;
     private boolean _initialized;
+
     private HttpServlet dispatchServlet;
+    private String systemPath;
+
     private String _prefix = "wcsGateway/";
 
     private Element _config;
@@ -187,6 +190,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
 
         dispatchServlet = servlet;
+        systemPath = ServletUtil.getSystemPath(servlet,"");
+
         _config = config;
 
         ingestPrefix();
@@ -626,8 +631,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(systemPath, response);
             log.error("sendASCII() encounterd a BESError: "+besError.getMessage());
         }
 
@@ -672,7 +677,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(systemPath, response);
             log.error("sendINFO() encounterd a BESError: "+besError.getMessage());
 
         }
@@ -732,7 +737,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
-            besError.sendErrorResponse(dispatchServlet,response);
+            besError.sendErrorResponse(systemPath, response);
 
 
             String msg = besError.getMessage();

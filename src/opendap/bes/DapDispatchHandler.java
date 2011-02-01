@@ -54,6 +54,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
     private boolean initialized;
     private HttpServlet _servlet;
 
+    private String systemPath;
 
     public DapDispatchHandler() {
 
@@ -79,6 +80,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         if(initialized) return;
 
         _servlet = ds;
+        systemPath = ServletUtil.getSystemPath(_servlet,"");
+
 
         dispatchMethods = new HashMap<Pattern,Method>();
 
@@ -287,7 +290,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
      * ************************************************************************
      * Default handler for the client's DAS request. Operates on the assumption
      * that the DAS information is cached on a disk local to the server. If you
-     * don't like that, then you better override it in your server :)
+     * don't like that, then you better Animal it in your server :)
      * <p/>
      * <p>Once the DAS has been parsed it is sent to the requesting client.
      *
@@ -447,8 +450,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Cache-Control", "public");
 
 
-        response.setStatus(HttpServletResponse.SC_OK);
-
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
@@ -592,7 +593,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_data");
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
@@ -662,7 +662,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             //besError.setErrorCode(BESError.INTERNAL_ERROR);
-            besError.sendErrorResponse(_servlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error(besError.getMessage());
         }
 
@@ -715,7 +715,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             //besError.setErrorCode(BESError.INTERNAL_ERROR);
-            besError.sendErrorResponse(_servlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error(besError.getMessage());
         }
 
@@ -772,7 +772,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 erros)){
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_servlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error(besError.getMessage());
         }
 
@@ -814,7 +814,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_servlet,response);
+            besError.sendErrorResponse(systemPath,response);
             log.error(besError.getMessage());
         }
 
@@ -904,7 +904,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             String currentDir = System.getProperty("user.dir");
-            String xslDir = ServletUtil.getSystemPath(_servlet, "/docs/xsl");
+            String xslDir = systemPath + "/docs/xsl";
             log.debug("Cached working directory: "+currentDir);
 
             log.debug("Changing working directory to "+ xslDir);
@@ -996,6 +996,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             response.setHeader("Content-Description", "dods_error");
             String msg = new String(erros.toByteArray());
             log.error(msg);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             os.write(msg.getBytes());
 
         }

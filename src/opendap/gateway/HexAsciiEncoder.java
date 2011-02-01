@@ -34,7 +34,7 @@ import java.io.PrintStream;
  * Date: Apr 22, 2008
  * Time: 5:01:33 PM
  */
-public class EncodeDecode {
+public class HexAsciiEncoder implements Encoder {
 
     public static String stringToHex(String s){
         String es = "";
@@ -46,6 +46,24 @@ public class EncodeDecode {
             es += Integer.toHexString(aB);
         }
         return es;
+    }
+
+
+    public  String encode(String s){
+        return stringToHex(s);
+    }
+
+    public  String decode(String s){
+        return hexToString(s);
+    }
+
+
+    public  void encode(InputStream is, OutputStream os) throws Exception {
+        stringToHex(is,os);
+    }
+
+    public  void decode(InputStream is, OutputStream os) throws Exception {
+        hexToString(is,os);
     }
 
 

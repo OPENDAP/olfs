@@ -303,31 +303,30 @@
 
 
         <copy todir="${build.src}" filtering="true">
-          <fileset dir="${src.dir}">
-              <!-- include all the java files -->
-              <include name="opendap/**"/>
-
-          
-              <!-- Exclude the old hao code  -->
-              <exclude name="hao/**"/>
+            <fileset dir="${src.dir}">
+                <!-- include all the java files -->
+                <include name="opendap/**"/>
 
 
-              <!-- Exclude the experimental code  -->
-              <exclude name="opendap/experiments/**"/>
+                <!-- Exclude the old hao code  -->
+                <exclude name="hao/**"/>
 
-              <!-- Exclude the Metacat code  -->
-              <exclude name="opendap/metacat/**"/>
 
-              <!-- Exclude the WCS and semantics code  -->
+                <!-- Exclude the experimental code  -->
+                <exclude name="opendap/experiments/**"/>
+
+                <!-- Exclude the Metacat code  -->
+                <exclude name="opendap/metacat/**"/>
+
+                <!-- Exclude the WCS and semantics code  -->
                 <exclude name="opendap/wcsGateway/**"/>
                 <exclude name="opendap/wcs/**"/>
                 <exclude name="opendap/semantics/**"/>
-                
 
-          </fileset>
+
+            </fileset>
 
         </copy>
-
 
 
     </target>
@@ -581,6 +580,9 @@
 
     </target>
 
+
+
+
     <target name="hexEncoderApp"
         depends="clean,compile"
         description="Builds executable jar file of the hex encoder">
@@ -594,7 +596,8 @@
         <jar destfile="${build.dist}/hexEncoder/hexEncoder.jar"
              manifest="resources/hexEncoder/hexEncoder.MANIFEST.MF">
             <fileset dir="${build.classes}">
-                <include name="opendap/gateway/EncodeDecode.class"/>
+                <include name="opendap/gateway/Encoder.class"/>
+                <include name="opendap/gateway/HexAsciiEncoder.class"/>
             </fileset>
         </jar>
 
@@ -604,6 +607,23 @@
             <zipfileset dir="${build.dist}/hexEncoder"  />
 
         </tar>
+
+    </target>
+
+
+
+
+
+    <target name="NcmlDispatchHandler"
+        depends="clean,compile"
+        description="Builds jar file for the NcML Dispatch Handler">
+
+
+        <jar destfile="${build.dist}/NcmlDispatchHandler.jar">
+            <fileset dir="${build.classes}">
+                <include name="opendap/ncml/DispatchHandler.class"/>
+            </fileset>
+        </jar>
 
     </target>
 
@@ -785,6 +805,7 @@
                 >   
         </sourceanalyzer>
     </target>
+
 
 
 

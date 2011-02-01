@@ -58,6 +58,9 @@ import java.util.regex.Pattern;
 public class BESThreddsDispatchHandler implements DispatchHandler {
 
     private DispatchServlet servlet;
+    private String systemPath;
+
+
     private org.slf4j.Logger log;
     private Pattern matchPattern =  Pattern.compile(".*.catalog.xml");
 
@@ -93,6 +96,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if(initialized) return;
 
         servlet  = s;
+        systemPath = ServletUtil.getSystemPath(servlet,"");
 
 
         log.info("Initialized.");
@@ -170,7 +174,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             log.debug(xmlo.outputString(showCatalogDoc));
 
-            String xsltDoc = ServletUtil.getSystemPath(servlet, "/docs/xsl/catalog.xsl");
+            String xsltDoc = systemPath + "/docs/xsl/catalog.xsl";
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
@@ -284,7 +288,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         } else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(servlet, response);
+            besError.sendErrorResponse(systemPath, response);
             log.error(besError.getMessage());
 
         }

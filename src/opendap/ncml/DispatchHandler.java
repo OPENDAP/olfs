@@ -126,8 +126,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
         if(ncmlRequestPattern.matcher(requestURL).matches())   {
             String relativeUrl = ReqInfo.getRelativeUrl(request);
-            String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-            DataSourceInfo dsi = new BESDataSource(dataSource);
+            DataSourceInfo dsi = new BESDataSource(relativeUrl);
 
 
 
@@ -221,28 +220,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         }
 
         return ncmlDocument;
-
-    }
-
-
-
-    private void sendSomeStuff(Document ddx,  HttpServletResponse response) throws Exception {
-
-        response.setContentType("text/html");
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-        XMLOutputter xmlo = new XMLOutputter();
-
-
-        pw.println("<h2>NCML Response</h2>");
-        pw.println("<p>The request URL has been directed to the "+getClass().getName()+" </p>");
-        pw.println("<p>The corrected NcML file looks like this:</p>");
-        pw.println("<pre>");
-        org.apache.commons.lang.StringEscapeUtils.escapeHtml(pw, xmlo.outputString(ddx));
-        pw.println("</pre>");
-
-        pw.flush();
-
 
     }
 

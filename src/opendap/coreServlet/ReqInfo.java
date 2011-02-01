@@ -458,7 +458,19 @@ public class ReqInfo {
     }
 
 
+    public static boolean isServiceOnlyRequest(HttpServletRequest req){
+        String contextPath = req.getContextPath();
+        String servletPath = req.getServletPath();
+        String reqURI = req.getRequestURI();
 
+        String serviceName = contextPath + servletPath;
+
+        if (reqURI.equals(serviceName)) {
+            return true;
+        }
+        return false;
+
+    }
 }
 
 

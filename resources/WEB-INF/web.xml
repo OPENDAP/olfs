@@ -61,7 +61,21 @@
         <load-on-startup>1</load-on-startup>
 
     </servlet>
-    
+
+    <servlet>
+        <servlet-name>gateway</servlet-name>
+
+        <servlet-class>opendap.gateway.DispatchServlet</servlet-class>
+
+        <init-param>
+            <param-name>GatewayConfigFileName</param-name>
+            <param-value>gateway.xml</param-value>
+        </init-param>
+
+        <load-on-startup>1</load-on-startup>
+
+    </servlet>
+
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
@@ -102,6 +116,11 @@
     <servlet-mapping>
         <servlet-name>webstart</servlet-name>
         <url-pattern>/webstart/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>gateway</servlet-name>
+        <url-pattern>/gateway/*</url-pattern>
     </servlet-mapping>
 
 

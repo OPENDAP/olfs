@@ -127,7 +127,7 @@ public class BESError extends OPeNDAPException {
 
     }
 
-    public BESError(InputStream is) {
+    public BESError( InputStream is) {
         SAXBuilder sb = new SAXBuilder();
 
         try {
@@ -270,12 +270,11 @@ public class BESError extends OPeNDAPException {
 
     /**
      *
-     * @param dispatchServlet
      * @param response
      * @return The HTTP status code returned to client.
      * @throws IOException
      */
-    public int sendErrorResponse(HttpServlet dispatchServlet, HttpServletResponse response)
+    public int sendErrorResponse(String systemPath, HttpServletResponse response)
             throws IOException{
 
 
@@ -313,8 +312,7 @@ public class BESError extends OPeNDAPException {
 
 
         try {
-            String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,
-                                                 "/docs/xsl/error"+errorVal+".xsl");
+            String xsltDoc = systemPath + "/docs/xsl/error"+errorVal+".xsl";
 
             File xsltFile = new File(xsltDoc);
 
