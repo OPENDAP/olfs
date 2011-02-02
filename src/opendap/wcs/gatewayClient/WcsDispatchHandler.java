@@ -1001,7 +1001,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
-            log.error("sendDDS() encounterd a BESError. Error Message:\n"+msg);
+            log.error("sendDDS() encountered a BESError. Error Message:\n"+msg);
             os.write(msg.getBytes());
         }
 
@@ -1048,7 +1048,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
-            log.error("sendDAS() encounterd a BESError: "+msg);
+            log.error("sendDAS() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }
@@ -1096,7 +1096,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encounterd a BESError: "+msg);
+            log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());
         }
 
@@ -1141,7 +1141,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDAP2Data() encounterd a BESError: "+msg);
+            log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }
@@ -1188,7 +1188,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(systemPath,response);
-            log.error("sendASCII() encounterd a BESError: "+besError.getMessage());
+            log.error("sendASCII() encountered a BESError: "+besError.getMessage());
         }
 
 
@@ -1231,7 +1231,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(systemPath,response);
-            log.error("sendINFO() encounterd a BESError: "+besError.getMessage());
+            log.error("sendINFO() encountered a BESError: "+besError.getMessage());
 
         }
 
@@ -1295,7 +1295,7 @@ public class WcsDispatchHandler implements DispatchHandler {
             String msg = besError.getMessage();
             //System.out.println(msg);
             //System.err.println(msg);
-            log.error("sendHTMLRequestForm() encounterd a BESError: "+msg);
+            log.error("sendHTMLRequestForm() encountered a BESError: "+msg);
         }
 
         os.flush();

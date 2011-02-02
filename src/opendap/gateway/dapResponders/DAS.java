@@ -79,7 +79,7 @@ public class DAS extends HttpResponder {
 
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDAS() encounterd a BESError: "+msg);
+            log.error("sendDAS() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

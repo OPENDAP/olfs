@@ -1090,48 +1090,6 @@ public class BesXmlAPI {
                                          String mimeBoundary)
             throws BadConfigurationException {
 
-
-        /*
-        String errorContext= XML_ERRORS;
-
-        String besDataSource = getBES(dataSource).trimPrefix(dataSource);
-
-        Element e, request = new Element("request", BES_NS);
-
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":bes_request]";
-
-        request.setAttribute("reqID",reqID);
-
-
-        if(xdap_accept!=null)
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT,xdap_accept));
-        else
-            request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
-
-        request.addContent(setContextElement(EXPICIT_CONTAINERS_CONTEXT,"no"));
-
-        request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
-
-        if(xmlBase!=null)
-            request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
-
-
-        request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,DataDDX));
-
-        Element def = defineElement("d1","default");
-        e = (containerElement("catalogContainer"));
-
-        if(ce!=null && !ce.equals(""))
-            e.addContent(constraintElement(ce));
-
-        def.addContent(e);
-
-        request.addContent(def);
-
-        Element getReq = getElement(DataDDX,"d1",null,null);
-
-*/
         Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
 
         Element req = reqDoc.getRootElement();

@@ -79,7 +79,7 @@ public class Dap2Data extends HttpResponder {
 
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDAP2Data() encounterd a BESError: "+msg);
+            log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

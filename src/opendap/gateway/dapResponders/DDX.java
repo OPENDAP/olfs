@@ -91,7 +91,7 @@ public class DDX extends HttpResponder {
 
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encounterd a BESError: "+msg);
+            log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

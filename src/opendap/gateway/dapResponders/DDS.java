@@ -82,7 +82,7 @@ public class DDS extends HttpResponder {
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
-            log.error("sendDDS() encounterd a BESError: "+msg);
+            log.error("sendDDS() encountered a BESError: "+msg);
             os.write(msg.getBytes());
         }
 

@@ -43,7 +43,71 @@ public class DataDDX extends HttpResponder {
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        sendSomeStuff(response);
+
+        String xmlBase = request.getRequestURL().toString();
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+
+
+
+
+        MimeBoundary mb = new MimeBoundary();
+        String startID = mb.newContentID();
+
+        log.debug("sendDataDDX() for dataset: " + dataSource+
+                "    CE: '" + constraintExpression + "'");
+
+
+        response.setContentType("Multipart/Related;  "+
+                                "type=\"text/xml\";  "+
+                                "start=\"<"+startID+">\";  "+
+                                "boundary=\""+mb.getBoundary()+"\"");
+
+
+        Version.setOpendapMimeHeaders(request,response);
+        response.setHeader("Content-Description", "dap4_data_ddx");
+
+        // This header indicates to the client that the content of this response
+        // is dependant on the HTTP request header XDAP-Accept
+        response.setHeader("Vary", "XDAP-Accept");
+
+        // Because the content of this response is dependant on a client provided
+        // HTTP header (XDAP-Accept) it is useful to include this Cach-Control
+        // header to make caching work correctly...
+        response.setHeader("Cache-Control", "public");
+
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+
+
+
+
+        OutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        Document reqDoc = BesGatewayApi.getDataDDXRequest(dataSourceUrl,
+                                                        constraintExpression,
+                                                        xdap_accept,
+                                                        xmlBase,
+                                                        startID,
+                                                        mb.getBoundary());
+
+        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("sendDAP2Data() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+
+        os.flush();
+        log.info("Sent DAP4 Data DDX response.");
+
 
 
 

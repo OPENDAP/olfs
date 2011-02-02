@@ -154,4 +154,48 @@ public class BesGatewayApi extends BesXmlAPI {
 
 
     }
+
+
+    /**
+     *  Returns the DDX request document for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDX is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the dap that should be used to build the
+     * response.
+     * @param xmlBase The request URL.
+     * @param contentID contentID of the first MIME part.
+     * @param mimeBoundary The MIME boundary to use in the response..
+     * @return The DDX request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public static Document getDataDDXRequest(String dataSource,
+                                         String ce,
+                                         String xdap_accept,
+                                         String xmlBase,
+                                         String contentID,
+                                         String mimeBoundary)
+            throws BadConfigurationException {
+
+        Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
+
+        Element req = reqDoc.getRootElement();
+
+        Element getReq = req.getChild("get",BES.BES_NS);
+
+        Element e = new Element("contentStartId",BES.BES_NS);
+        e.setText(contentID);
+        getReq.addContent(e);
+
+
+        e = new Element("mimeBoundary",BES.BES_NS);
+        e.setText(mimeBoundary);
+        getReq.addContent(e);
+
+
+        return reqDoc;
+
+    }
+
 }
