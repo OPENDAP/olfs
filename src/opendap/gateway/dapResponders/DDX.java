@@ -27,11 +27,22 @@ public class DDX extends HttpResponder {
     private Logger log;
 
 
-    public DDX(String sysPath){
-        super(sysPath, ".*\\.ddx");
+
+    private static String defaultRegex = ".*\\.ddx";
+
+
+    public DDX(String sysPath) {
+        super(sysPath, null, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
+
+    public DDX(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
          sendDDX( request,  response);
@@ -45,7 +56,7 @@ public class DDX extends HttpResponder {
         String xmlBase = request.getRequestURL().toString();
 
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendDDX() for dataset: " + dataSource);

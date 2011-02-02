@@ -21,11 +21,21 @@ public class NetcdfFileOut extends HttpResponder {
     private Logger log;
 
 
+    private static String defaultRegex = ".*\\.nc";
+
+
     public NetcdfFileOut(String sysPath) {
-        super(sysPath, ".*\\.nc");
+        super(sysPath, null, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
+
+    public NetcdfFileOut(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 

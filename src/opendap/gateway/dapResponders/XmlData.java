@@ -20,8 +20,17 @@ public class XmlData extends HttpResponder {
     private Logger log;
 
 
+    private static String defaultRegex = ".*\\.xdods";
+
+
     public XmlData(String sysPath) {
-        super(sysPath, ".*\\.xdods");
+        super(sysPath, null, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+    public XmlData(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }

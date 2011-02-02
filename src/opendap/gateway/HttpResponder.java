@@ -14,22 +14,30 @@ public abstract class HttpResponder {
 
     private Pattern _pattern;
     protected String _systemPath;
+    private String pathPrefix;
 
-    private Method _doResponse;
 
     private HttpResponder(){}
 
-    public HttpResponder(String sysPath, String regexPattern){//}, Method doResponse){
+    public HttpResponder(String sysPath, String pathPrefix, String regexPattern){//}, Method doResponse){
+        super();
         _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
         _systemPath = sysPath;
+        this.pathPrefix = pathPrefix;
     }
 
     public Pattern getPattern(){ return _pattern;}
+    public void setPattern(String regexPattern){ _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
 
     public boolean matches(String s){
        return _pattern.matcher(s).matches();
 
     }
+
+
+    public void setPathPrefix(String prefix){ pathPrefix = prefix ;}
+    public String getPathPrefix() { return pathPrefix; }
+
 
     public abstract void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 

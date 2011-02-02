@@ -26,9 +26,17 @@ public class DataDDX extends HttpResponder {
 
     private Logger log;
 
+    private static String defaultRegex = ".*\\.dap";
 
-    public DataDDX(String sysPath){
-        super(sysPath, ".*\\.dap");
+
+    public DataDDX(String sysPath) {
+        super(sysPath, null, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+    public DataDDX(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }

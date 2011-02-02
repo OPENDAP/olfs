@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.net.URI;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 
 /**
@@ -189,23 +190,29 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         //ingestTrustedHosts(config);
 
 
-        responders.add(new DDX(systemPath));
-        responders.add(new DDS(systemPath));
-        responders.add(new DAS(systemPath));
-        responders.add(new RDF(systemPath));
+        HttpResponder hr;
+        Pattern p;
 
-        responders.add(new HtmlDataRequestForm(systemPath));
-        responders.add(new DatasetInfoHtmlPage(systemPath));
+        hr = new DDX(systemPath,_prefix);
 
-        responders.add(new Dap2Data(systemPath));
-        responders.add(new Ascii(systemPath));
+        responders.add(hr);
+
+        responders.add(new DDS(systemPath,_prefix));
+        responders.add(new DAS(systemPath,_prefix));
+        responders.add(new RDF(systemPath,_prefix));
+
+        responders.add(new HtmlDataRequestForm(systemPath,_prefix));
+        responders.add(new DatasetInfoHtmlPage(systemPath,_prefix));
+
+        responders.add(new Dap2Data(systemPath,_prefix));
+        responders.add(new Ascii(systemPath,_prefix));
 
 
-        responders.add(new DataDDX(systemPath));
-        responders.add(new NetcdfFileOut(systemPath));
-        responders.add(new XmlData(systemPath));
+        responders.add(new DataDDX(systemPath,_prefix));
+        responders.add(new NetcdfFileOut(systemPath,_prefix));
+        responders.add(new XmlData(systemPath,_prefix));
 
-        responders.add(new GatewayForm(systemPath));
+        responders.add(new GatewayForm(systemPath,_prefix));
 
 
 
@@ -285,10 +292,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         if(!_prefix.endsWith("/"))
             _prefix += "/";
 
-
-        //if(!_prefix.startsWith("/"))
-        //    _prefix = "/" + _prefix;
-
         if(_prefix.startsWith("/"))
             _prefix = _prefix.substring(1, _prefix.length());
 
@@ -362,10 +365,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         String relativeUrl = ReqInfo.getRelativeUrl(request);
 
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        DataSourceInfo dsi;
-
-
         String requestURL = request.getRequestURL().toString();
 
         for (HttpResponder r : responders) {
@@ -373,11 +372,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
                 log.info("The request URL: " + requestURL + " matches " +
                         "the pattern: \"" + r.getPattern() + "\"");
 
-                //dsi = new BESDataSource(dataSource);
-                //if(dsi.isDataset()){
                 r.respondToHttpRequest(request, response);
                 return;
-                //}
 
             }
         }

@@ -21,17 +21,30 @@ public class Ascii extends HttpResponder {
     private Logger log;
 
 
-    public Ascii(String sysPath){
-        super(sysPath,".*\\.asc(ii)?");
+    private static String defaultRegex = ".*\\.asc(ii)?";
+
+
+    public Ascii(String sysPath) {
+        super(sysPath, null, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     }
+
+    public Ascii(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+
+
 
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getRelativeUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendASCII() for dataset: " + dataSource);

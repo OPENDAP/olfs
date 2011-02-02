@@ -26,10 +26,22 @@ public class GatewayForm extends HttpResponder {
 
     Logger log;
 
-    public GatewayForm(String sysPath){
-        super(sysPath, ".*");
+    private static String defaultRegex = ".*";
+
+
+    public GatewayForm(String sysPath) {
+        super(sysPath, null, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     }
+
+    public GatewayForm(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+
 
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

@@ -24,8 +24,17 @@ public class RDF extends HttpResponder {
     private Logger log;
 
 
+    private static String defaultRegex = ".*\\.rdf";
+
+
     public RDF(String sysPath) {
-        super(sysPath, ".*\\.rdf");
+        super(sysPath, null, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+    public RDF(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
@@ -37,7 +46,7 @@ public class RDF extends HttpResponder {
         String xmlBase = request.getRequestURL().toString();
 
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 

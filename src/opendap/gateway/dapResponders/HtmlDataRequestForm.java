@@ -30,10 +30,22 @@ public class HtmlDataRequestForm extends HttpResponder {
 
     Logger log;
 
-    public HtmlDataRequestForm(String sysPath){
-        super(sysPath, ".*\\.html?");
+
+    private static String defaultRegex = ".*\\.html?";
+
+
+    public HtmlDataRequestForm(String sysPath) {
+        super(sysPath, null, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     }
+
+    public HtmlDataRequestForm(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
 
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -43,7 +55,7 @@ public class HtmlDataRequestForm extends HttpResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);

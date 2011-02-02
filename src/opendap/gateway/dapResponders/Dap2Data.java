@@ -27,11 +27,22 @@ public class Dap2Data extends HttpResponder {
     private Logger log;
 
 
-    public Dap2Data(String sysPath){
-        super(sysPath, ".*\\.dods");
+    private static String defaultRegex = ".*\\.dods";
+
+
+    public Dap2Data(String sysPath) {
+        super(sysPath, null, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
+
+    public Dap2Data(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -39,7 +50,7 @@ public class Dap2Data extends HttpResponder {
         String relativeUrl = ReqInfo.getRelativeUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendDAP2Data() For: " + dataSource+

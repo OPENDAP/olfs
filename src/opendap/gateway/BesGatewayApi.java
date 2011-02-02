@@ -125,7 +125,7 @@ public class BesGatewayApi extends BesXmlAPI {
 
     }
 
-    public static String getDataSourceUrl(HttpServletRequest req) throws MalformedURLException {
+    public static String getDataSourceUrl(HttpServletRequest req, String pathPrefix) throws MalformedURLException {
 
 
         String relativeURL = ReqInfo.getRelativeUrl(req);
@@ -134,9 +134,16 @@ public class BesGatewayApi extends BesXmlAPI {
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
+
+
         String dataSourceUrl = relativeURL;
 
+        if(pathPrefix!=null && dataSourceUrl.startsWith(pathPrefix))
+            dataSourceUrl = dataSourceUrl.substring(pathPrefix.length());
+
         dataSourceUrl = dataSourceUrl.substring(0,dataSourceUrl.lastIndexOf("."+requestSuffix));
+
+
 
         dataSourceUrl = HexAsciiEncoder.hexToString(dataSourceUrl);
 

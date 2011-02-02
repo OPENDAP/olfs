@@ -28,8 +28,17 @@ public class DDS extends HttpResponder {
     private Logger log;
 
 
-    public DDS(String sysPath){
-        super(sysPath, ".*\\.dds");
+    private static String defaultRegex = ".*\\.dds";
+
+
+    public DDS(String sysPath) {
+        super(sysPath, null, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+    public DDS(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
@@ -41,7 +50,7 @@ public class DDS extends HttpResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendDDS() for dataset: " + dataSource);

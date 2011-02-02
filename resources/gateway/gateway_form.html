@@ -170,7 +170,7 @@
         </tr>
         <tr>
             <td align="right" >
-                 <span class="medium">dataset id:</span>
+                 <span class="medium">dataset id</span>
             </td>
             <td>
                 <input name="datasetID" type="text" size="140" value="" readonly />
@@ -178,20 +178,36 @@
 
         </tr>
         <tr>
+            <td align="right">
+                <input type="button" value="Data Request Form" onclick="dataRequestForm_button()"/>
+
+            </td>
             <td>
             </td>
-            <td><hr />
+
+        </tr>
+    </table>
+    <hr />
+    <table>
+        <tr>
+            <td align="right"><span class="medium">DAP Responses</span></td>
+            <td>
             </td>
         </tr>
         <tr>
-            <td align="right">DAP Responses</td>
+            <td align="right"></td>
             <td>
                 <input type="button" value="DDX" onclick="ddx_button()"/>
                 <input type="button" value="RDF" onclick="rdf_button()"/>
                 <input type="button" value="DDS" onclick="dds_button()"/>
                 <input type="button" value="DAS" onclick="das_button()"/>
                 <input type="button" value="INFO" onclick="info_button()"/>
-                <input type="button" value="Data Request Form" onclick="dataRequestForm_button()"/>
+            </td>
+
+        </tr>
+        <tr>
+            <td align="right"></td>
+            <td>
                 <input type="button" value="DAP2 Binary Data" onclick="dap2data_button()"/>
                 <input type="button" value="Ascii Data" onclick="ascii_button()"/>
                 <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
@@ -199,10 +215,6 @@
                 <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
             </td>
 
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
         </tr>
     </table>
 </form>

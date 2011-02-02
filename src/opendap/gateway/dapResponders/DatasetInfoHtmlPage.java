@@ -29,8 +29,18 @@ public class DatasetInfoHtmlPage extends HttpResponder {
     private Logger log;
 
 
-    public DatasetInfoHtmlPage(String sysPath){
-        super(sysPath, ".*\\.info");
+
+    private static String defaultRegex = ".*\\.info";
+
+
+    public DatasetInfoHtmlPage(String sysPath) {
+        super(sysPath, null, defaultRegex);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+    }
+
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix) {
+        super(sysPath, pathPrefix, defaultRegex);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
@@ -40,7 +50,7 @@ public class DatasetInfoHtmlPage extends HttpResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request);
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendINFO() for dataset: " + dataSource);
