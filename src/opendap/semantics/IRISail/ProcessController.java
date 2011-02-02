@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // This file is part of the "OPeNDAP Web Coverage Service Project."
 //
-// Copyright (c) 2010 OPeNDAP, Inc.
+// Copyright (c) 2011 OPeNDAP, Inc.
 //
 // Authors:
 //     Nathan David Potter  <ndp@opendap.org>

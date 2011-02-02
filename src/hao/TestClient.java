@@ -2,7 +2,7 @@
 // This file is part of the "Java-OPeNDAP" project, a Java implementation
 // of the OPeNDAP Data Access Protocol.
 //
-// Copyright (c) 2010 OPeNDAP, Inc.
+// Copyright (c) 2011 OPeNDAP, Inc.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
