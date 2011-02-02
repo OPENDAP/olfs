@@ -319,7 +319,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         //response.setHeader("Content-Encoding", "plain");
 
         String xdap_accept = request.getHeader("XDAP-Accept");
-        response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
@@ -381,7 +380,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
@@ -528,7 +526,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Cache-Control", "public");
 
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
@@ -634,7 +631,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_ascii");
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
@@ -687,7 +683,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dap_xml");
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
@@ -742,7 +737,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setHeader("Content-Description", "dods_form");
 
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
@@ -797,7 +791,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", "dods_description");
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
@@ -873,7 +866,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
 
 
@@ -893,9 +885,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 xmlBase,
                 ddx)){
             response.setHeader("Content-Description", "dods_error");
-            String msg = new String(erros.toByteArray());
-            log.error("BES Error. Message: \n"+msg);
-            os.write(msg.getBytes());
+            BESError error = new BESError(ddx);
+            error.sendErrorResponse(systemPath,response);
 
         }
         else {
@@ -980,7 +971,6 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         Version.setOpendapMimeHeaders(request,response);
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 

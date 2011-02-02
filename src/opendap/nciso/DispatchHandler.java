@@ -1,18 +1,20 @@
 package opendap.nciso;
 
 import opendap.bes.BESDataSource;
-import opendap.bes.BadConfigurationException;
+import opendap.bes.BESError;
 import opendap.bes.BesXmlAPI;
+import opendap.bes.Version;
 import opendap.coreServlet.*;
-import opendap.ppt.PPTException;
+import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +31,9 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     private Logger log;
     private boolean initialized;
-    private HttpServlet dispatchServlet;
+
+    private String _systemPath;
+
     private String isoRequestPatternRegexString;
     private Pattern isoRequestPattern;
 
@@ -48,7 +52,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         if(initialized) return;
 
         _config = config;
-        dispatchServlet = servlet;
+        _systemPath = ServletUtil.getSystemPath(servlet,"");
 
         isoRequestPatternRegexString = ".*\\.iso";
         isoRequestPattern = Pattern.compile(isoRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
@@ -75,6 +79,11 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
+    /**
+     * See the contract for this method in opendap.coreServlet.DispatchHandler
+     * @param req The request for which we need to get a last modified date.
+     * @return
+     */
     public long getLastModified(HttpServletRequest req) {
 
         String name = ReqInfo.getRelativeUrl(req);
@@ -155,25 +164,10 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
 
-        Document ddx = getDDX(request);
-
-
-
-        sendSomeStuff(ddx,response);
-
-
-
-
-
-
-    }
-
-
-    private Document getDDX(HttpServletRequest request)
-            throws JDOMException, IOException, BadConfigurationException, PPTException {
+        // This first bit just collects a bunch of information about the request
 
         String relativeUrl = ReqInfo.getRelativeUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
@@ -182,55 +176,83 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
         int suffix_start = xmlBase.lastIndexOf("." + requestSuffix);
         xmlBase = xmlBase.substring(0, suffix_start);
 
+
+        log.debug("Sending ISO Response() for dataset: " + dataSourceId);
+
+
+        // Set up up the response header
+        String accepts = request.getHeader("Accepts");
+
+        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
+            response.setContentType("application/rdf+xml");
+        else
+            response.setContentType("text/xml");
+
+        Version.setOpendapMimeHeaders(request, response);
+        response.setHeader("Content-Description", "text/xml");
+
+
+        ServletOutputStream os = response.getOutputStream();
+
+        // Doing this insures that the DDX that
         String xdap_accept = "3.2";
 
 
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
         Document ddx = new Document();
 
 
         if(!BesXmlAPI.getDDXDocument(
-                dataSource,
+                dataSourceId,
                 constraintExpression,
                 xdap_accept,
                 xmlBase,
                 ddx)){
+            response.setHeader("Content-Description", "dap_error");
 
-            log.error("BES Error. Message: \n"+erros.toString());
+            BESError error = new BESError(ddx);
+            error.sendErrorResponse(_systemPath,response);
+        }
+        else {
 
-            ByteArrayInputStream errorDoc = new ByteArrayInputStream(erros.toByteArray());
+            ddx.getRootElement().setAttribute("dataset_id",dataSourceId);
 
-            SAXBuilder sb = new SAXBuilder();
-            ddx = sb.build(errorDoc);
+            String currentDir = System.getProperty("user.dir");
+            log.debug("Cached working directory: "+currentDir);
 
+
+            String xslDir = _systemPath + "/nciso/xsl";
+
+
+            log.debug("Changing working directory to "+ xslDir);
+            System.setProperty("user.dir",xslDir);
+
+            String xsltDocName = "ddx2iso.xsl";
+
+
+            // This Transformer class is an attemnpt at making the use of the saxon-9 API
+            // a little simpler to use. It makes it easy to set input parameters for the stylesheet.
+            // See the source code for opendap.xml.Transformer for more.
+            Transformer transformer = new Transformer(xsltDocName);
+
+            // Transform the BES  showCatalog response into a HTML page for the browser
+            transformer.transform( new JDOMSource(ddx),os);
+
+
+
+
+            os.flush();
+            log.info("Sent RDF version of DDX.");
+            log.debug("Restoring working directory to "+ currentDir);
+            System.setProperty("user.dir",currentDir);
         }
 
-        return ddx;
+
+
 
     }
 
 
-
-    private void sendSomeStuff(Document ddx,  HttpServletResponse response) throws Exception {
-
-        response.setContentType("text/html");
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-        XMLOutputter xmlo = new XMLOutputter();
-
-
-        pw.println("<h2>ISO Response</h2>");
-        pw.println("<p>The request URL has been directed to the "+getClass().getName()+" </p>");
-        pw.println("<p>The DDX associated with the data holding is:</p>");
-        pw.println("<pre>");
-        org.apache.commons.lang.StringEscapeUtils.escapeHtml(pw, xmlo.outputString(ddx));
-        pw.println("</pre>");
-
-        pw.flush();
-
-
-    }
 
 
 
