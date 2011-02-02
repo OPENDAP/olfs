@@ -66,9 +66,9 @@ public abstract class HttpResponder {
 
 
 
-    public String readFileAsString(String pathname) throws IOException {
+    public String readFileAsString(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(pathname));
+        Scanner scanner = new Scanner(new File(fileName));
 
         try {
             while (scanner.hasNextLine()) {
