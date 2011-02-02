@@ -1,14 +1,24 @@
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesXmlAPI;
+import opendap.bes.Version;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
+import opendap.gateway.BesGatewayApi;
 import opendap.gateway.HttpResponder;
 import org.jdom.Document;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,28 +49,79 @@ public class NetcdfFileOut extends HttpResponder {
 
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        sendSomeStuff(response);
+
+        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String fullSourceName = ReqInfo.getRelativeUrl(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+
+
+        log.debug("respondToHttpRequest(): Sending netCDF File Out response for dataset: " + dataSource + "?" +
+                    constraintExpression);
+
+        String downloadFileName = fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length());
+        Pattern startsWithNumber = Pattern.compile("[0-9].*");
+        if(startsWithNumber.matcher(downloadFileName).matches())
+            downloadFileName = "nc_"+downloadFileName;
+
+        log.debug("sendNetcdfFileOut() downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=" +downloadFileName;
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", Scrub.fileName(contentDisposition));
+
+        Version.setOpendapMimeHeaders(request, response);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+
+
+        OutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+
+
+        Document reqDoc = BesGatewayApi.getRequestDocument(
+                                                        BesGatewayApi.DAP2,
+                                                        dataSourceUrl,
+                                                        constraintExpression,
+                                                        xdap_accept,
+                                                        null,
+                                                        null,
+                                                        "netcdf",
+                                                        BesGatewayApi.DAP2_ERRORS);
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        log.debug("BesGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+
+        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("sendDDX() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+
+
+        os.flush();
+        log.info("Sent DAP2 data as netCDF file.");
+
+
+
+
+
+
+
 
 
     }
-
-    private void sendSomeStuff(HttpServletResponse response) throws Exception {
-
-        response.setContentType("text/html");
-
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(response.getOutputStream()));
-        XMLOutputter xmlo = new XMLOutputter();
-
-
-        pw.println("<h2>NetCDF FileOut Response</h2>");
-        pw.println("<p>This request is being handled by: "+getClass().getName()+"</p>");
-
-        pw.flush();
-
-
-    }
-
-
 
 
 }
