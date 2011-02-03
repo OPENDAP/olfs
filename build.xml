@@ -702,6 +702,7 @@
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
+                <include name="${commons-lang.lib}"/>
                 <include name="${commons-cli.lib}"/>
                 <include name="${commons-httpclient.lib}"/>
                 <include name="${commons-logging.lib}"/>
