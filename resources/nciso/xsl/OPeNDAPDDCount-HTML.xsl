@@ -7,10 +7,34 @@
 			<xd:p/>
 		</xd:desc>
 	</xd:doc>
-  <xsl:variable name="stylesheetTitle" select="'OPeNDAPDDCount-HTML'"/>
-  <xsl:variable name="rubricVersion" select="'1.0.0'"/>
-
+    <xsl:param name="docsService"/>
+    <xsl:param name="HyraxVersion"/>
 	<xsl:output method="xml"/>
+
+    <xsl:variable name="stylesheetTitle" select="'OPeNDAPDDCount-HTML'"/>
+    <xsl:variable name="rubricVersion" select="'1.0.0'"/>
+
+
+
+
+
+
+
+
+    <xsl:template name="pageLinks">
+        <div class="medium">
+            <a href="#Identification">Identification</a> |
+            <a href="#Text Search">Text Search</a> |
+            <a href="#Extent Search">Extent Search</a> |
+            <a href="#Other Extent Information">Other Extent Information</a> |
+            <a href="#Creator Search">Creator Search</a> |
+            <a href="#Contributor Search">Contributor Search</a> |
+            <a href="#Publisher Search">Publisher Search</a> |
+            <a href="#Other Attributes">Other Attributes</a>
+        </div>
+    </xsl:template>
+
+
 	<xsl:template name="showScore">
 		<xsl:param name="score"/>
 		<xsl:choose>
@@ -206,17 +230,25 @@
 	  <xsl:variable name="spiralMax" select="$identifierMax + $otherMax + $textSearchMax + $creatorMax + $extentMax + $responsiblePartyMax"/>
 	  <!-- Display Results Fields -->
 		<html>
+            <head>
+                <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
+                <title>OPeNDAP Hyrax: NetCDF Attribute Convention for Dataset Discovery Report</title>
+            </head>
+
 			<style type="text/css">
 				table {
 				    empty-cells:show;
 				}</style>
+            <body>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.gif'/>
+
 			<h1>NetCDF Attribute Convention for Dataset Discovery Report</h1>
 		  <xsl:variable name="titleAttribute" select="/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='title']"/> The Unidata Attribute Convention for Data Discovery provides recommendations for netCDF attributes that can be added to netCDF files to
 			facilitate discovery of those files using standard metadata searches. This tool tests conformance with those recommendations. More <a
-				href="https://www.nosc.noaa.gov/dmc/swg/wiki/index.php?title=NetCDF_Attribute_Convention_for_Dataset_Discovery#Conformance_Test">Information on Convention and Tool</a>. <h2> Title: <xsl:value-of
-					select="$titleAttribute/@value"/>
-			</h2>
-			<h2>Total Score: <xsl:value-of select="$spiralTotal"/>/<xsl:value-of select="$spiralMax"/></h2>
+				href="https://www.nosc.noaa.gov/dmc/swg/wiki/index.php?title=NetCDF_Attribute_Convention_for_Dataset_Discovery#Conformance_Test">Information on Convention and Tool</a>.
+
+            <p><span class="large_bold"> Title:</span><span class="large"><xsl:value-of select="$titleAttribute/@value"/>   </span></p>
+			<p><span class="large_bold">Total Score: </span><span class="large"><xsl:value-of select="$spiralTotal"/>/<xsl:value-of select="$spiralMax"/></span></p>
 			<h2>General File Characteristics</h2>
 			<table>
 				<tr>
@@ -299,7 +331,7 @@
 					<xsl:with-param name="max" select="$otherMax"/>
 				</xsl:call-template>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Identification"/>
 			<h2>Identification / Metadata Reference Score: <xsl:value-of select="$identifierTotal"/>/<xsl:value-of select="$identifierMax"/></h2>
@@ -360,7 +392,8 @@
 					<td valign="top"/>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
+
 			<a name="Text Search"/>
 			<h2>Text Search Score: <xsl:value-of select="$textSearchTotal"/>/<xsl:value-of select="$textSearchMax"/></h2>
 			<p>Text searches are a very important mechanism for data discovery. This group includes attributes that contain descriptive text that could be the target of these searches. Some of these attributes, for example title and
@@ -469,7 +502,7 @@
 					</td>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Extent Search"/>
 			<h2>Extent Search Score: <xsl:value-of select="$extentTotal"/>/<xsl:value-of select="$extentMax"/></h2>
@@ -570,7 +603,7 @@
 					<td valign="top">/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:verticalElement/gmd:EX_VerticalExtent/gmd:maximumValue/gco:Real</td>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Other Extent Information"/>
 			<h2>Other Extent Information Score: <xsl:value-of select="$otherExtentTotal"/>/<xsl:value-of select="$otherExtentMax"/></h2>
@@ -680,7 +713,7 @@
 					<td/>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Creator Search"/>
 			<h2>Creator Search Score: <xsl:value-of select="$creatorTotal"/>/<xsl:value-of select="$creatorMax"/></h2>
@@ -802,7 +835,7 @@
 					<td valign="top">/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:credit/gco:CharacterString</td>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Contributor Search"/>
 			<h2>Contributor Search Score: <xsl:value-of select="$contributorTotal"/>/<xsl:value-of select="$contributorMax"/></h2>
@@ -840,7 +873,7 @@
 						"author"</td>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Publisher Search"/>
 			<h2>Publisher Search Score: <xsl:value-of select="$publisherTotal"/>/<xsl:value-of select="$publisherMax"/></h2>
@@ -893,7 +926,7 @@
 						CI_RoleCode="publisher"</td>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
 			<a name="Other Attributes"/>
 			<h2>Other Attributes Score: <xsl:value-of select="$otherTotal"/>/<xsl:value-of select="$otherMax"/></h2>
@@ -941,11 +974,55 @@
 						vector, grid, textTable, tin, stereoModel, video.</td>
 				</tr>
 			</table>
-			<a href="#Identification">Identification</a> | <a href="#Text Search">Text Search</a> | <a href="#Extent Search">Extent Search</a> | <a href="#Other Extent Information">Other Extent Information</a> | <a href="#Creator Search">Creator Search</a> | <a href="#Contributor Search">Contributor Search</a> | <a href="#Publisher Search">Publisher Search</a> | <a href="#Other Attributes">Other Attributes</a>
+                <xsl:call-template name="pageLinks"/>
 
-			<hr/>
-		  <xsl:value-of select="$stylesheetTitle"/> Version: <xsl:value-of select="$rubricVersion"/><br/>
-			<a href="https://www.nosc.noaa.gov/dmc/swg/wiki/index.php?title=NetCDF_Attribute_Convention_for_Dataset_Discovery">More Information</a>
+
+
+
+                <!-- ****************************************************** -->
+                <!--                              FOOTER                    -->
+                <!--                                                        -->
+                <!--                                                        -->
+                <hr size="1" noshade="noshade"/>
+                <table width="100%" border="0">
+                    <tr>
+                        <td>
+                            <div class="small" align="left">
+
+                            <xsl:value-of select="$stylesheetTitle"/> Version: <xsl:value-of select="$rubricVersion"/><br/>
+                              <a href="https://www.nosc.noaa.gov/dmc/swg/wiki/index.php?title=NetCDF_Attribute_Convention_for_Dataset_Discovery">More Information</a>
+                            </div>
+
+                        </td>
+                        <td>
+                            <div class="small" align="right">
+                                Hyrax development sponsored by
+                                <a href='http://www.nsf.gov/'>NSF</a>
+                                ,
+                                <a href='http://www.nasa.gov/'>NASA</a>
+                                , and
+                                <a href='http://www.noaa.gov/'>NOAA</a>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <h3>OPeNDAP Hyrax (<xsl:value-of select="$HyraxVersion"/>)
+                    <br/>
+                    <a href='{$docsService}/'>Documentation</a>
+                </h3>
+
+
+            </body>
+
 		</html>
 	</xsl:template>
+
+
+
+
+
+
+
+
 </xsl:stylesheet>

@@ -23,11 +23,11 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
--->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx"
-  xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml"
-  xmlns:gmd2="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:odap="http://xml.opendap.org/ns/DAP2">
+--><xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gco="http://www.isotc211.org/2005/gco"
+  xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss"
+  xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:dap="http://xml.opendap.org/ns/DAP2">
+  <!--  xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#" -->
   <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" scope="stylesheet">
     <xd:desc>
       <xd:p><xd:b>Created on:</xd:b> October 16, 2010</xd:p>
@@ -37,91 +37,95 @@
   </xd:doc>
   <xsl:variable name="stylesheetVersion" select="'0.0.0'"/>
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+  <xsl:variable name="globalAttributeCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/Attribute)"/>
+  <xsl:variable name="variableCnt" select="count(/dap:Dataset/dap:Grid)"/>
+  <xsl:variable name="variableAttributeCnt" select="count(/dap:Dataset/dap:variable/dap:Attribute)"/>
+  <xsl:variable name="standardNameCnt" select="count(/dap:Dataset/dap:variable/dap:Attribute[@name='standard_name'])"/>
+  <!-- Identifier Fields: 4 possible -->
+  <xsl:variable name="idCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='id'])"/>
+  <xsl:variable name="identifierNameSpaceCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='naming_authority'])"/>
+  <xsl:variable name="metadataConventionCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='Metadata_Conventions'])"/>
+  <xsl:variable name="metadataLinkCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='Metadata_Link'])"/>
+  <xsl:variable name="identifierTotal" select="$idCnt + $identifierNameSpaceCnt + $metadataConventionCnt + $metadataLinkCnt"/>
+  <xsl:variable name="identifierMax">4</xsl:variable>
+  <!-- Service Fields: 1 possible -->
+  <xsl:variable name="opendap_URLCnt" select="count(dap:Dataset[@xml:base])"/>
+  <xsl:variable name="serviceTotal" select="$opendap_URLCnt"/>
+  <xsl:variable name="serviceMax">1</xsl:variable>
+  <!-- Text Search Fields: 7 possible -->
+  <xsl:variable name="titleCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='title'])"/>
+  <xsl:variable name="summaryCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='summary'])"/>
+  <xsl:variable name="keywordsCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='keywords'])"/>
+  <xsl:variable name="keywordsVocabCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='keywords_vocabulary'])"/>
+  <xsl:variable name="stdNameVocabCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='standard_name_vocabulary'])"/>
+  <xsl:variable name="commentCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='comment'])"/>
+  <xsl:variable name="historyCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='history'])"/>
+  <xsl:variable name="textSearchTotal" select="$titleCnt + $summaryCnt + $keywordsCnt + $keywordsVocabCnt      + $stdNameVocabCnt + $commentCnt + $historyCnt"/>
+  <xsl:variable name="textSearchMax">7</xsl:variable>
+  <!-- Extent Search Fields: 17 possible -->
+  <xsl:variable name="geospatial_lat_minCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_min'])"/>
+  <xsl:variable name="geospatial_lat_maxCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_max'])"/>
+  <xsl:variable name="geospatial_lon_minCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_min'])"/>
+  <xsl:variable name="geospatial_lon_maxCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_max'])"/>
+  <xsl:variable name="timeStartCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_start'])"/>
+  <xsl:variable name="timeEndCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_end'])"/>
+  <xsl:variable name="vertical_minCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_min'])"/>
+  <xsl:variable name="vertical_maxCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_max'])"/>
+  <xsl:variable name="extentTotal" select="$geospatial_lat_minCnt + $geospatial_lat_maxCnt + $geospatial_lon_minCnt + $geospatial_lon_maxCnt     + $timeStartCnt + $timeEndCnt + $vertical_minCnt + $vertical_maxCnt"/>
+  <xsl:variable name="extentMax">8</xsl:variable>
+  <!--  -->
+  <xsl:variable name="geospatial_lat_unitsCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_units'])"/>
+  <xsl:variable name="geospatial_lat_resolutionCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_resolution'])"/>
+  <xsl:variable name="geospatial_lon_unitsCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_units'])"/>
+  <xsl:variable name="geospatial_lon_resolutionCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_resolution'])"/>
+  <xsl:variable name="timeResCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_resolution'])"/>
+  <xsl:variable name="timeDurCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_duration'])"/>
+  <xsl:variable name="vertical_unitsCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_units'])"/>
+  <xsl:variable name="vertical_resolutionCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_resolution'])"/>
+  <xsl:variable name="vertical_positiveCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_positive'])"/>
+  <xsl:variable name="otherExtentTotal"
+    select="$geospatial_lat_resolutionCnt + $geospatial_lat_unitsCnt     + $geospatial_lon_resolutionCnt + $geospatial_lon_unitsCnt     + $timeResCnt + $timeDurCnt     + $vertical_unitsCnt + $vertical_resolutionCnt + $vertical_positiveCnt"/>
+  <xsl:variable name="otherExtentMax">9</xsl:variable>
+  <!-- Responsible Party Fields: 14 possible -->
+  <xsl:variable name="creatorNameCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_name'])"/>
+  <xsl:variable name="creatorURLCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_url'])"/>
+  <xsl:variable name="creatorEmailCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_email'])"/>
+  <xsl:variable name="creatorDateCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_created'])"/>
+  <xsl:variable name="modifiedDateCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_modified'])"/>
+  <xsl:variable name="issuedDateCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_issued'])"/>
+  <xsl:variable name="creatorInstCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='institution'])"/>
+  <xsl:variable name="creatorProjCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='project'])"/>
+  <xsl:variable name="creatorAckCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='acknowledgment'])"/>
+  <xsl:variable name="dateCnt" select="$creatorDateCnt + $modifiedDateCnt + $issuedDateCnt"/>
+  <xsl:variable name="creatorTotal" select="$creatorNameCnt + $creatorURLCnt + $creatorEmailCnt + $creatorDateCnt + $modifiedDateCnt + $issuedDateCnt + $creatorInstCnt + $creatorProjCnt + $creatorAckCnt"/>
+  <xsl:variable name="creatorMax">9</xsl:variable>
+  <!--  -->
+  <xsl:variable name="contributorNameCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='contributor_name'])"/>
+  <xsl:variable name="contributorRoleCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='contributor_role'])"/>
+  <xsl:variable name="contributorTotal" select="$contributorNameCnt + $contributorRoleCnt"/>
+  <xsl:variable name="contributorMax">2</xsl:variable>
+  <!--  -->
+  <xsl:variable name="publisherNameCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='publisher_name'])"/>
+  <xsl:variable name="publisherURLCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='publisher_url'])"/>
+  <xsl:variable name="publisherEmailCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='publisher_email'])"/>
+  <xsl:variable name="publisherTotal" select="$publisherNameCnt + $publisherURLCnt + $publisherEmailCnt"/>
+  <xsl:variable name="publisherMax">3</xsl:variable>
+  <!--  -->
+  <xsl:variable name="responsiblePartyCnt" select="$creatorNameCnt + $contributorNameCnt + $publisherNameCnt"/>
+  <xsl:variable name="responsiblePartyTotal" select="$creatorTotal + $contributorTotal + $publisherTotal"/>
+  <xsl:variable name="responsiblePartyMax">14</xsl:variable>
+  <!-- Other Fields: 2 possible -->
+  <xsl:variable name="cdmTypeCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='cdm_data_type'])"/>
+  <xsl:variable name="procLevelCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='processing_level'])"/>
+  <xsl:variable name="licenseCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='license'])"/>
+  <xsl:variable name="otherTotal" select="$cdmTypeCnt + $procLevelCnt + $licenseCnt"/>
+  <xsl:variable name="otherMax">3</xsl:variable>
+  <xsl:variable name="spiralTotal" select="$identifierTotal + $textSearchTotal + $extentTotal + $otherExtentTotal + $otherTotal + $responsiblePartyTotal"/>
+  <xsl:variable name="spiralMax" select="$identifierMax + $otherMax + $textSearchMax + $creatorMax + $extentMax + $responsiblePartyMax"/>
+  <!--                        -->
+  <!--    Write ISO Metadata  -->
+  <!--                        -->
   <xsl:template match="/">
-    <xsl:variable name="globalAttributeCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/Attribute)"/>
-    <xsl:variable name="variableCnt" select="count(/odap:Dataset/odap:Grid)"/>
-    <xsl:variable name="variableAttributeCnt" select="count(/odap:Dataset/odap:variable/odap:Attribute)"/>
-    <xsl:variable name="standardNameCnt" select="count(/odap:Dataset/odap:variable/odap:Attribute[@name='standard_name'])"/>
-    <!-- Identifier Fields: 4 possible -->
-    <xsl:variable name="idCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='id'])"/>
-    <xsl:variable name="identifierNameSpaceCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='naming_authority'])"/>
-    <xsl:variable name="metadataConventionCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='Metadata_Conventions'])"/>
-    <xsl:variable name="metadataLinkCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='Metadata_Link'])"/>
-    <xsl:variable name="identifierTotal" select="$idCnt + $identifierNameSpaceCnt + $metadataConventionCnt + $metadataLinkCnt"/>
-    <xsl:variable name="identifierMax">4</xsl:variable>
-    <!-- Text Search Fields: 7 possible -->
-    <xsl:variable name="titleCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='title'])"/>
-    <xsl:variable name="summaryCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='summary'])"/>
-    <xsl:variable name="keywordsCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='keywords'])"/>
-    <xsl:variable name="keywordsVocabCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='keywords_vocabulary'])"/>
-    <xsl:variable name="stdNameVocabCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='standard_name_vocabulary'])"/>
-    <xsl:variable name="commentCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='comment'])"/>
-    <xsl:variable name="historyCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='history'])"/>
-    <xsl:variable name="textSearchTotal" select="$titleCnt + $summaryCnt + $keywordsCnt + $keywordsVocabCnt      + $stdNameVocabCnt + $commentCnt + $historyCnt"/>
-    <xsl:variable name="textSearchMax">7</xsl:variable>
-    <!-- Extent Search Fields: 17 possible -->
-    <xsl:variable name="geospatial_lat_minCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_min'])"/>
-    <xsl:variable name="geospatial_lat_maxCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_max'])"/>
-    <xsl:variable name="geospatial_lon_minCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_min'])"/>
-    <xsl:variable name="geospatial_lon_maxCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_max'])"/>
-    <xsl:variable name="timeStartCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_start'])"/>
-    <xsl:variable name="timeEndCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_end'])"/>
-    <xsl:variable name="vertical_minCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_min'])"/>
-    <xsl:variable name="vertical_maxCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_max'])"/>
-    <xsl:variable name="extentTotal" select="$geospatial_lat_minCnt + $geospatial_lat_maxCnt + $geospatial_lon_minCnt + $geospatial_lon_maxCnt     + $timeStartCnt + $timeEndCnt + $vertical_minCnt + $vertical_maxCnt"/>
-    <xsl:variable name="extentMax">8</xsl:variable>
-    <!--  -->
-    <xsl:variable name="geospatial_lat_unitsCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_units'])"/>
-    <xsl:variable name="geospatial_lat_resolutionCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_resolution'])"/>
-    <xsl:variable name="geospatial_lon_unitsCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_units'])"/>
-    <xsl:variable name="geospatial_lon_resolutionCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_resolution'])"/>
-    <xsl:variable name="timeResCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_resolution'])"/>
-    <xsl:variable name="timeDurCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_duration'])"/>
-    <xsl:variable name="vertical_unitsCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_units'])"/>
-    <xsl:variable name="vertical_resolutionCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_resolution'])"/>
-    <xsl:variable name="vertical_positiveCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_positive'])"/>
-    <xsl:variable name="otherExtentTotal"
-      select="$geospatial_lat_resolutionCnt + $geospatial_lat_unitsCnt     + $geospatial_lon_resolutionCnt + $geospatial_lon_unitsCnt     + $timeResCnt + $timeDurCnt     + $vertical_unitsCnt + $vertical_resolutionCnt + $vertical_positiveCnt"/>
-    <xsl:variable name="otherExtentMax">9</xsl:variable>
-    <!-- Responsible Party Fields: 14 possible -->
-    <xsl:variable name="creatorNameCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='creator_name'])"/>
-    <xsl:variable name="creatorURLCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='creator_url'])"/>
-    <xsl:variable name="creatorEmailCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='creator_email'])"/>
-    <xsl:variable name="creatorDateCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='date_created'])"/>
-    <xsl:variable name="modifiedDateCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='date_modified'])"/>
-    <xsl:variable name="issuedDateCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='date_issued'])"/>
-    <xsl:variable name="creatorInstCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='institution'])"/>
-    <xsl:variable name="creatorProjCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='project'])"/>
-    <xsl:variable name="creatorAckCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='acknowledgment'])"/>
-    <xsl:variable name="dateCnt" select="$creatorDateCnt + $modifiedDateCnt + $issuedDateCnt"/>
-    <xsl:variable name="creatorTotal" select="$creatorNameCnt + $creatorURLCnt + $creatorEmailCnt + $creatorDateCnt + $modifiedDateCnt + $issuedDateCnt + $creatorInstCnt + $creatorProjCnt + $creatorAckCnt"/>
-    <xsl:variable name="creatorMax">9</xsl:variable>
-    <!--  -->
-    <xsl:variable name="contributorNameCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='contributor_name'])"/>
-    <xsl:variable name="contributorRoleCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='contributor_role'])"/>
-    <xsl:variable name="contributorTotal" select="$contributorNameCnt + $contributorRoleCnt"/>
-    <xsl:variable name="contributorMax">2</xsl:variable>
-    <!--  -->
-    <xsl:variable name="publisherNameCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='publisher_name'])"/>
-    <xsl:variable name="publisherURLCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='publisher_url'])"/>
-    <xsl:variable name="publisherEmailCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='publisher_email'])"/>
-    <xsl:variable name="publisherTotal" select="$publisherNameCnt + $publisherURLCnt + $publisherEmailCnt"/>
-    <xsl:variable name="publisherMax">3</xsl:variable>
-    <!--  -->
-    <xsl:variable name="responsiblePartyCnt" select="$creatorNameCnt + $contributorNameCnt + $publisherNameCnt"/>
-    <xsl:variable name="responsiblePartyTotal" select="$creatorTotal + $contributorTotal + $publisherTotal"/>
-    <xsl:variable name="responsiblePartyMax">14</xsl:variable>
-    <!-- Other Fields: 2 possible -->
-    <xsl:variable name="cdmTypeCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='cdm_data_type'])"/>
-    <xsl:variable name="procLevelCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='processing_level'])"/>
-    <xsl:variable name="licenseCnt" select="count(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='license'])"/>
-    <xsl:variable name="otherTotal" select="$cdmTypeCnt + $procLevelCnt + $licenseCnt"/>
-    <xsl:variable name="otherMax">3</xsl:variable>
-    <xsl:variable name="spiralTotal" select="$identifierTotal + $textSearchTotal + $extentTotal + $otherExtentTotal + $otherTotal + $responsiblePartyTotal"/>
-    <xsl:variable name="spiralMax" select="$identifierMax + $otherMax + $textSearchMax + $creatorMax + $extentMax + $responsiblePartyMax"/>
-    <!--                        -->
-    <!--    Write ISO Metadata  -->
-    <!--                        -->
     <gmi:MI_Metadata>
       <xsl:attribute name="xsi:schemaLocation">
         <xsl:value-of select="'http://www.isotc211.org/2005/gmi http://www.ngdc.noaa.gov/metadata/published/xsd/schema.xsd'"/>
@@ -132,9 +136,9 @@
             <gco:CharacterString>
               <xsl:choose>
                 <xsl:when test="$identifierNameSpaceCnt">
-                  <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='naming_authority']/odap:value,'&quot;','')"/>:</xsl:when>
+                  <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='naming_authority']/dap:value,'&quot;','')"/>:</xsl:when>
               </xsl:choose>
-              <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='id']/odap:value,'&quot;','')"/>
+              <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='id']/dap:value,'&quot;','')"/>
             </gco:CharacterString>
           </xsl:when>
           <xsl:otherwise>
@@ -162,6 +166,12 @@
           <xsl:with-param name="codeListValue" select="'dataset'"/>
         </xsl:call-template>
       </gmd:hierarchyLevel>
+      <gmd:hierarchyLevel>
+        <xsl:call-template name="writeCodelist">
+          <xsl:with-param name="codeListName" select="'gmd:MD_ScopeCode'"/>
+          <xsl:with-param name="codeListValue" select="'service'"/>
+        </xsl:call-template>
+      </gmd:hierarchyLevel>
       <gmd:contact>
         <xsl:attribute name="gco:nilReason">
           <xsl:value-of select="'unknown'"/>
@@ -186,29 +196,29 @@
               <xsl:if test="$geospatial_lon_unitsCnt">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'column'"/>
-                  <xsl:with-param name="dimensionUnits" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_units']/odap:value,'&quot;','')"/>
-                  <xsl:with-param name="dimensionResolution" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_resolution']/odap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionUnits" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_units']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_resolution']/dap:value,'&quot;','')"/>
                 </xsl:call-template>
               </xsl:if>
               <xsl:if test="$geospatial_lat_unitsCnt">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'row'"/>
-                  <xsl:with-param name="dimensionUnits" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_units']/odap:value,'&quot;','')"/>
-                  <xsl:with-param name="dimensionResolution" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_resolution']/odap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionUnits" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_units']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_resolution']/dap:value,'&quot;','')"/>
                 </xsl:call-template>
               </xsl:if>
               <xsl:if test="$vertical_unitsCnt">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'vertical'"/>
-                  <xsl:with-param name="dimensionUnits" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_units']/odap:value,'&quot;','')"/>
-                  <xsl:with-param name="dimensionResolution" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_resolution']/odap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionUnits" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_units']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_resolution']/dap:value,'&quot;','')"/>
                 </xsl:call-template>
               </xsl:if>
               <xsl:if test="$timeResCnt">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'temporal'"/>
                   <xsl:with-param name="dimensionUnits" select="'unknown'"/>
-                  <xsl:with-param name="dimensionResolution" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_resolution']/odap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_resolution']/dap:value,'&quot;','')"/>
                 </xsl:call-template>
               </xsl:if>
               <gmd:cellGeometry>
@@ -234,24 +244,24 @@
               <gmd:title>
                 <xsl:call-template name="writeCharacterString">
                   <xsl:with-param name="testValue" select="$titleCnt"/>
-                  <xsl:with-param name="stringToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='title']/odap:value,'&quot;','')"/>
+                  <xsl:with-param name="stringToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='title']/dap:value,'&quot;','')"/>
                 </xsl:call-template>
               </gmd:title>
               <xsl:choose>
                 <xsl:when test="$dateCnt">
                   <xsl:call-template name="writeDate">
                     <xsl:with-param name="testValue" select="$creatorDateCnt"/>
-                    <xsl:with-param name="dateToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='date_created']/odap:value,'&quot;','')"/>
+                    <xsl:with-param name="dateToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_created']/dap:value,'&quot;','')"/>
                     <xsl:with-param name="dateType" select="'creation'"/>
                   </xsl:call-template>
                   <xsl:call-template name="writeDate">
                     <xsl:with-param name="testValue" select="$issuedDateCnt"/>
-                    <xsl:with-param name="dateToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='date_issued']/odap:value,'&quot;','')"/>
+                    <xsl:with-param name="dateToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_issued']/dap:value,'&quot;','')"/>
                     <xsl:with-param name="dateType" select="'issued'"/>
                   </xsl:call-template>
                   <xsl:call-template name="writeDate">
                     <xsl:with-param name="testValue" select="$modifiedDateCnt"/>
-                    <xsl:with-param name="dateToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='date_modified']/odap:value,'&quot;','')"/>
+                    <xsl:with-param name="dateToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_modified']/dap:value,'&quot;','')"/>
                     <xsl:with-param name="dateType" select="'revision'"/>
                   </xsl:call-template>
                 </xsl:when>
@@ -267,12 +277,12 @@
                 <xsl:choose>
                   <xsl:when test="$idCnt">
                     <gmd:MD_Identifier>
-                      <xsl:if test="/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='naming_authority']">
+                      <xsl:if test="/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='naming_authority']">
                         <gmd:authority>
                           <gmd:CI_Citation>
                             <gmd:title>
                               <gco:CharacterString>
-                                <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='naming_authority']/odap:value,'&quot;','')"/>
+                                <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='naming_authority']/dap:value,'&quot;','')"/>
                               </gco:CharacterString>
                             </gmd:title>
                             <gmd:date>
@@ -285,7 +295,7 @@
                       </xsl:if>
                       <gmd:code>
                         <gco:CharacterString>
-                          <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='id']/odap:value,'&quot;','')"/>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='id']/dap:value,'&quot;','')"/>
                         </gco:CharacterString>
                       </gmd:code>
                     </gmd:MD_Identifier>
@@ -302,10 +312,10 @@
                   <xsl:if test="$creatorTotal">
                     <xsl:call-template name="writeResponsibleParty">
                       <xsl:with-param name="testValue" select="$creatorTotal"/>
-                      <xsl:with-param name="individualName" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='creator_name']/odap:value,'&quot;','')"/>
-                      <xsl:with-param name="organisationName" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='institution']/odap:value,'&quot;','')"/>
-                      <xsl:with-param name="email" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='creator_email']/odap:value,'&quot;','')"/>
-                      <xsl:with-param name="url" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='creator_url']/odap:value,'&quot;','')"/>
+                      <xsl:with-param name="individualName" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_name']/dap:value,'&quot;','')"/>
+                      <xsl:with-param name="organisationName" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='institution']/dap:value,'&quot;','')"/>
+                      <xsl:with-param name="email" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_email']/dap:value,'&quot;','')"/>
+                      <xsl:with-param name="url" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_url']/dap:value,'&quot;','')"/>
                       <xsl:with-param name="roleCode" select="'originator'"/>
                     </xsl:call-template>
                   </xsl:if>
@@ -313,20 +323,20 @@
                     <xsl:call-template name="writeResponsibleParty">
                       <xsl:with-param name="testValue" select="$publisherTotal"/>
                       <xsl:with-param name="individualName"/>
-                      <xsl:with-param name="organisationName" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='publisher_name']/odap:value,'&quot;','')"/>
-                      <xsl:with-param name="email" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='publisher_email']/odap:value,'&quot;','')"/>
-                      <xsl:with-param name="url" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='publisher_url']/odap:value,'&quot;','')"/>
+                      <xsl:with-param name="organisationName" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='publisher_name']/dap:value,'&quot;','')"/>
+                      <xsl:with-param name="email" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='publisher_email']/dap:value,'&quot;','')"/>
+                      <xsl:with-param name="url" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='publisher_url']/dap:value,'&quot;','')"/>
                       <xsl:with-param name="roleCode" select="'publisher'"/>
                     </xsl:call-template>
                   </xsl:if>
                   <xsl:if test="$contributorTotal">
                     <xsl:call-template name="writeResponsibleParty">
                       <xsl:with-param name="testValue" select="$contributorTotal"/>
-                      <xsl:with-param name="individualName" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='contributor_name']/odap:value,'&quot;','')"/>
+                      <xsl:with-param name="individualName" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='contributor_name']/dap:value,'&quot;','')"/>
                       <xsl:with-param name="organisationName"/>
                       <xsl:with-param name="email"/>
                       <xsl:with-param name="url"/>
-                      <xsl:with-param name="roleCode" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='contributor_role']/odap:value,'&quot;','')"/>
+                      <xsl:with-param name="roleCode" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='contributor_role']/dap:value,'&quot;','')"/>
                     </xsl:call-template>
                   </xsl:if>
                 </xsl:when>
@@ -341,7 +351,7 @@
               <xsl:if test="$commentCnt">
                 <gmd:otherCitationDetails>
                   <gco:CharacterString>
-                    <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='comment']/odap:value,'&quot;','')"/>
+                    <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='comment']/dap:value,'&quot;','')"/>
                   </gco:CharacterString>
                 </gmd:otherCitationDetails>
               </xsl:if>
@@ -350,13 +360,13 @@
           <gmd:abstract>
             <xsl:call-template name="writeCharacterString">
               <xsl:with-param name="testValue" select="$summaryCnt"/>
-              <xsl:with-param name="stringToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='summary']/odap:value,'&quot;','')"/>
+              <xsl:with-param name="stringToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='summary']/dap:value,'&quot;','')"/>
             </xsl:call-template>
           </gmd:abstract>
           <gmd:credit>
             <xsl:call-template name="writeCharacterString">
               <xsl:with-param name="testValue" select="$creatorAckCnt"/>
-              <xsl:with-param name="stringToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='acknowledgment']/odap:value,'&quot;','')"/>
+              <xsl:with-param name="stringToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='acknowledgment']/dap:value,'&quot;','')"/>
             </xsl:call-template>
           </gmd:credit>
           <xsl:if test="$keywordsCnt">
@@ -364,7 +374,7 @@
               <gmd:MD_Keywords>
                 <gmd:keyword>
                   <gco:CharacterString>
-                    <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='keywords']/odap:value,'&quot;','')"/>
+                    <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='keywords']/dap:value,'&quot;','')"/>
                   </gco:CharacterString>
                 </gmd:keyword>
                 <gmd:type>
@@ -377,7 +387,7 @@
                   <gmd:CI_Citation>
                     <gmd:title>
                       <gco:CharacterString>
-                        <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='keywords_vocabulary']/odap:value,'&quot;','')"/>
+                        <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='keywords_vocabulary']/dap:value,'&quot;','')"/>
                       </gco:CharacterString>
                     </gmd:title>
                     <gmd:date>
@@ -393,10 +403,10 @@
           <xsl:if test="$standardNameCnt">
             <gmd:descriptiveKeywords>
               <gmd:MD_Keywords>
-                <xsl:for-each select="/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:variable/odap:Attribute[@name='standard_name']">
+                <xsl:for-each select="/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:variable/dap:Attribute[@name='standard_name']">
                   <gmd:keyword>
                     <gco:CharacterString>
-                      <xsl:value-of select="./odap:value"/>
+                      <xsl:value-of select="./dap:value"/>
                     </gco:CharacterString>
                   </gmd:keyword>
                 </xsl:for-each>
@@ -411,7 +421,7 @@
                     <gmd:title>
                       <xsl:call-template name="writeCharacterString">
                         <xsl:with-param name="testValue" select="$stdNameVocabCnt"/>
-                        <xsl:with-param name="stringToWrite" select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='standard_name_vocabulary']/odap:value,'&quot;','')"/>
+                        <xsl:with-param name="stringToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='standard_name_vocabulary']/dap:value,'&quot;','')"/>
                       </xsl:call-template>
                     </gmd:title>
                     <gmd:date gco:nilReason="unknown"/>
@@ -425,7 +435,7 @@
               <gmd:MD_LegalConstraints>
                 <gmd:useLimitation>
                   <gco:CharacterString>
-                    <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='license']/odap:value,'&quot;','')"/>
+                    <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='license']/dap:value,'&quot;','')"/>
                   </gco:CharacterString>
                 </gmd:useLimitation>
               </gmd:MD_LegalConstraints>
@@ -438,7 +448,7 @@
                   <gmd:CI_Citation>
                     <gmd:title>
                       <gco:CharacterString>
-                        <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='project']/odap:value,'&quot;','')"/>
+                        <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='project']/dap:value,'&quot;','')"/>
                       </gco:CharacterString>
                     </gmd:title>
                     <gmd:date gco:nilReason="inapplicable"/>
@@ -474,7 +484,7 @@
                     </gmd:authority>
                     <gmd:code>
                       <gco:CharacterString>
-                        <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='cdm_data_type']/odap:value,'&quot;','')"/>
+                        <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='cdm_data_type']/dap:value,'&quot;','')"/>
                       </gco:CharacterString>
                     </gmd:code>
                   </gmd:MD_Identifier>
@@ -515,22 +525,22 @@
                         </gmd:extentTypeCode>
                         <gmd:westBoundLongitude>
                           <gco:Decimal>
-                            <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_min']/odap:value,'&quot;','')"/>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_min']/dap:value,'&quot;','')"/>
                           </gco:Decimal>
                         </gmd:westBoundLongitude>
                         <gmd:eastBoundLongitude>
                           <gco:Decimal>
-                            <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lon_max']/odap:value,'&quot;','')"/>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_max']/dap:value,'&quot;','')"/>
                           </gco:Decimal>
                         </gmd:eastBoundLongitude>
                         <gmd:southBoundLatitude>
                           <gco:Decimal>
-                            <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_min']/odap:value,'&quot;','')"/>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_min']/dap:value,'&quot;','')"/>
                           </gco:Decimal>
                         </gmd:southBoundLatitude>
                         <gmd:northBoundLatitude>
                           <gco:Decimal>
-                            <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_lat_max']/odap:value,'&quot;','')"/>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_max']/dap:value,'&quot;','')"/>
                           </gco:Decimal>
                         </gmd:northBoundLatitude>
                       </gmd:EX_GeographicBoundingBox>
@@ -545,10 +555,10 @@
                         <gmd:extent>
                           <gml:TimePeriod gml:id="timePeriod_id">
                             <gml:beginPosition>
-                              <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_start']/odap:value,'&quot;','')"/>
+                              <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_start']/dap:value,'&quot;','')"/>
                             </gml:beginPosition>
                             <gml:endPosition>
-                              <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='time_coverage_end']/odap:value,'&quot;','')"/>
+                              <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_end']/dap:value,'&quot;','')"/>
                             </gml:endPosition>
                           </gml:TimePeriod>
                         </gmd:extent>
@@ -560,12 +570,12 @@
                       <gmd:EX_VerticalExtent>
                         <gmd:minimumValue>
                           <gco:Real>
-                            <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_min']/odap:value,'&quot;','')"/>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_min']/dap:value,'&quot;','')"/>
                           </gco:Real>
                         </gmd:minimumValue>
                         <gmd:maximumValue>
                           <gco:Real>
-                            <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='geospatial_vertical_max']/odap:value,'&quot;','')"/>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_max']/dap:value,'&quot;','')"/>
                           </gco:Real>
                         </gmd:maximumValue>
                         <gmd:verticalCRS>
@@ -587,29 +597,37 @@
           </gmd:extent>
         </gmd:MD_DataIdentification>
       </gmd:identificationInfo>
+      <xsl:if test="$opendap_URLCnt">
+        <xsl:call-template name="writeService">
+          <xsl:with-param name="serviceID" select="'OPeNDAP'"/>
+          <xsl:with-param name="serviceTypeName" select="'THREDDS OPeNDAP'"/>
+          <xsl:with-param name="serviceOperationName" select="'OPeNDAPDatasetQueryAndAccess'"/>
+          <xsl:with-param name="operationURL" select="/dap:Dataset/@xml:base"/>
+        </xsl:call-template>
+      </xsl:if>
       <xsl:if test="$variableCnt">
         <gmd:contentInfo>
           <gmi:MI_CoverageDescription>
-            <gmd:AttributeDescription>
+            <gmd:attributeDescription>
               <xsl:attribute name="gco:nilReason">
                 <xsl:value-of select="'unknown'"/>
               </xsl:attribute>
-            </gmd:AttributeDescription>
+            </gmd:attributeDescription>
             <gmd:contentType>
               <xsl:attribute name="gco:nilReason">
                 <xsl:value-of select="'unknown'"/>
               </xsl:attribute>
             </gmd:contentType>
-            <xsl:for-each select="/odap:Dataset/odap:Grid">
+            <xsl:for-each select="/dap:Dataset/dap:Grid">
               <xsl:call-template name="writeVariable">
                 <xsl:with-param name="variableName" select="translate(./@name,'&quot;','')"/>
-                <xsl:with-param name="variableLongName" select="translate(./odap:Attribute[@name='long_name']/odap:value,'&quot;','')"/>
+                <xsl:with-param name="variableLongName" select="translate(./dap:Attribute[@name='long_name']/dap:value,'&quot;','')"/>
                 <xsl:with-param name="variableType" select="translate(./@type,'&quot;','')"/>
-                <xsl:with-param name="maxValue" select="translate(./odap:Attribute[@name='valid_max']/odap:value,'&quot;','')"/>
-                <xsl:with-param name="minValue" select="translate(./odap:Attribute[@name='valid_min']/odap:value,'&quot;','')"/>
-                <xsl:with-param name="variableUnits" select="translate(./odap:Attribute[@name='units']/odap:value,'&quot;','')"/>
-                <xsl:with-param name="scaleFactor" select="translate(./odap:Attribute[@name='scale_factor']/odap:value,'&quot;','')"/>
-                <xsl:with-param name="offset" select="translate(./odap:Attribute[@name='offset']/odap:value,'&quot;','')"/>
+                <xsl:with-param name="maxValue" select="translate(./dap:Attribute[@name='valid_max']/dap:value,'&quot;','')"/>
+                <xsl:with-param name="minValue" select="translate(./dap:Attribute[@name='valid_min']/dap:value,'&quot;','')"/>
+                <xsl:with-param name="variableUnits" select="translate(./dap:Attribute[@name='units']/dap:value,'&quot;','')"/>
+                <xsl:with-param name="scaleFactor" select="translate(./dap:Attribute[@name='scale_factor']/dap:value,'&quot;','')"/>
+                <xsl:with-param name="offset" select="translate(./dap:Attribute[@name='offset']/dap:value,'&quot;','')"/>
               </xsl:call-template>
             </xsl:for-each>
           </gmi:MI_CoverageDescription>
@@ -632,7 +650,7 @@
               <gmd:LI_Lineage>
                 <gmd:statement>
                   <gco:CharacterString>
-                    <xsl:value-of select="translate(/odap:Dataset/odap:Attribute[@name='NC_GLOBAL']/odap:Attribute[@name='history']/odap:value,'&quot;','')"/>
+                    <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='history']/dap:value,'&quot;','')"/>
                   </gco:CharacterString>
                 </gmd:statement>
               </gmd:LI_Lineage>
@@ -686,42 +704,44 @@
     <xsl:param name="testValue"/>
     <xsl:param name="dateToWrite"/>
     <xsl:param name="dateType"/>
-    <xsl:choose>
-      <xsl:when test="contains($dateToWrite, 'T' ) ">
-        <gmd:date>
-          <gmd:CI_Date>
-            <gmd:date>
-              <gco:DateTime>
-                <xsl:value-of select="$dateToWrite"/>
-              </gco:DateTime>
-            </gmd:date>
-            <gmd:dateType>
-              <xsl:call-template name="writeCodelist">
-                <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
-                <xsl:with-param name="codeListValue" select="$dateType"/>
-              </xsl:call-template>
-            </gmd:dateType>
-          </gmd:CI_Date>
-        </gmd:date>
-      </xsl:when>
-      <xsl:otherwise>
-        <gmd:date>
-          <gmd:CI_Date>
-            <gmd:date>
-              <gco:Date>
-                <xsl:value-of select="$dateToWrite"/>
-              </gco:Date>
-            </gmd:date>
-            <gmd:dateType>
-              <xsl:call-template name="writeCodelist">
-                <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
-                <xsl:with-param name="codeListValue" select="$dateType"/>
-              </xsl:call-template>
-            </gmd:dateType>
-          </gmd:CI_Date>
-        </gmd:date>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:if test="$testValue">
+      <xsl:choose>
+        <xsl:when test="contains($dateToWrite, 'T' ) ">
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+                <gco:DateTime>
+                  <xsl:value-of select="$dateToWrite"/>
+                </gco:DateTime>
+              </gmd:date>
+              <gmd:dateType>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
+                  <xsl:with-param name="codeListValue" select="$dateType"/>
+                </xsl:call-template>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </xsl:when>
+        <xsl:otherwise>
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+                <gco:Date>
+                  <xsl:value-of select="$dateToWrite"/>
+                </gco:Date>
+              </gmd:date>
+              <gmd:dateType>
+                <xsl:call-template name="writeCodelist">
+                  <xsl:with-param name="codeListName" select="'gmd:CI_DateTypeCode'"/>
+                  <xsl:with-param name="codeListValue" select="$dateType"/>
+                </xsl:call-template>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
   </xsl:template>
   <xsl:template name="writeResponsibleParty">
     <xsl:param name="testValue"/>
@@ -914,5 +934,176 @@
       </gmd:MD_Band>
     </gmd:dimension>
   </xsl:template>
+  <xsl:template name="writeService">
+    <xsl:param name="serviceID"/>
+    <xsl:param name="serviceTypeName"/>
+    <xsl:param name="serviceOperationName"/>
+    <xsl:param name="operationURL"/>
+    <gmd:identificationInfo>
+      <xsl:element name="srv:SV_ServiceIdentification">
+        <xsl:attribute name="id">
+          <xsl:value-of select="$serviceID"/>
+        </xsl:attribute>
+        <gmd:citation>
+          <gmd:CI_Citation>
+            <gmd:title>
+              <xsl:call-template name="writeCharacterString">
+                <xsl:with-param name="testValue" select="$titleCnt"/>
+                <xsl:with-param name="stringToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='title']/dap:value,'&quot;','')"/>
+              </xsl:call-template>
+            </gmd:title>
+            <xsl:choose>
+              <xsl:when test="$dateCnt">
+                <xsl:call-template name="writeDate">
+                  <xsl:with-param name="testValue" select="$creatorDateCnt"/>
+                  <xsl:with-param name="dateToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_created']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dateType" select="'creation'"/>
+                </xsl:call-template>
+                <xsl:call-template name="writeDate">
+                  <xsl:with-param name="testValue" select="$issuedDateCnt"/>
+                  <xsl:with-param name="dateToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_issued']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dateType" select="'issued'"/>
+                </xsl:call-template>
+                <xsl:call-template name="writeDate">
+                  <xsl:with-param name="testValue" select="$modifiedDateCnt"/>
+                  <xsl:with-param name="dateToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='date_modified']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dateType" select="'revision'"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <gmd:date>
+                  <xsl:attribute name="gco:nilReason">
+                    <xsl:value-of select="'missing'"/>
+                  </xsl:attribute>
+                </gmd:date>
+              </xsl:otherwise>
+            </xsl:choose>
+          </gmd:CI_Citation>
+        </gmd:citation>
+        <gmd:abstract>
+          <xsl:call-template name="writeCharacterString">
+            <xsl:with-param name="testValue" select="$summaryCnt"/>
+            <xsl:with-param name="stringToWrite" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='summary']/dap:value,'&quot;','')"/>
+          </xsl:call-template>
+        </gmd:abstract>
+        <srv:serviceType>
+          <gco:LocalName>
+            <xsl:value-of select="$serviceTypeName"/>
+          </gco:LocalName>
+        </srv:serviceType>
+        <srv:extent>
+          <xsl:choose>
+            <xsl:when test="$extentTotal">
+              <gmd:EX_Extent>
+                <!--
+                  <xsl:attribute name="id">
+                  <xsl:value-of select="'boundingExtent'"/>
+                </xsl:attribute>
+-->
+                <xsl:if test="$geospatial_lat_minCnt">
+                  <gmd:geographicElement>
+                    <gmd:EX_GeographicBoundingBox>
+                      <gmd:extentTypeCode>
+                        <gco:Boolean>1</gco:Boolean>
+                      </gmd:extentTypeCode>
+                      <gmd:westBoundLongitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_min']/dap:value,'&quot;','')"/>
+                        </gco:Decimal>
+                      </gmd:westBoundLongitude>
+                      <gmd:eastBoundLongitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_max']/dap:value,'&quot;','')"/>
+                        </gco:Decimal>
+                      </gmd:eastBoundLongitude>
+                      <gmd:southBoundLatitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_min']/dap:value,'&quot;','')"/>
+                        </gco:Decimal>
+                      </gmd:southBoundLatitude>
+                      <gmd:northBoundLatitude>
+                        <gco:Decimal>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_max']/dap:value,'&quot;','')"/>
+                        </gco:Decimal>
+                      </gmd:northBoundLatitude>
+                    </gmd:EX_GeographicBoundingBox>
+                  </gmd:geographicElement>
+                </xsl:if>
+                <xsl:if test="$timeStartCnt">
+                  <gmd:temporalElement>
+                    <gmd:EX_TemporalExtent>
+                      <!--
+                      <xsl:attribute name="id">
+                        <xsl:value-of select="'boundingTemporalExtent'"/>
+                      </xsl:attribute>
+                      -->
+                      <gmd:extent>
+                        <gml:TimePeriod gml:id="_timePeriod_id">
+                          <gml:beginPosition>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_start']/dap:value,'&quot;','')"/>
+                          </gml:beginPosition>
+                          <gml:endPosition>
+                            <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_end']/dap:value,'&quot;','')"/>
+                          </gml:endPosition>
+                        </gml:TimePeriod>
+                      </gmd:extent>
+                    </gmd:EX_TemporalExtent>
+                  </gmd:temporalElement>
+                </xsl:if>
+                <xsl:if test="$vertical_minCnt">
+                  <gmd:verticalElement>
+                    <gmd:EX_VerticalExtent>
+                      <gmd:minimumValue>
+                        <gco:Real>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_min']/dap:value,'&quot;','')"/>
+                        </gco:Real>
+                      </gmd:minimumValue>
+                      <gmd:maximumValue>
+                        <gco:Real>
+                          <xsl:value-of select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_max']/dap:value,'&quot;','')"/>
+                        </gco:Real>
+                      </gmd:maximumValue>
+                      <gmd:verticalCRS>
+                        <xsl:attribute name="gco:nilReason">
+                          <xsl:value-of select="'missing'"/>
+                        </xsl:attribute>
+                      </gmd:verticalCRS>
+                    </gmd:EX_VerticalExtent>
+                  </gmd:verticalElement>
+                </xsl:if>
+              </gmd:EX_Extent>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="gco:nilReason">
+                <xsl:value-of select="'missing'"/>
+              </xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
+        </srv:extent>
+        <srv:couplingType>
+          <srv:SV_CouplingType codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#SV_CouplingType" codeListValue="tight">tight</srv:SV_CouplingType>
+        </srv:couplingType>
+        <srv:containsOperations>
+          <srv:SV_OperationMetadata>
+            <srv:operationName>
+              <gco:CharacterString>
+                <xsl:value-of select="$serviceOperationName"/>
+              </gco:CharacterString>
+            </srv:operationName>
+            <srv:DCP gco:nilReason="unknown"/>
+            <srv:connectPoint>
+              <gmd:CI_OnlineResource>
+                <gmd:linkage>
+                  <gmd:URL>
+                    <xsl:value-of select="$operationURL"/>
+                  </gmd:URL>
+                </gmd:linkage>
+              </gmd:CI_OnlineResource>
+            </srv:connectPoint>
+          </srv:SV_OperationMetadata>
+        </srv:containsOperations>
+        <srv:operatesOn xlink:href="#DataIdentification"/>
+      </xsl:element>
+    </gmd:identificationInfo>
+  </xsl:template>
 </xsl:stylesheet>
-
