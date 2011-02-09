@@ -44,7 +44,7 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 /**
- * DispatchHandler for ISO responses from Hyrax
+ * IsoDispatchHandler for ISO responses from Hyrax
  */
 public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
 
