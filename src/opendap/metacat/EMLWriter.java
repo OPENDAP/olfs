@@ -148,7 +148,7 @@ public class EMLWriter {
 
 	    		if (output) {
 	    			output_counter++;
-					String name = ddxURL + ".eml";
+					String name = ddxURL.substring(ddxURL.lastIndexOf('/')+1) + ".eml";
 					if (verbose)
 						ps.println("Writing " + name);
 	    			FileWriter fw = new FileWriter(name);
@@ -170,7 +170,13 @@ public class EMLWriter {
 					// For both the one-ddx and many-ddx cases use the first
 					// DDX, so grab it here
 					String ddxUrl = group.getURLs().get(0).getTheURL();
+					if (verbose)
+						ps.println("Reading DDX from: " + ddxUrl);
 					String ddxDoc = ddxRetriever.getDDXDoc(ddxUrl);
+					if (veryVerbose) {
+						ps.println("DDX:");
+						ps.println(ddxDoc);
+					}
 
 					// one URL group?
 					if (group.getURLs().size() == 1) {
