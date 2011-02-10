@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>1.7.1, OLFS</string>
+	<string>@OlfsVersion@, OLFS</string>
 	<!--
 	<key>CFBundleIdentifier</key>
 	<string>opendap.olfs</string>
@@ -23,7 +23,7 @@
 	<key>IFPkgFlagBackgroundScaling</key>
 	<string>none</string>
 	<key>IFPkgFlagDefaultLocation</key>
-	<string>/usr/local/opendap/servers/hyrax-1.6.2</string>
+	<string>/usr/local/opendap/servers/hyrax-@HyraxVersion@</string>
 	<key>IFPkgFlagFollowLinks</key>
 	<true/>
 	<key>IFPkgFlagInstallFat</key>
