@@ -23,18 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
-import opendap.coreServlet.ReqInfo;
-import org.jdom.Document;
+import opendap.coreServlet.HttpResponder;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -72,9 +67,16 @@ public class GatewayForm extends HttpResponder {
 
         String contextPath = request.getContextPath();
 
-        String gatewayFormFile = _systemPath + "/gateway/gateway_form.html";
 
+
+        String gatewayFormFile = _systemPath + "/gateway/gateway_form.html";
         String form = readFileAsString(gatewayFormFile);
+
+
+        //String gatewayFormResource = "resources/gateway/gateway_form.html";
+        //InputStream is = this.getClass().getClassLoader().getSystemResourceAsStream(gatewayFormResource);
+        //form  = streamToString(is);
+
 
         form = form.replaceAll("<CONTEXT_PATH />",contextPath);
         form = form.replaceAll("<SERVLET_NAME />","/docs");

@@ -67,6 +67,13 @@ HR {
 .medium {
     font-size: 14px;
 }
+.large {
+    font-size: 18px;
+}
+.large_bold {
+    font-size: 18px;
+    font-weight: bold;
+}
 .xlarge {
     font-size: 24px;
 }

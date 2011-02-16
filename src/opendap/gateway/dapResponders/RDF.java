@@ -25,9 +25,9 @@ package opendap.gateway.dapResponders;
 
 import opendap.bes.BESError;
 import opendap.bes.Version;
+import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
-import opendap.gateway.HttpResponder;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -35,12 +35,9 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-
-
-
 
 
 public class RDF extends HttpResponder {
@@ -140,16 +137,44 @@ public class RDF extends HttpResponder {
         response.setHeader("Content-Description", "text/xml");
 
 
-        Document rdf = transformer.transform(ddx);
+        Document rdf = null;
+        try {
+            rdf = transformer.transform(ddx);
+
+        } catch (Exception e) {
+            sendRdfErrorResponse(e, dataSource, request,response);
+            log.error(e.getMessage());
+        }
 
 
 
-        OutputStream os = response.getOutputStream();
-        xmlo.output(rdf,os);
-        os.flush();
-        log.info("Sent RDF version of DDX.");
-        log.debug("Restoring working directory to "+ currentDir);
+        if(rdf!=null){
+            ServletOutputStream os = response.getOutputStream();
+            xmlo.output(rdf,os);
+            os.flush();
+            log.info("Sent RDF version of DDX.");
+        }
+
+        log.debug("Restoring working directory to " + currentDir);
         System.setProperty("user.dir",currentDir);
+
+    }
+
+
+
+    public void sendRdfErrorResponse(Exception e, String dataSource, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String errorMessage =
+                        "<p align=\"center\">I'm sorry.</p>\n" +
+                        "<p align=\"center\">You requested the RDF representation of the metadata for the dataset:</p>\n" +
+                        "<p align=\"center\" class=\"bold\">"+dataSource+" </p>\n" +
+                        "<p align=\"center\">The server attempted to transform the metadata in the dataset, " +
+                                "represented as a DDX document, into an RDF representation.</p>\n" +
+                        "<p align=\"center\">The transform failed, and returned this specific error message:</p>\n" +
+                        "<p align=\"center\" class=\"bold\">" + e.getMessage() + "</p>\n";
+
+
+        sendHttpErrorResponse(500, errorMessage, request, response);
 
     }
 

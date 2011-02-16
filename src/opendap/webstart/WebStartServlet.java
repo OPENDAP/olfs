@@ -221,7 +221,7 @@ public class WebStartServlet extends HttpServlet {
                 log.error(msg);
                 throw new ServletException(msg, e);
             } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
+                msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
                 log.error(msg);
                 throw new ServletException(msg, e);
             }

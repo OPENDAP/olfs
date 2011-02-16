@@ -293,7 +293,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
             _prefix += "/";
 
         if(_prefix.startsWith("/"))
-            _prefix = _prefix.substring(1, _prefix.length());
+            _prefix = _prefix.substring(1);
 
         log.info("Initialized. prefix="+ _prefix);
 
@@ -316,7 +316,18 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
                                     boolean sendResponse)
             throws Exception {
 
+
+        String serviceContext = ReqInfo.getFullServiceContext(request);
+
+
+
         String relativeURL = ReqInfo.getRelativeUrl(request);
+
+
+        log.debug("serviceContext: "+serviceContext);
+        log.debug("relativeURL:    "+relativeURL);
+
+
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -325,13 +336,23 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         boolean isMyRequest = false;
 
+        boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
+
+
         if (relativeURL != null) {
 
-            if (relativeURL.startsWith(_prefix)) {
+            if (relativeURL.startsWith(_prefix) || itsJustThePrefixWithoutTheSlash ) {
                 isMyRequest = true;
                 if (sendResponse) {
-                    sendGatewayResponse(request, response);
-                    log.info("Sent gateway Response");
+
+                    if(itsJustThePrefixWithoutTheSlash){
+                        response.sendRedirect(_prefix);
+                        log.debug("Sent redirect to service prefix: "+_prefix);
+                    }
+                    else {
+                        sendGatewayResponse(request, response);
+                        log.info("Sent gateway Response");
+                    }
                 }
             }
         }

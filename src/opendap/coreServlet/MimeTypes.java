@@ -202,6 +202,14 @@ public class MimeTypes {
         typeMap.put("jnlp",    "application/x-java-jnlp-file");
 
 
+        typeMap.put("hdf",     "application/x-hdf");
+        typeMap.put("hdf4",    "application/x-hdf");
+
+        typeMap.put("h5",      "application/x-hdf5");
+        typeMap.put("hdf5",    "application/x-hdf5");
+
+        typeMap.put("nc",      "application/x-netcdf");
+
 
 
 

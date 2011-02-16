@@ -838,7 +838,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
      */
     public void sendDDX2RDF(HttpServletRequest request,
                         HttpServletResponse response)
-            throws Exception {
+            throws Exception  {
 
         String relativeUrl = ReqInfo.getRelativeUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
@@ -912,20 +912,52 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
-            Document rdf = transformer.transform(ddx);
+            Document rdf = null;
+            try {
+                rdf = transformer.transform(ddx);
 
-            xmlo.output(rdf,os);
+            } catch (Exception e) {
+                sendRdfErrorResponse(e, dataSource, request,response);
+                log.error(e.getMessage());
+            }
 
-            os.flush();
-            log.info("Sent RDF version of DDX.");
+
+
+            if(rdf!=null){
+                xmlo.output(rdf,os);
+                os.flush();
+                log.info("Sent RDF version of DDX.");
+            }
+
             log.debug("Restoring working directory to "+ currentDir);
             System.setProperty("user.dir",currentDir);
+
         }
 
     }
     /***************************************************************************/
 
 
+
+    public void sendRdfErrorResponse(Exception e, String dataSource, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String errorPageTemplate = systemPath + "/docs/error.html";
+
+
+
+        String errorMessage =
+                        "<p align=\"center\">I'm sorry.</p>\n" +
+                        "<p align=\"center\">You requested the RDF representation of the metadata for the dataset:</p>\n" +
+                        "<p align=\"center\" class=\"bold\">"+dataSource+" </p>\n" +
+                        "<p align=\"center\">The server attempted to transform the metadata in the dataset, " +
+                                "represented as a DDX document, into an RDF representation.</p>\n" +
+                        "<p align=\"center\">The transform failed, and returned this specific error message:</p>\n" +
+                        "<p align=\"center\" class=\"bold\">" + e.getMessage() + "</p>\n";
+
+
+        HttpResponder.sendHttpErrorResponse(500, errorMessage, errorPageTemplate, request, response);
+
+    }
 
 
 
@@ -966,7 +998,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
         String contentDisposition = " attachment; filename=" +downloadFileName;
 
-        response.setContentType("application/octet-stream");
+        response.setContentType("application/x-netcdf");
         response.setHeader("Content-Disposition",Scrub.fileName(contentDisposition));
 
         Version.setOpendapMimeHeaders(request,response);

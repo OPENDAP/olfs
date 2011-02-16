@@ -33,7 +33,7 @@
 
             <!-- Bot Blocker
                -
-               - This handler can beused to block access from specific IP addresses
+               - This handler can be used to block access from specific IP addresses
                - and by a range of IP addresses using a regular expression.
                -
               -->
@@ -53,6 +53,10 @@
             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
                 <prefix>thredds</prefix>
                 <useMemoryCache>true</useMemoryCache>
+            </Handler>
+
+            <Handler className="opendap.gateway.DispatchHandler">
+                <prefix>gateway</prefix>
             </Handler>
 
             <Handler className="opendap.bes.DapDispatchHandler" />

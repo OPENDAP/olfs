@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.jdom.Element;
 
@@ -177,6 +178,15 @@ public class FileDispatchHandler implements DispatchHandler {
 
         log.debug("sendFile(): Sending file \"" + name + "\"");
 
+        String downloadFileName = name.substring(name.lastIndexOf("/")+1);
+
+        log.debug("sendFile() downloadFileName: " + downloadFileName );
+
+        String contentDisposition = " attachment; filename=" +downloadFileName;
+
+        response.setHeader("Content-Disposition",Scrub.fileName(contentDisposition));
+
+
         String suffix = ReqInfo.getRequestSuffix(req);
 
         if (suffix != null) {
@@ -187,6 +197,10 @@ public class FileDispatchHandler implements DispatchHandler {
 
             log.debug("   MIME type: " + mType + "  ");
         }
+
+
+
+
 
         response.setStatus(HttpServletResponse.SC_OK);
         ByteArrayOutputStream erros = new ByteArrayOutputStream();

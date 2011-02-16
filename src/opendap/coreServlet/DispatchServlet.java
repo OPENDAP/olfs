@@ -212,12 +212,12 @@ public class DispatchServlet extends HttpServlet {
      * calling their init() methods and passing into them the XML Element
      * that defined them from the config document.
      *
-     * @param type             A String containing the name of DispatchHandler list from
+     * @param type             A String containing the name of IsoDispatchHandler list from
      *                         the OLFS to build from.
      * @param dispatchHandlers A Vector in which to store the built
-     *                         DispatchHandler instances
+     *                         IsoDispatchHandler instances
      * @param handlerConfigs   A Vector in which to store the configuration
-     *                         Element for each DispatchHandler
+     *                         Element for each IsoDispatchHandler
      * @throws ServletException When things go poorly
      */
     private void buildHandlers(String type, Vector<DispatchHandler> dispatchHandlers, Vector<Element> handlerConfigs) throws ServletException {
@@ -255,7 +255,7 @@ public class DispatchServlet extends HttpServlet {
                 log.error(msg);
                 throw new ServletException(msg, e);
             } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + className + " to opendap.coreServlet.DispatchHandler";
+                msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
                 log.error(msg);
                 throw new ServletException(msg, e);
             } catch (Exception e) {
@@ -603,7 +603,7 @@ public class DispatchServlet extends HttpServlet {
      * @param request The request we are looking to handle
      * @param dhvec   A Vector of DispatchHandlers that will be asked if they can
      *                handle the request.
-     * @return The DispatchHandler that can handle the request, null if no
+     * @return The IsoDispatchHandler that can handle the request, null if no
      *         handler claims the request.
      * @throws Exception For bad behaviour.
      */

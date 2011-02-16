@@ -23,14 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
-import opendap.bes.BesXmlAPI;
 import opendap.bes.Version;
+import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
-import opendap.gateway.HttpResponder;
 import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;

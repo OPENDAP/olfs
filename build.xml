@@ -630,6 +630,23 @@
     </target>
 
 
+    <target name="GatewayDispatchHandler"
+        depends="clean,compile"
+        description="Builds jar file for the Gateway Dispatch Handler">
+
+
+        <jar destfile="${build.dist}/GatewayDispatchHandler.jar">
+            <fileset dir=".">
+                <include name="resources/gateway/**"/>
+            </fileset>
+            <fileset dir="${build.classes}">
+                <include name="opendap/gateway/**"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+
 
     <target name="validatorApp"
         depends="clean,compile"
