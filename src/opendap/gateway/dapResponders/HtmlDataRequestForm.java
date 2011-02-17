@@ -76,6 +76,7 @@ public class HtmlDataRequestForm extends HttpResponder {
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String docsService = request.getContextPath()+"/docs";
 
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
@@ -120,7 +121,7 @@ public class HtmlDataRequestForm extends HttpResponder {
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
-            besError.sendErrorResponse(_systemPath,response);
+            besError.sendErrorResponse(_systemPath, docsService, response);
 
 
             String msg = besError.getMessage();

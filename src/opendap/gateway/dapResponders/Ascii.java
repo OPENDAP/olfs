@@ -69,6 +69,8 @@ public class Ascii extends HttpResponder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
+        String docsService = request.getContextPath()+"/docs";
+
 
         log.debug("sendASCII() for dataset: " + dataSource);
 
@@ -98,7 +100,7 @@ public class Ascii extends HttpResponder {
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath,response);
+            besError.sendErrorResponse(_systemPath,docsService, response);
             log.error("sendASCII() encountered a BESError: "+besError.getMessage());
         }
 

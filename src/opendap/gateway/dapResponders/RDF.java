@@ -67,6 +67,7 @@ public class RDF extends HttpResponder {
 
 
         String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String docsService = request.getContextPath()+"/docs";
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -94,7 +95,7 @@ public class RDF extends HttpResponder {
         Document ddx = new Document();
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
-            besError.sendErrorResponse(_systemPath,response);
+            besError.sendErrorResponse(_systemPath, docsService, response);
             log.error("sendDDX() encountered a BESError:\n" + xmlo.outputString(ddx));
             return;
         }
@@ -142,7 +143,7 @@ public class RDF extends HttpResponder {
             rdf = transformer.transform(ddx);
 
         } catch (Exception e) {
-            sendRdfErrorResponse(e, dataSource, request,response);
+            sendRdfErrorResponse(e, dataSource, docsService, response);
             log.error(e.getMessage());
         }
 
@@ -162,7 +163,7 @@ public class RDF extends HttpResponder {
 
 
 
-    public void sendRdfErrorResponse(Exception e, String dataSource, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendRdfErrorResponse(Exception e, String dataSource, String docsService, HttpServletResponse response) throws Exception {
 
         String errorMessage =
                         "<p align=\"center\">I'm sorry.</p>\n" +
@@ -174,7 +175,7 @@ public class RDF extends HttpResponder {
                         "<p align=\"center\" class=\"bold\">" + e.getMessage() + "</p>\n";
 
 
-        sendHttpErrorResponse(500, errorMessage, request, response);
+        sendHttpErrorResponse(500, errorMessage, docsService, response);
 
     }
 

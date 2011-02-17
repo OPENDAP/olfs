@@ -145,6 +145,8 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         log.debug("Processing THREDDS request.");
 
         Request oreq = new Request(servlet,request);
+        String docsService = request.getContextPath()+"/docs";
+
         
 
         log.debug(Util.probeRequest(servlet,request));
@@ -288,7 +290,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         } else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(systemPath, response);
+            besError.sendErrorResponse(systemPath, docsService, response);
             log.error(besError.getMessage());
 
         }

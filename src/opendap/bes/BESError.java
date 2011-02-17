@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.DispatchServlet;
 import opendap.coreServlet.ServletUtil;
@@ -275,7 +276,7 @@ public class BESError extends OPeNDAPException {
      * @return The HTTP status code returned to client.
      * @throws IOException
      */
-    public int sendErrorResponse(String systemPath, HttpServletResponse response)
+    public int sendErrorResponse(String systemPath, String docsService, HttpServletResponse response)
             throws IOException{
 
 
@@ -315,6 +316,7 @@ public class BESError extends OPeNDAPException {
         try {
             String xsltDoc = systemPath + "/docs/xsl/error"+errorVal+".xsl";
 
+
             File xsltFile = new File(xsltDoc);
 
             if(xsltFile.exists()){
@@ -333,14 +335,20 @@ public class BESError extends OPeNDAPException {
             else {
                 if(!response.isCommitted())
                     response.reset();
-                response.sendError(errorVal,getMessage());
+                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/docs/error.html",docsService,response);
             }
 
         }
         catch(Exception e){
             if(!response.isCommitted())
                 response.reset();
-            response.sendError(errorVal,getMessage());
+            try {
+                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/docs/error.html",docsService,response);
+            }
+            catch(Exception e1){
+                response.sendError(errorVal,e1.getMessage());
+            }
+
         }
 
         return errorVal;

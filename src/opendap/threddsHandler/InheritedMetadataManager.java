@@ -149,6 +149,7 @@ public class InheritedMetadataManager {
             _dsIngestTransformer = new Transformer(new StreamSource(is));
         } catch (SaxonApiException e) {
             log.error("FAILED to build transform! Msg: " + e.getMessage());
+            _dsIngestTransformer = null;
         }
     }
 

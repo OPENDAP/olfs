@@ -197,6 +197,8 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
+        String docsService = request.getContextPath()+"/docs";
+
 
         String xmlBase = request.getRequestURL().toString();
         int suffix_start = xmlBase.lastIndexOf("." + requestSuffix);
@@ -237,7 +239,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
             response.setHeader("Content-Description", "dap_error");
 
             BESError error = new BESError(ddx);
-            error.sendErrorResponse(_systemPath,response);
+            error.sendErrorResponse(_systemPath,docsService, response);
         }
         else {
 

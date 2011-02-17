@@ -76,15 +76,14 @@ public abstract class HttpResponder {
 
 
 
-    public void sendHttpErrorResponse(int HttpStatus, String errorMessage, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendHttpErrorResponse(int HttpStatus, String errorMessage, String docsService, HttpServletResponse response) throws Exception {
         String errorPageTemplate = _systemPath + "/docs/error.html";
-        sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  request, response);
+        sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  docsService, response);
     }
 
 
-    public static void sendHttpErrorResponse(int httpStatus, String errorMessage, String errorPageTemplate, HttpServletRequest request,  HttpServletResponse response) throws Exception {
+    public static void sendHttpErrorResponse(int httpStatus, String errorMessage, String errorPageTemplate, String docsService,  HttpServletResponse response) throws Exception {
 
-        String docsService = request.getContextPath()+"/docs";
         String template = loadHtmlTemplate(errorPageTemplate, docsService);
 
         template = template.replaceAll("<ERROR_MESSAGE />",errorMessage);

@@ -221,6 +221,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         log.info("sendDIR() request = " + request);
 
+        String docsService = request.getContextPath()+"/docs";
+
+
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_directory");
 
@@ -274,7 +277,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(systemPath,response);
+            besError.sendErrorResponse(systemPath, docsService, response);
             log.error(besError.getMessage());
 
         }
