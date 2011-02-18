@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -124,6 +125,7 @@ public class ConstructRuleEvaluator {
          try {
              con = repository.getConnection();
              ValueFactory creatValue = repository.getValueFactory(); //moved from line 159
+             Hashtable<String, Double> ruleTimeTotal = new Hashtable<String, Double>();
 
              while (modelChanged && runNbr < runNbrMax ) {
 
@@ -265,9 +267,13 @@ public class ConstructRuleEvaluator {
                      totalStAdded = totalStAdded + stAdded;
                      totalStAddedIn1Pass = totalStAddedIn1Pass + stAdded;
                      notPostProcessed1Pass = notPostProcessed1Pass + notPostProcessedAdded;
-                     //notPostProcessed = notPostProcessed + notPostProcessed1Pass;
-                    // con.commit();
-
+                     
+                     if(ruleTimeTotal.get(qstring) != null){
+                         Double ruleTotal = ruleTimeTotal.get(qstring) + ruleTime;
+                         ruleTimeTotal.put(qstring, ruleTotal) ;
+                     }else{
+                         ruleTimeTotal.put(qstring, ruleTime) ;
+                     }
                  } // for(String qstring
                  notPostProcessed = notPostProcessed + notPostProcessed1Pass;
                  log.info("runConstruct(): Completed pass " + runNbr + "  " +
@@ -278,7 +284,11 @@ public class ConstructRuleEvaluator {
 
                  findConstruct(repository);
              } // while (modelChanged
-
+             for (String qstring : this.constructQuery) {
+                 
+                 DecimalFormat df = new DecimalFormat("#.#####");
+             log.debug("rule " +this.constructContext.get(qstring) + " takes " + df.format(ruleTimeTotal.get(qstring)) + " seconds");
+             }
              //the construct rules run too many times
              if (runNbr >= runNbrMax) {
                  log.warn("runConstruct(): The construct rules have executed to the maximum number times allowed!");
@@ -438,9 +448,10 @@ public class ConstructRuleEvaluator {
 
         Pattern comma = Pattern.compile(",");
 
-        Pattern p_fn_className = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
-                        Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-
+        //Pattern p_fn_className = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(([^)]+)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
+        //                Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern p_fn_className   = Pattern.compile("(([a-z]+):([A-Za-z]+)\\(((\"[^\"]*\"|[^)\"]*)*)\\)).+using namespace.+\\2 *= *<import:([^#]+)#>",
+                Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
         Matcher functionMatcher = p_fn_className.matcher(processedQueryString);
 
         if (stringMatcher.find()) {
@@ -475,7 +486,7 @@ public class ConstructRuleEvaluator {
             while (functionMatcher.find()) {
                 String expand = "";
                 String rdfFunctionName = functionMatcher.group(3);
-                String rdfClassName = functionMatcher.group(5);
+                String rdfClassName = functionMatcher.group(6);
 
 
                 fullyQualifiedFunctionName = rdfClassName + "#" + rdfFunctionName;

@@ -80,7 +80,17 @@ public class RepositoryOps {
     public static boolean flushRepositoryOnDrop = false;
     public static boolean dropWithMemoryStore   = false;
     public static boolean dropWithMemoryStoreDeleteDir  = false;
-     
+    
+    public static void setFlushRepositoryOnDrop (){
+        flushRepositoryOnDrop =  true;
+    }
+    public static void setDropWithMemoryStore (){
+        dropWithMemoryStore =  true;
+    }
+    public static void setDropWithMemoryStoreDeleteDir (){
+        dropWithMemoryStoreDeleteDir =  true;
+    }
+    
     public static void dropStartingPointsAndContexts(Repository repo, Vector<String> startingPointUrls, Vector<String> dropList) throws InterruptedException {
         RepositoryConnection con = null;
         ValueFactory valueFactory;
@@ -1295,9 +1305,6 @@ public class RepositoryOps {
         Vector<String> startingPointsToDrop = null;
         boolean repositoryHasBeenChanged = false;
 
-        RdfImporter rdfImporter = new RdfImporter(resourceDir);
-
-
         Date startTime = new Date();
         log.debug("-----------------------------------------------------------------------");
         log.debug("updateSemanticRepository(): Start.");
@@ -1333,16 +1340,14 @@ public class RepositoryOps {
             ProcessController.checkState();
 
             //log.debug(showContexts(repository));
-
-
+            
             boolean modelChanged = false;
 
 
             if (!dropList.isEmpty()) {
                 log.debug("updateSemanticRepository(): Add external inferencing contexts to dropList");
                 dropList.addAll(findExternalInferencingContexts(repository));
-                //log.info("Remove uploadComplete statement!");
-                //removeUploadComplete(repository);
+                
                 if(flushRepositoryOnDrop){
                     log.warn("updateSemanticRepository(): Repository content has been changed! Flushing Repository!");
 
@@ -1395,26 +1400,18 @@ public class RepositoryOps {
                     
                     log.info("updateSemanticRepository(): Loading Owlim Repository to MemoryStore");
                     conMem.add(conOwlim.getStatements(null, null, null, false));
-                    
+                    conOwlim.close();
                     log.info("updateSemanticRepository(): Dropping StartingPoint and contexts from MemoryStore ...");
                     
                     dropStartingPointsAndContexts(memRepository, startingPointsToDrop, dropList);
                     
-                    log.warn("updateSemanticRepository(): Deleting OwlimRepository!");
-                              //clearRepository(repository);
-                    conOwlim.close();
-                    repository.shutDown();
-                    
-                    //File repoPath = new File(catalogCacheDirectory);
-                    //deleteDirectory(repoPath);
-                    //repository = setupOwlimSailRepository(catalogCacheDirectory, loadfromtrig);
-                    //
-                    //log.info("updateSemanticRepository(): Reloading MemoryStore back to Owlim Repository");
-                    //conOwlim = repository.getConnection();
-                    //conOwlim.add(conMem.getStatements(null, null, null, true));
-                    //
-                    //conOwlim.close();
-                    
+                                      
+                  String filename = "owlimMaxFromMemoryStore.trig";
+                  log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
+                  RepositoryOps.dumpRepository(memRepository, filename);
+                  filename = "owlimMaxFromMemoryStore.nt";
+                  log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
+                  RepositoryOps.dumpRepository(memRepository, filename);
                     conMem.close();                    
                     memRepository.shutDown();
                 }
@@ -1425,7 +1422,7 @@ public class RepositoryOps {
                 
                 modelChanged = true;
 
-            }//if (!dropList.isEmpty()) 
+            } //if (!dropList.isEmpty()) 
 
             ProcessController.checkState();
 
@@ -1440,43 +1437,9 @@ public class RepositoryOps {
                 modelChanged = true;
 
             }
-
-            ProcessController.checkState();
-
-            log.info("updateSemanticRepository(): Checking for referenced documents that are not already in the repository.");
-            boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
-            if(foundNewDocuments){
-                modelChanged = true;
-            }
-
-            ProcessController.checkState();
-
             repositoryHasBeenChanged = modelChanged;
-
-            log.info("updateSemanticRepository(): Updating repository ...");
-            ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
-
-            log.info("updateSemanticRepository(): Running construct rules ...");
-            boolean firstPass = true;
-            while (modelChanged || firstPass) {
-
-                firstPass = false;
-                
-                repositoryHasBeenChanged =  constructRuleEvaluator.runConstruct(repository) || repositoryHasBeenChanged;
-
-                ProcessController.checkState();
-
-                log.debug(showContexts(repository));
-
-                modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
-                
-                repositoryHasBeenChanged = repositoryHasBeenChanged || modelChanged;
-
-                ProcessController.checkState();
-
-            }
-            //Add uploadComplete statement
-            setUploadComplete(repository);
+            
+            ProcessController.checkState();
 
         } catch (RepositoryException e) {
             log.error("updateSemanticRepository(): Caught RepositoryException. Message:"
@@ -1489,17 +1452,79 @@ public class RepositoryOps {
         
         log.info("updateSemanticRepository() End. Elapsed time: " + elapsedTime + " seconds  repositoryHasBeenChanged: "+repositoryHasBeenChanged);
         log.debug("-----------------------------------------------------------------------");
-        String filename = catalogCacheDirectory + "owlimMaxRepository.trig";
-        log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
-        RepositoryOps.dumpRepository(repository, filename);
-        filename = catalogCacheDirectory + "owlimMaxRepository.nt";
-        log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
-        RepositoryOps.dumpRepository(repository, filename);
+        //String filename = catalogCacheDirectory + "owlimMaxRepository.trig";
+        //log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
+        //RepositoryOps.dumpRepository(repository, filename);
+        //filename = catalogCacheDirectory + "owlimMaxRepository.nt";
+        //log.debug("updateSemanticRepository(): Dumping Semantic Repository to: " + filename);
+        //RepositoryOps.dumpRepository(repository, filename);
         
         return repositoryHasBeenChanged;
     }
+    
+    public static void loadFromMem(Repository repository) throws RepositoryException, InterruptedException{
+        Repository memRepository = setupMemoryStoreSailRepository();
+        RepositoryConnection conMem = memRepository.getConnection();
+        RepositoryConnection conOwlim = repository.getConnection();
+                
+        log.info("loadFromMem(): Reloading MemoryStore back to Owlim Repository");
+        
+        conOwlim.add(conMem.getStatements(null, null, null, true));
+        
+        conOwlim.close();
+        
+        conMem.close();                    
+        memRepository.shutDown();
+    }
+    public static boolean updateExternalInference(Repository repository, Vector<String> doNotImportTheseUrls, 
+            String resourceDir, String catalogCacheDirectory, String loadfromtrig)
+            throws InterruptedException, RepositoryException, RDFParseException, IOException {
+        boolean firstPass = true;
+        boolean repositoryHasBeenChanged = false;
+        boolean modelChanged = false;
+        
+        RdfImporter rdfImporter = new RdfImporter(resourceDir);
+        
+        log.info("updateExternalInference: Updating repository ...");
+        ConstructRuleEvaluator constructRuleEvaluator = new ConstructRuleEvaluator();
+        log.info("updateExternalInference: Checking for referenced documents that are not already in the repository.");
+        boolean foundNewDocuments = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
+        if(foundNewDocuments){
+            modelChanged = true;
+        }
 
-    private static IRISailRepository setupOwlimSailRepository( String catalogCacheDirectory, String loadfromtrig) throws RepositoryException, InterruptedException, RDFParseException, IOException {
+        ProcessController.checkState();
+
+        repositoryHasBeenChanged = modelChanged;
+        log.info("updateExternalInference: Running construct rules ...");
+        while (modelChanged || firstPass) {
+
+            firstPass = false;
+            String filename = catalogCacheDirectory + "owlimMaxRepository.trig";
+            RepositoryOps.dumpRepository(repository, filename);
+            filename = catalogCacheDirectory + "owlimMaxRepository.nt";
+            RepositoryOps.dumpRepository(repository, filename);
+            
+            repositoryHasBeenChanged =  constructRuleEvaluator.runConstruct(repository) || repositoryHasBeenChanged;
+
+            ProcessController.checkState();
+
+            log.debug(showContexts(repository));
+
+            modelChanged = rdfImporter.importReferencedRdfDocs(repository, doNotImportTheseUrls);
+            
+            repositoryHasBeenChanged = repositoryHasBeenChanged || modelChanged;
+
+            ProcessController.checkState();
+
+        }
+        //Add uploadComplete statement
+        setUploadComplete(repository);  
+        return repositoryHasBeenChanged;
+    }
+    
+
+    public static IRISailRepository setupOwlimSailRepository( String catalogCacheDirectory, String loadfromtrig) throws RepositoryException, InterruptedException, RDFParseException, IOException {
 
 
         log.info("Setting up Semantic Repository.");
@@ -1521,12 +1546,11 @@ public class RepositoryOps {
 
         // Choose the operational ruleset
         String ruleset;
-        //ruleset = "owl-horst";
+        //ruleset = "owl-horst-optimized";
         ruleset = "owl-max-optimized";
 
         owlimSail.setParameter("ruleset", ruleset);
-        //owlimSail.setParameter("ruleset", "owl-max");
-        
+                
         // switches on few performance "optimizations of the RDFS and OWL inference
         owlimSail.setParameter("partialRdfs", "true");
         
@@ -2114,7 +2138,7 @@ public class RepositoryOps {
         
         log.info("setupMemoryStoreSailRepository(): Configuring Semantic Repository.");
         String workingDir = "./";
-        File storageDir = new File(workingDir + "MemoryStore"); //define local copy of repository
+        File storageDir = new File(workingDir + "_MemoryStore_"); //define local copy of repository
         MemoryStore memStore = new MemoryStore(storageDir);
         memStore.setPersist(true);
         memStore.setSyncDelay(1000L);

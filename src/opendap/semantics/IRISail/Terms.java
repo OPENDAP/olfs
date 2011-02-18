@@ -46,7 +46,8 @@ public class Terms {
      * It is always a rdfcache:StartingPoint, consequently it is always
      * included in the repository.
      */
-    public static String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+    //public static String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/rdfcache.owl";
+    public static String internalStartingPoint = "http://iridl.ldeo.columbia.edu/ontologies/r201102/rdfcache.owl";
 
 
     /**
