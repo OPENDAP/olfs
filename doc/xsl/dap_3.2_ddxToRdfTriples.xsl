@@ -101,7 +101,7 @@
     -->
 
 
-    <!-- dap:Attribute elements of type Continer -->
+    <!-- dap:Attribute elements of type Container -->
     <xsl:template match="dap:Attribute[@type='Container']" mode="body">
         <xsl:element name="att:{@name}" namespace="{$LocalAttributeNS}">
             <xsl:attribute name="rdf:parseType">Resource</xsl:attribute>
