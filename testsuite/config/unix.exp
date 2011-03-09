@@ -178,29 +178,29 @@ proc curl_version {} {
 }
 
 
-proc curl_all {url fileBase {constraint ""} } {
+proc curl_all {url fileBase {constraint ""}  {failureOperand 0} } {
 
     #send_user "${url}" "${fileBase}" "${constraint}"
 
-    curl_dds   "$url" "$fileBase" "$constraint"
-    curl_das   "$url" "$fileBase" "$constraint"
-    curl_ddx   "$url" "$fileBase" "$constraint"
-    curl_dap2  "$url" "$fileBase" "$constraint"
-    curl_ascii "$url" "$fileBase" "$constraint"
+    curl_dds   "$url" "$fileBase" "$constraint" $failureOperand
+    curl_das   "$url" "$fileBase" "$constraint" $failureOperand
+    curl_ddx   "$url" "$fileBase" "$constraint" $failureOperand
+    curl_dap2  "$url" "$fileBase" "$constraint" $failureOperand
+    curl_ascii "$url" "$fileBase" "$constraint" $failureOperand
     curl_info  "$url" "$fileBase" 
     curl_html  "$url" "$fileBase" 
 
 
 
 }
-proc curl_all_but_ascii {url fileBase {constraint ""} } {
+proc curl_all_but_ascii {url fileBase {constraint ""}  {failureOperand 0} } {
 
     #send_user "${url}" "${fileBase}" "${constraint}"
 
-    curl_dds   "$url" "$fileBase" "$constraint"
-    curl_das   "$url" "$fileBase" "$constraint"
-    curl_ddx   "$url" "$fileBase" "$constraint"
-    curl_dap2  "$url" "$fileBase" "$constraint"
+    curl_dds   "$url" "$fileBase" "$constraint" $failureOperand
+    curl_das   "$url" "$fileBase" "$constraint" $failureOperand
+    curl_ddx   "$url" "$fileBase" "$constraint" $failureOperand
+    curl_dap2  "$url" "$fileBase" "$constraint" $failureOperand
     curl_info  "$url" "$fileBase" 
     curl_html  "$url" "$fileBase" 
 
@@ -208,7 +208,7 @@ proc curl_all_but_ascii {url fileBase {constraint ""} } {
 
 }
 
-proc curl_dds { url fileBase {constraint ""} } {
+proc curl_dds { url fileBase {constraint ""} {failureOperand 0} } {
     global verbose
     global comp_output
     global spawn_id
@@ -217,46 +217,46 @@ proc curl_dds { url fileBase {constraint ""} } {
 
 
     curl_start "${url}.dds?$constraint"
-    compare_stdout "${fileBase}.dds" "curl request for ${url}.dds?$constraint  against baseline file: $fileBase.dds" 0
+    compare_stdout "${fileBase}.dds" "curl request for ${url}.dds?$constraint  against baseline file: $fileBase.dds" $failureOperand
 }
 
 
-proc curl_das { url fileBase {constraint ""} } {
+proc curl_das { url fileBase {constraint ""} {failureOperand 0} } {
     global verbose
     global comp_output
     global spawn_id
 
     curl_start "${url}.das?$constraint"
-    compare_stdout "${fileBase}.das" "curl request for $url.das?$constraint  against baseline file: $fileBase.das" 0
+    compare_stdout "${fileBase}.das" "curl request for $url.das?$constraint  against baseline file: $fileBase.das" $failureOperand
 }
 
 
-proc curl_ddx { url fileBase {constraint ""} } {
+proc curl_ddx { url fileBase {constraint ""} {failureOperand 0} } {
     global verbose
     global comp_output
     global spawn_id
 
     curl_start "${url}.ddx?$constraint"
-    compare_stdout "${fileBase}.ddx" "curl request for $url.ddx?$constraint  against baseline file: $fileBase.ddx" 0
+    compare_stdout "${fileBase}.ddx" "curl request for $url.ddx?$constraint  against baseline file: $fileBase.ddx" $failureOperand
 }
 
 
-proc curl_dap2 { url fileBase {constraint ""} } {
+proc curl_dap2 { url fileBase {constraint ""} {failureOperand 0} } {
     global verbose
     global comp_output
     global spawn_id
 
     curl_start "${url}.dods?$constraint"
-    compare_stdout "${fileBase}.dods" "curl request for $url.dods?$constraint  against baseline file: $fileBase.dods" 0
+    compare_stdout "${fileBase}.dods" "curl request for $url.dods?$constraint  against baseline file: $fileBase.dods" $failureOperand
 }
 
-proc curl_ascii { url fileBase {constraint ""} } {
+proc curl_ascii { url fileBase {constraint ""} {failureOperand 0} } {
     global verbose
     global comp_output
     global spawn_id
 
     curl_start "${url}.ascii?$constraint"
-    compare_stdout "${fileBase}.ascii" "curl request for $url.ascii?$constraint  against baseline file: $fileBase.ascii" 0
+    compare_stdout "${fileBase}.ascii" "curl request for $url.ascii?$constraint  against baseline file: $fileBase.ascii" $failureOperand
 }
 
 

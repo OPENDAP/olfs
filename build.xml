@@ -34,6 +34,7 @@
     <!-- Global Properties for Java-OPeNDAP software development -->
 
 
+
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
     <!-- relative to the project "Basedir" directory,  -->
@@ -175,6 +176,7 @@
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
+
 
 
     <!-- Libraries -->
@@ -829,17 +831,45 @@
     </target>
 
 
+    <!-- OS-X stuff -->
+
+    <property name="osx.resources" location="${resources.dir}/osx"/>
+    <property name="build.osx" location="${build.dir}/macosx"/>
+    <property name="packagemaker" location="/Developer/usr/bin/packagemaker"/>
 
 
 
+    <target name="osx-package"
+        depends="server"
+        description="Builds OSX package installer for the OLFS">
 
+        <mkdir dir="${build.osx}${CATALINA_HOME}/webapps"/>
+        
+        <copy file="${build.dist}/opendap.war" tofile="${build.osx}${CATALINA_HOME}/webapps/opendap.war"/>
 
+        <copy todir="${build.dir}/osx-resources" filtering="true">
+          <fileset dir="${osx.resources}" />
+        </copy>
+        
+        <chmod file="${build.dir}/osx-resources/InstallationCheck" perm="755"/>
 
+        <exec executable="${packagemaker}">
+            <arg value="--root"/>
+            <arg value="${build.osx}"/>
+            <arg value="--id" />
+            <arg value="org.opendap.olfs-${OLFS_VERSION}"/>
+            <arg value="--title" />
+            <arg value="OPeNDAP olfs-${OLFS_VERSION}"/>
+            <arg value="--version" />
+            <arg value="${OLFS_VERSION}"/>
+            <arg value="--out" />
+            <arg value="${build.dist}/olfs-${OLFS_VERSION}.pkg"/>
+            <arg value="--resources" />
+            <arg value="${build.dir}/osx-resources"/>
+        </exec>
+        
 
-
-
-
-
+    </target>
 
 </project>
 
