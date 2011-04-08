@@ -172,7 +172,7 @@ public class XMLfromRDF {
                     Map <String,String> docAttributes = new HashMap<String,String>();
                     String type = "text/xsl";
                     String href = null;
-                    
+                    //string of URL of the stylesheet of topURI (string/URL)
                     href=RepositoryOps.getUrlForStyleSheet(con, f, topURI);
                     if(href != null){
                     docAttributes.put("type", type);

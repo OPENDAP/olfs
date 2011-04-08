@@ -338,7 +338,8 @@ public class RepositoryOps {
             else if(startingPoint.startsWith("file://")){
                 startingPointFile = new File(startingPoint);
                 con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
-                
+                log.info("addStartingPoint(): Added StartingPoint to the repository <" + startingPointUri + "> <" + isa
+                        + "> " + "<" + startingPointContext + "> " + "<" + startingPointsContext + "> "); 
             }
             else  {
                 log.error("addStartingPoint() - The startingPoint '"+startingPoint+"' does not appear to by a URL, skipping.");
@@ -660,19 +661,26 @@ public class RepositoryOps {
      */
     public static void dumpRepository(RepositoryConnection con, String filename) throws InterruptedException {
         FileOutputStream myFileOutputStream = null;
+        FileOutputStream myFileOutputStreamAll = null; //includes inferred 
         // export repository to an n-triple file
         try {
             log.info("dumpRepository(): Dumping repository to: '"+filename+"'");
             myFileOutputStream = new FileOutputStream(Scrub.fileName(filename));
+            int posPoint = filename.lastIndexOf(".");
+            String fullTriplesOutFile = filename.substring(0, posPoint) + "all" +".nt";
+            myFileOutputStreamAll= new FileOutputStream(Scrub.fileName(fullTriplesOutFile));
             if (filename.endsWith(".nt")) {
 
                 NTriplesWriter myNTRiplesWriter = new NTriplesWriter(
                         myFileOutputStream);
-
-                con.export(myNTRiplesWriter);
+                con.export(myNTRiplesWriter); //explicit statements only
                 myNTRiplesWriter.startRDF();
                 myNTRiplesWriter.endRDF();
-
+                NTriplesWriter allNTRiplesWriter = new NTriplesWriter(
+                        myFileOutputStreamAll);
+                con.exportStatements(null, null, null, true, allNTRiplesWriter); //include inferred
+                allNTRiplesWriter.startRDF();
+                allNTRiplesWriter.endRDF();
             }
             if (filename.endsWith(".trix")) {
 
@@ -972,7 +980,7 @@ public class RepositoryOps {
             f = new File(urlstring.substring(7)); //file://
             ltmod = f.lastModified();
            }
-            
+            log.debug("getLTMODContext():urlstring= "+urlstring +"ltmod= "+ltmod);
             ltmodstr = getLastModifiedTimeString(ltmod);
             
         } catch (MalformedURLException e) {
@@ -1415,7 +1423,7 @@ public class RepositoryOps {
                     conMem.close();                    
                     memRepository.shutDown();
                 }
-                else {
+                else {//drop with native repository
                     dropStartingPointsAndContexts(repository, startingPointsToDrop, dropList); 
 
                 }
