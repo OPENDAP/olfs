@@ -191,6 +191,7 @@ public class CatalogManager {
         _log.debug("Ingesting inherited metadata (if any) for catalog '"+catalog.getName()+"'");
         InheritedMetadataManager.ingestInheritedMetadata(catalog);
 
+        NcmlManager.ingestNcml(catalog);
 
         _catalogs.put(catalogKey, catalog);
 
