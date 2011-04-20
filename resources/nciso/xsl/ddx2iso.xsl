@@ -1,42 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-/////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
-//
-//
-// Copyright (c) 2011 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-/////////////////////////////////////////////////////////////////////////////
---><xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gco="http://www.isotc211.org/2005/gco"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gco="http://www.isotc211.org/2005/gco"
   xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss"
   xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:dap="http://xml.opendap.org/ns/DAP2">
+  xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
   <!--  xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#" -->
   <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" scope="stylesheet">
     <xd:desc>
-      <xd:p><xd:b>Created on:</xd:b> October 16, 2010</xd:p>
+      <xd:p><xd:b>Created on:</xd:b>February 4, 2011</xd:p>
       <xd:p><xd:b>Author:</xd:b>ted.habermann@noaa.gov</xd:p>
       <xd:p/>
     </xd:desc>
   </xd:doc>
-  <xsl:variable name="stylesheetVersion" select="'0.0.0'"/>
+  <xsl:variable name="stylesheetVersion" select="'1.0.0'"/>
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+
   <xsl:variable name="globalAttributeCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/Attribute)"/>
   <xsl:variable name="variableCnt" select="count(/dap:Dataset/dap:Grid)"/>
   <xsl:variable name="variableAttributeCnt" select="count(/dap:Dataset/dap:variable/dap:Attribute)"/>

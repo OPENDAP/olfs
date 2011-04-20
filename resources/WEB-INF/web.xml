@@ -62,7 +62,7 @@
 
     </servlet>
 
-    <!-- servlet>
+    <servlet>
         <servlet-name>gateway</servlet-name>
 
         <servlet-class>opendap.gateway.DispatchServlet</servlet-class>
@@ -74,7 +74,7 @@
 
         <load-on-startup>1</load-on-startup>
 
-    </servlet -->
+    </servlet>
 
 
     <servlet-mapping>
@@ -118,10 +118,10 @@
         <url-pattern>/webstart/*</url-pattern>
     </servlet-mapping>
 
-    <!-- servlet-mapping>
+    <servlet-mapping>
         <servlet-name>gateway</servlet-name>
         <url-pattern>/gateway/*</url-pattern>
-    </servlet-mapping -->
+    </servlet-mapping>
 
 
 

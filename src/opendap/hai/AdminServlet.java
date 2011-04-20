@@ -61,6 +61,14 @@ public class AdminServlet extends HttpServlet {
             sos.println("</li><li>");
             sos.println("req.getScheme(): "+ req.getScheme());
             sos.println("</li><li>");
+            sos.println("req.isSecure(): "+ req.isSecure());
+            sos.println("</li><li>");
+            sos.println("req.isRequestedSessionIdFromCookie(): "+ req.isRequestedSessionIdFromCookie());
+            sos.println("</li><li>");
+            sos.println("req.isRequestedSessionIdFromURL(): "+ req.isRequestedSessionIdFromURL());
+            sos.println("</li><li>");
+            sos.println("req.isRequestedSessionIdValid(): "+ req.isRequestedSessionIdValid());
+            sos.println("</li><li>");
             sos.println("req.getRemoteUser(): "+ req.getRemoteUser());
             sos.println("</li><li>");
             sos.println("req.isUserInRole('manager'): "+ req.isUserInRole("manager"));
