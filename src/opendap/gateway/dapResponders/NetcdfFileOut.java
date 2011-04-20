@@ -89,7 +89,7 @@ public class NetcdfFileOut extends HttpResponder {
 
         String contentDisposition = " attachment; filename=" +downloadFileName;
 
-        response.setContentType("application/octet-stream");
+        response.setContentType("application/x-netcdf");
         response.setHeader("Content-Disposition", Scrub.fileName(contentDisposition));
 
         Version.setOpendapMimeHeaders(request, response);
