@@ -234,7 +234,7 @@
             <a href="{../@name}.das">das</a>
             <a href="{../@name}.info">info</a>
             <a href="{../@name}.html">html</a>
-            <a href="{../@name}.rdf">rdf</a>
+            <a href="{../@name}.rdf">rdf</a><br/>
         </td>
         <xsl:call-template name="WebStartLinks"/>
     </xsl:template>
