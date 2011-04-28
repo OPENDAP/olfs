@@ -21,9 +21,8 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.gateway;
+package opendap.hai;
 
-import opendap.gateway.dapResponders.DDX;
 import opendap.logging.LogUtil;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -42,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import opendap.coreServlet.*;
-import opendap.gateway.dapResponders.*;
 
 /**
  * User: ndp
@@ -93,23 +91,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         }
 
 
-        responders.add(new DDX(systemPath));
-        responders.add(new DDS(systemPath));
-        responders.add(new DAS(systemPath));
-        responders.add(new RDF(systemPath));
-
-        responders.add(new HtmlDataRequestForm(systemPath));
-        responders.add(new DatasetInfoHtmlPage(systemPath));
-
-        responders.add(new Dap2Data(systemPath));
-        responders.add(new Ascii(systemPath));
-
-
-        responders.add(new DataDDX(systemPath));
-        responders.add(new NetcdfFileOut(systemPath));
-        responders.add(new XmlData(systemPath));
-
-        responders.add(new GatewayForm(systemPath));
+        responders.add(new OlfsLoggingApi(systemPath));
 
 
         log.info("masterDispatchRegex=\"" + getDispatchRegex() + "\"");
@@ -215,7 +197,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         RequestCache.startRequest();
 
         long reqno = reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "GATEWAY_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, "ADMIN_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
 
         if (ReqInfo.isServiceOnlyRequest(req))
             return -1;
@@ -227,7 +209,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         } catch (Exception e) {
             return -1;
         } finally {
-            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "GATEWAY_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "ADMIN_SERVICE_ACCESS");
 
         }
 
@@ -256,7 +238,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         try {
 
-            LogUtil.logServerAccessStart(request, "GATEWAY_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "ADMIN_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -298,9 +280,37 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             }
         } finally {
             RequestCache.endRequest();
-            LogUtil.logServerAccessEnd(0, -1, "GATEWAY_SERVICE_ACCESS");
+            LogUtil.logServerAccessEnd(0, -1, "ADMIN_SERVICE_ACCESS");
         }
     }
+
+
+    /**
+     *
+     * This override checks to see if we are in secure mode and if not send a forbidden error.
+     *
+     * @param req   Same as for javax.servlet.http.HttpServlet.service()
+     * @param resp   Same as for javax.servlet.http.HttpServlet.service()
+     * @throws javax.servlet.ServletException    Same as for javax.servlet.http.HttpServlet.service()
+     * @throws java.io.IOException   Same as for javax.servlet.http.HttpServlet.service()
+     */
+    @Override
+    protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
+            throws javax.servlet.ServletException, java.io.IOException {
+
+        if (!req.isSecure()) {
+            resp.sendError(403);
+        }
+        else {
+            log.debug("Connection is secure. Protocol: "+req.getProtocol());
+        }
+
+        super.service(req,resp);
+
+
+
+    }
+
 
 
 }

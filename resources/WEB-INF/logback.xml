@@ -17,6 +17,9 @@
 
     </appender>
 
+    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
+        <MaxSize>512</MaxSize>
+    </appender>
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/error.log</File>
@@ -72,9 +75,15 @@
 
 
     <!-- OPeNDAP Hyrax Logging -->
+
+
     <logger name="opendap" level="error" >
-        <appender-ref ref="ErrorLog"/>
+        <appender-ref ref="stdout"/>
     </logger>
+
+
+    <logger name="opendap.hai" level="debug" />
+
 
 
     <!-- Access/Performance Logging -->
@@ -90,6 +99,7 @@
 
     <root level="error">
         <appender-ref ref="ErrorLog"/>
+        <appender-ref ref="HAI_DEBUG_LOGGER"/>
     </root>
 
 </configuration>

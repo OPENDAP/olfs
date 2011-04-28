@@ -10,11 +10,9 @@
 <web-app>
 
 
-
     <display-name>Hyrax</display-name>
     <description>OPeNDAP Hyrax Server</description>
 
-    
 
     <servlet>
         <servlet-name>hyrax</servlet-name>
@@ -23,7 +21,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value> </param-value>
+            <param-value>true</param-value>
         </init-param>
 
         <init-param>
@@ -36,7 +34,6 @@
     </servlet>
 
 
-
     <servlet>
         <servlet-name>docs</servlet-name>
         <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
@@ -45,8 +42,10 @@
 
     <servlet>
         <servlet-name>adminInterface</servlet-name>
-        <servlet-class>opendap.hai.AdminServlet</servlet-class>
+        <servlet-class>opendap.hai.DispatchServlet</servlet-class>
     </servlet>
+
+
 
     <servlet>
         <servlet-name>webstart</servlet-name>
@@ -112,7 +111,6 @@
         <url-pattern>/hai/*</url-pattern>
     </servlet-mapping>
 
-
     <servlet-mapping>
         <servlet-name>webstart</servlet-name>
         <url-pattern>/webstart/*</url-pattern>
@@ -124,12 +122,10 @@
     </servlet-mapping>
 
 
-
     <session-config>
         <session-timeout>20</session-timeout>
     </session-config>
 
-             
 
     <!-- Default Error Page Definitions -->
     <error-page>
@@ -160,6 +156,39 @@
         <exception-type>java.lang.Throwable</exception-type>
         <location>/docs/error500.html</location>
     </error-page>
+
+
+    <!-- Define a Security Constraint on this Application -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Hyrax Admin Interface</web-resource-name>
+            <url-pattern>/hai/*</url-pattern>
+            <url-pattern>/docs/admin/*</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>manager</role-name>
+        </auth-constraint>
+
+        <user-data-constraint>
+            <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!-- Define the Login Configuration for this Application -->
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Hyrax Administration Pages</realm-name>
+    </login-config>
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            The role that is required to login to the Hyrax Administration Application
+        </description>
+        <role-name>manager</role-name>
+    </security-role>
 
 
 </web-app>
