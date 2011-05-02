@@ -328,6 +328,10 @@
                 <exclude name="opendap/semantics/**"/>
 
 
+                <!-- Exclude the Hyrax Admin Interface code  -->
+                <exclude name="opendap/hai/**"/>
+
+
             </fileset>
 
         </copy>

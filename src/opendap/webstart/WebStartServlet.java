@@ -283,13 +283,13 @@ public class WebStartServlet extends HttpServlet {
         HashMap<String, String> params = new HashMap<String, String>();
 
         if(query==null){
-            log.error("No parameters sent to " + getClass().getName() + "?" + query + "'");
+            log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(),Scrub.simpleQueryString(query));
             return params;
         }
 
         String args[] = query.split("&");
         if (args == null) {
-            log.error("No parameters sent to " + getClass().getName() + "?" + query + "'");
+            log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(),Scrub.simpleQueryString(query));
             return params;
         }
 
@@ -300,7 +300,7 @@ public class WebStartServlet extends HttpServlet {
                 if (pairs.length == 2) {
                     params.put(pairs[0], pairs[1]);
                 } else {
-                    log.error("Parse failed for argument: " + arg);
+                    log.error("Parse failed for argument: " + Scrub.simpleQueryString(arg));
                 }
             }
         }
@@ -334,11 +334,11 @@ public class WebStartServlet extends HttpServlet {
 
             params = parseQuery(query);
 
-            String dapService = params.get("dapService");
-            String besDatasetId = params.get("datasetID");
+            String dapService = Scrub.fileName(params.get("dapService"));
+            String besDatasetId = Scrub.fileName(params.get("datasetID"));
 
-            if(dapService==null || besDatasetId ==null){
-                log.error("No parameters sent to " + getClass().getName() + "?" + query + "'");
+            if(dapService==null || besDatasetId==null){
+                log.error("Incorrect parameters sent to '{}' query:{}", getClass().getName(),Scrub.simpleQueryString(query));
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
 
@@ -411,7 +411,7 @@ public class WebStartServlet extends HttpServlet {
                     pw.print(jnlpContent);
 
                 } else {
-                    log.error("Unable to locate a Java WebStart handler to respond to: '" + applicationID + "?" + query + "'");
+                    log.error("Unable to locate a Java WebStart handler to respond to: '{}?{}'",Scrub.simpleString(applicationID), Scrub.simpleQueryString(query));
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
