@@ -157,8 +157,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         } catch (FileNotFoundException e) {
             String msg = "gateway configuration file \"" + filename + "\" cannot be found.";
-            log.error(msg);
-            throw new ServletException(msg, e);
+            log.warn(msg);
+            // throw new ServletException(msg, e);
         } catch (IOException e) {
             String msg = "gateway configuration file \"" + filename + "\" is not readable.";
             log.error(msg);
@@ -169,7 +169,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             throw new ServletException(msg, e);
         }
 
-
+	return null;
     }
 
 
