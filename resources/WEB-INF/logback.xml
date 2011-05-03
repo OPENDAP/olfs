@@ -79,9 +79,6 @@
     </logger>
 
 
-    <logger name="opendap.hai" level="debug" />
-
-
 
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="all">
