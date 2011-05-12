@@ -135,7 +135,7 @@ public class DispatchServlet extends HttpServlet {
 
 
         buildHandlers("HttpGetHandlers", httpGetDispatchHandlers, httpGetHandlerConfigs);
-        identifyRequiredGetHandlers(httpGetDispatchHandlers);
+        //identifyRequiredGetHandlers(httpGetDispatchHandlers);
         intitializeHandlers(httpGetDispatchHandlers, httpGetHandlerConfigs);
 
 

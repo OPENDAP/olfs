@@ -638,11 +638,16 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 fileName,
                 useMemoryCache);
         */
+
+        log.debug("Memory report prior to static thredds catalog ingest: \n{}",opendap.coreServlet.Util.getMemoryReport());
+
         CatalogManager.addCatalog(
                 pathPrefix,
                 thisUrlPrefix,
                 fileName,
                 useMemoryCache);
+
+        log.debug("Memory report post static thredds catalog ingest: \n{}",opendap.coreServlet.Util.getMemoryReport());
 
         log.debug("THREDDS catalog.xml (and children thereof) have been ingested.");
 

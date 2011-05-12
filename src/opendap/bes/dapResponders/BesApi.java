@@ -1,52 +1,56 @@
-/////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
-//
-//
-// Copyright (c) 2011 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-/////////////////////////////////////////////////////////////////////////////
-package opendap.bes;
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * //
+ * //
+ * // Copyright (c) $year OPeNDAP, Inc.
+ * // Author: Nathan David Potter  <ndp@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
 
-import org.slf4j.Logger;
+package opendap.bes.dapResponders;
+
+import opendap.bes.*;
+import opendap.coreServlet.RequestCache;
+import opendap.ppt.OPeNDAPClient;
+import opendap.ppt.PPTException;
 import org.jdom.Document;
-import org.jdom.JDOMException;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.util.Iterator;
 
-import opendap.ppt.PPTException;
-import opendap.ppt.OPeNDAPClient;
-import opendap.coreServlet.RequestCache;
-
 /**
+ * Created by IntelliJ IDEA.
  * User: ndp
- * Date: Sep 5, 2008
- * Time: 1:07:46 PM
+ * Date: 5/11/11
+ * Time: 3:15 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class BesXmlAPI {
-
+public class BesApi {
 
     public static String DDS        = "dds";
     public static String DAS        = "das";
@@ -62,10 +66,6 @@ public class BesXmlAPI {
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
-
-
-
-
     public static String ERRORS_CONTEXT  = "errors";
     public static String XML_ERRORS      = "xml";
     public static String DAP2_ERRORS     = "dap2";
@@ -80,7 +80,7 @@ public class BesXmlAPI {
 
     private static Logger log;
     static {
-        log = org.slf4j.LoggerFactory.getLogger(BesXmlAPI.class);
+        log = org.slf4j.LoggerFactory.getLogger(BesApi.class);
     }
     private static boolean _initialized = false;
 
@@ -90,17 +90,30 @@ public class BesXmlAPI {
      */
     private static String BES_ERROR = "BESError";
 
+    /**
+     * Initializes logging for the BesAPI class.
+     */
+    public void init() {
 
-    public static boolean isConfigured() {
+        if (_initialized) return;
+
+
+        _initialized = true;
+
+
+    }
+
+
+    public boolean isConfigured() {
         return BESManager.isConfigured();
     }
 
 
-    public static Document getVersionDocument(String path) throws Exception {
+    public Document getVersionDocument(String path) throws Exception {
         return BESManager.getVersionDocument(path);
     }
 
-    public static Document getCombinedVersionDocument() throws Exception {
+    public Document getCombinedVersionDocument() throws Exception {
         return BESManager.getCombinedVersionDocument();
     }
 
@@ -123,12 +136,12 @@ public class BesXmlAPI {
      * @param err                  The Stream to which to errors returned by
      *                             the BES..
      * @return False if the BES returns an error, true otherwise.
-     * @throws BadConfigurationException .
-     * @throws BESError              .
+     * @throws opendap.bes.BadConfigurationException .
+     * @throws opendap.bes.BESError              .
      * @throws java.io.IOException               .
      * @throws opendap.ppt.PPTException              .
      */
-    public static boolean writeDDX(String dataSource,
+    public boolean writeDDX(String dataSource,
                                 String constraintExpression,
                                 String xdap_accept,
                                 String xmlBase,
@@ -160,7 +173,7 @@ public class BesXmlAPI {
          * @throws java.io.IOException               .
          * @throws opendap.ppt.PPTException              .
          */
-        public static boolean writeDataDDX(String dataSource,
+        public boolean writeDataDDX(String dataSource,
                                     String constraintExpression,
                                     String xdap_accept,
                                     String xmlBase,
@@ -183,7 +196,7 @@ public class BesXmlAPI {
         }
 
 
-    public static boolean getDDXDocument(String dataSource,
+    public boolean getDDXDocument(String dataSource,
                                           String constraintExpression,
                                           String xdap_accept,
                                           String xmlBase,
@@ -216,7 +229,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeDDS(String dataSource,
+    public boolean writeDDS(String dataSource,
                                 String constraintExpression,
                                 String xdap_accept,
                                 OutputStream os,
@@ -249,7 +262,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeFile(String dataSource,
+    public boolean writeFile(String dataSource,
                                  OutputStream os,
                                  OutputStream err)
             throws BadConfigurationException,
@@ -282,7 +295,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeDAS(String dataSource,
+    public boolean writeDAS(String dataSource,
                                 String constraintExpression,
                                 String xdap_accept,
                                 OutputStream os,
@@ -319,7 +332,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeDap2Data(String dataSource,
+    public boolean writeDap2Data(String dataSource,
                                      String constraintExpression,
                                      String xdap_accept,
                                      OutputStream os,
@@ -353,7 +366,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeNetcdfFileOut(String dataSource,
+    public boolean writeNetcdfFileOut(String dataSource,
                                              String constraintExpression,
                                             String xdap_accept,
                                             OutputStream os,
@@ -385,7 +398,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeXmlDataResponse(String dataSource,
+    public boolean writeXmlDataResponse(String dataSource,
                                              String constraintExpression,
                                             String xdap_accept,
                                             OutputStream os,
@@ -420,7 +433,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeASCII(String dataSource,
+    public boolean writeASCII(String dataSource,
                                   String constraintExpression,
                                   String xdap_accept,
                                   OutputStream os,
@@ -453,7 +466,7 @@ public class BesXmlAPI {
      * @throws IOException              .
      * @throws BESError              .
      */
-    public static boolean writeHTMLForm(String dataSource,
+    public boolean writeHTMLForm(String dataSource,
                                         String xdap_accept,
                                         String url,
                                         OutputStream os,
@@ -486,7 +499,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static boolean writeHtmlInfoPage(String dataSource,
+    public boolean writeHtmlInfoPage(String dataSource,
                                             String xdap_accept,
                                             OutputStream os,
                                             OutputStream err)
@@ -515,7 +528,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws JDOMException             .
      */
-    public static boolean getVersion(String dataSource, Document response) throws
+    public boolean getVersion(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,
@@ -543,7 +556,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws JDOMException             .
      */
-    public static boolean getCatalog(String dataSource, Document response) throws
+    public boolean getCatalog(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,
@@ -622,7 +635,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws JDOMException             .
      */
-    public static boolean getInfo(String dataSource, Document response) throws
+    public boolean getInfo(String dataSource, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,
@@ -694,7 +707,7 @@ public class BesXmlAPI {
 
     }
 
-    private static class NoSuchDatasource {
+    private class NoSuchDatasource {
         Document err;
         NoSuchDatasource(Document besError){
             err = besError;
@@ -738,7 +751,7 @@ public class BesXmlAPI {
 
 
 
-    
+
 
 
 
@@ -759,7 +772,7 @@ public class BesXmlAPI {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public static InputStream getDap2DataStream(String dataSource,
+    public InputStream getDap2DataStream(String dataSource,
                                                 String constraintExpression,
                                                 String xdap_accept)
             throws BadConfigurationException, BESError, PPTException, IOException {
@@ -801,7 +814,7 @@ public class BesXmlAPI {
      * @throws BadConfigurationException
      * @throws JDOMException
      */
-    public static boolean besTransaction( BES bes,
+    public boolean besTransaction( BES bes,
                                            Document request,
                                            Document response
                                             )
@@ -906,7 +919,7 @@ public class BesXmlAPI {
      * @throws BadConfigurationException
      * @throws JDOMException
      */
-    public static boolean besTransaction( String dataSource,
+    public boolean besTransaction( String dataSource,
                                            Document request,
                                            Document response
                                             )
@@ -951,7 +964,7 @@ public class BesXmlAPI {
      * @throws IOException
      * @throws PPTException
      */
-    public static boolean besTransaction(String dataSource,
+    public boolean besTransaction(String dataSource,
                                              Document request,
                                              OutputStream os,
                                              OutputStream err)
@@ -1003,7 +1016,7 @@ public class BesXmlAPI {
 
 
 
-    public static Element setContainerElement(String name,
+    public Element setContainerElement(String name,
                                                String space,
                                                String source,
                                                String type) {
@@ -1017,7 +1030,7 @@ public class BesXmlAPI {
         return e;
     }
 
-    public static Element defineElement(String name,
+    public Element defineElement(String name,
                                          String space) {
 
         Element e = new Element("define",BES_NS);
@@ -1027,20 +1040,20 @@ public class BesXmlAPI {
     }
 
 
-    public static Element containerElement(String name) {
+    public Element containerElement(String name) {
         Element e = new Element("container",BES_NS);
         e.setAttribute("name",name);
         return e;
     }
 
 
-    public static Element constraintElement(String ce) {
+    public Element constraintElement(String ce) {
         Element e = new Element("constraint",BES_NS);
         e.setText(ce);
         return e;
     }
 
-    public static Element getElement(String type,
+    public Element getElement(String type,
                                       String definition,
                                       String url,
                                       String returnAs ) {
@@ -1057,7 +1070,7 @@ public class BesXmlAPI {
     }
 
 
-    public static Element setContextElement(String name, String value) {
+    public Element setContextElement(String name, String value) {
         Element e = new Element("setContext",BES_NS);
         e.setAttribute("name",name);
         e.setText(value);
@@ -1081,7 +1094,7 @@ public class BesXmlAPI {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public static Document getDDXRequest(String dataSource,
+    public Document getDDXRequest(String dataSource,
                                          String ce,
                                          String xdap_accept,
                                          String xmlBase)
@@ -1103,7 +1116,7 @@ public class BesXmlAPI {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public static Document getDataDDXRequest(String dataSource,
+    public Document getDataDDXRequest(String dataSource,
                                          String ce,
                                          String xdap_accept,
                                          String xmlBase,
@@ -1141,7 +1154,7 @@ public class BesXmlAPI {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public static Document getDDSRequest(String dataSource,
+    public Document getDDSRequest(String dataSource,
                                          String ce,
                                          String xdap_accept)
             throws BadConfigurationException {
@@ -1151,7 +1164,7 @@ public class BesXmlAPI {
     }
 
 
-    public static Document getDASRequest(String dataSource,
+    public Document getDASRequest(String dataSource,
                                          String ce,
                                          String xdap_accept)
             throws BadConfigurationException {
@@ -1160,7 +1173,7 @@ public class BesXmlAPI {
 
     }
 
-    public static Document getDap2DataRequest(String dataSource,
+    public Document getDap2DataRequest(String dataSource,
                                               String ce,
                                               String xdap_accept)
             throws BadConfigurationException {
@@ -1169,7 +1182,7 @@ public class BesXmlAPI {
 
     }
 
-    public static Document getAsciiDataRequest(String dataSource,
+    public Document getAsciiDataRequest(String dataSource,
                                                String ce,
                                                String xdap_accept)
             throws BadConfigurationException {
@@ -1179,7 +1192,7 @@ public class BesXmlAPI {
     }
 
 
-    public static Document getHtmlFormRequest(String dataSource,
+    public Document getHtmlFormRequest(String dataSource,
                                               String xdap_accept,
                                               String URL)
             throws BadConfigurationException {
@@ -1188,7 +1201,7 @@ public class BesXmlAPI {
 
     }
 
-    public static Document getStreamRequest(String dataSource)
+    public Document getStreamRequest(String dataSource)
             throws BadConfigurationException{
 
         return getRequestDocument(STREAM,dataSource,null,null,null,null,null,XML_ERRORS);
@@ -1196,14 +1209,14 @@ public class BesXmlAPI {
     }
 
 
-    public static Document getHtmlInfoPageRequest(String dataSource, String xdap_accept)
+    public Document getHtmlInfoPageRequest(String dataSource, String xdap_accept)
             throws BadConfigurationException {
 
         return getRequestDocument(INFO_PAGE,dataSource,null,xdap_accept,null,null,null,XML_ERRORS);
 
     }
 
-    public static Document getNetcdfFileOutRequest(String dataSource, String ce, String xdap_accept)
+    public Document getNetcdfFileOutRequest(String dataSource, String ce, String xdap_accept)
             throws BadConfigurationException {
 
 
@@ -1221,7 +1234,7 @@ public class BesXmlAPI {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public static Document getXmlDataRequest(String dataSource,
+    public Document getXmlDataRequest(String dataSource,
                                          String ce,
                                          String xdap_accept)
             throws BadConfigurationException {
@@ -1232,7 +1245,7 @@ public class BesXmlAPI {
 
 
 
-    public static  Document getRequestDocument(String type,
+    public  Document getRequestDocument(String type,
                                                 String dataSource,
                                                 String ce,
                                                 String xdap_accept,
@@ -1293,28 +1306,28 @@ public class BesXmlAPI {
 
 
 
-    public static Document showVersionRequest()
+    public Document showVersionRequest()
         throws BadConfigurationException {
         return showRequestDocument("showVersion",null);
 
     }
 
 
-    public static Document showCatalogRequest(String dataSource)
+    public Document showCatalogRequest(String dataSource)
             throws BadConfigurationException {
         return showRequestDocument("showCatalog",dataSource);
 
     }
 
 
-    public static Document showInfoRequest(String dataSource)
+    public Document showInfoRequest(String dataSource)
             throws BadConfigurationException {
         return showRequestDocument("showInfo",dataSource);
     }
 
 
 
-    public static Document showRequestDocument(String type, String dataSource)
+    public Document showRequestDocument(String type, String dataSource)
             throws BadConfigurationException {
 
 
@@ -1342,7 +1355,7 @@ public class BesXmlAPI {
 
 
 
-    public static BES getBES(String dataSource) throws BadConfigurationException {
+    public BES getBES(String dataSource) throws BadConfigurationException {
         BES bes = BESManager.getBES(dataSource);
 
         if (bes == null)
@@ -1350,7 +1363,7 @@ public class BesXmlAPI {
         return bes;
     }
 
-    public static String getBESprefix(String dataSource) throws BadConfigurationException {
+    public String getBESprefix(String dataSource) throws BadConfigurationException {
         BES bes = BESManager.getBES(dataSource);
 
         if (bes == null)
@@ -1359,14 +1372,14 @@ public class BesXmlAPI {
     }
 
 
-    static void showRequest(Document request, OutputStream os) throws IOException{
+     void showRequest(Document request, OutputStream os) throws IOException{
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         xmlo.output(request, os);
 
 
     }
 
-    static String showRequest(Document request) throws IOException{
+    String showRequest(Document request) throws IOException{
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         return xmlo.outputString(request);
@@ -1388,11 +1401,4 @@ public class BesXmlAPI {
 
 
 
-
 }
-
-
-
-
-
-

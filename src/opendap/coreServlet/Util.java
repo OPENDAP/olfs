@@ -33,6 +33,9 @@ import javax.servlet.ServletConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Enumeration;
@@ -379,10 +382,62 @@ public class Util {
     }
 
 
+    public static String urlInfo(URL url){
+        String msg = "\n";
+
+        msg += "URL: "+url.toString()+"\n";
+        msg += "  protocol:      "+url.getProtocol()+"\n";
+        msg += "  host:          "+url.getHost()+"\n";
+        msg += "  port:          "+url.getPort()+"\n";
+        msg += "  default port:  "+url.getDefaultPort()+"\n";
+        msg += "  path:          "+url.getPath()+"\n";
+        msg += "  query:         "+url.getQuery()+"\n";
+        msg += "  file:          "+url.getFile()+"\n";
+        msg += "  ref:           "+url.getRef()+"\n";
+        msg += "  user info:     "+url.getUserInfo()+"\n";
+        msg += "  hash code:     "+url.hashCode()+"\n";
+
+        try {
+            msg += "  URI:           "+url.toURI().toASCIIString()+"\n";
+        } catch (URISyntaxException e) {
+            msg += "  URI:            error: Could not express the URL as URI because: "+e.getMessage()+"\n";
+        }
+
+        return msg;
+    }
+
+    public static String uriInfo(URI uri){
+
+        String msg = "\n";
 
 
+        msg += "URI: "+uri.toString()+"\n";
+        msg += "  Authority:              "+uri.getAuthority()+"\n";
+        msg += "  Host:                   "+uri.getHost()+"\n";
+        msg += "  Port:                   "+uri.getPort()+"\n";
+        msg += "  Path:                   "+uri.getPath()+"\n";
+        msg += "  Query:                  "+uri.getQuery()+"\n";
+        msg += "  hashCode:               "+uri.hashCode()+"\n";
+        msg += "  Fragment:               "+uri.getFragment()+"\n";
+        msg += "  RawAuthority:           "+uri.getRawAuthority()+"\n";
+        msg += "  RawFragment:            "+uri.getRawFragment()+"\n";
+        msg += "  RawPath:                "+uri.getRawPath()+"\n";
+        msg += "  RawQuery:               "+uri.getRawQuery()+"\n";
+        msg += "  RawSchemeSpecificPart:  "+uri.getRawSchemeSpecificPart()+"\n";
+        msg += "  RawUSerInfo:            "+uri.getRawUserInfo()+"\n";
+        msg += "  Scheme:                 "+uri.getScheme()+"\n";
+        msg += "  SchemeSpecificPart:     "+uri.getSchemeSpecificPart()+"\n";
+        msg += "  UserInfo:               "+uri.getUserInfo()+"\n";
+        msg += "  isAbsoulte:             "+uri.isAbsolute()+"\n";
+        msg += "  isOpaque:               "+uri.isOpaque()+"\n";
+        msg += "  ASCIIString:            "+uri.toASCIIString()+"\n";
 
+        try {
+            msg += "  URL:                    "+uri.toURL()+"\n";
+        } catch (Exception e) {
+            msg += "  URL:                    uri.toURL() FAILED msg="+e.getMessage();
+        }
 
-
-
+        return msg;
+    }
 }

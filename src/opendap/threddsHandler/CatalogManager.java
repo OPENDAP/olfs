@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
+import opendap.ncml.NcmlManager;
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -191,6 +192,7 @@ public class CatalogManager {
         _log.debug("Ingesting inherited metadata (if any) for catalog '"+catalog.getName()+"'");
         InheritedMetadataManager.ingestInheritedMetadata(catalog);
 
+        _log.debug("Ingesting NcML datasets (if any) for catalog '"+catalog.getName()+"'");
         NcmlManager.ingestNcml(catalog);
 
         _catalogs.put(catalogKey, catalog);
@@ -286,16 +288,16 @@ public class CatalogManager {
      * @param catalogKey
      */
     private static void purgeCatalog(String catalogKey) {
-        Catalog c;
+        Catalog catalog;
         String childCatalogKeys[];
 
 
         if (catalogKey != null) {
 
             _log.debug("purgeCatalog(): Removing catalog: " + catalogKey);
-            c = _catalogs.remove(catalogKey);
+            catalog = _catalogs.remove(catalogKey);
 
-            if (c == null) {
+            if (catalog == null) {
                 _log.warn("purgeCatalog(): Catalog '" + catalogKey + "' not in catalog collection!!");
             }
 
@@ -316,8 +318,11 @@ public class CatalogManager {
             _log.debug("purgeCatalog(): Purging inherited metadata (if any) for catalogKey: " +catalogKey);
             InheritedMetadataManager.purgeInheritedMetadata(catalogKey);
 
+            _log.debug("purgeCatalog(): Purging NcML data sets (if any) for catalogKey: " +catalogKey);
+            NcmlManager.purgeNcmlDatasets(catalog);
 
-            // c.destroy();
+
+            // catalog.destroy();
             _log.debug("purgeCatalog(): Purged catalog: " + catalogKey);
 
 

@@ -103,73 +103,6 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     }
 
-    public static String urlInfo(URL url){
-        String msg = "\n";
-
-        msg += "URL: "+url.toString()+"\n";
-        msg += "  protocol:      "+url.getProtocol()+"\n";
-        msg += "  host:          "+url.getHost()+"\n";
-        msg += "  port:          "+url.getPort()+"\n";
-        msg += "  default port:  "+url.getDefaultPort()+"\n";
-        msg += "  path:          "+url.getPath()+"\n";
-        msg += "  query:         "+url.getQuery()+"\n";
-        msg += "  file:          "+url.getFile()+"\n";
-        msg += "  ref:           "+url.getRef()+"\n";
-        msg += "  user info:     "+url.getUserInfo()+"\n";
-        msg += "  hash code:     "+url.hashCode()+"\n";
-
-        try {
-            msg += "  URI:           "+url.toURI().toASCIIString()+"\n";
-        } catch (URISyntaxException e) {
-            msg += "  URI:            error: Could not express the URL as URI because: "+e.getMessage()+"\n";
-        }
-
-        return msg;
-    }
-
-
-
-
-
-
-    public static String uriInfo(URI uri){
-
-        String msg = "\n";
-
-
-        msg += "URI: "+uri.toString()+"\n";
-        msg += "  Authority:              "+uri.getAuthority()+"\n";
-        msg += "  Host:                   "+uri.getHost()+"\n";
-        msg += "  Port:                   "+uri.getPort()+"\n";
-        msg += "  Path:                   "+uri.getPath()+"\n";
-        msg += "  Query:                  "+uri.getQuery()+"\n";
-        msg += "  hashCode:               "+uri.hashCode()+"\n";
-        msg += "  Fragment:               "+uri.getFragment()+"\n";
-        msg += "  RawAuthority:           "+uri.getRawAuthority()+"\n";
-        msg += "  RawFragment:            "+uri.getRawFragment()+"\n";
-        msg += "  RawPath:                "+uri.getRawPath()+"\n";
-        msg += "  RawQuery:               "+uri.getRawQuery()+"\n";
-        msg += "  RawSchemeSpecificPart:  "+uri.getRawSchemeSpecificPart()+"\n";
-        msg += "  RawUSerInfo:            "+uri.getRawUserInfo()+"\n";
-        msg += "  Scheme:                 "+uri.getScheme()+"\n";
-        msg += "  SchemeSpecificPart:     "+uri.getSchemeSpecificPart()+"\n";
-        msg += "  UserInfo:               "+uri.getUserInfo()+"\n";
-        msg += "  isAbsoulte:             "+uri.isAbsolute()+"\n";
-        msg += "  isOpaque:               "+uri.isOpaque()+"\n";
-        msg += "  ASCIIString:            "+uri.toASCIIString()+"\n";
-
-        try {
-            msg += "  URL:                    "+uri.toURL()+"\n";
-        } catch (Exception e) {
-            msg += "  URL:                    uri.toURL() FAILED msg="+e.getMessage();
-        }
-
-        return msg;
-    }
-
-
-
-
 
     public void init(HttpServlet servlet, Element config) throws Exception {
         if (_initialized) return;
@@ -246,11 +179,11 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
                 String host = hostElem.getTextTrim();
 
                 url = new URL(host);
-                log.debug(urlInfo(url));
+                log.debug(Util.urlInfo(url));
 
 
                 uri = new URI(host);
-                log.debug(uriInfo(uri));
+                log.debug(Util.uriInfo(uri));
 
                 log.info("Adding " + url + " to allowed hosts list.");
                 trustedHosts.add(host);

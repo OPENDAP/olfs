@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 /**
  * IsoDispatchHandler for ISO responses from Hyrax
  */
-public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
+public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
 
 
@@ -59,7 +59,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler {
     private Element _config;
 
 
-    public DispatchHandler(){
+    public NcmlFileDispatcher(){
         log = LoggerFactory.getLogger(getClass());
     }
 

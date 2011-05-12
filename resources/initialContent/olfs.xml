@@ -62,7 +62,7 @@
             <Handler className="opendap.nciso.IsoDispatchHandler" />
             <Handler className="opendap.nciso.RubricDispatchHandler" />
 
-            <Handler className="opendap.ncml.DispatchHandler" />
+            <Handler className="opendap.ncml.NcmlFileDispatcher" />
 
             <Handler className="opendap.bes.DapDispatchHandler" />
 

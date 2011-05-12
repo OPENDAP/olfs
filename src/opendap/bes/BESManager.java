@@ -108,10 +108,6 @@ public class BESManager implements DispatchHandler {
 
         if(_isConfigured) return;
 
-        // BesAPI.init();
-        BesXmlAPI.init();
-
-
         _besCollection  = new Vector<BES>();
 
         List besList = besConfiguration.getChildren("BES");
@@ -168,7 +164,7 @@ public class BESManager implements DispatchHandler {
             path = "/";
 
         if(path.indexOf("/")!=0){
-            log.debug("Appending / to path: "+ path);
+            log.debug("Pre-pending / to path: "+ path);
             path = "/"+path;
         }
 
