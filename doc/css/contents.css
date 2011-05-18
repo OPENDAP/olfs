@@ -3,24 +3,28 @@ H1 {
     color:white;
     background-color:#527CC1;
     font-size:22px;
+    padding-left: 5px;
 }
 H2 {
     font-family:Tahoma,Arial,sans-serif;
     color:white;
     background-color:#527CC1;
     font-size:16px;
+    padding-left: 5px;
 }
 H3 {
     font-family:Tahoma,Arial,sans-serif;
     color:white;
     background-color:#527CC1;
     font-size:14px;
+    padding-left: 5px;
     }
 H4 {
     font-family:Tahoma,Arial,sans-serif;
     color:white;
     background-color:#527CC1;
     font-size:12px;
+    padding-left: 5px;
     }
 BODY {
     font-family:Tahoma,Arial,sans-serif;

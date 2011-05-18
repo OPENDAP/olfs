@@ -66,7 +66,7 @@ public class OPeNDAPClient {
     private OutputStream _stream = null;
     private boolean _isRunning;
     private Logger log = null;
-    private int _id;
+    private String _id;
 
     /**
      * Creates a OpenDAPClient to handle OpenDAP requests.
@@ -83,11 +83,11 @@ public class OPeNDAPClient {
     }
 
 
-    public int getID() {
+    public String getID() {
         return _id;
     }
 
-    public void setID(int ID) {
+    public void setID(String ID) {
         _id = ID;
     }
 

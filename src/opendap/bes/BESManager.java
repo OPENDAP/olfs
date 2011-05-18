@@ -27,6 +27,7 @@ package opendap.bes;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.List;
 
@@ -75,6 +76,10 @@ public class BESManager implements DispatchHandler {
         initialized = true;
 
     }
+
+
+
+
 
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception{
@@ -186,6 +191,12 @@ public class BESManager implements DispatchHandler {
         }
 
         return result;
+
+    }
+
+    public static Iterator<BES> getBES(){
+
+        return _besCollection.listIterator();
 
     }
 

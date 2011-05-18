@@ -6,7 +6,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.BesXmlAPI;
 import opendap.namespaces.*;
 import opendap.ppt.PPTException;
-import opendap.semantics.IRISail.ThreddsCatalogUtil;
+import opendap.threddsHandler.ThreddsCatalogUtil;
 import opendap.threddsHandler.Catalog;
 import org.jdom.Document;
 import org.jdom.Element;

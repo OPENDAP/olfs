@@ -21,6 +21,9 @@
                     <!-- The port number for this BES -->
                     <port>10002</port>
 
+                    <!-- The port number for this BES -->
+                    <adminPort>11002</adminPort>
+
                     <!-- The ClientPool maximum number of concurrent
                       -  BES client connections allowed.
                       -->

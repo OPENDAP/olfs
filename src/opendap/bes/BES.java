@@ -24,17 +24,22 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Enumeration;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.List;
 import java.util.HashMap;
 import java.io.IOException;
 
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.jdom.JDOMException;
 import org.jdom.Document;
@@ -52,23 +57,23 @@ public class BES {
 
 
     private ArrayBlockingQueue<OPeNDAPClient> _clientQueue;
-    private HashMap<Integer, OPeNDAPClient> _clients;
+    private ConcurrentHashMap<String, OPeNDAPClient> _clients;
     private Semaphore _checkOutFlag;
     private BESConfig _config;
     private int totalClients;
+    private ReentrantLock _adminLock;
+    private OPeNDAPClient adminClient;
 
 
     private Document _serverVersionDocument;
     private ReentrantLock _versionDocLock;
-    private ReentrantLock _mapLock;
+    private ReentrantLock _clientsMapLock;
     private ReentrantLock _clientCheckoutLock;
 
-    private int clientMaxCommands;
-
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
+    private static final Namespace BES_ADMIN_NS = opendap.namespaces.BES.BES_NS;
 
 
-    //private DevNull devNull = new DevNull();
 
 
     public BES(BESConfig config) throws Exception {
@@ -82,18 +87,22 @@ public class BES {
         _checkOutFlag = new Semaphore(getMaxClients(), true);
         totalClients = 0;
 
+        _adminLock = new ReentrantLock(true);
         _versionDocLock = new ReentrantLock(true);
-        _mapLock = new ReentrantLock(true);
-        _clients = new HashMap<Integer, OPeNDAPClient>();
+        _clientsMapLock = new ReentrantLock(true);
+        _clients = new ConcurrentHashMap<String, OPeNDAPClient>();
 
 
         log.debug("BES built with configuration: \n" + _config);
         _serverVersionDocument = null;
 
-        clientMaxCommands = 2000;
 
     }
 
+
+    public int getAdminPort() {
+        return _config.getAdminPort();
+    }
 
     public int getPort() {
         return _config.getPort();
@@ -111,6 +120,13 @@ public class BES {
         return _config.getMaxClients();
     }
 
+    public int getBesClientCount(){
+        return _clients.size();
+    }
+
+    public Enumeration<OPeNDAPClient> getClients(){
+        return _clients.elements();
+    }
 
     public String toString() {
 
@@ -118,9 +134,82 @@ public class BES {
                 " host: " + getHost() +
                 " port: " + getPort() +
                 " maxClients: " + getMaxClients() +
-                " maxClientCommands: " + clientMaxCommands +
+                " maxClientCommands: " + _config.getMaxCommands() +
                 "]";
 
+
+    }
+
+    public String executeBesAdminCommand(String besCmd){
+        StringBuffer sb = new StringBuffer();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        if(getAdminPort()<=0){
+            sb.append("BES Admin Service is not configured! Port number for admin connection has not been set!");
+            return sb.toString();
+        }
+
+        try {
+            _adminLock.lock();
+            OPeNDAPClient admin = new OPeNDAPClient();
+            admin.startClient(getHost(), getAdminPort());
+
+
+            admin.executeCommand(besCmd,baos,baos);
+
+            return baos.toString();
+
+        } catch (PPTException e) {
+
+            sb.append("Failed to execute BES command. Message: ")
+            .append(e.getMessage());
+
+            return sb.toString();
+        }
+        finally {
+            _adminLock.unlock();
+        }
+
+    }
+    public String start(){
+        String startCmd = getStartCommand();
+        return executeBesAdminCommand(startCmd);
+    }
+
+    public String stopNice(long timeOut){
+        String startCmd = getStopNiceCommand();
+        return executeBesAdminCommand(startCmd);
+    }
+
+    public String stopNow(){
+        String startCmd = getStopNowCommand();
+        return executeBesAdminCommand(startCmd);
+    }
+
+    public String getStartCommand(){
+        return  getBesCommand("Start");
+    }
+
+    public String getStopNowCommand(){
+        return  getBesCommand("StopNow");
+    }
+
+    public String getStopNiceCommand(){
+        return  getBesCommand("StopNice");
+    }
+
+
+    public String getBesCommand(String besCmd){
+
+        Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
+        Element cmd = new Element(besCmd,BES_ADMIN_NS);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
 
     }
 
@@ -247,6 +336,7 @@ public class BES {
             throws PPTException, BadConfigurationException {
 
         OPeNDAPClient odc = null;
+        String clientId;
 
         if (_checkOutFlag == null)
             return null;
@@ -267,13 +357,14 @@ public class BES {
                 odc.startClient(getHost(), getPort());
 
                 try {
-                    _mapLock.lock();
-                    odc.setID(totalClients);
-                    _clients.put(totalClients, odc);
+                    _clientsMapLock.lock();
+                    clientId="besC-"+totalClients;
+                    odc.setID(clientId);
+                    _clients.put(clientId, odc);
                     totalClients++;
                 }
                 finally {
-                    _mapLock.unlock();
+                    _clientsMapLock.unlock();
                 }
 
 
@@ -312,26 +403,26 @@ public class BES {
      * When a piece of code is done using an OPeNDAPClient, it should return it
      * to the pool using this method.
      *
-     * @param odc     The OPeNDAPClient to return to the client pool.
+     * @param dapClient     The OPeNDAPClient to return to the client pool.
      * @param discard Pitch it, it's broken.
      * @throws PPTException .
      */
-    public void returnClient(OPeNDAPClient odc, boolean discard) throws PPTException {
+    public void returnClient(OPeNDAPClient dapClient, boolean discard) throws PPTException {
 
 
-        if (odc == null)
+        if (dapClient == null)
             return;
 
-        //log.debug("returnClient() clientID="+odc.getID()+"  discard="+discard);
+        //log.debug("returnClient() clientID="+dapClient.getID()+"  discard="+discard);
 
 
         try {
 
             if (discard){
-                discardClient(odc);
+                discardClient(dapClient);
             }
             else {
-                checkInClient(odc);
+                checkInClient(dapClient);
             }
 
         } catch (PPTException e) {
@@ -342,11 +433,11 @@ public class BES {
 
             log.error(msg);
             try {
-                _mapLock.lock();
-                _clients.remove(odc.getID());
+                _clientsMapLock.lock();
+                _clients.remove(dapClient.getID());
             }
             finally {
-                _mapLock.unlock();
+                _clientsMapLock.unlock();
             }
 
             throw new PPTException(msg, e);
@@ -359,23 +450,23 @@ public class BES {
     }
 
 
-    private void checkInClient(OPeNDAPClient odc) throws PPTException {
+    private void checkInClient(OPeNDAPClient dapClient) throws PPTException {
 
 
-        if (clientMaxCommands > 0 && odc.getCommandCount() > clientMaxCommands) {
-            discardClient(odc);
+        if (_config.getMaxCommands() > 0 && dapClient.getCommandCount() > _config.getMaxCommands()) {
+            discardClient(dapClient);
             log.debug("checkInClient() This instance of OPeNDAPClient (id:"+
-                    odc.getID()+") has " +
-                    "excecuted " + odc.getCommandCount() +
+                    dapClient.getID()+") has " +
+                    "excecuted " + dapClient.getCommandCount() +
                     " commands which is in excess of the maximum command " +
-                    "limit of " + clientMaxCommands + ", discarding client.");
+                    "limit of " + _config.getMaxCommands() + ", discarding client.");
 
         }
         else {
 
-            if(_clientQueue.offer(odc)){
+            if(_clientQueue.offer(dapClient)){
             log.debug("checkInClient() Returned OPeNDAPClient (id:"+
-                    odc.getID()+") to Pool.");
+                    dapClient.getID()+") to Pool.");
             }
             else {
                 log.error("checkInClient(): OUCH! OUCH! OUCH! The Pool is " +
@@ -389,24 +480,24 @@ public class BES {
     }
 
 
-    private void discardClient(OPeNDAPClient odc) throws PPTException {
+    private void discardClient(OPeNDAPClient dapClient) throws PPTException {
         // By failing to put the client into the queue and
         // removing the client from the _clients Map the client is
         // discarded.
 
-        log.debug("discardClient() Discarding OPeNDAPClient #"+odc.getID());
+        log.debug("discardClient() Discarding OPeNDAPClient #" +dapClient.getID());
 
         try {
-            _mapLock.lock();
-            _clients.remove(odc.getID());
+            _clientsMapLock.lock();
+            _clients.remove(dapClient.getID());
         }
         finally {
-            _mapLock.unlock();
+            _clientsMapLock.unlock();
         }
 
 
-        if (odc.isRunning()) {
-            shutdownClient(odc);
+        if (dapClient.isRunning()) {
+            shutdownClient(dapClient);
         }
 
     }
@@ -484,7 +575,7 @@ public class BES {
             log.debug("destroy() Timed Out. Destroying Clients.");
 
             try {
-                _mapLock.lock();
+                _clientsMapLock.lock();
                 for (int i = 0; i < totalClients; i++) {
                     OPeNDAPClient oc = _clients.get(i);
                     if (oc != null) {
@@ -499,7 +590,7 @@ public class BES {
 
                 }
             } finally {
-                _mapLock.unlock();
+                _clientsMapLock.unlock();
             }
         }
 

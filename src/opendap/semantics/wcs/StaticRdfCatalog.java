@@ -30,6 +30,7 @@ package opendap.semantics.wcs;
 import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
 import opendap.semantics.IRISail.*;
+import opendap.threddsHandler.ThreddsCatalogUtil;
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.JDOMException;

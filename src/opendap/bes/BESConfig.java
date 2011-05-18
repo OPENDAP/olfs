@@ -49,7 +49,9 @@ public class BESConfig  {
 
     private  String    _BESHost;
     private  int       _BESPort;
+    private  int       _BESAdminPort;
     private  int       _BESMaxClients;
+    private  int       _BESMaxCommands;
     private  String    _BESPrefix;
     //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
@@ -60,7 +62,9 @@ public class BESConfig  {
 
         _BESHost = "HostNameIsNotSet!";
         _BESPort = -1;
+        _BESAdminPort = -1;
         _BESMaxClients = 10;
+        _BESMaxCommands = 2000;
         _BESPrefix = "/";
     }
 
@@ -85,7 +89,9 @@ public class BESConfig  {
 
         copy._BESHost        = _BESHost;
         copy._BESPort        = _BESPort;
+        copy._BESAdminPort   = _BESAdminPort;
         copy._BESMaxClients  = _BESMaxClients;
+        copy._BESMaxCommands = _BESMaxCommands;
         copy._BESPrefix      = _BESPrefix;
 
         return copy;
@@ -154,6 +160,15 @@ public class BESConfig  {
         }
 
 
+        Element prefix = besConfig.getChild("prefix");
+        if( prefix!=null ){
+            setPrefix(prefix.getTextTrim());
+            log.info("BES prefix set to '{}'",getPrefix());
+        }
+        else {
+            log.warn("BES prefix not set in configuration. Using default value of: '{}'",getPrefix());
+        }
+
 
         Element host = besConfig.getChild("host");
         if( host==null ){
@@ -175,10 +190,14 @@ public class BESConfig  {
 
 
 
-        Element prefix = besConfig.getChild("prefix");
-        if( prefix!=null ){
-            setPrefix(prefix.getTextTrim());
+        Element adminPort = besConfig.getChild("adminPort");
+        if( adminPort!=null ){
+            setAdminPort(adminPort.getTextTrim());
+            log.info("BES '{}' adminPort set to {}",getPrefix(), getAdminPort());
         }
+
+
+
 
         Element clientPool = besConfig.getChild("ClientPool");
 
@@ -187,15 +206,42 @@ public class BESConfig  {
 
             Attribute maxClients = clientPool.getAttribute("maximum");
 
-            int clients = maxClients.getIntValue();
+            if(maxClients != null){
+                int clients = maxClients.getIntValue();
 
-            if(clients<1){
-                throw new Exception("OLFS configuration document does not " +
-                        "contain correct content. The <ClientPool> element " +
-                        "MUST contain an Attribute called \"maximum\" whose " +
-                        "value is an integer greater than 0 (zero).");
+                if(clients<1){
+                    throw new Exception("OLFS configuration document does not " +
+                            "MAY correct content. The <ClientPool> element " +
+                            "MUST contain an Attribute called \"maximum\" whose " +
+                            "value MUST be an integer greater than 0 (zero).");
+                }
+                setMaxClients(clients);
             }
-            setMaxClients(clients);
+            else {
+                log.warn("Configuration of BES ClientPool did not specify a 'maximum' size. Using default value.");
+            }
+            log.info("BES '{}' client pool will have a maximum size of {}",getPrefix(), getMaxClients());
+
+
+            Attribute maxCmds = clientPool.getAttribute("maxCmds");
+
+            if(maxCmds != null){
+                int max = maxCmds.getIntValue();
+
+                if(max<0){
+                    throw new Exception("OLFS configuration document does not " +
+                            "contain correct content. The <ClientPool> element " +
+                            "MAY contain an Attribute called \"maxCmds\" whose " +
+                            "value is an integer greater than or equal to 0 (zero).");
+                }
+                setMaxCommands(max);
+            }
+            else {
+                log.warn("Configuration of BES ClientPool did not specify a 'maxCmds' value. Using default value.");
+            }
+            log.info("BES '{}' clients be used for at most {} commands",getPrefix(), getMaxCommands());
+
+
         }
 
 
@@ -205,6 +251,13 @@ public class BESConfig  {
 
 
 
+    public void setMaxCommands(int max){
+        _BESMaxCommands = max;
+    }
+
+    public int getMaxCommands(){
+        return _BESMaxCommands;
+    }
 
 
 
@@ -250,9 +303,13 @@ public class BESConfig  {
         Element port = new Element("port");
         port.setText(String.valueOf(getPort()));
 
+        Element adminPort = new Element("adminPort");
+        adminPort.setText(String.valueOf(getAdminPort()));
+
 
         Element clientPool = new Element("ClientPool");
         clientPool.setAttribute("maximum",Integer.toString(_BESMaxClients));
+        clientPool.setAttribute("maxCmds",Integer.toString(_BESMaxCommands));
 
         bes.addContent(prefix);
         bes.addContent(host);
@@ -274,6 +331,10 @@ public class BESConfig  {
     public void setPort(int port){ _BESPort = port; }
     public int getPort() { return _BESPort; }
 
+    public void setAdminPort(String port){ _BESAdminPort = Integer.parseInt(port); }
+    public void setAdminPort(int port){ _BESAdminPort = port; }
+    public int getAdminPort() { return _BESAdminPort; }
+
 
     public void setPrefix(String prefix){ _BESPrefix = prefix; }
     public String getPrefix() { return _BESPrefix; }
@@ -293,7 +354,9 @@ public class BESConfig  {
         s += "        Prefix:     " + getPrefix() + "\n";
         s += "        Host:       " + getHost() + "\n";
         s += "        Port:       " + getPort() + "\n";
+        s += "        adminPort:  " + getAdminPort() + "\n";
         s += "        MaxClients: " + getMaxClients() + "\n";
+        s += "        MaxCommands/client: " + getMaxCommands() + "\n";
 
 
 
@@ -446,6 +509,23 @@ public class BESConfig  {
                 done = true;
             }
             else if(bc.getPort()==-1)
+                System.out.println("You must enter a port number.\n\n");
+            else
+                done = true;
+        }
+
+
+
+        done = false;
+        while(!done){
+            System.out.print("\nEnter the admin port number for the BES host "+bc.getHost()+"   ");
+            System.out.print("[" + bc.getAdminPort() + "]: ");
+            k = kybrd.readLine();
+            if (k!=null && !k.equals("")){
+                bc.setAdminPort(k);
+                done = true;
+            }
+            else if(bc.getAdminPort()==-1)
                 System.out.println("You must enter a port number.\n\n");
             else
                 done = true;
