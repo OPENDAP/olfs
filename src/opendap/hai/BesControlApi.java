@@ -275,19 +275,19 @@ public class BesControlApi extends HttpResponder {
 
         sb.append("</div>");
 
-        sb.append("<div class='content'><div class='medium'\n");
+        sb.append("<div class='content'><div class='medium'>\n");
 
         if(currentClient!=null){
 
-            sb.append("<strong>client id: </strong>")
+            sb.append("client id: <strong>")
                 .append(currentClient.getID())
-                .append("<br />\n")
-                .append("<strong>commands executed: </strong>")
+                .append("</strong><br />\n")
+                .append("commands executed: <strong>")
                 .append(currentClient.getCommandCount())
-                .append("<br />\n")
-                .append("<strong>is running: </strong>")
+                .append("</strong><br />\n")
+                .append("is running: <strong>")
                 .append(currentClient.isRunning())
-                .append("<br />\n");
+                .append("</strong><br />\n");
 
         }
         else {
