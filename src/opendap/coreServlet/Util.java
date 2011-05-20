@@ -64,7 +64,9 @@ public class Util {
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
         msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
-        msg +="\n";
+        msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
+        msg += "\n";
+        msg += "    getPathInfo():             '" + req.getPathInfo()+"'\n";
         msg +="ReqInfo:\n";
         msg += ReqInfo.toString(req);
         msg += "-------------------------------------------";

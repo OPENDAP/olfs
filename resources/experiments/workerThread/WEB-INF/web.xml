@@ -8,7 +8,7 @@
 
 
     <display-name>Test</display-name>
-    <description>OPeNDAP Test Thingy</description>
+    <description>Worker Thread Test Thingy</description>
 
     <listener>
         <listener-class>opendap.experiments.WorkerThread</listener-class>
