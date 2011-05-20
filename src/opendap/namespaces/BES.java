@@ -38,6 +38,6 @@ public class BES {
     public static final Namespace BES_NS =  Namespace.getNamespace("bes", BES_NAMESPACE_STRING);
     
     public static final String BES_ADMIN_NAMESPACE_STRING = "http://xml.opendap.org/ns/bes/admin/1.0#";
-    public static final Namespace BES_ADMIN_NS =  Namespace.getNamespace("bes", BES_ADMIN_NAMESPACE_STRING);
+    public static final Namespace BES_ADMIN_NS =  Namespace.getNamespace("bai", BES_ADMIN_NAMESPACE_STRING);
 
 }

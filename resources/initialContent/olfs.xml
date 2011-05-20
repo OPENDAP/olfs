@@ -4,7 +4,7 @@
     <DispatchHandlers>
 
         <HttpGetHandlers>
-
+            
             <Handler className="opendap.bes.BESManager">
                 <BES>
                     <!-- The prefix is a URL token between server address/port
@@ -21,13 +21,13 @@
                     <!-- The port number for this BES -->
                     <port>10002</port>
 
-                    <!-- The port number for this BES -->
-                    <adminPort>11002</adminPort>
+                    <!-- The Administration port number for this BES -->
+                    <!-- <adminPort>11002</adminPort> -->
 
                     <!-- The ClientPool maximum number of concurrent
                       -  BES client connections allowed.
                       -->
-                    <ClientPool maximum="10" />
+                    <ClientPool maximum="10" maxCmds="2000" />
 
                 </BES>
 
@@ -36,7 +36,7 @@
 
             <!-- Bot Blocker
                -
-               - This handler can be used to block access from specific IP addresses
+               - This handler can beused to block access from specific IP addresses
                - and by a range of IP addresses using a regular expression.
                -
               -->
@@ -51,8 +51,10 @@
                 <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
 
             <!-- </Handler>  -->
-
-
+                     
+                     
+            <Handler className="opendap.ncml.NcmlDatasetDispatcher" />            
+   
             <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
                 <prefix>thredds</prefix>
                 <useMemoryCache>true</useMemoryCache>
@@ -64,12 +66,11 @@
 
             <Handler className="opendap.nciso.IsoDispatchHandler" />
             <Handler className="opendap.nciso.RubricDispatchHandler" />
-
-            <Handler className="opendap.ncml.NcmlFileDispatcher" />
-
-            <Handler className="opendap.bes.DapDispatchHandler" />
+            <Handler className="opendap.ncml.NcmlFileDispatcher" />            
+            <Handler className="opendap.bes.dapResponders.DapDispatcher" />
 
             <Handler className="opendap.bes.DirectoryDispatchHandler" />
+            
 
             <Handler className="opendap.coreServlet.SpecialRequestDispatchHandler" />
 
@@ -87,7 +88,9 @@
                   - and allowing their transmission with out subsetting can put heavy loads
                   - on the network and the server.
                   -->
-                <AllowDirectDataSourceAccess />
+                  <AllowDirectDataSourceAccess />
+
+                
             </Handler>
 
             <Handler className="opendap.bes.BESThreddsDispatchHandler" />
@@ -97,7 +100,6 @@
 
 
         <HttpPostHandlers>
-
             <Handler className="opendap.coreServlet.SOAPRequestDispatcher" >
                 <OpendapSoapDispatchHandler>opendap.bes.SoapDispatchHandler</OpendapSoapDispatchHandler>
             </Handler>

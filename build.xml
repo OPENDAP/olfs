@@ -168,6 +168,11 @@
     <property name="WCS.dir" location="${resources.dir}/WCS"/>
 
 
+    <property name="jspServerWebInf.dir" location="resources/experiments/jsp/WEB-INF"/>
+
+
+
+
     <!-- Build Directories -->
     <property name="build.dir" location="build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
@@ -788,6 +793,90 @@
         <delete file="${build.dist}/index.html"/>
 
     </target>
+
+    <target
+            name="JspServer"
+            depends="olfs-lib,doc"
+            description="Performs a clean build of the core software and assembles the WAR file."
+            >
+
+
+        <echo level="info" message="Building jsp server war file."/>
+        <echo level="info" message="jspServerWebInf.dir: ${jspServerWebInf.dir}"/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
+
+        <war destfile="${build.dist}/opendap.war" webxml="${jspServerWebInf.dir}/web.xml" >
+
+            <lib dir="${lib.dir}">
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${commons-lang.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+                <include name="${slf4j.lib}"/>
+                <include name="${logback-core.lib}"/>
+                <include name="${logback-classic.lib}"/>
+
+            </lib>
+            <classes dir="${build.classes}"/>
+
+            <zipfileset dir="${build.doc}" prefix="docs" >
+                <exclude name="src.distribution.readme"/>
+                <exclude name="_notes"/>
+            </zipfileset>
+
+
+            <zipfileset dir="${WebStartResources.dir}" prefix="WebStart" />
+            <zipfileset dir="${GatewayResources.dir}" prefix="gateway" />
+            <zipfileset dir="${ncISO.dir}" prefix="nciso" />
+
+
+            <!--
+            <zipfileset dir="${THREDDSResources.dir}/views" prefix="views"/>
+            -->
+
+
+            <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>
+
+
+            <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+            </zipfileset>
+
+            <zipfileset dir="${initialContent.dir}" prefix="initialContent">
+                <include name="**/*"/>
+            </zipfileset>
+
+            <webinf dir="${jspServerWebInf.dir}">
+                <include name="logback-test.xml"/>
+                <include name="logback.xml"/>
+            </webinf>
+
+        </war>
+
+        <delete file="${build.dist}/index.html"/>
+
+    </target>
+
 
 
     <target name="fortify" if="fortify.present">

@@ -199,14 +199,18 @@ public class BESConfig  {
 
 
 
+        //  <ClientPool maximum="10" />
+
         Element clientPool = besConfig.getChild("ClientPool");
 
 
         if( clientPool!=null ){
 
+            log.debug("Found ClientPool element.");
             Attribute maxClients = clientPool.getAttribute("maximum");
 
             if(maxClients != null){
+                log.debug("@maximum: {}",maxClients.getValue());
                 int clients = maxClients.getIntValue();
 
                 if(clients<1){
@@ -226,6 +230,7 @@ public class BESConfig  {
             Attribute maxCmds = clientPool.getAttribute("maxCmds");
 
             if(maxCmds != null){
+                log.debug("@maxCmds: {}",maxCmds);
                 int max = maxCmds.getIntValue();
 
                 if(max<0){

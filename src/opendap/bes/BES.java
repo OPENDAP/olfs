@@ -24,7 +24,6 @@
 
 package opendap.bes;
 
-import opendap.bes.dapResponders.BesApi;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
@@ -35,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.HashMap;
 import java.io.IOException;
 
 import org.jdom.output.Format;
@@ -71,7 +69,7 @@ public class BES {
     private ReentrantLock _clientCheckoutLock;
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
-    private static final Namespace BES_ADMIN_NS = opendap.namespaces.BES.BES_NS;
+    private static final Namespace BES_ADMIN_NS = opendap.namespaces.BES.BES_ADMIN_NS;
 
 
 
@@ -141,7 +139,7 @@ public class BES {
     }
 
     public String executeBesAdminCommand(String besCmd){
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         if(getAdminPort()<=0){
@@ -151,11 +149,16 @@ public class BES {
 
         try {
             _adminLock.lock();
+
+            log.debug("Sending BES admin commend:\n{}", besCmd);
+
             OPeNDAPClient admin = new OPeNDAPClient();
             admin.startClient(getHost(), getAdminPort());
 
 
-            admin.executeCommand(besCmd,baos,baos);
+            admin.executeCommand(besCmd, baos, baos);
+
+            log.debug("BES returned:\n{}",baos.toString());
 
             return baos.toString();
 
@@ -163,6 +166,10 @@ public class BES {
 
             sb.append("Failed to execute BES command. Message: ")
             .append(e.getMessage());
+
+
+            log.error(sb.toString());
+            log.error("BES returned:\n{}",baos.toString());
 
             return sb.toString();
         }
@@ -172,34 +179,34 @@ public class BES {
 
     }
     public String start(){
-        String startCmd = getStartCommand();
-        return executeBesAdminCommand(startCmd);
+        String cmd = getStartCommand();
+        return executeBesAdminCommand(cmd);
     }
 
     public String stopNice(long timeOut){
-        String startCmd = getStopNiceCommand();
-        return executeBesAdminCommand(startCmd);
+        String cmd = getStopNiceCommand();
+        return executeBesAdminCommand(cmd);
     }
 
     public String stopNow(){
-        String startCmd = getStopNowCommand();
-        return executeBesAdminCommand(startCmd);
+        String cmd = getStopNowCommand();
+        return executeBesAdminCommand(cmd);
     }
 
     public String getStartCommand(){
-        return  getBesCommand("Start");
+        return  getBesAdminCommand("Start");
     }
 
     public String getStopNowCommand(){
-        return  getBesCommand("StopNow");
+        return  getBesAdminCommand("StopNow");
     }
 
     public String getStopNiceCommand(){
-        return  getBesCommand("StopNice");
+        return  getBesAdminCommand("StopNice");
     }
 
 
-    public String getBesCommand(String besCmd){
+    public String getBesAdminCommand(String besCmd){
 
         Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
         Element cmd = new Element(besCmd,BES_ADMIN_NS);
@@ -489,7 +496,8 @@ public class BES {
 
         try {
             _clientsMapLock.lock();
-            _clients.remove(dapClient.getID());
+            if(dapClient!=null && dapClient.getID()!=null)
+                _clients.remove(dapClient.getID());
         }
         finally {
             _clientsMapLock.unlock();

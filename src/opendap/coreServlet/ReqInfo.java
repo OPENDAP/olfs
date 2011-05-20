@@ -29,7 +29,6 @@ package opendap.coreServlet;
 import opendap.dap.Request;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
@@ -121,7 +120,10 @@ public class ReqInfo {
 
         String requestUri = request.getRequestURI().toString();
 
-        String serviceContext = requestUri.substring(0, requestUri.lastIndexOf(request.getPathInfo()));
+        String pathInfo = request.getPathInfo();
+
+
+        String serviceContext = requestUri.substring(0, requestUri.lastIndexOf(pathInfo));
 
         return serviceContext;
 
