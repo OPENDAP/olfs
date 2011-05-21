@@ -147,16 +147,19 @@ public class BES {
             return sb.toString();
         }
 
+
+        OPeNDAPClient admin=null;
+
         try {
             _adminLock.lock();
 
             log.debug("Sending BES admin command:\n{}", besCmd);
 
-            OPeNDAPClient admin = new OPeNDAPClient();
-            log.debug("Got new BES OPeNDAPClient. Starting...");
+            admin = new OPeNDAPClient();
+            log.debug("Starting new admin client...");
 
             admin.startClient(getHost(), getAdminPort());
-            log.debug("BES OPeNDAPClient client started\n");
+            log.debug("BES admin client started\n");
 
 
             admin.executeCommand(besCmd, baos, baos);
@@ -172,11 +175,19 @@ public class BES {
 
 
             log.error(sb.toString());
-            log.error("BES returned:\n{}",baos.toString());
+            log.error("BES returned:\n{}", baos.toString());
 
             return sb.toString();
         }
         finally {
+            if(admin!=null){
+                try{
+                    admin.shutdownClient();
+                } catch (PPTException e) {
+                    sb.append("FAILED TO SHUTDOWN CLIENT! Msg: ").append(e.getMessage());
+                    admin.killClient();
+                }
+            }
             _adminLock.unlock();
         }
 
