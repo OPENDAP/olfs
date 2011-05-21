@@ -150,10 +150,13 @@ public class BES {
         try {
             _adminLock.lock();
 
-            log.debug("Sending BES admin commend:\n{}", besCmd);
+            log.debug("Sending BES admin command:\n{}", besCmd);
 
             OPeNDAPClient admin = new OPeNDAPClient();
+            log.debug("Got new BES OPeNDAPClient. Starting...");
+
             admin.startClient(getHost(), getAdminPort());
+            log.debug("BES OPeNDAPClient client started\n");
 
 
             admin.executeCommand(besCmd, baos, baos);
