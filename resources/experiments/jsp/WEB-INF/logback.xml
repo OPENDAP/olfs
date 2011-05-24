@@ -17,6 +17,10 @@
 
     </appender>
 
+    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
+        <MaxSize>512</MaxSize>
+    </appender>
+
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/error.log</File>

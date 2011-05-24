@@ -35,12 +35,10 @@ import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
-import org.jdom.transform.XSLTransformer;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 
@@ -103,7 +101,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getRelativeUrl(req);
+        String name = ReqInfo.getLocalUrl(req);
 
         if(name.endsWith("contents.html"))
             name = name.substring(0,name.lastIndexOf("contents.html"));
@@ -151,14 +149,13 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         String dataSetName = ReqInfo.getDataSetName(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
-        String dsName = ReqInfo.getRelativeUrl(request);
+        String dsName = ReqInfo.getLocalUrl(request);
 
 
         boolean isDirectoryResponse = false;
         boolean isContentsRequest = false;
 
-        if(dataSetName != null) {
-            if(
+        if(dataSetName != null &&
                 (dataSetName.equalsIgnoreCase("contents") ||
                 dataSetName.equalsIgnoreCase("catalog")) &&
                 requestSuffix != null &&
@@ -168,7 +165,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
                 isDirectoryResponse = true;
                 isContentsRequest = true;
-            }
 
         } else {
             DataSourceInfo dsi = new BESDataSource(dsName);
@@ -190,7 +186,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 // redirect the URL without a trailing slash to the one with.
                 // This keeps everything copacetic downstream when it's time
                 // to build the directory document.
-                response.sendRedirect(Scrub.urlContent(request.getContextPath()+dsName+"/"));
+                response.sendRedirect(Scrub.urlContent(request.getContextPath()+"/"+dispatchServlet.getServletName()+dsName+"/"));
             }
 
 

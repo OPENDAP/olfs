@@ -72,7 +72,7 @@ public class DDX extends HttpResponder {
 
     public void sendDDX(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();

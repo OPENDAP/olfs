@@ -97,7 +97,7 @@ public class VersionDispatchHandler implements DispatchHandler {
                                    HttpServletResponse response,
                                    boolean sendResponse)
             throws Exception {
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 

@@ -117,7 +117,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     public void sendThreddsCatalogResponse(HttpServletRequest request,
                                            HttpServletResponse response) throws Exception {
 
-        String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getRelativeUrl(request));
+        String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(request));
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         String query = request.getQueryString();
 
@@ -161,7 +161,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throws IOException {
 
         boolean redirect = false;
-        String relativeURL = ReqInfo.getRelativeUrl(req);
+        String relativeURL = ReqInfo.getLocalUrl(req);
 
         // Make sure it really is a relative URL.
         if (relativeURL.startsWith("/"))
@@ -717,7 +717,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                                            boolean sendResponse)
             throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         //String requestSuffix = ReqInfo.getRequestSuffix(request);
 
@@ -751,7 +751,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         String catalogKey = null;
         try {
-            catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getRelativeUrl(req));
+            catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(req));
             if (requestCanBeHandled(req)) {
                 long lm = CatalogManager.getLastModified(catalogKey);
                 log.debug("lastModified(" + catalogKey + "): " + (lm == -1 ? "unknown" : new Date(lm)));

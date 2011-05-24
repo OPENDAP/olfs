@@ -115,7 +115,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
                                        boolean sendResponse)
             throws Exception {
 
-        String relativeURL = ReqInfo.getRelativeUrl(request);
+        String relativeURL = ReqInfo.getLocalUrl(request);
 
         if (relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1, relativeURL.length());

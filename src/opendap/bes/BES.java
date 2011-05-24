@@ -198,6 +198,38 @@ public class BES {
     }
 
     public String stopNice(long timeOut){
+
+
+        _clientCheckoutLock.lock();
+        try {
+
+
+            boolean allClientsAcquired = true;
+            for(OPeNDAPClient client: _clients.values()){
+                boolean inQue = _clientQueue.remove(client);
+                if(!inQue)
+                    allClientsAcquired = false;
+            }
+
+            if(!allClientsAcquired){
+
+
+            }
+
+
+        }
+        finally{
+            _clientCheckoutLock.unlock();
+        }
+
+
+
+
+
+
+
+
+
         String cmd = getStopNiceCommand();
         return executeBesAdminCommand(cmd);
     }
@@ -486,7 +518,7 @@ public class BES {
         else {
 
             if(_clientQueue.offer(dapClient)){
-            log.debug("checkInClient() Returned OPeNDAPClient (id:"+
+                log.debug("checkInClient() Returned OPeNDAPClient (id:"+
                     dapClient.getID()+") to Pool.");
             }
             else {

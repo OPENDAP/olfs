@@ -78,7 +78,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
     public String getWcsRequest(HttpServletRequest req) throws Exception {
 
 
-        String relativeURL = ReqInfo.getRelativeUrl(req);
+        String relativeURL = ReqInfo.getLocalUrl(req);
         String requestSuffix = ReqInfo.getRequestSuffix(req);
 
         if(relativeURL.startsWith("/"))
@@ -294,7 +294,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
                                        boolean sendResponse)
             throws Exception {
 
-        String relativeURL = ReqInfo.getRelativeUrl(request);
+        String relativeURL = ReqInfo.getLocalUrl(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -411,7 +411,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -460,7 +460,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendDAS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -507,7 +507,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendDDX(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
@@ -555,7 +555,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendDAP2Data(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -600,7 +600,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendASCII(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String docsService = request.getContextPath()+"/docs";
@@ -647,7 +647,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendINFO(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -697,7 +697,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
     private void sendHTMLRequestForm(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 

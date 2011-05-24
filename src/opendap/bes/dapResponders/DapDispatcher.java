@@ -171,7 +171,7 @@ public class DapDispatcher implements DispatchHandler {
                               boolean sendResponse)
             throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
 
         String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
 
@@ -205,7 +205,7 @@ public class DapDispatcher implements DispatchHandler {
     public long getLastModified(HttpServletRequest req) {
 
 
-        String relativeUrl = ReqInfo.getRelativeUrl(req);
+        String relativeUrl = ReqInfo.getLocalUrl(req);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
 
 

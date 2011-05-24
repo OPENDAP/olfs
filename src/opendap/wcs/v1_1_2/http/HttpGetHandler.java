@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.net.URL;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -143,7 +141,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
             throws Exception {
 
         String dataAccessBase = Util.getServiceUrl(request);
-        String relativeURL = ReqInfo.getRelativeUrl(request);
+        String relativeURL = ReqInfo.getLocalUrl(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());

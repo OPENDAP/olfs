@@ -312,7 +312,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
      * @return The last time the thing refered to in the request was modified.
      */
     public long getLastModified(HttpServletRequest req){
-        String name = ReqInfo.getRelativeUrl(req);
+        String name = ReqInfo.getLocalUrl(req);
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
                 "collection: " + name );

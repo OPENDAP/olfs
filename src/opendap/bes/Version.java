@@ -153,7 +153,7 @@ public class Version  {
 
 
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
         Document versionDoc = getVersionDocument(dataSource);
 
@@ -209,7 +209,7 @@ public class Version  {
     public static String getXOPeNDAPServerVersion(HttpServletRequest request)
             throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
         Document versionDoc = getVersionDocument(datasource);
 
@@ -306,7 +306,7 @@ public class Version  {
         if (request != null)
             clientDapVer = request.getHeader("XDAP");
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
         Document versionDoc = getVersionDocument(datasource);
 

@@ -386,7 +386,7 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response) {
 
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
 
         try {
@@ -537,7 +537,7 @@ public class DispatchServlet extends HttpServlet {
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
 
         try {

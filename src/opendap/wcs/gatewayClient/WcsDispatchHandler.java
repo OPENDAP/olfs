@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BESError;
@@ -32,16 +31,12 @@ import opendap.dap.Request;
 import opendap.xml.Transformer;
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.transform.JDOMSource;
-import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.stream.StreamSource;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.text.SimpleDateFormat;
@@ -77,7 +72,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 HttpServletResponse response) throws Exception {
 
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         boolean isContentsRequest = false;
@@ -301,7 +296,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                        boolean sendResponse)
             throws Exception {
 
-        String relativeURL = ReqInfo.getRelativeUrl(request);
+        String relativeURL = ReqInfo.getLocalUrl(request);
 
         if(relativeURL.startsWith("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
@@ -391,7 +386,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         long size = 0;
 
 
-        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(req));
+        String collectionName = Scrub.urlContent(ReqInfo.getLocalUrl(req));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -453,7 +448,7 @@ public class WcsDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getLocalUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -547,7 +542,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 String projectName,
                                 String siteName)
             throws Exception {
-        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getLocalUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -652,7 +647,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
         Request oRequest = new Request(null,request);
-        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getLocalUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -734,7 +729,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         Request oRequest = new Request(null,request);
 
         /*
-        String collectionName = Scrub.urlContent(ReqInfo.getRelativeUrl(request));
+        String collectionName = Scrub.urlContent(ReqInfo.getLocalUrl(request));
 
         if (collectionName.endsWith("/contents.html")) {
             collectionName = collectionName.substring(0, collectionName.lastIndexOf("contents.html"));
@@ -853,7 +848,7 @@ public class WcsDispatchHandler implements DispatchHandler {
                                 String dateName)
             throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
@@ -965,7 +960,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -1017,7 +1012,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDAS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -1064,7 +1059,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDDX(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
@@ -1111,7 +1106,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendDAP2Data(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -1155,7 +1150,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendASCII(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -1203,7 +1198,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendINFO(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
@@ -1249,7 +1244,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
     private void sendHTMLRequestForm(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 

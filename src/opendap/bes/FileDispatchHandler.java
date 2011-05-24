@@ -34,7 +34,6 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 import org.jdom.Element;
 
@@ -94,7 +93,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getRelativeUrl(req);
+        String name = ReqInfo.getLocalUrl(req);
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
 
@@ -140,7 +139,7 @@ public class FileDispatchHandler implements DispatchHandler {
                                 boolean sendResponse) throws Exception {
 
 
-        DataSourceInfo dsi = new BESDataSource(ReqInfo.getRelativeUrl(request));
+        DataSourceInfo dsi = new BESDataSource(ReqInfo.getLocalUrl(request));
 
         boolean isFileResponse = false;
 
@@ -173,7 +172,7 @@ public class FileDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        String name = ReqInfo.getRelativeUrl(req);
+        String name = ReqInfo.getLocalUrl(req);
 
 
         log.debug("sendFile(): Sending file \"" + name + "\"");

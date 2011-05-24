@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * This child class of opendap.bes.BesXmlAPI provides an implementation of the
@@ -128,7 +127,7 @@ public class BesGatewayApi extends BesXmlAPI {
     public static String getDataSourceUrl(HttpServletRequest req, String pathPrefix) throws MalformedURLException {
 
 
-        String relativeURL = ReqInfo.getRelativeUrl(req);
+        String relativeURL = ReqInfo.getLocalUrl(req);
         String requestSuffix = ReqInfo.getRequestSuffix(req);
 
         if(relativeURL.startsWith("/"))

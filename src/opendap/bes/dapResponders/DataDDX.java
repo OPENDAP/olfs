@@ -61,7 +61,7 @@ public class DataDDX extends HttpResponder {
 
 
         String xmlBase = request.getRequestURL().toString();
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 

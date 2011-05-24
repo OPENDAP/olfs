@@ -59,8 +59,8 @@ public class Util {
         msg += "  Client:  " + req.getRemoteHost() + "\n";
         msg += "  Request Info:\n";
         msg += "    baseURI:                   '" + ReqInfo.getServiceUrl(req) + "'\n";
-        msg += "    fullSourceName:            '" + ReqInfo.getRelativeUrl(req) + "'\n";
-        msg += "    dataSource:                '" + ReqInfo.getBesDataSourceID(ReqInfo.getRelativeUrl(req)) + "'\n";
+        msg += "    fullSourceName:            '" + ReqInfo.getLocalUrl(req) + "'\n";
+        msg += "    dataSource:                '" + ReqInfo.getBesDataSourceID(ReqInfo.getLocalUrl(req)) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
         msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";

@@ -100,7 +100,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getRelativeUrl(req);
+        String name = ReqInfo.getLocalUrl(req);
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
 
@@ -148,7 +148,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         boolean isNcmlRequest = false;
 
         if(ncmlRequestPattern.matcher(requestURL).matches())   {
-            String relativeUrl = ReqInfo.getRelativeUrl(request);
+            String relativeUrl = ReqInfo.getLocalUrl(request);
             DataSourceInfo dsi = new BESDataSource(relativeUrl);
 
 
@@ -183,7 +183,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         String serviceUrl = ReqInfo.getFullServiceContext(request);
 
 
-        String name = ReqInfo.getRelativeUrl(request);
+        String name = ReqInfo.getLocalUrl(request);
 
 
         Document ncml = getNcmlDocument(name);

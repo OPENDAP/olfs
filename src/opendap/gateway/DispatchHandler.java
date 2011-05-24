@@ -77,7 +77,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
     public String getDataSourceURL(HttpServletRequest req) throws Exception {
 
 
-        String relativeURL = ReqInfo.getRelativeUrl(req);
+        String relativeURL = ReqInfo.getLocalUrl(req);
         String requestSuffix = ReqInfo.getRequestSuffix(req);
 
         if(relativeURL.startsWith("/"))
@@ -254,7 +254,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
 
 
-        String relativeURL = ReqInfo.getRelativeUrl(request);
+        String relativeURL = ReqInfo.getLocalUrl(request);
 
 
         log.debug("serviceContext: "+serviceContext);
@@ -317,7 +317,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         log.debug("The client requested this: " + name);
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
 
         String requestURL = request.getRequestURL().toString();
 

@@ -136,7 +136,7 @@ public class ReqInfo {
      * @param req The client request.
      * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
      */
-    public static String getRelativeUrl(HttpServletRequest req){
+    public static String getLocalUrl(HttpServletRequest req){
 
         String name=req.getPathInfo();
 
@@ -206,7 +206,7 @@ public class ReqInfo {
 
         String cName, dSrc, dSetName;
 
-        dSrc = getBesDataSourceID(getRelativeUrl(req));
+        dSrc = getBesDataSourceID(getLocalUrl(req));
         dSetName = getDataSetName(req);
 
         if(dSetName == null)
@@ -235,7 +235,7 @@ public class ReqInfo {
     public static String getRequestSuffix(HttpServletRequest req){
 
         String requestSuffix = null;
-        String relativeUrl = getRelativeUrl(req);
+        String relativeUrl = getLocalUrl(req);
         log.debug("getRequestSuffix() - relativeUrl(request): " + relativeUrl);
 
 
@@ -270,27 +270,27 @@ public class ReqInfo {
      */
     public static String getDataSetName(HttpServletRequest req){
 
-        String requestPath = getRelativeUrl(req);
-        log.debug("getDataSetName()   - req.getPathInfo(): " + requestPath);
+        String localUrl = getLocalUrl(req);
+        log.debug("getDataSetName()   - req.getLocalUrl(): " + localUrl);
 
 
-        String dataSetName = requestPath;
+        String dataSetName = localUrl;
 
 
 
-        // Is it a dataset and not a collection?
-        if (requestPath== null ||  requestPath.endsWith("/")) {
+        // Is it a collection?
+        if (localUrl== null ||  localUrl.endsWith("/")) {
 
             dataSetName = null;
 
         }
-        else{
+        else{  // Must be a dataset...
 
             // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
             // and strip it off the dataSetName
 
-            if(requestPath.lastIndexOf("/") < requestPath.lastIndexOf(".")){
-                   dataSetName = requestPath.substring(requestPath.lastIndexOf("/")+1, requestPath.lastIndexOf('.'));
+            if(localUrl.lastIndexOf("/") < localUrl.lastIndexOf(".")){
+                   dataSetName = localUrl.substring(localUrl.lastIndexOf("/")+1, localUrl.lastIndexOf('.'));
             }
         }
 
@@ -333,7 +333,7 @@ public class ReqInfo {
      */
     public static String getBesDataSourceID(HttpServletRequest req){
 
-        String requestPath = getRelativeUrl(req);
+        String requestPath = getLocalUrl(req);
         log.debug("getBesDataSourceID()    - req.getPathInfo(): " + requestPath);
 
 
@@ -468,8 +468,8 @@ public class ReqInfo {
     public static String toString(HttpServletRequest request){
         String s = "";
         
-        s += "getRelativeUrl(): "+ getRelativeUrl(request) + "\n";
-        s += "getBesDataSourceID(): "+ getBesDataSourceID(getRelativeUrl(request)) + "\n";
+        s += "getLocalUrl(): "+ getLocalUrl(request) + "\n";
+        s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
         s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
         s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
         s += "getConstraintExpression(): "+ ReqInfo.getConstraintExpression(request) + "\n";

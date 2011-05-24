@@ -69,9 +69,9 @@ public class NetcdfFileOut extends HttpResponder {
     public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String fullSourceName = ReqInfo.getRelativeUrl(request);
+        String fullSourceName = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());

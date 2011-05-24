@@ -202,9 +202,15 @@
     <img src='<%=contextPath%>/docs/images/startButton.png' border='0' height='40px'/>
     </a>
 
+    <a href="?prefix=<%=currentPrefix%>&clientId=<%=currentClientId%>&cmd=StopNice">
+    <img src='<%=contextPath%>/docs/images/stopNiceButton.png' border='0' height='40px'/>
+    </a>
+
+
     <a href="?prefix=<%=currentPrefix%>&clientId=<%=currentClientId%>&cmd=StopNow">
     <img src='<%=contextPath%>/docs/images/stopNowButton.png' border='0' height='40px'/>
     </a>
+
 
 
     <div class='status'><%=StringEscapeUtils.escapeHtml(status.toString())%></div>

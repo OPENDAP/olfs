@@ -32,8 +32,6 @@ import opendap.dap.Request;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -110,7 +107,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
      */
     public long getLastModified(HttpServletRequest req) {
 
-        String name = ReqInfo.getRelativeUrl(req);
+        String name = ReqInfo.getLocalUrl(req);
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() for collection: " + name );
 
@@ -158,7 +155,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         boolean isrubricResponse = false;
 
         if(rubricRequestPattern.matcher(requestURL).matches())   {
-            String relativeUrl = ReqInfo.getRelativeUrl(request);
+            String relativeUrl = ReqInfo.getLocalUrl(request);
             String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
             DataSourceInfo dsi = new BESDataSource(dataSource);
 
@@ -192,7 +189,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         // This first bit just collects a bunch of information about the request
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);

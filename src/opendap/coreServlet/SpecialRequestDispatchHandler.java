@@ -113,7 +113,7 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                                           boolean sendResponse)
             throws Exception {
 
-        String relativeUrl = ReqInfo.getRelativeUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
