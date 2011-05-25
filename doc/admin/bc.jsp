@@ -213,7 +213,7 @@
 
 
 
-    <div class='status'><%=StringEscapeUtils.escapeHtml(status.toString())%></div>
+    <div id='status' class='status'><pre><%=StringEscapeUtils.escapeHtml(status.toString())%></pre></div>
 
     <hr/>
 

@@ -156,7 +156,7 @@ public class ReqInfo {
      * @param req The client request.
      * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
      */
-    public static String getRelativeUrl(HttpServletRequest req,String pathPrefix){
+    public static String getLocalUrl(HttpServletRequest req,String pathPrefix){
 
 
 

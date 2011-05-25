@@ -9,6 +9,8 @@
  5. This notice must be kept intact with any use of the code to provide attribution.
  */
 
+var request1 = createRequest();
+
 function getLog(logURL) {
 
     document.getElementById("message").innerHTML = "Polling OLFS log...";

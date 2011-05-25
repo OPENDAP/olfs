@@ -102,19 +102,19 @@
 
 <p>If Tomcat is running and Hyrax is installed you could: </p>
 <ul>
-    <li><a href="<CONTEXT_PATH />/hyrax/"><strong>Look here for Hyrax default page</strong></a> (Which may return a
+    <li><a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a> (Which may return a
         THREDDS catalog.html, or an OPeNDAP contents.html, depending on your configuration) <br/>
         <br/>
     </li>
-    <li><a href="<CONTEXT_PATH />/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
+    <li><a href="<%= contextPath %>/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
         directory </strong><br/>
         <br/>
     </a></li>
-    <li><a href="<CONTEXT_PATH />/hyrax/catalog.html"><strong>Top Level THREDDS catalog.html (an HTML version of the
+    <li><a href="<%= contextPath %>/hyrax/catalog.html"><strong>Top Level THREDDS catalog.html (an HTML version of the
         THREDDS catalog) is here. </strong></a><br/>
         <br/>
     </li>
-    <li><a href="<CONTEXT_PATH />/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a></li>
+    <li><a href="<%= contextPath %>/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a></li>
 </ul>
 <h3>Thanks!</h3>
 

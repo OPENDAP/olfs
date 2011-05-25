@@ -53,7 +53,7 @@
 
 
 <dl>
-    <dd><a href="olfsLogView.html">OLFS Log Viewer</a></dd>
+    <dd><a href="olfsLogView.jsp">OLFS Log Viewer</a></dd>
     <dd><a href="bc.jsp">BES Control</a></dd>
 </dl>
 

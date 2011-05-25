@@ -24,14 +24,37 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% String contextPath = request.getContextPath(); %>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-    <link rel='stylesheet' href='<CONTEXT_PATH /><SERVLET_NAME />/css/contents.css' type='text/css'/>
-    <title>Hyrax Admin Interface</title>
+    <link rel='stylesheet' href='<%=contextPath%>/docs/css/contents.css' type='text/css'/>
+    <script type="text/javascript" src="js/ajax.js"></script>
+    <script type="text/javascript" src="js/ajax-logtail.js"></script>
+    <title>OLFS Log Viewer</title>
 </head>
 <body>
 
 
+<style type="text/css">
+    .resiziableLogWindow {
+        background: rgba(255, 0, 0, 0.03);
+        font-size: 8pt;
+        border: 1px solid black;
+        height: 125px;
+        margin-left: 25px;
+        margin-right: 25px;
+        margin-bottom: 25px;
+        overflow: auto;
+        resize: vertical;
+        min-width: 500px;
+        min-height: 75px;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-top: 10px;
+        padding-bottom: 20px;
+
+    }
+</style>
 
 
 <!-- ****************************************************** -->
@@ -39,9 +62,9 @@
 <!--                                                        -->
 <!--                                                        -->
 
-<img alt="OPeNDAP Logo" src='<CONTEXT_PATH /><SERVLET_NAME />/images/logo.gif'/>
+<img alt="OPeNDAP Logo" src='<%=contextPath%>/docs/images/logo.gif'/>
 
-<h1>Hyrax Admin Interface: Home</h1>
+<h1>Hyrax Admin Interface: OLFS Log Viewer</h1>
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->
@@ -50,14 +73,55 @@
 <!--                                                        -->
 
 
-<dl>
-    <dd><a href="olfsLogView.html">OLFS Log Viewer</a></dd>
-    <dd><a href="/opendap/hai/besctl">BES Control</a></dd>
-</dl>
+<div id="controls"
+     style="
+        border:solid 1px #dddddd;
+        margin-left:25px;
+        margin-right: 25px;
+        font-size:14px;
+        font-family:san-serif,tahoma,arial;
+        padding-left:15px;
+        padding-right:15px;
+        padding-top:0px;
+        padding-bottom:0px;
+        margin-top:25px;
+        margin-bottom:10px;
+        text-align:left;
+        "
+
+        >
+    <div>
+        <button onclick="getLog('<%=contextPath%>/hai/olfsLog');">Start</button>
+        <button onclick="stopTail();">Stop</button>
+        <button onclick="clearLogWindow();">Clear</button>
+    </div>
+</div>
 
 
+<div id="resize">
+    <div id="log"
+         class="resiziableLogWindow"
+            />
+</div>
+<div id="message"
+     style="
+        border:solid 1px #dddddd;
+        margin-left:25px;
+        margin-right: 25px;
+        font-size: 11px;
+        font-family:san-serif,tahoma,arial;
+        padding-left:15px;
+        padding-right:15px;
+        padding-top:0px;
+        padding-bottom:0px;
+        margin-top:25px;
+        margin-bottom:10px;
+        text-align:left;
+        "
 
-
+        >
+    This is the OLFS Log Viewer. To begin viewing the OLFS log, click the Start button.
+</div>
 
 
 
@@ -70,7 +134,7 @@
     <tr>
         <td>
             <div class="small" align="left">
-                <a href="<CONTEXT_PATH /><SERVLET_NAME />/admin/index.html">Hyrax Admin Interface </a>
+                <a href="<%=contextPath%>/docs/admin/index.html">Hyrax Admin Interface</a>
             </div>
         </td>
         <td>
@@ -91,7 +155,7 @@
 <!--                                                        -->
 <h3>OPeNDAP Hyrax
     <br/>
-    <a href='<CONTEXT_PATH /><SERVLET_NAME />/'>Documentation</a>
+    <a href='<%=contextPath%>/docs/'>Documentation</a>
 </h3>
 
 

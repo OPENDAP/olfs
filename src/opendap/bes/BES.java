@@ -28,6 +28,8 @@ import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -153,13 +155,13 @@ public class BES {
         try {
             _adminLock.lock();
 
-            log.debug("Sending BES admin command:\n{}", besCmd);
+            log.debug("Getting new admin client...");
 
             admin = new OPeNDAPClient();
-            log.debug("Starting new admin client...");
+            log.debug("Starting new admin client. Host: {} Port: {}",getHost(), getAdminPort());
 
             admin.startClient(getHost(), getAdminPort());
-            log.debug("BES admin client started\n");
+            log.debug("BES admin client started, sending command:\n{}",besCmd);
 
 
             admin.executeCommand(besCmd, baos, baos);
@@ -197,41 +199,132 @@ public class BES {
         return executeBesAdminCommand(cmd);
     }
 
+
     public String stopNice(long timeOut){
+        StringBuilder sb = new StringBuilder();
 
 
+        long stopNiceMinTimeOut = 1000;
+        if(timeOut< stopNiceMinTimeOut)
+            timeOut = stopNiceMinTimeOut;
+
+        long stopNiceMaxTimeOut = 30000;
+        if(timeOut> stopNiceMaxTimeOut)
+            timeOut = stopNiceMaxTimeOut;
+
+
+        String msg = "Attempting to acquire client checkOut lock...";
+        log.info(msg);
+        sb.append(msg).append("\n");
         _clientCheckoutLock.lock();
         try {
 
+            Date startTime = new Date();
 
-            boolean allClientsAcquired = true;
-            for(OPeNDAPClient client: _clients.values()){
-                boolean inQue = _clientQueue.remove(client);
-                if(!inQue)
-                    allClientsAcquired = false;
+            boolean done = false;
+            msg = "Attempting to acquire all BES clients...";
+            log.info(msg);
+            sb.append(msg).append("\n");
+
+            while(!done){
+
+                Collection<OPeNDAPClient> clients = _clients.values();
+
+                boolean allClientsAcquired = true;
+                for(OPeNDAPClient client: clients){
+                    boolean inQue = _clientQueue.remove(client);
+                    if(!inQue){
+                        allClientsAcquired = false;
+                    }
+                    else {
+                        msg = "Shutting down client connection '"+client.getID()+"'...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+
+                        try {
+
+                            discardClient(client);
+                            //client.shutdownClient();
+                            msg = "Client connection '"+client.getID()+"'shutdown normally";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                        } catch (PPTException e) {
+                            msg = "Shutdown FAILED for client connection '"+client.getID()+"'Trying to kill connection.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                            client.killClient();
+
+                            msg = "Killed client connection '"+client.getID()+"'.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+
+                        }
+                        msg = "Removing client connection '"+client.getID()+"' from clients list.";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        _clients.remove(client.getID());
+                    }
+                }
+
+                if(!allClientsAcquired){
+                    Date endTime = new Date();
+
+                    long elapsedTime = endTime.getTime() - startTime.getTime();
+
+                    if(elapsedTime > timeOut){
+                        done = true;
+                        msg = "Timeout Has Expired. Shutting down BES NOW...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                    }
+                    else {
+                        msg = "Did not acquire all clients. Sleeping...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        Thread.sleep(timeOut/3);
+                    }
+
+
+                }
+                else {
+                    done = true;
+
+
+                    msg = "Stopped all BES client connections.";
+                    log.info(msg);
+                    sb.append(msg).append("\n");
+
+                }
+
+
             }
 
-            if(!allClientsAcquired){
+            msg = "Stopping BES...";
+            log.info(msg);
+            sb.append(msg).append("\n");
+            msg =  stopNow();
+            log.info(msg);
+            sb.append(msg).append("\n");
 
 
-            }
 
+        } catch (InterruptedException e) {
 
-        }
-        finally{
+            sb.append(e.getMessage());
+
+        } finally{
+            msg = "Releasing client checkout lock...";
+            log.info(msg);
+            sb.append(msg).append("\n");
             _clientCheckoutLock.unlock();
         }
 
 
 
-
-
-
-
-
-
-        String cmd = getStopNiceCommand();
-        return executeBesAdminCommand(cmd);
+        return sb.toString();
     }
 
     public String stopNow(){
