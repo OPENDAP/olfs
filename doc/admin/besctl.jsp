@@ -124,7 +124,7 @@
 </ol>
 <div id="besDetail"class="content">
     <strong>BES</strong><br/>
-    prefix: <strong><%=currentPrefix%>
+    prefix: <strong><%=bes.getPrefix()%>
 </strong><br/>
     hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%>
 </strong><br/>
