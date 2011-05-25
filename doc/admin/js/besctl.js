@@ -24,33 +24,38 @@
 
 var request1 = createRequest();
 
-function start(prefix) {
+function start(prefix,besctlUrl) {
 
-    document.getElementById("status").innerHTML = "Polling OLFS log...";
-    var url = logURL;
+    document.getElementById("status").innerHTML = "Starting BES '"+prefix+"'...";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
     request1.send(null);
-    startTail(url);
 }
 
 
 
-function stopNice(prefix) {
-    t = setTimeout("getLog('"+tailURL+"')", 1000);
+function stopNice(prefix,besctlUrl) {
+    document.getElementById("status").innerHTML = "Gently stopping BES '"+prefix+"'...";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
+    request1.open("GET", url, true);
+    request1.onreadystatechange = updatePage;
+    request1.send(null);
 }
 
-function stopNow(prefix) {
-    clearTimeout(t);
-    document.getElementById("message").innerHTML =
-            "The log viewer has been paused. " +
-            "To begin viewing again, click the Start button.";
+function stopNow(prefix,besctlUrl) {
+    document.getElementById("status").innerHTML = "Stopping BES '"+prefix+"' NOW.";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
+    request1.open("GET", url, true);
+    request1.onreadystatechange = updatePage;
+    request1.send(null);
 
 }
 
 
-function clearLogWindow() {
-    document.getElementById("log").innerHTML="";
+
+function showBes() {
+    document.getElementById("status").innerHTML="New BES TIME...";
 }
 
 
@@ -59,10 +64,8 @@ function updatePage() {
     if (request1.readyState == 4) {
         if (request1.status == 200) {
 
-            logDiv = document.getElementById("log");
-
-            logDiv.innerHTML = request1.responseText
-
+            document.getElementById("status").innerHTML = "<pre>"+request1.responseText+"</pre>";
+            //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
 
         } else

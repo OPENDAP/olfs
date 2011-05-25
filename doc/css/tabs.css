@@ -4,14 +4,14 @@ div.content {
     padding: 10px;
 }
 
-ol#toc {
+ol {
 	height: 2em;
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-ol#toc a {
+ol a {
 	background: #527CC1 100% 0;
 	color: #78a3e7;
 	float: left;
@@ -23,11 +23,11 @@ ol#toc a {
     border: #527CC1 solid 1px;
 }
 
-ol#toc li.current {
+ol li.current {
 	background-color: #ffffff ;
 }
 
-ol#toc li.current a {
+ol li.current a {
 	background-color: #78a3e7 ;
 	color: #000;
 	font-weight: bold;
@@ -35,7 +35,7 @@ ol#toc li.current a {
 
 }
 
-ol#toc li {
+ol li {
 	background: #527CC1 #ffffff ;
 	float: left;
 	margin: 0 1px 0 0;
@@ -49,3 +49,5 @@ div.status {
     font-size: 14px;
 
 }
+
+

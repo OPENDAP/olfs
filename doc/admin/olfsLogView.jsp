@@ -28,8 +28,8 @@
 <% String contextPath = request.getContextPath(); %>
 <head>
     <link rel='stylesheet' href='<%=contextPath%>/docs/css/contents.css' type='text/css'/>
-    <script type="text/javascript" src="js/ajax.js"></script>
-    <script type="text/javascript" src="js/ajax-logtail.js"></script>
+    <script type="text/javascript" src="js/XmlHttpRequest.js"></script>
+    <script type="text/javascript" src="js/logTail.js"></script>
     <title>OLFS Log Viewer</title>
 </head>
 <body>
