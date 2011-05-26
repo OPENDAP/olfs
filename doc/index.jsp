@@ -61,7 +61,26 @@
 
 <p> Both the OLFS and the BES require installation and configuration before they can be run. </p>
 
+<h3>Find Your Hyrax Server Here...</h3>
+
+<p>If Tomcat is running and Hyrax is installed you could: </p>
+<ul>
+    <li><a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a><br/>
+        <br/>
+    </li>
+    <li><a href="<%= contextPath %>/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
+        directory </strong><br/>
+        <br/>
+    </a></li>
+    <li><a href="<%= contextPath %>/hyrax/catalog.html"><strong>Top Level THREDDS catalog.html (an HTML version of the
+        THREDDS catalog) is here. </strong></a><br/>
+        <br/>
+    </li>
+    <li><a href="<%= contextPath %>/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a></li>
+</ul>
+
 <p>&nbsp;</p>
+<h3>Documentation</h3>
 
 <p>OPeNDAP user and developer documentation is now located at the <a href="http://docs.opendap.org">OPeNDAP
     Documentation Site</a></p>
@@ -102,23 +121,6 @@
     be found in our <a href="http://scm.opendap.org:8090/trac/browser/tags/SoapTestClient/0.1.4">Subversion
         archive here</a>. </p>
 
-<h3>Find Your Server Here...</h3>
-
-<p>If Tomcat is running and Hyrax is installed you could: </p>
-<ul>
-    <li><a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a><br/>
-        <br/>
-    </li>
-    <li><a href="<%= contextPath %>/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
-        directory </strong><br/>
-        <br/>
-    </a></li>
-    <li><a href="<%= contextPath %>/hyrax/catalog.html"><strong>Top Level THREDDS catalog.html (an HTML version of the
-        THREDDS catalog) is here. </strong></a><br/>
-        <br/>
-    </li>
-    <li><a href="<%= contextPath %>/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a></li>
-</ul>
 <h3>Thanks!</h3>
 
 <p>We hope we hope you find this software useful, and we welcome
