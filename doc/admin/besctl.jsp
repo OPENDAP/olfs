@@ -54,6 +54,7 @@
 
     BES bes = BESManager.getBES(currentPrefix);
 
+    currentPrefix = bes.getPrefix();
 
     StringBuffer status = new StringBuffer();
     status.append("Waiting for you to do something...");

@@ -805,7 +805,16 @@
         <echo level="info" message="jspServerWebInf.dir: ${jspServerWebInf.dir}"/>
         <echo level="info" message="build.dist: ${build.dist}"/>
 
+
+        <mkdir dir="${build.dir}/webapp" />
+        <copy file="${build.doc}/index.html" tofile="${build.dir}/webapp/index.jsp" />
+
         <war destfile="${build.dist}/opendap.war" webxml="${jspServerWebInf.dir}/web.xml" >
+
+
+            <zipfileset dir="${build.dir}/webapp" prefix="" />
+
+
 
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
