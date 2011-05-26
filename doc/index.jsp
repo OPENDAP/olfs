@@ -145,15 +145,15 @@
 <p> OPeNDAP Hyrax development is sponsored by:</p>
 <blockquote>
     <blockquote>
-        <p><a href="http://www.nsf.gov"><img src="images/nsf-logo.png" alt="NSF" width="95" height="95" border="0"
+        <p><a href="http://www.nsf.gov"><img src="<%= contextPath %>/docs/images/nsf-logo.png" alt="NSF" width="95" height="95" border="0"
                                              align="middle" longdesc="http://www.nsf.gov"/></a> <span class="style8"><a
                 href="http://www.nsf.gov">National Science Foundation</a></span></p>
 
-        <p><a href="http://www.nasa.gov"><img src="images/nasa-logo.jpg" alt="NASA" width="97" height="80" border="0"
+        <p><a href="http://www.nasa.gov"><img src="<%= contextPath %>/docs/images/nasa-logo.jpg" alt="NASA" width="97" height="80" border="0"
                                               align="middle" longdesc="http://www.nasa.gov"/><span class="style8">National Aeronautics and Space Administration</span></a>
         </p>
 
-        <p><a href="http://www.noaa.gov"><img src="images/noaa-logo.jpg" alt="NOAA" width="90" height="90" border="0"
+        <p><a href="http://www.noaa.gov"><img src="<%= contextPath %>/docs/images/noaa-logo.jpg" alt="NOAA" width="90" height="90" border="0"
                                               align="middle" longdesc="http://www.noaa.gov"/></a> <span
                 class="style8"><a href="http://www.noaa.gov">National Oceanic and Atmospheric Administration</a></span>
         </p>
