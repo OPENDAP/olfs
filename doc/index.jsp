@@ -85,11 +85,11 @@
 </ul>
 
 <h3>THREDDS Support </h3>
-<h4>Hyrax supports THREDDS catalogs, look <a href="http://docs.opendap.org/index.php/Hyrax_-_THREDDS_Configuration">here
-    for configuration details</a>. </h4>
+<p>Hyrax supports THREDDS catalogs, look <a href="http://docs.opendap.org/index.php/Hyrax_-_THREDDS_Configuration">here
+    for configuration details</a>. </p>
 
 <h3>SOAP Support </h3>
-<h4>Hyrax supports SOAP requests.</h4>
+<p>Hyrax supports SOAP requests.</p>
 
 <p>A prototype SOAP interface is included with this release of Hyrax. It is discussed in the
     <a href="http://rsg.opendap.org:8090/server-4/templates/soapAPI.html"> RSG template pages here</a>.
