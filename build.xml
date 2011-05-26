@@ -807,7 +807,7 @@
 
 
         <mkdir dir="${build.dir}/webapp" />
-        <copy file="${build.doc}/index.html" tofile="${build.dir}/webapp/index.jsp" />
+        <copy file="${build.doc}/index.jsp" tofile="${build.dir}/webapp/index.jsp" />
 
         <war destfile="${build.dist}/opendap.war" webxml="${jspServerWebInf.dir}/web.xml" >
 
