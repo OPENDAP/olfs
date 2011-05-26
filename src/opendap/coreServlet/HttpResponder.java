@@ -52,7 +52,7 @@ public abstract class HttpResponder {
 
     private HttpResponder(){}
 
-    public HttpResponder(String sysPath, String pathPrefix, String regexPattern){//}, Method doResponse){
+    public HttpResponder(String sysPath, String pathPrefix, String regexPattern){
         super();
         _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
         _systemPath = sysPath;
@@ -73,6 +73,12 @@ public abstract class HttpResponder {
 
 
     public abstract void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
+
+
+
+    public  void respondToHttpPostRequest(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        response.getWriter().append("POST is not implemented by this Responder");
+    }
 
 
 

@@ -57,7 +57,7 @@
     currentPrefix = bes.getPrefix();
 
     StringBuffer status = new StringBuffer();
-    status.append("Waiting for you to do something...");
+    status.append(" Waiting for you to do something...");
 
 
 
@@ -233,6 +233,17 @@
     <div id='status' class='status'><pre><%=StringEscapeUtils.escapeHtml(status.toString())%></pre></div>
 
     <hr/>
+
+
+    <form action="<%=contextPath%>/hai/besctl?prefix=<%=currentPrefix%>&cmd=setConfig" method="post">
+        <p>
+            <textarea name="CONFIGURATION" rows="20" cols="80">Insert your BES configuration here...</textarea>
+        </p>
+        <input type="submit" value="Get Configuration"/>
+        <input type="submit" value="Set Configuration"/>
+        <input type="reset"/>
+    </form>
+
 
     <!--
     <div class='medium'>Version Document</div>

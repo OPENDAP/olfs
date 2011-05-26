@@ -285,6 +285,57 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         }
     }
 
+    public void doPost(HttpServletRequest request,
+                      HttpServletResponse response) {
+
+        try {
+
+            LogUtil.logServerAccessStart(request, "ADMIN_SERVICE_ACCESS", "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+
+            if (!redirect(request, response)) {
+
+                String name = getName(request);
+
+                log.debug("The client requested this: " + name);
+
+                String relativeUrl = ReqInfo.getLocalUrl(request);
+
+                String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+                DataSourceInfo dsi;
+
+
+                String requestURL = request.getRequestURL().toString();
+
+                for (HttpResponder r : responders) {
+                    if (r.matches(requestURL)) {
+                        log.info("The request URL: " + requestURL + " matches " +
+                                "the pattern: \"" + r.getPattern() + "\"");
+
+                        //dsi = new BESDataSource(dataSource);
+                        //if(dsi.isDataset()){
+                        r.respondToHttpPostRequest(request, response);
+                        return;
+                        //}
+
+                    }
+                }
+
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                log.info("Sent BAD URL - not an OPeNDAP request suffix.");
+            }
+
+        } catch (Throwable t) {
+            try {
+                OPeNDAPException.anyExceptionHandler(t, response);
+            } catch (Throwable t2) {
+                log.error("BAD THINGS HAPPENED!", t2);
+            }
+        } finally {
+            RequestCache.endRequest();
+            LogUtil.logServerAccessEnd(0, -1, "ADMIN_SERVICE_ACCESS");
+        }
+    }
+
 
     /**
      *

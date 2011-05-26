@@ -327,25 +327,65 @@ public class BES {
         return sb.toString();
     }
 
+
+    public String getConfiguration(String moduleName){
+        String cmd = getGetConfigurationCommand(moduleName);
+        return executeBesAdminCommand(cmd);
+    }
+
+    public String setConfiguration(String moduleName, String configuration){
+        String cmd = getSetConfigurationCommand(moduleName, configuration);
+        return executeBesAdminCommand(cmd);
+    }
+
     public String stopNow(){
         String cmd = getStopNowCommand();
         return executeBesAdminCommand(cmd);
     }
 
     public String getStartCommand(){
-        return  getBesAdminCommand("Start");
+        return  getSimpleBesAdminCommand("Start");
     }
 
     public String getStopNowCommand(){
-        return  getBesAdminCommand("StopNow");
+        return  getSimpleBesAdminCommand("StopNow");
     }
 
-    public String getStopNiceCommand(){
-        return  getBesAdminCommand("StopNice");
+    public String getGetConfigurationCommand(String moduleName){
+        Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
+        Element cmd = new Element("GetConfig",BES_ADMIN_NS);
+
+        if(moduleName!=null)
+            cmd.setAttribute("module",moduleName);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
+    }
+
+    public String getSetConfigurationCommand(String moduleName, String configuration){
+        Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
+        Element cmd = new Element("SetConfig",BES_ADMIN_NS);
+
+        if(moduleName!=null)
+            cmd.setAttribute("module",moduleName);
+
+        cmd.setText(configuration);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
     }
 
 
-    public String getBesAdminCommand(String besCmd){
+
+    public String getSimpleBesAdminCommand(String besCmd){
 
         Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
         Element cmd = new Element(besCmd,BES_ADMIN_NS);
