@@ -67,22 +67,26 @@
     Documentation Site</a></p>
 
 <p>There you will find:</p>
-<h4><a href="http://docs.opendap.org/index.php/Hyrax">Hyrax Documentation </a></h4>
-<ul>
-    <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Installation_Instructions">Installation instructions</a></li>
-    <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Configuration">Configuration information</a></li>
-    <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Logging_Configuration">Logging configuration information</a>
-    </li>
-    <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Apache_Integration">Apache integration instructions <br/>
-        <br/>
-        <br/>
-    </a></li>
-    <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Release_Notes">Release Notes</a><br/>
-    </li>
-    <li><a href="http://docs.opendap.org/index.php/Hyrax#For_Developers:">Instructions for developers.</a><br/>
-        <br/>
-    </li>
-</ul>
+<dl>
+    <dt><a href="http://docs.opendap.org/index.php/Hyrax">Hyrax Documentation </a></dt>
+    <dd>
+        <ul>
+            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Installation_Instructions">Installation instructions</a></li>
+            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Configuration">Configuration information</a></li>
+            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Logging_Configuration">Logging configuration information</a>
+            </li>
+            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Apache_Integration">Apache integration instructions <br/>
+                <br/>
+                <br/>
+            </a></li>
+            <li><a href="http://docs.opendap.org/index.php/Hyrax_-_Release_Notes">Release Notes</a><br/>
+            </li>
+            <li><a href="http://docs.opendap.org/index.php/Hyrax#For_Developers:">Instructions for developers.</a><br/>
+                <br/>
+            </li>
+        </ul>
+    </dd>
+</dl>
 
 <h3>THREDDS Support </h3>
 <p>Hyrax supports THREDDS catalogs, look <a href="http://docs.opendap.org/index.php/Hyrax_-_THREDDS_Configuration">here
@@ -102,8 +106,7 @@
 
 <p>If Tomcat is running and Hyrax is installed you could: </p>
 <ul>
-    <li><a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a> (Which may return a
-        THREDDS catalog.html, or an OPeNDAP contents.html, depending on your configuration) <br/>
+    <li><a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a><br/>
         <br/>
     </li>
     <li><a href="<%= contextPath %>/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
