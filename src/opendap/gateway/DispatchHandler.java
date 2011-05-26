@@ -326,7 +326,7 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
                 log.info("The request URL: " + requestURL + " matches " +
                         "the pattern: \"" + r.getPattern() + "\"");
 
-                r.respondToHttpRequest(request, response);
+                r.respondToHttpGetRequest(request, response);
                 return;
 
             }

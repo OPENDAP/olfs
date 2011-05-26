@@ -66,7 +66,7 @@ public class Ascii extends HttpResponder {
 
 
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);

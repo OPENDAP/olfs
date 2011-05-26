@@ -262,7 +262,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
                         //dsi = new BESDataSource(dataSource);
                         //if(dsi.isDataset()){
-                        r.respondToHttpRequest(request, response);
+                        r.respondToHttpGetRequest(request, response);
                         return;
                         //}
 

@@ -63,7 +63,7 @@ public class XmlData extends HttpResponder {
         _besApi = besApi;
     }
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
 
@@ -76,7 +76,7 @@ public class XmlData extends HttpResponder {
 
 
 
-        log.debug("respondToHttpRequest(): Sending XML Data response For: " + dataSource +
+        log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + dataSource +
                     "    CE: '" + constraintExpression + "'");
 
 

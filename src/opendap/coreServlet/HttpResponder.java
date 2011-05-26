@@ -72,7 +72,7 @@ public abstract class HttpResponder {
     public String getPathPrefix() { return pathPrefix; }
 
 
-    public abstract void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    public abstract void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 
 
@@ -88,7 +88,7 @@ public abstract class HttpResponder {
 
         template = template.replaceAll("<ERROR_MESSAGE />",errorMessage);
 
-        log.debug("respondToHttpRequest(): Sending Error Page ");
+        log.debug("respondToHttpGetRequest(): Sending Error Page ");
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "error_page");

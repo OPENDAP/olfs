@@ -69,7 +69,7 @@ public class HtmlDataRequestForm extends HttpResponder {
 
 
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);

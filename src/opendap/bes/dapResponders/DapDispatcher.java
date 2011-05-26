@@ -189,7 +189,7 @@ public class DapDispatcher implements DispatchHandler {
                 dsi = getDataSourceInfo(besDataSourceId);
                 if(dsi.isDataset()){
                     if(sendResponse)
-                        r.respondToHttpRequest(request, response);
+                        r.respondToHttpGetRequest(request, response);
                     return true;
                 }
             }

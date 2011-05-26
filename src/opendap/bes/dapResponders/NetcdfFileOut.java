@@ -68,7 +68,7 @@ public class NetcdfFileOut extends HttpResponder {
     }
 
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
@@ -78,7 +78,7 @@ public class NetcdfFileOut extends HttpResponder {
 
 
 
-        log.debug("respondToHttpRequest(): Sending netCDF File Out response for dataset: " + dataSource + "?" +
+        log.debug("respondToHttpGetRequest(): Sending netCDF File Out response for dataset: " + dataSource + "?" +
                     constraintExpression);
 
         String downloadFileName = fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length());

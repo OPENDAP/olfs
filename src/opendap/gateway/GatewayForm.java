@@ -62,7 +62,7 @@ public class GatewayForm extends HttpResponder {
 
 
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String contextPath = request.getContextPath();
@@ -82,7 +82,7 @@ public class GatewayForm extends HttpResponder {
         form = form.replaceAll("<SERVLET_NAME />","/docs");
 
 
-        log.debug("respondToHttpRequest(): Sending Gateway Page ");
+        log.debug("respondToHttpGetRequest(): Sending Gateway Page ");
 
         response.setContentType("text/html");
         Version.setOpendapMimeHeaders(request, response);

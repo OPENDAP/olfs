@@ -62,7 +62,7 @@ public class RDF extends HttpResponder {
         _besApi = besApi;
     }
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
@@ -74,7 +74,7 @@ public class RDF extends HttpResponder {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-        log.debug("respondToHttpRequest() Sending RDF for dataset: " + dataSource);
+        log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + dataSource);
 
 
 

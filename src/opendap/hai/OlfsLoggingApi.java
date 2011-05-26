@@ -105,7 +105,7 @@ public class OlfsLoggingApi extends HttpResponder {
         init();
     }
 
-    public void respondToHttpRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String queryString = request.getQueryString();
 
