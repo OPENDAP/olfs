@@ -125,9 +125,6 @@ public class BES {
 
            }
 
-
-
-
        } catch (JDOMException e) {
            log.error("Failed to parse BES response. Msg: {}",e.getMessage());
        } catch (IOException e) {

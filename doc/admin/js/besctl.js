@@ -26,7 +26,7 @@ var request1 = createRequest();
 
 function start(prefix,besctlUrl) {
 
-    document.getElementById("status").innerHTML = "Starting BES '"+prefix+"'...";
+    document.getElementById("status").innerHTML = "<pre>Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
@@ -36,7 +36,7 @@ function start(prefix,besctlUrl) {
 
 
 function stopNice(prefix,besctlUrl) {
-    document.getElementById("status").innerHTML = "Gently stopping BES '"+prefix+"'...";
+    document.getElementById("status").innerHTML = "<pre>Gently stopping BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
@@ -44,7 +44,7 @@ function stopNice(prefix,besctlUrl) {
 }
 
 function stopNow(prefix,besctlUrl) {
-    document.getElementById("status").innerHTML = "Stopping BES '"+prefix+"' NOW.";
+    document.getElementById("status").innerHTML = "<pre>Stopping BES '"+prefix+"' NOW.</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
@@ -68,7 +68,7 @@ function setConfig(module,prefix,besctlUrl) {
 
 
     var config = configElement.value;
-    var configParam = "CONFIGURATION="+encodeURI(config);
+    var configParam = "CONFIGURATION="+encodeURIComponent(config);
 
 
 

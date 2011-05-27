@@ -4,17 +4,24 @@ import opendap.bes.BES;
 import opendap.bes.BESManager;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.Scrub;
+import opendap.ppt.OPeNDAPClient;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BesControlApi extends HttpResponder {
@@ -89,12 +96,74 @@ public class BesControlApi extends HttpResponder {
 
         //@todo work this out to not escape everything.
         //output.append(StringEscapeUtils.escapeHtml(status));
-        output.append(status);
+
+        String s = processStatus(status);
+
+
+        output.append(s);
 
 
         output.flush();
 
     }
+
+
+    public String processStatus(String status){
+
+        StringBuilder s = new StringBuilder();
+        SAXBuilder sb = new SAXBuilder(false);
+        ByteArrayInputStream bais = new ByteArrayInputStream(status.getBytes());
+
+
+        try {
+            Document besResponseDoc = sb.build(bais);
+            Element besResponse = besResponseDoc.getRootElement();
+
+            List errors = besResponse.getChildren("BESError", opendap.namespaces.BES.BES_ADMIN_NS);
+
+            if(!errors.isEmpty()) {
+                for(Object o: errors){
+                    Element error = (Element) o;
+                    Element msgElem = error.getChild("Message",opendap.namespaces.BES.BES_ADMIN_NS);
+                    Element typeElem = error.getChild("Type",opendap.namespaces.BES.BES_ADMIN_NS);
+
+                    String msg = "BES ERROR Message Is Missing";
+                    if(msgElem!=null)
+                        msg = msgElem.getTextNormalize();
+
+                    String type = "BES ERROR Type Is Missing";
+                    if(typeElem!=null)
+                        type = typeElem.getTextNormalize();
+
+
+                    s.append("Error[").append(type).append("]: ").append(msg).append("\n");
+                }
+            }
+            else {
+                Element ok = besResponse.getChild("OK",opendap.namespaces.BES.BES_ADMIN_NS);
+                if(ok!=null){
+                    s.append("OK");
+                }
+                else {
+                    s.append("ERROR! Unrecognized BES response.");
+                }
+
+            }
+
+        } catch (JDOMException e) {
+            s.append("Failed to parse BES response! Msg: ").append(e.getMessage());
+            log.error(s.toString());
+        } catch (IOException e) {
+            s.append("Failed to ingest BES response! Msg: ").append(e.getMessage());
+            log.error(s.toString());
+        }
+
+
+        return s.toString();
+    }
+
+
+
 
 
     public static HashMap<String, String> processQuery(HttpServletRequest request){
@@ -158,11 +227,14 @@ public class BesControlApi extends HttpResponder {
             else if (besCmd.equals("getConfig")) {
                 String module = kvp.get("module");
 
+
+                /*
                 sb.append("You issued a getConfig command");
                 if(module!=null)
                     sb.append(" for module '").append(module).append("'.\n");
                 else
                     sb.append(".\n");
+                 */
 
                 String status = bes.getConfiguration(module);
                 sb.append(status);

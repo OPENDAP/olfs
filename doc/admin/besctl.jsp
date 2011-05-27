@@ -213,13 +213,9 @@
     </div>
 
 
-    <div id='status' class='status'><pre><%=StringEscapeUtils.escapeHtml(status.toString())%></pre></div>
-
-    <hr/>
 
 
-
-    <h3>Configuration Management</h3>
+    <h3>Configuration Management For BES <%=currentPrefix%></h3>
 
     <div class='small'>
         <ol id="modules">
@@ -288,7 +284,12 @@
     <br/>
 
 
+    <hr/>
+    <div class="tiny_black_fw">Status
 
+    <div id='status' class='status'><pre><%=StringEscapeUtils.escapeHtml(status.toString())%></pre></div>
+
+    </div>
 
 
     <!--

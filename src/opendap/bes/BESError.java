@@ -192,8 +192,8 @@ public class BESError extends OPeNDAPException {
 
 
     private  String makeBesErrorMsg(Element besErrorElement) {
-
         Element e1, e2;
+
         String msg = "";
 
         msg += "[";
