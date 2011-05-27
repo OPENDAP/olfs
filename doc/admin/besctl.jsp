@@ -259,7 +259,7 @@
             <%
                 if (currentModule != null) {
 
-                    out.append("module name: <strong>")
+                    out.append("<strong>")
                             .append(currentModule.getName())
                             .append("</strong><br />\n");
 
