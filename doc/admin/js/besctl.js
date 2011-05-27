@@ -26,7 +26,7 @@ var request1 = createRequest();
 
 function start(prefix,besctlUrl) {
 
-    document.getElementById("status").innerHTML = "<pre>Starting BES '"+prefix+"'...</pre>";
+    document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
@@ -36,7 +36,7 @@ function start(prefix,besctlUrl) {
 
 
 function stopNice(prefix,besctlUrl) {
-    document.getElementById("status").innerHTML = "<pre>Gently stopping BES '"+prefix+"'...</pre>";
+    document.getElementById("status").innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
@@ -44,7 +44,7 @@ function stopNice(prefix,besctlUrl) {
 }
 
 function stopNow(prefix,besctlUrl) {
-    document.getElementById("status").innerHTML = "<pre>Stopping BES '"+prefix+"' NOW.</pre>";
+    document.getElementById("status").innerHTML = "<pre> Stopping BES '"+prefix+"' NOW.</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
@@ -62,6 +62,8 @@ function getConfig(module,prefix,besctlUrl) {
 
 function setConfig(module,prefix,besctlUrl) {
 
+    document.getElementById("status").innerHTML = "<pre> Setting configuration for "+module+"</pre>";
+
     var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=setConfig";
 
     var configElement =   document.getElementById("CONFIGURATION");
@@ -69,11 +71,6 @@ function setConfig(module,prefix,besctlUrl) {
 
     var config = configElement.value;
     var configParam = "CONFIGURATION="+encodeURIComponent(config);
-
-
-
-    document.getElementById("status").innerHTML = " Setting configuration for "+module;
-
 
     request1.open("POST", url, false);
     request1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -95,7 +92,7 @@ function updatePage() {
     if (request1.readyState == 4) {
         if (request1.status == 200) {
 
-            document.getElementById("status").innerHTML = "<pre>"+request1.responseText+"</pre>";
+            document.getElementById("status").innerHTML = "<pre> "+request1.responseText+"</pre>";
             //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
 
@@ -113,6 +110,7 @@ function updateConfig() {
             //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
             alert(request1.responseText);
+            document.getElementById("status").innerHTML = "<pre> "+request1.responseText+"</pre>";
 
         } else
             alert("Error! Request status is " + request1.status);
