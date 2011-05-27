@@ -289,7 +289,7 @@
 
 
     <hr/>
-    <div class="tiny_black_fw">Status
+    <div class="tiny_black_fw"><strong>Status</strong>
 
     <div id='status' class='status'><pre><%=status%></pre></div>
 
