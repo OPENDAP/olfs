@@ -52,6 +52,34 @@ function stopNow(prefix,besctlUrl) {
 
 }
 
+function getConfig(module,prefix,besctlUrl) {
+    var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=getConfig";
+    request1.open("GET", url, true);
+    request1.onreadystatechange = updateConfig;
+    request1.send(null);
+
+}
+
+function setConfig(module,prefix,besctlUrl) {
+
+    var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=setConfig";
+
+
+
+    var config = document.getElementById("CONFIGURATION").innerHTML;
+    var configParam = "CONFIGURATION="+encodeURI(config);
+
+    document.getElementById("status").innerHTML = "Setting configuration: <br/>"+configParam;
+
+
+    request1.open("POST", url, false);
+    request1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    request1.onreadystatechange = updateConfig;
+    request1.send(configParam);
+
+}
+
 
 
 function showBes() {
@@ -65,6 +93,20 @@ function updatePage() {
         if (request1.status == 200) {
 
             document.getElementById("status").innerHTML = "<pre>"+request1.responseText+"</pre>";
+            //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
+
+
+        } else
+            alert("Error! Request status is " + request1.status);
+    }
+}
+
+
+function updateConfig() {
+    if (request1.readyState == 4) {
+        if (request1.status == 200) {
+
+            document.getElementById("CONFIGURATION").innerHTML = request1.responseText;
             //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
 

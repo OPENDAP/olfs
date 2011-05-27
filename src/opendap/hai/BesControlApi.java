@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,19 +67,38 @@ public class BesControlApi extends HttpResponder {
     private void controlApi(HttpServletRequest request, HttpServletResponse response, boolean isPost)throws Exception {
 
 
+
+        StringBuilder sb = new StringBuilder();
+
+        Enumeration headers = request.getHeaderNames();
+        while(headers.hasMoreElements()){
+            String headerName = (String) headers.nextElement();
+            String headerValue = request.getHeader(headerName);
+            sb.append("    ").append(headerName).append(" = '").append(headerValue).append("'\n");
+        }
+
+        log.debug("\nHTTP HEADERS:\n{}",sb);
+
+        //log.debug("\nBODY:\n{}",getRequestBodyAsString(request));
+
         HashMap<String,String> kvp = processQuery(request);
 
-        String status = processBesCommand(kvp, request, isPost);
+        String status = processBesCommand(kvp, isPost);
 
         PrintWriter output = response.getWriter();
 
+        //@todo work this out to not escape everything.
         output.append(StringEscapeUtils.escapeHtml(status));
+
+
         output.flush();
 
     }
 
 
-    public HashMap<String, String> processQuery(HttpServletRequest request){
+    public static HashMap<String, String> processQuery(HttpServletRequest request){
+
+        Logger log = LoggerFactory.getLogger("opendap.bes.BesControlApi");
         HashMap<String, String> kvp = new HashMap<String, String>();
 
         StringBuilder sb = new StringBuilder();
@@ -111,7 +131,7 @@ public class BesControlApi extends HttpResponder {
      * @param kvp
      * @return
      */
-    public String processBesCommand(HashMap<String, String> kvp, HttpServletRequest request, boolean isPost) {
+    public String processBesCommand(HashMap<String, String> kvp, boolean isPost) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -132,6 +152,8 @@ public class BesControlApi extends HttpResponder {
             else if (besCmd.equals("StopNow")) {
                 sb.append(bes.stopNow());
             }
+
+
             else if (besCmd.equals("getConfig")) {
                 String module = kvp.get("module");
 
@@ -144,6 +166,8 @@ public class BesControlApi extends HttpResponder {
                 String status = bes.getConfiguration(module);
                 sb.append(status);
             }
+
+
             else if (besCmd.equals("setConfig")) {
                 String submittedConfiguration  = kvp.get("CONFIGURATION");
                 if(isPost && submittedConfiguration!=null ){
@@ -164,7 +188,7 @@ public class BesControlApi extends HttpResponder {
 
                 }
                 else {
-                    sb.append("In order to use the setConfig command you MUST supply a configuration via HTTP POST content");
+                    sb.append("In order to use the setConfig command you MUST supply a configuration via HTTP POST content.\n");
                 }
             }
             else  {

@@ -27,10 +27,9 @@ package opendap.bes;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -98,6 +97,48 @@ public class BES {
 
 
     }
+
+
+
+
+   public Vector<BesConfigurationModule> getConfigurationModules(){
+
+       Vector<BesConfigurationModule> configurationModules = new Vector<BesConfigurationModule>();
+
+       String configString = getConfiguration(null);
+
+       ByteArrayInputStream bais = new  ByteArrayInputStream(configString.getBytes());
+
+       try {
+           Document confDoc = opendap.xml.Util.getDocument(bais);
+
+           Element root = confDoc.getRootElement();
+
+           List moduleConfigs = root.getChildren("BesConfig", BES.BES_ADMIN_NS);
+
+           for(Object o : moduleConfigs){
+               Element moduleConfigElement = (Element) o ;
+
+               BesConfigurationModule bm = new BesConfigurationModule(moduleConfigElement);
+
+               configurationModules.add(bm);
+
+           }
+
+
+
+
+       } catch (JDOMException e) {
+           log.error("Failed to parse BES response. Msg: {}",e.getMessage());
+       } catch (IOException e) {
+           log.error("Failed to ingest BES response. Msg: {}", e.getMessage());
+       }
+
+
+       return configurationModules;
+
+   }
+
 
 
     public int getAdminPort() {

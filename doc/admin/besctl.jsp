@@ -9,6 +9,10 @@
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="opendap.coreServlet.Scrub" %>
+<%@ page import="java.net.URL" %>
+<%@ page import="opendap.bes.BesConfigurationModule" %>
+<%@ page import="java.util.Vector" %>
+<%@ page import="opendap.hai.BesControlApi" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -16,45 +20,28 @@
 
     String contextPath = request.getContextPath();
 
-    HashMap<String, String> kvp = new HashMap<String, String>();
+    HashMap<String, String> kvp = BesControlApi.processQuery(request);
 
-    String query = request.getQueryString();
-
-    if (query != null) {
-        for (String kvPair : query.split("&")) {
-            String[] kv = kvPair.split("=");
-
-            String key = null, value = null;
-
-
-            switch (kv.length) {
-                case 2:
-                    key = kv[0];
-                    value = kv[1];
-                    break;
-                case 1:
-                    key = kv[0];
-                    break;
-                default:
-                    break;
-
-            }
-
-            if (key != null)
-                kvp.put(key, value);
-        }
-    }
 
     String currentPrefix = kvp.get("prefix");
-    String currentClientId = kvp.get("clientId");
-
     if (currentPrefix == null)
         currentPrefix = "/";
 
 
+    String currentClientId = kvp.get("clientId");
+
+
+    String currentModuleId =  kvp.get("module");
+
     BES bes = BESManager.getBES(currentPrefix);
 
     currentPrefix = bes.getPrefix();
+    
+    String besCtlApi = contextPath+"/hai/besctl";
+    
+    
+    
+    
 
     StringBuffer status = new StringBuffer();
     status.append(" Waiting for you to do something...");
@@ -118,17 +105,12 @@
 
 
         }
-        out.append("</ol>");
-
 
     %>
 </ol>
 <div id="besDetail"class="content">
-    <strong>BES</strong><br/>
-    prefix: <strong><%=bes.getPrefix()%>
-</strong><br/>
-    hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%>
-</strong><br/>
+    bes prefix: <strong><%=bes.getPrefix()%></strong><br/>
+    hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%></strong><br/>
 
 
     max client connections: <strong><%=bes.getMaxClients()%></strong><br/>
@@ -209,19 +191,20 @@
 
 
         <button style="border: 0; background-color: transparent;"
-                onclick="start('<%=currentPrefix%>','<%=contextPath%>/hai/besctl');">
+                onclick="start('<%=currentPrefix%>','<%=besCtlApi%>');">
             <img alt="Start" src="<%=contextPath%>/docs/images/startButton.png"  border='0' height='40px'>
         </button>
 
 
         <button style="border: 0; background-color: transparent;"
-                onclick="stopNice('<%=currentPrefix%>','<%=contextPath%>/hai/besctl');">
+                onclick="stopNice('<%=currentPrefix%>','<%=besCtlApi%>');">
             <img alt="StopNice" src="<%=contextPath%>/docs/images/stopNiceButton.png"  border='0' height='40px'>
         </button>
 
 
         <button style="border: 0; background-color: transparent;"
-                onclick="stopNow('<%=currentPrefix%>','<%=contextPath%>/hai/besctl');">
+                onclick="stopNow('<%=currentPrefix%>','<%=besCtlApi%>');"
+                >
             <img alt="StopNow" src="<%=contextPath%>/docs/images/stopNowButton.png"  border='0' height='40px'>
         </button>
 
@@ -235,14 +218,85 @@
     <hr/>
 
 
-    <form action="<%=contextPath%>/hai/besctl?prefix=<%=currentPrefix%>&cmd=setConfig" method="post">
-        <p>
-            <textarea name="CONFIGURATION" rows="20" cols="80">Insert your BES configuration here...</textarea>
-        </p>
-        <input type="submit" value="Get Configuration"/>
-        <input type="submit" value="Set Configuration"/>
-        <input type="reset"/>
-    </form>
+
+    <h3>Configuration Management</h3>
+
+    <div class='small'>
+        <ol id="modules">
+            <%
+
+                Vector<BesConfigurationModule> configurationModules;
+                BesConfigurationModule currentModule = null;
+                configurationModules = bes.getConfigurationModules();
+                for(BesConfigurationModule module : configurationModules){
+
+                    out.append("    <li ");
+
+
+                    if (module.getName().equals(currentModuleId)) {
+                        out.append("class=\"current\"");
+                        currentModule = module;
+                    }
+                    out.append(">");
+
+
+                    out.append("<a href=\"?prefix=")
+                            .append(currentPrefix)
+                            .append("&module=")
+                            .append(module.getName())
+                            .append("\">")
+                            .append(module.getShortName())
+                            .append("</a></li>\n");
+                }
+            %>
+
+        </ol>
+
+    </div>
+    <div class='medium'>
+        <div id="currentModule" class='content'>
+
+            <%
+                if (currentModule != null) {
+
+                    out.append("module name: <strong>")
+                            .append(currentModule.getName())
+                            .append("</strong><br />\n");
+
+            %>
+            <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&module=<%=currentModule.getName()%>&cmd=setConfig" method="post">
+                <p>
+                    <textarea style="font-family:courier;"   id="CONFIGURATION" name="CONFIGURATION" rows="20" cols="80"><%=currentModule.getConfig()%></textarea>
+                </p>
+                <input type="submit" value="Save Config"/>
+                <input type="reset"/>
+            </form>
+
+            <button  onclick="getConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">Get Configuration</button>
+            <button  onclick="setConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">Set Configuration</button>
+
+            <%
+
+
+
+
+
+
+
+
+                } else {
+                    out.append("<strong>Select a configurationModule to configure.</strong>");
+                }
+
+
+            %>
+
+        </div>
+    </div>
+    <br/>
+
+
+
 
 
     <!--
