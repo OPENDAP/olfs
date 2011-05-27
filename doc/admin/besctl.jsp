@@ -44,7 +44,7 @@
     
 
     StringBuffer status = new StringBuffer();
-    status.append(" Waiting for you to do something...");
+    status.append(" OK ");
 
 
 
@@ -140,6 +140,8 @@
                             .append(currentPrefix)
                             .append("&clientId=")
                             .append(client.getID())
+                            .append("&module=")
+                            .append(currentModuleId)
                             .append("\">")
                             .append(client.getID())
                             .append("</a></li>\n");
@@ -240,6 +242,8 @@
                             .append(currentPrefix)
                             .append("&module=")
                             .append(module.getName())
+                            .append("&clientId=")
+                            .append(currentClientId)
                             .append("\">")
                             .append(module.getShortName())
                             .append("</a></li>\n");
@@ -287,7 +291,7 @@
     <hr/>
     <div class="tiny_black_fw">Status
 
-    <div id='status' class='status'><pre><%=StringEscapeUtils.escapeHtml(status.toString())%></pre></div>
+    <div id='status' class='status'><pre><%=status%></pre></div>
 
     </div>
 
