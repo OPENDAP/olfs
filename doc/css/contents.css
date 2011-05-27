@@ -88,6 +88,11 @@ HR {
     font-size: 10px;
     color    : black;
 }
+.tiny_black_fw {
+    font-family: courier;
+    font-size: 9px;
+    color    : black;
+}
 .dark {
     font-weight: bold;
 }

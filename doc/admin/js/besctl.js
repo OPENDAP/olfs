@@ -64,12 +64,15 @@ function setConfig(module,prefix,besctlUrl) {
 
     var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=setConfig";
 
+    var configElement =   document.getElementById("CONFIGURATION");
 
 
-    var config = document.getElementById("CONFIGURATION").innerHTML;
+    var config = configElement.value;
     var configParam = "CONFIGURATION="+encodeURI(config);
 
-    document.getElementById("status").innerHTML = "Setting configuration: <br/>"+configParam;
+
+
+    document.getElementById("status").innerHTML = " Setting configuration for "+module;
 
 
     request1.open("POST", url, false);
@@ -106,9 +109,10 @@ function updateConfig() {
     if (request1.readyState == 4) {
         if (request1.status == 200) {
 
-            document.getElementById("CONFIGURATION").innerHTML = request1.responseText;
+            //document.getElementById("CONFIGURATION").innerHTML = request1.responseText;
             //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
+            alert(request1.responseText);
 
         } else
             alert("Error! Request status is " + request1.status);

@@ -88,7 +88,8 @@ public class BesControlApi extends HttpResponder {
         PrintWriter output = response.getWriter();
 
         //@todo work this out to not escape everything.
-        output.append(StringEscapeUtils.escapeHtml(status));
+        //output.append(StringEscapeUtils.escapeHtml(status));
+        output.append(status);
 
 
         output.flush();
@@ -174,6 +175,7 @@ public class BesControlApi extends HttpResponder {
 
                     String module = kvp.get("module");
 
+                    /*
                     sb.append("You issued a setConfig command");
                     if(module!=null)
                         sb.append(" for module '").append(module).append("'.\n");
@@ -182,6 +184,7 @@ public class BesControlApi extends HttpResponder {
 
                     sb.append("Your Configuration: \n");
                     sb.append(submittedConfiguration);
+                     */
 
                     String status = bes.setConfiguration(module, submittedConfiguration);
                     sb.append(status);

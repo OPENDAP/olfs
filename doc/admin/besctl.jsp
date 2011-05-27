@@ -268,23 +268,15 @@
                 <p>
                     <textarea style="font-family:courier;"   id="CONFIGURATION" name="CONFIGURATION" rows="20" cols="80"><%=currentModule.getConfig()%></textarea>
                 </p>
-                <input type="submit" value="Save Config"/>
                 <input type="reset"/>
             </form>
 
-            <button  onclick="getConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">Get Configuration</button>
-            <button  onclick="setConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">Set Configuration</button>
+            <button  onclick="setConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">Save <%=currentModule.getShortName()%> module configuration</button>
 
             <%
 
-
-
-
-
-
-
-
                 } else {
+
                     out.append("<strong>Select a configurationModule to configure.</strong>");
                 }
 
