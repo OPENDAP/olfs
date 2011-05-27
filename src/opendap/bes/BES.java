@@ -37,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.io.IOException;
 
+import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -182,6 +184,7 @@ public class BES {
         StringBuilder sb = new StringBuilder();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+
         if(getAdminPort()<=0){
             sb.append("BES Admin Service is not configured! Port number for admin connection has not been set!");
             return sb.toString();
@@ -249,6 +252,8 @@ public class BES {
         long stopNiceMaxTimeOut = 30000;
         if(timeOut> stopNiceMaxTimeOut)
             timeOut = stopNiceMaxTimeOut;
+
+        String besResponse=null;
 
 
         String msg = "Attempting to acquire client checkOut lock...";
@@ -343,9 +348,10 @@ public class BES {
             msg = "Stopping BES...";
             log.info(msg);
             sb.append(msg).append("\n");
-            msg =  stopNow();
-            log.info(msg);
-            sb.append(msg).append("\n");
+            besResponse =  stopNow();
+            log.info(besResponse);
+
+
 
 
 
@@ -362,7 +368,8 @@ public class BES {
 
 
 
-        return sb.toString();
+
+        return besResponse;
     }
 
 
