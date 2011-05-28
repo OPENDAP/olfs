@@ -136,7 +136,7 @@ function getBesLog(besLogUrl, besPrefix, lines) {
     var url = logUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+lines;
 
     var d = new Date();
-    var status = d.toDateString() + "  "+ d.toTimeString() + " Polling log: "+url;
+    var status = d.toTimeString() + " Polling log: "+url;
 
     document.getElementById("status").innerHTML = status;
     request1.open("GET", url, true);
@@ -153,9 +153,14 @@ function startTailing(tailURL,besPrefix, lines) {
 
 function stopTailing() {
     clearTimeout(t);
-    document.getElementById("message").innerHTML =
+
+    var d = new Date();
+    var status = d.toDateString() + "  "+ d.toTimeString() + " "+
             "The log viewer has been paused. " +
             "To begin viewing again, click the Start button.";
+
+
+    document.getElementById("status").innerHTML = status;
 
 }
 
