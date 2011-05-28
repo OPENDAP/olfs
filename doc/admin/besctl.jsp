@@ -13,6 +13,7 @@
 <%@ page import="opendap.bes.BesConfigurationModule" %>
 <%@ page import="java.util.Vector" %>
 <%@ page import="opendap.hai.BesControlApi" %>
+<%@ page import="opendap.hai.Util" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -20,7 +21,7 @@
 
     String contextPath = request.getContextPath();
 
-    HashMap<String, String> kvp = BesControlApi.processQuery(request);
+    HashMap<String, String> kvp = Util.processQuery(request);
 
 
     String currentPrefix = kvp.get("prefix");
@@ -55,6 +56,7 @@
     <title>BES Controller</title>
     <link rel='stylesheet' href='<%= contextPath%>/docs/css/contents.css' type='text/css'/>
     <link rel='stylesheet' href='<%= contextPath%>/docs/css/tabs.css' type='text/css'/>
+    <link rel='stylesheet' href='<%= contextPath%>/docs/css/besctl.css' type='text/css'/>
     <script type="text/javascript" src="js/XmlHttpRequest.js"></script>
     <script type="text/javascript" src="js/besctl.js"></script>
 
@@ -65,7 +67,7 @@
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
         <td>
-            <div style='v-align:center;font-size:large;'>Hyrax Admin Interface</div>
+            <div style='v-align:center;font-size:large;'><a href=".">Hyrax Admin Interface</a></div>
         </td>
     </tr>
 </table>
@@ -264,9 +266,23 @@
                             .append("</strong><br />\n");
 
             %>
-            <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&module=<%=currentModule.getName()%>&cmd=setConfig" method="post">
+            <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&module=<%=currentModule.getName()%>&cmd=setConfig"
+                  method="post">
                 <p>
-                    <textarea style="font-family:courier;"   id="CONFIGURATION" name="CONFIGURATION" rows="20" cols="80"><%=currentModule.getConfig()%></textarea>
+                    <textarea
+                            style=  "
+                                font-family:courier;
+                                margin-left: 5px;
+                                margin-right: 5px;
+                                max-width: 99%;
+                                width: 99%;
+                                "
+                            id="CONFIGURATION"
+                            name="CONFIGURATION"
+                            rows="20"
+                            cols="80">
+                        <%=currentModule.getConfig()%>
+                    </textarea>
                 </p>
                 <input type="reset"/>
             </form>
@@ -277,7 +293,7 @@
 
                 } else {
 
-                    out.append("<strong>Select a configurationModule to configure.</strong>");
+                    out.append("<strong>Select a configuration module to configure.</strong>");
                 }
 
 
@@ -291,7 +307,7 @@
     <hr/>
     <div class="tiny_black_fw"><strong>Status</strong>
 
-    <div id='status' class='status'><pre><%=status%></pre></div>
+    <div id='status' class='statusDisplay'><pre><%=status%></pre></div>
 
     </div>
 

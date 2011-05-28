@@ -28,6 +28,7 @@
 <% String contextPath = request.getContextPath(); %>
 <head>
     <link rel='stylesheet' href='<%=contextPath%>/docs/css/contents.css' type='text/css'/>
+    <link rel='stylesheet' href='<%=contextPath%>/docs/css/besctl.css' type='text/css'/>
     <script type="text/javascript" src="js/XmlHttpRequest.js"></script>
     <script type="text/javascript" src="js/logTail.js"></script>
     <title>OLFS Log Viewer</title>
@@ -35,36 +36,18 @@
 <body>
 
 
-<style type="text/css">
-    .resiziableLogWindow {
-        background: rgba(255, 0, 0, 0.03);
-        font-size: 8pt;
-        border: 1px solid black;
-        height: 125px;
-        margin-left: 25px;
-        margin-right: 25px;
-        margin-bottom: 25px;
-        overflow: auto;
-        resize: vertical;
-        min-width: 500px;
-        min-height: 75px;
-        padding-left: 15px;
-        padding-right: 15px;
-        padding-top: 10px;
-        padding-bottom: 20px;
-
-    }
-</style>
-
-
 <!-- ****************************************************** -->
 <!--                      PAGE BANNER                       -->
 <!--                                                        -->
 <!--                                                        -->
-
-<img alt="OPeNDAP Logo" src='<%=contextPath%>/docs/images/logo.gif'/>
-
-<h1>Hyrax Admin Interface: OLFS Log Viewer</h1>
+<table width='95%'>
+    <tr>
+        <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
+        <td>
+            <div style='v-align:center;font-size:large;'><a href=".">Hyrax Admin Interface</a></div>
+        </td>
+    </tr>
+</table>
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->
@@ -73,25 +56,9 @@
 <!--                                                        -->
 
 
-<div id="controls"
-     style="
-        border:solid 1px #dddddd;
-        margin-left:25px;
-        margin-right: 25px;
-        font-size:14px;
-        font-family:san-serif,tahoma,arial;
-        padding-left:15px;
-        padding-right:15px;
-        padding-top:0px;
-        padding-bottom:0px;
-        margin-top:25px;
-        margin-bottom:10px;
-        text-align:left;
-        "
-
-        >
+<div id="controls" class="loggingControls">
     <div>
-        <button onclick="getLog('<%=contextPath%>/hai/olfsLog');">Start</button>
+        <button onclick="getLog('<%=contextPath%>/hai/olfsLog','500');">Start</button>
         <button onclick="stopTail();">Stop</button>
         <button onclick="clearLogWindow();">Clear</button>
     </div>
@@ -99,27 +66,9 @@
 
 
 <div id="resize">
-    <div id="log"
-         class="resiziableLogWindow"
-            />
+    <div id="log" class="LogWindow" />
 </div>
-<div id="message"
-     style="
-        border:solid 1px #dddddd;
-        margin-left:25px;
-        margin-right: 25px;
-        font-size: 11px;
-        font-family:san-serif,tahoma,arial;
-        padding-left:15px;
-        padding-right:15px;
-        padding-top:0px;
-        padding-bottom:0px;
-        margin-top:25px;
-        margin-bottom:10px;
-        text-align:left;
-        "
-
-        >
+<div id="message" class="statusDisplay">
     This is the OLFS Log Viewer. To begin viewing the OLFS log, click the Start button.
 </div>
 

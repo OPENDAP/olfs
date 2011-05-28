@@ -11,20 +11,21 @@
 
 var request1 = createRequest();
 
-function getLog(logURL) {
+function getLog(logURL, besPrefix, lines) {
 
-    document.getElementById("message").innerHTML = "Polling OLFS log...";
-    var url = logURL;
+    var url = logURL+"?cmd=getLog&prefix="+besPrefix+"&lines="+lines;
+
+    document.getElementById("message").innerHTML = "Polling log: "+url;
     request1.open("GET", url, true);
     request1.onreadystatechange = updatePage;
     request1.send(null);
-    startTail(url);
+    startTail(logURL, lines);
 }
 
 
 
-function startTail(tailURL) {
-    t = setTimeout("getLog('"+tailURL+"')", 1000);
+function startTail(tailURL,lines) {
+    t = setTimeout("getLog('"+tailURL+"','"+lines+"')", 1000);
 }
 
 function stopTail() {

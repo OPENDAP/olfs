@@ -239,7 +239,18 @@ public class BES {
         String cmd = getStartCommand();
         return executeBesAdminCommand(cmd);
     }
+    public String stopNow(){
+        String cmd = getStopNowCommand();
+        return executeBesAdminCommand(cmd);
+    }
 
+    public String getStartCommand(){
+        return  getSimpleBesAdminCommand("Start");
+    }
+
+    public String getStopNowCommand(){
+        return  getSimpleBesAdminCommand("StopNow");
+    }
 
     public String stopNice(long timeOut){
         StringBuilder sb = new StringBuilder();
@@ -383,19 +394,6 @@ public class BES {
         return executeBesAdminCommand(cmd);
     }
 
-    public String stopNow(){
-        String cmd = getStopNowCommand();
-        return executeBesAdminCommand(cmd);
-    }
-
-    public String getStartCommand(){
-        return  getSimpleBesAdminCommand("Start");
-    }
-
-    public String getStopNowCommand(){
-        return  getSimpleBesAdminCommand("StopNow");
-    }
-
     public String getGetConfigurationCommand(String moduleName){
         Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
         Element cmd = new Element("GetConfig",BES_ADMIN_NS);
@@ -427,6 +425,31 @@ public class BES {
 
         return xmlo.outputString(besCmdDoc);
     }
+
+
+
+
+    public String getLog(String lines){
+        String cmd = getGetLogCommand(lines);
+        return executeBesAdminCommand(cmd);
+    }
+
+    public String getGetLogCommand(String lines){
+        Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
+        Element cmd = new Element("TailLog",BES_ADMIN_NS);
+
+        if(lines!=null)
+            cmd.setAttribute("lines",lines);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
+    }
+
+
 
 
 

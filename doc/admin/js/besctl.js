@@ -58,6 +58,10 @@ function getConfig(module,prefix,besctlUrl) {
     request1.onreadystatechange = updateConfig;
     request1.send(null);
 
+
+
+
+
 }
 
 function setConfig(module,prefix,besctlUrl) {
@@ -111,6 +115,66 @@ function updateConfig() {
 
             alert(request1.responseText);
             document.getElementById("status").innerHTML = "<pre> "+request1.responseText+"</pre>";
+
+        } else
+            alert("Error! Request status is " + request1.status);
+    }
+}
+
+
+var logUrl;
+var logBesPrefix;
+var logLines;
+
+
+function getBesLog(besLogUrl, besPrefix, lines) {
+
+    logUrl = besLogUrl;
+    logBesPrefix = besPrefix;
+    logLines=lines;
+
+    var url = logUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+lines;
+
+    var d = new Date();
+    var status = d.toDateString() + "  "+ d.toTimeString() + " Polling log: "+url;
+
+    document.getElementById("status").innerHTML = status;
+    request1.open("GET", url, true);
+    request1.onreadystatechange = updateLoggerPage;
+    request1.send(null);
+}
+
+
+
+function startTailing(tailURL,besPrefix, lines) {
+    t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"','"+lines+"')", 1000);
+}
+
+
+function stopTailing() {
+    clearTimeout(t);
+    document.getElementById("message").innerHTML =
+            "The log viewer has been paused. " +
+            "To begin viewing again, click the Start button.";
+
+}
+
+function clearLogWindow() {
+    document.getElementById("log").innerHTML="";
+}
+
+
+
+function updateLoggerPage() {
+    if (request1.readyState == 4) {
+        if (request1.status == 200) {
+
+            logDiv = document.getElementById("log");
+
+            logDiv.innerHTML = "<pre>"+request1.responseText+"</pre>" ;
+
+            startTailing(logUrl, logBesPrefix, logLines);
+
 
         } else
             alert("Error! Request status is " + request1.status);

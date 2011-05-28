@@ -1,3 +1,7 @@
+<%@ page import="opendap.bes.BESManager" %>
+<%@ page import="opendap.bes.BES" %>
+<%@ page import="opendap.hai.Util" %>
+<%@ page import="java.util.HashMap" %>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
@@ -23,17 +27,41 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% String contextPath = request.getContextPath(); %>
-
 <html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+
+    String contextPath = request.getContextPath();
+
+    HashMap<String, String> kvp = Util.processQuery(request);
+
+
+    String currentPrefix = kvp.get("prefix");
+    if (currentPrefix == null)
+        currentPrefix = "/";
+
+
+    BES bes = BESManager.getBES(currentPrefix);
+
+    currentPrefix = bes.getPrefix();
+
+    String besCtlApi = contextPath+"/hai/besctl";
+
+
+    StringBuilder status = new StringBuilder();
+    status.append(" OK ");
+
+
+
+%>
 <head>
-    <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>
-    <title>Hyrax Admin Interface</title>
+    <link rel='stylesheet' href='<%=contextPath%>/docs/css/contents.css' type='text/css'/>
+    <link rel='stylesheet' href='<%=contextPath%>/docs/css/besctl.css' type='text/css'/>
+    <script type="text/javascript" src="js/XmlHttpRequest.js"></script>
+    <script type="text/javascript" src="js/besctl.js"></script>
+    <title>OLFS Log Viewer</title>
 </head>
 <body>
-
-
 
 
 <!-- ****************************************************** -->
@@ -57,15 +85,22 @@
 <!--                                                        -->
 
 
-<dl>
-    <dd><a href="olfsLogView.jsp">OLFS Log Viewer</a></dd>
-    <dd><a href="besctl.jsp">BES Control</a></dd>
-    <dd><a href="besLogView.jsp">BES Log Viewer</a></dd>
-</dl>
+<div id="controls" class="loggingControls">
+    <div>
+
+        <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
+        <button onclick="stopTailing();">Stop</button>
+        <button onclick="clearLogWindow();">Clear</button>
+    </div>
+</div>
 
 
-
-
+<div id="resize">
+    <div id="log" class="LogWindow"></div>
+</div>
+<div id="status" class="statusDisplay">
+    This is the BES Log Viewer. To begin viewing the BES log, click the Start button.
+</div>
 
 
 
@@ -78,7 +113,7 @@
     <tr>
         <td>
             <div class="small" align="left">
-                <a href="<%= contextPath %>/docs/admin/">Hyrax Admin Interface </a>
+                <a href="<%=contextPath%>/docs/admin/index.html">Hyrax Admin Interface</a>
             </div>
         </td>
         <td>
@@ -99,7 +134,7 @@
 <!--                                                        -->
 <h3>OPeNDAP Hyrax
     <br/>
-    <a href='<%= contextPath %>/docs/'>Documentation</a>
+    <a href='<%=contextPath%>/docs/'>Documentation</a>
 </h3>
 
 

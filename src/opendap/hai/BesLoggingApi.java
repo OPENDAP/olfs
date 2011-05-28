@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,12 +50,12 @@ import ch.qos.logback.core.read.CyclicBufferAppender;
  * Time: 2:35:04 PM
  * To change this template use File | Settings | File Templates.
  */
-public class OlfsLoggingApi extends HttpResponder {
+public class BesLoggingApi extends HttpResponder {
 
 
     private Logger log;
 
-    private static String defaultRegex = ".*\\/olfsLog";
+    private static String defaultRegex = ".*\\/besLog";
 
 
     private String AdminLogger = "HAI_DEBUG_LOGGER";
@@ -74,33 +75,16 @@ public class OlfsLoggingApi extends HttpResponder {
 
         String msg = "";
 
-        for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
-            msg += "   Logger: " + logger.getName() + "\n";
-
-            Iterator<Appender<ILoggingEvent>> i = logger.iteratorForAppenders();
-            while (i.hasNext()) {
-                Appender<ILoggingEvent> a = i.next();
-                msg += "        Appender: " + a.getName() + "\n";
-
-            }
-
-
-        }
-        log.debug("Initializing ViewLastLog Servlet. \n" + msg);
-
-        ch.qos.logback.classic.Logger rootLogger = lc.getLogger(ROOT_NAME);
-
-        cyclicBufferAppender = (CyclicBufferAppender) rootLogger.getAppender(AdminLogger);
 
     }
 
 
-    public OlfsLoggingApi(String sysPath) {
+    public BesLoggingApi(String sysPath) {
         super(sysPath, null, defaultRegex);
         init();
     }
 
-    public OlfsLoggingApi(String sysPath, String pathPrefix) {
+    public BesLoggingApi(String sysPath, String pathPrefix) {
         super(sysPath, pathPrefix, defaultRegex);
         init();
     }
@@ -110,19 +94,24 @@ public class OlfsLoggingApi extends HttpResponder {
         String queryString = request.getQueryString();
 
         log.debug("queryString: "+queryString);
-        if(queryString!=null){
-            log.debug("Implement QUERY handling");
-            // @todo Make this accept control parameters:
-            // @todo   - set buffer length
-            // @todo   - change debugging params
-        }
+        HashMap<String,String> kvp = Util.processQuery(request);
 
-        showLog(request, response);
+        showLog(request, response, kvp);
     }
 
 
-    private void showLog(HttpServletRequest req, HttpServletResponse resp)
+    private void showLog(HttpServletRequest req, HttpServletResponse resp, HashMap<String,String> kvp)
             throws ServletException, IOException {
+
+
+
+
+        String lines=kvp.get("lines");
+
+        if(lines == null)
+            lines = "500";
+
+
 
 
         //log.debug("Sending logging info");
@@ -152,61 +141,9 @@ public class OlfsLoggingApi extends HttpResponder {
     }
 
     private void printLogs(PrintWriter output) {
-        int count = -1;
-        if (cyclicBufferAppender != null) {
-            count = cyclicBufferAppender.getLength();
-        }
-
-        if (count == -1) {
-            output.append("<h3>Failed to locate CyclicBuffer</h3>\r\n");
-        } else if (count == 0) {
-            output.append("<h3><td>No logging events to display</h3>\r\n");
-        } else {
-            LoggingEvent le;
-            for (int i = 0; i < count; i++) {
-                le = (LoggingEvent) cyclicBufferAppender.get(i);
-                output.append(StringEscapeUtils.escapeHtml(formatLoggingEvent(le)));
-            }
-        }
     }
 
 
-    private String formatLoggingEvent(LoggingEvent event){
 
-
-        //private String PATTERN = "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n";
-
-        StringBuffer sbuf = new StringBuffer(128);
-        Date date = new Date(event.getTimeStamp());
-
-
-        sbuf.append(sdf.format(date));
-        sbuf.append(" ");
-        sbuf.append(" [").append(event.getThreadName()).append("] ");
-        sbuf.append(event.getLevel());
-        sbuf.append(" - ");
-        sbuf.append(event.getLoggerName());
-        sbuf.append(" - ");
-        sbuf.append(event.getFormattedMessage());
-        sbuf.append("\n");
-
-        IThrowableProxy itp = event.getThrowableProxy();
-        if(itp!=null){
-            for(StackTraceElementProxy ste  : itp.getStackTraceElementProxyArray()){
-                sbuf.append("    ").append(ste);
-                sbuf.append("\n");
-            }
-        }
-        return sbuf.toString();
-
-    }
-
-
-    private void initialize(LoggerContext context) {
-
-
-
-
-    }
 
 }

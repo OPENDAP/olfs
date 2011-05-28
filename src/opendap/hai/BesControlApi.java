@@ -4,7 +4,6 @@ import opendap.bes.BES;
 import opendap.bes.BESManager;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.Scrub;
-import opendap.ppt.OPeNDAPClient;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -22,7 +21,6 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BesControlApi extends HttpResponder {
 
@@ -88,7 +86,7 @@ public class BesControlApi extends HttpResponder {
 
         //log.debug("\nBODY:\n{}",getRequestBodyAsString(request));
 
-        HashMap<String,String> kvp = processQuery(request);
+        HashMap<String,String> kvp = Util.processQuery(request);
 
         String status = processBesCommand(kvp, isPost);
 
@@ -97,10 +95,10 @@ public class BesControlApi extends HttpResponder {
         //@todo work this out to not escape everything.
         //output.append(StringEscapeUtils.escapeHtml(status));
 
-        String s = processStatus(status);
+        //String s = processStatus(status);
 
 
-        output.append(s);
+        output.append(status);
 
 
         output.flush();
@@ -119,36 +117,57 @@ public class BesControlApi extends HttpResponder {
             Document besResponseDoc = sb.build(bais);
             Element besResponse = besResponseDoc.getRootElement();
 
-            List errors = besResponse.getChildren("BESError", opendap.namespaces.BES.BES_ADMIN_NS);
-
-            if(!errors.isEmpty()) {
-                for(Object o: errors){
-                    Element error = (Element) o;
-                    Element msgElem = error.getChild("Message",opendap.namespaces.BES.BES_ADMIN_NS);
-                    Element typeElem = error.getChild("Type",opendap.namespaces.BES.BES_ADMIN_NS);
-
-                    String msg = "BES ERROR Message Is Missing";
-                    if(msgElem!=null)
-                        msg = msgElem.getTextNormalize();
-
-                    String type = "BES ERROR Type Is Missing";
-                    if(typeElem!=null)
-                        type = typeElem.getTextNormalize();
+            s.append(processBesErrors(besResponse));
 
 
-                    s.append("Error[").append(type).append("]: ").append(msg).append("\n");
-                }
+            Element ok = besResponse.getChild("OK",opendap.namespaces.BES.BES_ADMIN_NS);
+            if(ok!=null){
+                s.append("OK");
             }
             else {
-                Element ok = besResponse.getChild("OK",opendap.namespaces.BES.BES_ADMIN_NS);
-                if(ok!=null){
-                    s.append("OK");
-                }
-                else {
-                    s.append("ERROR! Unrecognized BES response.");
-                }
-
+                s.append("ERROR! Unrecognized BES response.");
             }
+
+
+        } catch (JDOMException e) {
+            s.append("Failed to parse BES response! Msg: ").append(e.getMessage());
+            log.error(s.toString());
+        } catch (IOException e) {
+            s.append("Failed to ingest BES response! Msg: ").append(e.getMessage());
+            log.error(s.toString());
+        }
+
+
+        return s.toString();
+
+    }
+
+
+
+    public String processLogResponse(String logResponse){
+
+        StringBuilder s = new StringBuilder();
+        SAXBuilder sb = new SAXBuilder(false);
+        ByteArrayInputStream bais = new ByteArrayInputStream(logResponse.getBytes());
+
+
+        try {
+            Document besResponseDoc = sb.build(bais);
+            Element besResponse = besResponseDoc.getRootElement();
+
+
+            s.append(processBesErrors(besResponse));
+
+
+            Element besLog = besResponse.getChild("BesLog",opendap.namespaces.BES.BES_ADMIN_NS);
+            if(besLog!=null){
+                s.append(besLog.getText());
+            }
+            else {
+                s.append("ERROR! Unrecognized BES response.");
+            }
+
+
 
         } catch (JDOMException e) {
             s.append("Failed to parse BES response! Msg: ").append(e.getMessage());
@@ -163,38 +182,34 @@ public class BesControlApi extends HttpResponder {
     }
 
 
+    private String processBesErrors(Element topElem){
+        StringBuilder s = new StringBuilder();
+
+        List errors = topElem.getChildren("BESError", opendap.namespaces.BES.BES_ADMIN_NS);
+
+        if(!errors.isEmpty()) {
+            for(Object o: errors){
+                Element error = (Element) o;
+                Element msgElem = error.getChild("Message",opendap.namespaces.BES.BES_ADMIN_NS);
+                Element typeElem = error.getChild("Type",opendap.namespaces.BES.BES_ADMIN_NS);
+
+                String msg = "BES ERROR Message Is Missing";
+                if(msgElem!=null)
+                    msg = msgElem.getTextNormalize();
+
+                String type = "BES ERROR Type Is Missing";
+                if(typeElem!=null)
+                    type = typeElem.getTextNormalize();
 
 
-
-    public static HashMap<String, String> processQuery(HttpServletRequest request){
-
-        Logger log = LoggerFactory.getLogger("opendap.bes.BesControlApi");
-        HashMap<String, String> kvp = new HashMap<String, String>();
-
-        StringBuilder sb = new StringBuilder();
-        Map<java.lang.String,java.lang.String[]> params = request.getParameterMap();
-        for(String name: params.keySet()){
-            sb.append(name).append(" = ");
-            String[] values = params.get(name);
-            if(values.length>1){
-                log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", name);
+                s.append("Error[").append(type).append("]: ").append(msg).append("\n");
             }
-            for(String value: values){
-                sb.append("'").append(value).append("' ");
-                kvp.put(name,value);
-            }
-            sb.append("\n");
         }
 
-        log.debug("Parameters:\n{}",sb);
 
-
-
-        return kvp;
-
+        return s.toString();
 
     }
-
 
     /**
      *
@@ -214,13 +229,13 @@ public class BesControlApi extends HttpResponder {
             BES bes = BESManager.getBES(currentPrefix);
 
             if (besCmd.equals("Start")) {
-                sb.append(bes.start());
+                sb.append(processStatus(bes.start()));
             }
             else if (besCmd.equals("StopNice")) {
-                sb.append(bes.stopNice(3000));
+                sb.append(processStatus(bes.stopNice(3000)));
             }
             else if (besCmd.equals("StopNow")) {
-                sb.append(bes.stopNow());
+                sb.append(processStatus(bes.stopNow()));
             }
 
 
@@ -259,18 +274,28 @@ public class BesControlApi extends HttpResponder {
                      */
 
                     String status = bes.setConfiguration(module, submittedConfiguration);
-                    sb.append(status);
+                    sb.append(processStatus(status));
 
                 }
                 else {
                     sb.append("In order to use the setConfig command you MUST supply a configuration via HTTP POST content.\n");
                 }
             }
+            else if (besCmd.equals("getLog")) {
+                String lines = kvp.get("lines");
+                String log =  bes.getLog(lines);
+                log = processLogResponse(log);
+
+                log = StringEscapeUtils.escapeXml(log);
+
+                sb.append(log);
+            }
             else  {
                 sb.append(" Unrecognized BES command: ").append(Scrub.simpleString(besCmd));
             }
         }
         else {
+
             sb.append(" Waiting for you to do something...");
         }
 
@@ -280,28 +305,6 @@ public class BesControlApi extends HttpResponder {
 
     }
 
-
-    private String getRequestBodyAsString(HttpServletRequest req) {
-
-
-        StringBuilder sb = new StringBuilder();
-        try {
-            int contentLength = req.getContentLength();
-            log.debug("HttpServletRequest.getContentLength(): {}",contentLength);
-            BufferedReader buff = req.getReader();
-            char[] buf = new char[4 * 1024]; // 4 KB char buffer
-            int len;
-            while ((len = buff.read(buf, 0, buf.length)) != -1) {
-                sb.append(buf,0,len);
-            }
-        } catch (IOException e) {
-            log.error("Failed to read HTTP request body.");
-        }
-
-
-        return sb.toString();
-
-    }
 
 
 }
