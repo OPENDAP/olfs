@@ -59,7 +59,7 @@
     <link rel='stylesheet' href='<%=contextPath%>/docs/css/besctl.css' type='text/css'/>
     <script type="text/javascript" src="js/XmlHttpRequest.js"></script>
     <script type="text/javascript" src="js/besctl.js"></script>
-    <title>OLFS Log Viewer</title>
+    <title>BES Log Viewer</title>
 </head>
 <body>
 
@@ -77,6 +77,8 @@
         </td>
     </tr>
 </table>
+<h1>BES Log Viewer</h1>
+
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->

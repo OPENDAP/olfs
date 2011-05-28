@@ -72,6 +72,7 @@
     </tr>
 </table>
 <h1>BES Control</h1>
+<hr size="1" noshade="noshade"/>
 <ol id="toc">
 
     <%

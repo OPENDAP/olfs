@@ -49,6 +49,7 @@
         </td>
     </tr>
 </table>
+<h1>Hyrax Admin Interface</h1>
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->
