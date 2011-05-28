@@ -147,7 +147,7 @@ function getBesLog(besLogUrl, besPrefix, lines) {
 
 
 function startTailing(tailURL,besPrefix, lines) {
-    t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"','"+lines+"')", 1000);
+    t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"','"+lines+"')", 2000);
 }
 
 
