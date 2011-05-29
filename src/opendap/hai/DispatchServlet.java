@@ -83,12 +83,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         // dapResponders.add(new DDX(getMethod(,HttpServletRequest.class,HttpServletResponse.class)));
 
 
-        try {
-            _config = loadConfig();
-
-        } catch (Exception e) {
-            log.error("init() Failed to load it's configuration! Caught " + e.getClass().getName() + " Message: " + e.getMessage());
-        }
 
 
         responders.add(new OlfsLoggingApi(systemPath));
@@ -112,11 +106,11 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      */
     private Document loadConfig() throws ServletException {
 
-        String filename = getInitParameter("GatewayConfigFileName");
+        String filename = getInitParameter("ConfigFileName");
         if (filename == null) {
             String msg = "Servlet configuration must include a file name for " +
-                    "the Gateway configuration!\n";
-            System.err.println(msg);
+                    "the Admin configuration!\n";
+            log.warn(msg);
             throw new ServletException(msg);
         }
 

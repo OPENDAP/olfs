@@ -108,9 +108,8 @@
 </div>
 
 
-<div id="resize">
-    <div id="log" class="LogWindow"></div>
-</div>
+<div id="log" class="LogWindow"></div>
+
 <div id="status" class="statusDisplay">
     This is the BES Log Viewer. To begin viewing the BES log, click the Start button.
 </div>
