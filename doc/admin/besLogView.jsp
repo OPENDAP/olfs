@@ -88,11 +88,22 @@
 
 
 <div id="controls" class="loggingControls">
-    <div>
+    <div class="small">
 
         <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
         <button onclick="stopTailing();">Stop</button>
         <button onclick="clearLogWindow();">Clear</button>
+        &nbsp;&nbsp;Lines To Show:
+        <select id="logLines">
+            <option>10</option>
+            <option>50</option>
+            <option>100</option>
+            <option selected="">500</option>
+            <option>1000</option>
+            <option>5000</option>
+            <option>all</option>
+        </select>
+
     </div>
 </div>
 

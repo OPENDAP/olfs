@@ -124,38 +124,58 @@ function updateConfig() {
 
 var logUrl;
 var logBesPrefix;
-var logLines;
 
 
-function getBesLog(besLogUrl, besPrefix, lines) {
+
+//#########################################################
+//#########################################################
+//#########################################################
+
+
+/**
+ *
+ * @param besLogUrl
+ * @param besPrefix
+ */
+function getBesLog(besLogUrl, besPrefix) {
 
     logUrl = besLogUrl;
     logBesPrefix = besPrefix;
-    logLines=lines;
 
-    var url = logUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+lines;
+    var logLines = document.getElementById("logLines").value;
+
+    if(logLines=="all")
+        logLines=0;
+
+    var url = logUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+logLines;
+
+    //alert(url);
 
     var d = new Date();
-    var status = d.toTimeString() + " Polling log: "+url;
+    var status = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
     document.getElementById("status").innerHTML = status;
     request1.open("GET", url, true);
     request1.onreadystatechange = updateLoggerPage;
     request1.send(null);
+    stopLogging = false;
 }
 
 
 
-function startTailing(tailURL,besPrefix, lines) {
-    t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"','"+lines+"')", 2000);
+function startTailing(tailURL,besPrefix) {
+    if(!stopLogging)
+        t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
 
 
+var stopLogging;
 function stopTailing() {
+    stopLogging = true;
     clearTimeout(t);
 
     var d = new Date();
-    var status = d.toDateString() + "  "+ d.toTimeString() + " "+
+    var status =  d.toTimeString() + " "+
             "The log viewer has been paused. " +
             "To begin viewing again, click the Start button.";
 
@@ -178,10 +198,10 @@ function updateLoggerPage() {
 
             logDiv.innerHTML = "<pre>"+request1.responseText+"</pre>" ;
 
-            startTailing(logUrl, logBesPrefix, logLines);
+            startTailing(logUrl, logBesPrefix);
 
 
         } else
-            alert("Error! Request status is " + request1.status);
+            alert("Error! BES log request returned HTTP status of " + request1.status);
     }
 }
