@@ -122,14 +122,17 @@ function updateConfig() {
 }
 
 
+//#########################################################
+//#########################################################
+//#########################################################
+
+
+
 var logUrl;
 var logBesPrefix;
 
+var stopUpdatingLogView;
 
-
-//#########################################################
-//#########################################################
-//#########################################################
 
 
 /**
@@ -158,20 +161,19 @@ function getBesLog(besLogUrl, besPrefix) {
     request1.open("GET", url, true);
     request1.onreadystatechange = updateLoggerPage;
     request1.send(null);
-    stopLogging = false;
+    stopUpdatingLogView = false;
 }
 
 
 
 function startTailing(tailURL,besPrefix) {
-    if(!stopLogging)
+    if(!stopUpdatingLogView)
         t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
 
 
-var stopLogging;
 function stopTailing() {
-    stopLogging = true;
+    stopUpdatingLogView = true;
     clearTimeout(t);
 
     var d = new Date();

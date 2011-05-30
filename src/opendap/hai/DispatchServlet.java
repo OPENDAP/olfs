@@ -85,7 +85,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
 
 
-        responders.add(new OlfsLoggingApi(systemPath));
+        responders.add(new OlfsControlApi(systemPath));
         responders.add(new BesControlApi(systemPath));
 
 

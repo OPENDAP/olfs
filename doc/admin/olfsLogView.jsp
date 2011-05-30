@@ -1,3 +1,13 @@
+<%@ page import="java.util.HashMap" %>
+<%@ page import="opendap.hai.Util" %>
+<%@ page import="opendap.bes.BES" %>
+<%@ page import="opendap.bes.BESManager" %>
+<%@ page import="ch.qos.logback.classic.LoggerContext" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="ch.qos.logback.core.Appender" %>
+<%@ page import="ch.qos.logback.classic.spi.ILoggingEvent" %>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
@@ -25,12 +35,36 @@
   -->
 <html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% String contextPath = request.getContextPath(); %>
+<%
+
+    String contextPath = request.getContextPath();
+
+    HashMap<String, String> kvp = Util.processQuery(request);
+
+
+    String currentPrefix = kvp.get("prefix");
+    if (currentPrefix == null)
+        currentPrefix = "/";
+
+
+    BES bes = BESManager.getBES(currentPrefix);
+
+    currentPrefix = bes.getPrefix();
+
+    String olfsCtlApi = contextPath+"/hai/olfsctl";
+
+
+    StringBuilder status = new StringBuilder();
+    status.append(" OK ");
+
+
+
+%>
 <head>
     <link rel='stylesheet' href='<%=contextPath%>/docs/css/contents.css' type='text/css'/>
     <link rel='stylesheet' href='<%=contextPath%>/docs/css/besctl.css' type='text/css'/>
     <script type="text/javascript" src="js/XmlHttpRequest.js"></script>
-    <script type="text/javascript" src="js/logTail.js"></script>
+    <script type="text/javascript" src="js/olfsctl.js"></script>
     <title>OLFS Log Viewer</title>
 </head>
 <body>
@@ -57,21 +91,59 @@
 <!--                                                        -->
 
 
+
 <div id="controls" class="loggingControls">
-    <div>
-        <button onclick="getLog('<%=contextPath%>/hai/olfsLog','500');">Start</button>
-        <button onclick="stopTail();">Stop</button>
-        <button onclick="clearLogWindow();">Clear</button>
+    <div class="small">
+        <div style="float: left;">
+            <button onclick="getOlfsLog('<%=olfsCtlApi%>','<%=currentPrefix%>','10');">Start</button>
+            <button onclick="stopTailing();">Stop</button>
+            <button onclick="clearLogWindow();">Clear</button>
+            &nbsp;&nbsp;Lines To Show:
+            <select id="logLines">
+                <option>10</option>
+                <option>50</option>
+                <option>100</option>
+                <option selected="">500</option>
+                <option>1000</option>
+                <option>5000</option>
+                <option>all</option>
+            </select>
+        </div>
+
+        <div style="float: right;">
+
+            <button onclick="setLogLevel('<%=olfsCtlApi%>');">Set Log Level</button>
+            <select id="loggerName" onchange="updateLevelSelection('<%=olfsCtlApi%>')">
+            <%
+                LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+                for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
+                    out.append("<option>").append(logger.getName()).append("</option>");
+                }
+            %>
+            </select>
+
+            <select id="logLevel">
+                <option>all</option>
+                <option>debug</option>
+                <option>info</option>
+                <option>warn</option>
+                <option selected="">error</option>
+                <option>off</option>
+            </select>
+        </div>
+
+        <div style="clear: both;"> </div>
+
     </div>
 </div>
 
 
-<div id="resize">
-    <div id="log" class="LogWindow" />
-</div>
-<div id="message" class="statusDisplay">
+<div id="log" class="LogWindow"></div>
+
+<div id="status" class="statusDisplay">
     This is the OLFS Log Viewer. To begin viewing the OLFS log, click the Start button.
 </div>
+
 
 
 

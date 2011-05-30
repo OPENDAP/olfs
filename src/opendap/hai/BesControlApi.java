@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -144,7 +143,7 @@ public class BesControlApi extends HttpResponder {
 
 
 
-    public String processLogResponse(String logResponse){
+    public String besLogTailResponse(String logResponse){
 
         StringBuilder s = new StringBuilder();
         SAXBuilder sb = new SAXBuilder(false);
@@ -284,7 +283,7 @@ public class BesControlApi extends HttpResponder {
             else if (besCmd.equals("getLog")) {
                 String lines = kvp.get("lines");
                 String log =  bes.getLog(lines);
-                log = processLogResponse(log);
+                log = besLogTailResponse(log);
 
                 log = StringEscapeUtils.escapeXml(log);
 
