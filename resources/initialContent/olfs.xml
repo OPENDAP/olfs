@@ -28,7 +28,7 @@
                         The maximum response size, in kilobytes, for non authenticated users
                         A value of zero means there is no limit.
                     -->
-                    <maxResponseSize>10</maxResponseSize>
+                    <maxResponseSize>0</maxResponseSize>
 
 
                     <!-- The ClientPool maximum number of concurrent
