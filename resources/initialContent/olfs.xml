@@ -24,6 +24,13 @@
                     <!-- The Administration port number for this BES -->
                     <!-- <adminPort>11002</adminPort> -->
 
+                    <!--
+                        The maximum response size, in kilobytes, for non authenticated users
+                        A value of zero means there is no limit.
+                    -->
+                    <maxResponseSize>10</maxResponseSize>
+
+
                     <!-- The ClientPool maximum number of concurrent
                       -  BES client connections allowed.
                       -->
