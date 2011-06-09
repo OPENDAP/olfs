@@ -27,6 +27,7 @@ import opendap.bes.Version;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.HttpResponder;
+import opendap.dap.User;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.net.UnknownServiceException;
 
 
 public class DataDDX extends HttpResponder {
@@ -99,6 +101,7 @@ public class DataDDX extends HttpResponder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
+        User user = new User(request);
 
 
 
@@ -108,6 +111,7 @@ public class DataDDX extends HttpResponder {
         Document reqDoc = _besApi.getDataDDXRequest(dataSource,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        user.getMaxResponseSize(),
                                                         xmlBase,
                                                         startID,
                                                         mb.getBoundary());

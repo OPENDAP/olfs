@@ -52,6 +52,7 @@ public class BESConfig  {
     private  int       _BESAdminPort;
     private  int       _BESMaxClients;
     private  int       _BESMaxCommands;
+    private  int       _BESMaxResponseSize;
     private  String    _BESPrefix;
     //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
@@ -66,6 +67,7 @@ public class BESConfig  {
         _BESMaxClients = 10;
         _BESMaxCommands = 2000;
         _BESPrefix = "/";
+        _BESMaxResponseSize = 0;
     }
 
     public BESConfig(Document besConfiguration) throws Exception{
@@ -90,6 +92,7 @@ public class BESConfig  {
         copy._BESHost        = _BESHost;
         copy._BESPort        = _BESPort;
         copy._BESAdminPort   = _BESAdminPort;
+        copy._BESMaxResponseSize   = _BESMaxResponseSize;
         copy._BESMaxClients  = _BESMaxClients;
         copy._BESMaxCommands = _BESMaxCommands;
         copy._BESPrefix      = _BESPrefix;
@@ -194,6 +197,14 @@ public class BESConfig  {
         if( adminPort!=null ){
             setAdminPort(adminPort.getTextTrim());
             log.info("BES '{}' adminPort set to {}",getPrefix(), getAdminPort());
+        }
+
+
+
+        Element maxResponseSize = besConfig.getChild("maxResponseSize");
+        if( maxResponseSize!=null ){
+            setMaxResponseSize(maxResponseSize.getTextTrim());
+            log.info("BES '{}' maxResponseSize set to {}",getPrefix(), getMaxResponseSize());
         }
 
 
@@ -311,6 +322,9 @@ public class BESConfig  {
         Element adminPort = new Element("adminPort");
         adminPort.setText(String.valueOf(getAdminPort()));
 
+        Element maxResponseSize = new Element("maxResponseSize");
+        adminPort.setText(String.valueOf(getMaxResponseSize()));
+
 
         Element clientPool = new Element("ClientPool");
         clientPool.setAttribute("maximum",Integer.toString(_BESMaxClients));
@@ -319,6 +333,8 @@ public class BESConfig  {
         bes.addContent(prefix);
         bes.addContent(host);
         bes.addContent(port);
+        bes.addContent(adminPort);
+        bes.addContent(maxResponseSize);
         bes.addContent(clientPool);
 
         return bes;
@@ -339,6 +355,10 @@ public class BESConfig  {
     public void setAdminPort(String port){ _BESAdminPort = Integer.parseInt(port); }
     public void setAdminPort(int port){ _BESAdminPort = port; }
     public int getAdminPort() { return _BESAdminPort; }
+
+    public void setMaxResponseSize(String maxResponseSize){ _BESMaxResponseSize = Integer.parseInt(maxResponseSize); }
+    public void setMaxResponseSize(int maxResponseSize){ _BESMaxResponseSize = maxResponseSize; }
+    public int getMaxResponseSize() { return _BESMaxResponseSize; }
 
 
     public void setPrefix(String prefix){ _BESPrefix = prefix; }
@@ -532,6 +552,23 @@ public class BESConfig  {
             }
             else if(bc.getAdminPort()==-1)
                 System.out.println("You must enter a port number.\n\n");
+            else
+                done = true;
+        }
+
+
+
+        done = false;
+        while(!done){
+            System.out.print("\nEnter the max response size for non-authenticated users for the BES host "+bc.getHost()+"   ");
+            System.out.print("[" + bc.getMaxResponseSize() + "]: ");
+            k = kybrd.readLine();
+            if (k!=null && !k.equals("")){
+                bc.setMaxResponseSize(k);
+                done = true;
+            }
+            else if(bc.getMaxResponseSize()==-1)
+                System.out.println("You must enter a max response size.\n\n");
             else
                 done = true;
         }

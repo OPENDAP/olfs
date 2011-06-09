@@ -160,6 +160,11 @@ public class BES {
         return _config.getMaxClients();
     }
 
+    public int getMaxResponseSize() {
+        return _config.getMaxResponseSize();
+    }
+
+
     public int getBesClientCount(){
         return _clients.size();
     }

@@ -94,6 +94,7 @@ public class DatasetInfoHtmlPage extends HttpResponder {
                                                         dataSource,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         null,
                                                         null,

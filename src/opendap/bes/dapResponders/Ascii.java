@@ -27,6 +27,8 @@ import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Util;
+import opendap.dap.User;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -84,19 +86,27 @@ public class Ascii extends HttpResponder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
+
+
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
+
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = _besApi.getRequestDocument(
-                                                        BesApi.ASCII,
-                                                        dataSource,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesApi.XML_ERRORS);
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.ASCII,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        maxRS,
+                        null,
+                        null,
+                        null,
+                        BesApi.XML_ERRORS);
 
         if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
 

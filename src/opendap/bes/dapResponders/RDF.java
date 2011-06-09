@@ -80,15 +80,17 @@ public class RDF extends HttpResponder {
 
 
         String xdap_accept = "3.2";
-        Document reqDoc = _besApi.getRequestDocument(
-                                                        BesApi.DDX,
-                                                        dataSource,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        xmlBase,
-                                                        null,
-                                                        null,
-                                                        BesApi.DAP2_ERRORS);
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.DDX,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        0,
+                        xmlBase,
+                        null,
+                        null,
+                        BesApi.DAP2_ERRORS);
 
 
 

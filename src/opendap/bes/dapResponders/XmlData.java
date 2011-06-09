@@ -26,6 +26,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.HttpResponder;
+import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -89,20 +90,26 @@ public class XmlData extends HttpResponder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
+
+        User user = new User(request);
+
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
-        Document reqDoc = _besApi.getRequestDocument(
-                                                        BesApi.XML_DATA,
-                                                        dataSource,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        xmlBase,
-                                                        null,
-                                                        null,
-                                                        BesApi.XML_ERRORS);
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.XML_DATA,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        user.getMaxResponseSize(),
+                        xmlBase,
+                        null,
+                        null,
+                        BesApi.XML_ERRORS);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

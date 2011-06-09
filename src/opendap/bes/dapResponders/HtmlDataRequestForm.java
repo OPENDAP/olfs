@@ -112,6 +112,7 @@ public class HtmlDataRequestForm extends HttpResponder {
                                                         dataSource,
                                                         null,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         url,
                                                         null,

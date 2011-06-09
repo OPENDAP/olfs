@@ -26,6 +26,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -86,16 +87,22 @@ public class Dap2Data extends HttpResponder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
+        User user = new User(request);
 
-        Document reqDoc = _besApi.getRequestDocument(
-                                                        BesApi.DAP2,
-                                                        dataSource,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesApi.DAP2_ERRORS);
+        user.getMaxResponseSize();
+
+
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.DAP2,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        user.getMaxResponseSize(),
+                        null,
+                        null,
+                        null,
+                        BesApi.DAP2_ERRORS);
 
         if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());

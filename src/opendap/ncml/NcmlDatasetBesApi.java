@@ -75,6 +75,7 @@ public class NcmlDatasetBesApi extends BesApi {
                                                 String localDataSourceId,
                                                 String ce,
                                                 String xdap_accept,
+                                                int maxResponseSize,
                                                 String xmlBase,
                                                 String formURL,
                                                 String returnAs,
@@ -95,15 +96,17 @@ public class NcmlDatasetBesApi extends BesApi {
         else
             request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
-        request.addContent(setContextElement(EXPICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
 
-        Element ncmlDatasetContainer =  NcmlManager.getNcmlDatasetContainer(localDataSourceId);
+        if(maxResponseSize>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
 
+        Element ncmlDatasetContainer =  NcmlManager.getNcmlDatasetContainer(localDataSourceId);
 
         if(ncmlDatasetContainer!=null)
             request.addContent(ncmlDatasetContainer);

@@ -74,7 +74,9 @@ public class BesApi {
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
     public static final String DEFAULT_XDAP_ACCEPT = "2.0";
 
-    public static final String EXPICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
+    public static final String EXPLICIT_CONTAINERS_CONTEXT = "dap_explicit_containers";
+
+    public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
 
 
 
@@ -176,6 +178,7 @@ public class BesApi {
         public boolean writeDataDDX(String dataSource,
                                     String constraintExpression,
                                     String xdap_accept,
+                                    int maxResponseSize,
                                     String xmlBase,
                                     String contentID,
                                     String mimeBoundary,
@@ -188,6 +191,7 @@ public class BesApi {
                     getDataDDXRequest(dataSource,
                             constraintExpression,
                             xdap_accept,
+                            maxResponseSize,
                             xmlBase,
                             contentID,
                             mimeBoundary),
@@ -335,6 +339,7 @@ public class BesApi {
     public boolean writeDap2Data(String dataSource,
                                      String constraintExpression,
                                      String xdap_accept,
+                                     int maxResponseSize,
                                      OutputStream os,
                                      OutputStream err)
             throws BadConfigurationException,
@@ -344,7 +349,7 @@ public class BesApi {
 
         return besTransaction(
                 dataSource,
-                getDap2DataRequest(dataSource,constraintExpression,xdap_accept),
+                getDap2DataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize),
                 os,
                 err);
     }
@@ -369,13 +374,14 @@ public class BesApi {
     public boolean writeNetcdfFileOut(String dataSource,
                                              String constraintExpression,
                                             String xdap_accept,
+                                            int maxResponseSize,
                                             OutputStream os,
                                             OutputStream err)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besTransaction(
                 dataSource,
-                getNetcdfFileOutRequest(dataSource,constraintExpression,xdap_accept),
+                getNetcdfFileOutRequest(dataSource,constraintExpression,xdap_accept, maxResponseSize),
                 os,
                 err);
     }
@@ -401,13 +407,14 @@ public class BesApi {
     public boolean writeXmlDataResponse(String dataSource,
                                              String constraintExpression,
                                             String xdap_accept,
+                                            int maxResponseSize,
                                             OutputStream os,
                                             OutputStream err)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besTransaction(
                 dataSource,
-                getXmlDataRequest(dataSource,constraintExpression,xdap_accept),
+                getXmlDataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize),
                 os,
                 err);
     }
@@ -436,6 +443,7 @@ public class BesApi {
     public boolean writeASCII(String dataSource,
                                   String constraintExpression,
                                   String xdap_accept,
+                                  int maxResponseSize,
                                   OutputStream os,
                                   OutputStream err)
             throws BadConfigurationException,
@@ -445,7 +453,7 @@ public class BesApi {
 
         return besTransaction(
                 dataSource,
-                getAsciiDataRequest(dataSource,constraintExpression,xdap_accept),
+                getAsciiDataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize),
                 os,
                 err);
     }
@@ -774,14 +782,15 @@ public class BesApi {
      */
     public InputStream getDap2DataStream(String dataSource,
                                                 String constraintExpression,
-                                                String xdap_accept)
+                                                String xdap_accept,
+                                                int maxResponseSize)
             throws BadConfigurationException, BESError, PPTException, IOException {
 
         //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        writeDap2Data(dataSource, constraintExpression, xdap_accept, baos, baos);
+        writeDap2Data(dataSource, constraintExpression, xdap_accept, maxResponseSize, baos, baos);
 
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
@@ -1100,7 +1109,7 @@ public class BesApi {
                                          String xmlBase)
             throws BadConfigurationException {
 
-        return getRequestDocument(DDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
+        return getRequestDocument(DDX,dataSource,ce,xdap_accept,0,xmlBase,null,null,XML_ERRORS);
 
     }
 
@@ -1119,12 +1128,23 @@ public class BesApi {
     public Document getDataDDXRequest(String dataSource,
                                          String ce,
                                          String xdap_accept,
+                                         int maxResponseSize,
                                          String xmlBase,
                                          String contentID,
                                          String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
+        Document reqDoc =
+                getRequestDocument(
+                        DataDDX,
+                        dataSource,
+                        ce,
+                        xdap_accept,
+                        maxResponseSize,
+                        xmlBase,
+                        null,
+                        null,
+                        XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
 
@@ -1159,7 +1179,7 @@ public class BesApi {
                                          String xdap_accept)
             throws BadConfigurationException {
 
-        return getRequestDocument(DDS,dataSource,ce,xdap_accept,null,null,null,DAP2_ERRORS);
+        return getRequestDocument(DDS,dataSource,ce,xdap_accept,0,null,null,null,DAP2_ERRORS);
 
     }
 
@@ -1169,25 +1189,26 @@ public class BesApi {
                                          String xdap_accept)
             throws BadConfigurationException {
 
-        return getRequestDocument(DAS,dataSource,ce,xdap_accept,null,null,null,DAP2_ERRORS);
+        return getRequestDocument(DAS,dataSource,ce,xdap_accept,0,null,null,null,DAP2_ERRORS);
 
     }
 
     public Document getDap2DataRequest(String dataSource,
                                               String ce,
-                                              String xdap_accept)
+                                              String xdap_accept, int maxResponseSize)
             throws BadConfigurationException {
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,null,null,null,DAP2_ERRORS);
+        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize,null,null,null,DAP2_ERRORS);
 
     }
 
     public Document getAsciiDataRequest(String dataSource,
                                                String ce,
-                                               String xdap_accept)
+                                               String xdap_accept,
+                                               int maxResponseSize)
             throws BadConfigurationException {
 
-        return getRequestDocument(ASCII,dataSource,ce,xdap_accept,null,null,null,XML_ERRORS);
+        return getRequestDocument(ASCII,dataSource,ce,xdap_accept,0,null,null,null,XML_ERRORS);
 
     }
 
@@ -1197,14 +1218,14 @@ public class BesApi {
                                               String URL)
             throws BadConfigurationException {
 
-        return getRequestDocument(HTML_FORM,dataSource,null,xdap_accept,null,URL,null,XML_ERRORS);
+        return getRequestDocument(HTML_FORM,dataSource,null,xdap_accept,0,null,URL,null,XML_ERRORS);
 
     }
 
     public Document getStreamRequest(String dataSource)
             throws BadConfigurationException{
 
-        return getRequestDocument(STREAM,dataSource,null,null,null,null,null,XML_ERRORS);
+        return getRequestDocument(STREAM,dataSource,null,null,0,null,null,null,XML_ERRORS);
 
     }
 
@@ -1212,15 +1233,15 @@ public class BesApi {
     public Document getHtmlInfoPageRequest(String dataSource, String xdap_accept)
             throws BadConfigurationException {
 
-        return getRequestDocument(INFO_PAGE,dataSource,null,xdap_accept,null,null,null,XML_ERRORS);
+        return getRequestDocument(INFO_PAGE,dataSource,null,xdap_accept,0,null,null,null,XML_ERRORS);
 
     }
 
-    public Document getNetcdfFileOutRequest(String dataSource, String ce, String xdap_accept)
+    public Document getNetcdfFileOutRequest(String dataSource, String ce, String xdap_accept, int maxResponseSize)
             throws BadConfigurationException {
 
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,null,null,"netcdf",DAP2_ERRORS);
+        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize, null,null,"netcdf",DAP2_ERRORS);
 
 
     }
@@ -1236,10 +1257,11 @@ public class BesApi {
      */
     public Document getXmlDataRequest(String dataSource,
                                          String ce,
-                                         String xdap_accept)
+                                         String xdap_accept,
+                                         int maxResponseSize)
             throws BadConfigurationException {
 
-        return getRequestDocument(XML_DATA,dataSource,ce,xdap_accept,null,null,null,XML_ERRORS);
+        return getRequestDocument(XML_DATA,dataSource,ce,xdap_accept,maxResponseSize,null,null,null,XML_ERRORS);
 
     }
 
@@ -1249,6 +1271,7 @@ public class BesApi {
                                                 String dataSource,
                                                 String ce,
                                                 String xdap_accept,
+                                                int maxResponseSize,
                                                 String xmlBase,
                                                 String formURL,
                                                 String returnAs,
@@ -1270,12 +1293,15 @@ public class BesApi {
         else
             request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
-        request.addContent(setContextElement(EXPICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
+
+        if(maxResponseSize>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
 
 
         request.addContent(setContainerElement("catalogContainer","catalog",besDataSource,type));

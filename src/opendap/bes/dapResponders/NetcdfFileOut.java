@@ -27,6 +27,7 @@ import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.HttpResponder;
+import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -100,21 +101,24 @@ public class NetcdfFileOut extends HttpResponder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
+        User user = new User(request);
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
-        Document reqDoc = _besApi.getRequestDocument(
-                                                        BesApi.DAP2,
-                                                        dataSource,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        "netcdf",
-                                                        BesApi.DAP2_ERRORS);
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.DAP2,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        user.getMaxResponseSize(),
+                        null,
+                        null,
+                        "netcdf",
+                        BesApi.DAP2_ERRORS);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

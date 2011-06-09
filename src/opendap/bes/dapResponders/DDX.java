@@ -95,15 +95,17 @@ public class DDX extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = _besApi.getRequestDocument(
-                                                        BesApi.DDX,
-                                                        dataSource,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        xmlBase,
-                                                        null,
-                                                        null,
-                                                        BesApi.XML_ERRORS);
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.DDX,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        0,
+                        xmlBase,
+                        null,
+                        null,
+                        BesApi.XML_ERRORS);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
