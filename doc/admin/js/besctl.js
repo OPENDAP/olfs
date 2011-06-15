@@ -101,7 +101,7 @@ function updatePage() {
 
 
         } else
-            alert("Error! Request status is " + request1.status);
+            alert("Error! Hyrax returned an HTTP status of " + request1.status+" Along with the following content: <pre>"+request1.responseText+"</pre>");
     }
 }
 
@@ -117,7 +117,7 @@ function updateConfig() {
             document.getElementById("status").innerHTML = "<pre> "+request1.responseText+"</pre>";
 
         } else
-            alert("Error! Request status is " + request1.status);
+            alert("Error! Hyrax returned an HTTP status of " + request1.status+" Along with the following content: <pre>"+request1.responseText+"</pre>");
     }
 }
 

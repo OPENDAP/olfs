@@ -103,7 +103,7 @@
     <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
     <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
-    <logger name="opendap.coreServlet.RequestCache"       level="all"/>
+    <logger name="opendap.coreServlet.RequestCache"       level="error"/>
     <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
 
 
@@ -113,12 +113,13 @@
         <appender-ref ref="stdout"/>
     </logger>
 
+    <logger name="opendap.bes.dapResponders.BesApi"  level="all"/>
+    <logger name="opendap.bes.dapResponders.Ascii"   level="all"/>
 
     <logger name="opendap.bes.BESManager"               level="all"/>
     <logger name="opendap.bes.BesXmlAPI"                level="all"/>
     <logger name="opendap.bes.BES"                      level="all"/>
     <logger name="opendap.bes.BESConfig"                level="all"/>
-    <logger name="opendap.bes.BESCrawlableDataset"      level="all"/>
     <logger name="opendap.bes.DapDispatchHandler"       level="all"/>
     <logger name="opendap.bes.DirectoryDispatchHandler" level="all"/>
     <logger name="opendap.bes.BESThreddsDispatchHandler"   level="all"/>

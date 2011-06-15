@@ -116,15 +116,19 @@ public class BesControlApi extends HttpResponder {
             Document besResponseDoc = sb.build(bais);
             Element besResponse = besResponseDoc.getRootElement();
 
-            s.append(processBesErrors(besResponse));
+            String errorResponse = processBesErrors(besResponse);
 
-
-            Element ok = besResponse.getChild("OK",opendap.namespaces.BES.BES_ADMIN_NS);
-            if(ok!=null){
-                s.append("OK");
+            if(errorResponse.length()==0){
+                Element ok = besResponse.getChild("OK",opendap.namespaces.BES.BES_ADMIN_NS);
+                if(ok!=null){
+                    s.append("OK");
+                }
+                else {
+                    s.append("ERROR! Unrecognized BES response.");
+                }
             }
             else {
-                s.append("ERROR! Unrecognized BES response.");
+                s.append(errorResponse);
             }
 
 
@@ -155,16 +159,21 @@ public class BesControlApi extends HttpResponder {
             Element besResponse = besResponseDoc.getRootElement();
 
 
-            s.append(processBesErrors(besResponse));
+            String errorResponse = processBesErrors(besResponse);
 
-
-            Element besLog = besResponse.getChild("BesLog",opendap.namespaces.BES.BES_ADMIN_NS);
-            if(besLog!=null){
-                s.append(besLog.getText());
+            if(errorResponse.length()==0){
+                Element besLog = besResponse.getChild("BesLog",opendap.namespaces.BES.BES_ADMIN_NS);
+                if(besLog!=null){
+                    s.append(besLog.getText());
+                }
+                else {
+                    s.append("ERROR! Unrecognized BES response.");
+                }
             }
             else {
-                s.append("ERROR! Unrecognized BES response.");
+                s.append(errorResponse);
             }
+
 
 
 
