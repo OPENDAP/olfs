@@ -73,22 +73,13 @@
 
 
 
-
-
     <logger name="opendap" level="error">
-        <appender-ref ref="ErrorLog"/>
-    </logger>
-    
-    <logger name="org.jdom" level="all">
         <appender-ref ref="stdout"/>
     </logger>
+
     
     
-    
-    <logger name="opendap.coreServlet" level="error">
-        <appender-ref ref="stdout"/>
-    </logger>
-    
+
     <logger name="opendap.dap.Request"         level="all"/>
     
     
@@ -102,10 +93,6 @@
     
     
     
-    
-    <logger name="opendap.bes" level="error">
-        <appender-ref ref="stdout"/>
-    </logger>
 
 
     <logger name="opendap.bes.BESManager"               level="all"/>
@@ -115,14 +102,23 @@
     <logger name="opendap.bes.DapDispatchHandler"       level="all"/>
     <logger name="opendap.bes.DirectoryDispatchHandler" level="all"/>
     <logger name="opendap.bes.BESThreddsDispatchHandler"   level="all"/>
-    <logger name="opendap.webstart"                     level="all">
-                 <appender-ref ref="stdout"/>
-    </logger>
+
+
+
+    <logger name="opendap.webstart"                     level="all" />
     
 
-    <logger name="opendap.threddsHandler" level="all">
-             <appender-ref ref="stdout"/>
+    <logger name="opendap.threddsHandler" level="all" />
+
+
+
+
+
+
+    <logger name="org.jdom" level="all">
+        <appender-ref ref="stdout"/>
     </logger>
+
     <logger name="org.apache.jasper" level="all">
              <appender-ref ref="stdout"/>
     </logger>

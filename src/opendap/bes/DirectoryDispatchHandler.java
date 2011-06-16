@@ -157,8 +157,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         boolean isDirectoryResponse = false;
         boolean isContentsRequest = false;
 
-        if(dataSetName != null) {
-            if(
+        if(dataSetName != null &&
                 (dataSetName.equalsIgnoreCase("contents") ||
                 dataSetName.equalsIgnoreCase("catalog")) &&
                 requestSuffix != null &&
@@ -168,7 +167,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
                 isDirectoryResponse = true;
                 isContentsRequest = true;
-            }
 
         } else {
             DataSourceInfo dsi = new BESDataSource(dsName);
@@ -190,7 +188,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 // redirect the URL without a trailing slash to the one with.
                 // This keeps everything copacetic downstream when it's time
                 // to build the directory document.
-                response.sendRedirect(Scrub.urlContent(request.getContextPath()+dsName+"/"));
+                response.sendRedirect(Scrub.urlContent(request.getContextPath()+"/"+dispatchServlet.getServletName()+dsName+"/"));
             }
 
 

@@ -74,9 +74,7 @@
     <!-- OPeNDAP Hyrax Logging -->
 
 
-    <logger name="opendap" level="error" >
-        <appender-ref ref="stdout"/>
-    </logger>
+    <logger name="opendap" level="error" />
 
 
 
@@ -88,7 +86,6 @@
     <logger name="DocServletAccess" level="all">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
-
 
 
     <root level="error">
