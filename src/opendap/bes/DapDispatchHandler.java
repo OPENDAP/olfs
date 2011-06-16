@@ -998,7 +998,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         log.debug("sendNetcdfFileOut() for dataset: " + dataSource + "?" +
                     constraintExpression);
 
-        String downloadFileName = fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length());
+        String downloadFileName = Scrub.fileName(fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length()));
         Pattern startsWithNumber = Pattern.compile("[0-9].*");
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
@@ -1008,7 +1008,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String contentDisposition = " attachment; filename=" +downloadFileName;
 
         response.setContentType("application/x-netcdf");
-        response.setHeader("Content-Disposition",Scrub.fileName(contentDisposition));
+        response.setHeader("Content-Disposition",contentDisposition);
 
         Version.setOpendapMimeHeaders(request,response);
 
