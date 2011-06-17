@@ -207,3 +207,74 @@ function updateLoggerPage() {
             alert("Error! BES log request returned HTTP status of " + request1.status);
     }
 }
+
+
+
+
+
+function setLoggerState(besCtlApi, besPrefix){
+
+
+    var loggerName = document.getElementById("loggerName").value;
+    var logLevel = document.getElementById("loggerState").value;
+
+    var url = besCtlApi+"?cmd=setLoggerState&prefix="+besPrefix+"&logger="+loggerName+"&state="+logLevel;
+
+    //alert(url);
+
+    var d = new Date();
+    var status = d.toTimeString() + " Setting "+loggerName+" log level to "+logLevel+".   <a href='"+url+"'>"+url+"</a>";
+
+    document.getElementById("status").innerHTML = status;
+    request1.open("GET", url, true);
+    request1.onreadystatechange = updateStatus;
+    request1.send(null);
+
+}
+
+function updateLoggerStateSelection(besCtlApi,besPrefix) {
+
+
+    var loggerName = document.getElementById("loggerName").value;
+
+    var url = besCtlApi+"?cmd=getLoggerState&prefix="+besPrefix+"&logger="+loggerName;
+
+    //alert("updateLoggerStateSelection:\n"+url);
+
+    var d = new Date();
+    var status = d.toTimeString() + " Getting "+loggerName+" log state.   <a href='"+url+"'>"+url+"</a>";
+
+    document.getElementById("status").innerHTML = status;
+    request1.open("GET", url, true);
+    request1.onreadystatechange = updateLoggerState;
+    request1.send(null);
+}
+
+
+
+function updateLoggerState() {
+    if (request1.readyState == 4) {
+        if (request1.status == 200) {
+
+            var loggerState = document.getElementById("loggerState");
+
+            loggerState.value = request1.responseText;
+
+        } else
+            alert("Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request1.status);
+    }
+}
+
+
+function updateStatus() {
+    if (request1.readyState == 4) {
+        if (request1.status == 200) {
+
+            var status = document.getElementById("status");
+
+            status.innerHTML = request1.responseText;
+
+        } else
+            alert("Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request1.status);
+    }
+}

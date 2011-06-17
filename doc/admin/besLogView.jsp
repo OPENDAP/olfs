@@ -2,6 +2,8 @@
 <%@ page import="opendap.bes.BES" %>
 <%@ page import="opendap.hai.Util" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Vector" %>
+<%@ page import="java.util.TreeMap" %>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
@@ -42,6 +44,7 @@
 
 
     BES bes = BESManager.getBES(currentPrefix);
+    TreeMap<String,BES.BesLogger> besLoggers = bes.getBesLoggers();
 
     currentPrefix = bes.getPrefix();
 
@@ -90,19 +93,62 @@
 <div id="controls" class="loggingControls">
     <div class="small">
 
-        <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
-        <button onclick="stopTailing();">Stop</button>
-        <button onclick="clearLogWindow();">Clear</button>
-        &nbsp;&nbsp;Lines To Show:
-        <select id="logLines">
-            <option>10</option>
-            <option>50</option>
-            <option>100</option>
-            <option selected="">500</option>
-            <option>1000</option>
-            <option>5000</option>
-            <option>all</option>
-        </select>
+        <div style="float: left;">
+
+            <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
+            <button onclick="stopTailing();">Stop</button>
+            <button onclick="clearLogWindow();">Clear</button>
+            &nbsp;&nbsp;Lines To Show:
+            <select id="logLines">
+                <option>10</option>
+                <option>50</option>
+                <option>100</option>
+                <option selected="">500</option>
+                <option>1000</option>
+                <option>5000</option>
+                <option>all</option>
+            </select>
+        </div>
+
+        <div style="float: right;">
+
+            <button onclick="setLoggerState('<%=besCtlApi%>','<%=bes.getPrefix()%>');">Set Log State</button>
+            <select id="loggerName" onchange="updateLoggerStateSelection('<%=besCtlApi%>','<%=bes.getPrefix()%>')">
+            <%
+
+                boolean first = true;
+                for(BES.BesLogger besLogger:besLoggers.values()){
+                    out.append("<option");
+                    if(first){
+                        out.append(" selected=\"\" ");
+                        first = false;
+                    }
+                    out.append(">").append(besLogger.getName()).append("</option>");
+
+                }
+                /// java code to get the various BES logger contexts
+            %>
+            </select>
+
+            <select id="loggerState">
+                <%
+                    String firstLoggerName = besLoggers.firstKey();
+                    BES.BesLogger besLogger = besLoggers.get(firstLoggerName);
+                    if(besLogger.getIsEnabled()){
+                        out.append("<option selected='' >on</option>");
+                        out.append("<option>off</option>");
+                    }
+                    else {
+                        out.append("<option>on</option>");
+                        out.append("<option selected='' >off</option>");
+                    }
+
+                %>
+            </select>
+        </div>
+
+        <div style="clear: both;"> </div>
+
 
     </div>
 </div>

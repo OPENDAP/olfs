@@ -298,6 +298,22 @@ public class BesControlApi extends HttpResponder {
 
                 sb.append(log);
             }
+            else if (besCmd.equals("getLoggerState")) {
+                String loggerName = kvp.get("logger");
+
+                String status =  bes.getLoggerState(loggerName);
+
+                sb.append(status);
+            }
+            else if (besCmd.equals("setLoggerState")) {
+                String loggerName = kvp.get("logger");
+
+                String loggerState = kvp.get("state");
+
+                String status =  bes.setLoggerState(loggerName,loggerState);
+
+                sb.append(status);
+            }
             else  {
                 sb.append(" Unrecognized BES command: ").append(Scrub.simpleString(besCmd));
             }

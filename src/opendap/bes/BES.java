@@ -29,6 +29,7 @@ import opendap.ppt.PPTException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -162,6 +163,127 @@ public class BES {
 
     public int getMaxResponseSize() {
         return _config.getMaxResponseSize();
+    }
+
+
+
+    public TreeMap<String,BesLogger> getBesLoggers(){
+        TreeMap<String,BesLogger> besLoggers = new TreeMap<String,BesLogger>();
+
+        String getLogContextsCmd = getSimpleBesAdminCommand("GetLogContexts");
+
+        String besResponse = executeBesAdminCommand(getLogContextsCmd);
+        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes());
+
+        SAXBuilder saxBuilder = new SAXBuilder(false);
+
+        try {
+            Document loggerContextsDoc =  saxBuilder.build(bais);
+            List loggers = loggerContextsDoc.getRootElement().getChildren("LogContext", BES_ADMIN_NS);
+
+            Iterator i = loggers.iterator();
+            while(i.hasNext()){
+                Element logger = (Element) i.next();
+                String name = logger.getAttributeValue("name");
+                String state = logger.getAttributeValue("state");
+                if(name!=null && state!=null)
+                    besLoggers.put(name,new BesLogger(name,state));
+                else
+                    log.error("BES responded with unrecognized content structure. Response: {}", besResponse);
+            }
+        } catch (JDOMException e) {
+            log.error("Failed to parse BES response! Msg: {}",e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to read BES response! Msg: {}", e.getMessage());
+        }
+
+
+        return besLoggers;
+    }
+
+    public String getLoggerState(String loggerName){
+
+        TreeMap<String,BesLogger> besLoggers = getBesLoggers();
+
+        BesLogger logger = besLoggers.get(loggerName);
+
+        if(logger!=null && logger.getIsEnabled())
+            return "on";
+
+        return "off";
+
+    }
+
+    public String setLoggerState(String loggerName, String loggerState) {
+
+        String setLoggerStateCmd = getSetBesLoggersStateCommand(loggerName, loggerState);
+
+        String besResponse = executeBesAdminCommand(setLoggerStateCmd);
+        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes());
+
+        SAXBuilder saxBuilder = new SAXBuilder(false);
+
+        String status = besResponse;
+        try {
+            Document besResponseDoc = saxBuilder.build(bais);
+            Element statusElement = besResponseDoc.getRootElement().getChild("OK",BES_ADMIN_NS);
+            if(statusElement!=null)
+                status = new StringBuilder().append("OK: The BES logger '").append(loggerName).append("' has been set to ").append(loggerState).toString();
+
+        } catch (JDOMException e) {
+            log.error("Failed to parse BES response! Msg: {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to read BES response! Msg: {}", e.getMessage());
+        }
+
+        return status;
+
+    }
+    public String getSetBesLoggersStateCommand(String loggerName, String loggerState){
+        Element docRoot = new Element("BesAdminCmd",BES_ADMIN_NS);
+        Element cmd = new Element("SetLogContext",BES_ADMIN_NS);
+
+        cmd.setAttribute("name",loggerName);
+        cmd.setAttribute("state",loggerState);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
+    }
+
+    public class BesLogger  {
+
+        public BesLogger(String name, boolean enabled){
+            loggerName = name;
+            isEnabled = enabled;
+        }
+        public BesLogger(String name, String enabled){
+            loggerName = name;
+            if(enabled!=null && enabled.equalsIgnoreCase("on"))
+                isEnabled = true;
+            else
+                isEnabled = false;
+        }
+
+        boolean isEnabled;
+        public boolean getIsEnabled(){
+            return isEnabled;
+        }
+        public void setIsEnabled(boolean enabled){
+            isEnabled = enabled;
+        }
+
+        String loggerName;
+        public String getName(){
+            return loggerName;
+        }
+        public void setName(String name){
+            loggerName = name;
+        }
+
     }
 
 
@@ -387,6 +509,7 @@ public class BES {
 
         return besResponse;
     }
+
 
 
     public String getConfiguration(String moduleName){
