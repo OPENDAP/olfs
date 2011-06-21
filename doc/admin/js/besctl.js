@@ -232,6 +232,36 @@ function setLoggerState(besCtlApi, besPrefix){
 
 }
 
+
+
+
+
+
+
+function commitLoggingChanges(besCtlApi, besPrefix){
+
+
+
+    var r=confirm("Comitting these changes will require that the BES be stopped and restarted. " +
+            "I will do this as gently as possible, but some connections may be dropped. " +
+            "Do you wish to continue?");
+
+    if(r==true){
+        stopNice(besPrefix,besCtlApi);
+        start(besPrefix,besCtlApi);
+    }
+    else {
+        var d = new Date();
+        var status = d.toTimeString() + " Logging Commit aborted!";
+        document.getElementById("status").innerHTML = status;
+
+    }
+
+}
+
+
+
+
 function updateLoggerStateSelection(besCtlApi,besPrefix) {
 
 
