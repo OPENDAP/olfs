@@ -177,13 +177,13 @@ public class FileDispatchHandler implements DispatchHandler {
 
         log.debug("sendFile(): Sending file \"" + name + "\"");
 
-        String downloadFileName = name.substring(name.lastIndexOf("/")+1);
+        String downloadFileName = Scrub.fileName(name.substring(name.lastIndexOf("/")+1));
 
         log.debug("sendFile() downloadFileName: " + downloadFileName );
 
-        String contentDisposition = " attachment; filename=" +downloadFileName;
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
 
-        response.setHeader("Content-Disposition",Scrub.fileName(contentDisposition));
+        response.setHeader("Content-Disposition",contentDisposition);
 
 
         String suffix = ReqInfo.getRequestSuffix(req);
