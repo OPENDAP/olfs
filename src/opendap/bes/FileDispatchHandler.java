@@ -182,7 +182,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
         log.debug("sendFile() downloadFileName: " + downloadFileName );
 
-        String contentDisposition = " attachment; filename=" +downloadFileName;
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
 
         response.setHeader("Content-Disposition",contentDisposition);
 
