@@ -60,8 +60,7 @@
 
 <dl>
     <dd><a href="olfsLogView.jsp">OLFS Log Viewer</a></dd>
-    <dd><a href="besctl.jsp">BES Control</a></dd>
-    <dd><a href="besLogView.jsp">BES Log Viewer</a></dd>
+    <dd><a href="besctl.jsp">BES Management</a></dd>
 </dl>
 
 
