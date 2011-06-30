@@ -92,7 +92,7 @@ public abstract class HttpResponder {
 
         String template = loadHtmlTemplate(errorPageTemplate, docsService);
 
-        template = template.replaceAll("<ERROR_MESSAGE />",errorMessage);
+        template = template.replaceAll("<ERROR_MESSAGE />",Scrub.simpleString(errorMessage));
 
         log.debug("respondToHttpGetRequest(): Sending Error Page ");
 
@@ -101,6 +101,7 @@ public abstract class HttpResponder {
         response.setStatus(httpStatus);
 
         ServletOutputStream sos  = response.getOutputStream();
+
         sos.println(template);
 
     }
