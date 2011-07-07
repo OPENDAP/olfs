@@ -374,7 +374,6 @@
 
 
 
-        <div id="controls" class="loggingControls">
             <div class="small">
 
                 <div style="float: left;">
@@ -400,53 +399,13 @@
                         String logConfigUrl =  "besLogConfig.jsp?prefix="+currentPrefix;
                     %>
 
-                    <button onclick='window.open("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=600")'>Config</button>
+                    <button onclick='window.open("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>Configuration</button>
 
-
-
-                    <button onclick="setLoggerState('<%=besCtlApi%>','<%=bes.getPrefix()%>');">Set</button>
-                    <select id="loggerName" onchange="updateLoggerStateSelection('<%=besCtlApi%>','<%=bes.getPrefix()%>')">
-                    <%
-                        TreeMap<String,BES.BesLogger> besLoggers = bes.getBesLoggers();
-
-
-                        boolean first = true;
-                        for(BES.BesLogger besLogger:besLoggers.values()){
-                            out.append("<option");
-                            if(first){
-                                out.append(" selected=\"\" ");
-                                first = false;
-                            }
-                            out.append(">").append(besLogger.getName()).append("</option>");
-
-                        }
-                        /// java code to get the various BES logger contexts
-                    %>
-                    </select>
-
-                    <select id="loggerState">
-                        <%
-                            String firstLoggerName = besLoggers.firstKey();
-                            BES.BesLogger besLogger = besLoggers.get(firstLoggerName);
-                            if(besLogger.getIsEnabled()){
-                                out.append("<option selected='' >on</option>");
-                                out.append("<option>off</option>");
-                            }
-                            else {
-                                out.append("<option>on</option>");
-                                out.append("<option selected='' >off</option>");
-                            }
-
-                        %>
-                    </select>
-                    <button onclick="commitLoggingChanges('<%=besCtlApi%>','<%=bes.getPrefix()%>');">Commit</button>
-                </div>
 
                 <div style="clear: both;"> </div>
 
 
             </div>
-        </div>
 
 
         <div id="log" class="LogWindow"></div>
