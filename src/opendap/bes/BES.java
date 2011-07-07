@@ -487,7 +487,7 @@ public class BES {
             log.info(msg);
             sb.append(msg).append("\n");
             besResponse =  stopNow();
-            log.info(besResponse);
+            //log.info(besResponse);
 
 
 

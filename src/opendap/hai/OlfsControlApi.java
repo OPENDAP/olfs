@@ -44,7 +44,6 @@ public class OlfsControlApi extends HttpResponder {
 
     // LoggerContext.ROOT_NAME = "root"
     private String ROOT_NAME = "ROOT";
-    private SimpleDateFormat sdf;
 
 
     private CyclicBufferAppender cyclicBufferAppender;
@@ -53,7 +52,6 @@ public class OlfsControlApi extends HttpResponder {
         log = (Logger) LoggerFactory.getLogger(getClass());
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
 
         String msg = "";
 
@@ -148,8 +146,11 @@ public class OlfsControlApi extends HttpResponder {
         StringBuffer sbuf = new StringBuffer(128);
         Date date = new Date(event.getTimeStamp());
 
+        SimpleDateFormat simpleDateFormat;
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
 
-        sbuf.append(sdf.format(date));
+
+        sbuf.append(simpleDateFormat.format(date));
         sbuf.append(" ");
         sbuf.append(" [").append(event.getThreadName()).append("] ");
         sbuf.append(event.getLevel());

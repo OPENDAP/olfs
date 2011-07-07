@@ -17,9 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BesControlApi extends HttpResponder {
 
@@ -314,6 +314,26 @@ public class BesControlApi extends HttpResponder {
 
                 sb.append(status);
             }
+            else if (besCmd.equals("setLoggerStates")) {
+                String enabled = cleanLoggerNames(kvp.get("enable"));
+
+                String disabled = cleanLoggerNames(kvp.get("disable"));
+
+                TreeMap<String, BES.BesLogger> validLoggers = bes.getBesLoggers();
+
+                StringBuilder status = new StringBuilder();
+                for(String enabledLoggerName : enabled.split(",")){
+                    if(validLoggers.containsKey(enabledLoggerName))
+                        status.append(bes.setLoggerState(enabledLoggerName,"on")).append("\n");
+                }
+
+                for(String disabledLoggerName : disabled.split(",")){
+                    if(validLoggers.containsKey(disabledLoggerName))
+                        status.append(bes.setLoggerState(disabledLoggerName,"off")).append("\n");
+                }
+
+                sb.append(status);
+            }
             else  {
                 sb.append(" Unrecognized BES command: ").append(Scrub.simpleString(besCmd));
             }
@@ -328,6 +348,26 @@ public class BesControlApi extends HttpResponder {
 
 
     }
+
+
+
+    private static String loggerNameInclusionRegex = "[a-zA-Z0-9_,]*";
+    private static String loggerNameExclusionRegex = "[^a-zA-Z0-9_,]";
+    private static Pattern loggerNameInclusionPattern = Pattern.compile(loggerNameInclusionRegex);
+
+    private String cleanLoggerNames(String s){
+        if(s==null)
+            return null;
+        Matcher m = loggerNameInclusionPattern.matcher(s);
+        log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ loggerNameInclusionRegex +"    matches: "+m.matches());
+        if(m.matches()){
+            return s;
+        }
+        else {
+            return s.replaceAll(loggerNameExclusionRegex,"#");
+        }
+    }
+
 
 
 

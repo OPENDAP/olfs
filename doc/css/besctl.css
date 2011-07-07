@@ -45,6 +45,10 @@ div.loggingControls {
        text-align:left;
     }
 
+div.loggingConfig {
+       border:solid 1px #dddddd;
+    }
+
 
 
 div.statusDisplay {

@@ -22,41 +22,75 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-var request1 = createRequest();
 
 function start(prefix,besctlUrl) {
 
     document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updatePage;
-    request1.send(null);
+    var request = createRequest();
+
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { preformattedStatusUpdate(request); }
+    request.send(null);
+
 }
 
 
 
 function stopNice(prefix,besctlUrl) {
-    document.getElementById("status").innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
-    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updatePage;
-    request1.send(null);
+
+
+    stopNice_worker(prefix,besctlUrl,true,preformattedStatusUpdate)
+
 }
+
+function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
+
+
+    var status = document.getElementById("status")
+    status.innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
+    var request = createRequest();
+    //alert("StopNice: \n stateChangeHandler: "+stateChangeHandler+"\n url: "+url);
+
+    if(isAsync) {
+        status.innerHTML = "Is Async";
+        alert(status.innerHTML.valueOf());
+        request.open("GET", url, true);
+        request.onreadystatechange = function() { stateChangeHandler(request); }
+        request.send(null);
+    }
+    else {
+        status.innerHTML = "Is Sync";
+        alert(status.innerHTML.valueOf());
+        request.open("GET", url, false);
+        request.send(null);
+        var status = document.getElementById("status");
+        status.innerHTML = "<pre> "+request.responseText+"</pre>";
+        alert(status.innerHTML.valueOf());
+        //stateChangeHandler(request);
+    }
+}
+
 
 function stopNow(prefix,besctlUrl) {
     document.getElementById("status").innerHTML = "<pre> Stopping BES '"+prefix+"' NOW.</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updatePage;
-    request1.send(null);
+    var request = createRequest();
+
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { preformattedStatusUpdate(request); }
+    request.send(null);
 
 }
 
 function getConfig(module,prefix,besctlUrl) {
     var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=getConfig";
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateConfig;
-    request1.send(null);
+    var request = createRequest();
+
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { updateConfig(request); }
+    request.send(null);
 
 
 
@@ -76,11 +110,12 @@ function setConfig(module,prefix,besctlUrl) {
     var config = configElement.value;
     var configParam = "CONFIGURATION="+encodeURIComponent(config);
 
-    request1.open("POST", url, false);
-    request1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    var request = createRequest();
+    request.open("POST", url, false);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    request1.onreadystatechange = updateConfig;
-    request1.send(configParam);
+    request.onreadystatechange = function() { updateConfig(request); }
+    request.send(configParam);
 
 }
 
@@ -92,32 +127,17 @@ function showBes() {
 
 
 
-function updatePage() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
-
-            document.getElementById("status").innerHTML = "<pre> "+request1.responseText+"</pre>";
-            //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
 
-        } else
-            alert("Error! Hyrax returned an HTTP status of " + request1.status+" Along with the following content: <pre>"+request1.responseText+"</pre>");
-    }
-}
+function updateConfig(request) {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
 
-
-function updateConfig() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
-
-            //document.getElementById("CONFIGURATION").innerHTML = request1.responseText;
-            //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
-
-            alert(request1.responseText);
-            document.getElementById("status").innerHTML = "<pre> "+request1.responseText+"</pre>";
+            alert(request.responseText);
+            document.getElementById("status").innerHTML = "<pre> "+request.responseText+"</pre>";
 
         } else
-            alert("Error! Hyrax returned an HTTP status of " + request1.status+" Along with the following content: <pre>"+request1.responseText+"</pre>");
+            alert("updateConfig(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
     }
 }
 
@@ -158,9 +178,11 @@ function getBesLog(besLogUrl, besPrefix) {
     var status = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
     document.getElementById("status").innerHTML = status;
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateLoggerPage;
-    request1.send(null);
+
+    var request = createRequest();
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { updateLoggerPage(request); }
+    request.send(null);
     stopUpdatingLogView = false;
 }
 
@@ -192,19 +214,19 @@ function clearLogWindow() {
 
 
 
-function updateLoggerPage() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
+function updateLoggerPage(request) {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
 
             logDiv = document.getElementById("log");
 
-            logDiv.innerHTML = "<pre>"+request1.responseText+"</pre>" ;
+            logDiv.innerHTML = "<pre>"+request.responseText+"</pre>" ;
 
             startTailing(logUrl, logBesPrefix);
 
 
         } else
-            alert("Error! BES log request returned HTTP status of " + request1.status);
+            alert("updateLoggerPage(): Error! BES log request returned HTTP status of " + request.status);
     }
 }
 
@@ -226,9 +248,12 @@ function setLoggerState(besCtlApi, besPrefix){
     var status = d.toTimeString() + " Setting "+loggerName+" log level to "+logLevel+".   <a href='"+url+"'>"+url+"</a>";
 
     document.getElementById("status").innerHTML = status;
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateStatus;
-    request1.send(null);
+
+
+    var request = createRequest();
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { updateStatus(request); }
+    request.send(null);
 
 }
 
@@ -238,26 +263,76 @@ function setLoggerState(besCtlApi, besPrefix){
 
 
 
-function commitLoggingChanges(besCtlApi, besPrefix){
+function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
+
+    var enabled = "";
+    var disabled = "";
+
+
+    for (i = 0; i < loggerSelect.length; i++){
+        if(loggerSelect[i].checked==true){
+            if(enabled!="")
+                enabled +=",";
+            enabled += loggerSelect[i].value;
+        }
+        else {
+            if(disabled!="")
+                disabled +=",";
+            disabled += loggerSelect[i].value;
+        }
+
+
+    }
+
+    var url = besCtlApi+"?prefix="+besPrefix+"&cmd=setLoggerStates&enable="+enabled+"&disable="+disabled;
 
 
 
-    var r=confirm("Comitting these changes will require that the BES be stopped and restarted. " +
-            "I will do this as gently as possible, but some connections may be dropped. " +
-            "Do you wish to continue?");
+    var d = new Date();
+    var status = "Enabling loggers: '"+enabled+"'\n Disabling loggers: '"+disabled+"'\n" +"   <a href='"+url+"'>"+url+"</a>";
+    //alert(status);
+    document.getElementById("status").innerHTML = status;
 
-    if(r==true){
-        stopNice(besPrefix,besCtlApi);
-        start(besPrefix,besCtlApi);
+    var setLoggerStatesRequest = createRequest();
+
+
+    setLoggerStatesRequest.open("GET", url, true);
+
+    setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); }
+
+
+    setLoggerStatesRequest.send(null);
+
+
+}
+
+function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
+
+    if (setLoggerStatesRequest.readyState != 4)
+        return;
+    if (setLoggerStatesRequest.status == 200) {
+        var r=confirm("Committing these changes will require that the BES be stopped and restarted. " +
+                "I will do this as gently as possible, but some connections may be dropped. " +
+                "Do you wish to continue?");
+        if(r==true){
+            stopNice_worker(besPrefix,besCtlApi,true,preformattedStatusUpdate);
+            alert("About to start BES...");
+            start(besPrefix,besCtlApi);
+        }
+        else {
+            var d = new Date();
+            var status = d.toTimeString() + " Logging Commit aborted!";
+            document.getElementById("status").innerHTML = status;
+        }
+
     }
     else {
-        var d = new Date();
-        var status = d.toTimeString() + " Logging Commit aborted!";
-        document.getElementById("status").innerHTML = status;
-
+        alert("confirmCommit(): Error! Failed to set the BES logger state. Hyrax returned an Http Request status of " + setLoggerStatesRequest.status);
     }
 
+    //self.close();
 }
+
 
 
 
@@ -275,36 +350,55 @@ function updateLoggerStateSelection(besCtlApi,besPrefix) {
     var status = d.toTimeString() + " Getting "+loggerName+" log state.   <a href='"+url+"'>"+url+"</a>";
 
     document.getElementById("status").innerHTML = status;
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateLoggerState;
-    request1.send(null);
+
+    var request = createRequest();
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { updateLoggerState(request); }
+    request.send(null);
+
 }
 
 
 
-function updateLoggerState() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
+function updateLoggerState(request) {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
 
             var loggerState = document.getElementById("loggerState");
 
-            loggerState.value = request1.responseText;
+            loggerState.value = request.responseText;
 
         } else
-            alert("Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request1.status);
+            alert("updateLoggerState(): Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request.status);
     }
 }
 
 
-function updateStatus() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
+function updateStatus(request) {
+    if (request.readyState == 4) {
+
+        if (request.status == 200) {
 
             var status = document.getElementById("status");
-
-            status.innerHTML = request1.responseText;
+            status.innerHTML = request.responseText;
 
         } else
-            alert("Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request1.status);
+            alert("updateStatus(): Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request.status);
+    }
+}
+
+
+function preformattedStatusUpdate(request) {
+    if (request.readyState == 4) {
+
+        if (request.status == 200) {
+
+            var status = document.getElementById("status");
+            status.innerHTML = "<pre> "+request.responseText+"</pre>";
+            //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
+
+
+        } else
+            alert("preformattedStatusUpdate(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
     }
 }

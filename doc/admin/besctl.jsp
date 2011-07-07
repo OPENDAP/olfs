@@ -91,18 +91,6 @@
                     .append(prefix)
                     .append("</a></li>\n");
 
-
-            /*
-           out.append("<button ")
-                   .append("onclick=\"showBes('").append(currentPrefix).append("')")
-                   .append("\">")
-                   .append(prefix)
-                   .append("</button></li>\n");
-
-
-            */
-
-
         }
 
     %>
@@ -203,6 +191,13 @@
     <div id="besTaskDetail" class='content'>
 
         <%
+            /**  #####################################################################
+             *
+             *         OLFS CONNECTIONS PANEL
+             *
+             *
+             *
+             */
             if (currentBesTask.equals("olfsConnections")) {
 
         %>
@@ -259,7 +254,7 @@
 
                     } else if (bes.getBesClientCount() == 0) {
 
-                        out.append("<div class='small'>No active connections to BES '").append(currentPrefix).append("'</div>");
+                        out.append("<div class='small'>This OLFS is holding no open connections to BES '").append(currentPrefix).append("'</div>");
 
                     } else {
                         out.append("<strong>Select a client to inspect.</strong>");
@@ -271,6 +266,13 @@
             </div>
         </div>
         <%
+            /**  #####################################################################
+             *
+             *         CONFIG PANEL
+             *
+             *
+             *
+             */
         } else if (currentBesTask.equals("config")) {
 
         %>
@@ -358,6 +360,14 @@
             </div>
         </div>
         <%
+
+        /**  #####################################################################
+         *
+         *         LOGGING PANEL
+         *
+         *
+         *
+         */
         } else if (currentBesTask.equals("logging")) {
         %>
 
@@ -385,6 +395,14 @@
                 </div>
 
                 <div style="float: right;">
+
+                    <%
+                        String logConfigUrl =  "besLogConfig.jsp?prefix="+currentPrefix;
+                    %>
+
+                    <button onclick='window.open("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=600")'>Config</button>
+
+
 
                     <button onclick="setLoggerState('<%=besCtlApi%>','<%=bes.getPrefix()%>');">Set</button>
                     <select id="loggerName" onchange="updateLoggerStateSelection('<%=besCtlApi%>','<%=bes.getPrefix()%>')">
