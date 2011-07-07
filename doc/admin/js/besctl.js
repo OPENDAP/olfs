@@ -181,7 +181,7 @@ function getBesLog(besLogUrl, besPrefix) {
 
     var request = createRequest();
     request.open("GET", url, true);
-    request.onreadystatechange = function() { updateLoggerPage(request); }
+    request.onreadystatechange = function() { updateLogContent(request); }
     request.send(null);
     stopUpdatingLogView = false;
 }
@@ -214,7 +214,7 @@ function clearLogWindow() {
 
 
 
-function updateLoggerPage(request) {
+function updateLogContent(request) {
     if (request.readyState == 4) {
         if (request.status == 200) {
 
@@ -229,38 +229,6 @@ function updateLoggerPage(request) {
             alert("updateLoggerPage(): Error! BES log request returned HTTP status of " + request.status);
     }
 }
-
-
-
-
-
-function setLoggerState(besCtlApi, besPrefix){
-
-
-    var loggerName = document.getElementById("loggerName").value;
-    var logLevel = document.getElementById("loggerState").value;
-
-    var url = besCtlApi+"?cmd=setLoggerState&prefix="+besPrefix+"&logger="+loggerName+"&state="+logLevel;
-
-    //alert(url);
-
-    var d = new Date();
-    var status = d.toTimeString() + " Setting "+loggerName+" log level to "+logLevel+".   <a href='"+url+"'>"+url+"</a>";
-
-    document.getElementById("status").innerHTML = status;
-
-
-    var request = createRequest();
-    request.open("GET", url, true);
-    request.onreadystatechange = function() { updateStatus(request); }
-    request.send(null);
-
-}
-
-
-
-
-
 
 
 function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
@@ -337,41 +305,6 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
 
 
 
-function updateLoggerStateSelection(besCtlApi,besPrefix) {
-
-
-    var loggerName = document.getElementById("loggerName").value;
-
-    var url = besCtlApi+"?cmd=getLoggerState&prefix="+besPrefix+"&logger="+loggerName;
-
-    //alert("updateLoggerStateSelection:\n"+url);
-
-    var d = new Date();
-    var status = d.toTimeString() + " Getting "+loggerName+" log state.   <a href='"+url+"'>"+url+"</a>";
-
-    document.getElementById("status").innerHTML = status;
-
-    var request = createRequest();
-    request.open("GET", url, true);
-    request.onreadystatechange = function() { updateLoggerState(request); }
-    request.send(null);
-
-}
-
-
-
-function updateLoggerState(request) {
-    if (request.readyState == 4) {
-        if (request.status == 200) {
-
-            var loggerState = document.getElementById("loggerState");
-
-            loggerState.value = request.responseText;
-
-        } else
-            alert("updateLoggerState(): Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request.status);
-    }
-}
 
 
 function updateStatus(request) {
