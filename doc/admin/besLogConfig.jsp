@@ -1,16 +1,8 @@
-<%@ page import="opendap.coreServlet.ServletUtil" %>
 <%@ page import="opendap.bes.BES" %>
 <%@ page import="opendap.bes.BESManager" %>
-<%@ page import="org.jdom.output.XMLOutputter" %>
-<%@ page import="org.jdom.output.Format" %>
-<%@ page import="opendap.ppt.OPeNDAPClient" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="opendap.coreServlet.Scrub" %>
-<%@ page import="java.net.URL" %>
-<%@ page import="opendap.bes.BesConfigurationModule" %>
-<%@ page import="opendap.hai.BesControlApi" %>
 <%@ page import="opendap.hai.Util" %>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.TreeMap" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>

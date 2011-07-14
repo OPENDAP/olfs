@@ -273,7 +273,7 @@
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
-        <location>/docs/error500.html</location>
+        <location>/docs/error500.jsp</location>
     </error-page>
 
 
@@ -281,9 +281,8 @@
   <!-- ===================== Default MIME Type Mappings =================== -->
   <!-- When serving static resources, Tomcat will automatically generate    -->
   <!-- a "Content-Type" header based on the resource's filename extension,  -->
-  <!-- based on these mappings.  Additional mappings can be added here (to  -->
-  <!-- apply to all web applications), or in your own application's web.xml -->
-  <!-- deployment descriptor.                                               -->
+  <!-- based on these mappings.  Additional mappings can be added here to   -->
+  <!-- apply to  your own application's web.xml deployment descriptor.      -->
 
     <mime-mapping>
         <extension>ddx</extension>
@@ -292,14 +291,11 @@
 
 
 
-<welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-</welcome-file-list>
-
-
-
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+    </welcome-file-list>
 
 
 

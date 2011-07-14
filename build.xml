@@ -334,7 +334,7 @@
 
 
                 <!-- Exclude the Hyrax Admin Interface code  -->
-                <exclude name="opendap/hai/**"/>
+                <!-- <exclude name="opendap/hai/**"/>  -->
 
 
             </fileset>
@@ -800,7 +800,7 @@
 
     <target
             name="JspServer"
-            depends="olfs-lib,doc"
+            depends="clean,compile,doc"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
 
@@ -857,9 +857,9 @@
             -->
 
 
-            <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>
+            <!-- <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>  -->
 
-
+            <!--
             <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
                 <include name="${jdom.lib}"/>
                 <include name="${junit.lib}"/>
@@ -874,6 +874,7 @@
                 <include name="${saxon.lib}"/>
 
             </zipfileset>
+              -->
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">
                 <include name="**/*"/>

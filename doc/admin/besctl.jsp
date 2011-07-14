@@ -1,16 +1,12 @@
-<%@ page import="opendap.coreServlet.ServletUtil" %>
 <%@ page import="opendap.bes.BES" %>
 <%@ page import="opendap.bes.BESManager" %>
-<%@ page import="org.jdom.output.XMLOutputter" %>
-<%@ page import="org.jdom.output.Format" %>
-<%@ page import="opendap.ppt.OPeNDAPClient" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="opendap.coreServlet.Scrub" %>
-<%@ page import="java.net.URL" %>
 <%@ page import="opendap.bes.BesConfigurationModule" %>
-<%@ page import="opendap.hai.BesControlApi" %>
 <%@ page import="opendap.hai.Util" %>
-<%@ page import="java.util.*" %>
+<%@ page import="opendap.ppt.OPeNDAPClient" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.Vector" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -45,6 +41,15 @@
     StringBuffer status = new StringBuffer();
     status.append(" OK ");
 
+    /*
+    System.out.println("contextPath: "+contextPath);
+    System.out.println("currentPrefix: "+currentPrefix);
+    System.out.println("currentClientId: "+currentClientId);
+    System.out.println("currentBesTask: "+currentBesTask);
+    System.out.println("currentModuleId: "+currentModuleId);
+    System.out.println("besCtlApi: "+besCtlApi);
+    System.out.println("status: "+status);
+    */
 
 %>
 
@@ -96,8 +101,6 @@
     %>
 </ol>
 <div id="besDetail" class="content">
-
-<div>
     <div class="small" style="float: left;">
 
         bes prefix: <strong><%=bes.getPrefix()%></strong><br/>
