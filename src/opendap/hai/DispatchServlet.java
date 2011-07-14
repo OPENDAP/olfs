@@ -23,24 +23,23 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.hai;
 
+import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
+import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-
 import org.slf4j.Logger;
-import org.jdom.Document;
-
-import java.util.Vector;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.io.*;
-import java.util.regex.Pattern;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import opendap.coreServlet.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 /**
  * User: ndp

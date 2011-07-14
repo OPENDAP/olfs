@@ -1,13 +1,24 @@
-/* an ajax log file tailer / viewer
- copyright 2007 john minnihan.
- http://freepository.com
- Released under these terms
- 1. This script, associated functions and HTML code ("the code") may be used by you ("the recipient") for any purpose.
- 2. This code may be modified in any way deemed useful by the recipient.
- 3. This code may be used in derivative works of any kind, anywhere, by the recipient.
- 4. Your use of the code indicates your acceptance of these terms.
- 5. This notice must be kept intact with any use of the code to provide attribution.
- */
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "Hyrax" project, a Java implementation
+// of the OPeNDAP Data Access Protocol.
+//
+// Copyright (c) 2011 OPeNDAP, Inc.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
 var request1 = createRequest();
 

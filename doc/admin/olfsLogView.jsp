@@ -1,9 +1,3 @@
-<%@ page import="ch.qos.logback.classic.LoggerContext" %>
-<%@ page import="opendap.bes.BES" %>
-<%@ page import="opendap.bes.BESManager" %>
-<%@ page import="opendap.hai.Util" %>
-<%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.util.HashMap" %>
 <!--
 ~ /////////////////////////////////////////////////////////////////////////////
 ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
@@ -29,6 +23,12 @@
 ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 ~ /////////////////////////////////////////////////////////////////////////////
 -->
+<%@ page import="ch.qos.logback.classic.LoggerContext" %>
+<%@ page import="opendap.bes.BES" %>
+<%@ page import="opendap.bes.BESManager" %>
+<%@ page import="opendap.hai.Util" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="java.util.HashMap" %>
 <html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
