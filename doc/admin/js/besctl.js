@@ -283,7 +283,8 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
                 "I will do this as gently as possible, but some connections may be dropped. " +
                 "Do you wish to continue?");
         if(r==true){
-            stopNice_worker(besPrefix,besCtlApi,true,preformattedStatusUpdate);
+	    // Changed to sychronous stop as part of debugging (fixing?) ticket 1781. jhrg 7/14/11
+            stopNice_worker(besPrefix,besCtlApi, false /*true*/,preformattedStatusUpdate);
             alert("About to start BES...");
             start(besPrefix,besCtlApi);
         }
