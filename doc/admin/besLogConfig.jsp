@@ -72,6 +72,8 @@
 </head>
 
 <body>
+<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
+<div style="clear: both;"> </div>
 <h1>Bes Logging Configuration</h1>
 
 <div id="besLoggingConfig" class="content">

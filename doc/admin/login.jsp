@@ -29,7 +29,7 @@
 <html>
 <head>
     <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>
-    <title>Hyrax Admin Interface</title>
+    <title>Hyrax Admin Login</title>
 </head>
 <body>
 
@@ -41,9 +41,6 @@
 <!--                                                        -->
 <!--                                                        -->
 
-<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
-<div style="clear: both;"> </div>
-
 <table width='95%'>
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
@@ -52,7 +49,7 @@
         </td>
     </tr>
 </table>
-<h1>Hyrax Admin Interface</h1>
+<h1>Hyrax Admin Login</h1>
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->
@@ -61,10 +58,23 @@
 <!--                                                        -->
 
 
-<dl>
-    <dd><a href="olfsLogView.jsp">OLFS Log Viewer</a></dd>
-    <dd><a href="besctl.jsp">BES Management</a></dd>
-</dl>
+
+<form method="POST" action="j_security_check">
+<table>
+	<tr>
+		<td>Name:</td>
+		<td><input type="text" name="j_username" /></td>
+	</tr>
+	<tr>
+		<td>Password:</td>
+		<td><input type="password" name="j_password"/ ></td>
+	</tr>
+	<tr>
+		<td colspan="2"><input type="submit" value="Go" /></td>
+	</tr>
+</table>
+</form>
+
 
 
 

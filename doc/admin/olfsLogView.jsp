@@ -65,6 +65,8 @@
 </head>
 <body>
 
+<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
+<div style="clear: both;"> </div>
 
 <!-- ****************************************************** -->
 <!--                      PAGE BANNER                       -->

@@ -131,7 +131,10 @@ public class OPeNDAPClient {
      * @see PPTException
      */
     public void shutdownClient() throws PPTException {
-        _client.closeConnection(true);
+
+        if(_client!=null)
+            _client.closeConnection(true);
+
         if (_stream != null) {
             try {
                 _stream.close();

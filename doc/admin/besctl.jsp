@@ -88,6 +88,9 @@
 </head>
 
 <body>
+<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
+<div style="clear: both;"> </div>
+
 <table width='95%'>
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
@@ -124,15 +127,9 @@
     %>
 </ol>
 <div id="besDetail" class="content">
-    <div class="small" style="float: left;">
 
-        bes prefix: <strong><%=bes.getPrefix()%></strong><br/>
-        hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%></strong><br/>
-        max client connections: <strong><%=bes.getMaxClients()%></strong><br/>
-        current client connections: <strong><%=bes.getBesClientCount()%></strong><br/>
-    </div>
 
-    <div id="besControls"style="float: right;">
+    <div id="besControls1">
 
 
         <button style="border: 0; background-color: transparent;"
@@ -155,11 +152,30 @@
 
 
     </div>
-    <div style="clear: both;"> </div>
 
-</div>
+
+
+
+    <div class="small"
+         style="
+            border: 1px solid rgb(150, 150, 150);
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            width: 300px;">
+
+        <div class="small_bold" style="padding-bottom: 4px;">OLFS Configuration</div>
+        bes prefix: <strong><%=bes.getPrefix()%></strong><br/>
+        hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%></strong><br/>
+        max client connections: <strong><%=bes.getMaxClients()%></strong><br/>
+        current client connections: <strong><%=bes.getBesClientCount()%></strong><br/>
+    </div>
+
 
 <br/>
+
+
 
 <div class='medium'>
     <ol id="besTasks">
@@ -442,6 +458,8 @@
 
 
     </div>
+
+</div>
 
 </div>
 
