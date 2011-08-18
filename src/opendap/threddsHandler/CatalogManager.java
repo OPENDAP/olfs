@@ -83,17 +83,27 @@ public class CatalogManager {
                                   boolean cacheCatalogFileContent)
             throws Exception {
 
-        LocalFileCatalog catalog = new LocalFileCatalog(pathPrefix, urlPrefix, fname, _catalogIngestTransformFilename, cacheCatalogFileContent);
-        try{
-            _catalogLock.lock();
-            _log.debug("addCatalog(): Catalog locked.");
+        LocalFileCatalog catalog = null;
 
-            addCatalog(catalog, cacheCatalogFileContent);
+        try {
+             catalog = new LocalFileCatalog(pathPrefix, urlPrefix, fname, _catalogIngestTransformFilename, cacheCatalogFileContent);
         }
-        finally {
-            _catalogLock.unlock();
-            _log.debug("addCatalog(): Catalog unlocked.");
+        catch (Exception e){
+            _log.error("Failed to build catalog from file: "+fname);
+        }
 
+        if(catalog !=null){
+            try{
+                _catalogLock.lock();
+                _log.debug("addCatalog(): Catalog locked.");
+
+                addCatalog(catalog, cacheCatalogFileContent);
+            }
+            finally {
+                _catalogLock.unlock();
+                _log.debug("addCatalog(): Catalog unlocked.");
+
+            }
         }
 
     }
@@ -171,15 +181,27 @@ public class CatalogManager {
                 catFname = Util.basename(thisPathPrefix);
                 thisPathPrefix = thisPathPrefix.substring(0, thisPathPrefix.lastIndexOf(catFname));
 
-                LocalFileCatalog thisCatalog = new LocalFileCatalog(thisPathPrefix,
+                LocalFileCatalog thisCatalog = null;
+                try {
+                    thisCatalog = new LocalFileCatalog(thisPathPrefix,
                         thisUrlPrefix,
                         catFname,
                         _catalogIngestTransformFilename,
                         cacheCatalogFileContent);
+                }
+                catch( Exception e){
+                    _log.error("Failed to build catalog from file: "+catFname+ " Msg: "+e.getMessage());
+                }
 
-                addCatalog(thisCatalog, cacheCatalogFileContent);
-                String thisCatalogIndex = thisCatalog.getCatalogKey();
-                catalogChildren.add(thisCatalogIndex);
+                if (thisCatalog != null) {
+                    addCatalog(thisCatalog, cacheCatalogFileContent);
+                    String thisCatalogIndex = thisCatalog.getCatalogKey();
+                    catalogChildren.add(thisCatalogIndex);
+                }
+                else {
+                    _log.error("Catalog dropped reference to: "+catFname);
+                }
+
 
             }
         }
@@ -262,7 +284,7 @@ public class CatalogManager {
                     return newCat;
                 }
                 catch (Exception e) {
-                    _log.error("getCatalogAndUpdateIfRequired(): Could not update Catalog: " + c.getName());
+                    _log.error("getCatalogAndUpdateIfRequired(): Could not update Catalog: " + c.getName()+ "Msg: "+e.getMessage());
                     return null;
                 }
             } else {

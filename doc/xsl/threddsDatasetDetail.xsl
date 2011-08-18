@@ -97,7 +97,7 @@
                 <!--                                                        -->
 
                 <head>
-                    <link rel='stylesheet' href='{$docsService}/css/thredds.css'
+                    <link rel='stylesheet' href='{$docsService}/css/contents.css'
                           type='text/css'/>
                     <title>THREDDS Dataset: <xsl:value-of select="@name"/></title>
 
@@ -109,33 +109,52 @@
                 <!--                                                        -->
                 <body>
 
+
                     <table width="100%">
                         <tr>
-                            <td width="30%" align="left"><img alt="Logo" src='{$docsService}/images/logo.gif' /></td>
+                            <td width="30%" align="left">
+                                <img alt="Logo" src='{$docsService}/images/logo.gif'/>
+                            </td>
                             <td class="dark" align="left">Hyrax - THREDDS Dataset Detail</td>
                         </tr>
                     </table>
 
                     <h1>
-                        <xsl:if test="not($remoteCatalog)">
-                            <font size="0">Dataset: <xsl:value-of select="@name" /><br/></font>
-                            <font size="-2">Catalog:
-                                <SCRIPT LANGUAGE="JavaScript">
-                                <xsl:comment >
-                                {
-                                    catalog = location.href.split("?");
-                                    document.write('Catalog: '+catalog[0]);
-                                }
-                                </xsl:comment>
-                            </SCRIPT>
-                            </font>
-                        </xsl:if>
-
-                        <xsl:if test="$remoteCatalog">
-                            <font size="0">Remote Dataset: <xsl:value-of select="@name" /><br/></font>
-                            <font size="-2">Remote Catalog: <xsl:value-of select="$remoteCatalog" /><br/></font>
-                        </xsl:if>
+                        <div>
+                            <xsl:choose>
+                                <xsl:when test="@name">
+                                    <xsl:value-of select="@name"/>
+                                </xsl:when>
+                                <xsl:when test="@ID">
+                                    <xsl:value-of select="@ID"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <span class="italic">'Dataset Missing ID and name attributes.'</span>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </div>
                     </h1>
+
+                    <div style="padding-bottom: 5px;">
+                        <span class="small_italic">Catalog:</span>
+                        <span class="small_bold">
+                        <SCRIPT LANGUAGE="JavaScript">
+                            <xsl:comment>
+                                {
+                                catalog = location.href.split("?");
+                                document.write(''+catalog[0]);
+                                }
+                            </xsl:comment>
+                        </SCRIPT>
+                        </span>
+
+                    </div>
+                    <div>
+                        <span class="small_italic">ID:</span><span class="medium_bold"><xsl:value-of select="@ID"/></span>
+                    </div>
+                    <div>
+                        <span class="small_italic">name:</span><span class="medium_bold"><xsl:value-of select="@name"/></span>
+                    </div>
 
                     <hr size="1" noshade="noshade"/>
 
@@ -145,27 +164,24 @@
                     <!--                                                        -->
 
 
+
+                    <h2>Access:</h2>
+
+                    <xsl:call-template name="doServiceLinks">
+                        <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
+                    </xsl:call-template>
+
+                    <hr/>
                     <h2>MetaData Summary:</h2>
 
-                    <xsl:variable name="serviceNameTest" select="thredds:serviceName |
-                                        thredds:metadata/thredds:serviceName |
-                                        $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName |
-                                        thredds:access" />
-                    <xsl:if test="$serviceNameTest" >
-                        <h3>Access: </h3>
-                        <table class="small">
-                            <xsl:apply-templates select="$serviceNameTest" mode="ServiceLinks" >
-                                 <xsl:with-param name="currentDataset" select="." />
-                            </xsl:apply-templates>
-                        </table>
-                    </xsl:if>
+
 
 
                     <xsl:variable name="docTest" select="thredds:documentation |
                                         thredds:metadata/thredds:documentation |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:documentation" />
                     <xsl:if test="$docTest" >
-                        <h3>Documentation: </h3>
+                        <div class="medium_bold">Documentation: </div>
                         <ul class="small">
                             <xsl:apply-templates select="$docTest" mode="documentationDetail" />
                         </ul>
@@ -176,7 +192,7 @@
                                         thredds:metadata/thredds:date |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:date" />
                     <xsl:if test="$dateTest" >
-                        <h3>Dates: </h3>
+                        <div class="medium_bold">Dates: </div>
                         <ul class="small">
                             <xsl:apply-templates select="$dateTest" mode="dateDetail" />
                         </ul>
@@ -187,7 +203,7 @@
                                         thredds:metadata/thredds:timeCoverage |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:timeCoverage" />
                     <xsl:if test="$timeCoverageTest" >
-                        <h3>Time Coverage: </h3>
+                        <div class="medium_bold">Time Coverage: </div>
                         <ul class="small">
                             <xsl:apply-templates select="$timeCoverageTest" mode="timeCoverageDetail" />
                         </ul>
@@ -199,7 +215,7 @@
                                         thredds:metadata/thredds:geospatialCoverage |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:geospatialCoverage" />
                     <xsl:if test="$geoCvrTest" >
-                        <h3>Geospatial Coverage: </h3>
+                        <div class="medium_bold">Geospatial Coverage: </div>
                             <xsl:apply-templates select="$geoCvrTest" mode="geospatialCoverageDetail" />
                     </xsl:if>
 
@@ -207,7 +223,7 @@
                                         thredds:metadata/thredds:creator |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:creator" />
                     <xsl:if test="$creatorTest" >
-                        <h3>Creators: </h3>
+                        <div class="medium_bold">Creators: </div>
                         <ul class="small">
                             <xsl:apply-templates select="$creatorTest" mode="creatorDetail" />
                         </ul>
@@ -218,7 +234,7 @@
                                         thredds:metadata/thredds:publisher |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:publisher" />
                     <xsl:if test="$publisherTest" >
-                        <h3>Publishers: </h3>
+                        <div class="medium_bold">Publishers: </div>
                         <ul class="small">
                             <xsl:apply-templates select="$publisherTest" mode="publisherDetail" />
                         </ul>
@@ -229,7 +245,7 @@
                                         thredds:metadata/thredds:property |
                                         $inheritedMetadata[boolean($inheritedMetadata)]/thredds:property" />
                     <xsl:if test="$propTest" >
-                        <h3>Properties: </h3>
+                        <div class="medium_bold">Properties: </div>
                         <ul class="small">
                             <xsl:apply-templates  select="$propTest" mode="propertyDetail" />
                         </ul>
@@ -301,144 +317,238 @@
     <!-- ******************************************************
       -  ServiceLinks
      -->
-    <xsl:template match="*" mode="ServiceLinks" >
-        <xsl:param name="currentDataset" />
+
+
+
+
+
+    <xsl:template name="doServiceLinks" >
+        <xsl:param name="inheritedMetadata" />
+
+        <table>
+            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:serviceName</div-->
+            <xsl:apply-templates select="key('service-by-name', thredds:serviceName)" mode="ServiceLinks" >
+                <xsl:with-param name="urlPath" select="@urlPath" />
+            </xsl:apply-templates>
+
+
+            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:metadata/thredds:serviceName </div-->
+            <xsl:apply-templates select="key('service-by-name', thredds:metadata/thredds:serviceName)" mode="ServiceLinks" >
+                <xsl:with-param name="urlPath" select="@urlPath" />
+            </xsl:apply-templates>
+
+
+            <!--div class="small">- - - - - - - - - - - - - - - - - - - @serviceName</div-->
+            <xsl:apply-templates select="key('service-by-name', @serviceName)" mode="ServiceLinks" >
+                <xsl:with-param name="urlPath" select="@urlPath" />
+            </xsl:apply-templates>
+
+
+            <!--div class="small">- - - - - - - - - - - - - - - - - - - $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName</div-->
+            <xsl:apply-templates select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)" mode="ServiceLinks" >
+                <xsl:with-param name="urlPath" select="@urlPath" />
+            </xsl:apply-templates>
+
+
+
+            <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:access/@serviceName</div-->
+
+            <xsl:apply-templates select="thredds:access" mode="ServiceLinks" >
+                <xsl:with-param name="currentDataset" select="." />
+                <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
+            </xsl:apply-templates>
+
+        </table>
+
+
     </xsl:template>
+
 
 
     <xsl:template match="thredds:access" mode="ServiceLinks" >
         <xsl:param name="currentDataset" />
+        <xsl:param name="inheritedMetadata" />
 
+        <xsl:variable name="urlPath" select="@urlPath"/>
+
+
+        <!-- Since the thredds:access element isn't required to have a serviceName attribute we have to check... -->
         <xsl:choose>
-            <xsl:when test="@serviceName" >
+            <xsl:when test="@serviceName">
                 <xsl:apply-templates select="key('service-by-name', @serviceName)" mode="ServiceLinks" >
-                    <xsl:with-param name="currentDataset" select="." />
+                    <xsl:with-param name="urlPath" select="$urlPath" />
                 </xsl:apply-templates>
             </xsl:when>
 
+            <!-- and if the serviceName attribute is missing we have to try to determine the "default" service" -->
             <xsl:otherwise>
+                <xsl:variable name="defaultServiceName">
+                    <xsl:call-template name="getDefaultService">
+                        <xsl:with-param name="currentDataset" select="$currentDataset" />
+                        <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:apply-templates select="key('service-by-name',  $defaultServiceName)" mode="ServiceLinks" >
+                    <xsl:with-param name="urlPath" select="$urlPath" />
+                </xsl:apply-templates>
             </xsl:otherwise>
         </xsl:choose>
 
 
 
-
     </xsl:template>
 
 
-    <xsl:template match="thredds:serviceName" mode="ServiceLinks" >
+
+    <xsl:template name="getDefaultService">
         <xsl:param name="currentDataset" />
-        <xsl:apply-templates select="key('service-by-name', .)" mode="ServiceLinks" >
-            <xsl:with-param name="currentDataset" select="$currentDataset" />
-        </xsl:apply-templates>
+        <xsl:param name="inheritedMetadata" />
+        <xsl:choose>
+            <xsl:when test="$currentDataset/thredds:serviceName">
+                <xsl:value-of select="$currentDataset/thredds:serviceName"/>
+            </xsl:when>
+            <xsl:when test="$currentDataset/thredds:metadata/thredds:serviceName">
+                <xsl:value-of select="$currentDataset/thredds:metadata/thredds:serviceName"/>
+            </xsl:when>
+            <xsl:when test="$currentDataset/@serviceName">
+                <xsl:value-of select="$currentDataset/@serviceName"/>
+            </xsl:when>
+            <xsl:when test="$inheritedMetadata/thredds:serviceName">
+                <xsl:value-of select="$inheritedMetadata/thredds:serviceName"/>
+            </xsl:when>
+            <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
 
     </xsl:template>
 
+
+
+
+    <xsl:template match="*" mode="ServiceLinks" >
+        <xsl:param name="urlPath" />
+    </xsl:template>
 
 
     <xsl:template match="thredds:service" mode="ServiceLinks" >
-        <xsl:param name="currentDataset" />
+        <xsl:param name="urlPath" />
 
-            <xsl:if test="./@serviceType[.='Compound']" >
-                <td><xsl:value-of select="./@name" />:</td>
-
-                <xsl:apply-templates select="./thredds:service" mode="ServiceLinks" >
-                        <xsl:with-param name="currentDataset" select="$currentDataset" />
-                </xsl:apply-templates>
-
-            </xsl:if>
-
-            <xsl:if test="not(./@serviceType[.='Compound'])" >
-
-
-                    <tr>
-                    <td>
-                        <b>&#160;&#160;<xsl:value-of select="./@name" /></b>
-                        (<xsl:value-of select="./@serviceType" />)&#160;&#160;&#160;&#160;
+        <xsl:choose>
+            <xsl:when test="./@serviceType[.='Compound']">
+                <tr>
+                    <td colspan="2">
+                        <div class="small" style="color: grey;"><xsl:value-of select="./@name" />:</div>
                     </td>
+                </tr>
+                <xsl:apply-templates select="./thredds:service" mode="ServiceLinks" >
+                        <xsl:with-param name="urlPath" select="$urlPath" />
+                </xsl:apply-templates>
+                <tr>
+                    <td colspan="2">&#160;</td>
+                </tr>
 
-                    <td>
-                        <xsl:choose>
-                        
-                            <!-- Check to see if we can build an access URL. -->
-                            <xsl:when test="not($currentDataset/@urlPath)">
-                            No Service Links Available (Missing thredds:dataset/@urlPath)
-                            </xsl:when>
+            </xsl:when>
 
+            <xsl:otherwise>
 
+                <tr>
+                    <td align="right">
+                        <span class="medium_bold"
+                              style="margin-left: 10px;">
+                            <xsl:value-of select="./@name"/>
+                        </span>
 
-                            <!-- Produces service URL's for the OPeNDAP serviceType -->
-                            <xsl:when test="./@serviceType[.='OPeNDAP'] |
-                                              ./@serviceType[.='OPENDAP'] |
-                                              ./@serviceType[.='OpenDAP'] |
-                                              ./@serviceType[.='OpenDap'] |
-                                              ./@serviceType[.='openDap'] |
-                                              ./@serviceType[.='opendap']">
+                        <span class="small">(<xsl:value-of select="./@serviceType"/>)
+                        </span>
 
-                                <xsl:if test="not($remoteHost)">
-                                    <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.rdf" >rdf</a>&#160;
-                                </xsl:if>
+                    </td>
+                    <td align="left">
+                        <span class="small_bold"
+                             style="margin-left: 10px;">
+                            <xsl:choose>
 
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.ddx" >ddx</a>&#160;
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.dds" >dds</a>&#160;
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.das" >das</a>&#160;
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.info" >info</a>&#160;
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.html" >html request form</a>
-                            </xsl:when>
-
-                            <!-- Produces service URL's for the WCS serviceType -->
-                            <xsl:when test="./@serviceType[.='WCS']" >
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}.ddx" >CoverageDescription</a>
-                            </xsl:when>
+                                <!-- Check to see if we can build an access URL. -->
+                                <xsl:when test="not($urlPath)">
+                                No Service Links Available (Missing thredds:dataset/@urlPath or thredds:access/@urlPath)
+                                </xsl:when>
 
 
-                            <!-- Produces service URL's for the HTTPServer serviceType -->
-                            <xsl:when test="./@serviceType[.='HTTPServer']" >
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >File Download</a>
-                            </xsl:when>
-                            
-                            
+                                <xsl:when test="matches(./@serviceType, 'opendap', 'i')">
+
+                                    <a title="Browser accessible form for requesting data."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.html">Data Request Form</a>&#160;
+
+                                    <xsl:if test="not($remoteHost)">
+                                        <a title="RDF representation of the DDX."
+                                           href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.rdf">rdf</a>&#160;
+                                    </xsl:if>
+
+                                    <a title="The DAP DDX document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.ddx">ddx</a>&#160;
+                                    <a title="The DAP DDS document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.dds">dds</a>&#160;
+                                    <a title="The DAP DAS document for this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.das">das</a>&#160;
+                                    <a title="Browser accessible informational page regarding this dataset."
+                                       href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}.info">info</a>&#160;
+                                </xsl:when>
+
+
+                                <!-- Produces service URL's for the HTTPServer serviceType -->
+                                <xsl:when test="matches(./@serviceType, 'HTTPServer', 'i')">
+                                    <a
+                                            title="This link provides file download access via HTTP."
+                                            href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" >File Download</a>
+                                </xsl:when>
+
+
                             <!-- #####################################################
-                              - 
                               -
-                              - Here is where you would add code to provide data access 
-                              - for a new service. 
                               -
-                              - Simply add a when statement with one or more link items. 
-                              - 
+                              - Here is where you would add code to provide data access
+                              - for a new service.
+                              -
+                              - Simply add a when statement with one or more link items.
+                              -
                               - In this example:
 
                                     <xsl:when test="./@serviceType[.='YOUR_SERVICE_TYPE']" >
                                         <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >TEXT_OF_RESPONSE_LINK</a>
                                     </xsl:when>
-                                    
+
                               - The href is formed to be the minium correct URL for a THREDDS catalog listing:
-                              - 
+                              -
                               -     remoteHost + thredds:service/@base + thredds:dataset/@urlPath
                               -
                               - Example:
-                              - 
+                              -
                               -    "http://test.opendap.org:8080" + "/opendap/" + "data/nc/fnoc1.nc"
                               -
-                              - This should be how correct data access links can be formed from a THREDDS catalog. 
+                              - This should be how correct data access links can be formed from a THREDDS catalog.
                               -
                               -->
 
 
-                            <!-- 
+                            <!--
                               - No way to map service to a particular set of access URLs, so
                               - Give them the baseic service link.
                               -->
-                            <xsl:otherwise>
-                                <a href="{$remoteHost[$remoteHost]}{./@base}{$currentDataset/@urlPath}" >THREDDS Service link.</a>
-                                <em>This is an unfamiliar service type for this transform, so no additional links are avail;able.)</em> 
-                            </xsl:otherwise>
+                                <xsl:otherwise>
+                                    <a
+                                            title="No additional links are available."
+                                            href="{$remoteHost[$remoteHost]}{./@base}{$urlPath}" ><xsl:value-of select="./@serviceType"/></a>
+
+                                </xsl:otherwise>
 
                         </xsl:choose>
-                    </td>
-                    </tr>
+                        </span>
 
-            </xsl:if>
+                    </td>
+                </tr>
+
+            </xsl:otherwise>
+        </xsl:choose>
+
     </xsl:template>
 
 
