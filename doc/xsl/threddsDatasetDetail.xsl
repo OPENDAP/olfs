@@ -129,31 +129,43 @@
                                     <xsl:value-of select="@ID"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <span class="italic">'Dataset Missing ID and name attributes.'</span>
+                                    <span class="italic">
+                                        <span class="medium">
+                                            Dataset Missing ID and name attributes.
+                                        </span>
+                                    </span>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </div>
                     </h1>
 
+                    <div>
+                        <span class="small_italic">ID:</span>
+                        <span class="medium_bold">
+                            <xsl:value-of select="@ID"/>
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="small_italic">name:</span>
+                        <span class="medium_bold">
+                            <xsl:value-of select="@name"/>
+                        </span>
+                    </div>
+
                     <div style="padding-bottom: 5px;">
                         <span class="small_italic">Catalog:</span>
                         <span class="small_bold">
-                        <SCRIPT LANGUAGE="JavaScript">
-                            <xsl:comment>
-                                {
-                                catalog = location.href.split("?");
-                                document.write(''+catalog[0]);
-                                }
-                            </xsl:comment>
-                        </SCRIPT>
+                            <SCRIPT LANGUAGE="JavaScript">
+                                <xsl:comment>
+                                    {
+                                    catalog = location.href.split("?");
+                                    document.write(''+catalog[0]);
+                                    }
+                                </xsl:comment>
+                            </SCRIPT>
                         </span>
 
-                    </div>
-                    <div>
-                        <span class="small_italic">ID:</span><span class="medium_bold"><xsl:value-of select="@ID"/></span>
-                    </div>
-                    <div>
-                        <span class="small_italic">name:</span><span class="medium_bold"><xsl:value-of select="@name"/></span>
                     </div>
 
                     <hr size="1" noshade="noshade"/>
@@ -165,13 +177,14 @@
 
 
 
-                    <h2>Access:</h2>
 
                     <xsl:call-template name="doServiceLinks">
                         <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
                     </xsl:call-template>
 
-                    <hr/>
+
+
+
                     <h2>MetaData Summary:</h2>
 
 
@@ -316,53 +329,79 @@
 
     <!-- ******************************************************
       -  ServiceLinks
+      -
+      -
+      -
+      - Note:
+      -
+      -
+      -
+      -
      -->
 
 
+    <xsl:template name="doServiceLinks">
+        <xsl:param name="inheritedMetadata"/>
 
-
-
-    <xsl:template name="doServiceLinks" >
-        <xsl:param name="inheritedMetadata" />
 
         <table>
+
+            <xsl:choose>
+                <xsl:when test="
+                    thredds:serviceName |
+                    thredds:metadata/thredds:serviceName |
+                    @serviceName |
+                    $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName |
+                    thredds:access"
+                        >
+                    <h2>Access:</h2>
+                </xsl:when>
+                <xsl:otherwise>
+                    No serviceName or access found for this dataset.
+                </xsl:otherwise>
+            </xsl:choose>
+
+
             <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:serviceName</div-->
-            <xsl:apply-templates select="key('service-by-name', thredds:serviceName)" mode="ServiceLinks" >
-                <xsl:with-param name="urlPath" select="@urlPath" />
+            <xsl:apply-templates select="key('service-by-name', thredds:serviceName)" mode="ServiceLinks">
+                <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
 
 
             <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:metadata/thredds:serviceName </div-->
-            <xsl:apply-templates select="key('service-by-name', thredds:metadata/thredds:serviceName)" mode="ServiceLinks" >
-                <xsl:with-param name="urlPath" select="@urlPath" />
+            <xsl:apply-templates select="key('service-by-name', thredds:metadata/thredds:serviceName)"
+                                 mode="ServiceLinks">
+                <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
 
 
             <!--div class="small">- - - - - - - - - - - - - - - - - - - @serviceName</div-->
-            <xsl:apply-templates select="key('service-by-name', @serviceName)" mode="ServiceLinks" >
-                <xsl:with-param name="urlPath" select="@urlPath" />
+            <xsl:apply-templates select="key('service-by-name', @serviceName)" mode="ServiceLinks">
+                <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
+
 
 
             <!--div class="small">- - - - - - - - - - - - - - - - - - - $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName</div-->
-            <xsl:apply-templates select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)" mode="ServiceLinks" >
-                <xsl:with-param name="urlPath" select="@urlPath" />
+            <xsl:apply-templates
+                    select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)"
+                    mode="ServiceLinks">
+                <xsl:with-param name="urlPath" select="@urlPath"/>
             </xsl:apply-templates>
-
 
 
             <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:access/@serviceName</div-->
 
-            <xsl:apply-templates select="thredds:access" mode="ServiceLinks" >
-                <xsl:with-param name="currentDataset" select="." />
-                <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata" />
+            <xsl:apply-templates select="thredds:access" mode="ServiceLinks">
+                <xsl:with-param name="currentDataset" select="."/>
+                <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata"/>
             </xsl:apply-templates>
 
-        </table>
 
+        </table>
+        <hr/>
 
     </xsl:template>
-
 
 
     <xsl:template match="thredds:access" mode="ServiceLinks" >
