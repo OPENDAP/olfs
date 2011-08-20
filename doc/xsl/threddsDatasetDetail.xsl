@@ -330,9 +330,14 @@
     <!-- ******************************************************
       -  ServiceLinks
       -
+      - This template produces data access (service) links for
+      - the presentation of the thredds dataset.
       -
       -
-      - Note:
+      -
+      - Note: The xsl:choose at the beginning should have all of
+      - the tests in it that appear in the individual xsl:apply-template
+      - calls in the subsequent code..
       -
       -
       -
@@ -344,24 +349,23 @@
         <xsl:param name="inheritedMetadata"/>
 
 
+
+        <xsl:choose>
+            <xsl:when test="
+                thredds:serviceName |
+                thredds:metadata/thredds:serviceName |
+                @serviceName |
+                $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName |
+                thredds:access"
+                    >
+                <h2>Access:</h2>
+            </xsl:when>
+            <xsl:otherwise>
+                No serviceName or access found for this dataset.
+            </xsl:otherwise>
+        </xsl:choose>
+
         <table>
-
-            <xsl:choose>
-                <xsl:when test="
-                    thredds:serviceName |
-                    thredds:metadata/thredds:serviceName |
-                    @serviceName |
-                    $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName |
-                    thredds:access"
-                        >
-                    <h2>Access:</h2>
-                </xsl:when>
-                <xsl:otherwise>
-                    No serviceName or access found for this dataset.
-                </xsl:otherwise>
-            </xsl:choose>
-
-
             <!--div class="small">- - - - - - - - - - - - - - - - - - - thredds:serviceName</div-->
             <xsl:apply-templates select="key('service-by-name', thredds:serviceName)" mode="ServiceLinks">
                 <xsl:with-param name="urlPath" select="@urlPath"/>
@@ -381,7 +385,6 @@
             </xsl:apply-templates>
 
 
-
             <!--div class="small">- - - - - - - - - - - - - - - - - - - $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName</div-->
             <xsl:apply-templates
                     select="key('service-by-name', $inheritedMetadata[boolean($inheritedMetadata)]/thredds:serviceName)"
@@ -396,8 +399,6 @@
                 <xsl:with-param name="currentDataset" select="."/>
                 <xsl:with-param name="inheritedMetadata" select="$inheritedMetadata"/>
             </xsl:apply-templates>
-
-
         </table>
         <hr/>
 
@@ -494,10 +495,10 @@
                     <td align="right">
                         <span class="medium_bold"
                               style="margin-left: 10px;">
-                            <xsl:value-of select="./@name"/>
+                            <div style="display:inline;" title="Service Name" ><xsl:value-of select="./@name"/></div>
                         </span>
 
-                        <span class="small">(<xsl:value-of select="./@serviceType"/>)
+                        <span class="small">(<div style="display:inline;" title="Service Type" ><xsl:value-of select="./@serviceType"/></div>)
                         </span>
 
                     </td>
