@@ -28,9 +28,6 @@
 ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-                xmlns:wcs="http://www.opengis.net/wcs"
-                xmlns:gml="http://www.opengis.net/gml"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
@@ -62,9 +59,25 @@
 
             <!-- Is this the dataset that we are supposed to summary? -->
             <xsl:when test="$targetDataset=$datasetPositionInDocument">
+
+                <!-- todo - Evaluate weather we want to drop the passed inheritedMetadata parameter in favor of the XPath expression
+
+                <xsl:variable name="im" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]"/>
+                <xsl:variable name="im_ancestor" select="ancestor::thredds:dataset/thredds:metadata[./@inherited='true']/thredds:serviceName"/>
+
+                <IM>
+                    <xsl:copy-of select="$im"/>
+                </IM>
+
+                <IM_ANCESTOR>
+                    <xsl:copy-of select="$im_ancestor"/>
+                </IM_ANCESTOR>
+
+                -->
+
+
                 <xsl:call-template name="targetDatasetPage">
                 <xsl:with-param name="inheritedMetadata" select="thredds:metadata[./@inherited='true']|$inheritedMetadata[boolean($inheritedMetadata)]" />
-
                 </xsl:call-template>
             </xsl:when>
 
@@ -434,9 +447,6 @@
                 </xsl:apply-templates>
             </xsl:otherwise>
         </xsl:choose>
-
-
-
     </xsl:template>
 
 
