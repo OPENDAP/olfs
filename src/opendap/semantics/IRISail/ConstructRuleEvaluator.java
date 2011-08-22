@@ -529,7 +529,7 @@ public class ConstructRuleEvaluator {
 
 
                 processedQueryString = processedQueryString.substring(0, functionMatcher.start(1)) + expand + processedQueryString.substring(functionMatcher.end(1));
-
+                log.debug("Inside convertSWRLQueryToSeasameQuery: " + processedQueryString);
                 functionMatcher.reset(processedQueryString);
 
 
