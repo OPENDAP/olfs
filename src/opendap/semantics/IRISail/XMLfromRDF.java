@@ -138,7 +138,8 @@ public class XMLfromRDF {
                         && bindingSet.getValue("class") != null){
                     
                     Value valueOfElement = (Value) bindingSet.getValue("element");
-                    Value valueOfUri = (Value) bindingSet.getValue("uri");
+                    Value valueOfUri = bindingSet.getValue("uri");
+                    log.debug("valueOfUri.stringValue " + valueOfUri.stringValue());
                     
                     Value valueOfClass = (Value) bindingSet.getValue("class");
                    
@@ -557,9 +558,10 @@ public class XMLfromRDF {
      */
 	private String createQueryString(String parentstr, Value parentclassstr)  throws InterruptedException{
 		String queryStringc;
-//		String objURI = parentstr.substring(0, 7);
+		String objURI = parentstr.substring(0, 7);
+		String fileURI = parentstr.substring(0, 8);
 		
-//		if (objURI.equalsIgnoreCase("http://")){ 
+		if (objURI.equalsIgnoreCase("http://") | fileURI.equalsIgnoreCase("file:///")){ 
 			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
 			"FROM "+
 			"{parent:} nameprop {obj}, "+
@@ -579,27 +581,27 @@ public class XMLfromRDF {
 			      "parent = <" + parentstr + ">," +
 			      "parentclass = <"+ parentclassstr + ">";     
 					
-//		}
-//		else{
-//			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
-//			"FROM "+
-//			"{" + parentstr + "} nameprop {obj}, "+
-//			"{parentclass:} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
-//			"owl:allValuesFrom {valueclass}, "+
-//			"{subprop} rdfs:subPropertyOf {xsd2owl:isConstrainedBy}; "+
-//			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, "+
-//			"{parentclass:} rdfs:subClassOf {} subprop {restriction}, "+
-//			"[{parentclass:} xsd2owl:uses {nameprop},{{parentclass:} xsd2owl:uses {nameprop}} "+
-//			"xsd2owl:useCount {order1}], "+
-//			"[{nameprop} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
-//			"using namespace "+
-//			      "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
-//			      "owl = <http://www.w3.org/2002/07/owl#>, "+
-//			      "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
-//			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, " +
-//			      "parentclass = <"+ parentclassstr + ">"; 
+		}
+		else{
+			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
+			"FROM "+
+			"{" + parentstr + "} nameprop {obj}, "+
+			"{parentclass:} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
+			"owl:allValuesFrom {valueclass}, "+
+			"{subprop} rdfs:subPropertyOf {xsd2owl:isConstrainedBy}; "+
+			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, "+
+			"{parentclass:} rdfs:subClassOf {} subprop {restriction}, "+
+			"[{parentclass:} xsd2owl:uses {nameprop},{{parentclass:} xsd2owl:uses {nameprop}} "+
+			"xsd2owl:useCount {order1}], "+
+			"[{nameprop} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
+			"using namespace "+
+			      "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
+			      "owl = <http://www.w3.org/2002/07/owl#>, "+
+			      "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
+			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, " +
+			      "parentclass = <"+ parentclassstr + ">"; 
 			
-//		}
+		}
 		return queryStringc;
 	}
 
