@@ -65,18 +65,33 @@
 
 <p>If Tomcat is running and Hyrax is installed you could: </p>
 <ul>
-    <li><a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a><br/>
+    <li>
+        <a href="<%= contextPath %>/hyrax/"><strong>Look here for Hyrax default page</strong></a>
+        <br/>
         <br/>
     </li>
-    <li><a href="<%= contextPath %>/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
-        directory </strong><br/>
+    <li>
+        <a href="<%= contextPath %>/hyrax/contents.html"><strong>Look here for the top level OPeNDAP
+        directory </strong></a>
         <br/>
-    </a></li>
-    <li><a href="<%= contextPath %>/hyrax/catalog.html"><strong>Top Level THREDDS catalog.html (an HTML version of the
-        THREDDS catalog) is here. </strong></a><br/>
         <br/>
     </li>
-    <li><a href="<%= contextPath %>/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a></li>
+    <li>
+        <a href="<%= contextPath %>/hyrax/catalog.html"><strong>Top Level THREDDS catalog.html (an HTML version of the
+        THREDDS catalog) is here. </strong></a>
+        <br/>
+        <br/>
+    </li>
+    <li>
+        <a href="<%= contextPath %>/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a>
+        <br />
+        <br />
+    </li>
+    <li><a href="<%= contextPath %>/docs/admin"><strong>Hyrax Admin Interface (beta) is here.</strong></a>
+        <span class="medium">(Requires SSL support in Tomcat.
+        See the <a href="http://docs.opendap.org/index.php/Hyrax_-_Administrators_Interface"> HAI instructions</a>
+        for more information.)</span>
+    </li>
 </ul>
 
 <p>&nbsp;</p>
