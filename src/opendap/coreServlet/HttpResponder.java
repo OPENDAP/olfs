@@ -83,14 +83,14 @@ public abstract class HttpResponder {
 
 
     public void sendHttpErrorResponse(int HttpStatus, String errorMessage, String docsService, HttpServletResponse response) throws Exception {
-        String errorPageTemplate = _systemPath + "/docs/error.html";
+        String errorPageTemplate = _systemPath + "/docs/error.html.proto";
         sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  docsService, response);
     }
 
 
-    public static void sendHttpErrorResponse(int httpStatus, String errorMessage, String errorPageTemplate, String docsService,  HttpServletResponse response) throws Exception {
+    public static void sendHttpErrorResponse(int httpStatus, String errorMessage, String errorPageTemplate, String context,  HttpServletResponse response) throws Exception {
 
-        String template = loadHtmlTemplate(errorPageTemplate, docsService);
+        String template = loadHtmlTemplate(errorPageTemplate, context);
 
         template = template.replaceAll("<ERROR_MESSAGE />",Scrub.simpleString(errorMessage));
 
@@ -108,9 +108,9 @@ public abstract class HttpResponder {
 
 
 
-    public static String loadHtmlTemplate(String htmlTemplateFile, String docsService) throws Exception {
+    public static String loadHtmlTemplate(String htmlTemplateFile, String context) throws Exception {
         String template = readFileAsString(htmlTemplateFile);
-        template = template.replaceAll("<DOCS_SERVICE />",docsService);
+        template = template.replaceAll("<CONTEXT />",context);
         return template;
     }
 

@@ -117,7 +117,7 @@
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
     <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
+    <property name="WebInfResources.dir" location="/resources/hyrax/WEB-INF"/>
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
 

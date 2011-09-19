@@ -627,7 +627,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         response.setContentType("text/plain");
         Version.setOpendapMimeHeaders(request,response);
@@ -660,7 +660,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             //besError.setErrorCode(BESError.INTERNAL_ERROR);
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error(besError.getMessage());
         }
 
@@ -681,7 +681,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
@@ -714,7 +714,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             //besError.setErrorCode(BESError.INTERNAL_ERROR);
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error(besError.getMessage());
         }
 
@@ -736,7 +736,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String requestSuffix = ReqInfo.getRequestSuffix(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         response.setContentType("text/html");
         Version.setOpendapMimeHeaders(request,response);
@@ -772,7 +772,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 erros)){
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error(besError.getMessage());
         }
 
@@ -793,7 +793,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         response.setContentType("text/html");
         Version.setOpendapMimeHeaders(request,response);
@@ -815,7 +815,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             response.setHeader("Content-Description", "dods_error");
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error(besError.getMessage());
         }
 
@@ -853,7 +853,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         String xmlBase = request.getRequestURL().toString();
         int suffix_start = xmlBase.lastIndexOf("." + requestSuffix);
@@ -895,7 +895,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 ddx)){
             response.setHeader("Content-Description", "dods_error");
             BESError error = new BESError(ddx);
-            error.sendErrorResponse(systemPath, docsService, response);
+            error.sendErrorResponse(systemPath, context, response);
 
         }
         else {
@@ -926,7 +926,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 rdf = transformer.transform(ddx);
 
             } catch (Exception e) {
-                sendRdfErrorResponse(e, dataSource, docsService, response);
+                sendRdfErrorResponse(e, dataSource, context, response);
                 log.error(e.getMessage());
             }
 
@@ -948,9 +948,9 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-    public void sendRdfErrorResponse(Exception e, String dataSource, String docsService, HttpServletResponse response) throws Exception {
+    public void sendRdfErrorResponse(Exception e, String dataSource, String context, HttpServletResponse response) throws Exception {
 
-        String errorPageTemplate = systemPath + "/docs/error.html";
+        String errorPageTemplate = systemPath + "/docs/error.html.proto";
 
 
 
@@ -964,7 +964,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                         "<p align=\"center\" class=\"bold\">" + e.getMessage() + "</p>\n";
 
 
-        HttpResponder.sendHttpErrorResponse(500, errorMessage, errorPageTemplate, docsService, response);
+        HttpResponder.sendHttpErrorResponse(500, errorMessage, errorPageTemplate, context, response);
 
     }
 

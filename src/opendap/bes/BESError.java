@@ -276,7 +276,7 @@ public class BESError extends OPeNDAPException {
      * @return The HTTP status code returned to client.
      * @throws IOException
      */
-    public int sendErrorResponse(String systemPath, String docsService, HttpServletResponse response)
+    public int sendErrorResponse(String systemPath, String context, HttpServletResponse response)
             throws IOException{
 
 
@@ -335,7 +335,7 @@ public class BESError extends OPeNDAPException {
             else {
                 if(!response.isCommitted())
                     response.reset();
-                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/docs/error.html",docsService,response);
+                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/docs/error.html.proto",context,response);
             }
 
         }
@@ -343,7 +343,7 @@ public class BESError extends OPeNDAPException {
             if(!response.isCommitted())
                 response.reset();
             try {
-                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/docs/error.html",docsService,response);
+                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/docs/error.html.proto",context,response);
             }
             catch(Exception e1){
                 response.sendError(errorVal,e1.getMessage());

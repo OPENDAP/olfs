@@ -24,10 +24,11 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 -->
+<% String contextPath = request.getContextPath(); %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<link rel='stylesheet' href='<DOCS_SERVICE />/css/contents.css' type='text/css' />
+<link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css' />
 <title>Hyrax:  ERROR</title>
 <style type="text/css">
 <!--
@@ -41,16 +42,17 @@
 
 <body>
 <p>&nbsp;</p>
-<h1 align="center">Hyrax Error</h1>
+<h1 align="center">Hyrax Error: No Such Service</h1>
 <hr size="1" noshade="noshade" />
 <table width="100%" border="0">
   <tr>
-    <td><img src="<DOCS_SERVICE />/images/superman.jpg" alt="Bad things are happening" width="320" height="426" /></td>
-    <td><p align="center" class="style1">OUCH!</p>
-        <p align="center"><ERROR_MESSAGE /></p>
+    <td><img src="<%= contextPath %>/docs/images/forbidden.png" alt="That's not going to work..." width="350" height="313" /></td>
+    <td><p align="center" class="style1">Hmmmm...</p>
+      <p align="center">You asked for a service that is not provided here.</p>
+    <p align="center">If you think that the server is broken (that the URL you submitted should have worked), then please contact the OPeNDAP user support coordinator at: <a href="mailto:support@opendap.org">support@opendap.org</a></p></td>
   </tr>
 </table>
 <hr size="1" noshade="noshade" />
-<h1 align="center">Hyrax Error</h1>
+<h1 align="center">Hyrax Error: No Such Service</h1>
 </body>
 </html>

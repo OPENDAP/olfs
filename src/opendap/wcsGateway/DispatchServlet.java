@@ -431,7 +431,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         log.debug("sendASCII() for dataset: " + dataSource);
 
@@ -461,7 +461,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error("sendASCII() encountered a BESError: "+besError.getMessage());
         }
 
@@ -478,7 +478,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         log.debug("sendINFO() for dataset: " + dataSource);
 
@@ -508,7 +508,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error("sendINFO() encountered a BESError: "+besError.getMessage());
 
         }
@@ -526,7 +526,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
 
@@ -570,7 +570,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
             BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
 
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
 
 
             String msg = besError.getMessage();

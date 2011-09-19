@@ -217,7 +217,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         log.info("sendDIR() request = " + request);
 
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
 
         response.setContentType("text/html");
@@ -273,7 +273,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         }
         else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(systemPath, docsService, response);
+            besError.sendErrorResponse(systemPath, context, response);
             log.error(besError.getMessage());
 
         }

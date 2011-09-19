@@ -67,9 +67,7 @@ public class RDF extends HttpResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = request.getRequestURL().toString();
-
-
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
@@ -99,7 +97,7 @@ public class RDF extends HttpResponder {
         Document ddx = new Document();
         if(!_besApi.besTransaction(dataSource,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
-            besError.sendErrorResponse(_systemPath, docsService, response);
+            besError.sendErrorResponse(_systemPath, context, response);
             log.error("sendDDX() encountered a BESError:\n" + xmlo.outputString(ddx));
             return;
         }
@@ -147,7 +145,7 @@ public class RDF extends HttpResponder {
             rdf = transformer.transform(ddx);
 
         } catch (Exception e) {
-            sendRdfErrorResponse(e, dataSource, docsService, response);
+            sendRdfErrorResponse(e, dataSource, context, response);
             log.error(e.getMessage());
         }
 

@@ -474,7 +474,7 @@
 
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
         <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
-        <copy file="${resources.dir}/WEB-INF/logback-test.xml" tofile="${build.run}/logback-test.xml"/>
+        <copy file="/resources/hyrax/WEB-INF/logback-test.xml" tofile="${build.run}/logback-test.xml"/>
 
         <java classname="opendap.semantics.wcs.StaticRdfCatalog"
               fork="true"

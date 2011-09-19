@@ -71,7 +71,7 @@ public class DatasetInfoHtmlPage extends HttpResponder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
-        String docsService = request.getContextPath()+"/docs";
+        String context = request.getContextPath();
 
 
         log.debug("sendINFO() for dataset: " + dataSource);
@@ -102,7 +102,7 @@ public class DatasetInfoHtmlPage extends HttpResponder {
         if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath, docsService, response);
+            besError.sendErrorResponse(_systemPath, context, response);
             log.error("sendINFO() encountered a BESError: "+besError.getMessage());
 
         }

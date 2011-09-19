@@ -24,8 +24,8 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
 <% String contextPath = request.getContextPath(); %>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
     <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>

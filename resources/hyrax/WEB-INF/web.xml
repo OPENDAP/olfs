@@ -33,6 +33,8 @@
 
   <!-- ================== Built In Servlet Definitions ==================== -->
 
+    <display-name>Hyrax</display-name>
+    <description>OPeNDAP Hyrax Server</description>
 
 
   <!-- The JSP page compiler and execution servlet, which is the mechanism  -->
@@ -203,6 +205,7 @@
         <url-pattern>/hyrax/*</url-pattern>
     </servlet-mapping>
 
+
     <servlet-mapping>
         <servlet-name>adminInterface</servlet-name>
         <url-pattern>/hai/*</url-pattern>
@@ -299,7 +302,7 @@
         </auth-constraint>
 
         <user-data-constraint>
-            <!-- this ensures that all efforts to access the admin interface and resources must use HTTPS -->
+            <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>

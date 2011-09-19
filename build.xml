@@ -159,7 +159,7 @@
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
     <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
-    <property name="WebInfResources.dir" location="${resources.dir}/WEB-INF"/>
+    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
     <property name="ncISO.dir" location="${resources.dir}/nciso"/>
@@ -723,9 +723,19 @@
             >
 
 
+
+        <echo level="info" message="Building Hyrax server war file."/>
+        <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
+
+
+        <mkdir dir="${build.dir}/webapp" />
+        <copy file="${build.doc}/index.jsp" tofile="${build.dir}/webapp/index.jsp" />
+
         <war destfile="${build.dist}/opendap.war"
              webxml="${WebInfResources.dir}/web.xml"
                 >
+            <zipfileset dir="${build.dir}/webapp" prefix="" />
 
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
@@ -759,29 +769,6 @@
             <zipfileset dir="${ncISO.dir}" prefix="nciso" />
 
 
-            <!--
-            <zipfileset dir="${THREDDSResources.dir}/views" prefix="views"/>
-            -->
-
-
-            <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>
-
-
-            <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
-                <include name="${jdom.lib}"/>
-                <include name="${junit.lib}"/>
-                <include name="${commons-cli.lib}"/>
-                <include name="${commons-httpclient.lib}"/>
-                <include name="${commons-logging.lib}"/>
-                <include name="${commons-codec.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
-                <include name="${saxon-jdom.lib}"/>
-                <include name="${saxon-s9api.lib}"/>
-                <include name="${saxon.lib}"/>
-
-            </zipfileset>
-
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">
                 <include name="**/*"/>
             </zipfileset>
@@ -800,7 +787,7 @@
 
     <target
             name="JspServer"
-            depends="clean,compile,doc"
+            depends="olfs-lib,doc"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
 
@@ -852,29 +839,6 @@
             <zipfileset dir="${ncISO.dir}" prefix="nciso" />
 
 
-            <!--
-            <zipfileset dir="${THREDDSResources.dir}/views" prefix="views"/>
-            -->
-
-
-            <!-- <zipfileset dir="${build.doc}/javadoc" prefix="javadocs/olfs"/>  -->
-
-            <!--
-            <zipfileset dir="${lib.dir}" prefix="olfs-libraries">
-                <include name="${jdom.lib}"/>
-                <include name="${junit.lib}"/>
-                <include name="${commons-cli.lib}"/>
-                <include name="${commons-httpclient.lib}"/>
-                <include name="${commons-logging.lib}"/>
-                <include name="${commons-codec.lib}"/>
-                <include name="${xercesImpl.lib}"/>
-                <include name="${xercesXmlApis.lib}"/>
-                <include name="${saxon-jdom.lib}"/>
-                <include name="${saxon-s9api.lib}"/>
-                <include name="${saxon.lib}"/>
-
-            </zipfileset>
-              -->
 
             <zipfileset dir="${initialContent.dir}" prefix="initialContent">
                 <include name="**/*"/>
