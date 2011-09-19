@@ -32,5 +32,5 @@ Relaunch it:
     $TOMCAT_HOME/bin/shutdown.sh $TOMCAT_HOME/bin/startup.sh
 
 
-See doc/index.html for information about this software, Installation
+See http://docs.opendap.org/index.php/Hyrax for information about this software, Installation
 instructions and News.

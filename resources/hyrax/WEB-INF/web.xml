@@ -276,7 +276,7 @@
 
     <mime-mapping>
         <extension>ddx</extension>
-        <mime-type>text/foo</mime-type>
+        <mime-type>text/xml</mime-type>
     </mime-mapping>
 
 

@@ -209,7 +209,7 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
             throws Exception {
 
         String context = request.getContextPath();
-        String helpPage = context+"/docs/help.html";
+        String helpPage = context+"/docs/help.jsp";
 
         response.sendRedirect(helpPage);
         log.debug("Sent redirect to help page: "+helpPage);

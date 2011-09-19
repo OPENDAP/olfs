@@ -35,27 +35,10 @@
     </servlet>
 
 
-    <servlet>
-        <servlet-name>docs</servlet-name>
-        <servlet-class>opendap.coreServlet.DocServlet</servlet-class>
-    </servlet>
-
-
     <servlet-mapping>
         <servlet-name>wcs</servlet-name>
-        <url-pattern>*</url-pattern>
+        <url-pattern>/wcs/*</url-pattern>
     </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>docs</servlet-name>
-        <url-pattern>/docs</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>docs</servlet-name>
-        <url-pattern>/docs/*</url-pattern>
-    </servlet-mapping>
-
 
 
     <session-config>
@@ -68,31 +51,31 @@
     <!-- Default Error Page Definitions -->
     <error-page>
         <error-code>400</error-code>
-        <location>/docs/error400.html</location>
+        <location>/docs/error400.jsp</location>
     </error-page>
     <error-page>
         <error-code>403</error-code>
-        <location>/docs/error403.html</location>
+        <location>/docs/error403.jsp</location>
     </error-page>
     <error-page>
         <error-code>404</error-code>
-        <location>/docs/error404.html</location>
+        <location>/docs/error404.jsp</location>
     </error-page>
     <error-page>
         <error-code>500</error-code>
-        <location>/docs/error500.html</location>
+        <location>/docs/error500.jsp</location>
     </error-page>
     <error-page>
         <error-code>501</error-code>
-        <location>/docs/error501.html</location>
+        <location>/docs/error501.jsp</location>
     </error-page>
     <error-page>
         <error-code>502</error-code>
-        <location>/docs/error502.html</location>
+        <location>/docs/error502.jsp</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
-        <location>/docs/error500.html</location>
+        <location>/docs/error500.jsp</location>
     </error-page>
 
 

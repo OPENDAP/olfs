@@ -184,11 +184,11 @@
     <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
     <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
 
-    <property name="owlim.lib"            value="owlim-3.3.jar"/>
-    <property name="trree.lib"            value="trree-3.3.jar"/>
-    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.3.1-onejar.jar" />
+    <property name="owlim.lib"            value="owlim-3.5.jar"/>
+    <property name="trree.lib"            value="trree-3.5.jar"/>
+    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.3.2-onejar.jar" />
 
-    <property name="commons-cli.lib"        value="commons-cli-1.2.jar"/>
+    <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
     <property name="commons-logging.lib"    value="apache-commons-logging-1.1.1.jar"/>
     <property name="commons-codec.lib"      value="apache-commons-codec-1.3.jar"/>
@@ -369,6 +369,11 @@
             depends="clean,compile"
             description="Performs a clean build of the core software and assembles the WAR file."
             >
+
+
+        <echo level="info" message="Building WCS server war file."/>
+        <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
 
 
         <war destfile="${build.dist}/WCS.war"

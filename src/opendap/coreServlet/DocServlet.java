@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 /**
  * This mini servlet provides access to distributed or, if it exists, persistent documentation in the
  * content directory.
+ * @deprecated This class is deprecated in favor of using the default Tomcat servlet that provides file and JSP services.
  */
 public class DocServlet extends HttpServlet {
 
