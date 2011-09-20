@@ -37,8 +37,14 @@
 
     <servlet-mapping>
         <servlet-name>wcs</servlet-name>
-        <url-pattern>/wcs/*</url-pattern>
+        <url-pattern>*</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/docs/*</url-pattern>
+    </servlet-mapping>
+
 
 
     <session-config>

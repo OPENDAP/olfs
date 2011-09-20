@@ -292,7 +292,6 @@
             <src path="${src.dir}"/>
             <include name="opendap/wcs/v1_1_2/**/*.java"/>
             <include name="opendap/semantics/**/*.java"/>
-            <include name="opendap/coreServlet/DocServlet.java"/>
 
         </javac>
 
@@ -316,6 +315,7 @@
             <zipfileset dir="." prefix="wcs-${VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
+                <exclude name="doc/admin/**"/>
                 <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="doc/_notes/**"/>
                 <!-- Exclude the _notes directory in the ${doc.dir} dir -->
@@ -406,6 +406,7 @@
 
             <zipfileset dir="${doc.dir}" prefix="docs" >
                 <exclude name="src.distribution.readme"/>
+                <exclude name="admin/**"/>
                 <exclude name="_notes"/>
             </zipfileset>
             
