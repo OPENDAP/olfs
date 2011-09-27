@@ -55,19 +55,19 @@ function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 
     if(isAsync) {
         status.innerHTML = "Is Async";
-        alert(status.innerHTML.valueOf());
+        //alert(status.innerHTML.valueOf());
         request.open("GET", url, true);
         request.onreadystatechange = function() { stateChangeHandler(request); }
         request.send(null);
     }
     else {
         status.innerHTML = "Is Sync";
-        alert(status.innerHTML.valueOf());
+        //alert(status.innerHTML.valueOf());
         request.open("GET", url, false);
         request.send(null);
         var status = document.getElementById("status");
         status.innerHTML = "<pre> "+request.responseText+"</pre>";
-        alert(status.innerHTML.valueOf());
+        //alert(status.innerHTML.valueOf());
         //stateChangeHandler(request);
     }
 }
@@ -283,10 +283,33 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
                 "I will do this as gently as possible, but some connections may be dropped. " +
                 "Do you wish to continue?");
         if(r==true){
-	    // Changed to sychronous stop as part of debugging (fixing?) ticket 1781. jhrg 7/14/11
-            stopNice_worker(besPrefix,besCtlApi, false /*true*/,preformattedStatusUpdate);
-            alert("About to start BES...");
-            start(besPrefix,besCtlApi);
+
+            /* I worked this over to use a 'closure' function. This allows me to daisy chain the async AJAX calls
+              and prevents commands from being sent in the wrong order. So StopNice is called and ONLY when it is
+              completed the closure function defined below is called. The closure function updates the status block and
+              then calls start. Sweet! Right?
+             */
+            stopNice_worker(
+                besPrefix,
+                besCtlApi,
+                true,
+                function(request){
+                    if (request.readyState == 4) {
+                        if (request.status == 200) {
+                            var status = document.getElementById("status");
+                            status.innerHTML = "<pre> "+request.responseText+"</pre>";
+                            //alert("About to start BES...");
+                            start(besPrefix,besCtlApi);
+                        }
+                        else {
+                            alert("confirmCommit(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
+
+                        }
+                    }
+                }
+            );
+            //alert("About to start BES...");
+            //start(besPrefix,besCtlApi);
         }
         else {
             var d = new Date();
@@ -301,6 +324,8 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
 
     //self.close();
 }
+
+
 
 
 
