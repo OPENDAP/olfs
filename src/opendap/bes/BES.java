@@ -145,6 +145,10 @@ public class BES {
         return _config.getAdminPort();
     }
 
+    public boolean isAdminPortConfigured() {
+        return _config.getAdminPort() > 0;
+    }
+
     public int getPort() {
         return _config.getPort();
     }
@@ -312,7 +316,7 @@ public class BES {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 
-        if(getAdminPort()<=0){
+        if(!isAdminPortConfigured()){
             sb.append("BES Admin Service is not configured! Port number for admin connection has not been set!");
             return sb.toString();
         }

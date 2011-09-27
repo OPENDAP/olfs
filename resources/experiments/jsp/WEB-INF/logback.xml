@@ -98,7 +98,6 @@
     <logger name="opendap.hai"         level="all"/>
 
 
-    <logger name="opendap.coreServlet.DocServlet"         level="all"/>
     <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
     <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
     <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>

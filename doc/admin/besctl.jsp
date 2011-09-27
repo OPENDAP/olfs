@@ -12,12 +12,12 @@
 //
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 // Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 -->
@@ -67,12 +67,14 @@
     /*
     System.out.println("contextPath: "+contextPath);
     System.out.println("currentPrefix: "+currentPrefix);
+    System.out.println("bes('"+currentPrefix+"').isAdminConfigured(): "+bes.isAdminConfigured());
     System.out.println("currentClientId: "+currentClientId);
     System.out.println("currentBesTask: "+currentBesTask);
     System.out.println("currentModuleId: "+currentModuleId);
     System.out.println("besCtlApi: "+besCtlApi);
     System.out.println("status: "+status);
     */
+
 
 %>
 
@@ -88,8 +90,9 @@
 </head>
 
 <body>
-<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
-<div style="clear: both;"> </div>
+<div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a>
+</div>
+<div style="clear: both;"></div>
 
 <table width='95%'>
     <tr>
@@ -128,36 +131,39 @@
 </ol>
 <div id="besDetail" class="content">
 
+<%
+    if (bes.isAdminPortConfigured()) {
 
-    <div id="besControls1">
-
-
-        <button style="border: 0; background-color: transparent;"
-                onclick="start('<%=currentPrefix%>','<%=besCtlApi%>');">
-            <img alt="Start" src="<%=contextPath%>/docs/images/startButton.png" border='0' height='40px'>
-        </button>
+%>
 
 
-        <button style="border: 0; background-color: transparent;"
-                onclick="stopNice('<%=currentPrefix%>','<%=besCtlApi%>');">
-            <img alt="StopNice" src="<%=contextPath%>/docs/images/stopNiceButton.png" border='0' height='40px'>
-        </button>
+<div id="besControls1">
 
 
-        <button style="border: 0; background-color: transparent;"
-                onclick="stopNow('<%=currentPrefix%>','<%=besCtlApi%>');"
-                >
-            <img alt="StopNow" src="<%=contextPath%>/docs/images/stopNowButton.png" border='0' height='40px'>
-        </button>
+    <button style="border: 0; background-color: transparent;"
+            onclick="start('<%=currentPrefix%>','<%=besCtlApi%>');">
+        <img alt="Start" src="<%=contextPath%>/docs/images/startButton.png" border='0' height='40px'>
+    </button>
 
 
-    </div>
+    <button style="border: 0; background-color: transparent;"
+            onclick="stopNice('<%=currentPrefix%>','<%=besCtlApi%>');">
+        <img alt="StopNice" src="<%=contextPath%>/docs/images/stopNiceButton.png" border='0' height='40px'>
+    </button>
 
 
+    <button style="border: 0; background-color: transparent;"
+            onclick="stopNow('<%=currentPrefix%>','<%=besCtlApi%>');"
+            >
+        <img alt="StopNow" src="<%=contextPath%>/docs/images/stopNowButton.png" border='0' height='40px'>
+    </button>
 
 
-    <div class="small"
-         style="
+</div>
+
+
+<div class="small"
+     style="
             border: 1px solid rgb(150, 150, 150);
             padding-left: 5px;
             padding-right: 5px;
@@ -165,16 +171,19 @@
             padding-bottom: 5px;
             width: 300px;">
 
-        <div class="small_bold" style="padding-bottom: 4px;">OLFS Configuration</div>
-        bes prefix: <strong><%=bes.getPrefix()%></strong><br/>
-        hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%></strong><br/>
-        max client connections: <strong><%=bes.getMaxClients()%></strong><br/>
-        current client connections: <strong><%=bes.getBesClientCount()%></strong><br/>
-    </div>
+    <div class="small_bold" style="padding-bottom: 4px;">OLFS Configuration</div>
+    bes prefix: <strong><%=bes.getPrefix()%>
+</strong><br/>
+    hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%>
+</strong><br/>
+    max client connections: <strong><%=bes.getMaxClients()%>
+</strong><br/>
+    current client connections: <strong><%=bes.getBesClientCount()%>
+</strong><br/>
+</div>
 
 
 <br/>
-
 
 
 <div class='medium'>
@@ -221,8 +230,6 @@
                     .append("</a></li>\n");
 
 
-
-
         %>
 
     </ol>
@@ -230,236 +237,261 @@
 </div>
 
 <div class='medium'>
-    <div id="besTaskDetail" class='content'>
+<div id="besTaskDetail" class='content'>
+
+<%
+    /**  #####################################################################
+     *
+     *         OLFS CONNECTIONS PANEL
+     *
+     *
+     *
+     */
+    if (currentBesTask.equals("olfsConnections")) {
+
+%>
+
+<div class='small'>
+    <ol id="toc2">
+        <%
+
+            Enumeration<OPeNDAPClient> clients;
+            OPeNDAPClient currentClient = null;
+            clients = bes.getClients();
+            while (clients.hasMoreElements()) {
+                OPeNDAPClient client = clients.nextElement();
+
+                out.append("    <li ");
+                if (client.getID().equals(currentClientId)) {
+                    out.append("class=\"current\"");
+                    currentClient = client;
+                }
+                out.append(">");
+
+
+                out.append("<a href=\"?prefix=")
+                        .append(currentPrefix)
+                        .append("&clientId=")
+                        .append(client.getID())
+                        .append("&task=")
+                        .append(currentBesTask)
+                        .append("\">")
+                        .append(client.getID())
+                        .append("</a></li>\n");
+            }
+        %>
+
+    </ol>
+
+</div>
+
+<div class='medium'>
+    <div id="clientDetail" class='content'>
 
         <%
-            /**  #####################################################################
-             *
-             *         OLFS CONNECTIONS PANEL
-             *
-             *
-             *
-             */
-            if (currentBesTask.equals("olfsConnections")) {
+            if (currentClient != null) {
+
+                out.append("client id: <strong>")
+                        .append(currentClient.getID())
+                        .append("</strong><br />\n")
+                        .append("commands executed: <strong>")
+                        .append(Integer.toString(currentClient.getCommandCount()))
+                        .append("</strong><br />\n")
+                        .append("is running: <strong>")
+                        .append(currentClient.isRunning() ? "true" : "false")
+                        .append("</strong><br />\n");
+
+            } else if (bes.getBesClientCount() == 0) {
+
+                out.append("<div class='small'>This OLFS is holding no open connections to BES '").append(currentPrefix).append("'</div>");
+
+            } else {
+                out.append("<strong>Select a client to inspect.</strong>");
+            }
+
 
         %>
 
-        <div class='small'>
-            <ol id="toc2">
-                <%
+    </div>
+</div>
+<%
+    /**  #####################################################################
+     *
+     *         CONFIG PANEL
+     *
+     *
+     *
+     */
+} else if (currentBesTask.equals("config")) {
 
-                    Enumeration<OPeNDAPClient> clients;
-                    OPeNDAPClient currentClient = null;
-                    clients = bes.getClients();
-                    while (clients.hasMoreElements()) {
-                        OPeNDAPClient client = clients.nextElement();
+%>
 
-                        out.append("    <li ");
-                        if (client.getID().equals(currentClientId)) {
-                            out.append("class=\"current\"");
-                            currentClient = client;
-                        }
-                        out.append(">");
-
-
-                        out.append("<a href=\"?prefix=")
-                                .append(currentPrefix)
-                                .append("&clientId=")
-                                .append(client.getID())
-                                .append("&task=")
-                                .append(currentBesTask)
-                                .append("\">")
-                                .append(client.getID())
-                                .append("</a></li>\n");
-                    }
-                %>
-
-            </ol>
-
-        </div>
-
-        <div class='medium'>
-            <div id="clientDetail" class='content'>
-
-                <%
-                    if (currentClient != null) {
-
-                        out.append("client id: <strong>")
-                                .append(currentClient.getID())
-                                .append("</strong><br />\n")
-                                .append("commands executed: <strong>")
-                                .append(Integer.toString(currentClient.getCommandCount()))
-                                .append("</strong><br />\n")
-                                .append("is running: <strong>")
-                                .append(currentClient.isRunning() ? "true" : "false")
-                                .append("</strong><br />\n");
-
-                    } else if (bes.getBesClientCount() == 0) {
-
-                        out.append("<div class='small'>This OLFS is holding no open connections to BES '").append(currentPrefix).append("'</div>");
-
-                    } else {
-                        out.append("<strong>Select a client to inspect.</strong>");
-                    }
-
-
-                %>
-
-            </div>
-        </div>
+<div class='small'>
+    <ol id="modules">
         <%
-            /**  #####################################################################
-             *
-             *         CONFIG PANEL
-             *
-             *
-             *
-             */
-        } else if (currentBesTask.equals("config")) {
 
+            Vector<BesConfigurationModule> configurationModules;
+            BesConfigurationModule currentModule = null;
+            configurationModules = bes.getConfigurationModules();
+            for (BesConfigurationModule module : configurationModules) {
+
+                out.append("    <li ");
+
+
+                if (module.getName().equals(currentModuleId)) {
+                    out.append("class=\"current\"");
+                    currentModule = module;
+                }
+                out.append(">");
+
+
+                out.append("<a href=\"?prefix=")
+                        .append(currentPrefix)
+                        .append("&module=")
+                        .append(module.getName())
+                        .append("&task=")
+                        .append(currentBesTask)
+                        .append("\">")
+                        .append(module.getShortName())
+                        .append("</a></li>\n");
+            }
         %>
 
-        <div class='small'>
-            <ol id="modules">
-                <%
+    </ol>
 
-                    Vector<BesConfigurationModule> configurationModules;
-                    BesConfigurationModule currentModule = null;
-                    configurationModules = bes.getConfigurationModules();
-                    for (BesConfigurationModule module : configurationModules) {
+</div>
+<div class='medium'>
+    <div id="currentModule" class='content'>
 
-                        out.append("    <li ");
+        <%
+            if (currentModule != null) {
 
+                out.append("<strong>")
+                        .append(currentModule.getName())
+                        .append("</strong><br />\n");
 
-                        if (module.getName().equals(currentModuleId)) {
-                            out.append("class=\"current\"");
-                            currentModule = module;
-                        }
-                        out.append(">");
-
-
-                        out.append("<a href=\"?prefix=")
-                                .append(currentPrefix)
-                                .append("&module=")
-                                .append(module.getName())
-                                .append("&task=")
-                                .append(currentBesTask)
-                                .append("\">")
-                                .append(module.getShortName())
-                                .append("</a></li>\n");
-                    }
-                %>
-
-            </ol>
-
-        </div>
-        <div class='medium'>
-            <div id="currentModule" class='content'>
-
-                <%
-                    if (currentModule != null) {
-
-                        out.append("<strong>")
-                                .append(currentModule.getName())
-                                .append("</strong><br />\n");
-
-                %>
-                <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&module=<%=currentModule.getName()%>&cmd=setConfig"
-                      method="post">
-                    <p>
-                        <textarea
-                                style="
+        %>
+        <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&module=<%=currentModule.getName()%>&cmd=setConfig"
+              method="post">
+            <p>
+                <textarea
+                        style="
                                 font-family:courier;
                                 margin-left: 5px;
                                 margin-right: 5px;
                                 max-width: 99%;
                                 width: 99%;
                                 "
-                                id="CONFIGURATION"
-                                name="CONFIGURATION"
-                                rows="20"
-                                cols="80">
-                            <%=currentModule.getConfig()%>
-                        </textarea>
-                    </p>
-                    <input type="reset"/>
-                </form>
+                        id="CONFIGURATION"
+                        name="CONFIGURATION"
+                        rows="20"
+                        cols="80">
+                    <%=currentModule.getConfig()%>
+                </textarea>
+            </p>
+            <input type="reset"/>
+        </form>
 
-                <button onclick="setConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">
-                    Save <%=currentModule.getShortName()%> module configuration
-                </button>
-
-                <%
-
-                    } else {
-
-                        out.append("<strong>Select a configuration module to configure.</strong>");
-                    }
-
-
-                %>
-
-            </div>
-        </div>
-        <%
-
-        /**  #####################################################################
-         *
-         *         LOGGING PANEL
-         *
-         *
-         *
-         */
-        } else if (currentBesTask.equals("logging")) {
-        %>
-
-
-
-
-            <div class="small">
-
-                <div style="float: left;">
-
-                    <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
-                    <button onclick="stopTailing();">Stop</button>
-                    <button onclick="clearLogWindow();">Clear</button>
-                    &nbsp;&nbsp;Lines To Show:
-                    <select id="logLines">
-                        <option>10</option>
-                        <option selected="">50</option>
-                        <option>100</option>
-                        <option >500</option>
-                        <option>1000</option>
-                        <option>5000</option>
-                        <option>all</option>
-                    </select>
-                </div>
-
-                <div style="float: right;">
-
-                    <%
-                        String logConfigUrl =  "besLogConfig.jsp?prefix="+currentPrefix;
-                    %>
-
-                    <button onclick='window.open("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>Configuration</button>
-
-
-                <div style="clear: both;"> </div>
-
-
-            </div>
-
-
-        <div id="log" class="LogWindow"></div>
+        <button onclick="setConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">
+            Save <%=currentModule.getShortName()%> module configuration
+        </button>
 
         <%
+
+            } else {
+
+                out.append("<strong>Select a configuration module to configure.</strong>");
             }
+
+
         %>
+
+    </div>
+</div>
+<%
+
+    /**  #####################################################################
+     *
+     *         LOGGING PANEL
+     *
+     *
+     *
+     */
+} else if (currentBesTask.equals("logging")) {
+%>
+
+
+<div class="small">
+
+    <div style="float: left;">
+
+        <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
+        <button onclick="stopTailing();">Stop</button>
+        <button onclick="clearLogWindow();">Clear</button>
+        &nbsp;&nbsp;Lines To Show:
+        <select id="logLines">
+            <option>10</option>
+            <option selected="">50</option>
+            <option>100</option>
+            <option>500</option>
+            <option>1000</option>
+            <option>5000</option>
+            <option>all</option>
+        </select>
+    </div>
+
+    <div style="float: right;">
+
+        <%
+            String logConfigUrl = "besLogConfig.jsp?prefix=" + currentPrefix;
+        %>
+
+        <button onclick='window.open("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>
+            Configuration
+        </button>
+
+
+        <div style="clear: both;"></div>
 
 
     </div>
 
+
+    <div id="log" class="LogWindow"></div>
+
+    <%
+        }
+    %>
+
+
 </div>
+
+</div>
+
+<%
+    } else {
+%>
+
+<div class="medium_bold">CONFIGURATION ERROR!</div>
+<br/>
+<div class="medium">
+    The OLFS configuration did not declare a port number for the administration interface
+    of the BES associated with prefix '<%= currentPrefix%>'.
+    <br/>
+    <br/>
+    Please:
+    <ul>
+        <li>Edit the olfs.xml file and make sure that the administration port for
+            the BES with prefix '<%= currentPrefix%>' is uncommented and set to the correct value.</li>
+        <li>Restart Tomcat.</li>
+        <li>Reload this page.</li>
+    </ul>
+</div>
+
+<%
+    }
+%>
+
 
 </div>
 
