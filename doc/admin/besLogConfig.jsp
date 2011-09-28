@@ -26,6 +26,7 @@
 <%@ page import="opendap.hai.Util" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.TreeMap" %>
+<%@ page import="opendap.bes.BesAdminFail" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -86,15 +87,24 @@
                           method="get">
 
                     <%
-                        TreeMap<String, BES.BesLogger> besLoggers = bes.getBesLoggers();
-                        for (BES.BesLogger logger : besLoggers.values()) {
-                            out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
+                        TreeMap<String, BES.BesLogger> besLoggers = null;
+                        try {
+                            besLoggers = bes.getBesLoggers();
+                            for (BES.BesLogger logger : besLoggers.values()) {
+                                out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
 
-                            if (logger.getIsEnabled()) {
-                                out.append(" checked='checked' ");
+                                if (logger.getIsEnabled()) {
+                                    out.append(" checked='checked' ");
+                                }
+                                out.append(" />").append(logger.getName()).append("<br/>\n");
+
                             }
-                            out.append(" />").append(logger.getName()).append("<br/>\n");
+                        } catch (BesAdminFail besAdminFail) {
 
+                            out.append("<strong>").append(besAdminFail.getMessage()).append("</strong>");
+                            status = new StringBuffer();
+                            status.append(besAdminFail.getMessage());
+                            //besAdminFail.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         }
 
                     %>

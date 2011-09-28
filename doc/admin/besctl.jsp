@@ -30,6 +30,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="opendap.bes.BesAdminFail" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -132,8 +133,53 @@
 <div id="besDetail" class="content">
 
 <%
-    if (bes.isAdminPortConfigured()) {
+    if (!bes.isAdminPortConfigured()) {
 
+        status = new StringBuffer();
+        status.append("OLFS CONFIGURATION ERROR!");
+%>
+
+<div class="medium_bold"><%=status%></div>
+<br/>
+<div class="medium">
+    The OLFS configuration did not declare a port number for the administration interface
+    of the BES associated with prefix '<%= currentPrefix%>'.
+    <br/>
+    <br/>
+    Please:
+    <ul>
+        <li>Edit the olfs.xml file and make sure that the administration port for
+            the BES with prefix '<%= currentPrefix%>' is uncommented and set to the correct value.</li>
+        <li>Restart Tomcat.</li>
+        <li>Reload this page.</li>
+    </ul>
+</div>
+
+<%
+    } else if (!bes.checkBesAdminConnection()) {
+        status = new StringBuffer();
+        status.append("There was an error communicating with the BES!");
+%>
+
+<div class="medium_bold"><%=status%></div>
+<br/>
+<div class="medium">
+    There are several possible sources of this issue:.
+    <br/>
+    <br/>
+    <ul>
+        <li>The OLFS is not configured with the correct BES admin port. Check the OLFS configuration (olfs.xml)</li>
+        <li>The BES.DaemonPort for this BES may not be enabled. Check the BES configuration (bes.conf)</li>
+        <li>The BES may not be running.</li>
+    </ul>
+</div>
+
+
+
+<%
+
+    }
+    else {
 %>
 
 
@@ -324,42 +370,51 @@
      */
 } else if (currentBesTask.equals("config")) {
 
+        Vector<BesConfigurationModule> configurationModules =  null;;
+        BesConfigurationModule currentModule = null;
+        boolean besFail = false;
+        try {
+            configurationModules = bes.getConfigurationModules();
+
+        } catch (BesAdminFail besAdminFail) {
+
+            out.append("<strong>").append(besAdminFail.getMessage()).append("</strong>");
+            besFail = true;
+
+        }
+
+        if(configurationModules != null){
 %>
 
 <div class='small'>
     <ol id="modules">
         <%
+                for (BesConfigurationModule module : configurationModules) {
 
-            Vector<BesConfigurationModule> configurationModules;
-            BesConfigurationModule currentModule = null;
-            configurationModules = bes.getConfigurationModules();
-            for (BesConfigurationModule module : configurationModules) {
+                    out.append("    <li ");
+                    if (module.getName().equals(currentModuleId)) {
+                        out.append("class=\"current\"");
+                        currentModule = module;
+                    }
+                    out.append(">");
 
-                out.append("    <li ");
 
-
-                if (module.getName().equals(currentModuleId)) {
-                    out.append("class=\"current\"");
-                    currentModule = module;
+                    out.append("<a href=\"?prefix=")
+                            .append(currentPrefix)
+                            .append("&module=")
+                            .append(module.getName())
+                            .append("&task=")
+                            .append(currentBesTask)
+                            .append("\">")
+                            .append(module.getShortName())
+                            .append("</a></li>\n");
                 }
-                out.append(">");
-
-
-                out.append("<a href=\"?prefix=")
-                        .append(currentPrefix)
-                        .append("&module=")
-                        .append(module.getName())
-                        .append("&task=")
-                        .append(currentBesTask)
-                        .append("\">")
-                        .append(module.getShortName())
-                        .append("</a></li>\n");
-            }
         %>
 
     </ol>
 
 </div>
+
 <div class='medium'>
     <div id="currentModule" class='content'>
 
@@ -398,7 +453,7 @@
 
         <%
 
-            } else {
+            } else if (!besFail) {
 
                 out.append("<strong>Select a configuration module to configure.</strong>");
             }
@@ -408,6 +463,10 @@
 
     </div>
 </div>
+<%
+    }
+%>
+
 <%
 
     /**  #####################################################################
@@ -468,25 +527,6 @@
 
 </div>
 
-<%
-    } else {
-%>
-
-<div class="medium_bold">CONFIGURATION ERROR!</div>
-<br/>
-<div class="medium">
-    The OLFS configuration did not declare a port number for the administration interface
-    of the BES associated with prefix '<%= currentPrefix%>'.
-    <br/>
-    <br/>
-    Please:
-    <ul>
-        <li>Edit the olfs.xml file and make sure that the administration port for
-            the BES with prefix '<%= currentPrefix%>' is uncommented and set to the correct value.</li>
-        <li>Restart Tomcat.</li>
-        <li>Reload this page.</li>
-    </ul>
-</div>
 
 <%
     }

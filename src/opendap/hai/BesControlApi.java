@@ -23,6 +23,7 @@ package opendap.hai;
 
 import opendap.bes.BES;
 import opendap.bes.BESManager;
+import opendap.bes.BesAdminFail;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.Scrub;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -92,7 +93,7 @@ public class BesControlApi extends HttpResponder {
     }
 
 
-    private void controlApi(HttpServletRequest request, HttpServletResponse response, boolean isPost)throws Exception {
+    private void controlApi(HttpServletRequest request, HttpServletResponse response, boolean isPost) throws IOException {
 
 
 
@@ -111,7 +112,14 @@ public class BesControlApi extends HttpResponder {
 
         HashMap<String,String> kvp = Util.processQuery(request);
 
-        String status = processBesCommand(kvp, isPost);
+        String status = null;
+        try {
+            status = processBesCommand(kvp, isPost);
+        }
+        catch (BesAdminFail baf){
+            status = baf.getMessage();
+
+        }
 
         PrintWriter output = response.getWriter();
 
@@ -248,7 +256,7 @@ public class BesControlApi extends HttpResponder {
      * @param kvp
      * @return
      */
-    public String processBesCommand(HashMap<String, String> kvp, boolean isPost) {
+    public String processBesCommand(HashMap<String, String> kvp, boolean isPost) throws BesAdminFail {
 
         StringBuilder sb = new StringBuilder();
 
