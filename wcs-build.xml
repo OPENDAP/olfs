@@ -186,7 +186,7 @@
 
     <property name="owlim.lib"            value="owlim-lite-4.2.jar"/>
     <property name="trree.lib"            value="trree-3.5.jar"/>
-    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.3.2-onejar.jar" />
+    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.5.1-onejar.jar" />
 
     <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
     <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
