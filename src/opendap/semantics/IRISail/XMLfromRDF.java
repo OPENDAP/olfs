@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -40,18 +41,28 @@ import org.jdom.Namespace;
 import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
 import org.openrdf.model.URI;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.impl.LiteralImpl;
+import org.openrdf.model.util.LiteralUtil;
+
+import org.openrdf.query.algebra.IsLiteral;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.impl.MapBindingSet;
+
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,25 +154,13 @@ public class XMLfromRDF {
                     
                     Value valueOfClass = (Value) bindingSet.getValue("class");
                    
-                    String queryString1 = createQueryString(valueOfUri.stringValue(), valueOfClass);
+                    String queryString1 = createQueryString();
                     String parent,ns;
-                    log.debug("queryString1: " +queryString1);                                    
-                    if (topURI.lastIndexOf("#") >= 0){
-                                
-                        int pl = topURI.lastIndexOf("#");
-                        ns = topURI.substring(0,pl);
-                        parent = topURI.substring(pl+1);
-
-                    }else if(topURI.lastIndexOf("/") >= 0){
-                        int pl = topURI.lastIndexOf("/");
-                        ns = topURI.substring(0,pl);
-                        parent = topURI.substring(pl+1);
-
-                    }else{
-                        parent = topURI;
-                        ns = topURI;
-
-                    }
+                    log.debug("queryStringValue1: " +queryString1);
+                    // convert rdf uri to xml namespace and parent
+                    parent = getParent(topURI);
+                    ns = getNs(topURI);
+                    
                     URI uri = new URIImpl(valueOfElement.toString());
                     Value targetNS = (Value) bindingSet.getValue("targetns");
                     ns = uri.getNamespace();
@@ -183,7 +182,7 @@ public class XMLfromRDF {
 
                     doc.addContent(0, pi);
                     }
-                    this.addChildren(queryString1, root, con,doc);
+                    this.addChildren(queryString1, root, con,doc, valueOfUri, valueOfClass);
                 } //if (bindingSet.getValue("topnameprop") 
             } //while ( result0.hasNext())
         }catch ( QueryEvaluationException e){
@@ -233,29 +232,19 @@ public class XMLfromRDF {
                    
                     String uritypestr;
                     
-                    if (valueOfobjtype!= null){uritypestr= valueOfobjtype.stringValue();}
+                    if (valueOfobjtype!= null){
+                    	uritypestr= valueOfobjtype.stringValue();}
                     else{
                         uritypestr= "nullstring";   
                     }
-                    String queryString1 = createQueryString(valueOfobj.toString(), valueOfvalueclass);
+                                        
+          		    String queryString1 = createQueryString();
                     String parent,ns;
-                    log.debug("queryString1: " +queryString1);                                    
-                    if (topURI.lastIndexOf("#") >= 0){
-                                
-                        int pl = topURI.lastIndexOf("#");
-                        ns = topURI.substring(0,pl);
-                        parent = topURI.substring(pl+1);
 
-                    }else if(topURI.lastIndexOf("/") >= 0){
-                        int pl = topURI.lastIndexOf("/");
-                        ns = topURI.substring(0,pl);
-                        parent = topURI.substring(pl+1);
-
-                    }else{
-                        parent = topURI;
-                        ns = topURI;
-
-                    }
+                    // convert rdf uri to xml namespace and parent
+                    parent = getParent(topURI);
+                    ns = getNs(topURI);
+                    
                     Value targetNS = (Value) bindingSet.getValue("targetns");
                     if(targetNS != null){
                         ns = targetNS.stringValue();
@@ -264,7 +253,7 @@ public class XMLfromRDF {
                     Element chd1 = new Element(parent,ns); //first level children
                     
                     root.addContent(chd1);
-                    this.addChildren(queryString1, chd1, con,doc);
+                    this.addChildren(queryString1, chd1, con,doc, valueOfobj, valueOfvalueclass);
                 } //if (bindingSet.getValue("topnameprop") 
             } //while ( result0.hasNext())
         }catch ( QueryEvaluationException e){
@@ -292,13 +281,20 @@ public class XMLfromRDF {
      * @param con-connection to the repository
      * @param doc-the document to build
      */
-	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc)  throws InterruptedException{
+	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc, Value Parent, Value Parentclass)  throws InterruptedException{
 		TupleQueryResult result = null;
-		boolean objisURI = false; //true if ojb is a URI/URL
+		boolean objisURI = false; //true if obj is a URI/URL
+        URI attributeURI = new URIImpl("http://http://www.w3.org/2001/XMLSchema#attribute");
 		
 		try{
 			TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);
-							
+			
+			MapBindingSet bSet = new MapBindingSet();
+			bSet.addBinding("parent",Parent);
+			bSet.addBinding("parentclass",Parentclass);
+			tupleQuery.setBinding("p", bSet.getValue("parent"));				
+			tupleQuery.setBinding("pc", bSet.getValue("parentclass"));
+			
 			result = tupleQuery.evaluate();
 
 			SortedMap<String,BindingSet >   mapOrderObj   =   new TreeMap<String, BindingSet>();
@@ -312,61 +308,43 @@ public class XMLfromRDF {
 				Value valueOforder;
 				Value valueOfobjtype;
 				Value valueOfform;
-				if (bindingSet.getValue("nameprop") != null && bindingSet.getValue("obj") != null 
-						&& bindingSet.getValue("valueclass") != null){
-					valueOfnameprop = (Value) bindingSet.getValue("nameprop");
-					valueOfobj = (Value) bindingSet.getValue("obj");
-					valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
-					valueOforder = (Value) bindingSet.getValue("order1");
-					valueOfobjtype = (Value) bindingSet.getValue("objtype");
-					valueOfform = (Value) bindingSet.getValue("form");
-				}else{
-					valueOfnameprop = (Value) bindingSet.getValue("prop");
-					valueOfobj = (Value) bindingSet.getValue("obj");
-					valueOfvalueclass = (Value) bindingSet.getValue("rangeclass");
-					valueOforder = (Value) bindingSet.getValue("order1");
-					valueOfobjtype = (Value) bindingSet.getValue("objtype");
-					valueOfform = (Value) bindingSet.getValue("form");
-				}
+				
+			    valueOfnameprop = (Value) bindingSet.getValue("nameprop");
+				valueOfobj = (Value) bindingSet.getValue("obj");
+				valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
+				valueOforder = (Value) bindingSet.getValue("order1");
+				valueOfobjtype = (Value) bindingSet.getValue("objtype");
+				valueOfform = (Value) bindingSet.getValue("form");
 
+				if (bindingSet.getValue("valueclass") != null){
+					valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
+				}
 					String formtypestr = valueOfform.stringValue();
 					URI formtype = new URIImpl(formtypestr);
 					if(valueOfobjtype != null){ //have type description (element,attribute ...)
 						String uritypestr = valueOfobjtype.stringValue();
 
 						String parent,ns;
-						
-						if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
-							
-							int pl = valueOfnameprop.toString().lastIndexOf("#");
 
-							ns = valueOfnameprop.toString().substring(0,pl);
-							parent = valueOfnameprop.toString().substring(pl+1);
-
-						}else if(valueOfnameprop.toString().lastIndexOf("/") >= 0){
-							int pl = valueOfnameprop.toString().lastIndexOf("/");
-							ns = valueOfnameprop.toString().substring(0,pl);
-							parent = valueOfnameprop.toString().substring(pl+1);
-
-						}else{
-							parent = valueOfnameprop.toString();
-							ns = valueOfnameprop.toString();
-
-						}
+						// convert rdf uri to xml namespace and parent
+	                    parent = getParent(valueOfnameprop.toString());
+	                    ns = getNs(valueOfnameprop.toString());
+	                    
 						Value targetNS = (Value) bindingSet.getValue("targetns");
 	                    if(targetNS != null){
 	                        ns = targetNS.stringValue();
 	                    }						
-						URI uritype = new URIImpl(uritypestr); 
+						URI uritype = new URIImpl(uritypestr);
 						
 
-						if(uritype.getLocalName().equalsIgnoreCase("attribute")){
+					    if(uritype.getLocalName().equalsIgnoreCase("attribute")){
 							URI urinameprop= new URIImpl(valueOfnameprop.stringValue());
 							if(formtype.getLocalName().equalsIgnoreCase("qualified")){
-							
-							Namespace attributeNS = Namespace.getNamespace("attributeNS",urinameprop.getNamespace());
+								// convert rdf namespace to xml namespace, no #'s
+			                    ns = getNs(valueOfnameprop.toString());
+							    Namespace attributeNS = Namespace.getNamespace("attributeNS",ns);
 
-							prt.setAttribute(urinameprop.getLocalName(),valueOfobj.stringValue(),attributeNS);
+							    prt.setAttribute(urinameprop.getLocalName(),valueOfobj.stringValue(),attributeNS);
 							}
 							else{
 								prt.setAttribute(urinameprop.getLocalName(),valueOfobj.stringValue());	
@@ -395,15 +373,14 @@ public class XMLfromRDF {
 								}else{
 									chd = new Element(parent,ns);
 								}
-								String objURI = valueOfobj.toString().substring(0, 1);
 								
-								if (objURI.equalsIgnoreCase("\"")) //literal
+								if (valueOfobj instanceof Literal) //literal
 								{
 									chd.setText(valueOfobj.stringValue());
 								}
 								else{	
-									String queryStringc = createQueryString(valueOfobj.toString(), valueOfvalueclass);
-									addChildren(queryStringc, chd, con,doc);
+									String queryStringc = createQueryString();
+									addChildren(queryStringc, chd, con,doc, valueOfobjtype, valueOfvalueclass);
 								}//if (obj3isURI/bnode)
 								
 								prt.addContent(chd);
@@ -414,23 +391,11 @@ public class XMLfromRDF {
 					}else{ //no type description (element, attribute ...)
 						String parent,ns;
 						String uritypestr = "nullstring";
-						if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
-							
-							int pl = valueOfnameprop.toString().lastIndexOf("#");
-
-							ns = valueOfnameprop.toString().substring(0,pl);
-							parent = valueOfnameprop.toString().substring(pl+1);
-
-						}else if(valueOfnameprop.toString().lastIndexOf("/") >= 0){
-							int pl = valueOfnameprop.toString().lastIndexOf("/");
-							ns = valueOfnameprop.toString().substring(0,pl);
-							parent = valueOfnameprop.toString().substring(pl+1);
-
-						}else{
-							parent = valueOfnameprop.toString();
-							ns = valueOfnameprop.toString();
-
-						}
+						
+	                    // convert rdf uri to xml namespace and parent
+	                    parent = getParent(valueOfnameprop.toString());
+	                    ns = getNs(valueOfnameprop.toString());
+	                    
 						Element chd;
 						if(formtype.getLocalName().equalsIgnoreCase("unqualified")){
 							chd = new Element(parent);
@@ -439,18 +404,17 @@ public class XMLfromRDF {
 							}
 						prt.addContent(chd);
 						
-						String queryStringc = createQueryString(valueOfobj.toString(), valueOfvalueclass);
-						String objURI = valueOfobj.toString().substring(0, 1);
-						if(objURI.equalsIgnoreCase("\""))
+						String queryStringc = createQueryString();
+
+						if(valueOfobj instanceof Literal)
 						{
 							chd.setText(valueOfobj.stringValue());
 						}
 						else{
 							objisURI = true;	
-
 						}
 						if (objisURI){
-							addChildren(queryStringc, chd, con,doc);
+							addChildren(queryStringc, chd, con,doc, valueOfobjtype, valueOfvalueclass);
 						}
 					}
 			} //while ( result4.hasNext())
@@ -467,37 +431,23 @@ public class XMLfromRDF {
 				Value valueOforder;
 				Value valueOfobjtype;
 				Value valueOfform;
-				if (bindingSet.getValue("nameprop") != null && bindingSet.getValue("obj") != null 
-						&& bindingSet.getValue("valueclass") != null){
-					valueOfnameprop = (Value) bindingSet.getValue("nameprop");
-					valueOfobj = (Value) bindingSet.getValue("obj");
+				
+			    valueOfnameprop = (Value) bindingSet.getValue("nameprop");
+				valueOfobj = (Value) bindingSet.getValue("obj");
+				valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
+				valueOforder = (Value) bindingSet.getValue("order1");
+				valueOfobjtype = (Value) bindingSet.getValue("objtype");
+				valueOfform = (Value) bindingSet.getValue("form");
+
+				if (bindingSet.getValue("valueclass") != null){
 					valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
-					valueOforder = (Value) bindingSet.getValue("order1");
-					valueOfobjtype = (Value) bindingSet.getValue("objtype");
-					valueOfform = (Value) bindingSet.getValue("form");
-				}else{
-					valueOfnameprop = (Value) bindingSet.getValue("prop");
-					valueOfobj = (Value) bindingSet.getValue("obj");
-					valueOfvalueclass = (Value) bindingSet.getValue("rangeclass");
-					valueOforder = (Value) bindingSet.getValue("order1");
-					valueOfobjtype = (Value) bindingSet.getValue("objtype");
-					valueOfform = (Value) bindingSet.getValue("form");
 				}
 					
 				String parent,ns;
 				
-				if (valueOfnameprop.toString().lastIndexOf("#") >= 0){
-					int pl = valueOfnameprop.toString().lastIndexOf("#");
-					ns = valueOfnameprop.toString().substring(0,pl);
-					parent = valueOfnameprop.toString().substring(pl+1);
-				}else if(valueOfnameprop.toString().lastIndexOf("/") >= 0){
-					int pl = valueOfnameprop.toString().lastIndexOf("/");
-					ns = valueOfnameprop.toString().substring(0,pl);
-					parent = valueOfnameprop.toString().substring(pl+1);
-				}else{
-					parent = valueOfnameprop.toString();
-					ns = valueOfnameprop.toString();
-				}
+                // convert rdf uri to xml namespace and parent
+                parent = getParent(valueOfnameprop.toString());
+                ns = getNs(valueOfnameprop.toString());
 					
 				Value targetNS = (Value) bindingSet.getValue("targetns");
                 if(targetNS != null){
@@ -514,19 +464,19 @@ public class XMLfromRDF {
 				if(valueOfobjtype.stringValue().equalsIgnoreCase("attribute")){
 					prt.setAttribute(valueOfnameprop.stringValue(),valueOfobjtype.stringValue());
 				}
-				
-				String objURI = valueOfobj.toString().substring(0, 1);
-				
-				if (objURI.equalsIgnoreCase("\""))
+								
+				if (valueOfobj instanceof Literal)
 				{
+					Literal lit = new LiteralImpl(valueOfobj.toString());
+					String lang = lit.getLanguage();
+					log.info("valueOfobj strings: "  + valueOfobj.stringValue());
 					chd.setText(valueOfobj.stringValue());
 					chd.getText();
 					
 				}
 				else{	
-								
-					String queryStringc = createQueryString(valueOfobj.toString(), valueOfvalueclass);
-					addChildren(queryStringc, chd, con,doc);
+					String queryStringc = createQueryString();
+					addChildren(queryStringc, chd, con,doc, valueOfobj, valueOfvalueclass);
 				} //if (obj3isURI)
 				prt.addContent(chd);
 			} //for   (int   i   =   0;   i   <   key.length;
@@ -556,53 +506,62 @@ public class XMLfromRDF {
      * @param parentclassstr
      * @return  a SeRQL query string
      */
-	private String createQueryString(String parentstr, Value parentclassstr)  throws InterruptedException{
-		String queryStringc;
-		String objURI = parentstr.substring(0, 7);
-		String fileURI = parentstr.substring(0, 8);
-		
-		if (objURI.equalsIgnoreCase("http://") | fileURI.equalsIgnoreCase("file:///")){ 
+	private String createQueryString()  throws InterruptedException{		
+		// create query string for retrieving children of a parent; uses tokens p and pc for parent and parentclass
+        String queryStringc;
 			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
 			"FROM "+
-			"{parent:} nameprop {obj}, "+
-			"{parentclass:} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
+			"{p} nameprop {obj}, "+
+			"{pc} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
 			"owl:allValuesFrom {valueclass}, "+
 			"{subprop} rdfs:subPropertyOf {xsd2owl:isConstrainedBy}; "+
 			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, "+
-			"{parentclass:} rdfs:subClassOf {} subprop {restriction}, "+
-			"[{parentclass:} xsd2owl:uses {nameprop},{{parentclass:} xsd2owl:uses {nameprop}} "+
+			"{pc} rdfs:subClassOf {} subprop {restriction}, "+
+			"[{pc} xsd2owl:uses {nameprop},{{pc} xsd2owl:uses {nameprop}} "+
 			"xsd2owl:useCount {order1}], "+
 			"[{nameprop} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
+			"UNION " +
+			"SELECT nameprop, obj, objtype, form FROM" +
+			"{pc} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}," +
+			"{obj} rdf:type {pc},{subprop} rdfs:subPropertyOf {xsd2owl:isConstrainedBy}; " +
+			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, {pc} rdfs:subClassOf {} subprop {restriction}" +
+			"WHERE (sameTerm(nameprop,rdf:about)OR sameTerm(nameprop,rdf:resource)) AND obj= p " +
 			"using namespace "+
 			      "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
 			      "owl = <http://www.w3.org/2002/07/owl#>, "+
 			      "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
-			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, "+
-			      "parent = <" + parentstr + ">," +
-			      "parentclass = <"+ parentclassstr + ">";     
-					
-		}
-		else{
-			queryStringc = "SELECT DISTINCT nameprop, obj, valueclass, order1, objtype, form, targetns "+
-			"FROM "+
-			"{" + parentstr + "} nameprop {obj}, "+
-			"{parentclass:} xsd2owl:isConstrainedBy {restriction} owl:onProperty {nameprop}; "+
-			"owl:allValuesFrom {valueclass}, "+
-			"{subprop} rdfs:subPropertyOf {xsd2owl:isConstrainedBy}; "+
-			"xsd2owl:hasTarget {objtype}; xsd2owl:hasTargetForm {form}, "+
-			"{parentclass:} rdfs:subClassOf {} subprop {restriction}, "+
-			"[{parentclass:} xsd2owl:uses {nameprop},{{parentclass:} xsd2owl:uses {nameprop}} "+
-			"xsd2owl:useCount {order1}], "+
-			"[{nameprop} rdfs:isDefinedBy {} xsd:targetNamespace {targetns}] " +
-			"using namespace "+
-			      "xsd2owl = <http://iridl.ldeo.columbia.edu/ontologies/xsd2owl.owl#>, "+
-			      "owl = <http://www.w3.org/2002/07/owl#>, "+
-			      "xsd = <http://www.w3.org/2001/XMLSchema#>, "+
-			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#>, " +
-			      "parentclass = <"+ parentclassstr + ">"; 
-			
-		}
+			      "rdfs = <http://www.w3.org/2000/01/rdf-schema#> ";
 		return queryStringc;
+	}
+	
+	private String getParent(String topURI)  throws InterruptedException{
+		// converts rdf parent to xml parent, no #'s
+		String parent;
+        if (topURI.lastIndexOf("#") >= 0){
+            int pl = topURI.lastIndexOf("#");
+            parent = topURI.substring(pl+1);
+        }else if(topURI.lastIndexOf("/") >= 0){
+            int pl = topURI.lastIndexOf("/");
+            parent = topURI.substring(pl+1);
+        }else{
+        	parent = topURI;
+        }
+        return parent;
+	}
+		
+	private String getNs(String topURI)  throws InterruptedException{
+		// converts rdf namepspace to xml namespace
+		String ns;
+        if (topURI.lastIndexOf("#") >= 0){        
+            int pl = topURI.lastIndexOf("#");
+            ns = topURI.substring(0,pl);
+        }else if(topURI.lastIndexOf("/") >= 0){
+            int pl = topURI.lastIndexOf("/");
+            ns = topURI.substring(0,pl);
+        }else{
+            ns = topURI;
+        }
+    return ns;
 	}
 
 	public Document getDoc(){

@@ -290,7 +290,7 @@ public class RdfImporter {
                             log.error("importRdfDocuments(): Previous server error, Skipping "
                                     + documentURL);
                         } else {
-                            if (documentURL.startsWith("http://")) {
+                            if (documentURL.startsWith("http://") || documentURL.startsWith("https://")) {
 
                                 addedDocument = addHttpRdf(documentURL, con,
                                         valueFactory, skipCount);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/jdom-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/saxon-9.1.0.5.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/saxon-9.1.0.5-s9api.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/apache-commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/logback-classic-0.9.26.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/haibo/javaproject/dl/generatentriple/lib/logback-core-0.9.26.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/jdcorral/SVN/generatentriple/lib/apache-commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/jdcorral/Sesame/BUILDS/owlim-lite-4.2.3924/lib/owlim-lite-4.2.jar"/>
+	<classpathentry kind="lib" path="/beluga/data/jdcorral/Sesame/BUILDS/openrdf-sesame-2.5.1-onejar.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
