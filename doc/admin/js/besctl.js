@@ -36,7 +36,7 @@ function start_worker(prefix,besctlUrl, stateChangeHandler) {
     var request = createRequest();
 
     request.open("GET", url, true);
-    request.onreadystatechange = function() { stateChangeHandler(request); }
+    request.onreadystatechange = function() { stateChangeHandler(request); };
     request.send(null);
 
 }
@@ -53,7 +53,7 @@ function stopNice(prefix,besctlUrl) {
 function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 
 
-    var status = document.getElementById("status")
+    var status = document.getElementById("status");
     status.innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
     var request = createRequest();
@@ -63,7 +63,7 @@ function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
         status.innerHTML = "Is Async";
         //alert(status.innerHTML.valueOf());
         request.open("GET", url, true);
-        request.onreadystatechange = function() { stateChangeHandler(request); }
+        request.onreadystatechange = function() { stateChangeHandler(request); };
         request.send(null);
     }
     else {
@@ -71,7 +71,6 @@ function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
         //alert(status.innerHTML.valueOf());
         request.open("GET", url, false);
         request.send(null);
-        var status = document.getElementById("status");
         status.innerHTML = "<pre> "+request.responseText+"</pre>";
         //alert(status.innerHTML.valueOf());
         //stateChangeHandler(request);
@@ -85,7 +84,7 @@ function stopNow(prefix,besctlUrl) {
     var request = createRequest();
 
     request.open("GET", url, true);
-    request.onreadystatechange = function() { preformattedStatusUpdate(request); }
+    request.onreadystatechange = function() { preformattedStatusUpdate(request); };
     request.send(null);
 
 }
@@ -95,13 +94,8 @@ function getConfig(module,prefix,besctlUrl) {
     var request = createRequest();
 
     request.open("GET", url, true);
-    request.onreadystatechange = function() { updateConfig(request); }
+    request.onreadystatechange = function() { updateConfig(request); };
     request.send(null);
-
-
-
-
-
 }
 
 function setConfig(module,prefix,besctlUrl) {
@@ -120,7 +114,7 @@ function setConfig(module,prefix,besctlUrl) {
     request.open("POST", url, false);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    request.onreadystatechange = function() { updateConfig(request); }
+    request.onreadystatechange = function() { updateConfig(request); };
     request.send(configParam);
 
 }
@@ -181,36 +175,37 @@ function getBesLog(besLogUrl, besPrefix) {
     //alert(url);
 
     var d = new Date();
-    var status = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
-    document.getElementById("status").innerHTML = status;
+    document.getElementById("status").innerHTML = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
     var request = createRequest();
     request.open("GET", url, true);
-    request.onreadystatechange = function() { updateLogContent(request); }
+    request.onreadystatechange = function() { updateLogContent(request); };
     request.send(null);
     stopUpdatingLogView = false;
 }
 
 
+var timeout;
 
 function startTailing(tailURL,besPrefix) {
     if(!stopUpdatingLogView)
-        t = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
+        timeout = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
 
 
 function stopTailing() {
     stopUpdatingLogView = true;
-    clearTimeout(t);
+    clearTimeout(timeout);
 
     var d = new Date();
-    var status =  d.toTimeString() + " "+
+
+
+    document.getElementById("status").innerHTML =  d.toTimeString() + " "+
             "The log viewer has been paused. " +
             "To begin viewing again, click the Start button.";
 
 
-    document.getElementById("status").innerHTML = status;
 
 }
 
@@ -224,7 +219,7 @@ function updateLogContent(request) {
     if (request.readyState == 4) {
         if (request.status == 200) {
 
-            logDiv = document.getElementById("log");
+            var logDiv = document.getElementById("log");
 
             logDiv.innerHTML = "<pre>"+request.responseText+"</pre>" ;
 
@@ -244,7 +239,7 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
 
     for (i = 0; i < loggerSelect.length; i++){
-        if(loggerSelect[i].checked==true){
+        if(loggerSelect[i].checked){
             if(enabled!="")
                 enabled +=",";
             enabled += loggerSelect[i].value;
@@ -272,7 +267,7 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
     setLoggerStatesRequest.open("GET", url, true);
 
-    setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); }
+    setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
 
 
     setLoggerStatesRequest.send(null);
@@ -288,7 +283,7 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
         var r=confirm("Committing these changes will require that the BES be stopped and restarted. " +
                 "I will do this as gently as possible, but some connections may be dropped. " +
                 "Do you wish to continue?");
-        if(r==true){
+        if(r){
 
             /* I worked this over to use a 'closure' function. This allows me to daisy chain the async AJAX calls
               and prevents commands from being sent in the wrong order. So StopNice is called and ONLY when it is
@@ -342,8 +337,7 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
         }
         else {
             var d = new Date();
-            var status = d.toTimeString() + " Logging Commit aborted!";
-            document.getElementById("status").innerHTML = status;
+            document.getElementById("status").innerHTML = d.toTimeString() + " Logging Commit aborted!";
         }
 
     }
