@@ -221,6 +221,13 @@ public class OlfsControlApi extends HttpResponder {
                 namedLog.setLevel(Level.DEBUG);
                 sb.append(loggerName).append(" logging level set to: ").append(level);
             }
+            else if( level.equals("off") ){
+                namedLog.setLevel(Level.OFF);
+                sb.append(loggerName).append(" logging level set to: ").append(level);
+            }
+            else {
+                sb.append(loggerName).append(" ERROR! The logging level ").append(level).append(" is unrecognized. Nothing has been done.");
+            }
         }
 
         return sb.toString();
