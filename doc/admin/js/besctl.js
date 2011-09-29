@@ -25,12 +25,18 @@
 
 function start(prefix,besctlUrl) {
 
+    start_worker(prefix,besctlUrl,preformattedStatusUpdate);
+
+}
+
+function start_worker(prefix,besctlUrl, stateChangeHandler) {
+
     document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
     var request = createRequest();
 
     request.open("GET", url, true);
-    request.onreadystatechange = function() { preformattedStatusUpdate(request); }
+    request.onreadystatechange = function() { stateChangeHandler(request); }
     request.send(null);
 
 }
@@ -40,7 +46,7 @@ function start(prefix,besctlUrl) {
 function stopNice(prefix,besctlUrl) {
 
 
-    stopNice_worker(prefix,besctlUrl,true,preformattedStatusUpdate)
+    stopNice_worker(prefix,besctlUrl,true,preformattedStatusUpdate);
 
 }
 
@@ -299,7 +305,30 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
                             var status = document.getElementById("status");
                             status.innerHTML = "<pre> "+request.responseText+"</pre>";
                             //alert("About to start BES...");
-                            start(besPrefix,besCtlApi);
+                            //
+                            // I used another closure here because I want to close the window after I start the BES.
+                            // To do this I need to ensure that the BES is started and all of the status updates are
+                            // done before I close the window. Failing to do this in a sequential order will crash the
+                            // browser (or at least Safari)
+                            start_worker(
+                                besPrefix,
+                                besCtlApi,
+                                function(request){
+                                    if (request.readyState == 4) {
+
+                                        if (request.status == 200) {
+
+                                            var status = document.getElementById("status");
+                                            status.innerHTML = "<pre> "+request.responseText+"</pre>";
+                                            //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
+
+
+                                        } else
+                                            alert("preformattedStatusUpdate(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
+                                    }
+                                    self.close();
+                                }
+                            );
                         }
                         else {
                             alert("confirmCommit(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
