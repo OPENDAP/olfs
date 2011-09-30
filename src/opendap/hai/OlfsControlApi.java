@@ -149,7 +149,8 @@ public class OlfsControlApi extends HttpResponder {
             LoggingEvent le;
             for (int i = 0; i < count; i++) {
                 le = (LoggingEvent) cyclicBufferAppender.get(i);
-                logContent.append(StringEscapeUtils.escapeHtml(formatLoggingEvent(le)));
+                //logContent.append(StringEscapeUtils.escapeHtml(formatLoggingEvent(le)));
+                logContent.append(formatLoggingEvent(le));
             }
         }
 
