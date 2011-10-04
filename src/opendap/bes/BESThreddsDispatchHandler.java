@@ -181,6 +181,8 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
+            if(FileDispatchHandler.allowDirectDataSourceAccess())
+                showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 

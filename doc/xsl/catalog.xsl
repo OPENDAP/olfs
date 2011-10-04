@@ -36,6 +36,8 @@
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
                 >
     <xsl:param name="dapService"/>
+    <xsl:param name="allowDirectDataSourceAccess"/>
+
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 
@@ -176,18 +178,26 @@
         </xsl:variable>
 
 
-        <thredds:access>
         <xsl:choose>
             <xsl:when test="bes:serviceRef">
-                <xsl:attribute name="serviceName"><xsl:value-of select="bes:serviceRef"/></xsl:attribute>
-                <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
+                <thredds:access>
+                    <xsl:attribute name="serviceName"><xsl:value-of select="bes:serviceRef"/></xsl:attribute>
+                    <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
+                </thredds:access>
+                <xsl:if test="$allowDirectDataSourceAccess='true'">
+                    <thredds:access>
+                        <xsl:attribute name="serviceName">file</xsl:attribute>
+                        <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
+                    </thredds:access>
+                </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:attribute name="serviceName">file</xsl:attribute>
-                <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
+                <thredds:access>
+                    <xsl:attribute name="serviceName">file</xsl:attribute>
+                    <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
+                </thredds:access>
             </xsl:otherwise>
         </xsl:choose>
-        </thredds:access>
 
     </xsl:template>
 
