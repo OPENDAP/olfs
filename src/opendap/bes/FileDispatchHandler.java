@@ -45,17 +45,19 @@ import org.jdom.Element;
 public class FileDispatchHandler implements DispatchHandler {
 
     private org.slf4j.Logger log;
-    private boolean allowDirectDataSourceAccess;
+    private static boolean allowDirectDataSourceAccess = false;
     private boolean initialized;
 
     public FileDispatchHandler() {
-
-        allowDirectDataSourceAccess = false;
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
 
     }
 
+
+    static boolean allowDirectDataSourceAccess(){
+        return allowDirectDataSourceAccess;
+    }
 
 
     public void init(HttpServlet servlet,Element config) throws Exception {

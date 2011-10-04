@@ -264,6 +264,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
             transformer.setParameter("dapService",oreq.getDapServiceLocalID());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
             transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
+            if(FileDispatchHandler.allowDirectDataSourceAccess())
+                transformer.setParameter("allowDirectDataSourceAccess","true");
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(besCatalog, response.getOutputStream());

@@ -36,6 +36,7 @@
     <xsl:param name="dapService" />
     <xsl:param name="docsService" />
     <xsl:param name="webStartService" />
+    <xsl:param name="allowDirectDataSourceAccess" />
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
 
@@ -95,7 +96,7 @@
                             <th align="left">Name</th>
                             <th align="center">Last Modified</th>
                             <th align="center">Size</th>
-                            <th align="center">Response Links</th>
+                            <th align="center">DAP Response Links</th>
                             <th align="center">Webstart</th>
                         </tr>
                         <tr>
@@ -188,12 +189,12 @@
             <xsl:value-of select="@name"/>/</a>
         </td>
 
-        <td align="center">
+        <td align="center" nowrap="nowrap">
             <xsl:value-of select="@lastModified"/>
         </td>
 
         <td align="right">-</td>
-        <xsl:call-template name="NoServiceLinks" />
+        <xsl:call-template name="NoDapServiceLinks" />
     </xsl:template>
 
 
@@ -220,7 +221,7 @@
             </b>
         </td>
 
-        <td align="center">
+        <td align="center" nowrap="nowrap">
             <xsl:value-of select="../@lastModified" />
         </td>
 
@@ -228,13 +229,21 @@
             <xsl:value-of select="../@size"/>
         </td>
 
+
         <td align="center">
-            <a href="{../@name}.ddx">ddx</a>
-            <a href="{../@name}.dds">dds</a>
-            <a href="{../@name}.das">das</a>
-            <a href="{../@name}.info">info</a>
-            <a href="{../@name}.html">html</a>
-            <a href="{../@name}.rdf">rdf</a><br/>
+            <table>
+                <tr>
+                    <td> <a href="{../@name}.ddx">ddx</a>&NBSP;</td>
+                    <td> <a href="{../@name}.dds">dds</a>&NBSP;</td>
+                    <td> <a href="{../@name}.das">das</a>&NBSP;</td>
+                    <td> <a href="{../@name}.info">info</a>&NBSP;</td>
+                    <td> <a href="{../@name}.html">html</a>&NBSP;</td>
+                    <td> <a href="{../@name}.rdf">rdf</a>&NBSP;</td>
+                    <xsl:if test="$allowDirectDataSourceAccess='true'">
+                        <td> <a href="{../@name}">file</a>&NBSP;</td>
+                    </xsl:if>
+                </tr>
+            </table>
         </td>
         <xsl:call-template name="WebStartLinks"/>
     </xsl:template>
@@ -271,7 +280,7 @@
                 <xsl:value-of select="../@name"/>
             </a>
         </td>
-        <td align="center">
+        <td align="center" nowrap="nowrap">
             <xsl:value-of
                     select="../@lastmodified" />
         </td>
@@ -292,7 +301,7 @@
                 <xsl:value-of select="@name"/>
             </a>
         </td>
-        <td align="center">
+        <td align="center" nowrap="nowrap">
             <xsl:value-of
                     select="@lastModified" />
         </td>
@@ -300,12 +309,24 @@
         <td align="right">
             <xsl:value-of select="@size"/>
         </td>
-        <xsl:call-template name="NoServiceLinks" />
+        <xsl:call-template name="NoDapServiceLinks" />
     </xsl:template>
 
-    <xsl:template name="NoServiceLinks">
-        <td align="center">
-            &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP; - &NBSP;
+    <xsl:template name="NoDapServiceLinks">
+        <td  align="center">
+            <table >
+                <tr>
+                    <td>&NBSP;-&NBSP;&NBSP;</td>
+                    <td>&NBSP;-&NBSP;&NBSP;</td>
+                    <td>&NBSP;-&NBSP;&NBSP;</td>
+                    <td>&NBSP;-&NBSP;&NBSP;&NBSP;</td>
+                    <td>&NBSP;-&NBSP;&NBSP;&NBSP;</td>
+                    <td>&NBSP;-&NBSP;&NBSP;</td>
+                    <xsl:if test="$allowDirectDataSourceAccess='true'">
+                        <td>&NBSP;-&NBSP;&NBSP;&NBSP;</td>
+                    </xsl:if>
+                </tr>
+            </table>
         </td>
     </xsl:template>
 
