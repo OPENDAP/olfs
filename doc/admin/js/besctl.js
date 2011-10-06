@@ -179,6 +179,9 @@ function getBesLog(besLogUrl, besPrefix) {
     document.getElementById("status").innerHTML = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
 
+
+    // When the request is sent a state change will call updateLogContent. Once updateLogContent gets the response,
+    // it will call startTailing_worker to initiate a new acquisition of the log tail.
     var request = createRequest();
     request.open("GET", url, true);
     request.onreadystatechange = function() { updateLogContent(request); };
@@ -189,11 +192,16 @@ function getBesLog(besLogUrl, besPrefix) {
 var timeout;
 
 function startTailing(tailURL,besPrefix) {
+    // Make sure that log viewing is enabled.
     stopUpdatingLogView = false;
+
+    // Go get the log and start the log tailing cycle.
     getBesLog(tailURL,besPrefix);
 }
 
-function startTailing_worker(tailURL,besPrefix) {
+function logTail_worker(tailURL,besPrefix) {
+
+    // When the timeout expires getBesLog will be called...
     if(!stopUpdatingLogView)
         timeout = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
@@ -202,10 +210,7 @@ function startTailing_worker(tailURL,besPrefix) {
 function stopTailing() {
     stopUpdatingLogView = true;
     clearTimeout(timeout);
-
     var d = new Date();
-
-
     document.getElementById("status").innerHTML =  d.toTimeString() + " "+
             "The log viewer has been paused. " +
             "To begin viewing again, click the Start button.";
@@ -213,11 +218,6 @@ function stopTailing() {
 
 
 }
-
-function clearLogWindow() {
-    document.getElementById("log").innerHTML="";
-}
-
 
 
 function updateLogContent(request) {
@@ -228,13 +228,20 @@ function updateLogContent(request) {
 
             logDiv.innerHTML = "<pre>"+request.responseText+"</pre>" ;
 
-            startTailing_worker(logUrl, logBesPrefix);
+            // Now that we have the log and have updated the display, start the cycle again...
+            logTail_worker(logUrl, logBesPrefix);
 
 
         } else
             alert("updateLoggerPage(): Error! BES log request returned HTTP status of " + request.status);
     }
 }
+
+
+function clearLogWindow() {
+    document.getElementById("log").innerHTML="";
+}
+
 
 
 function launchLoggingConfigurationWindow(logConfigUrl, name, size){
