@@ -154,7 +154,7 @@
     <tr>
         <td>
             <div class="small" align="left">
-                <a href="<%=contextPath%>/docs/admin/index.html">Hyrax Admin Interface</a>
+                <a href="<%=contextPath%>/docs/admin/">Hyrax Admin Interface</a>
             </div>
         </td>
         <td>
