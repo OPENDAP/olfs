@@ -178,17 +178,22 @@ function getBesLog(besLogUrl, besPrefix) {
 
     document.getElementById("status").innerHTML = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
+
     var request = createRequest();
     request.open("GET", url, true);
     request.onreadystatechange = function() { updateLogContent(request); };
     request.send(null);
-    stopUpdatingLogView = false;
 }
 
 
 var timeout;
 
 function startTailing(tailURL,besPrefix) {
+    stopUpdatingLogView = false;
+    getBesLog(tailURL,besPrefix);
+}
+
+function startTailing_worker(tailURL,besPrefix) {
     if(!stopUpdatingLogView)
         timeout = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
@@ -223,7 +228,7 @@ function updateLogContent(request) {
 
             logDiv.innerHTML = "<pre>"+request.responseText+"</pre>" ;
 
-            startTailing(logUrl, logBesPrefix);
+            startTailing_worker(logUrl, logBesPrefix);
 
 
         } else
@@ -232,7 +237,13 @@ function updateLogContent(request) {
 }
 
 
+function launchLoggingConfigurationWindow(logConfigUrl, name, size){
+    stopTailing();
+    window.open(logConfigUrl, name, size);
+}
+
 function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
+
 
     var enabled = "";
     var disabled = "";
@@ -263,13 +274,8 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
     document.getElementById("status").innerHTML = status;
 
     var setLoggerStatesRequest = createRequest();
-
-
     setLoggerStatesRequest.open("GET", url, true);
-
     setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
-
-
     setLoggerStatesRequest.send(null);
 
 

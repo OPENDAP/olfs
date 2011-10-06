@@ -484,7 +484,7 @@
 
     <div style="float: left;">
 
-        <button onclick="getBesLog('<%=besCtlApi%>','<%=currentPrefix%>','10');">Start</button>
+        <button onclick="startTailing('<%=besCtlApi%>','<%=currentPrefix%>');">Start</button>
         <button onclick="stopTailing();">Stop</button>
         <button onclick="clearLogWindow();">Clear</button>
         &nbsp;&nbsp;Lines To Show:
@@ -505,7 +505,7 @@
             String logConfigUrl = "besLogConfig.jsp?prefix=" + currentPrefix;
         %>
 
-        <button onclick='window.open("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>
+        <button onclick='launchLoggingConfigurationWindow("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>
             Configuration
         </button>
 
