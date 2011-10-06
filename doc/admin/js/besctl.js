@@ -151,7 +151,6 @@ function updateConfig(request) {
 var logUrl;
 var logBesPrefix;
 
-var stopUpdatingLogView;
 
 
 
@@ -182,13 +181,14 @@ function getBesLog(besLogUrl, besPrefix) {
     request.open("GET", url, true);
     request.onreadystatechange = function() { updateLogContent(request); };
     request.send(null);
-    stopUpdatingLogView = false;
 }
 
 
+var stopUpdatingLogView;
 var timeout;
 
 function startTailing(tailURL,besPrefix) {
+    stopUpdatingLogView = false;
     if(!stopUpdatingLogView)
         timeout = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
