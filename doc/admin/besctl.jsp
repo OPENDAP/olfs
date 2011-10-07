@@ -490,10 +490,10 @@
         &nbsp;&nbsp;Lines To Show:
         <select id="logLines">
             <option>10</option>
-            <option selected="">50</option>
+            <option >50</option>
             <option>100</option>
             <option>500</option>
-            <option>1000</option>
+            <option selected="">1000</option>
             <option>5000</option>
             <option>all</option>
         </select>
