@@ -152,8 +152,36 @@ var logUrl;
 var logBesPrefix;
 
 var stopUpdatingLogView;
+var logTailTimer;
+var loggingStarted = false;;
 
 
+function startTailing(tailURL,besPrefix) {
+
+    if(!loggingStarted){
+        // Make sure that log viewing is enabled.
+        stopUpdatingLogView = false;
+        loggingStarted = true;
+
+        // Go get the log and start the log tailing cycle.
+        getBesLog(tailURL,besPrefix);
+    }
+}
+
+
+
+function stopTailing() {
+    loggingStarted = false;
+    stopUpdatingLogView = true;
+    clearTimeout(logTailTimer);
+    var d = new Date();
+    document.getElementById("status").innerHTML =  d.toTimeString() + " "+
+            "The log viewer has been paused. " +
+            "To begin viewing again, click the Start button.";
+
+
+
+}
 
 /**
  *
@@ -181,43 +209,14 @@ function getBesLog(besLogUrl, besPrefix) {
 
 
     // When the request is sent a state change will call updateLogContent. Once updateLogContent gets the response,
-    // it will call startTailing_worker to initiate a new acquisition of the log tail.
+    // it will call logTail_worker() to initiate a new acquisition of the log tail (which is done by call this function,
+    // getBesLog() )
     var request = createRequest();
     request.open("GET", url, true);
     request.onreadystatechange = function() { updateLogContent(request); };
     request.send(null);
 }
 
-
-var timeout;
-
-function startTailing(tailURL,besPrefix) {
-    // Make sure that log viewing is enabled.
-    stopUpdatingLogView = false;
-
-    // Go get the log and start the log tailing cycle.
-    getBesLog(tailURL,besPrefix);
-}
-
-function logTail_worker(tailURL,besPrefix) {
-
-    // When the timeout expires getBesLog will be called...
-    if(!stopUpdatingLogView)
-        timeout = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
-}
-
-
-function stopTailing() {
-    stopUpdatingLogView = true;
-    clearTimeout(timeout);
-    var d = new Date();
-    document.getElementById("status").innerHTML =  d.toTimeString() + " "+
-            "The log viewer has been paused. " +
-            "To begin viewing again, click the Start button.";
-
-
-
-}
 
 
 function updateLogContent(request) {
@@ -238,9 +237,21 @@ function updateLogContent(request) {
 }
 
 
+function logTail_worker(tailURL,besPrefix) {
+
+    // When the timeout expires getBesLog will be called...
+    if(!stopUpdatingLogView)
+        logTailTimer = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
+}
+
+
+
 function clearLogWindow() {
     document.getElementById("log").innerHTML="";
 }
+
+
+
 
 
 
