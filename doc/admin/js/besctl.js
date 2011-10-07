@@ -294,27 +294,6 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
     var setLoggerStatesRequest = createRequest();
     setLoggerStatesRequest.open("GET", url, true);
     setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
-
-    /*
-    setLoggerStatesRequest.onreadystatechange =
-        function(request){
-            if (request.readyState == 4) {
-
-                if (request.status == 200) {
-
-                    var status = document.getElementById("status");
-                    status.innerHTML = "<pre> "+request.responseText+"</pre>";
-
-
-                } else {
-                    alert("commitLoggingChanges(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
-                }
-            }
-            self.close();
-        };
-
-    */
-
     setLoggerStatesRequest.send(null);
 
 
@@ -376,8 +355,6 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
                     }
                 }
             );
-            //alert("About to start BES...");
-            //start(besPrefix,besCtlApi);
         }
         else {
             var d = new Date();
@@ -389,14 +366,7 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
         alert("confirmCommit(): Error! Failed to set the BES logger state. Hyrax returned an Http Request status of " + setLoggerStatesRequest.status);
     }
 
-    //self.close();
 }
-
-
-
-
-
-
 
 
 
