@@ -293,7 +293,9 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
     var setLoggerStatesRequest = createRequest();
     setLoggerStatesRequest.open("GET", url, true);
-    //setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
+    setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
+
+    /*
     setLoggerStatesRequest.onreadystatechange =
         function(request){
             if (request.readyState == 4) {
@@ -310,6 +312,8 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
             }
             self.close();
         };
+
+    */
 
     setLoggerStatesRequest.send(null);
 
