@@ -31,7 +31,7 @@
     <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>
     <title>Hyrax Admin Login</title>
 </head>
-<body>
+<body onload="document.getElementById('j_username').focus();">
 
 
 
@@ -45,7 +45,7 @@
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
         <td>
-            <div style='v-align:center;font-size:large;'><a href=".">Hyrax Admin Interface</a></div>
+            <div style='font-size:large;'><a href=".">Hyrax Admin Interface</a></div>
         </td>
     </tr>
 </table>
@@ -63,11 +63,11 @@
 <table>
 	<tr>
 		<td>Name:</td>
-		<td><input type="text" name="j_username" /></td>
+		<td><input id="j_username" type="text" name="j_username" /></td>
 	</tr>
 	<tr>
 		<td>Password:</td>
-		<td><input type="password" name="j_password"/ ></td>
+		<td><input id="j_password" type="password" name="j_password"/ ></td>
 	</tr>
 	<tr>
 		<td colspan="2"><input type="submit" value="Go" /></td>
