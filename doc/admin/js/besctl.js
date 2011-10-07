@@ -343,14 +343,14 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
 
 
                                         } else
-                                            alert("preformattedStatusUpdate(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
+                                            alert("confirmCommit(stopNice_worker(start_worker())): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
                                     }
                                     self.close();
                                 }
                             );
                         }
                         else {
-                            alert("confirmCommit(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
+                            alert("confirmCommit(stopNice_worker()): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
 
                         }
                     }
