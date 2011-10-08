@@ -20,43 +20,31 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 
-var request1 = createRequest();
 
-var logUrl;
 
-function getOlfsLog(olfsCtlApi) {
+var stopUpdatingOlfsLogView = true;
+var olfsLogTailTimer;
+var olfsLoggingStarted = false;
 
-    logUrl = olfsCtlApi;
 
-    var logLines = document.getElementById("logLines").value;
 
-    if(logLines=="all")
-        logLines=0;
+function startOlfsLogTailing(olfsLogTailUrl) {
 
-    var url = logUrl+"?cmd=getLog&lines="+logLines;
+    if(!olfsLoggingStarted){
+        // Make sure that log viewing is enabled.
+        stopUpdatingOlfsLogView = false;
+        olfsLoggingStarted = true;
 
-    //alert(url);
-
-    var d = new Date();
-    var status = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
-
-    document.getElementById("status").innerHTML = status;
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateLoggerPage;
-    request1.send(null);
-    stopUpdatingLogView = false;
+        // Go get the log and start the log tailing cycle.
+        getOlfsLog(olfsLogTailUrl);
+    }
 }
 
 
-
-function startTailing(tailURL) {
-    if(!stopUpdatingLogView)
-        t = setTimeout("getOlfsLog('"+tailURL+"')", 1000);
-}
-
-function stopTailing() {
-    stopUpdatingLogView = true;
-    clearTimeout(t);
+function stopOlfsLogTailing() {
+    olfsLoggingStarted = false;
+    stopUpdatingOlfsLogView = true;
+    clearTimeout(olfsLogTailTimer);
     var d = new Date();
     var status =  d.toTimeString() + " "+
             "The log viewer has been paused. " +
@@ -68,94 +56,129 @@ function stopTailing() {
 }
 
 
-function clearLogWindow() {
+function clearOlfsLogWindow() {
     document.getElementById("log").innerHTML="";
 }
 
 
-
-function updateLoggerPage() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
-
-            logDiv = document.getElementById("log");
-
-            logDiv.innerHTML = "<pre>"+request1.responseText+"</pre>";
+function getOlfsLog(olfsLogTailUrl) {
 
 
-            startTailing(logUrl);
+    var olfsLogLines = document.getElementById("olfsLogLines").value;
 
+    if(olfsLogLines=="all")
+        olfsLogLines=0;
 
-
-        } else
-            alert("Error! Request status is " + request1.status);
-    }
-}
-
-
-
-function setLogLevel(olfsCtlApi){
-
-
-    var loggerName = document.getElementById("loggerName").value;
-    var logLevel = document.getElementById("logLevel").value;
-
-    var url = olfsCtlApi+"?cmd=setLogLevel&logger="+loggerName+"&level="+logLevel;
+    var url = olfsLogTailUrl+"?cmd=getLog&lines="+olfsLogLines;
 
     //alert(url);
 
     var d = new Date();
-    var status = d.toTimeString() + " Setting "+loggerName+" log level to "+logLevel+".   <a href='"+url+"'>"+url+"</a>";
+    var status = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
     document.getElementById("status").innerHTML = status;
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateStatus;
-    request1.send(null);
-
-}
-
-function updateLevelSelection(olfsCtlApi) {
-
-
-    var loggerName = document.getElementById("loggerName").value;
-
-    var url = olfsCtlApi+"?cmd=getLogLevel&logger="+loggerName;
-
-
-    var d = new Date();
-    var status = d.toTimeString() + " Getting "+loggerName+" log level.   <a href='"+url+"'>"+url+"</a>";
-
-    document.getElementById("status").innerHTML = status;
-    request1.open("GET", url, true);
-    request1.onreadystatechange = updateLoggerLevel;
-    request1.send(null);
+    var request = createRequest();
+    request.open("GET", url, true);
+    request.onreadystatechange = function(){ updateOlfsLoggerPage(request, olfsLogTailUrl) };
+    request.send(null);
 }
 
 
 
-function updateLoggerLevel() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
+function updateOlfsLoggerPage(request, olfsLogTailUrl) {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
 
-            var logLevel = document.getElementById("logLevel");
+            var olfsLogDisplay = document.getElementById("olfsLogDisplay");
 
-            logLevel.value = request1.responseText;
+            olfsLogDisplay.innerHTML = "<pre>"+request.responseText+"</pre>";
+
+
+            olfsLogTail_worker(olfsLogTailUrl);
+
+
 
         } else
-            alert("Error! Request status is " + request1.status);
+            alert("Error! Request status is " + request.status);
     }
 }
 
-function updateStatus() {
-    if (request1.readyState == 4) {
-        if (request1.status == 200) {
+function olfsLogTail_worker(olfsLogTailUrl) {
+
+    // When the timeout expires getOlfsLog will be called...
+    if(!stopUpdatingOlfsLogView) {
+        olfsLogTailTimer = setTimeout("getOlfsLog('"+olfsLogTailUrl+"')", 1000);
+    }
+}
+
+
+
+
+function setOlfsLogLevel(olfsCtlApi){
+
+
+    var olfsLoggerName = document.getElementById("olfsLoggerName").value;
+    var olfsLoggerLevel = document.getElementById("olfsLoggerLevel").value;
+
+    var url = olfsCtlApi+"?cmd=setLogLevel&logger="+olfsLoggerName+"&level="+olfsLoggerLevel;
+
+    //alert(url);
+
+    var d = new Date();
+    var status = d.toTimeString() + " Setting "+olfsLoggerName+" log level to "+olfsLoggerLevel+".   <a href='"+url+"'>"+url+"</a>";
+
+    document.getElementById("status").innerHTML = status;
+    var request = createRequest();
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { updateStatus(request) };
+    request.send(null);
+
+}
+
+function updateOlfsLogLevelSelection(olfsCtlApi) {
+
+
+    var olfsLoggerName = document.getElementById("olfsLoggerName").value;
+
+    var url = olfsCtlApi+"?cmd=getLogLevel&logger="+olfsLoggerName;
+
+
+    var d = new Date();
+    var status = d.toTimeString() + " Getting "+olfsLoggerName+" log level.   <a href='"+url+"'>"+url+"</a>";
+
+    document.getElementById("status").innerHTML = status;
+    var request = createRequest();
+    request.open("GET", url, true);
+    request.onreadystatechange = function() { updateOlfsLoggerLevel(request) };
+    request.send(null);
+}
+
+
+
+function updateOlfsLoggerLevel(request) {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
+
+            var olfsLoggerLevel = document.getElementById("olfsLoggerLevel");
+
+            olfsLoggerLevel.value = request.responseText;
+
+        } else {
+            alert("Error! Request status is " + request.status);
+        }
+    }
+}
+
+function updateStatus(request) {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
 
             logDiv = document.getElementById("status");
 
-            logDiv.innerHTML = "<pre>"+request1.responseText+"</pre>";
+            logDiv.innerHTML = "<pre>"+request.responseText+"</pre>";
 
         } else
-            alert("Error! Request status is " + request1.status);
+            alert("Error! Request status is " + request.status);
     }
 }
 

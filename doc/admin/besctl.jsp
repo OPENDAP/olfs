@@ -187,19 +187,19 @@
 
 
     <button style="border: 0; background-color: transparent;"
-            onclick="start('<%=currentPrefix%>','<%=besCtlApi%>');">
+            onclick="startBes('<%=currentPrefix%>','<%=besCtlApi%>');">
         <img alt="Start" src="<%=contextPath%>/docs/images/startButton.png" border='0' height='40px'>
     </button>
 
 
     <button style="border: 0; background-color: transparent;"
-            onclick="stopNice('<%=currentPrefix%>','<%=besCtlApi%>');">
+            onclick="stopBesNicely('<%=currentPrefix%>','<%=besCtlApi%>');">
         <img alt="StopNice" src="<%=contextPath%>/docs/images/stopNiceButton.png" border='0' height='40px'>
     </button>
 
 
     <button style="border: 0; background-color: transparent;"
-            onclick="stopNow('<%=currentPrefix%>','<%=besCtlApi%>');"
+            onclick="stopBesNow('<%=currentPrefix%>','<%=besCtlApi%>');"
             >
         <img alt="StopNow" src="<%=contextPath%>/docs/images/stopNowButton.png" border='0' height='40px'>
     </button>
@@ -436,6 +436,7 @@
                                 margin-right: 5px;
                                 max-width: 99%;
                                 width: 99%;
+                                background: rgba(255, 0, 0, 0.03);
                                 "
                         id="CONFIGURATION"
                         name="CONFIGURATION"
@@ -447,7 +448,7 @@
             <input type="reset"/>
         </form>
 
-        <button onclick="setConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">
+        <button onclick="setBesConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">
             Save <%=currentModule.getShortName()%> module configuration
         </button>
 
@@ -484,9 +485,9 @@
 
     <div style="float: left;">
 
-        <button onclick="startTailing('<%=besCtlApi%>','<%=currentPrefix%>');">Start</button>
-        <button onclick="stopTailing();">Stop</button>
-        <button onclick="clearLogWindow();">Clear</button>
+        <button onclick="startBesLogTailing('<%=besCtlApi%>','<%=currentPrefix%>');">Start</button>
+        <button onclick="stopBesLogTailing();">Stop</button>
+        <button onclick="clearBesLogWindow();">Clear</button>
         &nbsp;&nbsp;Lines To Show:
         <select id="logLines">
             <option>10</option>
@@ -505,7 +506,7 @@
             String logConfigUrl = "besLogConfig.jsp?prefix=" + currentPrefix;
         %>
 
-        <button onclick='launchLoggingConfigurationWindow("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>
+        <button onclick='launchBesLoggingConfigurationWindow("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>
             Configuration
         </button>
 

@@ -23,13 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-function start(prefix,besctlUrl) {
+function startBes(prefix,besctlUrl) {
 
-    start_worker(prefix,besctlUrl,preformattedStatusUpdate);
+    startBes_worker(prefix,besctlUrl,preformattedStatusUpdate);
 
 }
 
-function start_worker(prefix,besctlUrl, stateChangeHandler) {
+function startBes_worker(prefix,besctlUrl, stateChangeHandler) {
 
     document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
@@ -43,14 +43,14 @@ function start_worker(prefix,besctlUrl, stateChangeHandler) {
 
 
 
-function stopNice(prefix,besctlUrl) {
+function stopBesNicely(prefix,besctlUrl) {
 
 
-    stopNice_worker(prefix,besctlUrl,true,preformattedStatusUpdate);
+    stopBesNicely_worker(prefix,besctlUrl,true,preformattedStatusUpdate);
 
 }
 
-function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
+function stopBesNicely_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 
 
     var status = document.getElementById("status");
@@ -78,7 +78,7 @@ function stopNice_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 }
 
 
-function stopNow(prefix,besctlUrl) {
+function stopBesNow(prefix,besctlUrl) {
     document.getElementById("status").innerHTML = "<pre> Stopping BES '"+prefix+"' NOW.</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
     var request = createRequest();
@@ -89,16 +89,16 @@ function stopNow(prefix,besctlUrl) {
 
 }
 
-function getConfig(module,prefix,besctlUrl) {
+function getBesConfig(module,prefix,besctlUrl) {
     var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=getConfig";
     var request = createRequest();
 
     request.open("GET", url, true);
-    request.onreadystatechange = function() { updateConfig(request); };
+    request.onreadystatechange = function() { updateBesConfig(request); };
     request.send(null);
 }
 
-function setConfig(module,prefix,besctlUrl) {
+function setBesConfig(module,prefix,besctlUrl) {
 
     document.getElementById("status").innerHTML = "<pre> Setting configuration for "+module+"</pre>";
 
@@ -114,7 +114,7 @@ function setConfig(module,prefix,besctlUrl) {
     request.open("POST", url, false);
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    request.onreadystatechange = function() { updateConfig(request); };
+    request.onreadystatechange = function() { updateBesConfig(request); };
     request.send(configParam);
 
 }
@@ -129,7 +129,7 @@ function showBes() {
 
 
 
-function updateConfig(request) {
+function updateBesConfig(request) {
     if (request.readyState == 4) {
         if (request.status == 200) {
 
@@ -148,20 +148,20 @@ function updateConfig(request) {
 
 
 
-var logUrl;
+var besLogUrl;
 var logBesPrefix;
 
-var stopUpdatingLogView;
-var logTailTimer;
-var loggingStarted = false;;
+var stopUpdatingBesLogView;
+var besLogTailTimer;
+var besLoggingStarted = false;;
 
 
-function startTailing(tailURL,besPrefix) {
+function startBesLogTailing(tailURL,besPrefix) {
 
-    if(!loggingStarted){
+    if(!besLoggingStarted){
         // Make sure that log viewing is enabled.
-        stopUpdatingLogView = false;
-        loggingStarted = true;
+        stopUpdatingBesLogView = false;
+        besLoggingStarted = true;
 
         // Go get the log and start the log tailing cycle.
         getBesLog(tailURL,besPrefix);
@@ -170,10 +170,10 @@ function startTailing(tailURL,besPrefix) {
 
 
 
-function stopTailing() {
-    loggingStarted = false;
-    stopUpdatingLogView = true;
-    clearTimeout(logTailTimer);
+function stopBesLogTailing() {
+    besLoggingStarted = false;
+    stopUpdatingBesLogView = true;
+    clearTimeout(besLogTailTimer);
     var d = new Date();
     document.getElementById("status").innerHTML =  d.toTimeString() + " "+
             "The log viewer has been paused. " +
@@ -190,7 +190,7 @@ function stopTailing() {
  */
 function getBesLog(besLogUrl, besPrefix) {
 
-    logUrl = besLogUrl;
+    besLogUrl = besLogUrl;
     logBesPrefix = besPrefix;
 
     var logLines = document.getElementById("logLines").value;
@@ -198,7 +198,7 @@ function getBesLog(besLogUrl, besPrefix) {
     if(logLines=="all")
         logLines=0;
 
-    var url = logUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+logLines;
+    var url = besLogUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+logLines;
 
     //alert(url);
 
@@ -213,13 +213,13 @@ function getBesLog(besLogUrl, besPrefix) {
     // getBesLog() )
     var request = createRequest();
     request.open("GET", url, true);
-    request.onreadystatechange = function() { updateLogContent(request); };
+    request.onreadystatechange = function() { updateBesLogContent(request); };
     request.send(null);
 }
 
 
 
-function updateLogContent(request) {
+function updateBesLogContent(request) {
     if (request.readyState == 4) {
         if (request.status == 200) {
 
@@ -228,7 +228,7 @@ function updateLogContent(request) {
             logDiv.innerHTML = "<pre>"+request.responseText+"</pre>" ;
 
             // Now that we have the log and have updated the display, start the cycle again...
-            logTail_worker(logUrl, logBesPrefix);
+            besLogTail_worker(besLogUrl, logBesPrefix);
 
 
         } else
@@ -237,16 +237,16 @@ function updateLogContent(request) {
 }
 
 
-function logTail_worker(tailURL,besPrefix) {
+function besLogTail_worker(tailURL,besPrefix) {
 
     // When the timeout expires getBesLog will be called...
-    if(!stopUpdatingLogView)
-        logTailTimer = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
+    if(!stopUpdatingBesLogView)
+        besLogTailTimer = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
 }
 
 
 
-function clearLogWindow() {
+function clearBesLogWindow() {
     document.getElementById("log").innerHTML="";
 }
 
@@ -255,12 +255,12 @@ function clearLogWindow() {
 
 
 
-function launchLoggingConfigurationWindow(logConfigUrl, name, size){
-    stopTailing();
+function launchBesLoggingConfigurationWindow(logConfigUrl, name, size){
+    stopBesLogTailing();
     window.open(logConfigUrl, name, size);
 }
 
-function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
+function commitBesLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
 
     var enabled = "";
@@ -293,13 +293,13 @@ function commitLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
     var setLoggerStatesRequest = createRequest();
     setLoggerStatesRequest.open("GET", url, true);
-    setLoggerStatesRequest.onreadystatechange = function() {confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
+    setLoggerStatesRequest.onreadystatechange = function() {confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
     setLoggerStatesRequest.send(null);
 
 
 }
 
-function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
+function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
 
     if (setLoggerStatesRequest.readyState != 4)
         return;
@@ -314,7 +314,7 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
               completed the closure function defined below is called. The closure function updates the status block and
               then calls start. Sweet! Right?
              */
-            stopNice_worker(
+            stopBesNicely_worker(
                 besPrefix,
                 besCtlApi,
                 true,
@@ -329,7 +329,7 @@ function confirmCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
                             // To do this I need to ensure that the BES is started and all of the status updates are
                             // done before I close the window. Failing to do this in a sequential order will crash the
                             // browser (or at least Safari)
-                            start_worker(
+                            startBes_worker(
                                 besPrefix,
                                 besCtlApi,
                                 function(request){

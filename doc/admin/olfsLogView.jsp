@@ -90,14 +90,14 @@
 
 
 
-<div id="controls" class="loggingControls">
+<div id="olfsLoggingControls" class="loggingControls">
     <div class="small">
         <div style="float: left;">
-            <button onclick="getOlfsLog('<%=olfsCtlApi%>','<%=currentPrefix%>','10');">Start</button>
-            <button onclick="stopTailing();">Stop</button>
-            <button onclick="clearLogWindow();">Clear</button>
+            <button onclick="startOlfsLogTailing('<%=olfsCtlApi%>');">Start</button>
+            <button onclick="stopOlfsLogTailing();">Stop</button>
+            <button onclick="clearOlfsLogWindow();">Clear</button>
             &nbsp;&nbsp;Lines To Show:
-            <select id="logLines">
+            <select id="olfsLogLines">
                 <option>10</option>
                 <option>50</option>
                 <option>100</option>
@@ -110,8 +110,8 @@
 
         <div style="float: right;">
 
-            <button onclick="setLogLevel('<%=olfsCtlApi%>');">Set Log Level</button>
-            <select id="loggerName" onchange="updateLevelSelection('<%=olfsCtlApi%>')">
+            <button onclick="setOlfsLogLevel('<%=olfsCtlApi%>');">Set Log Level</button>
+            <select id="olfsLoggerName" onchange="updateOlfsLogLevelSelection('<%=olfsCtlApi%>')">
             <%
                 LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
                 for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
@@ -120,7 +120,7 @@
             %>
             </select>
 
-            <select id="logLevel">
+            <select id="olfsLoggerLevel">
                 <option>all</option>
                 <option>debug</option>
                 <option>info</option>
@@ -136,7 +136,7 @@
 </div>
 
 
-<div id="log" class="LogWindow"></div>
+<div id="olfsLogDisplay" class="LogWindow"></div>
 
 <div id="status" class="statusDisplay">
     This is the OLFS Log Viewer. To begin viewing the OLFS log, click the Start button.

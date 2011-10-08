@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-        <button onclick="commitLoggingChanges('<%=besCtlApi%>','<%=bes.getPrefix()%>',document.loggerSelect.lSelection);">Commit</button>
+        <button onclick="commitBesLoggingChanges('<%=besCtlApi%>','<%=bes.getPrefix()%>',document.loggerSelect.lSelection);">Commit</button>
 
         <button onclick="self.close()">Cancel</button>
 
