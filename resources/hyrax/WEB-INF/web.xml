@@ -194,17 +194,43 @@
 
     </servlet>
 
+    <servlet>
+        <servlet-name>docs_servlet</servlet-name>
+        <servlet-class>opendap.coreServlet.DocServlet </servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-    <servlet-mapping>
-        <servlet-name>hyrax</servlet-name>
-        <url-pattern>/hyrax</url-pattern>
-    </servlet-mapping>
+
+
+
+
+    <filter>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+        <init-param>
+            <param-name>logLevel</param-name>
+            <param-value>sysout:DEBUG</param-value>
+        </init-param>
+        <init-param>
+            <param-name>RewriteLog</param-name>
+            <param-value>log4j</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
         <url-pattern>/hyrax/*</url-pattern>
     </servlet-mapping>
-
 
     <servlet-mapping>
         <servlet-name>adminInterface</servlet-name>
@@ -220,6 +246,14 @@
         <servlet-name>gateway</servlet-name>
         <url-pattern>/gateway/*</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>docs_servlet</servlet-name>
+        <url-pattern>/docs/*</url-pattern>
+    </servlet-mapping>
+
+
+
 
 
 
@@ -239,31 +273,31 @@
     <!-- Default Error Page Definitions -->
     <error-page>
         <error-code>400</error-code>
-        <location>/docs/error400.jsp</location>
+        <location>/error/error400.jsp</location>
     </error-page>
     <error-page>
         <error-code>403</error-code>
-        <location>/docs/error403.jsp</location>
+        <location>/error/error403.jsp</location>
     </error-page>
     <error-page>
         <error-code>404</error-code>
-        <location>/docs/error404.jsp</location>
+        <location>/error/error404.jsp</location>
     </error-page>
     <error-page>
         <error-code>500</error-code>
-        <location>/docs/error500.jsp</location>
+        <location>/error/error500.jsp</location>
     </error-page>
     <error-page>
         <error-code>501</error-code>
-        <location>/docs/error501.jsp</location>
+        <location>/error/error501.jsp</location>
     </error-page>
     <error-page>
         <error-code>502</error-code>
-        <location>/docs/error502.jsp</location>
+        <location>/error/error502.jsp</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
-        <location>/docs/error500.jsp</location>
+        <location>/error/error500.jsp</location>
     </error-page>
 
 
@@ -273,12 +307,6 @@
   <!-- a "Content-Type" header based on the resource's filename extension,  -->
   <!-- based on these mappings.  Additional mappings can be added here to   -->
   <!-- apply to  your own application's web.xml deployment descriptor.      -->
-
-    <mime-mapping>
-        <extension>ddx</extension>
-        <mime-type>text/xml</mime-type>
-    </mime-mapping>
-
 
 
     <welcome-file-list>
@@ -294,7 +322,7 @@
         <web-resource-collection>
             <web-resource-name>Hyrax Admin Interface</web-resource-name>
             <url-pattern>/hai/*</url-pattern>
-            <url-pattern>/docs/admin/*</url-pattern>
+            <url-pattern>/admin/*</url-pattern>
         </web-resource-collection>
 
         <auth-constraint>
@@ -313,8 +341,8 @@
         <auth-method>FORM</auth-method>
         <realm-name>Hyrax Administration Pages</realm-name>
         <form-login-config>
-            <form-login-page>/docs/admin/login.jsp</form-login-page>
-            <form-error-page>/docs/admin/login-failed.jsp</form-error-page>
+            <form-login-page>/admin/jsp/login.jsp</form-login-page>
+            <form-error-page>/admin/jsp/login-failed.jsp</form-error-page>
         </form-login-config>
     </login-config>
 
