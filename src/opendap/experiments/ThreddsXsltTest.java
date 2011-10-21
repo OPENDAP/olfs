@@ -25,7 +25,7 @@ public class ThreddsXsltTest {
 
         try {
 
-        Transformer thredds2DatasetUrl = new Transformer("doc/xsl/thredds2datasetAccess.xsl");
+        Transformer thredds2DatasetUrl = new Transformer("xsl/thredds2datasetAccess.xsl");
 
 
             for(String arg: args){

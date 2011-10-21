@@ -904,7 +904,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
             String currentDir = System.getProperty("user.dir");
-            String xslDir = systemPath + "/docs/xsl";
+            String xslDir = systemPath + "/xsl";
             log.debug("Cached working directory: "+currentDir);
 
             log.debug("Changing working directory to "+ xslDir);
@@ -950,7 +950,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
     public void sendRdfErrorResponse(Exception e, String dataSource, String context, HttpServletResponse response) throws Exception {
 
-        String errorPageTemplate = systemPath + "/docs/error.html.proto";
+        String errorPageTemplate = systemPath + "/error/error.html.proto";
 
 
 

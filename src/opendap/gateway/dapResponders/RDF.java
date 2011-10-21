@@ -110,7 +110,7 @@ public class RDF extends HttpResponder {
 
 
         String currentDir = System.getProperty("user.dir");
-        String xslDir = _systemPath + "/docs/xsl";
+        String xslDir = _systemPath + "/xsl";
         log.debug("Cached working directory: "+currentDir);
 
         log.debug("Changing working directory to "+ xslDir);

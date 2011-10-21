@@ -423,7 +423,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         Request oreq = new Request(null,req);
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/xsl/contents.xsl");
 
         Transformer transformer = new Transformer(xsltDoc);
 
@@ -494,7 +494,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         /*
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/xsl/contents.xsl");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
@@ -517,7 +517,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         Request oreq = new Request(null,request);
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/xsl/contents.xsl");
 
         Transformer transformer = new Transformer(xsltDoc);
 
@@ -596,7 +596,7 @@ public class WcsDispatchHandler implements DispatchHandler {
         /*
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/xsl/contents.xsl");
 
         XSLTransformer transformer = new XSLTransformer(xsltDoc);
 
@@ -619,7 +619,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
         Request oreq = new Request(null,request);
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/docs/xsl/contents.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet,"/xsl/contents.xsl");
 
         Transformer transformer = new Transformer(xsltDoc);
 
@@ -690,7 +690,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
 
-        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/wcs_coveragesList.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/xsl/wcs_coveragesList.xsl");
         Transformer transformer = new Transformer(xsltDoc);
         transformer.setParameter("dapService", oRequest.getDapServiceLocalID());
         transformer.setParameter("docsService", oRequest.getDocsServiceLocalID());
@@ -784,7 +784,7 @@ public class WcsDispatchHandler implements DispatchHandler {
 
 
 
-                String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/docs/xsl/wcs_coveragePage.xsl");
+                String xsltDoc = ServletUtil.getSystemPath(dispatchServlet, "/xsl/wcs_coveragePage.xsl");
                 Transformer transformer = new Transformer(xsltDoc);
 
                 transformer.setParameter("dapService", oRequest.getDapServiceLocalID());

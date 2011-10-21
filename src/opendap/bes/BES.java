@@ -144,7 +144,7 @@ public class BES {
 
         boolean besIsOk = true;
 
-        //@todo Make use a specially designed BES command!
+        //@todo Make and use a specially designed BES command!
         try {
             getConfiguration(null);
         } catch (BesAdminFail besAdminFail) {

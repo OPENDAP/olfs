@@ -236,31 +236,31 @@
     <!-- Default Error Page Definitions -->
     <error-page>
         <error-code>400</error-code>
-        <location>/docs/error400.jsp</location>
+        <location>/error/error400.jsp</location>
     </error-page>
     <error-page>
         <error-code>403</error-code>
-        <location>/docs/error403.jsp</location>
+        <location>/error/error403.jsp</location>
     </error-page>
     <error-page>
         <error-code>404</error-code>
-        <location>/docs/error404.jsp</location>
+        <location>/error/error404.jsp</location>
     </error-page>
     <error-page>
         <error-code>500</error-code>
-        <location>/docs/error500.jsp</location>
+        <location>/error/error500.jsp</location>
     </error-page>
     <error-page>
         <error-code>501</error-code>
-        <location>/docs/error501.jsp</location>
+        <location>/error/error501.jsp</location>
     </error-page>
     <error-page>
         <error-code>502</error-code>
-        <location>/docs/error502.jsp</location>
+        <location>/error/error502.jsp</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
-        <location>/docs/error500.jsp</location>
+        <location>/error/error500.jsp</location>
     </error-page>
 
 

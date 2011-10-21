@@ -335,7 +335,7 @@ public class BESError extends OPeNDAPException {
             else {
                 if(!response.isCommitted())
                     response.reset();
-                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/docs/error.html.proto",context,response);
+                HttpResponder.sendHttpErrorResponse(500, getMessage(), systemPath + "/error/error.html.proto",context,response);
             }
 
         }
@@ -343,7 +343,7 @@ public class BESError extends OPeNDAPException {
             if(!response.isCommitted())
                 response.reset();
             try {
-                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/docs/error.html.proto",context,response);
+                HttpResponder.sendHttpErrorResponse(500,e.getMessage(),systemPath + "/error/error.html.proto",context,response);
             }
             catch(Exception e1){
                 response.sendError(errorVal,e1.getMessage());

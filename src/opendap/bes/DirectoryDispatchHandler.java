@@ -257,7 +257,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-            String xsltDoc = systemPath + "/docs/xsl/contents.xsl";
+            String xsltDoc = systemPath + "/xsl/contents.xsl";
 
             Transformer transformer = new Transformer(xsltDoc);
 

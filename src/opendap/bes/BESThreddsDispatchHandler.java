@@ -177,7 +177,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
             log.debug(xmlo.outputString(showCatalogDoc));
 
-            String xsltDoc = systemPath + "/docs/xsl/catalog.xsl";
+            String xsltDoc = systemPath + "/xsl/catalog.xsl";
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());

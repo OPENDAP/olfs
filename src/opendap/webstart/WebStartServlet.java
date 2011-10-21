@@ -461,7 +461,7 @@ public class WebStartServlet extends HttpServlet {
     private void sendDatasetPage(String webStartService, String docsService, String dapService, String datasetID, Document ddx, OutputStream os) throws IOException, PPTException, BadConfigurationException, SaxonApiException, JDOMException
     {
 
-        String xsltDoc = ServletUtil.getSystemPath(this, "/docs/xsl/webStartDataset.xsl");
+        String xsltDoc = ServletUtil.getSystemPath(this, "/xsl/webStartDataset.xsl");
 
         Transformer transformer = new Transformer(xsltDoc);
 

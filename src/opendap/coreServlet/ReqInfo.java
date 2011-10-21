@@ -122,8 +122,11 @@ public class ReqInfo {
 
         String pathInfo = request.getPathInfo();
 
+        String serviceContext = requestUri;
+        if(pathInfo != null)
+            serviceContext = requestUri.substring(0, requestUri.lastIndexOf(pathInfo));
 
-        String serviceContext = requestUri.substring(0, requestUri.lastIndexOf(pathInfo));
+
 
         return serviceContext;
 
@@ -486,11 +489,15 @@ public class ReqInfo {
     public static boolean isServiceOnlyRequest(HttpServletRequest req){
         String contextPath = req.getContextPath();
         String servletPath = req.getServletPath();
+
+
+
         String reqURI = req.getRequestURI();
 
         String serviceName = contextPath + servletPath;
 
-        if (reqURI.equals(serviceName)) {
+
+        if (reqURI.equals(serviceName) && !reqURI.endsWith("/")) {
             return true;
         }
         return false;

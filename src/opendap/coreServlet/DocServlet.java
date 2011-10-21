@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 /**
  * This mini servlet provides access to distributed or, if it exists, persistent documentation in the
  * content directory.
- * @deprecated This class is deprecated in favor of using the default Tomcat servlet that provides file and JSP services.
+ *
  */
 public class DocServlet extends HttpServlet {
 
@@ -91,7 +91,6 @@ public class DocServlet extends HttpServlet {
         String name = Scrub.fileName(getName(req));
 
 
-
         File f = new File(name);
 
         if (f.exists())
@@ -111,7 +110,7 @@ public class DocServlet extends HttpServlet {
     private boolean redirect(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
         if (req.getPathInfo() == null) {
-            res.sendRedirect(Scrub.urlContent(req.getRequestURI()+"/index.html"));
+            res.sendRedirect(Scrub.urlContent(req.getRequestURI() + "/index.html"));
             log.debug("Sent redirect to make the web page work!");
             return true;
         }
@@ -123,7 +122,7 @@ public class DocServlet extends HttpServlet {
 
         String name = req.getPathInfo();
 
-        if(name == null)
+        if (name == null)
             name = "/";
 
         if (name.endsWith("/"))
@@ -134,18 +133,14 @@ public class DocServlet extends HttpServlet {
     }
 
 
-
-
-
-    public void doGet(HttpServletRequest request,  HttpServletResponse response) {
-
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 
         try {
             String contextPath = ServletUtil.getContextPath(this);
             String servletName = "/" + this.getServletName();
 
-            LogUtil.logServerAccessStart(request, "DocServletAccess","GET", Integer.toString(reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "DocServletAccess", "GET", Integer.toString(reqNumber.incrementAndGet()));
 
             if (!redirect(request, response)) {
 
@@ -158,78 +153,86 @@ public class DocServlet extends HttpServlet {
 
                 if (f.exists()) {
                     log.debug("   Requested item exists.");
+                    if (f.isFile()) {
+                        log.debug("   It's a file...");
 
 
-                    String suffix = null;
-                    if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
-                        suffix = name.substring(name.lastIndexOf('.') + 1);
-                    }
+                        String suffix = null;
+                        if (name.lastIndexOf("/") < name.lastIndexOf(".")) {
+                            suffix = name.substring(name.lastIndexOf('.') + 1);
+                        }
 
-                    String mType = null;
-                    if (suffix != null) {
-                        mType = MimeTypes.getMimeType(suffix);
+                        String mType = null;
+                        if (suffix != null) {
+                            mType = MimeTypes.getMimeType(suffix);
+                            if (mType != null)
+                                response.setContentType(mType);
+                            log.debug("   MIME type: " + mType + "  ");
+                        }
+
+                        // Gah! Don't do a setStatus()!!!! Doing so breaks the HTTP status value for <error-page>
+                        // declarations in the web.xml file.
+                        //response.setStatus(HttpServletResponse.SC_OK);
+
+                        log.debug("   Sending.");
                         if (mType != null)
                             response.setContentType(mType);
-                        log.debug("   MIME type: " + mType + "  ");
-                    }
-
-                    // Gah! Don't do a setStatus()!!!! Doing so breaks the HTTP status value for <error-page>
-                    // declarations in the web.xml file.
-                    //response.setStatus(HttpServletResponse.SC_OK);
-
-                    log.debug("   Sending.");
-                    if (mType != null)
-                        response.setContentType(mType);
 
 
-                    ServletOutputStream sos = null;
-                    sos = response.getOutputStream();
+                        ServletOutputStream sos = null;
+                        sos = response.getOutputStream();
 
 
-                    if(mType!=null && mType.startsWith("text/")){
+                        if (mType != null && mType.startsWith("text/")) {
 
-                        String docString  = readFileAsString(f);
+                            String docString = readFileAsString(f);
 
-                        log.debug("read file "+f.getAbsolutePath()+" into a String.");
-
-
-                        docString = docString.replace("<CONTEXT_PATH />",contextPath);
-                        docString = docString.replace("<SERVLET_NAME />",servletName);
+                            log.debug("read file " + f.getAbsolutePath() + " into a String.");
 
 
+                            docString = docString.replace("<CONTEXT_PATH />", contextPath);
+                            docString = docString.replace("<SERVLET_NAME />", servletName);
 
 
-                        sos.println(docString);
+                            sos.println(docString);
+                        } else {
+
+                            FileInputStream fis = new FileInputStream(f);
+                            try {
+                                byte buff[] = new byte[8192];
+                                int rc;
+                                boolean doneReading = false;
+                                while (!doneReading) {
+                                    rc = fis.read(buff);
+                                    if (rc < 0) {
+                                        doneReading = true;
+                                    } else if (rc > 0) {
+                                        sos.write(buff, 0, rc);
+                                    }
+
+                                }
+                            } finally {
+
+                                if (fis != null)
+                                    fis.close();
+
+                                if (sos != null)
+                                    sos.flush();
+                            }
+                        }
+
+                        LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
+
+                    } else if (f.isDirectory()) {
+                        log.debug("   Requested directory exists.");
+                        response.sendRedirect(request.getRequestURL()+"/");
+
 
                     }
                     else {
-
-                        FileInputStream fis = new FileInputStream(f);
-                        try {    
-                            byte buff[] = new byte[8192];
-                            int rc;
-                            boolean doneReading = false;
-                            while (!doneReading) {
-                                rc = fis.read(buff);
-                                if (rc < 0) {
-                                    doneReading = true;
-                                } else if (rc > 0) {
-                                    sos.write(buff, 0, rc);
-                                }
-
-                            }
-                        }
-                        finally {
-
-                            if(fis!=null)
-                                fis.close();
-
-                            if(sos!=null)
-                                sos.flush();
-                        }
+                        log.error("Unable to determine type of requested item: "+f.getName());
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     }
-
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, f.length(), "DocServletAccess");
 
 
                 } else {
@@ -239,21 +242,17 @@ public class DocServlet extends HttpServlet {
 
                 }
 
-            }
-            else
-                LogUtil.logServerAccessEnd(HttpServletResponse.SC_MOVED_TEMPORARILY , -1, "DocServletAccess");
+            } else
+                LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "DocServletAccess");
 
 
-        }
-        catch( Throwable t){
+        } catch (Throwable t) {
             try {
                 OPeNDAPException.anyExceptionHandler(t, response);
-            }
-            catch(Throwable t2) {
+            } catch (Throwable t2) {
                 try {
                     log.error("BAD THINGS HAPPENED!", t2);
-                }
-                catch(Throwable t3){
+                } catch (Throwable t3) {
                     // Never mind we can't manage anything sensible at this point....
                 }
             }

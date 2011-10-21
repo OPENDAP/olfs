@@ -63,11 +63,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private String _prefix;
     boolean useMemoryCache = false;
 
-    String catalogToHtmlTransformFile = "/docs/xsl/threddsCatalogPresentation.xsl";
+    String catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
     Transformer catalogToHtmlTransform = null;
     ReentrantLock catalogToHtmlTransformLock;
 
-    String datasetToHtmlTransformFile = "/docs/xsl/threddsDatasetDetail.xsl";
+    String datasetToHtmlTransformFile = "/xsl/threddsDatasetDetail.xsl";
     Transformer datasetToHtmlTransform = null;
     ReentrantLock datasetToHtmlTransformLock;
 
@@ -606,7 +606,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
         if (ingestTransformFile == null) {
-            ingestTransformFile = ServletUtil.getSystemPath(servlet, "/docs/xsl/threddsCatalogIngest.xsl");
+            ingestTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/threddsCatalogIngest.xsl");
         }
 
         log.debug("Using ingest transform file: " + ingestTransformFile);

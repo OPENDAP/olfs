@@ -83,7 +83,7 @@ public abstract class HttpResponder {
 
 
     public void sendHttpErrorResponse(int HttpStatus, String errorMessage, String docsService, HttpServletResponse response) throws Exception {
-        String errorPageTemplate = _systemPath + "/docs/error.html.proto";
+        String errorPageTemplate = _systemPath + "/error/error.html.proto";
         sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  docsService, response);
     }
 
