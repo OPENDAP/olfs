@@ -27,6 +27,7 @@ import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
+import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -37,6 +38,9 @@ import org.slf4j.Logger;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 
 public class RDF extends HttpResponder {
@@ -109,6 +113,102 @@ public class RDF extends HttpResponder {
 
 
 
+        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));
+
+
+        String addRdfId2DapTransformFileName = _systemPath + "/xsl/addRdfId2Dap3.2.xsl";
+        Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
+
+        String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
+        Transformer xml2rdf = new Transformer(xml2rdfFileName);
+
+
+        String accepts = request.getHeader("Accepts");
+
+        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
+            response.setContentType("application/rdf+xml");
+        else
+            response.setContentType("text/xml");
+
+        Version.setOpendapMimeHeaders(request,response);
+        response.setHeader("Content-Description", "text/xml");
+
+
+        /*
+        StreamSource ddxWithRdfId = new StreamSource(addRdfId2DdxTransform.transform(ddxStreamSource));
+
+        ServletOutputStream os = response.getOutputStream();
+
+        xml2rdf.transform(ddxWithRdfId,os);
+        log.info("Sent RDF version of DDX.");
+        */
+
+
+        ServletOutputStream os = response.getOutputStream();
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        addRdfId2DdxTransform.transform(ddxStreamSource,baos);
+
+
+        StreamSource ddxWithRdfId = new StreamSource(new ByteArrayInputStream(baos.toByteArray()));
+
+        xml2rdf.transform(ddxWithRdfId,os);
+
+        log.info("Sent RDF version of DDX.");
+
+
+
+    }
+
+
+    public void oldRespondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String dataSourceID = ReqInfo.getBesDataSourceID(relativeUrl);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String xmlBase = request.getRequestURL().toString();
+        String context = request.getContextPath();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+        log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + dataSourceID);
+
+
+
+
+        String xdap_accept = "3.2";
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.DDX,
+                        dataSourceID,
+                        constraintExpression,
+                        xdap_accept,
+                        0,
+                        xmlBase,
+                        null,
+                        null,
+                        BesApi.DAP2_ERRORS);
+
+
+
+        log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+
+        Document ddx = new Document();
+        if(!_besApi.besTransaction(dataSourceID,reqDoc,ddx)){
+            BESError besError = new BESError(xmlo.outputString(ddx));
+            besError.sendErrorResponse(_systemPath, context, response);
+            log.error("sendDDX() encountered a BESError:\n" + xmlo.outputString(ddx));
+            return;
+        }
+
+
+        ddx.getRootElement().setAttribute("dataset_id",dataSourceID);
+
+        log.debug(xmlo.outputString(ddx));
+
+
+
 
 
         String currentDir = System.getProperty("user.dir");
@@ -145,7 +245,7 @@ public class RDF extends HttpResponder {
             rdf = transformer.transform(ddx);
 
         } catch (Exception e) {
-            sendRdfErrorResponse(e, dataSource, context, response);
+            sendRdfErrorResponse(e, dataSourceID, context, response);
             log.error(e.getMessage());
         }
 

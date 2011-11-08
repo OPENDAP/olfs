@@ -621,7 +621,8 @@ public class BES {
                 if (_serverVersionDocument == null) {
                     // Cache it!
                     cacheServerVersionDocument();
-                    log.info("BES Version: \n" + _serverVersionDocument);
+                    XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
+                    log.info("BES Version Document: \n" + xmlo.outputString(_serverVersionDocument));
                 }
             } finally {
                 // Unlock the resource.
