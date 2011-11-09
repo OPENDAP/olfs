@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import net.sf.saxon.s9api.XsltTransformer;
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
@@ -35,6 +36,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
+import javax.annotation.processing.Processor;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -111,6 +113,106 @@ public class RDF extends HttpResponder {
 
         log.debug(xmlo.outputString(ddx));
 
+        ServletOutputStream os = response.getOutputStream();
+        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));
+
+        /*
+         Because we are going to daisy chain the XSLT's we have to be careful here!
+         */
+
+        // Make the first Transform
+        String addRdfId2DapTransformFileName = _systemPath + "/xsl/addRdfId2Dap3.2.xsl";
+        Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
+
+        // Grab it's Processor object. All of the XSLT's in the chain must be built
+        // using the same Processor
+        net.sf.saxon.s9api.Processor proc = addRdfId2DdxTransform.getProcessor();
+
+        // Make the 2nd Transform using the Processor from the first.
+        String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
+        Transformer xml2rdf = new Transformer(proc, xml2rdfFileName);
+
+
+        // set the destination of the 1st transform to be the 2nd transform
+        addRdfId2DdxTransform.setDestination(xml2rdf);
+
+        // Set the destination of the 2nd transform to be the response OutputStream
+        xml2rdf.setOutputStream(os);
+
+        // Set the response headers
+
+        String accepts = request.getHeader("Accepts");
+
+        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
+            response.setContentType("application/rdf+xml");
+        else
+            response.setContentType("text/xml");
+
+        Version.setOpendapMimeHeaders(request,response);
+        response.setHeader("Content-Description", "text/xml");
+
+
+        // run the transform and send the content
+        addRdfId2DdxTransform.transform(ddxStreamSource);
+
+        log.info("Sent RDF version of DDX.");
+
+
+
+    }
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     * @deprecated
+     */
+    public void rev2_respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+        String xmlBase = request.getRequestURL().toString();
+        String context = request.getContextPath();
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+        log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + dataSource);
+
+
+
+
+        String xdap_accept = "3.2";
+        Document reqDoc =
+                _besApi.getRequestDocument(
+                        BesApi.DDX,
+                        dataSource,
+                        constraintExpression,
+                        xdap_accept,
+                        0,
+                        xmlBase,
+                        null,
+                        null,
+                        BesApi.DAP2_ERRORS);
+
+
+
+        log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+
+        Document ddx = new Document();
+        if(!_besApi.besTransaction(dataSource,reqDoc,ddx)){
+            BESError besError = new BESError(xmlo.outputString(ddx));
+            besError.sendErrorResponse(_systemPath, context, response);
+            log.error("sendDDX() encountered a BESError:\n" + xmlo.outputString(ddx));
+            return;
+        }
+
+
+        ddx.getRootElement().setAttribute("dataset_id",dataSource);
+
+        log.debug(xmlo.outputString(ddx));
+
 
 
         StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));
@@ -118,6 +220,8 @@ public class RDF extends HttpResponder {
 
         String addRdfId2DapTransformFileName = _systemPath + "/xsl/addRdfId2Dap3.2.xsl";
         Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
+
+
 
         String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
         Transformer xml2rdf = new Transformer(xml2rdfFileName);
@@ -162,6 +266,13 @@ public class RDF extends HttpResponder {
     }
 
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws Exception
+     * @deprecated
+     */
     public void oldRespondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSourceID = ReqInfo.getBesDataSourceID(relativeUrl);

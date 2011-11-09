@@ -28,17 +28,7 @@ package opendap.xml;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.s9api.DocumentBuilder;
-import net.sf.saxon.s9api.Processor;
-import net.sf.saxon.s9api.Serializer;
-import net.sf.saxon.s9api.XsltTransformer;
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XsltCompiler;
-import net.sf.saxon.s9api.XsltExecutable;
-import net.sf.saxon.s9api.XPathCompiler;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.XdmValue;
+import net.sf.saxon.s9api.*;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -54,11 +44,9 @@ import org.jdom.input.SAXBuilder;
 
 import org.slf4j.Logger;
 
-import java.net.URI;
 import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * User: ndp
@@ -74,7 +62,7 @@ public class Transformer {
     }
 
     private Processor proc;
-    private Serializer out;
+    private Serializer serializer;
     private XsltTransformer transform;
     private Date cacheTime;
     private String xsltDoc;
@@ -82,7 +70,7 @@ public class Transformer {
 
     private Transformer(){
         proc = null;
-        out = null;
+        serializer = null;
         transform = null;
         cacheTime = null;
         xsltDoc = null;
@@ -93,16 +81,16 @@ public class Transformer {
         this();
 
         proc = new Processor(false);
-
-        init(proc, xsltDocument);
+        xsltDoc = xsltDocument;
+        init(proc, new StreamSource(xsltDoc));
 
     }
 
     public Transformer(Processor proc, String xsltDocument) throws SaxonApiException {
         this();
 
-
-        init(proc, xsltDocument);
+        xsltDoc = xsltDocument;
+        init(proc, new StreamSource(xsltDoc));
 
     }
 
@@ -111,7 +99,6 @@ public class Transformer {
         this();
 
         proc = new Processor(false);
-
         init(proc, xsltDocStream);
 
     }
@@ -123,28 +110,12 @@ public class Transformer {
         proc = processor;
 
         // Get an XSLT processor and serializer
-        out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
+        serializer = new Serializer();
+        serializer.setOutputProperty(Serializer.Property.METHOD, "xml");
+        serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
         builder = getDocumentBuilder();
 
         loadTransform(xsltDocument);
-
-    }
-
-
-    private void init(Processor processor,String xsltDocument) throws SaxonApiException {
-
-        xsltDoc = xsltDocument;
-        proc = processor;
-
-        // Get an XSLT processor and serializer
-        out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        builder = getDocumentBuilder();
-
-        loadTransform(new StreamSource(xsltDoc));
 
     }
 
@@ -189,13 +160,44 @@ public class Transformer {
         return proc;
     }
 
+    public void setProcessor(Processor processor){
+        proc = processor;
+    }
+
+    public Serializer getSerializer() {
+        return serializer;
+    }
+
+    public void setSource(Source s) throws SaxonApiException {
+        transform.setSource(s);
+    }
+
+
+    public void setOutputStream(OutputStream os){
+        serializer.setOutputStream(os);
+        transform.setDestination(serializer);
+    }
+
+
+    public Destination getDestination(){
+        return transform.getDestination();
+    }
+
+    public void setDestination(Destination destination){
+        transform.setDestination(destination);
+    }
+
+    public void setDestination(Transformer destination){
+        transform.setDestination(destination.getCurrentTransform());
+    }
+
     public void transform(Source inputDocumentSource,  StreamSource transformDocumentSource, OutputStream os) throws SaxonApiException {
 
         Transformer t = new Transformer(transformDocumentSource);
 
-        out.setOutputStream(os);
+        serializer.setOutputStream(os);
         transform.setSource(inputDocumentSource);
-        transform.setDestination(out);
+        transform.setDestination(serializer);
         transform.transform();
 
     }
@@ -240,40 +242,38 @@ public class Transformer {
     }
 
     public void transform(XdmNode doc, OutputStream os) throws SaxonApiException {
-        out.setOutputStream(os);
+        serializer.setOutputStream(os);
         transform.setInitialContextNode(doc);
-        transform.setDestination(out);
+        transform.setDestination(serializer);
         transform.transform();
     }
 
     public void transform(Source s, OutputStream os) throws SaxonApiException {
-        out.setOutputStream(os);
+        serializer.setOutputStream(os);
         transform.setSource(s);
-        transform.setDestination(out);
+        transform.setDestination(serializer);
         transform.transform();
     }
 
-    public InputStream  transform(Source s) throws SaxonApiException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        out.setOutputStream(os);
-        transform.setSource(s);
-        transform.setDestination(out);
+    public void transform() throws SaxonApiException {
         transform.transform();
-        ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
-
-        log.debug("Transformed document is "+os.size()+" bytes.");
-
-        return bis;
-
     }
+
+    public void transform(Source s) throws SaxonApiException {
+        transform.setSource(s);
+        transform.transform();
+    }
+
+
+
 
 
     public InputStream  transform(String inputDocumentUrl) throws SaxonApiException {
         StreamSource s = new StreamSource(inputDocumentUrl);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        out.setOutputStream(os);
+        serializer.setOutputStream(os);
         transform.setSource(s);
-        transform.setDestination(out);
+        transform.setDestination(serializer);
         transform.transform();
         ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
 
@@ -418,6 +418,11 @@ public class Transformer {
 
     }
 
+    public XsltTransformer  getCurrentTransform(){
+        return transform;
+    }
+
+
 
     public static Document getXMLDoc(String s) throws Exception{
 
@@ -510,7 +515,7 @@ public class Transformer {
             }
         }
         catch(Exception e){
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.serializer);
             System.exit(1);
         }
 
@@ -518,7 +523,7 @@ public class Transformer {
 
     }
     */
-    public static void saxonXsltTransform(String srcDocUri, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
+    private static void saxonXsltTransform(String srcDocUri, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
 
 
         log.debug("Performing transform using Saxon");
@@ -543,57 +548,6 @@ public class Transformer {
     }
 
 
-    public static void saxonXsltTransform(InputStream srcDoc, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
-
-
-        log.debug("Performing transform using Saxon");
-
-        Processor proc = new Processor(false);
-
-        XsltTransformer trans = Transformer.getXsltTransformer(proc, xslTransformUri);
-
-        XdmNode source = proc.newDocumentBuilder().build(new StreamSource(srcDoc));
-
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        out.setOutputStream(os);
-
-        trans.setInitialContextNode(source);
-        trans.setDestination(out);
-        trans.transform();
-
-        log.debug("Output written to: "+os);
-
-    }
-
-
-    public static void saxonXsltTransform(InputStream srcDoc, InputStream xslTransform, OutputStream os) throws IOException, SaxonApiException {
-
-
-        log.debug("Performing transform using Saxon");
-
-        Processor proc = new Processor(false);
-
-        XsltCompiler comp = proc.newXsltCompiler();
-
-        XsltExecutable exp = comp.compile(new StreamSource(xslTransform));
-        XsltTransformer trans = exp.load();
-
-        XdmNode source = proc.newDocumentBuilder().build(new StreamSource(srcDoc));
-
-        Serializer out = new Serializer();
-        out.setOutputProperty(Serializer.Property.METHOD, "xml");
-        out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        out.setOutputStream(os);
-
-        trans.setInitialContextNode(source);
-        trans.setDestination(out);
-        trans.transform();
-
-        log.debug("Output written to: "+os);
-
-    }
 
 
 
@@ -656,12 +610,9 @@ public class Transformer {
 
 
 
-    public XsltTransformer  getCurrentTransform(){
-        return transform;
-    }
 
 
-    public static XsltTransformer getXsltTransformer(Processor proc, String xslTransformUri) throws IOException, SaxonApiException {
+    private static XsltTransformer getXsltTransformer(Processor proc, String xslTransformUri) throws IOException, SaxonApiException {
 
         XsltCompiler comp = proc.newXsltCompiler();
         XsltExecutable exp;
@@ -727,41 +678,6 @@ public class Transformer {
 
 
 
-    public static String uriInfo(URI uri){
-
-        String msg = "\n";
-
-
-        msg += "URI: "+uri.toString()+"\n";
-        msg += "  Authority:              "+uri.getAuthority()+"\n";
-        msg += "  Host:                   "+uri.getHost()+"\n";
-        msg += "  Port:                   "+uri.getPort()+"\n";
-        msg += "  Path:                   "+uri.getPath()+"\n";
-        msg += "  Query:                  "+uri.getQuery()+"\n";
-        msg += "  hashCode:               "+uri.hashCode()+"\n";
-        msg += "  Fragment:               "+uri.getFragment()+"\n";
-        msg += "  RawAuthority:           "+uri.getRawAuthority()+"\n";
-        msg += "  RawFragment:            "+uri.getRawFragment()+"\n";
-        msg += "  RawPath:                "+uri.getRawPath()+"\n";
-        msg += "  RawQuery:               "+uri.getRawQuery()+"\n";
-        msg += "  RawSchemeSpecificPart:  "+uri.getRawSchemeSpecificPart()+"\n";
-        msg += "  RawUSerInfo:            "+uri.getRawUserInfo()+"\n";
-        msg += "  Scheme:                 "+uri.getScheme()+"\n";
-        msg += "  SchemeSpecificPart:     "+uri.getSchemeSpecificPart()+"\n";
-        msg += "  UserInfo:               "+uri.getUserInfo()+"\n";
-        msg += "  isAbsoulte:             "+uri.isAbsolute()+"\n";
-        msg += "  isOpaque:               "+uri.isOpaque()+"\n";
-        msg += "  ASCIIString:            "+uri.toASCIIString()+"\n";
-
-        try {
-        msg += "  URL:                    "+uri.toURL()+"\n";
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        return msg;
-    }
 
 
 
