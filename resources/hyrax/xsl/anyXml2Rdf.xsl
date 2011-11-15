@@ -45,10 +45,13 @@
     <xsl:include href="xml2rdf.xsl"/>
 
 
-    <xsl:template match="/">
+    <xsl:template match="/*">
         <rdf:RDF>
+            <xsl:if test="@xml:base">
+                <xsl:attribute name="xml:base"><xsl:value-of select="@xml:base" /></xsl:attribute>
+            </xsl:if>
             <rdf:Description rdf:about="">
-                <xsl:apply-templates mode="xml2rdf"/>               
+                <xsl:apply-templates select="." mode="xml2rdf"/>
             </rdf:Description>
         </rdf:RDF>
     </xsl:template>
