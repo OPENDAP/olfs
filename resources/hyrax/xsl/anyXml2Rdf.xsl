@@ -23,20 +23,10 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 -->
-<!DOCTYPE xsl:stylesheet [
-        <!ENTITY DAPOBJ  "http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#" >
-        <!ENTITY DAP     "http://xml.opendap.org/ns/DAP/3.2#" >
-        <!ENTITY XSD     "http://www.w3.org/2001/XMLSchema#" >
-        ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                xmlns:owl="http://www.w3.org/2002/07/owl#"
-                xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
                 xmlns:xml="http://www.w3.org/XML/1998/namespace"
-                xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
         >
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
@@ -45,6 +35,7 @@
     <xsl:include href="xml2rdf.xsl"/>
 
 
+    <!-- matches ONLY the top level element in the source document, which is specifically NOT the document (root) node -->
     <xsl:template match="/*">
         <rdf:RDF>
             <xsl:if test="@xml:base">
