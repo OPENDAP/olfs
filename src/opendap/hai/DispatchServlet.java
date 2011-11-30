@@ -160,7 +160,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             else
                 masterRegex = "";
 
-            masterRegex += p.getPattern();
+            masterRegex += p.getRegexPatternString();
         }
         return Pattern.compile(masterRegex);
     }
@@ -251,7 +251,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 for (HttpResponder r : responders) {
                     if (r.matches(requestURL)) {
                         log.info("The request URL: " + requestURL + " matches " +
-                                "the pattern: \"" + r.getPattern() + "\"");
+                                "the pattern: \"" + r.getRegexPatternString() + "\"");
 
                         //dsi = new BESDataSource(dataSource);
                         //if(dsi.isDataset()){
@@ -302,7 +302,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 for (HttpResponder r : responders) {
                     if (r.matches(requestURL)) {
                         log.info("The request URL: " + requestURL + " matches " +
-                                "the pattern: \"" + r.getPattern() + "\"");
+                                "the pattern: \"" + r.getRegexPatternString() + "\"");
 
                         //dsi = new BESDataSource(dataSource);
                         //if(dsi.isDataset()){
