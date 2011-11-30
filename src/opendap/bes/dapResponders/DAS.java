@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
@@ -41,29 +42,29 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DAS extends HttpResponder {
+public class DAS extends BesDapResponder {
 
 
     private Logger log;
 
-    private BesApi _besApi;
 
 
-    private static String defaultRegex = ".*\\.das";
+    private static String defaultRequestSuffix = ".das";
 
 
     public DAS(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
     public DAS(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
     }
 
+
+    public DAS(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
 
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -83,11 +84,15 @@ public class DAS extends HttpResponder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
+
+
+        BesApi besApi = getBesApi();
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = _besApi.getRequestDocument(
+        Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.DAS,
                                                         dataSource,
                                                         constraintExpression,
@@ -98,9 +103,9 @@ public class DAS extends HttpResponder {
                                                         null,
                                                         BesApi.DAP2_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDAS() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

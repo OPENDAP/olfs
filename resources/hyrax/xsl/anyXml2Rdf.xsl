@@ -38,9 +38,6 @@
     <!-- matches ONLY the top level element in the source document, which is specifically NOT the document (root) node -->
     <xsl:template match="/*">
         <rdf:RDF>
-            <xsl:if test="@xml:base">
-                <xsl:attribute name="xml:base"><xsl:value-of select="@xml:base" /></xsl:attribute>
-            </xsl:if>
             <rdf:Description rdf:about="">
                 <xsl:apply-templates select="." mode="xml2rdf"/>
             </rdf:Description>

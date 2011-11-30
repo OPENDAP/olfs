@@ -24,10 +24,11 @@
 package opendap.gateway.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -42,7 +43,7 @@ import java.io.OutputStream;
 
 
 
-public class DatasetInfoHtmlPage extends HttpResponder {
+public class DatasetInfoHtmlPage extends BesDapResponder {
 
 
 
@@ -50,27 +51,32 @@ public class DatasetInfoHtmlPage extends HttpResponder {
 
 
 
-    private static String defaultRegex = ".*\\.info";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".info";
 
 
-    public DatasetInfoHtmlPage(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DatasetInfoHtmlPage(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public DatasetInfoHtmlPage(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
 
@@ -89,17 +95,18 @@ public class DatasetInfoHtmlPage extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.INFO_PAGE,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.INFO_PAGE,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.XML_ERRORS);
+                                                        BesApi.XML_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath, context, response);

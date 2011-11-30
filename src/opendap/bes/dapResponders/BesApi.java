@@ -80,10 +80,17 @@ public class BesApi {
 
 
 
-    private static Logger log;
-    static {
-        log = org.slf4j.LoggerFactory.getLogger(BesApi.class);
+    private Logger log;
+
+    public BesApi(){
+        super();
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     }
+
+
+
+
     private static boolean _initialized = false;
 
 

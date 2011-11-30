@@ -69,6 +69,10 @@
     <xsl:template match="/dap:Dataset">
 
         <!--
+        <xsl:attribute name="rdf:about">
+            <xsl:value-of select="@dataset_id"/>
+        </xsl:attribute>
+
         <rdf:RDF>
             <xsl:attribute name="base" namespace="http://www.w3.org/XML/1998/namespace">
                 <xsl:value-of select="$XML_BASE"/>
@@ -98,6 +102,9 @@
         </rdf:RDF>
         -->
         <xsl:copy>
+            <xsl:attribute name="rdf:about">
+                <xsl:value-of select="@dataset_id"/>
+            </xsl:attribute>
             <xsl:apply-templates select="@* | node()" />
         </xsl:copy>
 

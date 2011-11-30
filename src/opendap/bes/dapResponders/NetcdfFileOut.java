@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
@@ -46,26 +47,25 @@ import java.util.regex.Pattern;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class NetcdfFileOut extends HttpResponder {
+public class NetcdfFileOut extends BesDapResponder {
 
     private Logger log;
 
-    private BesApi _besApi;
 
-
-    private static String defaultRegex = ".*\\.nc";
-
+    private static String defaultRequestSuffix = ".nc";
 
     public NetcdfFileOut(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
     public NetcdfFileOut(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+    }
+
+
+    public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
     }
 
 
@@ -87,7 +87,7 @@ public class NetcdfFileOut extends HttpResponder {
         if(startsWithNumber.matcher(downloadFileName).matches())
             downloadFileName = "nc_"+downloadFileName;
 
-        log.debug("sendNetcdfFileOut() downloadFileName: " + downloadFileName );
+        log.debug("respondToHttpGetRequest(): NetCDF file downloadFileName: " + downloadFileName );
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
 
@@ -103,13 +103,15 @@ public class NetcdfFileOut extends HttpResponder {
 
         User user = new User(request);
 
+
+        BesApi besApi = getBesApi();
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
 
         Document reqDoc =
-                _besApi.getRequestDocument(
+                besApi.getRequestDocument(
                         BesApi.DAP2,
                         dataSource,
                         constraintExpression,
@@ -125,9 +127,9 @@ public class NetcdfFileOut extends HttpResponder {
 
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }
@@ -136,14 +138,6 @@ public class NetcdfFileOut extends HttpResponder {
 
         os.flush();
         log.info("Sent DAP2 data as netCDF file.");
-
-
-
-
-
-
-
-
 
     }
 

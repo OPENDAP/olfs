@@ -23,10 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.nciso;
 
-import opendap.bes.BESDataSource;
-import opendap.bes.BESError;
-import opendap.bes.BesXmlAPI;
-import opendap.bes.Version;
+import opendap.bes.*;
 import opendap.coreServlet.*;
 import opendap.xml.Transformer;
 import org.jdom.Document;

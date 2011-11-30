@@ -23,9 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -40,38 +42,49 @@ import java.io.OutputStream;
 
 
 
-public class Dap2Data extends HttpResponder {
+public class Dap2Data extends BesDapResponder {
 
 
 
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.dods";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".dods";
 
 
-    public Dap2Data(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public Dap2Data(String sysPath, BesGatewayApi besApi) {
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
-    public Dap2Data(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    public Dap2Data(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+    }
 
+    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
 
+
+
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
+
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
 
         log.debug("sendDAP2Data() For: " + dataSource+
                 "    CE: '" + constraintExpression + "'");
@@ -87,17 +100,18 @@ public class Dap2Data extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DAP2,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.DAP2,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        maxRS,
                                                         null,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.DAP2_ERRORS);
+                                                        BesApi.DAP2_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());

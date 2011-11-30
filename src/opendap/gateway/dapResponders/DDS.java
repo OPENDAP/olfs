@@ -23,10 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -42,27 +43,32 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DDS extends HttpResponder {
+public class DDS extends BesDapResponder {
 
 
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.dds";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".dds";
 
 
-    public DDS(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DDS(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public DDS(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DDS(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
+    public DDS(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
@@ -70,7 +76,7 @@ public class DDS extends HttpResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         log.debug("sendDDS() for dataset: " + dataSource);
@@ -89,17 +95,18 @@ public class DDS extends HttpResponder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DDS,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.DDS,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.DAP2_ERRORS);
+                                                        BesApi.DAP2_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
             log.error("sendDDS() encountered a BESError: "+msg);

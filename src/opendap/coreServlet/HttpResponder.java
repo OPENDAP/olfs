@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -52,15 +53,18 @@ public abstract class HttpResponder {
 
     private HttpResponder(){}
 
-    public HttpResponder(String sysPath, String pathPrefix, String regexPattern){
+    protected HttpResponder(String sysPath, String pathPrefix, String regexPattern){
         super();
         _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
         _systemPath = sysPath;
         this.pathPrefix = pathPrefix;
     }
 
-    public Pattern getPattern(){ return _pattern;}
-    public void setPattern(String regexPattern){ _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
+    public String getRegexPatternString(){ return _pattern.toString();}
+    protected void setRegexPattern(String regexPattern){ _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
+
+
+
 
     public boolean matches(String s){
        return _pattern.matcher(s).matches();
@@ -69,6 +73,7 @@ public abstract class HttpResponder {
 
 
     public void setPathPrefix(String prefix){ pathPrefix = prefix ;}
+
     public String getPathPrefix() { return pathPrefix; }
 
 

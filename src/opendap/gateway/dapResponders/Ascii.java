@@ -24,9 +24,11 @@
 package opendap.gateway.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -39,39 +41,47 @@ import java.io.OutputStream;
 
 
 
-public class Ascii extends HttpResponder {
+public class Ascii extends BesDapResponder {
 
     private Logger log;
 
+    private BesGatewayApi besGatewayApi;
 
-    private static String defaultRegex = ".*\\.asc(ii)?";
+    private static String defaultRequestSuffix = ".asc(ii)?";
 
 
-    public Ascii(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public Ascii(String sysPath, BesGatewayApi besApi) {
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
-    public Ascii(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    public Ascii(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+    }
 
+    public Ascii(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
 
 
 
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
+
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
 
 
         log.debug("sendASCII() for dataset: " + dataSource);
+
 
         response.setContentType("text/plain");
         Version.setOpendapMimeHeaders(request,response);
@@ -86,17 +96,20 @@ public class Ascii extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.ASCII,
-                                                        dataSourceUrl,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesGatewayApi.XML_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                        BesApi.ASCII,
+                        dataSourceUrl,
+                        constraintExpression,
+                        xdap_accept,
+                        maxRS,
+                        null,
+                        null,
+                        null,
+                        BesApi.XML_ERRORS);
+
+
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);

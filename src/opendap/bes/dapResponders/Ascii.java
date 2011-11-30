@@ -24,6 +24,7 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
@@ -40,28 +41,24 @@ import java.io.OutputStream;
 
 
 
-public class Ascii extends HttpResponder {
+public class Ascii extends BesDapResponder {
 
     private Logger log;
 
-    private BesApi _besApi;
-
-
-    private static String defaultRegex = ".*\\.asc(ii)?";
+    private static String defaultRequestSuffix = ".asc(ii)?";
 
 
     public Ascii(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
-
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
     public Ascii(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+    }
 
+    public Ascii(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -92,12 +89,14 @@ public class Ascii extends HttpResponder {
         int maxRS = user.getMaxResponseSize();
 
 
+        BesApi besApi = getBesApi();
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         Document reqDoc =
-                _besApi.getRequestDocument(
+                besApi.getRequestDocument(
                         BesApi.ASCII,
                         dataSource,
                         constraintExpression,
@@ -108,11 +107,11 @@ public class Ascii extends HttpResponder {
                         null,
                         BesApi.XML_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);
-            log.error("sendASCII() encountered a BESError: "+besError.getMessage());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
         }
 
 

@@ -23,10 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -34,7 +36,8 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,37 +46,45 @@ import java.io.*;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class XmlData extends HttpResponder {
+public class XmlData extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.xdods";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".xdods";
 
 
-    public XmlData(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public XmlData(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public XmlData(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public XmlData(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
+    public XmlData(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-
-
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
 
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+
+
+
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
 
 
         log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + dataSource +
@@ -94,22 +105,23 @@ public class XmlData extends HttpResponder {
 
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.XML_DATA,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.XML_DATA,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        maxRS,
                                                         xmlBase,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.XML_ERRORS);
+                                                        BesApi.XML_ERRORS);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        log.debug("BesGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());

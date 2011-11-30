@@ -24,49 +24,58 @@
 package opendap.gateway.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
+import opendap.xml.Transformer;
 import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
 
 
-public class RDF extends HttpResponder {
+public class RDF extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.rdf";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".rdf";
 
 
-    public RDF(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public RDF(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public RDF(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public RDF(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
+    public RDF(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
 
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -78,54 +87,60 @@ public class RDF extends HttpResponder {
 
 
         String xdap_accept = "3.2";
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DDX,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.DDX,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         xmlBase,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.DAP2_ERRORS);
+                                                        BesApi.DAP2_ERRORS);
 
 
 
-        log.debug("BesGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         Document ddx = new Document();
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,ddx)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
             besError.sendErrorResponse(_systemPath, context, response);
-            log.error("sendDDX() encountered a BESError:\n" + xmlo.outputString(ddx));
+            log.error("respondToHttpGetRequest() encountered a BESError:\n" + xmlo.outputString(ddx));
             return;
         }
-
 
         ddx.getRootElement().setAttribute("dataset_id",dataSource);
 
         log.debug(xmlo.outputString(ddx));
 
+        ServletOutputStream os = response.getOutputStream();
+        StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));
+
+        /*
+         Because we are going to daisy chain the XSLT's we have to be careful here!
+         */
+
+        // Make the first Transform
+        String addRdfId2DapTransformFileName = _systemPath + "/xsl/addRdfId2Dap3.2.xsl";
+        Transformer addRdfId2DdxTransform = new Transformer(addRdfId2DapTransformFileName);
+
+        // Grab it's Processor object. All of the XSLT's in the chain must be built
+        // using the same Processor
+        net.sf.saxon.s9api.Processor proc = addRdfId2DdxTransform.getProcessor();
+
+        // Make the 2nd Transform using the Processor from the first.
+        String xml2rdfFileName = _systemPath + "/xsl/anyXml2Rdf.xsl";
+        Transformer xml2rdf = new Transformer(proc, xml2rdfFileName);
 
 
+        // set the destination of the 1st transform to be the 2nd transform
+        addRdfId2DdxTransform.setDestination(xml2rdf);
 
+        // Set the destination of the 2nd transform to be the response OutputStream
+        xml2rdf.setOutputStream(os);
 
-        String currentDir = System.getProperty("user.dir");
-        String xslDir = _systemPath + "/xsl";
-        log.debug("Cached working directory: "+currentDir);
-
-        log.debug("Changing working directory to "+ xslDir);
-        System.setProperty("user.dir",xslDir);
-
-        String xsltDocName = "dap_3.2_ddxToRdfTriples.xsl";
-        SAXBuilder sb = new SAXBuilder();
-        Document xsltDoc = sb.build(xsltDocName);
-
-        log.debug(xmlo.outputString(xsltDoc));
-
-        XSLTransformer transformer = new XSLTransformer(xsltDoc);
-
-
-
+        // Set the response headers
 
         String accepts = request.getHeader("Accepts");
 
@@ -138,28 +153,26 @@ public class RDF extends HttpResponder {
         response.setHeader("Content-Description", "text/xml");
 
 
-        Document rdf = null;
-        try {
-            rdf = transformer.transform(ddx);
+        // run the 1st transform. This will send the result through the 2nd transform and
+        // the result of the 2nd transform will then be sent out the response OutputStream
 
+
+        try {
+            addRdfId2DdxTransform.transform(ddxStreamSource);
         } catch (Exception e) {
             sendRdfErrorResponse(e, dataSource, context, response);
             log.error(e.getMessage());
         }
 
 
+        log.info("Sent RDF version of DDX.");
 
-        if(rdf!=null){
-            ServletOutputStream os = response.getOutputStream();
-            xmlo.output(rdf,os);
-            os.flush();
-            log.info("Sent RDF version of DDX.");
-        }
-
-        log.debug("Restoring working directory to " + currentDir);
-        System.setProperty("user.dir",currentDir);
 
     }
+
+
+
+
 
 
 

@@ -337,7 +337,9 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+
+        String requestUrl = request.getRequestURL().toString();
+        String xmlBase = requestUrl.substring(0,requestUrl.lastIndexOf(".ddx"));
 
         log.debug("sendDDX() for dataset: " + dataSource);
 

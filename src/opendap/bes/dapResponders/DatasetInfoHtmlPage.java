@@ -24,6 +24,7 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.HttpResponder;
@@ -41,29 +42,27 @@ import java.io.OutputStream;
 
 
 
-public class DatasetInfoHtmlPage extends HttpResponder {
+public class DatasetInfoHtmlPage extends BesDapResponder {
 
 
 
     private Logger log;
 
-    private BesApi _besApi;
 
-
-
-    private static String defaultRegex = ".*\\.info";
+    private static String defaultRequestSuffix = ".info";
 
 
     public DatasetInfoHtmlPage(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null,defaultRequestSuffix,besApi);
+    }
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
     }
 
-    public DatasetInfoHtmlPage(String sysPath, String pathPrefix,BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
+
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
     }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -85,11 +84,13 @@ public class DatasetInfoHtmlPage extends HttpResponder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
+
+        BesApi besApi = getBesApi();
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = _besApi.getRequestDocument(
+        Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.INFO_PAGE,
                                                         dataSource,
                                                         constraintExpression,
@@ -100,11 +101,11 @@ public class DatasetInfoHtmlPage extends HttpResponder {
                                                         null,
                                                         BesApi.XML_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath, context, response);
-            log.error("sendINFO() encountered a BESError: "+besError.getMessage());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
 
         }
 

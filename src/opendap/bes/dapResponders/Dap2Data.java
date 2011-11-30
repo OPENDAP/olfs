@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
@@ -40,28 +41,28 @@ import java.io.OutputStream;
 
 
 
-public class Dap2Data extends HttpResponder {
+public class Dap2Data extends BesDapResponder {
 
 
 
     private Logger log;
 
-    private BesApi _besApi;
 
-    private static String defaultRegex = ".*\\.dods";
+    private static String defaultRequestSuffix = ".dods";
 
 
-    public Dap2Data(String sysPath,BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+    public Dap2Data(String sysPath, BesApi besApi) {
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
     public Dap2Data(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+    }
 
+
+    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -84,16 +85,19 @@ public class Dap2Data extends HttpResponder {
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
+
+        BesApi besApi = getBesApi();
+
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
         User user = new User(request);
-
         user.getMaxResponseSize();
 
 
         Document reqDoc =
-                _besApi.getRequestDocument(
+                besApi.getRequestDocument(
                         BesApi.DAP2,
                         dataSource,
                         constraintExpression,
@@ -104,9 +108,9 @@ public class Dap2Data extends HttpResponder {
                         null,
                         BesApi.DAP2_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDAP2Data() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

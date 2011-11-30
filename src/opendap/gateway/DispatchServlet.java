@@ -93,21 +93,24 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         }
 
 
-        responders.add(new DDX(systemPath));
-        responders.add(new DDS(systemPath));
-        responders.add(new DAS(systemPath));
-        responders.add(new RDF(systemPath));
-
-        responders.add(new HtmlDataRequestForm(systemPath));
-        responders.add(new DatasetInfoHtmlPage(systemPath));
-
-        responders.add(new Dap2Data(systemPath));
-        responders.add(new Ascii(systemPath));
+        BesGatewayApi besApi = new BesGatewayApi();
 
 
-        responders.add(new DataDDX(systemPath));
-        responders.add(new NetcdfFileOut(systemPath));
-        responders.add(new XmlData(systemPath));
+        responders.add(new DDX(systemPath, besApi));
+        responders.add(new DDS(systemPath, besApi));
+        responders.add(new DAS(systemPath, besApi));
+        responders.add(new RDF(systemPath, besApi));
+
+        responders.add(new HtmlDataRequestForm(systemPath, besApi));
+        responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
+
+        responders.add(new Dap2Data(systemPath, besApi));
+        responders.add(new Ascii(systemPath, besApi));
+
+
+        responders.add(new DataDDX(systemPath, besApi));
+        responders.add(new NetcdfFileOut(systemPath, besApi));
+        responders.add(new XmlData(systemPath, besApi));
 
         responders.add(new GatewayForm(systemPath));
 
@@ -184,7 +187,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             else
                 masterRegex = "";
 
-            masterRegex += p.getPattern();
+            masterRegex += p.getRegexPatternString();
         }
         return Pattern.compile(masterRegex);
     }
@@ -275,7 +278,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 for (HttpResponder r : responders) {
                     if (r.matches(requestURL)) {
                         log.info("The request URL: " + requestURL + " matches " +
-                                "the pattern: \"" + r.getPattern() + "\"");
+                                "the pattern: \"" + r.getRegexPatternString() + "\"");
 
                         //dsi = new BESDataSource(dataSource);
                         //if(dsi.isDataset()){

@@ -132,13 +132,6 @@ public class ReqInfo {
 
     }
 
-    /**
-     * Returns the full source name for this request. This is essentially the same as the value
-     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
-     * is null then the full source name is "/".
-     * @param req The client request.
-     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
-     */
     public static String getLocalUrl(HttpServletRequest req){
 
         String name=req.getPathInfo();
@@ -152,27 +145,6 @@ public class ReqInfo {
     }
 
 
-    /**
-     * Returns the full source name for this request. This is essentially the same as the value
-     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
-     * is null then the full source name is "/".
-     * @param req The client request.
-     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
-     */
-    public static String getLocalUrl(HttpServletRequest req,String pathPrefix){
-
-
-
-
-        String name=req.getPathInfo();
-
-        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
-            name = "/";
-
-        }
-        return name;
-
-    }
 
 
 

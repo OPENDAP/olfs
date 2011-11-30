@@ -24,6 +24,7 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
@@ -43,29 +44,31 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class HtmlDataRequestForm extends HttpResponder {
+public class HtmlDataRequestForm extends BesDapResponder {
 
 
 
     private Logger log;
 
-    private BesApi _besApi;
 
 
-    private static String defaultRegex = ".*\\.html?";
-
+    private static String defaultRequestSuffix = ".html?";
 
     public HtmlDataRequestForm(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
     public HtmlDataRequestForm(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
     }
+
+
+    public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
 
 
 
@@ -79,7 +82,8 @@ public class HtmlDataRequestForm extends HttpResponder {
         String context = request.getContextPath();
 
 
-        log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
+        log.debug("respondToHttpGetRequest() - Sending HTML Data Request Form for dataset: " + dataSource+
+                "    CE: '" + request.getQueryString() + "'");
 
         response.setContentType("text/html");
         Version.setOpendapMimeHeaders(request,response);
@@ -88,10 +92,6 @@ public class HtmlDataRequestForm extends HttpResponder {
 
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
-
-        log.debug("sendHTMLRequestForm(): Sending HTML Data Request Form For: "
-                + dataSource +
-                "    CE: '" + request.getQueryString() + "'");
 
 
         OutputStream os = response.getOutputStream();
@@ -103,11 +103,13 @@ public class HtmlDataRequestForm extends HttpResponder {
         url = url.substring(0, suffix_start);
 
 
-        log.debug("sendHTMLRequestForm(): HTML Form URL: " + url);
+        log.debug("respondToHttpGetRequest() - HTML Form URL: " + url);
+
+        BesApi besApi = getBesApi();
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = _besApi.getRequestDocument(
+        Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.HTML_FORM,
                                                         dataSource,
                                                         null,
@@ -118,7 +120,7 @@ public class HtmlDataRequestForm extends HttpResponder {
                                                         null,
                                                         BesApi.XML_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 
@@ -126,7 +128,7 @@ public class HtmlDataRequestForm extends HttpResponder {
 
 
             String msg = besError.getMessage();
-            log.error("sendHTMLRequestForm() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() - Encountered a BESError: "+msg);
         }
 
         os.flush();

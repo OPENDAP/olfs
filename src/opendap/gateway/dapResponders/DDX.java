@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
 import org.jdom.Document;
@@ -42,7 +43,7 @@ import java.io.OutputStream;
 
 
 
-public class DDX extends HttpResponder {
+public class DDX extends BesDapResponder {
 
 
 
@@ -50,38 +51,39 @@ public class DDX extends HttpResponder {
 
 
 
-    private static String defaultRegex = ".*\\.ddx";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".ddx";
 
 
-    public DDX(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DDX(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public DDX(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    public DDX(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    }
 
+    public DDX(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-         sendDDX( request,  response);
-    }
-
-    public void sendDDX(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
 
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
-        log.debug("sendDDX() for dataset: " + dataSource);
+        log.debug("respondToHttpGetRequest() for dataset: " + dataSource);
 
         response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response);
@@ -96,24 +98,25 @@ public class DDX extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DDX,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.DDX,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         xmlBase,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.XML_ERRORS);
+                                                        BesApi.XML_ERRORS);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        log.debug("BesGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

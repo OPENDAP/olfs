@@ -23,11 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
+import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -46,26 +48,32 @@ import java.util.regex.Pattern;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class NetcdfFileOut extends HttpResponder {
+public class NetcdfFileOut extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.nc";
+    private BesGatewayApi besGatewayApi;
+
+    private static String defaultRequestSuffix = ".nc";
 
 
-    public NetcdfFileOut(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public NetcdfFileOut(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public NetcdfFileOut(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    public NetcdfFileOut(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    }
 
+    public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
@@ -74,7 +82,15 @@ public class NetcdfFileOut extends HttpResponder {
         String fullSourceName = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+
+
+
+
+
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
+
 
 
         log.debug("respondToHttpGetRequest(): Sending netCDF File Out response for dataset: " + dataSource + "?" +
@@ -105,22 +121,23 @@ public class NetcdfFileOut extends HttpResponder {
 
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DAP2,
+        Document reqDoc = besGatewayApi.getRequestDocument(
+                                                        BesApi.DAP2,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        maxRS,
                                                         null,
                                                         null,
                                                         "netcdf",
-                                                        BesGatewayApi.DAP2_ERRORS);
+                                                        BesApi.DAP2_ERRORS);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        log.debug("BesGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());

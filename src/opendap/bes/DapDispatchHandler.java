@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 
 /**
  * Handler for DAP requests.
+ * @deprecated
  */
 public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 

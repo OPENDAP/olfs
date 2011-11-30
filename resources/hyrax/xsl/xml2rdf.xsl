@@ -84,13 +84,20 @@
                             </xsl:attribute>
                         </xsl:if>
 
+                        <xsl:if test="@xml:base">
+                            <xsl:attribute name="xml:base">
+                                <xsl:value-of select="@xml:base"/>
+                            </xsl:attribute>
+                        </xsl:if>
+
                         <!-- Convert the attributes to elements -->
                         <xsl:for-each
                                 select="@*[
                                 generate-id(.) != generate-id(../@rdf:about)  and
                                 generate-id(.) != generate-id(../@rdfx:about) and
                                 generate-id(.) != generate-id(../@rdf:ID)     and
-                                generate-id(.) != generate-id(../@rdfx:ID)
+                                generate-id(.) != generate-id(../@rdfx:ID)    and
+                                generate-id(.) != generate-id(../@xml:base)
                                 ]">
                             <xsl:variable name="attNamespace">
                                 <xsl:call-template name="getConvertedNamespace"/>

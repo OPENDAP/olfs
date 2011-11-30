@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
@@ -38,31 +39,37 @@ import java.io.OutputStream;
 import java.net.UnknownServiceException;
 
 
-public class DataDDX extends HttpResponder {
+public class DataDDX extends BesDapResponder {
 
 
 
-    private Logger log;private BesApi _besApi;
+    private Logger log;
 
-    private static String defaultRegex = ".*\\.dap";
+
+    private static String defaultRequestSuffix = ".dap";
 
 
     public DataDDX(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null,defaultRequestSuffix,besApi);
     }
 
     public DataDDX(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
     }
+
+
+
+    public DataDDX(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
@@ -104,11 +111,12 @@ public class DataDDX extends HttpResponder {
         User user = new User(request);
 
 
+        BesApi besApi = getBesApi();
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = _besApi.getDataDDXRequest(dataSource,
+        Document reqDoc = besApi.getDataDDXRequest(dataSource,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         user.getMaxResponseSize(),
@@ -116,9 +124,9 @@ public class DataDDX extends HttpResponder {
                                                         startID,
                                                         mb.getBoundary());
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDAP2Data() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }
