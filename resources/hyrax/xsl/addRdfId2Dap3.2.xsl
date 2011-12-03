@@ -119,6 +119,7 @@
             <xsl:attribute name="rdf:ID">
                 <xsl:call-template name="localIdWorker"/>
             </xsl:attribute>
+            <xsl:call-template name="localId"/>
             <xsl:apply-templates select="@* | node()" />
         </xsl:copy>
     </xsl:template>
@@ -129,6 +130,7 @@
             <xsl:attribute name="rdf:ID">
                 <xsl:call-template name="localIdWorker"/>
             </xsl:attribute>
+            <xsl:call-template name="localId"/>
             <xsl:apply-templates mode="array" select="@* | node()" />
         </xsl:copy>
     </xsl:template>
@@ -152,9 +154,9 @@
      -
     -->
     <xsl:template name="localId">
-        <dapObj:localId rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
+        <xsl:attribute name="localId">
             <xsl:call-template name="localIdWorker"/>
-        </dapObj:localId>
+        </xsl:attribute>
     </xsl:template>
 
     <xsl:template match="*" name="localIdWorker" mode="localId">
