@@ -58,7 +58,7 @@ public class FileDispatchHandler implements DispatchHandler {
     }
 
 
-    static boolean allowDirectDataSourceAccess(){
+    public static boolean allowDirectDataSourceAccess(){
         return allowDirectDataSourceAccess;
     }
 
@@ -235,22 +235,55 @@ public class FileDispatchHandler implements DispatchHandler {
 
         String serviceUrl = ReqInfo.getServiceUrl(request);
 
-        pw.println("<h2>ACCESS DENIED</h2>");
-        pw.println("<p>The requested URL references a data source directly. </p>" +
-                "<p>You must use the OPeNDAP request interface to get data from the data source.</p>");
+
+        pw.println("<html xmlns=\"http://www.w3.org/1999/xhtml\"> ");
+        pw.println("<head>  ");
+        pw.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\" />");
+        pw.println("    <link rel='stylesheet' href='/opendap/docs/css/contents.css' type='text/css' />");
+        pw.println("<title>Hyrax:  Access Denied</title>");
+        pw.println("</head>");
+        pw.println("");
+        pw.println("<body>");
+        pw.println("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.gif\"/>");
+
+        pw.println("<h1>Hyrax : Access Denied (403) </h1>");
+        pw.println("<hr align=\"left\" size=\"1\" noshade=\"noshade\" />");
 
 
-        pw.println("<p>If you would like to start at the top level of this server, go here:</p>");
-        pw.println("<p><a href='" + Scrub.completeURL(serviceUrl) + "'>" + Scrub.completeURL(serviceUrl) + "</a></p>");
+
+        pw.println("<div class=\"large\">The requested URL directly references a data source. </div>");
+        pw.println("<p>You must use the OPeNDAP request interface to get data from the data source.</p>");
+
+
+        pw.println("<p>If you would like to start at the top level of this server, go here:");
+        pw.println("<a href='" + Scrub.completeURL(serviceUrl) + "'>" + Scrub.completeURL(serviceUrl) + "</a></p>");
         pw.println("<p>If you think that the server is broken (that the URL you");
         pw.println("submitted should have worked), then please contact the");
         pw.println("OPeNDAP user support coordinator at: ");
         pw.println("<a href=\"mailto:support@opendap.org\">support@opendap.org</a></p>");
 
+        pw.println("<hr align=\"left\" size=\"1\" noshade=\"noshade\" />");
+        pw.println("<h1 >Hyrax : Access Denied (403) </h1>");
+        pw.println("</body>");
+        pw.println("</html>");
         pw.flush();
 
+        /*
+        pw.println("<table width=\"100%\" border=\"0\">");
+        pw.println("  <tr>");
+        pw.println("    <td><img src=\"/opendap/docs/images/forbidden.png\" alt=\"Forbidden!\" width=\"350\" height=\"313\" /></td> ");
+        pw.println("    <td align=\"center\"><strong>You do not have permission to access the requested resource. </strong>");
+        pw.println("      <p align=\"left\">&nbsp;</p>");
+        pw.println("      <p align=\"left\">&nbsp;</p></td>");
+        pw.println("  </tr>");
+        pw.println("</table>");
+        */
 
     }
+
+
+
+
 
 
 }
