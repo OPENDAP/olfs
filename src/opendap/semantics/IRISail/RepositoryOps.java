@@ -1086,8 +1086,8 @@ public class RepositoryOps {
 
                 idltm.put(idstr, ltmodstr);
 
-                // log.debug("ID:" + valueOfID.stringValue());
-                // log.debug("LMT:" + valueOfLMT.stringValue());
+                log.debug("ID:" + valueOfID.stringValue());
+                log.debug("LMT:" + valueOfLMT.stringValue());
 
             }
         } catch (QueryEvaluationException e) {

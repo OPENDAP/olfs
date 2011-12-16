@@ -25,6 +25,7 @@
 package opendap.bes;
 
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServlet;
@@ -281,7 +282,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new BESDataSource(dataSourceName);
+        return new BESDataSource(dataSourceName, new BesApi());
     }
 
 
@@ -314,7 +315,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -374,7 +375,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -434,7 +435,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         // This will need to be dependent on the DAP version with 3.2 and
         // earlier using dods_ddx and 3.3 or later using dap4_ddx.
         response.setHeader("Content-Description", "dods_ddx");
@@ -514,7 +515,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                                 "boundary=\""+mb.getBoundary()+"\"");
 
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dap4_data_ddx");
 
         // This hedaer indicates to the client that the content of this response
@@ -588,7 +589,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType("application/octet-stream");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dods_data");
 
 
@@ -631,7 +632,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String context = request.getContextPath();
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dods_ascii");
 
 
@@ -685,7 +686,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String context = request.getContextPath();
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dap_xml");
 
 
@@ -740,7 +741,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String context = request.getContextPath();
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dods_form");
 
 
@@ -797,7 +798,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String context = request.getContextPath();
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "dods_description");
 
 
@@ -871,7 +872,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         else
             response.setContentType("text/xml");
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
         response.setHeader("Content-Description", "text/xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -1011,7 +1012,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         response.setContentType("application/x-netcdf");
         response.setHeader("Content-Disposition",contentDisposition);
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
 
 
         String xdap_accept = request.getHeader("XDAP-Accept");

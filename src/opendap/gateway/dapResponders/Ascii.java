@@ -45,7 +45,7 @@ public class Ascii extends BesDapResponder {
 
     private Logger log;
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".asc(ii)?";
 
@@ -60,7 +60,7 @@ public class Ascii extends BesDapResponder {
 
     public Ascii(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -73,7 +73,7 @@ public class Ascii extends BesDapResponder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
         User user = new User(request);
@@ -84,7 +84,7 @@ public class Ascii extends BesDapResponder {
 
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_ascii");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -97,7 +97,7 @@ public class Ascii extends BesDapResponder {
 
 
 
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                         BesApi.ASCII,
                         dataSourceUrl,
                         constraintExpression,
@@ -109,7 +109,7 @@ public class Ascii extends BesDapResponder {
                         BesApi.XML_ERRORS);
 
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);

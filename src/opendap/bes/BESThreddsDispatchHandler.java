@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
@@ -57,24 +58,26 @@ import java.util.regex.Pattern;
  */
 public class BESThreddsDispatchHandler implements DispatchHandler {
 
-    private DispatchServlet servlet;
-    private String systemPath;
+    private DispatchServlet _servlet;
+    private String _systemPath;
 
 
-    private org.slf4j.Logger log;
+    private org.slf4j.Logger _log;
     private Pattern matchPattern =  Pattern.compile(".*.catalog.xml");
 
-    private boolean initialized;
+    private boolean _initialized;
+
+    private BesApi _besApi;
 
 
 
     public BESThreddsDispatchHandler(){
 
-        servlet  = null;
+        _servlet = null;
 
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        _log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        initialized = false;
+        _initialized = false;
 
 
     }
@@ -93,14 +96,15 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
     public void init(DispatchServlet s,Element config) throws Exception{
 
-        if(initialized) return;
+        if(_initialized) return;
 
-        servlet  = s;
-        systemPath = ServletUtil.getSystemPath(servlet,"");
+        _servlet = s;
+        _systemPath = ServletUtil.getSystemPath(_servlet,"");
 
+        _besApi = new BesApi();
 
-        log.info("Initialized.");
-        initialized = true;
+        _log.info("Initialized.");
+        _initialized = true;
 
     }
 
@@ -125,11 +129,11 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         }
 
         if(isThreddsRequest){
-            log.debug("Identified a THREDDS request.");
+            _log.debug("Identified a THREDDS request.");
             return true;
         }
 
-        log.debug("Not a THREDDS request.");
+        _log.debug("Not a THREDDS request.");
         return false;
     }
 
@@ -142,15 +146,15 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             throws Exception {
 
 
-        log.debug("Processing THREDDS request.");
+        _log.debug("Processing THREDDS request.");
 
-        Request oreq = new Request(servlet,request);
+        Request oreq = new Request(_servlet,request);
 
         String context = request.getContextPath();
 
         
 
-        log.debug(Util.probeRequest(servlet,request));
+        _log.debug(Util.probeRequest(_servlet,request));
 
 
         String besCatalogName = Scrub.urlContent(oreq.getRelativeUrl());
@@ -165,19 +169,19 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         if (besCatalogName.startsWith("/"))
             besCatalogName = besCatalogName.substring(1, besCatalogName.length());
 
-        log.debug("sendThreddsCatalog() - besCatalogName:  " + besCatalogName);
+        _log.debug("sendThreddsCatalog() - besCatalogName:  " + besCatalogName);
 
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         Document showCatalogDoc = new Document();
 
-        if (BesXmlAPI.getCatalog(besCatalogName, showCatalogDoc)) {
+        if (_besApi.getCatalog(besCatalogName, showCatalogDoc)) {
 
 
-            log.debug(xmlo.outputString(showCatalogDoc));
+            _log.debug(xmlo.outputString(showCatalogDoc));
 
-            String xsltDoc = systemPath + "/xsl/catalog.xsl";
+            String xsltDoc = _systemPath + "/xsl/catalog.xsl";
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
@@ -190,12 +194,12 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
             response.setContentType("text/xml");
-            Version.setOpendapMimeHeaders(request,response);
+            Version.setOpendapMimeHeaders(request,response,_besApi);
             response.setHeader("Content-Description", "thredds_catalog");
 
 
             if(InheritedMetadataManager.hasInheritedMetadata(threddsCatalogID)){
-                log.debug("Found inherited metadata for collection '"+ besCatalogName +"'");
+                _log.debug("Found inherited metadata for collection '"+ besCatalogName +"'");
 
                 // Go get the inherited metadata elements.
                 Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(threddsCatalogID);
@@ -213,12 +217,12 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                 Element topDataset = catalog.getChild("dataset", THREDDS.NS);
 
                 // Add the metadata content to the dataset element.
-                log.debug("Adding inherited metadata to catalog");
+                _log.debug("Adding inherited metadata to catalog");
                 topDataset.addContent(1,metadata);
 
                 // Get the service definitions (if any) used by the inherited metadata?
                 Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
-                log.debug("Collecting inherited services.");
+                _log.debug("Collecting inherited services.");
                 Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
                 HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
                 Element service;
@@ -231,7 +235,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
                     
-                    log.debug("Collecting existing services.");
+                    _log.debug("Collecting existing services.");
                     i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
                     HashMap<String, Element> existingServices = new HashMap<String, Element>();
                     while(i.hasNext()){
@@ -244,7 +248,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
                     for(Element inheritedService: inheritedServices.values()){
                         iServiceName = inheritedService.getAttributeValue("name");
-                        log.debug("Inherited service has service '"+iServiceName+"' - Checking existing services...");
+                        _log.debug("Inherited service has service '"+iServiceName+"' - Checking existing services...");
 
                         Element existingService = existingServices.get(iServiceName);
 
@@ -256,7 +260,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                             String eServiceBase = existingService.getAttributeValue("base");
 
                             if(!iServiceType.equalsIgnoreCase(eServiceType) || !iServiceBase.equals(eServiceBase)){
-                                log.warn("Removing conflicting service definition for service '"+iServiceName+"' from inherited services");
+                                _log.warn("Removing conflicting service definition for service '"+iServiceName+"' from inherited services");
                                 inheritedService.detach();
                             }
 
@@ -293,12 +297,12 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         } else {
             BESError besError = new BESError(showCatalogDoc);
-            besError.sendErrorResponse(systemPath, context, response);
-            log.error(besError.getMessage());
+            besError.sendErrorResponse(_systemPath, context, response);
+            _log.error(besError.getMessage());
 
         }
 
-        log.debug("THREDDS showCatalogDoc request processed.");
+        _log.debug("THREDDS showCatalogDoc request processed.");
 
 
     }
@@ -317,9 +321,9 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
     public long getLastModified(HttpServletRequest req){
         String name = ReqInfo.getLocalUrl(req);
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
+        _log.debug("getLastModified(): Tomcat requesting getlastModified() for " +
                 "collection: " + name );
-        log.debug("getLastModified(): Returning: -1" );
+        _log.debug("getLastModified(): Returning: -1" );
 
         return -1;
     }
@@ -327,9 +331,9 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
     public void destroy(){
-        servlet  = null;
-        initialized = false;
-        log.info("Destroy complete.");
+        _servlet = null;
+        _initialized = false;
+        _log.info("Destroy complete.");
 
     }
 

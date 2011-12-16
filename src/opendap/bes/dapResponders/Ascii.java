@@ -71,11 +71,13 @@ public class Ascii extends BesDapResponder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String context = request.getContextPath();
 
+        BesApi besApi = getBesApi();
+
 
         log.debug("sendASCII() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ascii");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -89,7 +91,6 @@ public class Ascii extends BesDapResponder {
         int maxRS = user.getMaxResponseSize();
 
 
-        BesApi besApi = getBesApi();
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();

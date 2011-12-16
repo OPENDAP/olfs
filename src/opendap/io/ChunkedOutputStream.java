@@ -60,7 +60,7 @@ public class ChunkedOutputStream  extends OutputStream {
     private int currentChunkType;
 
     protected boolean isOpen;
-    protected String closedMsg = "ChunkedOutputSTream has been closed.";
+    protected String closedMsg = "ChunkedOutputStream has been closed.";
 
 
 
@@ -70,15 +70,7 @@ public class ChunkedOutputStream  extends OutputStream {
      */
     public ChunkedOutputStream(OutputStream stream){
         super();
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-
-        _rawOS = stream;
-        minimumChunkSize = Chunk.DEFAULT_SIZE;
-        cache = new byte[Chunk.DEFAULT_SIZE];
-        cacheSize = 0;
-        currentChunkType = Chunk.DATA;
-        isOpen = true;
-
+        init(stream,Chunk.DEFAULT_SIZE);
 
     }
 
@@ -92,7 +84,6 @@ public class ChunkedOutputStream  extends OutputStream {
     public ChunkedOutputStream(OutputStream stream, int minChunkSize) throws Exception {
 
         super();
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
         if(minChunkSize > Chunk.MAX_SIZE)
@@ -100,11 +91,18 @@ public class ChunkedOutputStream  extends OutputStream {
                     Chunk.MAX_SIZE + " bytes. You asked for "+minChunkSize
                     + " bytes.");
 
+        init(stream,minChunkSize);
 
+    }
+
+    private void init(OutputStream stream, int minChunkSize){
+
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
         _rawOS = stream;
 
         minimumChunkSize = minChunkSize;
         cache = new byte[minimumChunkSize];
+        cacheSize = 0;
         currentChunkType = Chunk.DATA;
         isOpen = true;
 
@@ -208,7 +206,9 @@ public class ChunkedOutputStream  extends OutputStream {
 
         if(cacheSize>0){
             Chunk.writeChunkHeader(_rawOS,cacheSize,currentChunkType);
-            log.debug("flushCache() - cache contains: \""+new String(cache,0,cacheSize)+"\"");
+            StringBuilder msg = new StringBuilder();
+            msg.append("flushCache() - cache contains: \"").append(new String(cache,0,cacheSize)+"\"");
+            log.debug(msg.toString());
             _rawOS.write(cache,0,cacheSize);
             cacheSize = 0;
         }

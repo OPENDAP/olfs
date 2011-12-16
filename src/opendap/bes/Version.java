@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.Document;
@@ -131,16 +132,6 @@ public class Version  {
 
 
 
-
-
-
-
-    private static Document getVersionDocument(String path) throws Exception{
-
-        return BesXmlAPI.getVersionDocument(path);
-    }
-
-
     /**
      *
      * @param request The client request for which to return the verison.
@@ -148,14 +139,14 @@ public class Version  {
      * ascertained by querying the BES.
      * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXDODSServerVersion(HttpServletRequest request)
+    public static String getXDODSServerVersion(HttpServletRequest request, BesApi besApi)
             throws Exception {
 
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
-        Document versionDoc = getVersionDocument(dataSource);
+        Document versionDoc = besApi.getVersionDocument(dataSource);
 
         if (versionDoc != null) {
 
@@ -206,12 +197,12 @@ public class Version  {
      *         the BES and conforming to the DAP4 specification.
      * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXOPeNDAPServerVersion(HttpServletRequest request)
+    public static String getXOPeNDAPServerVersion(HttpServletRequest request, BesApi besApi)
             throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
-        Document versionDoc = getVersionDocument(datasource);
+        Document versionDoc = besApi.getVersionDocument(datasource);
 
         if (versionDoc != null) {
 
@@ -297,7 +288,7 @@ public class Version  {
      * the DAP specifcation that the server response conforms to.
      * @throws Exception If these is a problem getting the version document.
      */
-    public static String getXDAPVersion(HttpServletRequest request) throws Exception {
+    public static String getXDAPVersion(HttpServletRequest request, BesApi besApi) throws Exception {
         double hval = 0.0;
         String hver = "";
 
@@ -308,7 +299,7 @@ public class Version  {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
-        Document versionDoc = getVersionDocument(datasource);
+        Document versionDoc = besApi.getVersionDocument(datasource);
 
 
         if (versionDoc != null) {
@@ -389,13 +380,12 @@ public class Version  {
      * @param response The response in which to set the headers.
      * @throws Exception If these is a problem getting the version document.
      */
-    public static void setOpendapMimeHeaders(HttpServletRequest request,
-                                      HttpServletResponse response)
+    public static void setOpendapMimeHeaders(HttpServletRequest request, HttpServletResponse response, BesApi besApi)
             throws Exception{
 
-        response.setHeader("XDODS-Server", Version.getXDODSServerVersion(request));
-        response.setHeader("XOPeNDAP-Server", Version.getXOPeNDAPServerVersion(request));
-        response.setHeader("XDAP", Version.getXDAPVersion(request));
+        response.setHeader("XDODS-Server", getXDODSServerVersion(request, besApi));
+        response.setHeader("XOPeNDAP-Server", getXOPeNDAPServerVersion(request, besApi));
+        response.setHeader("XDAP", getXDAPVersion(request, besApi));
 
     }
 

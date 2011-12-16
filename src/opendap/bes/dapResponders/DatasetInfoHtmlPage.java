@@ -72,11 +72,12 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
 
         String context = request.getContextPath();
 
+        BesApi besApi = getBesApi();
 
         log.debug("sendINFO() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -85,7 +86,6 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
-        BesApi besApi = getBesApi();
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 

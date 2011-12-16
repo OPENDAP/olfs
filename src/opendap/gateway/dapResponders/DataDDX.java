@@ -44,7 +44,7 @@ public class DataDDX extends BesDapResponder {
 
     private Logger log;
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".dap";
 
@@ -59,7 +59,7 @@ public class DataDDX extends BesDapResponder {
 
     public DataDDX(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -72,7 +72,7 @@ public class DataDDX extends BesDapResponder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
 
@@ -93,7 +93,7 @@ public class DataDDX extends BesDapResponder {
                                 "boundary=\""+mb.getBoundary()+"\"");
 
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dap4_data_ddx");
 
         // This header indicates to the client that the content of this response
@@ -117,7 +117,7 @@ public class DataDDX extends BesDapResponder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = besGatewayApi.getDataDDXRequest(dataSourceUrl,
+        Document reqDoc = _besGatewayApi.getDataDDXRequest(dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         maxRS,
@@ -125,7 +125,7 @@ public class DataDDX extends BesDapResponder {
                                                         startID,
                                                         mb.getBoundary());
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());

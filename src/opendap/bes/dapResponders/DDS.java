@@ -76,12 +76,13 @@ public class DDS extends BesDapResponder {
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        BesApi besApi = getBesApi();
 
 
         log.debug("Sending DDS for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -90,7 +91,6 @@ public class DDS extends BesDapResponder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
-        BesApi besApi = getBesApi();
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 

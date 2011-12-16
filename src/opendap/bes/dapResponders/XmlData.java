@@ -80,6 +80,7 @@ public class XmlData extends BesDapResponder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
+        BesApi besApi = getBesApi();
 
 
 
@@ -88,7 +89,7 @@ public class XmlData extends BesDapResponder {
 
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -100,7 +101,6 @@ public class XmlData extends BesDapResponder {
         User user = new User(request);
 
 
-        BesApi besApi = getBesApi();
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 

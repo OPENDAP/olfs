@@ -25,6 +25,7 @@ package opendap.bes;
 
 import opendap.io.ChunkedOutputStream;
 import opendap.io.Chunk;
+import opendap.ppt.PPTSessionProtocol;
 
 import java.io.OutputStream;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class BESChunkedOutputStream  extends ChunkedOutputStream {
 
     private Logger log;
 
-    private String exitMsg = "status=PPT_EXIT_NOW;";
+    private String exitMsg = "status="+PPTSessionProtocol.PPT_EXIT_NOW+";";
 
     public BESChunkedOutputStream(OutputStream stream){
         super(stream);

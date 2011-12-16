@@ -25,8 +25,8 @@ package opendap.nciso;
 
 import opendap.bes.BESDataSource;
 import opendap.bes.BESError;
-import opendap.bes.BesXmlAPI;
 import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.xml.Transformer;
@@ -60,6 +60,8 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
     private Element _config;
 
+    private BesApi _besApi;
+
 
     public RubricDispatchHandler(){
         log = LoggerFactory.getLogger(getClass());
@@ -77,6 +79,8 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
         rubricRequestPatternRegexString = ".*\\.rubric";
         rubricRequestPattern = Pattern.compile(rubricRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
+
+        _besApi = new BesApi();
 
 
         initialized = true;
@@ -113,7 +117,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name);
+            DataSourceInfo dsi = new BESDataSource(name,_besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -157,7 +161,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         if(rubricRequestPattern.matcher(requestURL).matches())   {
             String relativeUrl = ReqInfo.getLocalUrl(request);
             String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-            DataSourceInfo dsi = new BESDataSource(dataSource);
+            DataSourceInfo dsi = new BESDataSource(dataSource,_besApi);
 
             if (dsi.sourceExists() && dsi.isDataset()) {
                 isrubricResponse = true;
@@ -213,7 +217,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         else
             response.setContentType("text/html");
 
-        Version.setOpendapMimeHeaders(request, response);
+        Version.setOpendapMimeHeaders(request, response, _besApi);
         response.setHeader("Content-Description", "text/html");
 
 
@@ -227,7 +231,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
         Document ddx = new Document();
 
 
-        if(!BesXmlAPI.getDDXDocument(
+        if(!_besApi.getDDXDocument(
                 dataSourceId,
                 constraintExpression,
                 xdap_accept,

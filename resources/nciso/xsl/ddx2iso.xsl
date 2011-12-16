@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gco="http://www.isotc211.org/2005/gco"
   xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss"
-  xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
   <!--  xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#" -->
   <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" scope="stylesheet">
     <xd:desc>
-      <xd:p><xd:b>Created on:</xd:b>February 4, 2011</xd:p>
+      <xd:p><xd:b>Created on:</xd:b>December 15, 2011</xd:p>
       <xd:p><xd:b>Author:</xd:b>ted.habermann@noaa.gov</xd:p>
       <xd:p/>
     </xd:desc>
   </xd:doc>
-  <xsl:variable name="stylesheetVersion" select="'1.0.0'"/>
+  <xsl:variable name="stylesheetVersion" select="'1.1.0'"/>
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
-
+  <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'"/>
+  <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
   <xsl:variable name="globalAttributeCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/Attribute)"/>
   <xsl:variable name="variableCnt" select="count(/dap:Dataset/dap:Grid)"/>
   <xsl:variable name="variableAttributeCnt" select="count(/dap:Dataset/dap:variable/dap:Attribute)"/>
@@ -63,6 +64,11 @@
   <xsl:variable name="otherExtentTotal"
     select="$geospatial_lat_resolutionCnt + $geospatial_lat_unitsCnt     + $geospatial_lon_resolutionCnt + $geospatial_lon_unitsCnt     + $timeResCnt + $timeDurCnt     + $vertical_unitsCnt + $vertical_resolutionCnt + $vertical_positiveCnt"/>
   <xsl:variable name="otherExtentMax">9</xsl:variable>
+  <!-- dimension variables -->
+  <xsl:variable name="longitudeVariableName" select="//dap:Array[dap:Attribute[@name='units' and dap:value='degrees_east']]/@name"/>
+  <xsl:variable name="latitudeVariableName" select="//dap:Array[dap:Attribute[@name='units' and dap:value='degrees_north']]/@name"/>
+  <xsl:variable name="verticalVariableName" select="//dap:Array[dap:Attribute[@name='positive' and (dap:value='up' or dap:value='down')]]/@name"/>
+  <xsl:variable name="timeVariableName" select="//dap:Array[dap:Attribute[@name='standard_name' and translate(dap:value,$uppercase, $smallcase)='time']]/@name"/>
   <!-- Responsible Party Fields: 14 possible -->
   <xsl:variable name="creatorNameCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_name'])"/>
   <xsl:variable name="creatorURLCnt" select="count(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='creator_url'])"/>
@@ -167,35 +173,43 @@
       </gmd:metadataStandardVersion>
       <gmd:spatialRepresentationInfo>
         <xsl:choose>
-          <xsl:when test="$otherExtentTotal">
+          <xsl:when test="$longitudeVariableName or $latitudeVariableName or $verticalVariableName">
             <gmd:MD_GridSpatialRepresentation>
-              <gmd:numberOfDimensions/>
-              <xsl:if test="$geospatial_lon_unitsCnt">
+              <gmd:numberOfDimensions>
+                <gco:Integer>
+                  <xsl:value-of select="(count($longitudeVariableName) > 0) + (count($latitudeVariableName) > 0) + (count($verticalVariableName) > 0) + (count($timeVariableName) > 0)"/>
+                </gco:Integer>
+              </gmd:numberOfDimensions>
+              <xsl:if test="$longitudeVariableName">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'column'"/>
-                  <xsl:with-param name="dimensionUnits" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_units']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionUnits" select="'degrees_east'"/>
                   <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lon_resolution']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionSize" select="/dap:Dataset/dap:Array[contains(@name,$longitudeVariableName)]/dap:dimension/@size"/>
                 </xsl:call-template>
               </xsl:if>
-              <xsl:if test="$geospatial_lat_unitsCnt">
+              <xsl:if test="$latitudeVariableName">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'row'"/>
                   <xsl:with-param name="dimensionUnits" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_units']/dap:value,'&quot;','')"/>
                   <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_lat_resolution']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionSize" select="/dap:Dataset/dap:Array[contains(@name,$latitudeVariableName)]/dap:dimension/@size"/>
                 </xsl:call-template>
               </xsl:if>
-              <xsl:if test="$vertical_unitsCnt">
+              <xsl:if test="$verticalVariableName">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'vertical'"/>
                   <xsl:with-param name="dimensionUnits" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_units']/dap:value,'&quot;','')"/>
                   <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='geospatial_vertical_resolution']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionSize" select="/dap:Dataset/dap:Array[contains(@name,$verticalVariableName)]/dap:dimension/@size"/>
                 </xsl:call-template>
               </xsl:if>
-              <xsl:if test="$timeResCnt">
+              <xsl:if test="$timeVariableName">
                 <xsl:call-template name="writeDimension">
                   <xsl:with-param name="dimensionType" select="'temporal'"/>
                   <xsl:with-param name="dimensionUnits" select="'unknown'"/>
                   <xsl:with-param name="dimensionResolution" select="translate(/dap:Dataset/dap:Attribute[@name='NC_GLOBAL']/dap:Attribute[@name='time_coverage_resolution']/dap:value,'&quot;','')"/>
+                  <xsl:with-param name="dimensionSize" select="/dap:Dataset/dap:Array[contains(@name,$timeVariableName)]/dap:dimension/@size"/>
                 </xsl:call-template>
               </xsl:if>
               <gmd:cellGeometry>
@@ -815,6 +829,7 @@
     <xsl:param name="dimensionType"/>
     <xsl:param name="dimensionUnits"/>
     <xsl:param name="dimensionResolution"/>
+    <xsl:param name="dimensionSize"/>
     <gmd:axisDimensionProperties>
       <gmd:MD_Dimension>
         <gmd:dimensionName>
@@ -823,14 +838,25 @@
             <xsl:with-param name="codeListValue" select="$dimensionType"/>
           </xsl:call-template>
         </gmd:dimensionName>
-        <gmd:dimensionSize/>
+        <gmd:dimensionSize>
+          <gco:Integer>
+            <xsl:value-of select="$dimensionSize"/>
+          </gco:Integer>
+        </gmd:dimensionSize>
         <gmd:resolution>
-          <gco:Measure>
-            <xsl:attribute name="uom">
-              <xsl:value-of select="$dimensionUnits"/>
-            </xsl:attribute>
-            <xsl:value-of select="$dimensionResolution"/>
-          </gco:Measure>
+          <xsl:choose>
+            <xsl:when test="$dimensionResolution">
+              <gco:Measure>
+                <xsl:attribute name="uom">
+                  <xsl:value-of select="$dimensionUnits"/>
+                </xsl:attribute>
+                <xsl:value-of select="$dimensionResolution"/>
+              </gco:Measure>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="gco:nilReason">missing</xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
         </gmd:resolution>
       </gmd:MD_Dimension>
     </gmd:axisDimensionProperties>

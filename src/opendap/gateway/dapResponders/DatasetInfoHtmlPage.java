@@ -51,7 +51,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
 
 
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".info";
 
@@ -66,7 +66,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
 
     public DatasetInfoHtmlPage(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -76,14 +76,14 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
 
         log.debug("sendINFO() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -95,7 +95,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                                                         BesApi.INFO_PAGE,
                                                         dataSourceUrl,
                                                         constraintExpression,
@@ -106,7 +106,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
                                                         null,
                                                         BesApi.XML_ERRORS);
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath, context, response);

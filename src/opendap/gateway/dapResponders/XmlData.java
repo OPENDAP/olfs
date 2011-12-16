@@ -50,7 +50,7 @@ public class XmlData extends BesDapResponder {
     private Logger log;
 
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".xdods";
 
@@ -65,7 +65,7 @@ public class XmlData extends BesDapResponder {
 
     public XmlData(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -79,7 +79,7 @@ public class XmlData extends BesDapResponder {
         String xmlBase = getXmlBase(request);
 
 
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
 
@@ -92,7 +92,7 @@ public class XmlData extends BesDapResponder {
 
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -105,7 +105,7 @@ public class XmlData extends BesDapResponder {
 
 
 
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                                                         BesApi.XML_DATA,
                                                         dataSourceUrl,
                                                         constraintExpression,
@@ -119,9 +119,9 @@ public class XmlData extends BesDapResponder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("_besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());

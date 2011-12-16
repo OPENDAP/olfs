@@ -23,7 +23,10 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.ncml;
 
-import opendap.bes.*;
+import opendap.bes.BESDataSource;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -58,6 +61,8 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
     private Element _config;
 
+    private BesApi _besApi;
+
 
     public NcmlFileDispatcher(){
         log = LoggerFactory.getLogger(getClass());
@@ -76,6 +81,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
         ncmlRequestPatternRegexString = ".*\\.ncml";
         ncmlRequestPattern = Pattern.compile(ncmlRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
 
+        _besApi = new BesApi();
 
         initialized = true;
 
@@ -106,7 +112,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name);
+            DataSourceInfo dsi = new BESDataSource(name, _besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -149,7 +155,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         if(ncmlRequestPattern.matcher(requestURL).matches())   {
             String relativeUrl = ReqInfo.getLocalUrl(request);
-            DataSourceInfo dsi = new BESDataSource(relativeUrl);
+            DataSourceInfo dsi = new BESDataSource(relativeUrl,_besApi);
 
 
 
@@ -188,7 +194,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         Document ncml = getNcmlDocument(name);
 
-        String besPrefix = BesXmlAPI.getBESprefix(name);
+        String besPrefix = _besApi.getBESprefix(name);
 
         String location;
         Element e;
@@ -231,7 +237,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
 
 
-        if(!BesXmlAPI.writeFile(name, baos, erros)){
+        if(!_besApi.writeFile(name, baos, erros)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             ByteArrayInputStream errorDoc = new ByteArrayInputStream(erros.toByteArray());

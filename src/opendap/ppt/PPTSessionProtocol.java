@@ -21,10 +21,11 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-
 package opendap.ppt;
 
-class PPTSessionProtocol {
+import opendap.io.ChunkProtocol;
+
+public class PPTSessionProtocol implements ChunkProtocol {
     // Message when the mapper fails to find the proper protocol string
     public static final String PPT_PROTOCOL_UNDEFINED = "PPT_PROTOCOL_UNDEFINED";
 
@@ -35,4 +36,30 @@ class PPTSessionProtocol {
     public static final String PPT_COMPLETE_DATA_TRANSMITION = "PPT_COMPLETE_DATA_TRANSMITION";
 
     public static final String PPT_EXIT_NOW = "PPT_EXIT_NOW";
+
+
+
+    public static final String PPTCLIENT_REQUEST_AUTHPORT = "PPTCLIENT_REQUEST_AUTHPORT";
+
+
+    public String serverProtocolUndefined(){
+        return PPT_PROTOCOL_UNDEFINED;
+    }
+    public String clientTestingConnection(){
+        return PPTCLIENT_TESTING_CONNECTION;
+
+    }
+    public String serverConnectionOk(){
+        return PPTSERVER_CONNECTION_OK;
+
+    }
+    public String clientCompleteDataTransmission(){
+        return PPT_COMPLETE_DATA_TRANSMITION;
+
+    }
+    public String clientExitingNow(){
+        return PPT_EXIT_NOW;
+
+    }
+
 }

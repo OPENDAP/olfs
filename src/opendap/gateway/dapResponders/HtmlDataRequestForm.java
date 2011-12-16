@@ -52,7 +52,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
     private Logger log;
 
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".html?";
 
@@ -67,7 +67,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
     public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -81,14 +81,14 @@ public class HtmlDataRequestForm extends BesDapResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_form");
 
 
@@ -113,7 +113,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                                                         BesApi.HTML_FORM,
                                                         dataSourceUrl,
                                                         null,
@@ -124,7 +124,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
                                                         null,
                                                         BesApi.XML_ERRORS);
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 

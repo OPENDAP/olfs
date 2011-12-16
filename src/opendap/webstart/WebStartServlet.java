@@ -26,7 +26,7 @@ package opendap.webstart;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.BesXmlAPI;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.logging.LogUtil;
@@ -66,6 +66,8 @@ public class WebStartServlet extends HttpServlet {
     private boolean disabled = false;
     private String resourcesDirectory;
     private Document configDoc;
+
+    private BesApi _besApi;
 
 
     private ConcurrentHashMap<String, JwsHandler> jwsHandlers = null;
@@ -117,6 +119,8 @@ public class WebStartServlet extends HttpServlet {
 
             // Build Handler Objects
             jwsHandlers = buildJwsHandlers(resourcesDirectory, configDoc.getRootElement());
+
+            _besApi = new BesApi();
         }
 
 
@@ -549,7 +553,7 @@ public class WebStartServlet extends HttpServlet {
 
         Document ddx = new Document();
 
-        if(!BesXmlAPI.getDDXDocument(
+        if(!_besApi.getDDXDocument(
                 datasetID,
                 constraintExpression,
                 xdap_accept,

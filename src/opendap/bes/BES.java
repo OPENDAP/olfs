@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
@@ -655,7 +656,9 @@ public class BES {
 
         Document version = new Document();
 
-        if (BesXmlAPI.getVersion(getPrefix(), version)) {
+        BesApi besApi = new BesApi();
+
+        if (besApi.getVersion(getPrefix(), version)) {
 
 
             Element ver = version.getRootElement().getChild("showVersion", BES_NS);

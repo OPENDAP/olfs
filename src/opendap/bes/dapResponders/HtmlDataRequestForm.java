@@ -81,12 +81,13 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
         String context = request.getContextPath();
 
+        BesApi besApi = getBesApi();
 
         log.debug("respondToHttpGetRequest() - Sending HTML Data Request Form for dataset: " + dataSource+
                 "    CE: '" + request.getQueryString() + "'");
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_form");
 
 
@@ -105,7 +106,6 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
         log.debug("respondToHttpGetRequest() - HTML Form URL: " + url);
 
-        BesApi besApi = getBesApi();
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 

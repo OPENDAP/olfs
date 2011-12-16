@@ -145,7 +145,7 @@ public class RDF extends BesDapResponder {
         else
             response.setContentType("text/xml");
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "text/xml");
 
 

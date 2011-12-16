@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServlet;
@@ -48,6 +49,8 @@ public class FileDispatchHandler implements DispatchHandler {
     private static boolean allowDirectDataSourceAccess = false;
     private boolean initialized;
 
+    private BesApi _besApi;
+
     public FileDispatchHandler() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
@@ -70,7 +73,12 @@ public class FileDispatchHandler implements DispatchHandler {
             allowDirectDataSourceAccess = true;
         }
 
-        log.info("Intialized. Direct Data Source Access: " + (allowDirectDataSourceAccess?"Enabled":"Disabled") );
+
+        _besApi = new BesApi();
+
+
+        log.info("Initialized. Direct Data Source Access: " + (allowDirectDataSourceAccess?"Enabled":"Disabled") );
+
 
         initialized = true;
 
@@ -101,7 +109,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name);
+            DataSourceInfo dsi = new BESDataSource(name,_besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -141,7 +149,7 @@ public class FileDispatchHandler implements DispatchHandler {
                                 boolean sendResponse) throws Exception {
 
 
-        DataSourceInfo dsi = new BESDataSource(ReqInfo.getLocalUrl(request));
+        DataSourceInfo dsi = new BESDataSource(ReqInfo.getLocalUrl(request),_besApi);
 
         boolean isFileResponse = false;
 
@@ -208,7 +216,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         ServletOutputStream sos = response.getOutputStream();
-        if(!BesXmlAPI.writeFile(name, sos, erros)){
+        if(!_besApi.writeFile(name, sos, erros)){
             String msg = new String(erros.toByteArray());
             log.error(msg);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST,msg);

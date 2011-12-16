@@ -84,6 +84,7 @@ public class BesApi {
 
     public BesApi(){
         super();
+        init();
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     }
@@ -100,7 +101,7 @@ public class BesApi {
     private static String BES_ERROR = "BESError";
 
     /**
-     * Initializes logging for the BesAPI class.
+     * Initializes logging for the BesApi class.
      */
     public void init() {
 
@@ -579,7 +580,7 @@ public class BesApi {
 
         boolean ret;
 
-        String responseCacheKey = BesXmlAPI.class.getName()+".showCatalog(\""+dataSource+"\")";
+        String responseCacheKey = this.getClass().getName()+".showCatalog(\""+dataSource+"\")";
 
         log.info("getCatalog(): Looking for cached copy of BES showCatalog response for responseCacheKey=\""+responseCacheKey+"\"");
 
@@ -658,7 +659,7 @@ public class BesApi {
 
 
         boolean ret;
-        String responseCacheKey = BesXmlAPI.class.getName()+".showInfo(\""+dataSource+"\")";
+        String responseCacheKey = this.getClass().getName()+".showInfo(\""+dataSource+"\")";
 
 
         log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \""+dataSource+"\"  (responseCacheKey=\""+responseCacheKey+"\")");

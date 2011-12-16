@@ -1092,7 +1092,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
     }
 
     /**
-     * Get the Dap Id of the dap Grid variable associated with the passed WCS filed ID.
+     * Get the Dap Id of the dap Grid variable associated with the passed WCS field ID.
      * @param con - connection to the repository.
      * @param coverageId - coverage ID.
      * @param fieldId - field ID.

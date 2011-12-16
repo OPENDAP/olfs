@@ -65,7 +65,7 @@ public class BesGatewayApi extends BesApi {
      *
      *
      *
-     * @see opendap.bes.BesXmlAPI
+     * @see opendap.bes.dapResponders.BesApi
      */
     @Override
     public Document getRequestDocument(String type,

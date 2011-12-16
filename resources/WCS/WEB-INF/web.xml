@@ -7,7 +7,10 @@
 
         >
 
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
 
 
 
@@ -34,6 +37,14 @@
 
     </servlet>
 
+    <servlet>
+        <servlet-name>docs_servlet</servlet-name>
+        <servlet-class>opendap.coreServlet.DocServlet </servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
 
     <servlet-mapping>
         <servlet-name>wcs</servlet-name>
@@ -41,10 +52,9 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>default</servlet-name>
+        <servlet-name>docs_servlet</servlet-name>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
-
 
 
     <session-config>

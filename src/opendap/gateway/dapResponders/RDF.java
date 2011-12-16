@@ -46,7 +46,7 @@ public class RDF extends BesDapResponder {
     private Logger log;
 
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".rdf";
 
@@ -61,7 +61,7 @@ public class RDF extends BesDapResponder {
 
     public RDF(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -75,7 +75,7 @@ public class RDF extends BesDapResponder {
         String xmlBase = getXmlBase(request);
 
 
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
@@ -87,7 +87,7 @@ public class RDF extends BesDapResponder {
 
 
         String xdap_accept = "3.2";
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                                                         BesApi.DDX,
                                                         dataSourceUrl,
                                                         constraintExpression,
@@ -100,10 +100,10 @@ public class RDF extends BesDapResponder {
 
 
 
-        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("_besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         Document ddx = new Document();
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,ddx)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
             besError.sendErrorResponse(_systemPath, context, response);
             log.error("respondToHttpGetRequest() encountered a BESError:\n" + xmlo.outputString(ddx));
@@ -149,7 +149,7 @@ public class RDF extends BesDapResponder {
         else
             response.setContentType("text/xml");
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "text/xml");
 
 

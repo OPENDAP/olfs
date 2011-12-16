@@ -74,26 +74,27 @@ public class Dap2Data extends BesDapResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
+
+        BesApi besApi = getBesApi();
 
         log.debug("sendDAP2Data() For: " + dataSource+
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType("application/octet-stream");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_data");
 
 
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
-        BesApi besApi = getBesApi();
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        User user = new User(request);
-        user.getMaxResponseSize();
 
 
         Document reqDoc =
@@ -102,7 +103,7 @@ public class Dap2Data extends BesDapResponder {
                         dataSource,
                         constraintExpression,
                         xdap_accept,
-                        user.getMaxResponseSize(),
+                        maxRS,
                         null,
                         null,
                         null,

@@ -52,7 +52,7 @@ public class NetcdfFileOut extends BesDapResponder {
     private Logger log;
 
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".nc";
 
@@ -67,7 +67,7 @@ public class NetcdfFileOut extends BesDapResponder {
 
     public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -82,7 +82,7 @@ public class NetcdfFileOut extends BesDapResponder {
         String fullSourceName = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
 
@@ -108,7 +108,7 @@ public class NetcdfFileOut extends BesDapResponder {
         response.setContentType("application/x-netcdf");
         response.setHeader("Content-Disposition", contentDisposition);
 
-        Version.setOpendapMimeHeaders(request, response);
+        Version.setOpendapMimeHeaders(request, response, _besGatewayApi);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -121,7 +121,7 @@ public class NetcdfFileOut extends BesDapResponder {
 
 
 
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                                                         BesApi.DAP2,
                                                         dataSourceUrl,
                                                         constraintExpression,
@@ -135,9 +135,9 @@ public class NetcdfFileOut extends BesDapResponder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        log.debug("besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("_besGatewayApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());

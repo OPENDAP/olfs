@@ -74,6 +74,7 @@ public class DataDDX extends BesDapResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        BesApi besApi = getBesApi();
 
 
 
@@ -90,7 +91,7 @@ public class DataDDX extends BesDapResponder {
                                 "boundary=\""+mb.getBoundary()+"\"");
 
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dap4_data_ddx");
 
         // This header indicates to the client that the content of this response
@@ -111,7 +112,6 @@ public class DataDDX extends BesDapResponder {
         User user = new User(request);
 
 
-        BesApi besApi = getBesApi();
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();

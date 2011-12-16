@@ -63,7 +63,7 @@ public class BesAPI extends BesXmlAPI {
      * @param errorContext See opendap.bes.BesXmlAPI
      * @return The request Document
      * @throws BadConfigurationException When the bad things happen.
-     * @see opendap.bes.BesXmlAPI
+     * @see opendap.bes.dapResponders.BesApi
      */
     public static  Document getRequestDocument(String type,
                                                 String wcsRequestURL,

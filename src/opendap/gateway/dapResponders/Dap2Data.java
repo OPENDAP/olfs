@@ -49,7 +49,7 @@ public class Dap2Data extends BesDapResponder {
     private Logger log;
 
 
-    private BesGatewayApi besGatewayApi;
+    private BesGatewayApi _besGatewayApi;
 
     private static String defaultRequestSuffix = ".dods";
 
@@ -64,7 +64,7 @@ public class Dap2Data extends BesDapResponder {
 
     public Dap2Data(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        besGatewayApi = besApi;
+        _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
@@ -80,7 +80,7 @@ public class Dap2Data extends BesDapResponder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = besGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
         User user = new User(request);
@@ -90,7 +90,7 @@ public class Dap2Data extends BesDapResponder {
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType("application/octet-stream");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_data");
 
 
@@ -100,7 +100,7 @@ public class Dap2Data extends BesDapResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = besGatewayApi.getRequestDocument(
+        Document reqDoc = _besGatewayApi.getRequestDocument(
                                                         BesApi.DAP2,
                                                         dataSourceUrl,
                                                         constraintExpression,
@@ -111,7 +111,7 @@ public class Dap2Data extends BesDapResponder {
                                                         null,
                                                         BesApi.DAP2_ERRORS);
 
-        if(!besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());

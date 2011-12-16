@@ -59,12 +59,15 @@ public class DapDispatcher implements DispatchHandler {
     private Element _config;
     private Vector<HttpResponder> responders;
 
+    private BesApi _besApi;
+
 
     public DapDispatcher(){
         log = LoggerFactory.getLogger(getClass());
         responders = new Vector<HttpResponder>();
 
     }
+
 
 
 
@@ -82,6 +85,8 @@ public class DapDispatcher implements DispatchHandler {
     protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
 
         if(initialized) return;
+
+        _besApi = besApi;
 
         _config = config;
         Element besApiImpl = _config.getChild("BesApiImpl");
@@ -246,7 +251,7 @@ public class DapDispatcher implements DispatchHandler {
     }
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new BESDataSource(dataSourceName);
+        return new BESDataSource(dataSourceName,_besApi);
     }
 
 

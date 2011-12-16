@@ -77,6 +77,7 @@ public class NetcdfFileOut extends BesDapResponder {
         String fullSourceName = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        BesApi besApi = getBesApi();
 
 
         log.debug("respondToHttpGetRequest(): Sending netCDF File Out response for dataset: " + dataSource + "?" +
@@ -94,7 +95,7 @@ public class NetcdfFileOut extends BesDapResponder {
         response.setContentType("application/x-netcdf");
         response.setHeader("Content-Disposition", contentDisposition);
 
-        Version.setOpendapMimeHeaders(request, response);
+        Version.setOpendapMimeHeaders(request, response, besApi);
 
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -104,7 +105,6 @@ public class NetcdfFileOut extends BesDapResponder {
         User user = new User(request);
 
 
-        BesApi besApi = getBesApi();
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 

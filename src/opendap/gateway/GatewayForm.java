@@ -85,7 +85,6 @@ public class GatewayForm extends HttpResponder {
         log.debug("respondToHttpGetRequest(): Sending Gateway Page ");
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request, response);
         response.setHeader("Content-Description", "gateway_form");
 
         ServletOutputStream sos  = response.getOutputStream();
