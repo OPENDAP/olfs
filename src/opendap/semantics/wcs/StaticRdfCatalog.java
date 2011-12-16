@@ -798,6 +798,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
             con = repository.getConnection();
             lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
 
+
             for (Object o : coverageDescriptions) {
                 Element cde = (Element) o;
 
@@ -807,41 +808,47 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                     coverageID = idElement.getTextTrim();
                     contextLMT = lmtfc.get(coverageID);
 
-                    String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
-                    log.debug("ingestWcsCatalog(): CoverageDescription '" + coverageID + "' has a last modified time of " + dateTime);
-                    lastModifiedTime = sdf.parse(dateTime).getTime();
-                    CoverageDescription coverageDescription = ingestWcsCoverageDescription(cde, lastModifiedTime);
+                    if(contextLMT == null){
+                        log.error("ingestWcsCatalog(): Failed to obtain last modified time for coverage "+coverageID);
+                        log.error("ingestWcsCatalog(): CoverageDescription "+coverageID+" cannot be ingested. Skipping...");
+                    }
+                    else {
+                        String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
+                        log.debug("ingestWcsCatalog(): CoverageDescription '" + coverageID + "' has a last modified time of " + dateTime);
+                        lastModifiedTime = sdf.parse(dateTime).getTime();
+                        CoverageDescription coverageDescription = ingestWcsCoverageDescription(cde, lastModifiedTime);
 
-                    if (_catalogLastModifiedTime < lastModifiedTime)
-                        _catalogLastModifiedTime = lastModifiedTime;
+                        if (_catalogLastModifiedTime < lastModifiedTime)
+                            _catalogLastModifiedTime = lastModifiedTime;
 
-                    if (coverageDescription != null) {
+                        if (coverageDescription != null) {
 
-                        for (String fieldID : coverageDescription.getFieldIDs()) {
-                            log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
+                            for (String fieldID : coverageDescription.getFieldIDs()) {
+                                log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
 
-                            dapVariableID = getDapGridId(con, coverageID, fieldID);
-                            coverageDescription.setDapGridArrayId(fieldID, dapVariableID);
+                                dapVariableID = getDapGridId(con, coverageID, fieldID);
+                                coverageDescription.setDapGridArrayId(fieldID, dapVariableID);
 
-                            dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
+                                dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
 
-                            dapVariableID = getLongitudeCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setLongitudeCoordinateDapId(fieldID, dapVariableID);
+                                dapVariableID = getLongitudeCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setLongitudeCoordinateDapId(fieldID, dapVariableID);
 
-                            dapVariableID = getElevationCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setElevationCoordinateDapId(fieldID, dapVariableID);
+                                dapVariableID = getElevationCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setElevationCoordinateDapId(fieldID, dapVariableID);
 
-                            dapVariableID = getTimeCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setTimeCoordinateDapId(fieldID, dapVariableID);
+                                dapVariableID = getTimeCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setTimeCoordinateDapId(fieldID, dapVariableID);
 
-                            String timeUnits = getTimeUnits(con, coverageID, fieldID);
-                            coverageDescription.setTimeUnits(fieldID, timeUnits);
+                                String timeUnits = getTimeUnits(con, coverageID, fieldID);
+                                coverageDescription.setTimeUnits(fieldID, timeUnits);
+                            }
+
                         }
-
+                        log.debug("ingestWcsCatalog(): Ingested CoverageDescription '" + coverageID + "'");
                     }
 
-                    log.debug("ingestWcsCatalog(): Ingested CoverageDescription '" + coverageID + "'");
 
                 }
 
