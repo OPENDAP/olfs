@@ -179,7 +179,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         try {
 
             catalog.resourcePath = workingDir;
-            catalog.catalogCacheDirectory = workingDir + "/repositorycache/";
+            catalog.catalogCacheDirectory = workingDir + "repositorycache/";
 
             String configFileName;
 
