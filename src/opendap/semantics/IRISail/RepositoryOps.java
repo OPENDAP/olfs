@@ -1027,17 +1027,17 @@ public class RepositoryOps {
 
         try{
             con = repository.getConnection();
-            return getLastModifiedTimesForContexts(con);
+            return getLastModifiedTimesForCoverages(con);
         }
         catch (RepositoryException e) {
-            log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTimesForCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
         }
         finally {
             if(con!=null){
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
+                    log.error("getLastModifiedTimesForCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
                 }
             }
         }
@@ -1053,15 +1053,15 @@ public class RepositoryOps {
      * modified times.
      * @return a HashMap of last modified times and context pair.
      */
-    public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) throws InterruptedException {
+    public static HashMap<String, String> getLastModifiedTimesForCoverages(RepositoryConnection con) throws InterruptedException {
         TupleQueryResult result = null;
         String ltmodstr = "";
         String idstr = "";
         HashMap<String, String> idltm = new HashMap<String, String>();
         String queryString = "SELECT DISTINCT id, lmt "
                 + "FROM "
-                + "{cd} wcs:Identifier {id}; "
-                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
+                + "{doc} wcs:CoverageDescription {cd} wcs:Identifier {id}, {doc}"
+                + "rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
                 + "using namespace "
                 + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";
@@ -1091,19 +1091,19 @@ public class RepositoryOps {
 
             }
         } catch (QueryEvaluationException e) {
-            log.error("getLastModifiedTimesForContexts(): Caught a QueryEvaluationException! Msg: "
+            log.error("getLastModifiedTimesForCoverages(): Caught a QueryEvaluationException! Msg: "
                     + e.getMessage());
         } catch (RepositoryException e) {
-            log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTimesForCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("getLastModifiedTimesForContexts(): Caught a MalformedQueryException! Msg: "
+            log.error("getLastModifiedTimesForCoverages(): Caught a MalformedQueryException! Msg: "
                     + e.getMessage());
         } finally {
             if (result != null) {
                 try {
                     result.close();
                 } catch (Exception e) {
-                    log.error("getLastModifiedTimesForContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("getLastModifiedTimesForCoverages(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }

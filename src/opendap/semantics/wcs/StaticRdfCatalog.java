@@ -796,7 +796,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         try {
 
             con = repository.getConnection();
-            lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
+            lmtfc = RepositoryOps.getLastModifiedTimesForCoverages(con);
 
 
             for (Object o : coverageDescriptions) {
