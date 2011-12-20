@@ -102,9 +102,6 @@
                         <h2>
                             <span align="left" class="small">wcs:</span>Coverage Description
                             <a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}"><span class="small">XML</span></a>
-
-                            <span class="small" align="right">fooo</span>
-
                         </h2>
                     </xsl:otherwise>
                 </xsl:choose>
