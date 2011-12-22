@@ -791,6 +791,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         RepositoryConnection con = null;
 
 
+        // Get the children of the CoverageDescription element in buildDoc. jhrg 12/21/11
         List coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
 
         try {
