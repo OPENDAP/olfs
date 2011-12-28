@@ -307,7 +307,7 @@ public class Util {
             i++;
             String s = (String) e.nextElement();
             probeMsg.append("        Attribute[").append(i).append("]: ").append(s);
-            probeMsg.append(" Type: ").append(request.getAttribute(s)).append("\n");
+            probeMsg.append(" Value: ").append(request.getAttribute(s)).append("\n");
         }
 
         probeMsg.append(".............................").append("\n");

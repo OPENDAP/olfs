@@ -43,14 +43,9 @@
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
     <xsl:key name="AttributeNames" match="dap:Attribute" use="@name"/>
 
-    <xsl:variable name="XML_BASE">
-        <xsl:value-of select="/dap:Dataset/@xml:base"/>
-    </xsl:variable>
+    <xsl:variable name="XML_BASE"><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:variable>
     <xsl:variable name="LocalOntology"><xsl:value-of select="$XML_BASE"/>.rdf</xsl:variable>
     <xsl:variable name="LocalAttributeNS"><xsl:value-of select="$XML_BASE"/>/att#</xsl:variable>
-
-
-
 
 
     <xsl:template name="identityTransform" match="node() | @*">
@@ -67,44 +62,8 @@
       -
     -->
     <xsl:template match="/dap:Dataset">
-
-        <!--
-        <xsl:attribute name="rdf:about">
-            <xsl:value-of select="@dataset_id"/>
-        </xsl:attribute>
-
-        <rdf:RDF>
-            <xsl:attribute name="base" namespace="http://www.w3.org/XML/1998/namespace">
-                <xsl:value-of select="$XML_BASE"/>
-            </xsl:attribute>
-
-            <owl:Ontology rdf:about="{$LocalOntology}">
-                <owl:imports rdf:resource="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl"/>
-                <owl:imports
-                    rdf:resource="http://xml.opendap.org/ontologies/NetcdfConventionRegistry.owl"
-                />
-            </owl:Ontology>
-
-            <xsl:comment>The empty rdf:about defaults to the value of @xml:base</xsl:comment>
-            <dapObj:Dataset rdf:about="">
-
-                <rdfs:isDefinedBy rdf:resource="{$LocalOntology}"/>
-
-                <dapObj:dataset_id rdf:datatype="http://www.w3.org/2001/XMLSchema#string">
-                    <xsl:value-of select="@dataset_id"/>
-                </dapObj:dataset_id>
-
-                <xsl:apply-templates select="*" mode="body"/>
-            </dapObj:Dataset>
-
-            <xsl:call-template name="AttPropDef"/>
-
-        </rdf:RDF>
-        -->
         <xsl:copy>
-            <xsl:attribute name="rdf:about">
-                <xsl:value-of select="@dataset_id"/>
-            </xsl:attribute>
+            <xsl:attribute name="rdf:about"></xsl:attribute>
             <xsl:apply-templates select="@* | node()" />
         </xsl:copy>
 

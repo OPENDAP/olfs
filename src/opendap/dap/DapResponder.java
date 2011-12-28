@@ -57,7 +57,19 @@ public abstract class DapResponder extends HttpResponder  {
 
 
     public String getXmlBase(HttpServletRequest req){
+
+        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
         String requestUrl = req.getRequestURL().toString();
+
+
+        if(forwardRequestUri != null){
+            String server = req.getServerName();
+            int port = req.getServerPort();
+            String scheme = req.getScheme();
+            requestUrl = scheme + "//" + server + ":" + port + forwardRequestUri;
+        }
+
+
         String xmlBase = requestUrl.substring(0,requestUrl.lastIndexOf(requestSuffix));
         log.debug("@xml:base='"+xmlBase+"'");
         return xmlBase;
