@@ -66,7 +66,7 @@ public abstract class DapResponder extends HttpResponder  {
             String server = req.getServerName();
             int port = req.getServerPort();
             String scheme = req.getScheme();
-            requestUrl = scheme + "//" + server + ":" + port + forwardRequestUri;
+            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
         }
 
 
