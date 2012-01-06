@@ -277,14 +277,13 @@ public class XMLfromRDF {
      * Recursively retrieve children and add to the document.
      *
      * @param qString-query string for retrieving children
-     * @param prt-parent
+     * @param Parent-parent
      * @param con-connection to the repository
      * @param doc-the document to build
      */
 	private void addChildren(String qString, Element prt, RepositoryConnection con, Document doc, Value Parent, Value Parentclass)  throws InterruptedException{
+
 		TupleQueryResult result = null;
-		boolean objisURI = false; //true if obj is a URI/URL
-        URI attributeURI = new URIImpl("http://http://www.w3.org/2001/XMLSchema#attribute");
 		
 		try{
 			TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL, qString);
@@ -315,7 +314,7 @@ public class XMLfromRDF {
 				valueOforder = (Value) bindingSet.getValue("order1");
 				valueOfobjtype = (Value) bindingSet.getValue("objtype");
 				valueOfform = (Value) bindingSet.getValue("form");
-
+				
 				if (bindingSet.getValue("valueclass") != null){
 					valueOfvalueclass = (Value) bindingSet.getValue("valueclass");
 				}
@@ -357,9 +356,10 @@ public class XMLfromRDF {
 						else{
 
 							Element chd; 
-							if (valueOforder != null){//order matters
+							if (valueOforder != null){ //order matters
 
 								String mapkeydigit = null;
+								// allow for up to 999 ordered xml elements
                                 if (valueOforder.stringValue().length() == 1) mapkeydigit = "00" +valueOforder.stringValue();
                                 if (valueOforder.stringValue().length() == 2) mapkeydigit = "0" +valueOforder.stringValue();
                                 if (valueOforder.stringValue().length() == 3) mapkeydigit = valueOforder.stringValue();
@@ -367,21 +367,21 @@ public class XMLfromRDF {
                                 String mapkey = mapkeydigit+"-"+valueOfnameprop.stringValue()+valueOfobj.stringValue(); //key=0001-http
 
 								mapOrderObj.put(mapkey,bindingSet);	
-							}else{//order does not matter
+							}else{ //order does not matter
 								if(formtype.getLocalName().equalsIgnoreCase("unqualified")){
 								chd = new Element(parent);
 								}else{
 									chd = new Element(parent,ns);
 								}
 								
-								if (valueOfobj instanceof Literal) //literal
+								if (valueOfobj instanceof Literal) //literals do not have children
 								{
 									chd.setText(valueOfobj.stringValue());
 								}
-								else{	
+								else {	
 									String queryStringc = createQueryString();
-									addChildren(queryStringc, chd, con,doc, valueOfobjtype, valueOfvalueclass);
-								}//if (obj3isURI/bnode)
+									addChildren(queryStringc, chd, con,doc, valueOfobj, valueOfvalueclass);
+								}//if (valueOfobj)
 								
 								prt.addContent(chd);
 								
@@ -390,7 +390,6 @@ public class XMLfromRDF {
 						
 					}else{ //no type description (element, attribute ...)
 						String parent,ns;
-						String uritypestr = "nullstring";
 						
 	                    // convert rdf uri to xml namespace and parent
 	                    parent = getParent(valueOfnameprop.toString());
@@ -406,18 +405,15 @@ public class XMLfromRDF {
 						
 						String queryStringc = createQueryString();
 
-						if(valueOfobj instanceof Literal)
+						if(valueOfobj instanceof Literal) // Literals do not have children
 						{
 							chd.setText(valueOfobj.stringValue());
 						}
 						else{
-							objisURI = true;	
-						}
-						if (objisURI){
-							addChildren(queryStringc, chd, con,doc, valueOfobjtype, valueOfvalueclass);
+							addChildren(queryStringc, chd, con,doc, valueOfobj, valueOfvalueclass);
 						}
 					}
-			} //while ( result4.hasNext())
+			} //while ( result.hasNext())
 			
 			Iterator<String> iterator = mapOrderObj.keySet().iterator();
 						
@@ -465,7 +461,7 @@ public class XMLfromRDF {
 					prt.setAttribute(valueOfnameprop.stringValue(),valueOfobjtype.stringValue());
 				}
 								
-				if (valueOfobj instanceof Literal)
+				if (valueOfobj instanceof Literal)  // Literals do not have children
 				{
 					Literal lit = new LiteralImpl(valueOfobj.toString());
 					String lang = lit.getLanguage();
@@ -477,9 +473,11 @@ public class XMLfromRDF {
 				else{	
 					String queryStringc = createQueryString();
 					addChildren(queryStringc, chd, con,doc, valueOfobj, valueOfvalueclass);
-				} //if (obj3isURI)
+				} //if (valueOfobj)
+				
 				prt.addContent(chd);
-			} //for   (int   i   =   0;   i   <   key.length;
+				
+			} // while iterator.hasNext
 					 
 		}catch ( QueryEvaluationException e){
 			log.error(e.getMessage());
