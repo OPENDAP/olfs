@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -67,7 +68,8 @@ public abstract class HttpResponder {
 
 
     public boolean matches(String s){
-       return _pattern.matcher(s).matches();
+       Matcher m = _pattern.matcher(s);
+       return m.matches();
 
     }
 

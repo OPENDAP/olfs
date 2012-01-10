@@ -161,6 +161,35 @@ public class Scrub {
         }
     }
 
+
+
+
+
+    private static String integerStringInclusionRegex = "[0-9]*";
+    private static String integerStringExclusionRegex = "[^0-9]";
+    private static Pattern integerStringInclusionPattern = Pattern.compile(integerStringInclusionRegex);
+
+    public static String integerString(String s){
+        if(s==null)
+            return null;
+        Matcher m = integerStringInclusionPattern.matcher(s);
+        log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ integerStringInclusionRegex +"    matches: "+m.matches());
+        if(m.matches()){
+            return s;
+        }
+        else {
+            return s.replaceAll(integerStringExclusionRegex,"#");
+        }
+    }
+
+
+
+
+
+
+
+
+
     private static String simpleQueryStringInclusionRegex = "[a-zA-Z0-9_ =\\.]*";
     private static String simpleQueryStringExclusionRegex = "[^a-zA-Z0-9_ =\\.]";
     private static Pattern simpleQueryStringInclusionPattern = Pattern.compile(simpleStringInclusionRegex);

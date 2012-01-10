@@ -249,7 +249,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 String requestURL = request.getRequestURL().toString();
 
                 for (HttpResponder r : responders) {
-                    if (r.matches(requestURL)) {
+                    boolean match = r.matches(requestURL);
+                    if (match) {
                         log.info("The request URL: " + requestURL + " matches " +
                                 "the pattern: \"" + r.getRegexPatternString() + "\"");
 
