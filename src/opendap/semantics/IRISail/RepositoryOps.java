@@ -319,7 +319,6 @@ public class RepositoryOps {
      * @param startingPoint - a StartingPoint.
      */
     public static void addStartingPoint(RepositoryConnection con, ValueFactory valueFactory, String startingPoint)throws InterruptedException {
-        File startingPointFile;
         URI startingPointUri;
         URI isa = valueFactory.createURI(Terms.rdfType.getUri());
         URI startingPointsContext = valueFactory.createURI(Terms.startingPointsContext.getUri());
@@ -328,31 +327,16 @@ public class RepositoryOps {
 
         try {
             startingPointUri = valueFactory.createURI(startingPoint);
-            if (startingPoint.startsWith("http://")) { //make sure it's a url and read it in
-                //startingPointUri = valueFactory.createURI(startingPoint);
-                con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
+            
+            con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
 
-                log.info("addStartingPoint(): Added StartingPoint to the repository <" + startingPointUri + "> <" + isa
+            log.info("addStartingPoint(): Added StartingPoint to the repository <" + startingPointUri + "> <" + isa
                         + "> " + "<" + startingPointContext + "> " + "<" + startingPointsContext + "> ");
-            }
-            else if(startingPoint.startsWith("file://")){
-                startingPointFile = new File(startingPoint);
-                con.add(startingPointUri, isa, startingPointContext, startingPointsContext);
-                log.info("addStartingPoint(): Added StartingPoint to the repository <" + startingPointUri + "> <" + isa
-                        + "> " + "<" + startingPointContext + "> " + "<" + startingPointsContext + "> "); 
-            }
-            else  {
-                log.error("addStartingPoint() - The startingPoint '"+startingPoint+"' does not appear to by a URL, skipping.");
-            }
-
 
         } catch (RepositoryException e) {
             log.error("addStartingPoint(): Caught an RepositoryException! Msg: "
                     + e.getMessage());
-
         }
-
-
     }
 
 
@@ -1060,11 +1044,12 @@ public class RepositoryOps {
         HashMap<String, String> idltm = new HashMap<String, String>();
         String queryString = "SELECT DISTINCT id, lmt "
                 + "FROM "
-                + "{doc} wcs:CoverageDescription {cd} wcs:Identifier {id}, {doc}"
-                + "rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
+                + "{cd} wcs:Identifier {id}; "
+                + "rdfs:isDefinedBy {doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
                 + "using namespace "
                 + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
                 + "wcs= <http://www.opengis.net/wcs/1.1#>";
+
 
         try {
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
@@ -1086,8 +1071,8 @@ public class RepositoryOps {
 
                 idltm.put(idstr, ltmodstr);
 
-                log.debug("ID:" + valueOfID.stringValue());
-                log.debug("LMT:" + valueOfLMT.stringValue());
+                // log.debug("ID:" + valueOfID.stringValue());
+                // log.debug("LMT:" + valueOfLMT.stringValue());
 
             }
         } catch (QueryEvaluationException e) {
