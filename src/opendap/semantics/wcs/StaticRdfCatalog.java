@@ -797,7 +797,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         try {
 
             con = repository.getConnection();
-            lmtfc = RepositoryOps.getLastModifiedTimesForCoverages(con);
+            lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
 
 
             for (Object o : coverageDescriptions) {
@@ -849,8 +849,9 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                         }
                         log.debug("ingestWcsCatalog(): Ingested CoverageDescription '" + coverageID + "'");
                     }
-
-
+                }
+                else {
+                    log.error("ingestWcsCatalog(): Failed to obtain wcs:Identifier for a generated wcs:Coverage.");
                 }
 
             }

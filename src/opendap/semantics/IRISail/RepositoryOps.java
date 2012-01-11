@@ -1011,17 +1011,17 @@ public class RepositoryOps {
 
         try{
             con = repository.getConnection();
-            return getLastModifiedTimesForCoverages(con);
+            return getLastModifiedTimesForContexts(con);
         }
         catch (RepositoryException e) {
-            log.error("getLastModifiedTimesForCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
         }
         finally {
             if(con!=null){
                 try {
                     con.close();
                 } catch (RepositoryException e) {
-                    log.error("getLastModifiedTimesForCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
+                    log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
                 }
             }
         }
@@ -1037,7 +1037,7 @@ public class RepositoryOps {
      * modified times.
      * @return a HashMap of last modified times and context pair.
      */
-    public static HashMap<String, String> getLastModifiedTimesForCoverages(RepositoryConnection con) throws InterruptedException {
+    public static HashMap<String, String> getLastModifiedTimesForContexts(RepositoryConnection con) throws InterruptedException {
         TupleQueryResult result = null;
         String ltmodstr = "";
         String idstr = "";
@@ -1052,6 +1052,9 @@ public class RepositoryOps {
 
 
         try {
+
+            log.debug("Query for wcs:Coverage last modified times: {} ",queryString);
+
             TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
                     queryString);
             result = tupleQuery.evaluate();
@@ -1059,6 +1062,9 @@ public class RepositoryOps {
             BindingSet bindingSet;
             Value valueOfID = null;
             Value valueOfLMT;
+
+
+            log.debug("Query for wcs:Coverage last modified times. result.hasNext(): {} ",result.hasNext());
 
             while (result.hasNext()) {
                 bindingSet = (BindingSet) result.next();
@@ -1076,19 +1082,19 @@ public class RepositoryOps {
 
             }
         } catch (QueryEvaluationException e) {
-            log.error("getLastModifiedTimesForCoverages(): Caught a QueryEvaluationException! Msg: "
+            log.error("getLastModifiedTimesForContexts(): Caught a QueryEvaluationException! Msg: "
                     + e.getMessage());
         } catch (RepositoryException e) {
-            log.error("getLastModifiedTimesForCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
+            log.error("getLastModifiedTimesForContexts(): Caught a RepositoryException! Msg: " + e.getMessage());
         } catch (MalformedQueryException e) {
-            log.error("getLastModifiedTimesForCoverages(): Caught a MalformedQueryException! Msg: "
+            log.error("getLastModifiedTimesForContexts(): Caught a MalformedQueryException! Msg: "
                     + e.getMessage());
         } finally {
             if (result != null) {
                 try {
                     result.close();
                 } catch (Exception e) {
-                    log.error("getLastModifiedTimesForCoverages(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                    log.error("getLastModifiedTimesForContexts(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
                 }
             }
         }
