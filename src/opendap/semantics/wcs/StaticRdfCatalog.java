@@ -219,7 +219,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         }
 
     }
-    /*******************************************************/
+
 
     /**
      *
@@ -797,7 +797,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         try {
 
             con = repository.getConnection();
-            lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
+            lmtfc = getLastModifiedTimesForWcsCoverages(con);
 
 
             for (Object o : coverageDescriptions) {
@@ -897,6 +897,82 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
         return cd;
     }
+
+
+
+    /**
+     * Returns a Hash containing last modified times of each context (URI) in the
+     * repository, keyed by the context name.
+     * @param con A connection to the repository from which to harvest the contexts and their associated last
+     * modified times.
+     * @return a HashMap of last modified times and context pair.
+     */
+    public HashMap<String, String> getLastModifiedTimesForWcsCoverages(RepositoryConnection con) throws InterruptedException {
+        TupleQueryResult result = null;
+        String ltmodstr = "";
+        String idstr = "";
+        HashMap<String, String> idltm = new HashMap<String, String>();
+        String queryString = "SELECT DISTINCT id, lmt "
+                + "FROM "
+                + "{doc} wcs:CoverageDescription {cd} wcs:Identifier {id},"
+                + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
+                + "using namespace "
+                + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
+                + "wcs= <http://www.opengis.net/wcs/1.1#>";
+
+
+        try {
+
+            log.debug("Query for wcs:Coverage last modified times: {} ",queryString);
+
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+            result = tupleQuery.evaluate();
+
+            BindingSet bindingSet;
+            Value valueOfID = null;
+            Value valueOfLMT;
+
+
+            log.debug("Query for wcs:Coverage last modified times. result.hasNext(): {} ",result.hasNext());
+
+            while (result.hasNext()) {
+                bindingSet = (BindingSet) result.next();
+
+                valueOfLMT = (Value) bindingSet.getValue("lmt");
+                ltmodstr = valueOfLMT.stringValue();
+
+                valueOfID = (Value) bindingSet.getValue("id");
+                idstr = valueOfID.stringValue();
+
+                idltm.put(idstr, ltmodstr);
+
+                // log.debug("ID:" + valueOfID.stringValue());
+                // log.debug("LMT:" + valueOfLMT.stringValue());
+
+            }
+        } catch (QueryEvaluationException e) {
+            log.error("getLastModifiedTimesForWcsCoverages(): Caught a QueryEvaluationException! Msg: "
+                    + e.getMessage());
+        } catch (RepositoryException e) {
+            log.error("getLastModifiedTimesForWcsCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("getLastModifiedTimesForWcsCoverages(): Caught a MalformedQueryException! Msg: "
+                    + e.getMessage());
+        } finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (Exception e) {
+                    log.error("getLastModifiedTimesForWcsCoverages(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
+            }
+        }
+
+        return idltm;
+    }
+    /*******************************************************/
+
 
     /**
      * Check if the coverage exists.
