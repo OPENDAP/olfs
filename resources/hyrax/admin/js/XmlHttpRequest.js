@@ -35,6 +35,3 @@ function createRequest() {
     }
 }
 
-var request2 = createRequest();
-var request2A = createRequest();
-var request3 = createRequest();

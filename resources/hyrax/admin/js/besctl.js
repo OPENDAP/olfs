@@ -33,11 +33,11 @@ function startBes_worker(prefix,besctlUrl, stateChangeHandler) {
 
     document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
-    var request = createRequest();
+    var startRequest = createRequest();
 
-    request.open("GET", url, true);
-    request.onreadystatechange = function() { stateChangeHandler(request); };
-    request.send(null);
+    startRequest.open("GET", url, true);
+    startRequest.onreadystatechange = function() { stateChangeHandler(startRequest); };
+    startRequest.send(null);
 
 }
 
@@ -56,22 +56,22 @@ function stopBesNicely_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
     var status = document.getElementById("status");
     status.innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
-    var request = createRequest();
+    var stopRequest = createRequest();
     //alert("StopNice: \n stateChangeHandler: "+stateChangeHandler+"\n url: "+url);
 
     if(isAsync) {
         status.innerHTML = "Is Async";
         //alert(status.innerHTML.valueOf());
-        request.open("GET", url, true);
-        request.onreadystatechange = function() { stateChangeHandler(request); };
-        request.send(null);
+        stopRequest.open("GET", url, true);
+        stopRequest.onreadystatechange = function() { stateChangeHandler(stopRequest); };
+        stopRequest.send(null);
     }
     else {
         status.innerHTML = "Is Sync";
         //alert(status.innerHTML.valueOf());
-        request.open("GET", url, false);
-        request.send(null);
-        status.innerHTML = "<pre> "+request.responseText+"</pre>";
+        stopRequest.open("GET", url, false);
+        stopRequest.send(null);
+        status.innerHTML = "<pre> "+stopRequest.responseText+"</pre>";
         //alert(status.innerHTML.valueOf());
         //stateChangeHandler(request);
     }
@@ -314,15 +314,18 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
               completed the closure function defined below is called. The closure function updates the status block and
               then calls start. Sweet! Right?
              */
+
+
             stopBesNicely_worker(
                 besPrefix,
                 besCtlApi,
                 true,
-                function(request){
-                    if (request.readyState == 4) {
-                        if (request.status == 200) {
+                function(stopRequest) {
+                    if (stopRequest.readyState == 4) {
+                        if (stopRequest.status == 200) {
                             var status = document.getElementById("status");
-                            status.innerHTML = "<pre> "+request.responseText+"</pre>";
+                            status.innerHTML = "<pre> " + stopRequest.responseText + "</pre>";
+
                             //alert("About to start BES...");
                             //
                             // I used another closure here because I want to close the window after I start the BES.
@@ -332,29 +335,32 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
                             startBes_worker(
                                 besPrefix,
                                 besCtlApi,
-                                function(request){
-                                    if (request.readyState == 4) {
+                                function(startRequest) {
+                                    if (startRequest.readyState == 4) {
 
-                                        if (request.status == 200) {
+                                        if (startRequest.status == 200) {
 
                                             var status = document.getElementById("status");
-                                            status.innerHTML = "<pre> "+request.responseText+"</pre>";
+                                            status.innerHTML = "<pre> " + startRequest.responseText + "</pre>";
 
+                                            self.close();
 
-                                        } else
-                                            alert("confirmCommit(stopNice_worker(start_worker())): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
+                                        } else {
+                                            alert("confirmCommit(stopBesNicely_worker(startBes_worker())): Error! Hyrax returned an HTTP status of " + startRequest.status + " Along with the following content: " + startRequest.responseText);
+
+                                        }
                                     }
-                                    self.close();
                                 }
                             );
                         }
                         else {
-                            alert("confirmCommit(stopNice_worker()): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
-
+                            alert("confirmCommit(stopNice_worker()): Error! Hyrax returned an HTTP status of " + stopRequest.status + " Along with the following content: " + stopRequest.responseText);
                         }
+
                     }
                 }
             );
+
         }
         else {
             var d = new Date();
@@ -367,6 +373,7 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
     }
 
 }
+
 
 
 
