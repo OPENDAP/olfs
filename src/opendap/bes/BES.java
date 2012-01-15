@@ -738,41 +738,56 @@ public class BES {
             // semaphores available is set to MaxClients.
             _checkOutFlag.acquire();
 
+            log.debug("_clientQueue size: '{}'",_clientQueue.size());
+
             if (_clientQueue.size() == 0) {
                 odc = new OPeNDAPClient();
                 log.debug("getClient() - " +
-                        "Made new OPeNDAPClient. Starting...");
+                        "Made new BES Client. Starting...");
 
-                odc.startClient(getHost(), getPort());
 
                 try {
-                    _clientsMapLock.lock();
-                    clientId = "besC-" + totalClients;
-                    odc.setID(clientId);
-                    _clients.put(clientId, odc);
-                    totalClients++;
-                } finally {
-                    _clientsMapLock.unlock();
+                    odc.startClient(getHost(), getPort());
+                    log.debug("BES Client started.");
+
+
+                    try {
+                        _clientsMapLock.lock();
+                        clientId = "besC-" + totalClients;
+                        odc.setID(clientId);
+                        _clients.put(clientId, odc);
+                        totalClients++;
+
+                        log.debug("BES Client ID assigned.");
+
+                    } finally {
+                        _clientsMapLock.unlock();
+                    }
+
+                }
+                catch (PPTException ppte){
+                    odc.setID(new Date().toString() + "BES Client Failed To Start: " + ppte.getMessage());
+                    log.error("Failed to start BES Client. msg:'{}'",ppte.getMessage());
+                    throw new PPTException(ppte);
                 }
 
 
-                log.debug("OPeNDAPClient started.");
 
 
             } else {
 
                 odc = _clientQueue.take();
                 log.debug("getClient() - Retrieved " +
-                        "OPeNDAPClient (id:" + odc.getID() + " from Pool.");
+                        "BES Client (id:" + odc.getID() + " from Pool.");
             }
 
 
             return odc;
 
-        } catch (Exception e) {
-            log.error("ERROR encountered: " + e.getMessage());
+        } catch (InterruptedException e) {
+            log.error("Interrupted!: " + e.getMessage());
             if (odc != null) {
-                log.error("Attempting to discard OPeNDAPClient (id:" + odc.getID() + ")");
+                log.error("Attempting to discard BES Client (id:" + odc.getID() + ")");
                 discardClient(odc);
             }
             throw new PPTException(e);
@@ -948,18 +963,18 @@ public class BES {
 
 
         if (!nicely) {
-            log.debug("destroy() Timed Out. Destroying Clients.");
+            log.debug("destroy() Timed Out. Destroying BES Clients.");
 
             try {
                 _clientsMapLock.lock();
                 for (int i = 0; i < totalClients; i++) {
                     OPeNDAPClient oc = _clients.get(i);
                     if (oc != null) {
-                        log.debug("destroy() Killing OPeNDAPClient (id:" +
+                        log.debug("destroy() Killing BES Client (id:" +
                                 oc.getID() + ")");
                         oc.killClient();
                     } else {
-                        log.debug("destroy() OPeNDAPClient (id:" +
+                        log.debug("destroy() BES Client (id:" +
                                 i + ")already discarded.");
 
                     }
