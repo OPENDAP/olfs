@@ -724,7 +724,7 @@ public class BES {
     public OPeNDAPClient getClient()
             throws PPTException, BadConfigurationException {
 
-        OPeNDAPClient odc = null;
+        OPeNDAPClient besClient = null;
         String clientId;
 
         if (_checkOutFlag == null)
@@ -741,54 +741,61 @@ public class BES {
             log.debug("_clientQueue size: '{}'",_clientQueue.size());
 
             if (_clientQueue.size() == 0) {
-                odc = new OPeNDAPClient();
-                log.debug("getClient() - " +
-                        "Made new BES Client. Starting...");
 
 
+                // Make a new OPeNDAClient to connect to the BES
+                besClient = new OPeNDAPClient();
+                log.debug("getClient() - Made new BES Client. Starting...");
+
+
+
+                // Start the client by opening the PPT connection to the BES.
                 try {
-                    odc.startClient(getHost(), getPort());
-                    log.debug("BES Client started.");
-
-
-                    try {
-                        _clientsMapLock.lock();
-                        clientId = "besC-" + totalClients;
-                        odc.setID(clientId);
-                        _clients.put(clientId, odc);
-                        totalClients++;
-
-                        log.debug("BES Client ID assigned.");
-
-                    } finally {
-                        _clientsMapLock.unlock();
-                    }
+                    besClient.startClient(getHost(), getPort());
+                    log.debug("getClient() - BES Client started.");
 
                 }
                 catch (PPTException ppte){
-                    odc.setID(new Date().toString() + "BES Client Failed To Start: " + ppte.getMessage());
-                    log.error("Failed to start BES Client. msg:'{}'",ppte.getMessage());
+                    besClient.setID(new Date().toString() + "BES Client Failed To Start: " + ppte.getMessage());
+                    log.error("getClient() - Failed to start BES Client. msg:'{}'",ppte.getMessage());
                     throw new PPTException(ppte);
                 }
+
+
+                // Add it to the client pool
+                try {
+                    _clientsMapLock.lock();
+                    clientId = "besC-" + totalClients;
+                    besClient.setID(clientId);
+                    _clients.put(clientId, besClient);
+                    totalClients++;
+
+                    log.debug("getClient() - BES Client assigned ID : " + besClient.getID());
+
+                } finally {
+                    _clientsMapLock.unlock();
+                }
+
 
 
 
 
             } else {
 
-                odc = _clientQueue.take();
+                // Get a client from the client pool.
+                besClient = _clientQueue.take();
                 log.debug("getClient() - Retrieved " +
-                        "BES Client (id:" + odc.getID() + " from Pool.");
+                        "BES Client (id:" + besClient.getID() + ") from Pool.");
             }
 
 
-            return odc;
+            return besClient;
 
         } catch (InterruptedException e) {
-            log.error("Interrupted!: " + e.getMessage());
-            if (odc != null) {
-                log.error("Attempting to discard BES Client (id:" + odc.getID() + ")");
-                discardClient(odc);
+            log.error("getClient() - Interrupted!: " + e.getMessage());
+            if (besClient != null) {
+                log.error("getClient() - Attempting to discard BES Client id: " + besClient.getID());
+                discardClient(besClient);
             }
             throw new PPTException(e);
         } finally {
