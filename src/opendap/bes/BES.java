@@ -785,7 +785,7 @@ public class BES {
                 // Get a client from the client pool.
                 besClient = _clientQueue.take();
                 log.debug("getClient() - Retrieved " +
-                        "BES Client (id:" + besClient.getID() + ") from Pool.");
+                        "BES Client (id: " + besClient.getID() + ") from Pool.");
             }
 
 

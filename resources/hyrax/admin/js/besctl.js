@@ -354,7 +354,7 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
                             );
                         }
                         else {
-                            alert("confirmCommit(stopNice_worker()): Error! Hyrax returned an HTTP status of " + stopRequest.status + " Along with the following content: " + stopRequest.responseText);
+                            alert("confirmCommit(stopBesNicely_worker()): Error! Hyrax returned an HTTP status of " + stopRequest.status + " Along with the following content: " + stopRequest.responseText);
                         }
 
                     }
