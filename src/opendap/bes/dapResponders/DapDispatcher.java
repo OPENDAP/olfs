@@ -101,12 +101,17 @@ public class DapDispatcher implements DispatchHandler {
                 log.debug("Loading BesApi from configuration.");
                 besApi = (BesApi) classDefinition.newInstance();
             }
-            else {
-
-            }
             log.debug("Using BesApi implementation: {}",besApi.getClass().getName());
 
         }
+
+        //boolean allowDirectDataSourceAccess = false;
+        //Element dv = config.getChild("AllowDirectDataSourceAccess");
+        //if(dv!=null){
+        //    allowDirectDataSourceAccess = true;
+        //}
+
+
 
         dispatchServlet = servlet;
 
@@ -137,6 +142,9 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new NetcdfFileOut(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
 
+        //DatasetFileAccess  dfa = new DatasetFileAccess(systemPath, besApi);
+        //dfa.setAllowDirectDataSourceAccess(allowDirectDataSourceAccess);
+        //responders.add(dfa);
 
 
 
@@ -182,14 +190,14 @@ public class DapDispatcher implements DispatchHandler {
 
         DataSourceInfo dsi;
 
-        log.debug("The client requested this: " + besDataSourceId);
+        log.debug("The client requested this BES DataSource: " + besDataSourceId);
 
 
-        String requestURL = request.getRequestURL().toString();
 
         for (HttpResponder r : responders) {
-            if (r.matches(requestURL)) {
-                log.info("The request URL: " + requestURL + " matches " +
+            log.debug(r.getPathPrefix());
+            if (r.matches(relativeUrl)) {
+                log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRegexPatternString() + "\"");
                 dsi = getDataSourceInfo(besDataSourceId);
                 if(dsi.isDataset()){
