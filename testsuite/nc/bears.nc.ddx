@@ -1,9 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Dataset name="bears.nc"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xmlns="http://xml.opendap.org/ns/DAP2"
-xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/dap2.xsd">
-
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset name="bears.nc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xml.opendap.org/ns/DAP2" xsi:schemaLocation="http://xml.opendap.org/ns/DAP2 http://xml.opendap.org/dap/dap2.xsd">
     <Attribute name="NC_GLOBAL" type="Container">
         <Attribute name="history" type="String">
             <value>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.</value>
@@ -14,7 +10,6 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             <value>k</value>
         </Attribute>
     </Attribute>
-
     <Grid name="bears">
         <Array name="bears">
             <Attribute name="act" type="String">
@@ -27,13 +22,13 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
                 <value>17000</value>
             </Attribute>
             <Attribute name="acf" type="Float32">
-                <value>-2.000000000</value>
-                <value>1.000000000</value>
-                <value>0.000000000</value>
+                <value>-2.00000000</value>
+                <value>1.00000000</value>
+                <value>0.00000000</value>
             </Attribute>
             <Attribute name="acd" type="Float64">
-                <value>-1.0000000000000000</value>
-                <value>0.75000000000000000</value>
+                <value>-1.000000000000000</value>
+                <value>0.7500000000000000</value>
             </Attribute>
             <Attribute name="string_length" type="Int32">
                 <value>3</value>
@@ -237,6 +232,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
         <Int16/>
         <dimension name="l" size="3"/>
     </Array>
-
     <dataBLOB href=""/>
 </Dataset>

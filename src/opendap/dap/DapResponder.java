@@ -69,10 +69,18 @@ public abstract class DapResponder extends HttpResponder  {
             requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
         }
 
+        String[] urlParts = requestUrl.split(requestSuffix);
 
-        String xmlBase = requestUrl.substring(0,requestUrl.lastIndexOf(requestSuffix));
+        StringBuilder xmlBase =  new StringBuilder();
+        for(int i=0; i < urlParts.length; i++){
+            if(xmlBase.length()>0){
+                xmlBase.append(requestSuffix);
+            }
+            xmlBase.append(urlParts[i]);
+        }
+
         log.debug("@xml:base='"+xmlBase+"'");
-        return xmlBase;
+        return xmlBase.toString();
     }
 
 

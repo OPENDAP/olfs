@@ -97,14 +97,11 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
         OutputStream os = response.getOutputStream();
 
-        String url = request.getRequestURL().toString();
-
-        int suffix_start = url.lastIndexOf("." + requestSuffix);
-
-        url = url.substring(0, suffix_start);
 
 
-        log.debug("respondToHttpGetRequest() - HTML Form URL: " + url);
+        String resourceUrl = getXmlBase(request);
+
+        log.debug("respondToHttpGetRequest() - HTML Form URL: " + resourceUrl);
 
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
@@ -116,7 +113,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
                                                         xdap_accept,
                                                         0,
                                                         null,
-                                                        url,
+                                                        resourceUrl,
                                                         null,
                                                         BesApi.XML_ERRORS);
 

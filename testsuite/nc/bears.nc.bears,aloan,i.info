@@ -20,16 +20,16 @@
 <td align=left valign=top>Grid<br>act: text string\\012\\011123<br>
 acs: -40<br>
 acl: 17000<br>
-acf: -2.000000000, 1.000000000, 0.000000000<br>
-acd: -1.0000000000000000, 0.75000000000000000<br>
+acf: -2.00000000, 1.00000000, 0.00000000<br>
+acd: -1.000000000000000, 0.7500000000000000<br>
 string_length: 3<br>
 <table>
 <td align=right valign=top><b>bears</b>:</td>
 <td align=left valign=top>Array of Strings [i = 0..1][j = 0..2]<br>act: text string\\012\\011123<br>
 acs: -40<br>
 acl: 17000<br>
-acf: -2.000000000, 1.000000000, 0.000000000<br>
-acd: -1.0000000000000000, 0.75000000000000000<br>
+acf: -2.00000000, 1.00000000, 0.00000000<br>
+acd: -1.000000000000000, 0.7500000000000000<br>
 string_length: 3<br>
 </td>
 <tr><td align=right valign=top><b>i</b>:</td>

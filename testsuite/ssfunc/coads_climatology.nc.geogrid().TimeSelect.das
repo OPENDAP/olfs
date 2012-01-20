@@ -14,29 +14,29 @@ Attributes {
         String modulo " ";
     }
     SST {
-        Float32 missing_value -9.999999790e+33;
-        Float32 _FillValue -9.999999790e+33;
+        Float32 missing_value -9.99999979e+33;
+        Float32 _FillValue -9.99999979e+33;
         String long_name "SEA SURFACE TEMPERATURE";
         String history "From coads_climatology";
         String units "Deg C";
     }
     AIRT {
-        Float32 missing_value -9.999999790e+33;
-        Float32 _FillValue -9.999999790e+33;
+        Float32 missing_value -9.99999979e+33;
+        Float32 _FillValue -9.99999979e+33;
         String long_name "AIR TEMPERATURE";
         String history "From coads_climatology";
         String units "DEG C";
     }
     UWND {
-        Float32 missing_value -9.999999790e+33;
-        Float32 _FillValue -9.999999790e+33;
+        Float32 missing_value -9.99999979e+33;
+        Float32 _FillValue -9.99999979e+33;
         String long_name "ZONAL WIND";
         String history "From coads_climatology";
         String units "M/S";
     }
     VWND {
-        Float32 missing_value -9.999999790e+33;
-        Float32 _FillValue -9.999999790e+33;
+        Float32 missing_value -9.99999979e+33;
+        Float32 _FillValue -9.99999979e+33;
         String long_name "MERIDIONAL WIND";
         String history "From coads_climatology";
         String units "M/S";
