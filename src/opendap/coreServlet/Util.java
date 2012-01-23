@@ -62,7 +62,7 @@ public class Util {
         msg += "    fullSourceName:            '" + ReqInfo.getLocalUrl(req) + "'\n";
         msg += "    dataSource:                '" + ReqInfo.getBesDataSourceID(ReqInfo.getLocalUrl(req)) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
-        msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
+        msg += "    requestSuffixRegex:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
         msg += "\n";

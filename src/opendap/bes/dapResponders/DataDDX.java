@@ -27,7 +27,6 @@ import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.HttpResponder;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.net.UnknownServiceException;
 
 
 public class DataDDX extends BesDapResponder {
@@ -46,21 +44,21 @@ public class DataDDX extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffix = ".dap";
+    private static String defaultRequestSuffixRegex = "\\.dap";
 
 
     public DataDDX(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public DataDDX(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
 
-    public DataDDX(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public DataDDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

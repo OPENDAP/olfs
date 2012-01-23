@@ -198,7 +198,7 @@ public class DapDispatcher implements DispatchHandler {
             log.debug(r.getPathPrefix());
             if (r.matches(relativeUrl)) {
                 log.info("The relative URL: " + relativeUrl + " matches " +
-                        "the pattern: \"" + r.getRegexPatternString() + "\"");
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
                 dsi = getDataSourceInfo(besDataSourceId);
                 if(dsi.isDataset()){
                     if(sendResponse)
@@ -235,7 +235,7 @@ public class DapDispatcher implements DispatchHandler {
         for (HttpResponder r : responders) {
             if (r.matches(requestURL)) {
                 log.info("The request URL: " + requestURL + " matches " +
-                        "the pattern: \"" + r.getRegexPatternString() + "\"");
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 try {
                     log.debug("getLastModified(): Getting datasource info for "+dataSource);

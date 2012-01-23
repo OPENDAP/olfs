@@ -5,19 +5,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 11/28/11
- * Time: 2:55 PM
- * To change this template use File | Settings | File Templates.
+ *
  */
 public abstract class DapResponder extends HttpResponder  {
 
-    private static String defaultRegex = ".*";
+    private static String matchAnythingRegex = ".*";
 
-    protected String requestSuffix;
+    protected String requestSuffixRegex;
 
     private Logger log;
 
@@ -27,31 +25,27 @@ public abstract class DapResponder extends HttpResponder  {
     }
 
     public DapResponder(String sysPath, String pathPrefix, String reqSuffix) {
-        super(sysPath, pathPrefix, defaultRegex);
+        super(sysPath, pathPrefix, matchAnythingRegex);
 
-        log = LoggerFactory.getLogger(DapResponder.class);
+        log = LoggerFactory.getLogger(this.getClass());
 
 
-        setRequestSuffix(reqSuffix);
+        setRequestSuffixRegex(reqSuffix);
     }
 
 
-    public void setRequestSuffix(String reqSuffix){
+    public void setRequestSuffixRegex(String reqSuffixRegex){
 
-        requestSuffix = reqSuffix;
+        requestSuffixRegex = reqSuffixRegex;
         String regex;
 
-        String conditionalSlash = "\\";
-        if(!requestSuffix.startsWith("."))
-            conditionalSlash = "";
-        regex = defaultRegex + conditionalSlash + requestSuffix;
+        if(requestSuffixRegex.startsWith("."))
+            requestSuffixRegex = "\\"+requestSuffixRegex;
+
+        regex = matchAnythingRegex + requestSuffixRegex;
 
         setRegexPattern(regex);
 
-    }
-
-    public String getRequestSuffix(){
-        return requestSuffix;
     }
 
 
@@ -69,21 +63,39 @@ public abstract class DapResponder extends HttpResponder  {
             requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
         }
 
-        String[] urlParts = requestUrl.split(requestSuffix);
 
-        StringBuilder xmlBase =  new StringBuilder();
-        for(int i=0; i < urlParts.length; i++){
-            if(xmlBase.length()>0){
-                xmlBase.append(requestSuffix);
-            }
-            xmlBase.append(urlParts[i]);
-        }
+        String xmlBase = trimRequestSuffix(requestUrl);
 
-        log.debug("@xml:base='"+xmlBase+"'");
-        return xmlBase.toString();
+
+        log.debug("@xml:base='{}'",xmlBase);
+        return xmlBase;
     }
 
 
+    public String trimRequestSuffix(String requestString){
+
+
+        String trimmedRequestString = requestString;
+        String regex = requestSuffixRegex;
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(requestString);
+
+        while (matcher.find()) {
+            log.debug("trimRequestSuffix() - matcher.find() found the text \""+matcher.group()+"\" starting at " +
+               "index "+matcher.start()+" and ending at index "+matcher.end());
+
+            if(matcher.end() == requestString.length()){
+                trimmedRequestString = requestString.substring(0,matcher.start());
+            }
+
+        }
+
+
+         return trimmedRequestString;
+
+
+    }
 
 
 }

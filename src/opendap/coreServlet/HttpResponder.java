@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public abstract class HttpResponder {
 
-    private Pattern _pattern;
+    private Pattern _requestMatchPattern;
     protected String _systemPath;
     private String pathPrefix;
 
@@ -56,19 +55,22 @@ public abstract class HttpResponder {
 
     protected HttpResponder(String sysPath, String pathPrefix, String regexPattern){
         super();
-        _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
+        _requestMatchPattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
         _systemPath = sysPath;
         this.pathPrefix = pathPrefix;
     }
 
-    public String getRegexPatternString(){ return _pattern.toString();}
-    protected void setRegexPattern(String regexPattern){ _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
+    public String getRequestMatchRegexString(){ return _requestMatchPattern.toString();}
+    protected void setRegexPattern(String regexPattern){ _requestMatchPattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
 
 
+    protected Pattern getPattern(){
+        return _requestMatchPattern;
+    }
 
 
     public boolean matches(String s){
-       Matcher m = _pattern.matcher(s);
+       Matcher m = _requestMatchPattern.matcher(s);
        return m.matches();
 
     }

@@ -719,7 +719,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        //String requestSuffix = ReqInfo.getRequestSuffix(request);
+        //String requestSuffixRegex = ReqInfo.getRequestSuffix(request);
 
         boolean threddsRequest = false;
 

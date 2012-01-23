@@ -26,7 +26,6 @@ package opendap.bes.dapResponders;
 import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -49,20 +48,20 @@ public class DDS extends BesDapResponder {
 
 
 
-    private static String defaultRequestSuffix = ".dds";
+    private static String defaultRequestSuffixRegex = "\\.dds";
 
 
     public DDS(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public DDS(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public DDS(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public DDS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

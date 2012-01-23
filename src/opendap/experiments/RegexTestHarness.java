@@ -37,40 +37,82 @@ public class RegexTestHarness {
     public static void main(String[] args) throws Exception {
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
 
-        String pString = null;
-        String input = null;
+        String regex = null;
+        String candidate = null;
         String k;
 
         while (true) {
 
-            System.out.print("\nEnter your regex ["+pString+"]: ");
+            System.out.print("-----------------------------------------------------------");
+            System.out.print("\nEnter your regex ["+regex+"]: ");
             k = kybrd.readLine();
             if(!k.equals(""))
-                pString = k;
-            Pattern pattern =
-            Pattern.compile(pString);
+                regex = k;
 
-            System.out.print("Enter input string to search["+input+"]: ");
+            System.out.print("Enter input string to search["+candidate+"]: ");
             k = kybrd.readLine();
             if(!k.equals(""))
-                input = k;
-            Matcher matcher =
-            pattern.matcher(input);
+                candidate = k;
 
-            boolean found = false;
-            while (matcher.find()) {
-                System.out.println("matcher.find() found the text \""+matcher.group()+"\" starting at " +
-                   "index "+matcher.start()+" and ending at index "+matcher.end());
-                found = true;
-            }
-
-            System.out.println("pattern.matcher("+input+").matches(): "+pattern.matcher(input).matches());
+            regexTest(regex,candidate);
 
 
-
-            if(!found){
-                System.out.println("No match found.");
-            }
         }
     }
+
+
+    public static void regexTest(String regex, String candidate){
+
+        System.out.println("-----------------------------------------------------------");
+        System.out.println("regex: "+regex);
+        System.out.println("candidate: "+candidate);
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(candidate);
+
+
+
+
+
+        boolean found = false;
+        while (matcher.find()) {
+            System.out.println("matcher.find() found the text \""+matcher.group()+"\" starting at " +
+               "index "+matcher.start()+" and ending at index "+matcher.end());
+            found = true;
+        }
+
+
+        System.out.println("pattern.matcher("+candidate+").matches(): "+pattern.matcher(candidate).matches());
+
+
+        if(!found){
+            System.out.println("No match found.");
+        }
+
+
+        System.out.println("String.split()");
+        String[] urlParts = candidate.split(regex);
+        for(int i=0; i<urlParts.length; i++){
+            System.out.println("    part["+i+"]: "+urlParts[i]);
+        }
+
+
+        System.out.println("Pattern.split()");
+        urlParts = pattern.split(candidate);
+        for(int i=0; i<urlParts.length; i++){
+            System.out.println("    part["+i+"]: "+urlParts[i]);
+        }
+
+
+
+
+
+
+
+
+    }
+
+
+
+
 }

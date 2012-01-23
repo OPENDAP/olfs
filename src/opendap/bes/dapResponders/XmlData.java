@@ -26,7 +26,6 @@ package opendap.bes.dapResponders;
 import opendap.bes.Version;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.HttpResponder;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -48,23 +47,22 @@ public class XmlData extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.xdods";
 
 
-    private static String defaultRequestSuffix = ".xdods";
+    private static String defaultRequestSuffixRegex = "\\.xdods";
 
     public XmlData(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public XmlData(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
 
-    public XmlData(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

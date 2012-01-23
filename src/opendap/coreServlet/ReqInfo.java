@@ -38,9 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Provides utility methods that perform "analysis" of the user request and return important componet strings
  * for the OPeNDAP servlet.
  *
- * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+ * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
  * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
- * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+ * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
  * <p><b>Examples:</b>
  * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds?lat,lon,time&lat>72.0<br/>
  * Then the:</li>
@@ -226,7 +226,7 @@ public class ReqInfo {
 
         }
 
-        log.debug("  requestSuffix:  " + requestSuffix);
+        log.debug("  requestSuffixRegex:  " + requestSuffix);
 
         return requestSuffix;
 
@@ -281,16 +281,16 @@ public class ReqInfo {
 
 
     /**
-     * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+     * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
      * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
-     * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+     * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
      * <p><b>Examples:</b>
      * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
      * Then the:</li>
      * <ul>
      * <li> dataSetName = fnoc1.nc </li>
      * <li> dataSourceName = /opendap/nc/fnoc1.nc </li>
-     * <li> requestSuffix = dds </li>
+     * <li> requestSuffixRegex = dds </li>
      * </ul>
      *
      * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
@@ -298,7 +298,7 @@ public class ReqInfo {
      * <ul>
      * <li> dataSetName = null </li>
      * <li> dataSourceName = /opendap/nc/ </li>
-     * <li> requestSuffix = "" </li>
+     * <li> requestSuffixRegex = "" </li>
      * </ul>
      * </ul>
      *
@@ -338,16 +338,16 @@ public class ReqInfo {
 
 
     /**
-     * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+     * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
      * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
-     * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+     * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
      * <p><b>Examples:</b>
      * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
      * Then the:</li>
      * <ul>
      * <li> dataSetName = fnoc1.nc </li>
      * <li> dataSourceName = /opendap/nc/fnoc1.nc </li>
-     * <li> requestSuffix = dds </li>
+     * <li> requestSuffixRegex = dds </li>
      * </ul>
      *
      * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
@@ -355,7 +355,7 @@ public class ReqInfo {
      * <ul>
      * <li> dataSetName = null </li>
      * <li> dataSourceName = /opendap/nc/ </li>
-     * <li> requestSuffix = "" </li>
+     * <li> requestSuffixRegex = "" </li>
      * </ul>
      * </ul>
      *

@@ -52,19 +52,19 @@ public class XmlData extends BesDapResponder {
 
     private BesGatewayApi _besGatewayApi;
 
-    private static String defaultRequestSuffix = ".xdods";
+    private static String defaultRequestSuffixRegex = "\\.xdods";
 
 
     public XmlData(String sysPath, BesGatewayApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+        this(sysPath, null, defaultRequestSuffixRegex, besApi);
     }
 
     public XmlData(String sysPath, String pathPrefix, BesGatewayApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+        this(sysPath, pathPrefix, defaultRequestSuffixRegex, besApi);
     }
 
-    public XmlData(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }

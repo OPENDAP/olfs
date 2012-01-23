@@ -25,7 +25,6 @@ package opendap.bes.dapResponders;
 
 import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import org.jdom.Document;
@@ -48,20 +47,20 @@ public class Dap2Data extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffix = ".dods";
+    private static String defaultRequestSuffixRegex = "\\.dods";
 
 
     public Dap2Data(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public Dap2Data(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

@@ -23,12 +23,12 @@ public abstract class BesDapResponder extends DapResponder {
     private BesApi _besApi;
 
 
-    public BesDapResponder(String sysPath, String requestSuffix, BesApi besApi) {
-        this(sysPath,null,requestSuffix, besApi);
+    public BesDapResponder(String sysPath, String requestSuffixRegex, BesApi besApi) {
+        this(sysPath,null,requestSuffixRegex, besApi);
     }
 
-    public BesDapResponder(String sysPath, String pathPrefix, String reqSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, reqSuffix);
+    public BesDapResponder(String sysPath, String pathPrefix, String reqSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, reqSuffixRegex);
 
         log = LoggerFactory.getLogger(DapResponder.class);
 

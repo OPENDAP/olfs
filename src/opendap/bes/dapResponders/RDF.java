@@ -45,19 +45,19 @@ public class RDF extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffix = ".rdf";
+    private static String defaultRequestSuffixRegex = "\\.rdf";
 
     public RDF(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public RDF(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public RDF(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public RDF(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

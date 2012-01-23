@@ -25,7 +25,6 @@ package opendap.bes.dapResponders;
 
 import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -48,19 +47,19 @@ public class DDX extends BesDapResponder {
 
     private Logger log;
 
-    private static String defaultRequestSuffix = ".ddx";
+    private static String defaultRequestSuffixRegex = "\\.ddx";
 
     public DDX(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public DDX(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public DDX(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public DDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

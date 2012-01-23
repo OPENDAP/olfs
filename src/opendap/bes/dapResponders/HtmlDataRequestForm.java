@@ -26,7 +26,6 @@ package opendap.bes.dapResponders;
 import opendap.bes.BESError;
 import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -52,19 +51,19 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
 
 
-    private static String defaultRequestSuffix = ".html?";
+    private static String defaultRequestSuffixRegex = "\\.html?";
 
     public HtmlDataRequestForm(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public HtmlDataRequestForm(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 

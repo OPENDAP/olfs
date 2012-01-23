@@ -53,19 +53,19 @@ public class DDX extends BesDapResponder {
 
     private BesGatewayApi _besGatewayApi;
 
-    private static String defaultRequestSuffix = ".ddx";
+    private static String defaultRequestSuffixRegex = "\\.ddx";
 
 
     public DDX(String sysPath, BesGatewayApi besApi) {
-        this(sysPath, null, defaultRequestSuffix, besApi);
+        this(sysPath, null, defaultRequestSuffixRegex, besApi);
     }
 
     public DDX(String sysPath, String pathPrefix, BesGatewayApi besApi) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+        this(sysPath, pathPrefix, defaultRequestSuffixRegex, besApi);
     }
 
-    public DDX(String sysPath, String pathPrefix,  String requestSuffix, BesGatewayApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public DDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         _besGatewayApi = besApi;
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }

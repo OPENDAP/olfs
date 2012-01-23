@@ -27,7 +27,6 @@ import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
-import opendap.coreServlet.HttpResponder;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -52,19 +51,19 @@ public class NetcdfFileOut extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffix = ".nc";
+    private static String defaultRequestSuffixRegex = "\\.nc";
 
     public NetcdfFileOut(String sysPath, BesApi besApi) {
-        this(sysPath,null,defaultRequestSuffix,besApi);
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public NetcdfFileOut(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix,defaultRequestSuffix,besApi);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffix, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
