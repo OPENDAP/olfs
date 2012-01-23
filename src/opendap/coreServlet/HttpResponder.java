@@ -61,10 +61,10 @@ public abstract class HttpResponder {
     }
 
     public String getRequestMatchRegexString(){ return _requestMatchPattern.toString();}
-    protected void setRegexPattern(String regexPattern){ _requestMatchPattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
+    protected void setRequestMatchRegex(String regexString){ _requestMatchPattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);}
 
 
-    protected Pattern getPattern(){
+    protected Pattern getRequestMatchPattern(){
         return _requestMatchPattern;
     }
 

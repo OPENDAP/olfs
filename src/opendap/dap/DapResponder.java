@@ -37,14 +37,12 @@ public abstract class DapResponder extends HttpResponder  {
     public void setRequestSuffixRegex(String reqSuffixRegex){
 
         requestSuffixRegex = reqSuffixRegex;
-        String regex;
 
-        if(requestSuffixRegex.startsWith("."))
-            requestSuffixRegex = "\\"+requestSuffixRegex;
+        String requestMatchRegex;
 
-        regex = matchAnythingRegex + requestSuffixRegex;
+        requestMatchRegex = matchAnythingRegex + requestSuffixRegex;
 
-        setRegexPattern(regex);
+        setRequestMatchRegex(requestMatchRegex);
 
     }
 
