@@ -1,0 +1,112 @@
+<html><head><title>Dataset Information</title></head>
+<body>
+<h3>Dataset Information</h3>
+<center>
+<table>
+
+<tr><td align=right valign=top><b>history</b>:</td>
+<td align=left>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.<br></td></tr>
+
+<tr><td align=right valign=top><b>Unlimited_Dimension</b>:</td>
+<td align=left>k<br></td></tr>
+</table>
+</center><p>
+
+<hr>
+<h3>Variables in this Dataset</h3>
+<center>
+<table>
+<tr><td align=right valign=top><b>bears</b>:</td>
+<td align=left valign=top>Grid<br>act: text string\\012\\011123<br>
+acs: -40<br>
+acl: 17000<br>
+acf: -2.00000000, 1.00000000, 0.00000000<br>
+acd: -1.000000000000000, 0.7500000000000000<br>
+string_length: 3<br>
+<table>
+<td align=right valign=top><b>bears</b>:</td>
+<td align=left valign=top>Array of Strings [i = 0..1][j = 0..2]<br>act: text string\\012\\011123<br>
+acs: -40<br>
+acl: 17000<br>
+acf: -2.00000000, 1.00000000, 0.00000000<br>
+acd: -1.000000000000000, 0.7500000000000000<br>
+string_length: 3<br>
+</td>
+<tr><td align=right valign=top><b>i</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1]<br>attr1: 1<br>
+attr2: 1, 2, 3, 4<br>
+i_1.attr3_1: 17<br>
+i_1.attr3_2: 19, 23, 27<br>
+</td>
+</tr><tr><td align=right valign=top><b>j</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [j = 0..2]<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>order</b>:</td>
+<td align=left valign=top>Grid<br><table>
+<td align=right valign=top><b>order</b>:</td>
+<td align=left valign=top>Array of 16 bit Integers [i = 0..1][j = 0..2]<br></td>
+<tr><td align=right valign=top><b>i</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1]<br>attr1: 1<br>
+attr2: 1, 2, 3, 4<br>
+i_1.attr3_1: 17<br>
+i_1.attr3_2: 19, 23, 27<br>
+</td>
+</tr><tr><td align=right valign=top><b>j</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [j = 0..2]<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>shot</b>:</td>
+<td align=left valign=top>Grid<br><table>
+<td align=right valign=top><b>shot</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1][j = 0..2]<br></td>
+<tr><td align=right valign=top><b>i</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1]<br>attr1: 1<br>
+attr2: 1, 2, 3, 4<br>
+i_1.attr3_1: 17<br>
+i_1.attr3_2: 19, 23, 27<br>
+</td>
+</tr><tr><td align=right valign=top><b>j</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [j = 0..2]<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>aloan</b>:</td>
+<td align=left valign=top>Grid<br><table>
+<td align=right valign=top><b>aloan</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [i = 0..1][j = 0..2]<br></td>
+<tr><td align=right valign=top><b>i</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1]<br>attr1: 1<br>
+attr2: 1, 2, 3, 4<br>
+i_1.attr3_1: 17<br>
+i_1.attr3_2: 19, 23, 27<br>
+</td>
+</tr><tr><td align=right valign=top><b>j</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [j = 0..2]<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>cross</b>:</td>
+<td align=left valign=top>Grid<br><table>
+<td align=right valign=top><b>cross</b>:</td>
+<td align=left valign=top>Array of 64 bit Reals [i = 0..1][j = 0..2]<br></td>
+<tr><td align=right valign=top><b>i</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1]<br>attr1: 1<br>
+attr2: 1, 2, 3, 4<br>
+i_1.attr3_1: 17<br>
+i_1.attr3_2: 19, 23, 27<br>
+</td>
+</tr><tr><td align=right valign=top><b>j</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [j = 0..2]<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>i</b>:</td>
+<td align=left valign=top>Array of 32 bit Integers [i = 0..1]<br>attr1: 1<br>
+attr2: 1, 2, 3, 4<br>
+i_1.attr3_1: 17<br>
+i_1.attr3_2: 19, 23, 27<br>
+</td>
+</tr><tr><td align=right valign=top><b>j</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [j = 0..2]<br></td>
+</tr><tr><td align=right valign=top><b>l</b>:</td>
+<td align=left valign=top>Array of 16 bit Integers [l = 0..2]<br></td>
+</tr></table>
+</center><p>
+
+<hr>
+
+</body>
+</html>

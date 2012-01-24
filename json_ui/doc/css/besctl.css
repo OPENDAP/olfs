@@ -1,0 +1,68 @@
+
+
+
+div.configEdit {
+	color: #000;
+    border: #527CC1 solid 1px;
+    font-family: courier;
+    width: 80%;
+}
+
+
+div.LogWindow {
+    background: rgba(255, 0, 0, 0.03);
+    font-family: courier;
+    font-size: 8pt;
+    border: 1px solid black;
+    height: 125px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    overflow: auto;
+    resize: vertical;
+    min-width: 500px;
+    min-height: 75px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+
+}
+
+
+div.loggingControls {
+       border:solid 1px #dddddd;
+       margin-left:5px;
+       margin-right: 5px;
+       font-size:14px;
+       font-family:san-serif,tahoma,arial;
+       padding-left:15px;
+       padding-right:15px;
+       padding-top:0px;
+       padding-bottom:0px;
+       margin-top:10px;
+       margin-bottom:10px;
+       text-align:left;
+    }
+
+div.loggingConfig {
+       border:solid 1px #dddddd;
+    }
+
+
+
+div.statusDisplay {
+       border:solid 1px #dddddd;
+       margin-left:5px;
+       margin-right: 5px;
+       font-family: courier;
+       font-size: 8pt;
+       padding-left:15px;
+       padding-right:15px;
+       padding-top:0px;
+       padding-bottom:0px;
+       margin-top:15px;
+       margin-bottom:10px;
+       text-align:left;
+    }
+

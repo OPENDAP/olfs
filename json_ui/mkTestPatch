@@ -1,0 +1,5 @@
+#!/bin/sh
+
+
+
+./make-check | grep FAIL  | awk '{print "curl -s -g ", $5, "  > ",  $9;}' - | sed -e "s/)/\\\)/g" -e "s/(/\\\(/g" -e "s/\?/\\\?/g"  -e "s/\&/\\\&/g"  -e "s/</\\\</g"  -e "s/>/\\\>/g" -e  "s/ \\\> / > /g" | tee testPatch | awk '{print $1, $2, $3, $4, " | diff - ", $6}' > testDiff

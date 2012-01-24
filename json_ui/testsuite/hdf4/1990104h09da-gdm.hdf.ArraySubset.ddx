@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset name="1990104h09da-gdm.hdf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xml.opendap.org/ns/DAP2" xsi:schemaLocation="http://xml.opendap.org/ns/DAP2 http://xml.opendap.org/dap/dap2.xsd">
+    <Attribute name="HDF_GLOBAL" type="Container">
+        <Attribute name="Title" type="String">
+            <value>AVHRR Oceans Pathfinder Equal Angle\\000</value>
+        </Attribute>
+        <Attribute name="Data Center" type="String">
+            <value>NASA/PO.DAAC AVHRR Oceans Pathfinder\\000</value>
+        </Attribute>
+        <Attribute name="Station" type="String">
+            <value>NOAA/NESDIS\\000</value>
+        </Attribute>
+        <Attribute name="Mission" type="String">
+            <value>AVHRR Oceans Pathfinder\\000</value>
+        </Attribute>
+        <Attribute name="Mission Characteristics" type="String">
+            <value>NOAA/NASA AVHRR Oceans Pathfinder\\000</value>
+        </Attribute>
+        <Attribute name="Sensor" type="String">
+            <value>NOAA polar orbiter data\\000</value>
+        </Attribute>
+        <Attribute name="Sensor Characteristics" type="String">
+            <value>National Oceanic and Atmospheric Administration Polar Orbiter\\000</value>
+        </Attribute>
+        <Attribute name="Product name" type="String">
+            <value>Equal Angle Map HDF\\000</value>
+        </Attribute>
+        <Attribute name="Quality type" type="String">
+            <value>Best SST\\000</value>
+        </Attribute>
+        <Attribute name="Binning period" type="String">
+            <value>DAILY\\000</value>
+        </Attribute>
+        <Attribute name="Pass" type="String">
+            <value>Ascending\\000</value>
+        </Attribute>
+        <Attribute name="Processing control" type="String">
+            <value>Algorithm: V4.0 pathfinder flagtree 26aug96\\000</value>
+        </Attribute>
+        <Attribute name="Data start time" type="String">
+            <value>4/14/1990 00:00:00\\000</value>
+        </Attribute>
+        <Attribute name="Data end time" type="String">
+            <value>4/14/1990 23:59:59\\000</value>
+        </Attribute>
+        <Attribute name="Data processing time" type="String">
+            <value>Thu Jun 26 18:02:09 1997</value>
+        </Attribute>
+        <Attribute name="Start year" type="Int16">
+            <value>1990</value>
+        </Attribute>
+        <Attribute name="End year" type="Int16">
+            <value>1990</value>
+        </Attribute>
+        <Attribute name="Start day" type="Int16">
+            <value>104</value>
+        </Attribute>
+        <Attribute name="End day" type="Int16">
+            <value>104</value>
+        </Attribute>
+        <Attribute name="Start millisec" type="Int32">
+            <value>53143</value>
+        </Attribute>
+        <Attribute name="End millisec" type="Int32">
+            <value>53143</value>
+        </Attribute>
+        <Attribute name="Number of rows" type="Int32">
+            <value>2048</value>
+        </Attribute>
+        <Attribute name="Number of columns" type="Int32">
+            <value>4096</value>
+        </Attribute>
+        <Attribute name="Map projection" type="String">
+            <value>Equirectangular projection\\000</value>
+        </Attribute>
+        <Attribute name="Parameter name" type="String">
+            <value>Sea Surface Temperature\\000</value>
+        </Attribute>
+        <Attribute name="Orbit" type="Float32">
+            <value>8007</value>
+        </Attribute>
+        <Attribute name="Maximum Latitude" type="Float32">
+            <value>89.9561</value>
+        </Attribute>
+        <Attribute name="Minimum Latitude" type="Float32">
+            <value>-89.9561</value>
+        </Attribute>
+        <Attribute name="Maximum Longitude" type="Float32">
+            <value>179.956</value>
+        </Attribute>
+        <Attribute name="Minimum Longitude" type="Float32">
+            <value>-179.956</value>
+        </Attribute>
+    </Attribute>
+    <Array name="Sea Surface Temperature">
+        <Attribute name="scale_factor" type="Float64">
+            <value>0.15</value>
+        </Attribute>
+        <Attribute name="scale_factor_err" type="Float64">
+            <value>0</value>
+        </Attribute>
+        <Attribute name="add_offset" type="Float64">
+            <value>-3</value>
+        </Attribute>
+        <Attribute name="add_offset_err" type="Float64">
+            <value>0</value>
+        </Attribute>
+        <Attribute name="calibrated_nt" type="Int32">
+            <value>20</value>
+        </Attribute>
+        <Attribute name="Slope" type="Float32">
+            <value>0.15</value>
+        </Attribute>
+        <Attribute name="Intercept" type="Float32">
+            <value>-3</value>
+        </Attribute>
+        <Attribute name="Unit" type="String">
+            <value>Degree in Celsius\\000</value>
+        </Attribute>
+        <Attribute name="Equation" type="String">
+            <value>SST (Celsius) = DN * .15 - 3.0\\000</value>
+        </Attribute>
+        <Attribute name="dim_0" type="Container">
+            <Attribute name="name" type="String">
+                <value>Longitude</value>
+            </Attribute>
+        </Attribute>
+        <Attribute name="dim_1" type="Container">
+            <Attribute name="name" type="String">
+                <value>Latitude</value>
+            </Attribute>
+        </Attribute>
+        <Int32/>
+        <dimension name="Longitude" size="41"/>
+        <dimension name="Latitude" size="21"/>
+    </Array>
+    <dataBLOB href=""/>
+</Dataset>

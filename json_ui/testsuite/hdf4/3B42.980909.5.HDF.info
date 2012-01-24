@@ -1,0 +1,29 @@
+<html><head><title>Dataset Information</title></head>
+<body>
+<h3>Dataset Information</h3>
+<center>
+<table>
+</table>
+</center><p>
+
+<hr>
+<h3>Variables in this Dataset</h3>
+<center>
+<table>
+<tr><td align=right valign=top><b>DATA_GRANULE</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>PlanetaryGrid</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>percipitate</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br></td>
+</tr><tr><td align=right valign=top><b>relError</b>:</td>
+<td align=left valign=top>Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br></td>
+</tr></table>
+</tr></table>
+</tr></table>
+</center><p>
+
+<hr>
+
+</body>
+</html>

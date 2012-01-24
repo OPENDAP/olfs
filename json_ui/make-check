@@ -1,0 +1,171 @@
+#!/bin/sh
+
+verbose="2"
+
+
+
+
+###########################################################
+#            initialize the environment
+#
+init() {
+
+if [ $verbose -gt "0" ]
+then 
+    echo
+    echo ------------------- init -------------------
+fi    
+
+export myclasspath="build/classes:\
+lib/apache-commons-cli-1.0.jar:\
+lib/jdom-1.0.jar:\
+lib/junit-4.4.jar:\
+lib/netcdf-2.2.20.jar:\
+lib/nlog4j-1.2.21.jar:\
+lib/tomcat-5.5.0-servlet.jar:\
+lib/tsf-3.16.22.jar:\
+lib/xercesImpl-2.8.1.jar:\
+lib/xml-apis-2.8.1.jar"
+
+export javaBase="java  -classpath $myclasspath"
+
+summary=""
+
+if [ $verbose -gt "0" ]
+then 
+    echo
+    echo "myclasspath=$myclasspath"
+    echo
+    echo "javaBase=$javaBase"
+    echo
+    echo
+    echo "current directory: " `pwd`
+    echo "path: " `echo $path`
+    echo "PATH: " `echo $PATH`
+    echo
+    echo "JVM located at: " `which java`
+    echo
+    java -version
+    echo
+    echo ----------------- end init -----------------
+    echo
+    echo
+fi
+}
+
+
+
+###########################################################
+#            Test ChunkedOutputStream
+#
+chunkedOutputStream() {
+
+    if [ ! -f build/classes/opendap/io/ChunkedOutputStream.class ]
+    then
+        ant compile
+    fi
+
+              
+    export testCmd="$javaBase opendap.io.ChunkedOutputStream"
+
+    
+    if [ $verbose -gt "0" ]
+    then 
+        echo "ChunkedOutputStream: "
+        echo "    testCmd:"
+        echo "        $testCmd"
+    fi
+
+        
+
+    $testCmd 2>/dev/null | tee /tmp/$$.chunkedOutput | cmp - testsuite/ChunkedIO/ChunkedOutputStream.dat 
+    testResult=$?
+    
+    if [ "$testResult" != 0 ]
+    then 
+        msg="FAILED: ChunkedOutputStream Test."
+    else
+        msg="PASSED: ChunkedOutputStream Test."
+    fi
+    echo $msg
+    
+    summary=$summary';'$msg
+
+    return $testResult
+
+}
+
+
+###########################################################
+#            Run JUnit Tests
+#
+junit() {
+    ant check
+    testResult=$?
+    
+    if [ "$testResult" != 0 ]
+    then 
+        msg="FAILED: JUnit Tests."
+    else
+        msg="PASSED: JUnit Tests."
+
+    fi
+    
+    echo $msg
+    summary=$summary';'$msg
+
+    return $testResult
+}
+
+
+###########################################################
+#            Run DejaGnu Tests
+#
+dejaGnu(){
+    runtest --outdir testsuite/logs --srcdir testsuite --tool olfs
+    testResult=$?
+    if [ "$testResult" != 0 ]
+    then 
+        msg="FAILED: DejaGnu Tests."
+    else
+        msg="PASSED: DejaGnu Tests."
+    fi
+
+    echo $msg
+    summary=$summary';'$msg
+
+    return $testResult
+
+}
+
+###########################################################
+#            Print Test Summary
+#
+summary() {
+
+
+echo
+echo
+echo 
+echo TEST SUMMARY:
+
+echo $summary | sed "s/;/    \\
+/g"
+
+}
+
+
+
+###########################################################
+#            Main
+#
+
+init
+
+junit
+
+chunkedOutputStream
+
+dejaGnu
+
+summary

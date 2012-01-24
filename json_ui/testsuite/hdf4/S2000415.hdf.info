@@ -1,0 +1,268 @@
+<html><head><title>Dataset Information</title></head>
+<body>
+<h3>Dataset Information</h3>
+<center>
+<table>
+
+<tr><td align=right valign=top><b>Producer_Agency</b>:</td>
+<td align=left>NASA\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Producer_Institution</b>:</td>
+<td align=left>JPL\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Sensor_Name</b>:</td>
+<td align=left>NSCAT\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Project_ID</b>:</td>
+<td align=left>NSCAT\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>SIS_ID</b>:</td>
+<td align=left>597-512-24/1996-07-01\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Build_ID</b>:</td>
+<td align=left>3.2.1/1996-11-05\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>ADEOS_Data_Package_ID</b>:</td>
+<td align=left>S2\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>ADEOS_Data_Package_Type</b>:</td>
+<td align=left>S\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Product_Creation_Time</b>:</td>
+<td align=left>1996-318T01:35:16.000\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Data_Type</b>:</td>
+<td align=left>L2\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Data_Status</b>:</td>
+<td align=left>COMPLETE\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>First_Rev_Number</b>:</td>
+<td align=left>415<br></td></tr>
+
+<tr><td align=right valign=top><b>First_Rev_Eq_Crossing_Time</b>:</td>
+<td align=left>1996-259T04:01:28.226\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>First_Rev_Eq_Crossing_Lon</b>:</td>
+<td align=left>279.983<br></td></tr>
+
+<tr><td align=right valign=top><b>First_Data_Time</b>:</td>
+<td align=left>1996-259T03:43:48.945\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Last_Data_Time</b>:</td>
+<td align=left>1996-259T05:09:48.997\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>Num_Expected_Output_Records</b>:</td>
+<td align=left>458<br></td></tr>
+
+<tr><td align=right valign=top><b>Num_Actual_Output_Records</b>:</td>
+<td align=left>458<br></td></tr>
+
+<tr><td align=right valign=top><b>Ambig_Removal_Method</b>:</td>
+<td align=left>Baseline used\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>HDF_Build_ID</b>:</td>
+<td align=left>JPL D-xxxxx 12/15/94\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>HDF_SIS_ID</b>:</td>
+<td align=left>JPL D-12060 12/15/94\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>HDF_Conversion_Organization</b>:</td>
+<td align=left>JPL PO.DAAC\\000<br></td></tr>
+
+<tr><td align=right valign=top><b>HDF_Conversion_Time</b>:</td>
+<td align=left>1996-320T17:32:34       <br></td></tr>
+
+<tr><td align=right valign=top><b>Data_Format_Type</b>:</td>
+<td align=left>HDF\\000<br></td></tr>
+</table>
+</center><p>
+
+<hr>
+<h3>Variables in this Dataset</h3>
+<center>
+<table>
+<tr><td align=right valign=top><b>NSCAT Rev 20</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>WVC_Lat</b>:</td>
+<td align=left valign=top>Array of 16 bit Integers [row = 0..457][WVC = 0..23]<br>long_name: latitude<br>
+units: deg<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 22<br>
+valid_range: -9000, 7771<br>
+</td>
+</tr><tr><td align=right valign=top><b>WVC_Lon</b>:</td>
+<td align=left valign=top>Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23]<br>long_name: longitude<br>
+units: deg<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 22<br>
+valid_range: 0, 31242<br>
+</td>
+</tr><tr><td align=right valign=top><b>Num_Sigma0</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: The total number of sigma-0 measurements<br>
+units: counts<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 19<br>
+</td>
+</tr><tr><td align=right valign=top><b>Num_Beam_12</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: The total number of sigma-0s received from beam 1 or 2<br>
+units: counts<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 6<br>
+</td>
+</tr><tr><td align=right valign=top><b>Num_Beam_34</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: The total number of sigma-0s received from beam 3 or 4<br>
+units: counts<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 6<br>
+</td>
+</tr><tr><td align=right valign=top><b>Num_Beam_56</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: The total number of sigma-0s received from beam 5 or 6<br>
+units: counts<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 6<br>
+</td>
+</tr><tr><td align=right valign=top><b>Num_Beam_78</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: The total number of sigma-0s received from beam 7 or 8<br>
+units: counts<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 6<br>
+</td>
+</tr><tr><td align=right valign=top><b>WVC_Quality_Flag</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: WVC Quality Flag<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 3<br>
+</td>
+</tr><tr><td align=right valign=top><b>Mean_Wind</b>:</td>
+<td align=left valign=top>Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23]<br>long_name: Mean Wind Speed<br>
+units: m/s<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 23<br>
+valid_range: 0, 2374<br>
+</td>
+</tr><tr><td align=right valign=top><b>Wind_Speed</b>:</td>
+<td align=left valign=top>Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>long_name: Wind speed associated with a WVC<br>
+units: m/s<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 23<br>
+valid_range: 0, 2571<br>
+</td>
+</tr><tr><td align=right valign=top><b>Wind_Dir</b>:</td>
+<td align=left valign=top>Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>long_name: Wind direction solution associated with a WVC<br>
+units: deg<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 23<br>
+valid_range: 0, 35997<br>
+</td>
+</tr><tr><td align=right valign=top><b>Error_Speed</b>:</td>
+<td align=left valign=top>Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>long_name: Uncertainty estimated for the wind speed value<br>
+units: m/s<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 23<br>
+valid_range: 0, 2410<br>
+</td>
+</tr><tr><td align=right valign=top><b>Error_Dir</b>:</td>
+<td align=left valign=top>Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>long_name: Uncertainty estimated for the wind direction value<br>
+units: deg<br>
+scale_factor: 0.01<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 23<br>
+valid_range: 0, 2435<br>
+</td>
+</tr><tr><td align=right valign=top><b>MLE_Likelihood</b>:</td>
+<td align=left valign=top>Array of 16 bit Integers [row = 0..457][WVC = 0..23][position = 0..3]<br>long_name: Relative likelihood that a given win vector solution is correct<br>
+scale_factor: 0.1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 22<br>
+valid_range: -32768, 2825<br>
+</td>
+</tr><tr><td align=right valign=top><b>Num_Ambigs</b>:</td>
+<td align=left valign=top>Array of Bytes [row = 0..457][WVC = 0..23]<br>long_name: Number of ambiguous wind vectors reported for a given cell<br>
+units: counts<br>
+scale_factor: 1<br>
+scale_factor_err: 0<br>
+add_offset: 0<br>
+add_offset_err: 0<br>
+calibrated_nt: 21<br>
+valid_range: 0, 4<br>
+</td>
+</tr><tr><td align=right valign=top><b>SwathIndex</b>:</td>
+<td align=left valign=top>Sequence<br><table>
+<tr><td align=right valign=top><b>begin</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>begin__0</b>:</td>
+<td align=left valign=top>16 bit Integer<br></td>
+</tr></table>
+</tr></table>
+</tr><tr><td align=right valign=top><b>NSCAT L2</b>:</td>
+<td align=left valign=top>Sequence<br><table>
+<tr><td align=right valign=top><b>Mean_Time</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>Mean_Time__0</b>:</td>
+<td align=left valign=top>String<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>Low_Wind_Speed_Flag</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>Low_Wind_Speed_Flag__0</b>:</td>
+<td align=left valign=top>32 bit Unsigned integer<br></td>
+</tr></table>
+</tr><tr><td align=right valign=top><b>High_Wind_Speed_Flag</b>:</td>
+<td align=left valign=top>Structure<br><table>
+<tr><td align=right valign=top><b>High_Wind_Speed_Flag__0</b>:</td>
+<td align=left valign=top>32 bit Unsigned integer<br></td>
+</tr></table>
+</tr></table>
+</tr></table>
+</tr></table>
+</center><p>
+
+<hr>
+
+</body>
+</html>

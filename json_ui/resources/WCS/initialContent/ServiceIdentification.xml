@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ************************************************************ -->
+<!-- * SERVICE IDENTIFICATION SECTION                           * -->
+<!-- ************************************************************ -->
+<ows:ServiceIdentification xmlns="http://www.opengis.net/wcs/1.1"
+xmlns:ows="http://www.opengis.net/ows/1.1"
+xmlns:xlink="http://www.w3.org/1999/xlink" >
+  <ows:Title>OPeNDAP WCS Service</ows:Title>
+  <ows:Abstract>A WCS server intended to provide WCS 1.1 (1.1.2) access to DAP datasets</ows:Abstract>
+  <ows:Keywords>
+     <ows:Keyword>Web Coverage Service</ows:Keyword>
+     <ows:Keyword>OPeNDAP</ows:Keyword>
+     <ows:Keyword>nectcdf</ows:Keyword>
+     <ows:Keyword>DAP</ows:Keyword>
+  </ows:Keywords>
+  <ows:ServiceType>WCS</ows:ServiceType>
+  <ows:ServiceTypeVersion>1.1.2</ows:ServiceTypeVersion>
+  <ows:Fees>NONE</ows:Fees>
+  <ows:AccessConstraints>NONE</ows:AccessConstraints>
+</ows:ServiceIdentification>

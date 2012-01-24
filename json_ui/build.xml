@@ -1,0 +1,856 @@
+<?xml version="1.0"?>
+
+<!--
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "Hyrax" project, a Java implementation
+// of the OPeNDAP Data Access Protocol.
+//
+// Copyright (c) 2011 OPeNDAP, Inc.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
+-->
+
+<!-- Build file for OPeNDAP core software -->
+
+<project
+        name="OPeNDAP Lightweight Front end Server (OLFS), part of the Hyrax project"
+        default="all" basedir=".">
+
+    <!-- Global Properties for Java-OPeNDAP software development -->
+
+
+
+    <!-- ********************************************* -->
+    <!-- Project-wide settings. All directories are    -->
+    <!-- relative to the project "Basedir" directory,  -->
+    <!-- which is assumed (by this file) to be set to  -->
+    <!-- ".."                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Version Tag: Used for doing distribution builds.
+         This property should be set from the command
+         line by the distribution build script using
+         tag information from CVS.
+    -->
+    <property name="HYRAX_VERSION" value="Not.A.Release"/>
+    <property name="OLFS_VERSION"  value="Not.A.Release"/>
+
+
+    <!-- Compiler Settings -->
+
+    <property name="compile.debug" value="on"/>
+    <property name="compile.debuglevel" value="lines,vars,source"/>
+    <property name="compile.deprecation" value="on"/>
+
+    <property name="modern.compiler" value="modern"/>
+    <property name="classic.compiler" value="classic"/>
+
+    <!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+    <property name="build.compiler" value="${modern.compiler}"/>
+
+
+
+    <!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+    <property name="build.sysclasspath" value="ignore"/>
+
+
+
+    <!-- ********************************************* -->
+
+    <!-- Target to create the build directories -->
+    <!-- prior to a compile target. We also mark -->
+    <!-- the start time of the build for the log. -->
+
+    <target name="noop" description="Do Nothing Target">
+        <echo level="info" message="no-op target in ${ant.file}"/>
+    </target>
+
+
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="Project Name:       ${ant.project.name}"/>
+        <echo level="info" message="Project File:       ${ant.file}"/>
+        <echo level="info" message="Hyrax Version:      ${HYRAX_VERSION}"/>
+        <echo level="info" message="Olfs Version:       ${OLFS_VERSION}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="    src.dir:       ${src.dir}"/>
+        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
+        <echo level="info" message="    resources.dir: ${resources.dir}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="    build.dir:      ${build.dir}"/>
+        <echo level="info" message="    build.classes:  ${build.classes}"/>
+        <echo level="info" message="    build.doc:      ${build.doc}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="    ant.file:          ${ant.file}"/>
+        <echo level="info" message="    ant.home:          ${ant.home}"/>
+        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
+        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
+        <echo level="info" message="    ant.version:       ${ant.version}"/>
+        <echo level="info" message="    basedir:           ${basedir}"/>
+        <echo level="info" message="    user.name:         ${user.name}"/>
+        <echo level="info" message="    user.home:         ${user.home}"/>
+        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+
+    </target>
+
+
+    <!-- ################################################################# -->
+    <!--                      Project Settings                             -->
+    <!-- ................................................................. -->
+
+
+
+    <!-- Project directories -->
+    <property name="src.dir" location="src"/>
+    <property name="doc.dir" location="doc"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="resources.dir" location="resources"/>
+    <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
+    <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
+    <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
+
+    <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
+    <property name="ncISO.dir" location="${resources.dir}/nciso"/>
+    <property name="GatewayResources.dir" location="${resources.dir}/gateway"/>
+    <property name="WebStartResources.dir" location="${resources.dir}/WebStart"/>
+    <property name="WCS.dir" location="${resources.dir}/WCS"/>
+
+
+    <property name="jspServerWebInf.dir" location="resources/experiments/jsp/WEB-INF"/>
+
+
+
+
+    <!-- Build Directories -->
+    <property name="build.dir" location="build"/>
+    <property name="build.classes" location="${build.dir}/classes"/>
+    <property name="build.doc" location="${build.dir}/doc"/>
+    <property name="build.dist" location="${build.dir}/dist"/>
+    <property name="build.lib" location="${build.dir}/lib"/>
+    <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.src" location="${build.dir}/src"/>
+    <property name="build.webapp" location="${build.dir}/webapp"/>
+
+
+
+    <!-- Libraries -->
+    <property name="junit.lib"       value="junit-4.4.jar"/>
+    <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
+    <property name="urlRewrite.lib"      value="urlrewrite-3.2.0.jar"/>
+
+
+    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+
+    <property name="owlim.lib"            value="owlim-lite-4.3.jar"/>
+    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
+
+    <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.1.jar"/>
+    <property name="commons-codec.lib"      value="apache-commons-codec-1.3.jar"/>
+    <property name="commons-lang.lib"      value="apache-commons-lang-2.5.jar"/>
+
+    <property name="serializer.lib"    value="xalan-2.7.1-serializer.jar"/>
+    <property name="xalan.lib"         value="xalan-2.7.1-xalan.jar"/>
+    <property name="xercesImpl.lib"    value="xalan-2.7.1-xercesImpl.jar"/>
+    <property name="xercesXmlApis.lib" value="xalan-2.7.1-xml-apis.jar"/>
+    <property name="xsltc.lib"         value="xalan-2.7.1-xsltc.jar"/>
+    
+    <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
+    <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
+
+    <property name="catalina.lib"         value="catalina-6.0.14.jar"/>
+    <property name="servlet-api.lib"      value="servlet-api-2.5.jar"/>
+
+
+    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
+               property="fortify.present"/>
+
+    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
+    <property name="rules.dir" value="fortify"/>
+
+
+    <!-- Library (class)paths -->
+    <path id="olfs.compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <fileset dir="${lib.dir}">
+            <include name="${servlet-api.lib}"/>
+            <include name="${jdom.lib}"/>
+            <include name="${junit.lib}"/>
+            <include name="${commons-cli.lib}"/>
+            <include name="${commons-httpclient.lib}"/>
+            <include name="${commons-logging.lib}"/>
+            <include name="${commons-codec.lib}"/>
+            <include name="${commons-lang.lib}"/>
+            <include name="${saxon-jdom.lib}"/>
+            <include name="${saxon-s9api.lib}"/>
+            <include name="${saxon.lib}"/>
+            <include name="${catalina.lib}"/>
+
+            <include name="${slf4j.lib}"/>
+            <include name="${logback-core.lib}"/>
+            <include name="${logback-classic.lib}"/>
+
+            
+        </fileset>
+    </path>
+
+
+
+    <target name="all" depends="clean,clients,check,server,soap-lib"
+            description="Builds lots of stuff."/>
+
+
+    <target name="clients" depends="BESclient"
+            description="Compiles the clients."/>
+
+
+    <target name="clean" description="Clean up ALL build products.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <target name="init" description="Prepare all build directories.">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.doc}"/>
+        <mkdir dir="${build.dist}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${build.run}"/>
+        <mkdir dir="${build.src}"/>
+
+        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
+        <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
+
+        <tstamp/>
+        <echo level="info" message="time: ${TSTAMP}"/>
+    </target>
+
+
+
+    <target name="check"
+            description="Run Unit Tests"
+            depends="compile"
+            >
+
+        <junit  showoutput="yes"
+                haltonfailure="yes"
+                printsummary="yes"
+                >
+
+          <formatter type="plain" usefile="false"/>
+          <classpath refid="olfs.compile.classpath"/>
+
+          <test name="opendap.coreServlet.Scrub" />
+
+        </junit>
+    </target>
+
+
+    <target  name="PreProcessSourceCode"
+             depends="init"
+             description="Moves selected source code from the development tree into
+             the build/src directory. The code text is filtered to update version numbers.">
+
+        <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=""/>
+
+
+        <copy todir="${build.src}" filtering="true">
+            <fileset dir="${src.dir}">
+                <!-- include all the java files -->
+                <include name="opendap/**"/>
+
+
+                <!-- Exclude the old hao code  -->
+                <exclude name="hao/**"/>
+
+
+                <!-- Exclude the experimental code  -->
+                <exclude name="opendap/experiments/**"/>
+
+                <!-- Exclude the Metacat code  -->
+                <exclude name="opendap/metacat/**"/>
+
+                <!-- Exclude the WCS and semantics code  -->
+                <exclude name="opendap/wcsGateway/**"/>
+                <exclude name="opendap/wcs/**"/>
+                <exclude name="opendap/semantics/**"/>
+
+
+                <!-- Exclude the Hyrax Admin Interface code  -->
+                <!-- <exclude name="opendap/hai/**"/>  -->
+
+
+            </fileset>
+
+        </copy>
+
+
+    </target>
+
+
+    <target
+            name="compile"
+            depends="PreProcessSourceCode"
+            description="Compiles the OLFS."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="olfs.compile.classpath"/>
+
+            <src path="${build.src}"/>
+
+        </javac>
+
+    </target>
+
+
+
+
+
+    <target
+            name="olfs-experiments"
+            depends="init"
+            description="Compiles the experimental code."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+
+
+
+
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="olfs.compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/**/*.java"/>
+            <include name="hao/**/*.java"/>
+
+        </javac>
+
+    </target>
+
+
+    <target name="olfs-lib" depends="clean,compile">
+
+        <jar destfile="${build.lib}/olfs-${OLFS_VERSION}.jar">
+            <fileset dir="${build.classes}">
+                <exclude name="hao/**/*.class"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+
+    <target name="soap-lib" depends="clean,compile">
+        <jar destfile="${build.lib}/opendap-soap-${OLFS_VERSION}.jar">
+            <fileset dir="${build.classes}">
+                <include name="opendap/soap/**/*.class"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+
+    <target
+            name="javaDoc"
+            depends="clean,PreProcessSourceCode,IsJavaDocUpToDate"
+            description="Builds JavaDoc for the Serve4 software packages, if missing or out of date."
+            unless="JavaDocIsUpToDate"
+            >
+
+        <javadoc destdir="${build.doc}/javadoc"
+                 Author="true"
+                 Verbose="true"
+                 Version="true"
+                 failonerror="true"
+                >
+            <classpath refid="olfs.compile.classpath"/>
+
+            <packageset dir="${build.src}" defaultexcludes="yes"/>
+
+
+        </javadoc>
+
+    </target>
+
+
+    <target name="doc-dist"
+            depends="clean,javaDoc"
+            description="Builds documentation distribution"
+            >
+
+        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-doc.tgz"
+             compression="gzip"
+                >
+            <zipfileset dir="${build.doc}" prefix="olfs-${OLFS_VERSION}-doc"/>
+        </tar>
+
+    </target>
+
+    <target name="src-dist"
+            depends="clean,PreProcessSourceCode"
+            description="Builds source distribution"
+            >
+
+        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-src.tgz"
+             compression="gzip"
+                >
+
+            <zipfileset dir="." prefix="olfs-${OLFS_VERSION}-src">
+
+                <!-- Exclude the build directory -->
+                <exclude name="build/**"/>
+
+                <!-- Exclude the fortify directory -->
+                <exclude name="fortify/**"/>
+
+                <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="doc/javadoc/**"/>
+
+                <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="doc/_notes/**"/>
+
+                <!-- Exclude the IntelliJ IDEA spore -->
+                <exclude name="out/**"/>
+                <exclude name="**/*.iml"/>
+                <exclude name="**/*.ipr"/>
+                <exclude name="**/*.iws"/>
+
+                <!-- Exclude the old hao code  -->
+                <exclude name="src/hao/**"/>
+
+
+                <!-- Exclude the Metacat code -->
+                <exclude name="src/opendap/metacat/**"/>
+
+                <!-- Exclude the WCS and semantics code  -->
+                <exclude name="wcs-build.xml"/>
+                <exclude name="resources/WCS/**"/>
+                <exclude name="src/opendap/wcsGateway/**"/>
+                <exclude name="src/opendap/wcs/**"/>
+                <exclude name="src/opendap/semantics/**"/>
+
+            </zipfileset>
+
+
+        </tar>
+
+    </target>
+
+    <target name="server-dist"
+            depends="server"
+            description="Packages the war file into tar file with a release related name.">
+
+        <copy file="${distributionResources.dir}/WarFileReadMe"
+              tofile="${build.dist}/README"/>
+
+        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-webapp.tgz"
+             compression="gzip"
+                >
+            <zipfileset dir="${build.dist}" prefix="olfs-${OLFS_VERSION}-webapp">
+                <include name="opendap.war"/>
+                <include name="README"/>
+            </zipfileset>
+
+        </tar>
+
+        <delete file="${build.dist}/README"/>
+        <delete file="${build.dist}/opendap.war"/>
+
+    </target>
+
+    <target name="DISTRO"
+            depends="clean,src-dist,doc-dist,server-dist,check"
+            description="Builds complete distribution"
+            >
+
+    </target>
+
+    <target name="IsJavaDocUpToDate"
+            description="Checks to see if the JavaDoc is out of date."
+            >
+        <uptodate property="JavaDocIsUpToDate"
+                  targetfile="${build.doc}/opendap/index.html">
+            <srcfiles dir="${src.dir}">
+                <include name="opendap/**/*.java"/>
+            </srcfiles>
+        </uptodate>
+
+    </target>
+
+    <target name="BESclient"
+            depends="olfs-lib"
+            description="Build and package the back end client."
+            >
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
+
+        <jar destfile="${build.dist}/beclient.jar"
+             manifest="resources/META-INF/BESclient.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/ppt/**/*.class"/>
+                <include name="hao/**/*.class"/>
+            </fileset>
+        </jar>
+
+
+    </target>
+
+    <target name="hexEncoderApp"
+        depends="clean,compile"
+        description="Builds executable jar file of the hex encoder">
+
+
+        <mkdir dir="${build.dist}/hexEncoder"/>
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/hexEncoder/${commons-cli.lib}"/>
+        <copy file="resources/hexEncoder/hexEncoder" tofile="${build.dist}/hexEncoder/hexEncoder"/>
+
+        <jar destfile="${build.dist}/hexEncoder/hexEncoder.jar"
+             manifest="resources/hexEncoder/hexEncoder.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/gateway/Encoder.class"/>
+                <include name="opendap/gateway/HexAsciiEncoder.class"/>
+            </fileset>
+        </jar>
+
+        <tar destfile="${build.dist}/hexEncoder.tgz"
+             compression="gzip"
+                >
+            <zipfileset dir="${build.dist}/hexEncoder"  />
+
+        </tar>
+
+    </target>
+
+    <target name="NcmlDispatchHandler"
+        depends="clean,compile"
+        description="Builds jar file for the NcML Dispatch Handler">
+
+
+        <jar destfile="${build.dist}/NcmlDispatchHandler.jar">
+            <fileset dir="${build.classes}">
+                <include name="opendap/ncml/DispatchHandler.class"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+    <target name="GatewayDispatchHandler"
+        depends="clean,compile"
+        description="Builds jar file for the Gateway Dispatch Handler">
+
+
+        <jar destfile="${build.dist}/GatewayDispatchHandler.jar">
+            <fileset dir=".">
+                <include name="resources/gateway/**"/>
+            </fileset>
+            <fileset dir="${build.classes}">
+                <include name="opendap/gateway/**"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+    <target name="validatorApp"
+        depends="clean,compile"
+        description="Builds executable jar file of the hex encoder">
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
+        <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
+        <copy file="${lib.dir}/${commons-logging.lib}" tofile="${build.dist}/${commons-logging.lib}"/>
+        <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
+        <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
+        <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
+        <!--
+        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
+        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
+        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
+        -->
+        <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
+
+        <jar destfile="${build.dist}/validator.jar"
+             manifest="resources/META-INF/validator.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/xml/Validator.class"/>
+            </fileset>
+        </jar>
+
+    </target>
+
+    <target name="XSLTransformer"
+        depends="clean,compile"
+        description="Builds executable jar file of a simple XSL Transformer application">
+
+        <copy file="${lib.dir}/${commons-cli.lib}" tofile="${build.dist}/${commons-cli.lib}"/>
+        <copy file="${lib.dir}/${commons-httpclient.lib}" tofile="${build.dist}/${commons-httpclient.lib}"/>
+        <copy file="${lib.dir}/${commons-logging.lib}" tofile="${build.dist}/${commons-logging.lib}"/>
+        <copy file="${lib.dir}/${commons-codec.lib}" tofile="${build.dist}/${commons-codec.lib}"/>
+        <copy file="${lib.dir}/${xercesImpl.lib}" tofile="${build.dist}/${xercesImpl.lib}"/>
+        <copy file="${lib.dir}/${xercesXmlApis.lib}" tofile="${build.dist}/${xercesXmlApis.lib}"/>
+        <!--
+        <copy file="${lib.dir}/${saxon-jdom.lib}" tofile="${build.dist}/${saxon-jdom.lib}"/>
+        <copy file="${lib.dir}/${saxon-xml-apis.lib}" tofile="${build.dist}/${saxon-xml-apis.lib}"/>
+        <copy file="${lib.dir}/${saxon.lib}" tofile="${build.dist}/${saxon.lib}"/>
+        -->
+        <copy file="${lib.dir}/${jdom.lib}" tofile="${build.dist}/${jdom.lib}"/>
+
+        <jar destfile="${build.dist}/xslt.jar"
+             manifest="resources/META-INF/xsltransformer.MANIFEST.MF">
+            <fileset dir="${build.classes}">
+                <include name="opendap/xml/Transformer.class"/>
+            </fileset>
+        </jar>
+
+
+    </target>
+
+
+    <target
+            name="server"
+            depends="clean,compile"
+            description="Performs a clean build of the core software and assembles the WAR file."
+            >
+
+
+
+        <echo level="info" message="Building Hyrax server war file."/>
+        <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
+
+
+        <mkdir dir="${build.dir}/webapp" />
+
+
+        <!-- Turning on filtering here allows us to inject the version number into the XSLT code -->
+        <copy todir="${build.webapp}/xsl" filtering="true" >
+            <fileset dir="${hyraxResources.dir}/xsl"/>
+        </copy>
+
+
+        <war destfile="${build.dist}/opendap.war"
+             webxml="${WebInfResources.dir}/web.xml"
+                >
+            <zipfileset dir="${build.dir}/webapp" prefix="" />
+
+            <lib dir="${lib.dir}">
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${urlRewrite.lib}"/>
+
+                <include name="${commons-lang.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+                <include name="${slf4j.lib}"/>
+                <include name="${logback-core.lib}"/>
+                <include name="${logback-classic.lib}"/>
+
+            </lib>
+            <classes dir="${build.classes}"/>
+
+            <zipfileset dir="${doc.dir}" prefix="docs" >
+                <exclude name="src.distribution.readme"/>
+            </zipfileset>
+
+
+            <zipfileset dir="${hyraxResources.dir}/admin" prefix="admin" />
+            <zipfileset dir="${hyraxResources.dir}/error" prefix="error" />
+            <zipfileset dir="${hyraxResources.dir}/jsp"   prefix="jsp" />
+
+            <zipfileset dir="${WebStartResources.dir}" prefix="WebStart" />
+            <zipfileset dir="${GatewayResources.dir}" prefix="gateway" />
+            <zipfileset dir="${ncISO.dir}" prefix="nciso" />
+
+
+            <zipfileset dir="${initialContent.dir}" prefix="initialContent">
+                <include name="**/*"/>
+            </zipfileset>
+
+            <webinf dir="${WebInfResources.dir}">
+                <include name="logback-test.xml"/>
+                <include name="logback.xml"/>
+                <include name="urlrewrite.xml"/>
+            </webinf>
+
+
+        </war>
+
+        <delete file="${build.dist}/index.html"/>
+
+    </target>
+
+
+    <target name="fortify" if="fortify.present">
+        <typedef name="sourceanalyzer"
+                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
+
+
+        <!-- call clean to ensure that all source files are recompiled -->
+        <antcall target="clean"/>
+
+
+
+        <!-- call the compile target using the SCA Compiler Adapter to -->
+        <!-- translate all source files -->
+        <antcall target="compile">
+            <param name="build.compiler"
+                   value="com.fortify.dev.ant.SCACompiler"/>
+        </antcall>
+
+
+        <!-- capture all configuration files in the WEB-INF directory -->
+        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                       >
+            <fileset dir="${WebInfResources.dir}">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </sourceanalyzer>
+
+
+
+        <!-- run analysis -->
+        <echo>sourceanalyzer scan</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                        scan="true"
+                        resultsfile="${build.dir}/issues.fpr"
+                        rules="${rules.dir}/OlfsRulePack.xml"
+                >   
+        </sourceanalyzer>
+    </target>
+
+
+    <!-- OS-X stuff -->
+
+    <property name="osx.resources" location="${resources.dir}/osx"/>
+    <property name="build.osx" location="${build.dir}/macosx"/>
+    <property name="packagemaker" location="/Developer/usr/bin/packagemaker"/>
+
+
+
+    <target name="osx-package"
+        depends="server"
+        description="Builds OSX package installer for the OLFS">
+
+        <mkdir dir="${build.osx}${CATALINA_HOME}/webapps"/>
+        
+        <copy file="${build.dist}/opendap.war" tofile="${build.osx}${CATALINA_HOME}/webapps/opendap.war"/>
+
+        <copy todir="${build.dir}/osx-resources" filtering="true">
+          <fileset dir="${osx.resources}" />
+        </copy>
+        
+        <chmod file="${build.dir}/osx-resources/InstallationCheck" perm="755"/>
+
+        <exec executable="${packagemaker}">
+            <arg value="--root"/>
+            <arg value="${build.osx}"/>
+            <arg value="--id" />
+            <arg value="org.opendap.olfs-${OLFS_VERSION}"/>
+            <arg value="--title" />
+            <arg value="OPeNDAP olfs-${OLFS_VERSION}"/>
+            <arg value="--version" />
+            <arg value="${OLFS_VERSION}"/>
+            <arg value="--out" />
+            <arg value="${build.dist}/olfs-${OLFS_VERSION}.pkg"/>
+            <arg value="--resources" />
+            <arg value="${build.dir}/osx-resources"/>
+        </exec>
+        
+
+    </target>
+
+</project>
+
+
+
+
+
+
+
+
+
+

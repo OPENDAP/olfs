@@ -1,0 +1,96 @@
+
+
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>fnoc1</web-resource-name>
+            <url-pattern>/hyrax/nc/fnoc1.nc.dds</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc1.nc.das</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc3.nc.dds</url-pattern>
+            <url-pattern>/hyrax/nc/fnoc3.nc.das</url-pattern>
+            <url-pattern>/hyrax/ff/*</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>fn1</role-name>
+        </auth-constraint>
+
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>fnoc2</web-resource-name>
+            <url-pattern>/hyrax/nc/fnoc2.nc.dds</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>fn2</role-name>
+        </auth-constraint>
+
+    </security-constraint>
+
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>FreeForm</web-resource-name>
+            <url-pattern>/hyrax/ff/*</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <!-- This role is not in the default user directory -->
+            <role-name>ff</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+
+
+
+    <!-- Define the login configuration for this application -->
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>OPeNDAP Hyrax</realm-name>
+    </login-config>
+
+
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            Access to fnoc1.nc
+        </description>
+        <role-name>fn1</role-name>
+    </security-role>
+
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            Access to fnoc2.nc
+        </description>
+        <role-name>fn2</role-name>
+    </security-role>
+
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            Access to fnoc3.nc
+        </description>
+        <role-name>fn3</role-name>
+    </security-role>
+
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            Access to FreeForm Data
+        </description>
+        <role-name>ff</role-name>
+    </security-role>
+
+
+
+
+
+
+

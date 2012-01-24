@@ -1,0 +1,1144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><title>OPeNDAP Server Dataset Query Form</title>
+<base href="http://www.opendap.org/online_help_files/opendap_form_help.html">
+<script type="text/javascript">
+<!--
+
+// $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
+
+var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
+
+// Event handlers for the disposition button.
+
+// The ascii_button handler sends data to a new window. The user can then 
+// save the data to a file.
+
+function ascii_button() {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var ascii_url = url_parts[0] + ".ascii?" + url_parts[1];
+    }
+    else {
+        var ascii_url = url_parts[0] + ".ascii?";
+    }
+
+    window.open(ascii_url, "ASCII_Data");
+}
+
+/* The netcdf_button handler loads the data to the current window. Since it 
+   is netcdf/binary, Netscape will ask the user for a filename and save the data
+   to that file. The parameter 'ext' should be 'nc'. */
+
+function netcdf_button(ext) {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
+    }
+    else {
+        var binary_url = url_parts[0] + "." + ext + "?";
+    }
+
+    window.location = binary_url;
+}
+
+/* The binary_button handler loads the data to the current window. Since it 
+   is binary, Netscape will ask the user for a filename and save the data
+   to that file. */
+
+function binary_button(ext) {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
+    }
+    else {
+        var binary_url = url_parts[0] + "." + ext + "?";
+    }
+
+    window.location = binary_url;
+}
+
+/* Route the URL to Matlab, IDL, .... Users must add an entry into their mime
+   types file (aka list of Netscape helper applications) so that the URL will
+   be fedd into Matlab which must, in addition, be running loaddods.
+
+   Note that reflection_cgi is a global JavaScript variable set at the 
+   begining of this `file'. 
+
+   DEPRECATED */
+
+function program_button() {
+    var program_url = new String(document.forms[0].url.value);
+
+    /* Build a call to the reflector CGI. */
+    var CGI = reflection_cgi + "?" + "url=" + program_url + "&disposition=matlab";
+
+    window.location = CGI;
+}
+
+var help = 0;			// Our friend, the help window.
+
+function help_button() {
+    // Check the global to keep from opening the window again if it is
+    // already visible. I think Netscape handles this but I know it will
+    // write the contents over and over again. This preents that, too.
+    // 10/8/99 jhrg
+    if (help && !help.closed)
+	return;
+
+    // Resize on Netscape 4 is hosed. When enabled, if a user resizes then
+    // the root window's document gets reloaded. This does not happen on IE5.
+    // regardless, with scrollbars we don't absolutely need to be able to
+    // resize. 10/8/99 jhrg
+    help = window.open("http://www.opendap.org/online_help_files/opendap_form_help.html",
+                       "help", "scrollbars,dependent,width=600,height=400");
+}
+
+//function open_dods_home() {
+//    window.open("http://www.opendap.org/", "DODS_HOME_PAGE");
+//}
+
+
+// Helper functions for the form.
+
+function describe_index() {
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
+}
+
+function describe_selection() {
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
+}
+
+function describe_operator() {
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
+}
+
+function describe_projection() {
+   window.status = "Add this variable to the projection.";
+   return true;
+}
+
+///////////////////////////////////////////////////////////
+// The dods_url object.
+///////////////////////////////////////////////////////////
+
+// CTOR for dods_url
+// Create the DODS URL object.
+function dods_url(base_url) {
+    this.url = base_url;
+    this.projection = "";
+    this.selection = "";
+    this.num_dods_vars = 0;
+    this.dods_vars = new Array();
+        
+    this.build_constraint = build_constraint;
+    this.add_dods_var = add_dods_var;
+    this.update_url = update_url;
+}
+
+// Method of dods_url
+// Add the projection and selection to the displayed URL.
+function update_url() {
+    this.build_constraint();
+    var url_text = this.url;
+    // Only add the projection & selection (and ?) if there really are
+    // constraints! 
+    if (this.projection.length + this.selection.length > 0)
+        url_text += "?" + this.projection + this.selection;
+    document.forms[0].url.value = url_text;
+}
+
+// Method of dods_url
+// Scan all the form elements and pick out the various pieces of constraint
+// information. Add these to the dods_url instance.
+function build_constraint() {
+    var p = "";
+    var s = "";
+    for (var i = 0; i < this.num_dods_vars; ++i) {
+        if (this.dods_vars[i].is_projected == 1) {
+	    // The comma is a clause separator.
+	    if (p.length > 0)
+	        p += ",";
+            p += this.dods_vars[i].get_projection();
+	}
+	var temp_s = this.dods_vars[i].get_selection();
+	if (temp_s.length > 0)
+	    s += "&" + temp_s;    // The ampersand is a prefix to the clause.
+    }
+
+    this.projection = p;
+    this.selection = s;
+}
+
+// Method of dods_url
+// Add the variable to the dods_var array of dods_vars. The var_index is the
+// number of *this particular* variable in the dataset, zero-based.
+function add_dods_var(dods_var) {
+    this.dods_vars[this.num_dods_vars] = dods_var;
+    this.num_dods_vars++;
+}
+
+/////////////////////////////////////////////////////////////////
+// dods_var
+/////////////////////////////////////////////////////////////////
+
+// CTOR for dods_var
+// name: the name of the variable from DODS' perspective.
+// js_var_name: the name of the variable within the form.
+// is_array: 1 if this is an array, 0 otherwise.
+function dods_var(name, js_var_name, is_array) {
+    // Common members
+    this.name = name;
+    this.js_var_name = js_var_name;
+    this.is_projected = 0;
+    if (is_array > 0) {
+        this.is_array = 1;
+        this.num_dims = 0;        // Holds the number of dimensions
+        this.dims = new Array(); // Holds the length of the dimensions
+
+        this.add_dim = add_dim;
+        this.display_indices = display_indices;
+        this.erase_indices = erase_indices;
+    }
+    else
+        this.is_array = 0;
+
+    this.handle_projection_change = handle_projection_change;
+    this.get_projection = get_projection;
+    this.get_selection = get_selection;
+}
+
+// Method of dods_var
+// Add a dimension to a DODS Array object.
+function add_dim(dim_size) {
+    this.dims[this.num_dims] = dim_size;
+    this.num_dims++;
+}
+
+// Method of dods_var
+// Add the array indices to the text widgets associated with this DODS
+// array object. The text widgets are names <var_name>_0, <var_name>_1, ...
+// <var_name>_n for an array with size N+1.
+function display_indices() {
+    for (var i = 0; i < this.num_dims; ++i) {
+        var end_index = this.dims[i]-1;
+        var s = "0:1:" + end_index.toString();
+	var text_widget = "document.forms[0]." + this.js_var_name + "_" + i.toString();
+	eval(text_widget).value = s;
+    }
+}
+
+// Method of dods_var
+// Use this to remove index information from a DODS array object.
+function erase_indices() {
+    for (var i = 0; i < this.num_dims; ++i) {
+	var text_widget = "document.forms[0]." + this.js_var_name + "_" + i.toString();
+	eval(text_widget).value = "";
+    }
+}
+
+// Method of  dods_var
+function handle_projection_change(check_box) {
+    if (check_box.checked) {
+        this.is_projected = 1;
+	if (this.is_array == 1)
+	    this.display_indices();
+    }
+    else {
+        this.is_projected = 0;
+	if (this.is_array == 1)
+	    this.erase_indices();
+    }
+
+    DODS_URL.update_url();
+}
+
+
+// Method of dods_var
+// Get the projection sub-expression for this variable.
+function get_projection() {
+    var p = "";
+    if (this.is_array == 1) {
+        p = this.name;		// ***
+        for (var i = 0; i < this.num_dims; ++i) {
+	    var text_widget = "document.forms[0]." + this.js_var_name + "_" + i.toString();
+	    p += "[" + eval(text_widget).value + "]";
+	}
+    }
+    else {
+	p = this.name;		// ***
+    }
+
+    return p;
+}
+
+// Method of dods_var
+// Get the selection (which is null for arrays).
+function get_selection() {
+    var s = "";
+    if (this.is_array == 1) {
+        return s;
+    }
+    else {
+	var text_widget = "document.forms[0]." + this.js_var_name + "_selection";
+        if (eval(text_widget).value != "") {
+            var oper_widget_name = "document.forms[0]." + this.js_var_name + "_operator";
+            var oper_widget = eval(oper_widget_name);
+	    var operator = oper_widget.options[oper_widget.selectedIndex].value;
+            // If the operator is `-' then don't prepend the variable name!
+            // This provides a way for users to enter function names as
+            // selection clauses. 
+            if (operator == "-")
+                s = eval(text_widget).value;
+            else
+	        s = this.name + operator + eval(text_widget).value; // ***
+        }
+    }
+
+    return s;
+}    
+
+DODS_URL = new dods_url("http://localhost:8080/opendap/data/hdf/S2000415.hdf");
+// -->
+</script>
+</head>
+<body>
+<p><h2 align='center'>OPeNDAP Server Dataset Access Form</h2>
+<hr>
+<form action="">
+<table>
+<tr>
+<td align="right">
+<h3>
+<a href="opendap_form_help.html#disposition" target="help">Action:</a></h3>
+<td>
+<input type="button" value="Get ASCII" onclick="ascii_button()">
+<input type="button" value="Get as NetCDF" onclick="binary_button('nc')">
+<input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')">
+<input type="button" value="Show Help" onclick="help_button()">
+
+<tr>
+<td align="right"><h3><a href="opendap_form_help.html#data_url" target="help">Data URL:</a>
+</h3>
+<td><input name="url" type="text" size="70" value="http://localhost:8080/opendap/data/hdf/S2000415.hdf">
+<tr><td><td><hr>
+
+<tr>
+<td align="right" valign="top"><h3>
+<a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
+<td><textarea name="global_attr" rows="5" cols="70">
+HDF_GLOBAL.Producer_Agency: NASA\\000
+HDF_GLOBAL.Producer_Institution: JPL\\000
+HDF_GLOBAL.Sensor_Name: NSCAT\\000
+HDF_GLOBAL.Project_ID: NSCAT\\000
+HDF_GLOBAL.SIS_ID: 597-512-24/1996-07-01\\000
+HDF_GLOBAL.Build_ID: 3.2.1/1996-11-05\\000
+HDF_GLOBAL.ADEOS_Data_Package_ID: S2\\000
+HDF_GLOBAL.ADEOS_Data_Package_Type: S\\000
+HDF_GLOBAL.Product_Creation_Time: 1996-318T01:35:16.000\\000
+HDF_GLOBAL.Data_Type: L2\\000
+HDF_GLOBAL.Data_Status: COMPLETE\\000
+HDF_GLOBAL.First_Rev_Number: 415
+HDF_GLOBAL.First_Rev_Eq_Crossing_Time: 1996-259T04:01:28.226\\000
+HDF_GLOBAL.First_Rev_Eq_Crossing_Lon: 279.983
+HDF_GLOBAL.First_Data_Time: 1996-259T03:43:48.945\\000
+HDF_GLOBAL.Last_Data_Time: 1996-259T05:09:48.997\\000
+HDF_GLOBAL.Num_Expected_Output_Records: 458
+HDF_GLOBAL.Num_Actual_Output_Records: 458
+HDF_GLOBAL.Ambig_Removal_Method: Baseline used\\000
+HDF_GLOBAL.HDF_Build_ID: JPL D-xxxxx 12/15/94\\000
+HDF_GLOBAL.HDF_SIS_ID: JPL D-12060 12/15/94\\000
+HDF_GLOBAL.HDF_Conversion_Organization: JPL PO.DAAC\\000
+HDF_GLOBAL.HDF_Conversion_Time: 1996-320T17:32:34       
+HDF_GLOBAL.Data_Format_Type: HDF\\000
+</textarea><p>
+
+<tr><td><td><hr>
+
+<tr>
+<td align="right" valign="top">
+<h3><a href="opendap_form_help.html#dataset_variables" target="help">Variables:</a></h3>
+<td><b>Structure NSCAT Rev 20 </b><br>
+<dl><dd>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Lat = new dods_var("NSCAT%20Rev%2020.WVC_Lat", "org_opendap_NSCAT_Rev_20_WVC_Lat", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_WVC_Lat);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_WVC_Lat"
+onclick="org_opendap_NSCAT_Rev_20_WVC_Lat.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Lat) "  onfocus="describe_projection()">
+<font size="+1">WVC_Lat</font></b>: Array of 16 bit Integers [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_WVC_Lat_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Lat.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_WVC_Lat_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Lat.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="WVC_Lat_attr" rows="5" cols="70">
+long_name: latitude
+units: deg
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 22
+valid_range: -9000, 7771
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Lon = new dods_var("NSCAT%20Rev%2020.WVC_Lon", "org_opendap_NSCAT_Rev_20_WVC_Lon", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_WVC_Lon);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_WVC_Lon"
+onclick="org_opendap_NSCAT_Rev_20_WVC_Lon.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Lon) "  onfocus="describe_projection()">
+<font size="+1">WVC_Lon</font></b>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_WVC_Lon_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Lon.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_WVC_Lon_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Lon.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="WVC_Lon_attr" rows="5" cols="70">
+long_name: longitude
+units: deg
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 22
+valid_range: 0, 31242
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Sigma0 = new dods_var("NSCAT%20Rev%2020.Num_Sigma0", "org_opendap_NSCAT_Rev_20_Num_Sigma0", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Num_Sigma0);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Num_Sigma0"
+onclick="org_opendap_NSCAT_Rev_20_Num_Sigma0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Sigma0) "  onfocus="describe_projection()">
+<font size="+1">Num_Sigma0</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Sigma0_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Sigma0.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Sigma0_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Sigma0.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Num_Sigma0_attr" rows="5" cols="70">
+long_name: The total number of sigma-0 measurements
+units: counts
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 19
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_12 = new dods_var("NSCAT%20Rev%2020.Num_Beam_12", "org_opendap_NSCAT_Rev_20_Num_Beam_12", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Num_Beam_12);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Num_Beam_12"
+onclick="org_opendap_NSCAT_Rev_20_Num_Beam_12.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_12) "  onfocus="describe_projection()">
+<font size="+1">Num_Beam_12</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_12_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_12.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_12_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_12.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Num_Beam_12_attr" rows="5" cols="70">
+long_name: The total number of sigma-0s received from beam 1 or 2
+units: counts
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 6
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_34 = new dods_var("NSCAT%20Rev%2020.Num_Beam_34", "org_opendap_NSCAT_Rev_20_Num_Beam_34", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Num_Beam_34);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Num_Beam_34"
+onclick="org_opendap_NSCAT_Rev_20_Num_Beam_34.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_34) "  onfocus="describe_projection()">
+<font size="+1">Num_Beam_34</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_34_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_34.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_34_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_34.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Num_Beam_34_attr" rows="5" cols="70">
+long_name: The total number of sigma-0s received from beam 3 or 4
+units: counts
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 6
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_56 = new dods_var("NSCAT%20Rev%2020.Num_Beam_56", "org_opendap_NSCAT_Rev_20_Num_Beam_56", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Num_Beam_56);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Num_Beam_56"
+onclick="org_opendap_NSCAT_Rev_20_Num_Beam_56.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_56) "  onfocus="describe_projection()">
+<font size="+1">Num_Beam_56</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_56_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_56.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_56_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_56.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Num_Beam_56_attr" rows="5" cols="70">
+long_name: The total number of sigma-0s received from beam 5 or 6
+units: counts
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 6
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_78 = new dods_var("NSCAT%20Rev%2020.Num_Beam_78", "org_opendap_NSCAT_Rev_20_Num_Beam_78", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Num_Beam_78);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Num_Beam_78"
+onclick="org_opendap_NSCAT_Rev_20_Num_Beam_78.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Beam_78) "  onfocus="describe_projection()">
+<font size="+1">Num_Beam_78</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_78_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_78.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Beam_78_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Beam_78.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Num_Beam_78_attr" rows="5" cols="70">
+long_name: The total number of sigma-0s received from beam 7 or 8
+units: counts
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 6
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Quality_Flag = new dods_var("NSCAT%20Rev%2020.WVC_Quality_Flag", "org_opendap_NSCAT_Rev_20_WVC_Quality_Flag", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_WVC_Quality_Flag);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag"
+onclick="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.handle_projection_change(get_org_opendap_NSCAT_Rev_20_WVC_Quality_Flag) "  onfocus="describe_projection()">
+<font size="+1">WVC_Quality_Flag</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_WVC_Quality_Flag_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_WVC_Quality_Flag.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="WVC_Quality_Flag_attr" rows="5" cols="70">
+long_name: WVC Quality Flag
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 3
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Mean_Wind = new dods_var("NSCAT%20Rev%2020.Mean_Wind", "org_opendap_NSCAT_Rev_20_Mean_Wind", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Mean_Wind);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Mean_Wind"
+onclick="org_opendap_NSCAT_Rev_20_Mean_Wind.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Mean_Wind) "  onfocus="describe_projection()">
+<font size="+1">Mean_Wind</font></b>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Mean_Wind_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Mean_Wind.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Mean_Wind_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Mean_Wind.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Mean_Wind_attr" rows="5" cols="70">
+long_name: Mean Wind Speed
+units: m/s
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 23
+valid_range: 0, 2374
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Speed = new dods_var("NSCAT%20Rev%2020.Wind_Speed", "org_opendap_NSCAT_Rev_20_Wind_Speed", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Wind_Speed);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Wind_Speed"
+onclick="org_opendap_NSCAT_Rev_20_Wind_Speed.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Wind_Speed) "  onfocus="describe_projection()">
+<font size="+1">Wind_Speed</font></b>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Wind_Speed_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Speed.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Wind_Speed_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Speed.add_dim(24);
+// -->
+</script>
+position:<input type="text" name="org_opendap_NSCAT_Rev_20_Wind_Speed_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Speed.add_dim(4);
+// -->
+</script>
+<br>
+
+<textarea name="Wind_Speed_attr" rows="5" cols="70">
+long_name: Wind speed associated with a WVC
+units: m/s
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 23
+valid_range: 0, 2571
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+dim_2.name: position
+dim_2.long_name: position of the ambiguities
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Dir = new dods_var("NSCAT%20Rev%2020.Wind_Dir", "org_opendap_NSCAT_Rev_20_Wind_Dir", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Wind_Dir);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Wind_Dir"
+onclick="org_opendap_NSCAT_Rev_20_Wind_Dir.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Wind_Dir) "  onfocus="describe_projection()">
+<font size="+1">Wind_Dir</font></b>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Wind_Dir_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Dir.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Wind_Dir_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Dir.add_dim(24);
+// -->
+</script>
+position:<input type="text" name="org_opendap_NSCAT_Rev_20_Wind_Dir_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Wind_Dir.add_dim(4);
+// -->
+</script>
+<br>
+
+<textarea name="Wind_Dir_attr" rows="5" cols="70">
+long_name: Wind direction solution associated with a WVC
+units: deg
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 23
+valid_range: 0, 35997
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+dim_2.name: position
+dim_2.long_name: position of the ambiguities
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Speed = new dods_var("NSCAT%20Rev%2020.Error_Speed", "org_opendap_NSCAT_Rev_20_Error_Speed", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Error_Speed);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Error_Speed"
+onclick="org_opendap_NSCAT_Rev_20_Error_Speed.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Error_Speed) "  onfocus="describe_projection()">
+<font size="+1">Error_Speed</font></b>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Error_Speed_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Speed.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Error_Speed_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Speed.add_dim(24);
+// -->
+</script>
+position:<input type="text" name="org_opendap_NSCAT_Rev_20_Error_Speed_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Speed.add_dim(4);
+// -->
+</script>
+<br>
+
+<textarea name="Error_Speed_attr" rows="5" cols="70">
+long_name: Uncertainty estimated for the wind speed value
+units: m/s
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 23
+valid_range: 0, 2410
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+dim_2.name: position
+dim_2.long_name: position of the ambiguities
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Dir = new dods_var("NSCAT%20Rev%2020.Error_Dir", "org_opendap_NSCAT_Rev_20_Error_Dir", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Error_Dir);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Error_Dir"
+onclick="org_opendap_NSCAT_Rev_20_Error_Dir.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Error_Dir) "  onfocus="describe_projection()">
+<font size="+1">Error_Dir</font></b>: Array of 16 bit Unsigned integers [row = 0..457][WVC = 0..23][position = 0..3]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Error_Dir_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Dir.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Error_Dir_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Dir.add_dim(24);
+// -->
+</script>
+position:<input type="text" name="org_opendap_NSCAT_Rev_20_Error_Dir_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Error_Dir.add_dim(4);
+// -->
+</script>
+<br>
+
+<textarea name="Error_Dir_attr" rows="5" cols="70">
+long_name: Uncertainty estimated for the wind direction value
+units: deg
+scale_factor: 0.01
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 23
+valid_range: 0, 2435
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+dim_2.name: position
+dim_2.long_name: position of the ambiguities
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_MLE_Likelihood = new dods_var("NSCAT%20Rev%2020.MLE_Likelihood", "org_opendap_NSCAT_Rev_20_MLE_Likelihood", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_MLE_Likelihood);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_MLE_Likelihood"
+onclick="org_opendap_NSCAT_Rev_20_MLE_Likelihood.handle_projection_change(get_org_opendap_NSCAT_Rev_20_MLE_Likelihood) "  onfocus="describe_projection()">
+<font size="+1">MLE_Likelihood</font></b>: Array of 16 bit Integers [row = 0..457][WVC = 0..23][position = 0..3]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_MLE_Likelihood_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_MLE_Likelihood.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_MLE_Likelihood_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_MLE_Likelihood.add_dim(24);
+// -->
+</script>
+position:<input type="text" name="org_opendap_NSCAT_Rev_20_MLE_Likelihood_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_MLE_Likelihood.add_dim(4);
+// -->
+</script>
+<br>
+
+<textarea name="MLE_Likelihood_attr" rows="5" cols="70">
+long_name: Relative likelihood that a given win vector solution is correct
+scale_factor: 0.1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 22
+valid_range: -32768, 2825
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+dim_2.name: position
+dim_2.long_name: position of the ambiguities
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Ambigs = new dods_var("NSCAT%20Rev%2020.Num_Ambigs", "org_opendap_NSCAT_Rev_20_Num_Ambigs", 1);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_Num_Ambigs);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_Num_Ambigs"
+onclick="org_opendap_NSCAT_Rev_20_Num_Ambigs.handle_projection_change(get_org_opendap_NSCAT_Rev_20_Num_Ambigs) "  onfocus="describe_projection()">
+<font size="+1">Num_Ambigs</font></b>: Array of Bytes [row = 0..457][WVC = 0..23]<br>
+
+row:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Ambigs_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Ambigs.add_dim(458);
+// -->
+</script>
+WVC:<input type="text" name="org_opendap_NSCAT_Rev_20_Num_Ambigs_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_Num_Ambigs.add_dim(24);
+// -->
+</script>
+<br>
+
+<textarea name="Num_Ambigs_attr" rows="5" cols="70">
+long_name: Number of ambiguous wind vectors reported for a given cell
+units: counts
+scale_factor: 1
+scale_factor_err: 0
+add_offset: 0
+add_offset_err: 0
+calibrated_nt: 21
+valid_range: 0, 4
+dim_0.name: row
+dim_0.long_name: WVC row
+dim_1.name: WVC
+dim_1.long_name: WVC index
+</textarea>
+
+<p><p>
+<b>Sequence SwathIndex</b><br>
+<dl><dd>
+<b>Structure begin </b><br>
+<dl><dd>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0 = new dods_var("NSCAT%20Rev%2020.SwathIndex.begin.begin__0", "org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0", 0);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0"
+onclick="org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0) "  onfocus="describe_projection()">
+<font size="+1">begin__0</font>: 16 bit Integer</b><br>
+
+begin__0 <select name="org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
+<option value="=" selected>=
+<option value="!=">!=
+<option value="<"><
+<option value="<="><=
+<option value=">">>
+<option value=">=">>=
+<option value="-">--
+</select>
+<input type="text" name="org_opendap_NSCAT_Rev_20_SwathIndex_begin_begin__0_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
+<br>
+
+<p><p>
+</dd></dl>
+<p><p>
+</dd></dl>
+<p><p>
+<b>Sequence NSCAT L2</b><br>
+<dl><dd>
+<b>Structure Mean_Time </b><br>
+<dl><dd>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0 = new dods_var("NSCAT%20Rev%2020.NSCAT%20L2.Mean_Time.Mean_Time__0", "org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0", 0);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0"
+onclick="org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0) "  onfocus="describe_projection()">
+<font size="+1">Mean_Time__0</font>: string</b><br>
+
+Mean_Time__0 <select name="org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
+<option value="=" selected>=
+<option value="!=">!=
+<option value="<"><
+<option value="<="><=
+<option value=">">>
+<option value=">=">>=
+<option value="-">--
+</select>
+<input type="text" name="org_opendap_NSCAT_Rev_20_NSCAT_L2_Mean_Time_Mean_Time__0_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
+<br>
+
+<p><p>
+</dd></dl>
+<p><p>
+<b>Structure Low_Wind_Speed_Flag </b><br>
+<dl><dd>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0 = new dods_var("NSCAT%20Rev%2020.NSCAT%20L2.Low_Wind_Speed_Flag.Low_Wind_Speed_Flag__0", "org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0", 0);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0"
+onclick="org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0) "  onfocus="describe_projection()">
+<font size="+1">Low_Wind_Speed_Flag__0</font>: 32 bit Unsigned integer</b><br>
+
+Low_Wind_Speed_Flag__0 <select name="org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
+<option value="=" selected>=
+<option value="!=">!=
+<option value="<"><
+<option value="<="><=
+<option value=">">>
+<option value=">=">>=
+<option value="-">--
+</select>
+<input type="text" name="org_opendap_NSCAT_Rev_20_NSCAT_L2_Low_Wind_Speed_Flag_Low_Wind_Speed_Flag__0_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
+<br>
+
+<p><p>
+</dd></dl>
+<p><p>
+<b>Structure High_Wind_Speed_Flag </b><br>
+<dl><dd>
+<script type="text/javascript">
+<!--
+org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0 = new dods_var("NSCAT%20Rev%2020.NSCAT%20L2.High_Wind_Speed_Flag.High_Wind_Speed_Flag__0", "org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0", 0);
+DODS_URL.add_dods_var(org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0"
+onclick="org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0.handle_projection_change(get_org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0) "  onfocus="describe_projection()">
+<font size="+1">High_Wind_Speed_Flag__0</font>: 32 bit Unsigned integer</b><br>
+
+High_Wind_Speed_Flag__0 <select name="org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0_operator" onfocus="describe_operator()" onchange="DODS_URL.update_url()">
+<option value="=" selected>=
+<option value="!=">!=
+<option value="<"><
+<option value="<="><=
+<option value=">">>
+<option value=">=">>=
+<option value="-">--
+</select>
+<input type="text" name="org_opendap_NSCAT_Rev_20_NSCAT_L2_High_Wind_Speed_Flag_High_Wind_Speed_Flag__0_selection" size=12 onFocus="describe_selection()" onChange="DODS_URL.update_url()">
+<br>
+
+<p><p>
+</dd></dl>
+<p><p>
+</dd></dl>
+<p><p>
+</dd></dl>
+
+<p><p>
+
+<tr><td><td>
+
+</table></form>
+
+<hr>
+
+<address>Send questions or comments to: <a href="mailto:support@opendap.org">support@opendap.org</a></address><p>
+                    <a href="http://validator.w3.org/check?uri=referer"><img
+                        src="http://www.w3.org/Icons/valid-html40"
+                        alt="Valid HTML 4.0 Transitional" height="31" width="88">
+                    </a></p>
+</body></html>

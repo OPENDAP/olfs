@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OLFSConfig>
+
+    <DispatchHandlers>
+
+        <HttpGetHandlers>
+            
+            <Handler className="opendap.bes.BESManager">
+                <BES>
+                    <!-- The prefix is a URL token between server address/port
+                    and catalog root used to designate a particular BES instance
+                    in the case that multiple Back-End-Servers are available to
+                    a single OLFS.  The default is no additional tag,
+                    designated by "/". So, for a single BES the prefix MUST be
+                    set to "/".  -->
+                    <prefix>/</prefix>
+
+                    <!-- The hostname (or IP address) for this BES -->
+                    <host>localhost</host>
+
+                    <!-- The port number for this BES -->
+                    <port>10002</port>
+
+                    <!-- The Administration port number for this BES -->
+                    <!-- <adminPort>11002</adminPort> -->
+
+                    <!--
+                        The maximum response size, in kilobytes, for non authenticated users
+                        A value of zero means there is no limit.
+                    -->
+                    <maxResponseSize>0</maxResponseSize>
+
+
+                    <!-- The ClientPool maximum number of concurrent
+                      -  BES client connections allowed.
+                      -->
+                    <ClientPool maximum="10" maxCmds="2000" />
+
+                </BES>
+
+            </Handler>
+
+
+            <!-- Bot Blocker
+               -
+               - This handler can beused to block access from specific IP addresses
+               - and by a range of IP addresses using a regular expression.
+               -
+              -->
+            <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
+
+                <!-- <IpAddress>127.0.0.1</IpAddress> -->
+
+                <!-- This matches all IPv4 addresses, work yours out from here.... -->
+                <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
+
+                <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
+                <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
+
+            <!-- </Handler>  -->
+                     
+                     
+            <Handler className="opendap.ncml.NcmlDatasetDispatcher" />            
+   
+            <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
+                <prefix>thredds</prefix>
+                <useMemoryCache>true</useMemoryCache>
+            </Handler>
+
+            <Handler className="opendap.gateway.DispatchHandler">
+                <prefix>gateway</prefix>
+            </Handler>
+
+            <Handler className="opendap.nciso.IsoDispatchHandler" />
+            <Handler className="opendap.nciso.RubricDispatchHandler" />
+            <Handler className="opendap.ncml.NcmlFileDispatcher" />            
+            <Handler className="opendap.bes.dapResponders.DapDispatcher" />
+
+            <Handler className="opendap.bes.DirectoryDispatchHandler" />
+            
+
+            <Handler className="opendap.coreServlet.SpecialRequestDispatchHandler" />
+
+            <Handler className="opendap.bes.VersionDispatchHandler" />
+
+            <Handler className="opendap.bes.FileDispatchHandler" >
+
+                <!-- AllowDirectDataSourceAccess
+                  - If this element is present then the server will allow users to request
+                  - the data source (file) directly. For example a user could just get the
+                  - underlying NetCDF files located on the server without using the OPeNDAP
+                  - request interface.
+                  -
+                  - THINK TWICE before allowing this, as data sources can be quite large
+                  - and allowing their transmission with out subsetting can put heavy loads
+                  - on the network and the server.
+                  -->
+                  <AllowDirectDataSourceAccess />
+
+                
+            </Handler>
+
+            <Handler className="opendap.bes.BESThreddsDispatchHandler" />
+
+
+        </HttpGetHandlers>
+
+
+        <HttpPostHandlers>
+            <Handler className="opendap.coreServlet.SOAPRequestDispatcher" >
+                <OpendapSoapDispatchHandler>opendap.bes.SoapDispatchHandler</OpendapSoapDispatchHandler>
+            </Handler>
+        </HttpPostHandlers>
+
+
+    </DispatchHandlers>
+
+
+</OLFSConfig>
+

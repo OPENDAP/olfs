@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WCSConfig>
+
+    <WCSService name="ceopAIRX2RET"
+                autoUpdate="true"
+                cacheTime="43200"
+            >
+        <ServiceURL>
+            http://g0dup05u.ecs.nasa.gov/cgi-bin/ceopAIRX2RET
+        </ServiceURL>
+        <service>WCS</service>
+        <version>1.0.0</version>
+    </WCSService>
+
+    <Project name="CEOP">
+        <Site name="BER">
+            <label>(BERMS Old Black Spruce)</label>
+            <WCSParameters>
+                <crs>WGS84</crs>
+                <bbox>-107.475000,45.935000,-102.725000,50.685000</bbox>
+                <time>2002-10-01/2004-09-30</time>
+                <resx>0.25</resx>
+                <resy>0.25</resy>
+                <interpolationMethod>Nearest%20neighbor</interpolationMethod>
+                <format>netCDF</format>
+            </WCSParameters>
+        </Site>
+    </Project>
+
+    <Project name="REAP">
+        <Site name="Andrews Research Forest">
+            <label>Really this is a duplicate if BER with a name change...</label>
+            <WCSParameters>
+                <crs>WGS84</crs>
+                <bbox>-107.475000,45.935000,-102.725000,50.685000</bbox>
+                <time>2002-10-01/2004-09-30</time>
+                <resx>0.25</resx>
+                <resy>0.25</resy>
+                <interpolationMethod>Nearest%20neighbor</interpolationMethod>
+                <format>netCDF</format>
+            </WCSParameters>
+        </Site>
+    </Project>
+
+</WCSConfig>
+

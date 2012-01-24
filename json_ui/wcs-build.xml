@@ -1,0 +1,558 @@
+<?xml version="1.0"?>
+
+<!--
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "Hyrax" project, a Java implementation
+// of the OPeNDAP Data Access Protocol.
+//
+// Copyright (c) 2011 OPeNDAP, Inc.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
+-->
+
+<!-- Build file for OPeNDAP core software -->
+
+<project
+        name="Web Coverage Service"
+        default="all" basedir=".">
+
+    <!-- Global Properties for Java-OPeNDAP software development -->
+
+
+    <!-- ********************************************* -->
+    <!-- Project-wide settings. All directories are    -->
+    <!-- relative to the project "Basedir" directory,  -->
+    <!-- which is assumed (by this file) to be set to  -->
+    <!-- ".."                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Version Tag: Used for doing distribution builds.
+         This property should be set from the command
+         line by the distribution build script using
+         tag information from CVS.
+    -->
+    <property name="VERSION" value="Not.A.Release"/>
+    <property name="CONFIG_FILE" value="ConfigFileNotSpecified"/>
+
+
+    <!-- Compiler Settings -->
+
+    <property name="compile.debug" value="on"/>
+    <property name="compile.debuglevel" value="lines,vars,source"/>
+    <property name="compile.deprecation" value="on"/>
+
+    <property name="modern.compiler" value="modern"/>
+    <property name="classic.compiler" value="classic"/>
+
+    <!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+    <property name="build.compiler" value="${modern.compiler}"/>
+
+
+
+    <!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+    <property name="build.sysclasspath" value="ignore"/>
+
+
+
+    <!-- ********************************************* -->
+
+    <!-- Target to create the build directories -->
+    <!-- prior to a compile target. We also mark -->
+    <!-- the start time of the build for the log. -->
+
+    <target name="noop" description="Do Nothing Target">
+        <echo level="info" message="no-op target in ${ant.file}"/>
+    </target>
+
+
+    <target name="show" description="Show build settings.">
+
+        <echo level="info" message="Project Name:       ${ant.project.name}"/>
+        <echo level="info" message="Project File:       ${ant.file}"/>
+        <echo level="info" message="VERSION:            ${VERSION}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Project Directories:"/>
+        <echo level="info" message="    src.dir:       ${src.dir}"/>
+        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
+        <echo level="info" message="    resources.dir: ${resources.dir}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Build Directories:"/>
+        <echo level="info" message="    build.dir:      ${build.dir}"/>
+        <echo level="info" message="    build.classes:  ${build.classes}"/>
+        <echo level="info" message="    build.doc:      ${build.doc}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Ant Properties:"/>
+        <echo level="info" message="    ant.file:          ${ant.file}"/>
+        <echo level="info" message="    ant.home:          ${ant.home}"/>
+        <echo level="info" message="    ant.java.version:  ${ant.java.version}"/>
+        <echo level="info" message="    ant.project.name:  ${ant.project.name}"/>
+        <echo level="info" message="    ant.version:       ${ant.version}"/>
+        <echo level="info" message="    basedir:           ${basedir}"/>
+        <echo level="info" message="    user.name:         ${user.name}"/>
+        <echo level="info" message="    user.home:         ${user.home}"/>
+        <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+
+    </target>
+
+
+    <!-- ################################################################# -->
+    <!--                      Project Settings                             -->
+    <!-- ................................................................. -->
+
+
+
+    <!-- Project directories -->
+    <property name="src.dir" location="src"/>
+    <property name="doc.dir" location="doc"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="resources.dir" location="resources"/>
+    <property name="WCS.dir" location="${resources.dir}/WCS"/>
+    <property name="initialContent.dir" location="${WCS.dir}/initialContent"/>
+    <property name="WebInfResources.dir" location="${WCS.dir}/WEB-INF"/>
+    <property name="distributionResources.dir"  location="${WCS.dir}/distribution"/>
+
+
+
+    <!-- Build Directories -->
+    <property name="build.dir" location="build"/>
+    <property name="build.classes" location="${build.dir}/classes"/>
+    <property name="build.doc" location="${build.dir}/doc"/>
+    <property name="build.dist" location="${build.dir}/dist"/>
+    <property name="build.lib" location="${build.dir}/lib"/>
+    <property name="build.run" location="${build.dir}/run"/>
+    <property name="build.src" location="${build.dir}/src"/>
+
+
+    <!-- Libraries -->
+    <property name="junit.lib"       value="junit-4.4.jar"/>
+    <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-2.5.jar"/>
+    <property name="echo.lib"        value="echosoap.jar"/>
+
+
+    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+
+    <property name="owlim.lib"            value="owlim-lite-4.3.jar"/>
+    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
+
+    <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.1.jar"/>
+    <property name="commons-codec.lib"      value="apache-commons-codec-1.3.jar"/>
+
+    <property name="serializer.lib"    value="xalan-2.7.1-serializer.jar"/>
+    <property name="xalan.lib"         value="xalan-2.7.1-xalan.jar"/>
+    <property name="xercesImpl.lib"    value="xalan-2.7.1-xercesImpl.jar"/>
+    <property name="xercesXmlApis.lib" value="xalan-2.7.1-xml-apis.jar"/>
+    <property name="xsltc.lib"         value="xalan-2.7.1-xsltc.jar"/>
+
+    <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
+    <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
+
+    <property name="catalina.lib"       value="catalina-6.0.14.jar"/>
+
+
+    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
+               property="fortify.present"/>
+
+    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
+    <property name="rules.dir" value="fortify"/>
+
+
+    <!-- Library (class)paths -->
+    <path id="compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <fileset dir="${lib.dir}">
+            <include name="${servlet-api.lib}"/>
+            <include name="${jdom.lib}"/>
+            <include name="${junit.lib}"/>
+            <include name="${commons-cli.lib}"/>
+            <include name="${commons-httpclient.lib}"/>
+            <include name="${commons-logging.lib}"/>
+            <include name="${commons-codec.lib}"/>
+            <include name="${saxon-jdom.lib}"/>
+            <include name="${saxon-s9api.lib}"/>
+            <include name="${saxon.lib}"/>
+            <include name="${catalina.lib}"/>
+
+            <include name="${slf4j.lib}"/>
+            <include name="${logback-core.lib}"/>
+            <include name="${logback-classic.lib}"/>
+
+	        <include name="${owlim.lib}"/>
+            <include name="${openrdf-sesame.lib}"/>
+
+        </fileset>
+    </path>
+
+
+
+
+
+
+    <target name="all" depends="clean,server"
+            description="Builds lots of stuff."/>
+
+
+    <target name="clean" description="Clean up ALL build products.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <target name="init" description="Prepare all build directories.">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.doc}"/>
+        <mkdir dir="${build.dist}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${build.run}"/>
+        <mkdir dir="${build.src}"/>
+
+        <filter token="HyraxVersion" value="${VERSION}"/>
+
+        <tstamp/>
+        <echo level="info" message="time: ${TSTAMP}"/>
+    </target>
+
+
+
+    <target
+            name="compile"
+            depends="init"
+            description="Compiles the Web Coverage Service."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <compilerarg value="-Xlint:unchecked"/> 
+            <classpath refid="compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/wcs/v1_1_2/**/*.java"/>
+            <include name="opendap/semantics/**/*.java"/>
+
+        </javac>
+
+    </target>
+
+
+
+
+
+
+    <target
+            name="src-dist"
+            depends="clean,init"
+            description="Builds source distribution"
+            >
+
+        <tar destfile="${build.dist}/wcs-${VERSION}-src.tgz"
+             compression="gzip"
+                >
+
+            <zipfileset dir="." prefix="wcs-${VERSION}-src">
+                <exclude name="build/**"/>
+                <exclude name="doc/javadoc/**"/>
+                <exclude name="doc/admin/**"/>
+                <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="doc/_notes/**"/>
+                <!-- Exclude the _notes directory in the ${doc.dir} dir -->
+                <exclude name="**/*.iml"/>
+                <exclude name="**/*.ipr"/>
+                <exclude name="**/*.iws"/>
+            </zipfileset>
+
+        </tar>
+
+    </target>
+
+    <target
+            name="server-dist"
+            depends="server"
+            description="Packages the war file into tar file with a release related name.">
+
+        <copy file="${distributionResources.dir}/README"
+              tofile="${build.dist}/README"/>
+
+        <tar destfile="${build.dist}/wcs-${VERSION}-webapp.tgz"
+             compression="gzip"
+                >
+            <zipfileset dir="${build.dist}" prefix="wcs-${VERSION}-webapp">
+                <include name="WCS.war"/>
+                <include name="README"/>
+            </zipfileset>
+
+        </tar>
+
+        <delete file="${build.dist}/README"/>
+        <delete file="${build.dist}/WCS.war"/>
+
+    </target>
+
+
+    <target
+            name="DISTRO"
+            depends="clean,src-dist,server-dist"
+            description="Builds complete distribution"
+            >
+
+    </target>
+
+
+
+
+
+    <target
+            name="server"
+            depends="clean,compile"
+            description="Performs a clean build of the core software and assembles the WAR file."
+            >
+
+
+        <echo level="info" message="Building WCS server war file."/>
+        <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
+        <echo level="info" message="build.dist: ${build.dist}"/>
+
+
+        <war destfile="${build.dist}/WCS.war"
+             webxml="${resources.dir}/WCS/WEB-INF/web.xml"
+                >
+
+            <lib dir="${lib.dir}">
+                <include name="${jdom.lib}"/>
+                <include name="${junit.lib}"/>
+                <include name="${commons-cli.lib}"/>
+                <include name="${commons-httpclient.lib}"/>
+                <include name="${commons-logging.lib}"/>
+                <include name="${commons-codec.lib}"/>
+                <include name="${xercesImpl.lib}"/>
+                <include name="${xercesXmlApis.lib}"/>
+                <include name="${saxon-jdom.lib}"/>
+                <include name="${saxon-s9api.lib}"/>
+                <include name="${saxon.lib}"/>
+
+                <include name="${slf4j.lib}"/>
+                <include name="${logback-core.lib}"/>
+                <include name="${logback-classic.lib}"/>
+
+	            <include name="${owlim.lib}"/>
+                <include name="${openrdf-sesame.lib}"/>
+
+            </lib>
+            <classes dir="${build.classes}"/>
+
+            <zipfileset dir="${doc.dir}" prefix="docs" >
+                <exclude name="src.distribution.readme"/>
+                <exclude name="admin/**"/>
+                <exclude name="_notes"/>
+            </zipfileset>
+            
+            <zipfileset dir="${resources.dir}/WCS" prefix="">
+                <include name="**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
+            </zipfileset>
+
+
+            <webinf dir="${resources.dir}/WCS/WEB-INF">
+                <include name="logback-test.xml"/>
+                <include name="logback.xml"/>
+            </webinf>
+
+
+        </war>
+
+        <delete file="${build.dist}/index.html"/>
+
+    </target>
+
+
+    <target
+            name="doc"
+            depends="clean,init"
+            description="Builds JavaDoc for the WCS Service software packages, if missing or out of date."
+            unless="JavaDocIsUpToDate"
+            >
+        <copy todir="${build.src}" filtering="false" >
+            <fileset dir="${src.dir}">
+                <exclude name="hao/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/bes/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/experiments/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/io/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/metacat/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/ppt/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/soap/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/thredds/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/threddsHandler/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/wcsGateway/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/wcs/gatewayClient/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+                <exclude name="opendap/webstart/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
+            </fileset>
+        </copy>
+
+        <javadoc destdir="${build.doc}/javadoc"
+                 Author="true"
+                 Verbose="true"
+                 Version="true"
+                 failonerror="true"
+                >
+            <classpath refid="compile.classpath"/>
+
+            <packageset dir="${build.src}" defaultexcludes="yes"/>
+
+
+        </javadoc>
+
+    </target>
+
+
+
+
+    <!-- *******************************************************
+
+            Semantic Web targets
+
+    -->
+
+    <target  name="test" depends="compile">
+
+        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
+        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
+        <copy file="${resources.dir}/WCS/WEB-INF/logback-test.xml"  tofile="${build.run}/logback-test.xml"/>
+
+        <java classname="opendap.semantics.wcs.StaticRdfCatalog"
+              fork="true"
+              maxmemory="1024m"
+              dir="${build.run}"
+                >
+            <classpath refid="compile.classpath"/>
+            <arg value="${CONFIG_FILE}"/>
+        </java>
+
+    </target>
+
+    <!-- *******************************************************  -->
+
+
+    <target name="fortify" if="fortify.present">
+        <typedef name="sourceanalyzer"
+                 classname="com.fortify.dev.ant.SourceanalyzerTask"/>
+
+
+        <!-- call clean to ensure that all source files are recompiled -->
+        <antcall target="clean"/>
+
+
+
+        <!-- call the compile target using the SCA Compiler Adapter to -->
+        <!-- translate all source files -->
+        <antcall target="compile">
+            <param name="build.compiler"
+                   value="com.fortify.dev.ant.SCACompiler"/>
+        </antcall>
+
+
+        <!-- capture all configuration files in the WEB-INF directory -->
+        <echo>sourceanalyzer ${WebInfResources.dir}</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                       >
+            <fileset dir="${WebInfResources.dir}">
+                <include name="**/*.properties"/>
+                <include name="**/*.xml"/>
+            </fileset>
+        </sourceanalyzer>
+
+
+
+        <!-- run analysis -->
+        <echo>sourceanalyzer scan</echo>
+        <sourceanalyzer buildid="${sourceanalyzer.buildid}"
+                        scan="true"
+                        resultsfile="${build.dir}/issues.fpr"
+                        rules="${rules.dir}/OlfsRulePack.xml"
+                >
+        </sourceanalyzer>
+    </target>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</project>
+
+
+
+
+
+
+
+
+
+

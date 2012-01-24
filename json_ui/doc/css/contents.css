@@ -1,0 +1,115 @@
+H1 {
+    font-family:Tahoma,Arial,sans-serif;
+    color:white;
+    background-color:#527CC1;
+    font-size:22px;
+    padding-left: 5px;
+}
+H2 {
+    font-family:Tahoma,Arial,sans-serif;
+    color:white;
+    background-color:#527CC1;
+    font-size:16px;
+    padding-left: 5px;
+}
+H3 {
+    font-family:Tahoma,Arial,sans-serif;
+    color:white;
+    background-color:#527CC1;
+    font-size:14px;
+    padding-left: 5px;
+    }
+H4 {
+    font-family:Tahoma,Arial,sans-serif;
+    color:white;
+    background-color:#527CC1;
+    font-size:12px;
+    padding-left: 5px;
+    }
+BODY {
+    font-family:Tahoma,Arial,sans-serif;
+    color:black;
+    background-color:white;
+}
+P {
+    font-family:Tahoma,Arial,sans-serif;
+    background:white;
+    color:black;
+    font-size:12px;
+}
+A {
+    color : black;
+}
+A.name {
+    color : black;
+}
+HR {
+    color : #525D76;
+}
+.uuid {
+    font-size: 9px;color:#2A54B9
+}
+.small_bold {
+    font-size: 10px;
+    font-weight: bold
+}
+.small_italic {
+    font-size: 10px;
+    font-style: italic
+}
+.small {
+    font-size: 10px;
+}
+.medium_bold {
+    font-size: 14px;
+    font-weight: bold
+}
+.medium_normal {
+    font-size: 14px;
+    font-weight: normal
+}
+.medium {
+    font-size: 14px;
+}
+.large {
+    font-size: 18px;
+}
+.large_bold {
+    font-size: 18px;
+    font-weight: bold;
+}
+.xlarge {
+    font-size: 24px;
+}
+.xxlarge {
+    font-size: 36px;
+}
+.small_black {
+    font-size: 10px;
+    color    : black;
+}
+.tiny_black_fw {
+    font-family: courier;
+    font-size: 11px;
+    color    : black;
+}
+.dark {
+    font-weight: bold;
+}
+.normal {
+    font-weight: normal
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.bold_italic {
+    font-weight: bold;
+    font-style: italic;
+}
+

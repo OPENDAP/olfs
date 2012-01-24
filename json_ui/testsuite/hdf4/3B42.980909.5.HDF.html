@@ -1,0 +1,804 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><title>OPeNDAP Server Dataset Query Form</title>
+<base href="http://www.opendap.org/online_help_files/opendap_form_help.html">
+<script type="text/javascript">
+<!--
+
+// $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
+
+var reflection_cgi = "http://unidata.ucar.edu/cgi-bin/dods/posturl.pl";
+
+// Event handlers for the disposition button.
+
+// The ascii_button handler sends data to a new window. The user can then 
+// save the data to a file.
+
+function ascii_button() {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var ascii_url = url_parts[0] + ".ascii?" + url_parts[1];
+    }
+    else {
+        var ascii_url = url_parts[0] + ".ascii?";
+    }
+
+    window.open(ascii_url, "ASCII_Data");
+}
+
+/* The netcdf_button handler loads the data to the current window. Since it 
+   is netcdf/binary, Netscape will ask the user for a filename and save the data
+   to that file. The parameter 'ext' should be 'nc'. */
+
+function netcdf_button(ext) {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
+    }
+    else {
+        var binary_url = url_parts[0] + "." + ext + "?";
+    }
+
+    window.location = binary_url;
+}
+
+/* The binary_button handler loads the data to the current window. Since it 
+   is binary, Netscape will ask the user for a filename and save the data
+   to that file. */
+
+function binary_button(ext) {
+    var url = new String(document.forms[0].url.value);
+
+    var url_parts = url.split("?");
+    /* handle case where constraint is null. */
+    if (url_parts[1] != null) {
+        var binary_url = url_parts[0] + "." + ext + "?" + url_parts[1];
+    }
+    else {
+        var binary_url = url_parts[0] + "." + ext + "?";
+    }
+
+    window.location = binary_url;
+}
+
+/* Route the URL to Matlab, IDL, .... Users must add an entry into their mime
+   types file (aka list of Netscape helper applications) so that the URL will
+   be fedd into Matlab which must, in addition, be running loaddods.
+
+   Note that reflection_cgi is a global JavaScript variable set at the 
+   begining of this `file'. 
+
+   DEPRECATED */
+
+function program_button() {
+    var program_url = new String(document.forms[0].url.value);
+
+    /* Build a call to the reflector CGI. */
+    var CGI = reflection_cgi + "?" + "url=" + program_url + "&disposition=matlab";
+
+    window.location = CGI;
+}
+
+var help = 0;			// Our friend, the help window.
+
+function help_button() {
+    // Check the global to keep from opening the window again if it is
+    // already visible. I think Netscape handles this but I know it will
+    // write the contents over and over again. This preents that, too.
+    // 10/8/99 jhrg
+    if (help && !help.closed)
+	return;
+
+    // Resize on Netscape 4 is hosed. When enabled, if a user resizes then
+    // the root window's document gets reloaded. This does not happen on IE5.
+    // regardless, with scrollbars we don't absolutely need to be able to
+    // resize. 10/8/99 jhrg
+    help = window.open("http://www.opendap.org/online_help_files/opendap_form_help.html",
+                       "help", "scrollbars,dependent,width=600,height=400");
+}
+
+//function open_dods_home() {
+//    window.open("http://www.opendap.org/", "DODS_HOME_PAGE");
+//}
+
+
+// Helper functions for the form.
+
+function describe_index() {
+   window.status = "Enter start, stride and stop for the array dimension.";
+   return true;
+}
+
+function describe_selection() {
+   window.status = "Enter a relational expression (e.g., <20). String variables may need values to be quoted";
+   return true;
+}
+
+function describe_operator() {
+   window.status = "Choose a relational operator. Use - to enter a function name).";
+   return true;
+}
+
+function describe_projection() {
+   window.status = "Add this variable to the projection.";
+   return true;
+}
+
+///////////////////////////////////////////////////////////
+// The dods_url object.
+///////////////////////////////////////////////////////////
+
+// CTOR for dods_url
+// Create the DODS URL object.
+function dods_url(base_url) {
+    this.url = base_url;
+    this.projection = "";
+    this.selection = "";
+    this.num_dods_vars = 0;
+    this.dods_vars = new Array();
+        
+    this.build_constraint = build_constraint;
+    this.add_dods_var = add_dods_var;
+    this.update_url = update_url;
+}
+
+// Method of dods_url
+// Add the projection and selection to the displayed URL.
+function update_url() {
+    this.build_constraint();
+    var url_text = this.url;
+    // Only add the projection & selection (and ?) if there really are
+    // constraints! 
+    if (this.projection.length + this.selection.length > 0)
+        url_text += "?" + this.projection + this.selection;
+    document.forms[0].url.value = url_text;
+}
+
+// Method of dods_url
+// Scan all the form elements and pick out the various pieces of constraint
+// information. Add these to the dods_url instance.
+function build_constraint() {
+    var p = "";
+    var s = "";
+    for (var i = 0; i < this.num_dods_vars; ++i) {
+        if (this.dods_vars[i].is_projected == 1) {
+	    // The comma is a clause separator.
+	    if (p.length > 0)
+	        p += ",";
+            p += this.dods_vars[i].get_projection();
+	}
+	var temp_s = this.dods_vars[i].get_selection();
+	if (temp_s.length > 0)
+	    s += "&" + temp_s;    // The ampersand is a prefix to the clause.
+    }
+
+    this.projection = p;
+    this.selection = s;
+}
+
+// Method of dods_url
+// Add the variable to the dods_var array of dods_vars. The var_index is the
+// number of *this particular* variable in the dataset, zero-based.
+function add_dods_var(dods_var) {
+    this.dods_vars[this.num_dods_vars] = dods_var;
+    this.num_dods_vars++;
+}
+
+/////////////////////////////////////////////////////////////////
+// dods_var
+/////////////////////////////////////////////////////////////////
+
+// CTOR for dods_var
+// name: the name of the variable from DODS' perspective.
+// js_var_name: the name of the variable within the form.
+// is_array: 1 if this is an array, 0 otherwise.
+function dods_var(name, js_var_name, is_array) {
+    // Common members
+    this.name = name;
+    this.js_var_name = js_var_name;
+    this.is_projected = 0;
+    if (is_array > 0) {
+        this.is_array = 1;
+        this.num_dims = 0;        // Holds the number of dimensions
+        this.dims = new Array(); // Holds the length of the dimensions
+
+        this.add_dim = add_dim;
+        this.display_indices = display_indices;
+        this.erase_indices = erase_indices;
+    }
+    else
+        this.is_array = 0;
+
+    this.handle_projection_change = handle_projection_change;
+    this.get_projection = get_projection;
+    this.get_selection = get_selection;
+}
+
+// Method of dods_var
+// Add a dimension to a DODS Array object.
+function add_dim(dim_size) {
+    this.dims[this.num_dims] = dim_size;
+    this.num_dims++;
+}
+
+// Method of dods_var
+// Add the array indices to the text widgets associated with this DODS
+// array object. The text widgets are names <var_name>_0, <var_name>_1, ...
+// <var_name>_n for an array with size N+1.
+function display_indices() {
+    for (var i = 0; i < this.num_dims; ++i) {
+        var end_index = this.dims[i]-1;
+        var s = "0:1:" + end_index.toString();
+	var text_widget = "document.forms[0]." + this.js_var_name + "_" + i.toString();
+	eval(text_widget).value = s;
+    }
+}
+
+// Method of dods_var
+// Use this to remove index information from a DODS array object.
+function erase_indices() {
+    for (var i = 0; i < this.num_dims; ++i) {
+	var text_widget = "document.forms[0]." + this.js_var_name + "_" + i.toString();
+	eval(text_widget).value = "";
+    }
+}
+
+// Method of  dods_var
+function handle_projection_change(check_box) {
+    if (check_box.checked) {
+        this.is_projected = 1;
+	if (this.is_array == 1)
+	    this.display_indices();
+    }
+    else {
+        this.is_projected = 0;
+	if (this.is_array == 1)
+	    this.erase_indices();
+    }
+
+    DODS_URL.update_url();
+}
+
+
+// Method of dods_var
+// Get the projection sub-expression for this variable.
+function get_projection() {
+    var p = "";
+    if (this.is_array == 1) {
+        p = this.name;		// ***
+        for (var i = 0; i < this.num_dims; ++i) {
+	    var text_widget = "document.forms[0]." + this.js_var_name + "_" + i.toString();
+	    p += "[" + eval(text_widget).value + "]";
+	}
+    }
+    else {
+	p = this.name;		// ***
+    }
+
+    return p;
+}
+
+// Method of dods_var
+// Get the selection (which is null for arrays).
+function get_selection() {
+    var s = "";
+    if (this.is_array == 1) {
+        return s;
+    }
+    else {
+	var text_widget = "document.forms[0]." + this.js_var_name + "_selection";
+        if (eval(text_widget).value != "") {
+            var oper_widget_name = "document.forms[0]." + this.js_var_name + "_operator";
+            var oper_widget = eval(oper_widget_name);
+	    var operator = oper_widget.options[oper_widget.selectedIndex].value;
+            // If the operator is `-' then don't prepend the variable name!
+            // This provides a way for users to enter function names as
+            // selection clauses. 
+            if (operator == "-")
+                s = eval(text_widget).value;
+            else
+	        s = this.name + operator + eval(text_widget).value; // ***
+        }
+    }
+
+    return s;
+}    
+
+DODS_URL = new dods_url("http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF");
+// -->
+</script>
+</head>
+<body>
+<p><h2 align='center'>OPeNDAP Server Dataset Access Form</h2>
+<hr>
+<form action="">
+<table>
+<tr>
+<td align="right">
+<h3>
+<a href="opendap_form_help.html#disposition" target="help">Action:</a></h3>
+<td>
+<input type="button" value="Get ASCII" onclick="ascii_button()">
+<input type="button" value="Get as NetCDF" onclick="binary_button('nc')">
+<input type="button" value="Binary (DAP) Object" onclick="binary_button('dods')">
+<input type="button" value="Show Help" onclick="help_button()">
+
+<tr>
+<td align="right"><h3><a href="opendap_form_help.html#data_url" target="help">Data URL:</a>
+</h3>
+<td><input name="url" type="text" size="70" value="http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF">
+<tr><td><td><hr>
+
+<tr>
+<td align="right" valign="top"><h3>
+<a href="opendap_form_help.html#global_attr" target="help">Global Attributes:</a></h3>
+<td><textarea name="global_attr" rows="5" cols="70">
+CoreMetadata.OrbitNumber.Value: -9999
+CoreMetadata.OrbitNumber.Data_Location: PGE
+CoreMetadata.OrbitNumber.Mandatory: FALSE
+CoreMetadata.RangeBeginningDate.Value: 1998/09/09
+CoreMetadata.RangeBeginningDate.Data_Location: PGE
+CoreMetadata.RangeBeginningDate.Mandatory: FALSE
+CoreMetadata.RangeBeginningTime.Value: 00:00:00
+CoreMetadata.RangeBeginningTime.Data_Location: PGE
+CoreMetadata.RangeBeginningTime.Mandatory: FALSE
+CoreMetadata.RangeEndingDate.Value: 1998/09/10
+CoreMetadata.RangeEndingDate.Data_Location: PGE
+CoreMetadata.RangeEndingDate.Mandatory: FALSE
+CoreMetadata.RangeEndingTime.Value: 00:00:00
+CoreMetadata.RangeEndingTime.Data_Location: PGE
+CoreMetadata.RangeEndingTime.Mandatory: FALSE
+CoreMetadata.GranulePointer.Value: "3B42.980909.5.HDF"
+CoreMetadata.GranulePointer.Data_Location: PGE
+CoreMetadata.GranulePointer.Mandatory: FALSE
+CoreMetadata.ShortName.Value: "Surface Rain from Geostationary Satellites C"
+CoreMetadata.ShortName.Data_Location: PGE
+CoreMetadata.ShortName.Mandatory: FALSE
+CoreMetadata.SizeMBECSDataGranule.Value: 0.220007
+CoreMetadata.SizeMBECSDataGranule.Data_Location: PGE
+CoreMetadata.SizeMBECSDataGranule.Mandatory: FALSE
+CoreMetadata.LongitudeOfMaximumLatitude.Value: -9999.9
+CoreMetadata.LongitudeOfMaximumLatitude.Data_Location: PGE
+CoreMetadata.LongitudeOfMaximumLatitude.Mandatory: FALSE
+CoreMetadata.SpatialCoverageType.Value: "Horizontal"
+CoreMetadata.SpatialCoverageType.Data_Location: PGE
+CoreMetadata.SpatialCoverageType.Mandatory: FALSE
+CoreMetadata.EllipsoidName.Value: "NULL"
+CoreMetadata.EllipsoidName.Data_Location: PGE
+CoreMetadata.EllipsoidName.Mandatory: FALSE
+CoreMetadata.EquatorialRadius.Value: -9999.9
+CoreMetadata.EquatorialRadius.Data_Location: PGE
+CoreMetadata.EquatorialRadius.Mandatory: FALSE
+CoreMetadata.DenominatorFlatteningRatio.Value: -9999.9
+CoreMetadata.DenominatorFlatteningRatio.Data_Location: PGE
+CoreMetadata.DenominatorFlatteningRatio.Mandatory: FALSE
+CoreMetadata.OrbitalModelName.Value: "NULL"
+CoreMetadata.OrbitalModelName.Data_Location: PGE
+CoreMetadata.OrbitalModelName.Mandatory: FALSE
+CoreMetadata.SemiMajorAxis.Value: -9999.9
+CoreMetadata.SemiMajorAxis.Data_Location: PGE
+CoreMetadata.SemiMajorAxis.Mandatory: FALSE
+CoreMetadata.MeanAnomaly.Value: -9999.9
+CoreMetadata.MeanAnomaly.Data_Location: PGE
+CoreMetadata.MeanAnomaly.Mandatory: FALSE
+CoreMetadata.RightAscensionNode.Value: -9999.9
+CoreMetadata.RightAscensionNode.Data_Location: PGE
+CoreMetadata.RightAscensionNode.Mandatory: FALSE
+CoreMetadata.ArgumentOfPerigee.Value: -9999.9
+CoreMetadata.ArgumentOfPerigee.Data_Location: PGE
+CoreMetadata.ArgumentOfPerigee.Mandatory: FALSE
+CoreMetadata.Eccentricity.Value: -9999.9
+CoreMetadata.Eccentricity.Data_Location: PGE
+CoreMetadata.Eccentricity.Mandatory: FALSE
+CoreMetadata.Inclination.Value: -9999.9
+CoreMetadata.Inclination.Data_Location: PGE
+CoreMetadata.Inclination.Mandatory: FALSE
+CoreMetadata.EpochTime.Value: 99:99:99
+CoreMetadata.EpochTime.Data_Location: PGE
+CoreMetadata.EpochTime.Mandatory: FALSE
+CoreMetadata.EpochDate.Value: 9999/99/99
+CoreMetadata.EpochDate.Data_Location: PGE
+CoreMetadata.EpochDate.Mandatory: FALSE
+CoreMetadata.EpochMillisec.Value: -9999.9
+CoreMetadata.EpochMillisec.Data_Location: PGE
+CoreMetadata.EpochMillisec.Mandatory: FALSE
+CoreMetadata.WestBoundingCoordinate.Value: -180
+CoreMetadata.WestBoundingCoordinate.Data_Location: PGE
+CoreMetadata.WestBoundingCoordinate.Mandatory: FALSE
+CoreMetadata.EastBoundingCoordinate.Value: 180
+CoreMetadata.EastBoundingCoordinate.Data_Location: PGE
+CoreMetadata.EastBoundingCoordinate.Mandatory: FALSE
+CoreMetadata.NorthBoundingCoordinate.Value: 40
+CoreMetadata.NorthBoundingCoordinate.Data_Location: PGE
+CoreMetadata.NorthBoundingCoordinate.Mandatory: FALSE
+CoreMetadata.SouthBoundingCoordinate.Value: -40
+CoreMetadata.SouthBoundingCoordinate.Data_Location: PGE
+CoreMetadata.SouthBoundingCoordinate.Mandatory: FALSE
+CoreMetadata.CenterLatitude.Value: -9999.9
+CoreMetadata.CenterLatitude.Data_Location: PGE
+CoreMetadata.CenterLatitude.Mandatory: FALSE
+CoreMetadata.CenterLongitude.Value: -9999.9
+CoreMetadata.CenterLongitude.Data_Location: PGE
+CoreMetadata.CenterLongitude.Mandatory: FALSE
+CoreMetadata.RadiusValue.Value: -9999.9
+CoreMetadata.RadiusValue.Data_Location: PGE
+CoreMetadata.RadiusValue.Mandatory: FALSE
+CoreMetadata.LatitudeResolution.Value: "1deg"
+CoreMetadata.LatitudeResolution.Data_Location: PGE
+CoreMetadata.LatitudeResolution.Mandatory: FALSE
+CoreMetadata.LongitudeResolution.Value: "1deg"
+CoreMetadata.LongitudeResolution.Data_Location: PGE
+CoreMetadata.LongitudeResolution.Mandatory: FALSE
+CoreMetadata.GeographicCoordinateUnits.Value: "Decimal Degrees"
+CoreMetadata.GeographicCoordinateUnits.Data_Location: PGE
+CoreMetadata.GeographicCoordinateUnits.Mandatory: FALSE
+CoreMetadata.TemporalRangeType.Value: "Continuous Range"
+CoreMetadata.TemporalRangeType.Data_Location: PGE
+CoreMetadata.TemporalRangeType.Mandatory: FALSE
+CoreMetadata.QualityAssuranceParameterName.Value: "ScienceQualityFlag"
+CoreMetadata.QualityAssuranceParameterName.Data_Location: PGE
+CoreMetadata.QualityAssuranceParameterName.Mandatory: FALSE
+CoreMetadata.QualityAssuranceParameterValue.Value: "NOT BEING INVESTIGATED"
+CoreMetadata.QualityAssuranceParameterValue.Data_Location: PGE
+CoreMetadata.QualityAssuranceParameterValue.Mandatory: FALSE
+CoreMetadata.ReprocessingActual.Value: "NULL"
+CoreMetadata.ReprocessingActual.Data_Location: PGE
+CoreMetadata.ReprocessingActual.Mandatory: FALSE
+CoreMetadata.BrowsePointer.Value: "3B42_BR.980909.5.BRO"
+CoreMetadata.BrowsePointer.Data_Location: PGE
+CoreMetadata.BrowsePointer.Mandatory: FALSE
+CoreMetadata.ScienceContact.Value: "George Huffman"
+CoreMetadata.ScienceContact.Data_Location: PGE
+CoreMetadata.ScienceContact.Mandatory: FALSE
+CoreMetadata.MeanMotion.Value: -9999.9
+CoreMetadata.MeanMotion.Data_Location: PGE
+CoreMetadata.MeanMotion.Mandatory: FALSE
+CoreMetadata.OrbitAdjustFlag.Value: -9999
+CoreMetadata.OrbitAdjustFlag.Data_Location: PGE
+CoreMetadata.OrbitAdjustFlag.Mandatory: FALSE
+CoreMetadata.AttitudeModeFlag.Value: -9999
+CoreMetadata.AttitudeModeFlag.Data_Location: PGE
+CoreMetadata.AttitudeModeFlag.Mandatory: FALSE
+CoreMetadata.SolarBetaAngleAtBeginningOfGranule.Value: -9999.9
+CoreMetadata.SolarBetaAngleAtBeginningOfGranule.Data_Location: PGE
+CoreMetadata.SolarBetaAngleAtBeginningOfGranule.Mandatory: FALSE
+CoreMetadata.SolarBetaAngleAtEndOfGranule.Value: -9999.9
+CoreMetadata.SolarBetaAngleAtEndOfGranule.Data_Location: PGE
+CoreMetadata.SolarBetaAngleAtEndOfGranule.Mandatory: FALSE
+CoreMetadata.SensorAlignment.Value: "NULL"
+CoreMetadata.SensorAlignment.Data_Location: PGE
+CoreMetadata.SensorAlignment.Mandatory: FALSE
+CoreMetadata.SensorAlignmentChannelOffsets.Value: "NULL"
+CoreMetadata.SensorAlignmentChannelOffsets.Data_Location: PGE
+CoreMetadata.SensorAlignmentChannelOffsets.Mandatory: FALSE
+CoreMetadata.ScanPathModel.Value: "NULL"
+CoreMetadata.ScanPathModel.Data_Location: PGE
+CoreMetadata.ScanPathModel.Mandatory: FALSE
+CoreMetadata.ScanPathModelParam.Value: "NULL"
+CoreMetadata.ScanPathModelParam.Data_Location: PGE
+CoreMetadata.ScanPathModelParam.Mandatory: FALSE
+CoreMetadata.EphemerisFileID.Value: "NULL"
+CoreMetadata.EphemerisFileID.Data_Location: PGE
+CoreMetadata.EphemerisFileID.Mandatory: FALSE
+ArchiveMetadata.DataGaps.Value: -9999.9
+ArchiveMetadata.DataGaps.Data_Location: PGE
+ArchiveMetadata.DataGaps.Mandatory: FALSE
+ArchiveMetadata.NumberOfDataGaps.Value: -9999.9
+ArchiveMetadata.NumberOfDataGaps.Data_Location: PGE
+ArchiveMetadata.NumberOfDataGaps.Mandatory: FALSE
+ArchiveMetadata.AlgorithmVersion.Value: "4.51"
+ArchiveMetadata.AlgorithmVersion.Data_Location: PGE
+ArchiveMetadata.AlgorithmVersion.Mandatory: FALSE
+ArchiveMetadata.ProductVersion.Value: 5
+ArchiveMetadata.ProductVersion.Data_Location: PGE
+ArchiveMetadata.ProductVersion.Mandatory: FALSE
+ArchiveMetadata.ToolkitVersion.Value: "5.6"
+ArchiveMetadata.ToolkitVersion.Data_Location: PGE
+ArchiveMetadata.ToolkitVersion.Mandatory: FALSE
+ArchiveMetadata.CalibrationCoefficientVersion.Value: -9999
+ArchiveMetadata.CalibrationCoefficientVersion.Data_Location: PGE
+ArchiveMetadata.CalibrationCoefficientVersion.Mandatory: FALSE
+ArchiveMetadata.MissingData.Value: -9999
+ArchiveMetadata.MissingData.Data_Location: PGE
+ArchiveMetadata.MissingData.Mandatory: FALSE
+ArchiveMetadata.PercentOfBadOrMissingPixels.Value: "NULL"
+ArchiveMetadata.PercentOfBadOrMissingPixels.Data_Location: PGE
+ArchiveMetadata.PercentOfBadOrMissingPixels.Mandatory: FALSE
+ArchiveMetadata.MaximumValidValueofChannel.Value: "NULL"
+ArchiveMetadata.MaximumValidValueofChannel.Data_Location: PGE
+ArchiveMetadata.MaximumValidValueofChannel.Mandatory: FALSE
+ArchiveMetadata.MinimumValidValueofChannel.Value: "NULL"
+ArchiveMetadata.MinimumValidValueofChannel.Data_Location: PGE
+ArchiveMetadata.MinimumValidValueofChannel.Mandatory: FALSE
+ArchiveMetadata.MinMaxUnits.Value: "NULL"
+ArchiveMetadata.MinMaxUnits.Data_Location: PGE
+ArchiveMetadata.MinMaxUnits.Mandatory: FALSE
+ArchiveMetadata.OrbitSize.Value: -9999
+ArchiveMetadata.OrbitSize.Data_Location: PGE
+ArchiveMetadata.OrbitSize.Mandatory: FALSE
+ArchiveMetadata.RadarWavelength.Value: -9999.9
+ArchiveMetadata.RadarWavelength.Data_Location: PGE
+ArchiveMetadata.RadarWavelength.Mandatory: FALSE
+ArchiveMetadata.MinimumReflectivityThreshold.Value: -9999.9
+ArchiveMetadata.MinimumReflectivityThreshold.Data_Location: PGE
+ArchiveMetadata.MinimumReflectivityThreshold.Mandatory: FALSE
+ArchiveMetadata.AlgorithmID.Value: "3B42m2"
+ArchiveMetadata.AlgorithmID.Data_Location: PGE
+ArchiveMetadata.AlgorithmID.Mandatory: FALSE
+ArchiveMetadata.DataAccuracy.Value: "NULL"
+ArchiveMetadata.DataAccuracy.Data_Location: PGE
+ArchiveMetadata.DataAccuracy.Mandatory: FALSE
+ArchiveMetadata.InputFiles.Value: "NULL"
+ArchiveMetadata.InputFiles.Data_Location: PGE
+ArchiveMetadata.InputFiles.Mandatory: FALSE
+ArchiveMetadata.DateOfGenerationOfInputFiles.Value: "NULL"
+ArchiveMetadata.DateOfGenerationOfInputFiles.Data_Location: PGE
+ArchiveMetadata.DateOfGenerationOfInputFiles.Mandatory: FALSE
+ArchiveMetadata.DataCenterSourceOfInputFiles.Value: "NULL"
+ArchiveMetadata.DataCenterSourceOfInputFiles.Data_Location: PGE
+ArchiveMetadata.DataCenterSourceOfInputFiles.Mandatory: FALSE
+ArchiveMetadata.GenerationDate.Value: 2000-02-09T11:00:04.000Z
+ArchiveMetadata.GenerationDate.Data_Location: PGE
+ArchiveMetadata.GenerationDate.Mandatory: FALSE
+ArchiveMetadata.DayNight.Value: -9999.9
+ArchiveMetadata.DayNight.Data_Location: PGE
+ArchiveMetadata.DayNight.Mandatory: FALSE
+ArchiveMetadata.SolarChannelGains.Value: "(-9999.9,-9999.9,-9999.9,-9999.9)"
+ArchiveMetadata.SolarChannelGains.Data_Location: PGE
+ArchiveMetadata.SolarChannelGains.Mandatory: FALSE
+ArchiveMetadata.TMIRolloverCoef.Value: "(-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9,-9999.9)"
+ArchiveMetadata.TMIRolloverCoef.Data_Location: PGE
+ArchiveMetadata.TMIRolloverCoef.Mandatory: FALSE
+ArchiveMetadata.OrbitFirstScanUTCDate.Value: 9999/99/99
+ArchiveMetadata.OrbitFirstScanUTCDate.Data_Location: PGE
+ArchiveMetadata.OrbitFirstScanUTCDate.Mandatory: FALSE
+ArchiveMetadata.OrbitFirstScanUTCTime.Value: 99:99:99
+ArchiveMetadata.OrbitFirstScanUTCTime.Data_Location: PGE
+ArchiveMetadata.OrbitFirstScanUTCTime.Mandatory: FALSE
+ArchiveMetadata.OrbitFirstScanUTCMilliseconds.Value: -9999
+ArchiveMetadata.OrbitFirstScanUTCMilliseconds.Data_Location: PGE
+ArchiveMetadata.OrbitFirstScanUTCMilliseconds.Mandatory: FALSE
+ArchiveMetadata.OrbitFirstSCSecs.Value: -9999
+ArchiveMetadata.OrbitFirstSCSecs.Data_Location: PGE
+ArchiveMetadata.OrbitFirstSCSecs.Mandatory: FALSE
+ArchiveMetadata.OrbitFirstSCSubsecs.Value: -9999
+ArchiveMetadata.OrbitFirstSCSubsecs.Data_Location: PGE
+ArchiveMetadata.OrbitFirstSCSubsecs.Mandatory: FALSE
+ArchiveMetadata.OrbitLastScanUTCDate.Value: 9999/99/99
+ArchiveMetadata.OrbitLastScanUTCDate.Data_Location: PGE
+ArchiveMetadata.OrbitLastScanUTCDate.Mandatory: FALSE
+ArchiveMetadata.OrbitLastScanUTCTime.Value: 99:99:99
+ArchiveMetadata.OrbitLastScanUTCTime.Data_Location: PGE
+ArchiveMetadata.OrbitLastScanUTCTime.Mandatory: FALSE
+ArchiveMetadata.OrbitLastScanUTCmilliseconds.Value: -9999
+ArchiveMetadata.OrbitLastScanUTCmilliseconds.Data_Location: PGE
+ArchiveMetadata.OrbitLastScanUTCmilliseconds.Mandatory: FALSE
+ArchiveMetadata.OrbitLastSCSecs.Value: -9999
+ArchiveMetadata.OrbitLastSCSecs.Data_Location: PGE
+ArchiveMetadata.OrbitLastSCSecs.Mandatory: FALSE
+ArchiveMetadata.OrbitLastSCSubsecs.Value: -9999
+ArchiveMetadata.OrbitLastSCSubsecs.Data_Location: PGE
+ArchiveMetadata.OrbitLastSCSubsecs.Mandatory: FALSE
+ArchiveMetadata.UTCFSeconds.Value: -9999
+ArchiveMetadata.UTCFSeconds.Data_Location: PGE
+ArchiveMetadata.UTCFSeconds.Mandatory: FALSE
+ArchiveMetadata.UTCFSubseconds.Value: -9999
+ArchiveMetadata.UTCFSubseconds.Data_Location: PGE
+ArchiveMetadata.UTCFSubseconds.Mandatory: FALSE
+ArchiveMetadata.UTCFflag.Value: -9999
+ArchiveMetadata.UTCFflag.Data_Location: PGE
+ArchiveMetadata.UTCFflag.Mandatory: FALSE
+ArchiveMetadata.LeapSecondsFlag.Value: Data_Location, "Error processing EOS attributes", "Error processing EOS attributes"
+ArchiveMetadata.LeapSecondsFlag.PGE: "Error processing EOS attributes"
+ArchiveMetadata.LeapSecondsFlag.Mandatory: FALSE
+ArchiveMetadata.RadarSiteName.Value: "NULL"
+ArchiveMetadata.RadarSiteName.Data_Location: PGE
+ArchiveMetadata.RadarSiteName.Mandatory: FALSE
+ArchiveMetadata.RadarCity.Value: "NULL"
+ArchiveMetadata.RadarCity.Data_Location: PGE
+ArchiveMetadata.RadarCity.Mandatory: FALSE
+ArchiveMetadata.RadarState.Value: "NULL"
+ArchiveMetadata.RadarState.Data_Location: PGE
+ArchiveMetadata.RadarState.Mandatory: FALSE
+ArchiveMetadata.RadarCountry.Value: "NULL"
+ArchiveMetadata.RadarCountry.Data_Location: PGE
+ArchiveMetadata.RadarCountry.Mandatory: FALSE
+ArchiveMetadata.NumberOfVOS.Value: -9999
+ArchiveMetadata.NumberOfVOS.Data_Location: PGE
+ArchiveMetadata.NumberOfVOS.Mandatory: FALSE
+ArchiveMetadata.RadarGridOriginLatitude.Value: -9999.9
+ArchiveMetadata.RadarGridOriginLatitude.Data_Location: PGE
+ArchiveMetadata.RadarGridOriginLatitude.Mandatory: FALSE
+ArchiveMetadata.RadarGridOriginLongitude.Value: -9999.9
+ArchiveMetadata.RadarGridOriginLongitude.Data_Location: PGE
+ArchiveMetadata.RadarGridOriginLongitude.Mandatory: FALSE
+ArchiveMetadata.RadarGridOriginAltitude.Value: -9999.9
+ArchiveMetadata.RadarGridOriginAltitude.Data_Location: PGE
+ArchiveMetadata.RadarGridOriginAltitude.Mandatory: FALSE
+ArchiveMetadata.RadarGridSpacingX.Value: -9999.9
+ArchiveMetadata.RadarGridSpacingX.Data_Location: PGE
+ArchiveMetadata.RadarGridSpacingX.Mandatory: FALSE
+ArchiveMetadata.RadarGridSpacingY.Value: -9999.9
+ArchiveMetadata.RadarGridSpacingY.Data_Location: PGE
+ArchiveMetadata.RadarGridSpacingY.Mandatory: FALSE
+ArchiveMetadata.RadarGridSpacingZ.Value: -9999.9
+ArchiveMetadata.RadarGridSpacingZ.Data_Location: PGE
+ArchiveMetadata.RadarGridSpacingZ.Mandatory: FALSE
+ArchiveMetadata.RadarGridSizeX.Value: -9999
+ArchiveMetadata.RadarGridSizeX.Data_Location: PGE
+ArchiveMetadata.RadarGridSizeX.Mandatory: FALSE
+ArchiveMetadata.RadarGridSizeY.Value: -9999
+ArchiveMetadata.RadarGridSizeY.Data_Location: PGE
+ArchiveMetadata.RadarGridSizeY.Mandatory: FALSE
+ArchiveMetadata.RadarGridSizeZ.Value: -9999
+ArchiveMetadata.RadarGridSizeZ.Data_Location: PGE
+ArchiveMetadata.RadarGridSizeZ.Mandatory: FALSE
+ArchiveMetadata.DZCal.Value: -9999.9
+ArchiveMetadata.DZCal.Data_Location: PGE
+ArchiveMetadata.DZCal.Mandatory: FALSE
+ArchiveMetadata.GVL1C_Scale.Value: -9999.9
+ArchiveMetadata.GVL1C_Scale.Data_Location: PGE
+ArchiveMetadata.GVL1C_Scale.Mandatory: FALSE
+ArchiveMetadata.Alpha.Value: -9999.9
+ArchiveMetadata.Alpha.Data_Location: PGE
+ArchiveMetadata.Alpha.Mandatory: FALSE
+ArchiveMetadata.RuntimeOptions.Value: "NULL"
+ArchiveMetadata.RuntimeOptions.Data_Location: PGE
+ArchiveMetadata.RuntimeOptions.Mandatory: FALSE
+ArchiveMetadata.AnomalyFlag.Value: "NOT EMPTY"
+ArchiveMetadata.AnomalyFlag.Data_Location: PGE
+ArchiveMetadata.AnomalyFlag.Mandatory: FALSE
+ArchiveMetadata.SoftwareVersion.Value: -9999
+ArchiveMetadata.SoftwareVersion.Data_Location: PGE
+ArchiveMetadata.SoftwareVersion.Mandatory: FALSE
+ArchiveMetadata.DatabaseVersion.Value: -9999
+ArchiveMetadata.DatabaseVersion.Data_Location: PGE
+ArchiveMetadata.DatabaseVersion.Mandatory: FALSE
+ArchiveMetadata.TotalQualityCode.Value: "NULL"
+ArchiveMetadata.TotalQualityCode.Data_Location: PGE
+ArchiveMetadata.TotalQualityCode.Mandatory: FALSE
+ArchiveMetadata.LongitudeOnEquator.Value: -9999.9
+ArchiveMetadata.LongitudeOnEquator.Data_Location: PGE
+ArchiveMetadata.LongitudeOnEquator.Mandatory: FALSE
+ArchiveMetadata.UTCDateOnEquator.Value: 9999/99/99
+ArchiveMetadata.UTCDateOnEquator.Data_Location: PGE
+ArchiveMetadata.UTCDateOnEquator.Mandatory: FALSE
+ArchiveMetadata.UTCTimeOnEquator.Value: 99:99:99
+ArchiveMetadata.UTCTimeOnEquator.Data_Location: PGE
+ArchiveMetadata.UTCTimeOnEquator.Mandatory: FALSE
+ArchiveMetadata.UTCMillisecsOnEquator.Value: -9999
+ArchiveMetadata.UTCMillisecsOnEquator.Data_Location: PGE
+ArchiveMetadata.UTCMillisecsOnEquator.Mandatory: FALSE
+ArchiveMetadata.CenterScanUTCDate.Value: 9999/99/99
+ArchiveMetadata.CenterScanUTCDate.Data_Location: PGE
+ArchiveMetadata.CenterScanUTCDate.Mandatory: FALSE
+ArchiveMetadata.CenterScanUTCTime.Value: 99:99:99
+ArchiveMetadata.CenterScanUTCTime.Data_Location: PGE
+ArchiveMetadata.CenterScanUTCTime.Mandatory: FALSE
+ArchiveMetadata.CenterScanUTCMillisec.Value: -9999
+ArchiveMetadata.CenterScanUTCMillisec.Data_Location: PGE
+ArchiveMetadata.CenterScanUTCMillisec.Mandatory: FALSE
+ArchiveMetadata.FirstScanLat.Value: -9999.9
+ArchiveMetadata.FirstScanLat.Data_Location: PGE
+ArchiveMetadata.FirstScanLat.Mandatory: FALSE
+ArchiveMetadata.FirstScanLon.Value: -9999.9
+ArchiveMetadata.FirstScanLon.Data_Location: PGE
+ArchiveMetadata.FirstScanLon.Mandatory: FALSE
+ArchiveMetadata.LastScanLat.Value: -9999.9
+ArchiveMetadata.LastScanLat.Data_Location: PGE
+ArchiveMetadata.LastScanLat.Mandatory: FALSE
+ArchiveMetadata.LastScanLon.Value: -9999.9
+ArchiveMetadata.LastScanLon.Data_Location: PGE
+ArchiveMetadata.LastScanLon.Mandatory: FALSE
+ArchiveMetadata.NumberOfRainScans.Value: -9999
+ArchiveMetadata.NumberOfRainScans.Data_Location: PGE
+ArchiveMetadata.NumberOfRainScans.Mandatory: FALSE
+</textarea><p>
+
+<tr><td><td><hr>
+
+<tr>
+<td align="right" valign="top">
+<h3><a href="opendap_form_help.html#dataset_variables" target="help">Variables:</a></h3>
+<td><b>Structure DATA_GRANULE </b><br>
+<dl><dd>
+<b>Structure PlanetaryGrid </b><br>
+<dl><dd>
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate = new dods_var("DATA_GRANULE.PlanetaryGrid.percipitate", "org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate", 1);
+DODS_URL.add_dods_var(org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate"
+onclick="org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate.handle_projection_change(get_org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate) "  onfocus="describe_projection()">
+<font size="+1">percipitate</font></b>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>
+
+scan:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate.add_dim(1);
+// -->
+</script>
+longitude:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate.add_dim(360);
+// -->
+</script>
+latitude:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate.add_dim(80);
+// -->
+</script>
+<br>
+
+<textarea name="percipitate_attr" rows="5" cols="70">
+dim_0.name: scan
+dim_1.name: longitude
+dim_2.name: latitude
+</textarea>
+
+<p><p>
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_relError = new dods_var("DATA_GRANULE.PlanetaryGrid.relError", "org_opendap_DATA_GRANULE_PlanetaryGrid_relError", 1);
+DODS_URL.add_dods_var(org_opendap_DATA_GRANULE_PlanetaryGrid_relError);
+// -->
+</script>
+<b><input type="checkbox" name="get_org_opendap_DATA_GRANULE_PlanetaryGrid_relError"
+onclick="org_opendap_DATA_GRANULE_PlanetaryGrid_relError.handle_projection_change(get_org_opendap_DATA_GRANULE_PlanetaryGrid_relError) "  onfocus="describe_projection()">
+<font size="+1">relError</font></b>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>
+
+scan:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_relError_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_relError.add_dim(1);
+// -->
+</script>
+longitude:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_relError_1" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_relError.add_dim(360);
+// -->
+</script>
+latitude:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_relError_2" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
+<script type="text/javascript">
+<!--
+org_opendap_DATA_GRANULE_PlanetaryGrid_relError.add_dim(80);
+// -->
+</script>
+<br>
+
+<textarea name="relError_attr" rows="5" cols="70">
+dim_0.name: scan
+dim_1.name: longitude
+dim_2.name: latitude
+</textarea>
+
+<p><p>
+</dd></dl>
+<p><p>
+</dd></dl>
+
+<p><p>
+
+<tr><td><td>
+
+</table></form>
+
+<hr>
+
+<address>Send questions or comments to: <a href="mailto:support@opendap.org">support@opendap.org</a></address><p>
+                    <a href="http://validator.w3.org/check?uri=referer"><img
+                        src="http://www.w3.org/Icons/valid-html40"
+                        alt="Valid HTML 4.0 Transitional" height="31" width="88">
+                    </a></p>
+</body></html>

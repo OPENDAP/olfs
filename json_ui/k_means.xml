@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+/////////////////////////////////////////////////////////////////////////////
+// of the OPeNDAP Data Access Protocol.
+//
+// Copyright (c) 2011 OPeNDAP, Inc.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
+-->
+
+<!-- Build file for the REAP THREDDS/DDX/EML Crawler and related software -->
+
+<project name="KMeans" default="all" basedir=".">
+
+	<!-- Compiler Settings -->
+
+	<property name="compile.debug" value="on"/>
+	<property name="compile.debuglevel" value="lines,vars,source"/>
+	<property name="compile.deprecation" value="on"/>
+
+	<property name="modern.compiler" value="modern"/>
+	<property name="classic.compiler" value="classic"/>
+
+	<!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+	<property name="build.compiler" value="${modern.compiler}"/>
+
+	<!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+	<property name="build.sysclasspath" value="ignore"/>
+
+	<!-- ********************************************* -->
+
+	<target name="noop" description="Do Nothing Target">
+		<echo level="info" message="no-op target in ${ant.file}"/>
+	</target>
+
+	<target name="show" description="Show build settings.">
+
+		<echo level="info" message="Project Name: ${ant.project.name}"/>
+		<echo level="info" message="Project File: ${ant.file}"/>
+		<echo level="info" message=""/>
+		<echo level="info" message="Project Directories:"/>
+		<echo level="info" message="    src.dir: ${src.dir}"/>
+		<echo level="info" message="    doc.dir: ${doc.dir}"/>
+		<echo level="info" message="    lib.dir: ${lib.dir}"/>
+		<echo level="info" message="    resources.dir: ${resources.dir}"/>
+		<echo level="info" message=""/>
+		<echo level="info" message="Build Directories:"/>
+		<echo level="info" message="    build.dir: ${build.dir}"/>
+		<echo level="info" message="    build.classes: ${build.classes}"/>
+		<echo level="info" message="    build.doc: ${build.doc}"/>
+		<echo level="info" message=""/>
+		<echo level="info" message="Ant Properties:"/>
+		<echo level="info" message="    ant.file: ${ant.file}"/>
+		<echo level="info" message="    ant.home: ${ant.home}"/>
+		<echo level="info" message="    ant.java.version: ${ant.java.version}"/>
+		<echo level="info" message="    ant.project.name: ${ant.project.name}"/>
+		<echo level="info" message="    ant.version: ${ant.version}"/>
+		<echo level="info" message="    basedir: ${basedir}"/>
+		<echo level="info" message="    user.name: ${user.name}"/>
+		<echo level="info" message="    user.home: ${user.home}"/>
+		<echo level="info" message="    java.home: ${java.home}"/>
+		<echo level="info" message=""/>
+
+	</target>
+
+
+	<!-- ################################################################# -->
+	<!--                      Project Settings                             -->
+	<!-- ................................................................. -->
+
+	<!-- Project directories -->
+	<property name="src.dir" location="src"/>
+	<property name="doc.dir" location="doc"/>
+	<property name="lib.dir" location="lib"/>
+
+	<property name="resources.dir" location="resources"/>
+
+	<!-- Build Directories -->
+	<property name="build.dir" location="build"/>
+	<property name="build.classes" location="${build.dir}/classes"/>
+	<property name="build.doc" location="${build.dir}/doc"/>
+	<property name="build.dist" location="${build.dir}/dist"/>
+	<property name="build.lib" location="${build.dir}/lib"/>
+	<property name="build.run" location="${build.dir}/run"/>
+	<property name="build.libexec" location="${build.dir}/libexec"/>
+
+	<!-- Libraries -->
+    <property name="junit.lib"   value="junit-4.4.jar"/>
+    <property name="jdom.lib"    value="jdom-1.1.1.jar"/>
+    <property name="servlet.lib" value="tomcat-5.5.0-servlet.jar"/>
+    <property name="echo.lib"    value="echosoap.jar"/>
+
+    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+
+    <property name="owlim.lib"            value="owlim-3.0.beta9.jar"/>
+    <property name="trree.lib"            value="trree-3.0.beta9.jar"/>
+    <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.3.0-onejar.jar" />
+
+    <property name="commons-cli.lib"        value="commons-cli-1.2.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.1.jar"/>
+    <property name="commons-codec.lib"      value="apache-commons-codec-1.3.jar"/>
+
+    <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
+    <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
+    <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>
+
+    <property name="catalina.lib"    value="catalina-6.0.14.jar"/>
+
+    <!-- Used for metacat -->
+    <property name="metacat.lib" value="metacat-client.jar"/>
+    <property name="nceas-utilities.lib" value="nceas-utilities.jar"/>
+    <property name="httpclient.lib" value="httpclient.jar"/>
+    <property name="servlet-api.lib" value="servlet-api-2.5.jar"/>
+    <property name="catalina.lib" value="catalina-6.0.14.jar"/>
+    <property name="xalan.lib" value="xalan.jar"/>
+
+    <property name="postgres-jdbc.lib" value="postgresql-8.4-701.jdbc4.jar"/>
+
+	<!-- ******************************************** -->
+
+	<path id="classpath">
+		<pathelement path="${build.classes}" />
+        <fileset dir="${lib.dir}">
+            <include name="${slf4j.lib}" />
+            <include name="${logback-core.lib}" />
+            <include name="${logback-classic.lib}" />
+            <include name="${jdom.lib}" />
+            <include name="${commons-cli.lib}" />
+            <include name="${commons-httpclient.lib}" />
+            <include name="${saxon-jdom.lib}" />
+            <include name="${saxon-s9api.lib}" />
+            <include name="${saxon.lib}" />
+
+            <!-- Used for metacat -->
+            <include name="${metacat.lib}" />
+            <include name="${nceas-utilities.lib}"/>
+            <include name="${httpclient.lib}" />
+            <include name="${servlet-api.lib}"/>
+            <include name="${catalina.lib}"/>
+            <include name="${xalan.lib}"/>
+
+            <include name="${postgres-jdbc.lib}"/>
+        </fileset>
+	</path>
+
+    <!-- create a property containing all .jar files, prefix lib/, and seperated with a space -->
+    <pathconvert property="crawlers_libs.jar" pathsep=" ">
+        <mapper>
+            <chainedmapper>
+                <!-- remove absolute path -->
+                <flattenmapper />
+                <!-- add lib/ prefix -->
+                <globmapper from="*" to="../lib/*" />
+            </chainedmapper>
+        </mapper>
+        <path>
+            <!-- lib.home contains all jar files -->
+            <fileset dir="${lib.dir}">
+                <include name="${slf4j.lib}" />
+                <include name="${logback-core.lib}" />
+                <include name="${logback-classic.lib}" />
+                <include name="${jdom.lib}" />
+                <include name="${commons-cli.lib}" />
+                <include name="${commons-httpclient.lib}" />
+                <include name="${saxon-jdom.lib}" />
+                <include name="${saxon-s9api.lib}" />
+                <include name="${saxon.lib}" />
+
+                <!-- Used for metacat -->
+                <include name="${metacat.lib}" />
+                <include name="${nceas-utilities.lib}" />
+                <include name="${httpclient.lib}" />
+                <include name="${servlet-api.lib}" />
+                <include name="${catalina.lib}" />
+                <include name="${xalan.lib}" />
+
+                <include name="${postgres-jdbc.lib}" />
+            </fileset>
+        </path>
+    </pathconvert>
+
+	<target name="all" depends="clean,compile" description="Builds lots of stuff." />
+
+	<target name="clean" description="Remove up ALL build products.">
+		<delete dir="${build.classes}"/>
+		<delete dir="${build.doc}"/>
+		<delete dir="${build.dist}"/>
+		<delete dir="${build.lib}"/>
+		<delete dir="${build.libexec}"/>
+	</target>
+
+	<target name="init" description="Prepare all build directories.">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.classes}"/>
+		<mkdir dir="${build.doc}"/>
+		<mkdir dir="${build.dist}"/>
+		<mkdir dir="${build.lib}"/>
+		<mkdir dir="${build.run}"/>
+		<mkdir dir="${build.libexec}"/>
+
+		<tstamp/>
+		<echo level="info" message="time: ${TSTAMP}"/>
+	</target>
+
+	<target name="compile"
+            depends="init"
+            description="Compiles the clustering example.">
+		<echo level="info" message="AntFile: ${ant.file} Compiling the Clustering example"/>
+		<echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+		<echo level="info" message=""/>
+		<javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+			<classpath refid="classpath"/>
+
+			<src path="${src.dir}"/>
+			<include name="opendap/metacat/k_means/*.java"/>
+		</javac>
+	</target>
+
+
+	<!-- ******************************************************* -->
+
+	<target name="BuildJCA"
+        depends="compile"
+        description="Build the executable jar file run by the jca.sh script">
+
+		<copy file="${resources.dir}/metacat/logback.xml" todir="${build.classes}" />
+		<copy file="${resources.dir}/metacat/jca.sh" todir="${build.run}/" />
+
+		<jar destfile="${build.libexec}/Cluster.jar">
+
+			<fileset dir="${build.classes}">
+				<include name="opendap/metacat/k_means/*.class" />
+			</fileset>
+			<!-- This adds the file to the jar at the top level. Using fileset
+                 dir="..." and an <include .../> element adds the directory
+                 structure, too -->
+			<fileset file="resources/metacat/logback.xml" />
+
+			<!-- define MANIFEST.MF -->
+			<manifest>
+				<attribute name="Built-By" value="ant" />
+				<attribute name="Main-Class" value="opendap.metacat.k_means.PrgMain" />
+				<!-- finally, use the magically generated libs path -->
+				<attribute name="Class-Path" value="" />
+			</manifest>
+		</jar>
+	</target>
+
+
+	<!-- ******************************************************* -->
+
+	<target name="TestKMeans" depends="compile">
+
+		<java classname="opendap.metacat.k_means.KMeans" fork="true" dir="${build.run}">
+			<arg line="test.opendap.org"/>
+			<classpath refid="classpath" />
+		</java>
+
+	</target>
+
+</project>

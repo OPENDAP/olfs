@@ -1,0 +1,32 @@
+#!/bin/sh
+
+
+curlswitches="-gs"
+dataset="$1"
+ce=`echo "$2" | sed 's/\"/\\\"/g'`
+baselineFileName="$3"
+
+echo
+echo dataset: "$dataset"
+echo constraint: "$ce"
+echo baselineFileName: "$baselineFileName"
+
+echo url: "http://localhost:8080/opendap/data/$dataset.xxxx?$ce"
+
+echo dds
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.dds?$ce"    > "$baselineFileName.dds"
+echo das
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.das?$ce"    > "$baselineFileName.das"
+echo ddx
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.ddx?$ce"    > "$baselineFileName.ddx"
+echo dods
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.dods?$ce"   > "$baselineFileName.dods"
+echo ascii
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.ascii?$ce"  > "$baselineFileName.ascii"
+echo info
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.info"       > "$baselineFileName.info"
+echo html
+curl $curlswitches "http://localhost:8080/opendap/data/$dataset.html"       > "$baselineFileName.html"
+
+#getdap -D  "http://localhost:8080/opendap/data/$dataset?$ce"                > "$baselineFileName.data"
+

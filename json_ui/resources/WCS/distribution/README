@@ -1,0 +1,35 @@
+#############################################################################
+
+                         OPeNDAP Web Coverage Service
+
+.............................................................................
+
+
+Here you (should) have the Web Archive (war) file containing the OPeNDAP
+Web Coverage Service (WCS).
+
+To install the WCS:
+
+1) Get and install Apache Tomcat 6.x (or newer - your milage may vary) from:
+
+        http://tomcat.apache.org.
+
+
+2) Place the "WCS.war" file in the directory $TOMCAT_HOME/webapps.
+
+
+3) Start the Tomcat server.
+
+
+4) Point your favorite web browser at:
+
+        http://the.machine.on.which.you.are.running.tomcat:8080/WCS/
+
+   for to see the default presenttion page for the WCS.
+
+
+5) Find i additional instructions and information here:
+
+       http://docs.opendap.org/index.php/WCS_Service_version_1.1
+
+.............................................................................

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <property name="logdir" value="metacat"/>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/error.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>error.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="InfoLog" class="ch.qos.logback.core.FileAppender">
+        <File>${logdir}/info.log</File>
+        <Append>False</Append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DebugLog" class="ch.qos.logback.core.FileAppender">
+        <File>${logdir}/debug.log</File>
+        <Append>False</Append>        
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%thread] [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="opendap" level="ERROR">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+
+    <logger name="opendap.metacat.NCMLWriter" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    
+    <!-- 
+    <logger name="opendap.metacat.DDXCrawler" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.DDXRetriever" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.URLClassifier" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    
+    <logger name="opendap.metacat.ResponseCachePostgres" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
+    <logger name="opendap.metacat.ThreddsCatalogUtil" level="DEBUG">
+        <appender-ref ref="DebugLog"/>
+    </logger>
+    -->
+    
+    <root level="error">
+        <appender-ref ref="ErrorLog"/>
+    </root>
+    
+</configuration>

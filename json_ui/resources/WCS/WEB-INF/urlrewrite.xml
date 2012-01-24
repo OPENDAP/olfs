@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.2//EN"
+        "http://tuckey.org/res/dtds/urlrewrite3.2.dtd">
+
+<urlrewrite>
+
+    <rule>
+         <set name="doRedirect">1</set>
+    </rule>
+
+    <rule>
+        <from>^/(docs|xsl|rdf|error|wcs)(/.*)?$</from>
+        <set name="doRedirect">0</set>
+    </rule>
+
+    <rule>
+        <condition type="attribute" name="doRedirect" operator="equal">1</condition>
+        <from>^/(.*)$</from>
+        <to last="true">/wcs/$1</to>
+    </rule>
+
+
+</urlrewrite>
+

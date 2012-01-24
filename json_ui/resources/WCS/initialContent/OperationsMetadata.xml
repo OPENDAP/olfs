@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ************************************************************ -->
+<!-- * OPERATIONS METADATA                                      * -->
+<!-- ************************************************************ -->
+<ows:OperationsMetadata xmlns="http://www.opengis.net/wcs/1.1"
+                        xmlns:ows="http://www.opengis.net/ows/1.1"
+                        xmlns:xlink="http://www.w3.org/1999/xlink">
+    <ows:Operation name="GetCapabilities">
+        <ows:DCP>
+            <ows:HTTP>
+                <ows:Get xlink:href="http://your.domain.name:8080/opendap/WCS?"/>
+                <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/post">
+                    <ows:Constraint name="PostEncoding">
+                        <ows:AllowedValues>
+                            <ows:Value>XML</ows:Value>
+                        </ows:AllowedValues>
+                    </ows:Constraint>
+                </ows:Post>
+                <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/soap">
+                    <ows:Constraint name="PostEncoding">
+                        <ows:AllowedValues>
+                            <ows:Value>SOAP</ows:Value>
+                        </ows:AllowedValues>
+                    </ows:Constraint>
+                </ows:Post>
+            </ows:HTTP>
+        </ows:DCP>
+    </ows:Operation>
+    <ows:Operation name="GetCoverage">
+        <ows:DCP>
+            <ows:HTTP>
+                <ows:Get xlink:href="http://your.domain.name:8080/opendap/WCS?"/>
+                <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/post">
+                    <ows:Constraint name="PostEncoding">
+                        <ows:AllowedValues>
+                            <ows:Value>XML</ows:Value>
+                        </ows:AllowedValues>
+                    </ows:Constraint>
+                </ows:Post>
+                <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/soap">
+                    <ows:Constraint name="PostEncoding">
+                        <ows:AllowedValues>
+                            <ows:Value>SOAP</ows:Value>
+                        </ows:AllowedValues>
+                    </ows:Constraint>
+                </ows:Post>
+            </ows:HTTP>
+        </ows:DCP>
+        <ows:Parameter name="Format">
+            <ows:AllowedValues/>
+        </ows:Parameter>
+    </ows:Operation>
+    <ows:Operation name="DescribeCoverage">
+        <ows:DCP>
+            <ows:HTTP>
+                <ows:Get xlink:href="http://your.domain.name:8080/opendap/WCS?"/>
+                <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/post">
+                    <ows:Constraint name="PostEncoding">
+                        <ows:AllowedValues>
+                            <ows:Value>XML</ows:Value>
+                        </ows:AllowedValues>
+                    </ows:Constraint>
+                </ows:Post>
+                <ows:Post xlink:href="http://your.domain.name:8080/opendap/WCS/soap">
+                    <ows:Constraint name="PostEncoding">
+                        <ows:AllowedValues>
+                            <ows:Value>SOAP</ows:Value>
+                        </ows:AllowedValues>
+                    </ows:Constraint>
+                </ows:Post>
+            </ows:HTTP>
+        </ows:DCP>
+        <ows:Parameter name="Format">
+            <ows:AllowedValues>
+                <ows:Value>text/xml</ows:Value>
+            </ows:AllowedValues>
+        </ows:Parameter>
+    </ows:Operation>
+</ows:OperationsMetadata>

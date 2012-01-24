@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dataset name="200803061600_HFRadar_USEGC_6km_rtv_SIO.nc"
+         xmlns:grddl="http://www.w3.org/2003/g/data-view#"
+         grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl"
+         xmlns="http://xml.opendap.org/ns/DAP/3.3#"
+         xmlns:dap="http://xml.opendap.org/ns/DAP/3.3#"
+         dap_version="3.2"
+         xmlns:xml="http://www.w3.org/XML/1998/namespace"
+         xml:base="http://localhost:8080/opendap/coverage/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc.ddx"
+        >
+
+
+    <Attribute name="xmlTest" type="OtherXML" relationship="is-a">
+        <t:level0 xmlns:t="http://namespace.t" t:foo1="namespacedattribute" foo2="nonamespaceAttribute">
+            <t:level1>simpleContent</t:level1>
+            <t:level1>
+                <t:level2>
+                    <t:level3>simpleContent</t:level3>
+                </t:level2>
+            </t:level1>
+            TextContent of Complex Type
+        </t:level0>
+    </Attribute>
+
+
+</Dataset>

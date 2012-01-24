@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://www.opendap.org/tools/jwstest/webstart">
+  <information>
+    <title>JwsTest</title>
+    <vendor>OPeNDAP</vendor>
+    <homepage href="http://www.opendap.org/"/>
+    <description kind="short">A simple Java Web Start test application.</description>
+    <icon href="http://test.opendap.org/opendap/docs/images/opendap_logo_masthead.gif"/>
+    <offline-allowed/>
+  </information>
+
+  <security>
+    <all-permissions/>
+  </security>
+
+  <resources>
+    <j2se version="1.6+" max-heap-size="512m"/>
+    <jar href="jwstest.jar"/>
+    <jar href="slf4j.jar"/>
+    <jar href="logback-core.jar"/>
+    <jar href="logback-classic.jar"/>
+    <jar href="resources.jar"/>
+  </resources>
+
+  <application-desc main-class="opendap.experiments.JwsTest">
+      <argument>--dataset-url=http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</argument>
+      <argument>--verbose</argument>
+  </application-desc>
+</jnlp>
+

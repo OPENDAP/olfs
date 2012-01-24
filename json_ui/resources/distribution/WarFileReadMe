@@ -1,0 +1,39 @@
+#############################################################################
+
+                                 Hyrax
+
+                     OPeNDAP Lightweight Frontend Server
+.............................................................................
+
+
+Here you (should) have the Web Archive (war) file containing the Hyrax
+front end - the OLFS.
+
+To install the OLFS:
+
+1) Build and install the BES and whatever handlers you wish to use.  See:
+
+        http://www.opendap.org/download/hyrax.html
+
+   for more information on that.
+
+
+2) Get and install Apache Tomcat 6.x (or newer - your milage may vary) from:
+
+        http://tomcat.apache.org.
+
+
+3) Place the "opendap.war" file in the directory $TOMCAT_HOME/webapps.
+
+
+4) Start the Tomcat server.
+
+
+5) Point your favorite web browser at:
+
+        http://the.machine.on.which.you.are.running.tomcat:8080/opendap/docs/
+
+   for configuration information for Hyrax.
+
+
+.............................................................................

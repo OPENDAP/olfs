@@ -1,0 +1,304 @@
+<?xml version="1.0"?>
+
+<!--
+/////////////////////////////////////////////////////////////////////////////
+// This file is part of the "Hyrax" project, a Java implementation
+// of the OPeNDAP Data Access Protocol.
+//
+// Copyright (c) 2011 OPeNDAP, Inc.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+/////////////////////////////////////////////////////////////////////////////
+-->
+
+<!-- Build file for OPeNDAP core software -->
+
+<project
+        name="Java WebStart Test"
+        default="all" basedir=".">
+
+    <!-- Global Properties for Java-OPeNDAP software development -->
+
+
+    <!-- ********************************************* -->
+    <!-- Project-wide settings. All directories are    -->
+    <!-- relative to the project "Basedir" directory,  -->
+    <!-- which is assumed (by this file) to be set to  -->
+    <!-- ".."                                          -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Version Tag: Used for doing distribution builds.
+         This property should be set from the command
+         line by the distribution build script using
+         tag information from CVS.
+    -->
+    <property name="VERSION" value="Not.A.Release"/>
+
+
+    <!-- Compiler Settings -->
+
+    <property name="compile.debug" value="on"/>
+    <property name="compile.debuglevel" value="lines,vars,source"/>
+    <property name="compile.deprecation" value="on"/>
+
+    <property name="modern.compiler" value="modern"/>
+    <property name="classic.compiler" value="classic"/>
+
+    <!--  build.compiler: This is a "magic" property.
+         In the javac task, if the "compiler" property is not
+         explicitly set, then javac will use the value of this
+         property ("build.compiler") to set the compiler type.
+
+    See the online ANT Users Manual.
+    Read the section the comipler attribute of the javac task.
+    http://ant.apache.org/manual/index.html
+    -->
+    <property name="build.compiler" value="${modern.compiler}"/>
+
+
+
+    <!-- build.sysclasspath
+         This is a "magic" property. The value of the build.sysclasspath
+         property controls how the system classpath, ie. the classpath in
+         effect when Ant is run, affects the behaviour of classpaths in
+         Ant. The default behavior varies from Ant to Ant task.
+
+         The values and their meanings are:
+            only -   Only the system classpath is used and classpaths
+                     specified in build files, etc are ignored. This
+                     situation could be considered as the person running
+                     the build file knows more about the environment
+                     than the person writing the build file
+            ignore - The system classpath is ignored. This situation is
+                     the reverse of the above. The person running the
+                     build trusts the build file writer to get the build
+                     file right
+            last -   The classpath is concatenated to any specified
+                     classpaths at the end. This is a compromise, where
+                     the build file writer has priority.
+            first -  Any specified classpaths are concatenated to the
+                     system classpath. This is the other form of compromise
+                     where the build runner has priority.
+
+    Excerpted from the online ANT users Manual
+    http://ant.apache.org/manual/sysclasspath.html
+    -->
+    <property name="build.sysclasspath" value="ignore"/>
+
+
+
+
+
+    <!-- ################################################################# -->
+    <!--                      Project Settings                             -->
+    <!-- ................................................................. -->
+    <property name="keystore" value="Secret"/>
+    <property name="keystore.password" value="ReallySecret"/>
+
+
+
+    <!-- Project directories -->
+    <property name="src.dir" location="src"/>
+    <property name="doc.dir" location="doc"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="resources.dir" location="resources"/>
+    <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
+    <property name="WebInfResources.dir" location="/resources/hyrax/WEB-INF"/>
+    <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
+
+
+    <!-- Build Directories -->
+    <property name="build.dir" location="build"/>
+    <property name="build.classes" location="${build.dir}/classes"/>
+    <property name="build.doc" location="${build.dir}/doc"/>
+    <property name="build.dist" location="${build.dir}/dist"/>
+    <property name="build.webstart" location="${build.dir}/webstart"/>
+    <property name="build.lib" location="${build.dir}/lib"/>
+    <property name="build.run" location="${build.dir}/run"/>
+
+
+    <!-- Libraries -->
+
+    <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
+    <property name="logback-core.lib"     value="logback-core-0.9.26.jar"/>
+    <property name="logback-classic.lib"  value="logback-classic-0.9.26.jar"/>
+
+
+
+    <available classname="com.fortify.dev.ant.SourceanalyzerTask"
+               property="fortify.present"/>
+
+    <property name="sourceanalyzer.buildid" value="FortifyBuild"/>
+    <property name="rules.dir" value="fortify"/>
+
+
+    <!-- Library (class)paths -->
+    <path id="compile.classpath">
+        <pathelement path="${build.classes}"/>
+        <fileset dir="${lib.dir}">
+
+            <include name="${slf4j.lib}"/>
+            <include name="${logback-core.lib}"/>
+            <include name="${logback-classic.lib}"/>
+
+        </fileset>
+    </path>
+
+
+
+    <target name="all" depends="clean,releaseWebstart"
+            description="Builds lots of stuff."/>
+
+
+    <target name="clean" description="Clean up ALL build products.">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <target name="init" description="Prepare all build directories.">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.doc}"/>
+        <mkdir dir="${build.dist}"/>
+        <mkdir dir="${build.webstart}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${build.run}"/>
+
+
+        <tstamp/>
+        <echo level="info" message="time: ${TSTAMP}"/>
+    </target>
+
+
+
+
+
+
+    <target
+            name="compile"
+            depends="init"
+            description="Compiles the JwsTest."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling JwsTest"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="compile.classpath"/>
+
+            <src path="${src.dir}"/>
+            <include name="opendap/experiments/JwsTest.java"/>
+
+        </javac>
+
+    </target>
+
+
+
+
+
+
+    <path id="runtime.classpath">
+        <fileset dir="${build.dist}">
+
+            <include name="**/*.jar"/>
+
+        </fileset>
+    </path>
+
+
+
+    <target name="dist" depends="compile">
+
+        <jar destfile="${build.dist}/resources.jar">
+            <fileset dir="${doc.dir}">
+                <include name="images/logo.gif"/>
+            </fileset>
+        </jar>
+
+        <jar destfile="${build.dist}/jwstest.jar">
+            <fileset dir="${build.classes}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+
+
+        <copy file="${lib.dir}/${slf4j.lib}" todir="${build.dist}" />
+        <copy file="${lib.dir}/${logback-core.lib}" todir="${build.dist}" />
+        <copy file="${lib.dir}/${logback-classic.lib}" todir="${build.dist}" />
+
+
+    </target>
+
+
+    <target name="run" depends="dist">
+
+        <java classname="opendap.experiments.JwsTest" fork="true" dir="${build.run}">
+            <arg line="--dataset-url=http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml" />
+            <arg line="--verbose" />
+            <classpath refid="runtime.classpath" />
+        </java>
+
+    </target>
+
+
+    <target name="releaseWebstart"
+            depends="dist"
+            description="make webstart release; do dist  first">
+
+
+        <echo level="info" message="Building Java Web Start release..."/>
+        <echo level="info" message="keystore:                ${keystore}"/>
+        <echo level="info" message="keystore.password:       ${keystore.password}"/>
+
+
+
+        <copy file="${resources.dir}/experiments/jwstest.jnlp" toDir="${build.webstart}" overwrite="true"/>
+
+        <signjar alias="jwstest" jar="${build.dist}/jwstest.jar" keystore="${keystore}"
+            signedjar="${build.webstart}/jwstest.jar" storepass="${keystore.password}"/>
+
+        <signjar alias="jwstest" jar="${build.dist}/resources.jar" keystore="${keystore}"
+            signedjar="${build.webstart}/resources.jar" storepass="${keystore.password}"/>
+
+        <signjar alias="jwstest" jar="${lib.dir}/${slf4j.lib}" keystore="${keystore}"
+            signedjar="${build.webstart}/slf4j.jar" storepass="${keystore.password}"/>
+        <signjar alias="jwstest" jar="${lib.dir}/${logback-core.lib}" keystore="${keystore}"
+            signedjar="${build.webstart}/logback-core.jar" storepass="${keystore.password}"/>
+        <signjar alias="jwstest" jar="${lib.dir}/${logback-classic.lib}" keystore="${keystore}"
+            signedjar="${build.webstart}/logback-classic.jar" storepass="${keystore.password}"/>
+
+    </target>
+
+
+
+</project>
+
+
+
+
+
+
+
+
+
+

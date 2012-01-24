@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebStartConfig>
+
+    <JwsHandler className="opendap.webstart.IdvViewerRequestHandler">
+        <JnlpFileName>idv.jnlp</JnlpFileName>
+    </JwsHandler>
+
+    <JwsHandler className="opendap.webstart.NetCdfToolsViewerRequestHandler">
+        <JnlpFileName>idv.jnlp</JnlpFileName>
+    </JwsHandler>
+
+</WebStartConfig>
+

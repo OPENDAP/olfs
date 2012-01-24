@@ -1,0 +1,12 @@
+# Test the OLFS netcdf handling.
+#
+# $Id$
+
+
+global comp_output		# contains output from das-test_start
+global verbose			# this and srcdir are set by runtest.exp
+global srcdir
+
+# The `1' in compare_stdout means call xfail if the test fails.
+
+

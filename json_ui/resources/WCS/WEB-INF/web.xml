@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+        PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+        "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"
+
+
+        >
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
+
+
+
+    <display-name>Web Coverage Service</display-name>
+    <description>OPeNDAP WCS Service</description>
+
+   
+    <servlet>
+        <servlet-name>wcs</servlet-name>
+
+        <servlet-class>opendap.wcs.v1_1_2.http.Servlet</servlet-class>
+        
+        <init-param>
+            <param-name>SemanticPreload</param-name>
+            <param-value>http://xml.opendap.org/semantics/Dap_To_Wcs-1.1.owl</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>EnableUpdateUrl</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <load-on-startup>1</load-on-startup> 
+
+    </servlet>
+
+    <servlet>
+        <servlet-name>docs_servlet</servlet-name>
+        <servlet-class>opendap.coreServlet.DocServlet </servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
+
+    <servlet-mapping>
+        <servlet-name>wcs</servlet-name>
+        <url-pattern>*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>docs_servlet</servlet-name>
+        <url-pattern>/docs/*</url-pattern>
+    </servlet-mapping>
+
+
+    <session-config>
+        <session-timeout>20</session-timeout>
+    </session-config>
+
+
+
+
+    <!-- Default Error Page Definitions -->
+    <error-page>
+        <error-code>400</error-code>
+        <location>/error/error400.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error/error403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/error404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error/error500.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>501</error-code>
+        <location>/error/error501.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>502</error-code>
+        <location>/error/error502.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error/error500.jsp</location>
+    </error-page>
+
+
+</web-app>
+
+
+
+

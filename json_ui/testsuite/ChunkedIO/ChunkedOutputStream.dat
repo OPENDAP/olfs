@@ -1,0 +1,9 @@
+ChunkedOutputStream: 
+    Minimum Chunk Size:           50
+    Cache Capacity:               50
+
+    Current Cache Size:           0
+    Current Chunk Type:           'd'
+    isOpen:                       true
+
+Buffer: 0000032dI'm in ur code, testin' ur methods.Another value: 0000033d1Another value: 12Another value: 123Another value: 000003cd1234Another value: 12345Another value: 123456Another value: 0000032d1234567Another value: 12345678Another value: 123450000004d67890000000d

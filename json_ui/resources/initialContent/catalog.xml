@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+FIRST: Go Read The THREDDS Documentation:
+
+    http://www.unidata.ucar.edu/projects/THREDDS/tech/index.html#catalog
+
+    http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/InvCatalogSpec.html
+
+    http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/Primer.html
+
+    http://www.unidata.ucar.edu/projects/THREDDS/tech/cataloggen/devel/datasetScanElement.html
+
+-->
+<catalog name="THREDDS Catalog"
+        xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <!-- ************************************************************************************* -->
+
+    <service name="Hyrax" serviceType="OPeNDAP" base="/opendap/hyrax/"/>
+
+    <!-- ************************************************************************************* -->
+
+
+
+    <catalogRef xlink:href="/opendap/hyrax/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
+
+
+
+
+
+</catalog>

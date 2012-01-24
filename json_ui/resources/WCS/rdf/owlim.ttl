@@ -1,0 +1,32 @@
+################################################################
+#
+# Sesame configuration template for a owlim repository
+#
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rep: <http://www.openrdf.org/config/repository#>.
+@prefix sr: <http://www.openrdf.org/config/repository/sail#>.
+@prefix sail: <http://www.openrdf.org/config/sail#>.
+@prefix owlim: <http://www.ontotext.com/trree/owlim#>.
+
+[] a rep:Repository ;
+  rep:repositoryID "wcs" ;
+  rdfs:label "WCS Test store" ;
+  rep:repositoryImpl [
+     rep:repositoryType "openrdf:SailRepository" ;
+     sr:sailImpl [
+        sail:sailType "swiftowlim:Sail" ;
+        owlim:ruleset "Rules_builtin" ;
+        owlim:partialRDFS  "false" ;
+        owlim:noPersist "false" ;
+        owlim:storage-folder "wcs-storage" ;
+                owlim:base-URL "http://iridl.ldeo.columbia.edu/ontologies#" ;
+        owlim:new-triples-file "new-triples-file.nt" ;
+        owlim:entity-index-size "800000" ;
+        owlim:jobsize "400" ;
+                owlim:repository-type "in-memory-repository" ;
+                owlim:imports "/Users/ndp/hyrax/ioos/src/olfs/resources/WCS/rdf/owl.rdfs;/Users/ndp/hyrax/ioos/src/olfs/resources/WCS/rdf/ontologies/cf2wcs.owl;/Users/ndp/hyrax/ioos/src/olfs/resources/WCS/rdf/ontologies/dap2netcdf.owl;/Users/ndp/hyrax/ioos/src/olfs/resources/WCS/rdf/ontologies/DAPstruct.owl;/Users/ndp/hyrax/ioos/src/olfs/resources/WCS/rdf/ontologies/NetcdfConventionRegostry.owl;" ;
+                owlim:defaultNS "http://www.w3.org/2002/07/owl#"
+
+     ]
+  ].
+################################################################

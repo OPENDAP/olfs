@@ -1,0 +1,53 @@
+<title>Hyrax Installation</title>
+
+<style type="text/css">
+<!--
+.style1 {font-family: "Courier New", Courier, mono}
+-->
+</style>
+<h1 align="center"><img src="doc/images/logo.gif" width="206" height="93" align="absmiddle"></h1>
+<h1 align="center">Hyrax Installation</h1>
+<p align="center">Ver 1.0.2 </p>
+<hr>
+<p align="left">Note: For more verbose instructions, see <a href="http://docs.opendap.org/index.php/Hyrax">documentation</a>. </p>
+<h2 align="left"><strong>First:</strong> </h2>
+<blockquote>
+  <p>Build and install bes and various handler  projects. <br>
+    Launch the beslistener <br>
+  </p>
+</blockquote>
+<h2><strong>Check out the OLFS:</strong>     </h2>
+<blockquote>
+  <p class="style1">	svn co http://scm.opendap.org:8090/svn/trunk/olfs<br>
+  </p>
+</blockquote>
+<h2><strong>Build it:</strong>         </h2>
+<blockquote>
+  <p><span class="style1">ant  server</span><br>
+  </p>
+</blockquote>
+<h2><strong>Install it:</strong>       </h2>
+<blockquote>
+  <p class="style1">rm -rf $TOMCAT_HOME/webapps/opendap<br>
+  cp build/dist/opendap.war $TOMCAT_HOME/webapps</p>
+</blockquote>
+<h2><strong>Launch it:</strong>        </h2>
+<blockquote>
+  <p><span class="style1">$TOMCAT_HOME/bin/startup.sh</span><br>
+  </p>
+</blockquote>
+<h2><strong>Configure it: </strong></h2>
+<blockquote>
+  <p><span class="style1">vi $TOMCAT_HOME/content/opendap/olfs.xml
+              </span><br />
+              <br>
+    (In the <span class="style1">&lt;BES&gt;</span> element adjust the values for <span class="style1">&lt;host&gt;</span> and <span class="style1">&lt;port&gt;</span>)<br>
+  </p>
+</blockquote>
+<h2><strong>Relaunch it:</strong>      </h2>
+<blockquote>
+  <p class="style1">$TOMCAT_HOME/bin/shutdown.sh        </p>
+  <p class="style1">$TOMCAT_HOME/bin/startup.sh</p>
+</blockquote>
+<p>&nbsp;</p>
+<h2><em>Go cat. Go. </em></h2>

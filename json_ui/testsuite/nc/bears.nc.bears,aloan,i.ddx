@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset name="bears.nc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xml.opendap.org/ns/DAP2" xsi:schemaLocation="http://xml.opendap.org/ns/DAP2 http://xml.opendap.org/dap/dap2.xsd">
+    <Attribute name="NC_GLOBAL" type="Container">
+        <Attribute name="history" type="String">
+            <value>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DODS_EXTRA" type="Container">
+        <Attribute name="Unlimited_Dimension" type="String">
+            <value>k</value>
+        </Attribute>
+    </Attribute>
+    <Grid name="bears">
+        <Array name="bears">
+            <Attribute name="act" type="String">
+                <value>text string\\012\\011123</value>
+            </Attribute>
+            <Attribute name="acs" type="Int16">
+                <value>-40</value>
+            </Attribute>
+            <Attribute name="acl" type="Int32">
+                <value>17000</value>
+            </Attribute>
+            <Attribute name="acf" type="Float32">
+                <value>-2.00000000</value>
+                <value>1.00000000</value>
+                <value>0.00000000</value>
+            </Attribute>
+            <Attribute name="acd" type="Float64">
+                <value>-1.000000000000000</value>
+                <value>0.7500000000000000</value>
+            </Attribute>
+            <Attribute name="string_length" type="Int32">
+                <value>3</value>
+            </Attribute>
+            <String/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
+        <Map name="i">
+            <Attribute name="attr1" type="String">
+                <value>1</value>
+            </Attribute>
+            <Attribute name="attr2" type="String">
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+                <value>4</value>
+            </Attribute>
+            <Attribute name="i_1" type="Container">
+                <Attribute name="attr3_1" type="String">
+                    <value>17</value>
+                </Attribute>
+                <Attribute name="attr3_2" type="Float64">
+                    <value>19</value>
+                    <value>23</value>
+                    <value>27</value>
+                </Attribute>
+            </Attribute>
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+    </Grid>
+    <Grid name="aloan">
+        <Array name="aloan">
+            <Float32/>
+            <dimension name="i" size="2"/>
+            <dimension name="j" size="3"/>
+        </Array>
+        <Map name="i">
+            <Attribute name="attr1" type="String">
+                <value>1</value>
+            </Attribute>
+            <Attribute name="attr2" type="String">
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+                <value>4</value>
+            </Attribute>
+            <Attribute name="i_1" type="Container">
+                <Attribute name="attr3_1" type="String">
+                    <value>17</value>
+                </Attribute>
+                <Attribute name="attr3_2" type="Float64">
+                    <value>19</value>
+                    <value>23</value>
+                    <value>27</value>
+                </Attribute>
+            </Attribute>
+            <Int32/>
+            <dimension name="i" size="2"/>
+        </Map>
+        <Map name="j">
+            <Float32/>
+            <dimension name="j" size="3"/>
+        </Map>
+    </Grid>
+    <Array name="i">
+        <Attribute name="attr1" type="String">
+            <value>1</value>
+        </Attribute>
+        <Attribute name="attr2" type="String">
+            <value>1</value>
+            <value>2</value>
+            <value>3</value>
+            <value>4</value>
+        </Attribute>
+        <Attribute name="i_1" type="Container">
+            <Attribute name="attr3_1" type="String">
+                <value>17</value>
+            </Attribute>
+            <Attribute name="attr3_2" type="Float64">
+                <value>19</value>
+                <value>23</value>
+                <value>27</value>
+            </Attribute>
+        </Attribute>
+        <Int32/>
+        <dimension name="i" size="2"/>
+    </Array>
+    <dataBLOB href=""/>
+</Dataset>

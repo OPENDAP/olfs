@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>OPeNDAP Gateway Service</title>
+    <link rel='stylesheet' href='<CONTEXT_PATH /><SERVLET_NAME />/css/contents.css' type='text/css' />
+    <script type="text/javascript">
+        <!--
+
+        // $Id: www.js 20720 2009-04-08 21:15:29Z jimg $
+
+        // Event handlers for the disposition button.
+
+        // The ascii_button handler sends data to a new window. The user can then
+        // save the data to a file.
+
+        /*
+                <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
+                <input type="button" value="Xml Data" onclick="xmlData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
+
+        */
+
+
+        function ddx_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".ddx" ;
+            window.open(url, "DDX");
+        }
+
+        function rdf_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".rdf" ;
+            window.open(url, "RDF");
+        }
+
+        function dds_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dds";
+            window.open(url, "DDS");
+        }
+
+        function das_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".das";
+            window.open(url, "DAS");
+        }
+
+        function info_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".info";
+            window.open(url, "Dataset Information");
+        }
+
+        function dataRequestForm_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".html";
+            window.open(url, "Data Request Form");
+        }
+
+
+        function dap2data_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dods";
+            window.open(url, "DAP2 Binary Data");
+        }
+
+        function ascii_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".asc";
+            window.open(url, "ASCII Data");
+        }
+
+
+        function dataDDX_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".dap";
+            window.open(url, "DAP4 Data DDX");
+        }
+        function xmlData_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".xdods";
+            window.open(url, "XML Data Response");
+        }
+
+        function getDatasetID(){
+            var id =  convertToHex(document.forms[0].url.value);
+            document.forms[0].datasetID.value  = id;
+            return id;
+        }
+
+
+        function netcdfFileOut_button() {
+            datasetID = getDatasetID();
+            url = datasetID + ".nc";
+            window.open(url, "NetCDF File Out Response");
+        }
+
+
+
+        function convertToHex(num) {
+            var hex = '';
+            for (i = 0; i < num.length; i++) {
+                if (num.charCodeAt(i).toString(16).toUpperCase().length < 2) {
+                    hex += "0" + num.charCodeAt(i).toString(16).toUpperCase();
+                } else {
+                    hex += num.charCodeAt(i).toString(16).toUpperCase();
+                }
+            }
+            return hex;
+        }
+
+
+        function convertHexToASCII() {
+            if (document.XSS.hexhtml.value != '') {
+                var hexText = document.XSS.hexhtml.value;
+                var testText = hexText.substring(3, hexText.length).split("&#x");
+                var resultString = '';
+                var sub = '';
+                for (i = 0; i < testText.length; i++) {
+                    sub = testText[i].substring(testText[i].length - 3, testText[i].length - 1)
+                    if (sub.length < 2) {
+                        resultString += "%0" + sub;
+                        alert(sub, " - ", resultString);
+                    } else {
+                        resultString += "%" + sub;
+                    }
+                    document.XSS.ascii.value = unescape(resultString);
+                }
+            }
+        }
+
+
+        // -->
+    </script>
+</head>
+<body>
+<p></p>
+
+<img alt="OPeNDAP Logo" src='<CONTEXT_PATH /><SERVLET_NAME />/images/logo.gif'/>
+<h1>Gateway Service</h1>
+<hr/>
+<form action="">
+    <table>
+        <tr>
+            <td></td>
+
+        </tr>
+        <tr>
+            <td align="right">Data Source URL</td>
+            <td>
+                <input name="url" type="text" size="140" value=""/>
+            </td>
+
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td align="right">
+                <input type="button" value="Encode Dataset ID" onclick="getDatasetID()"/>
+
+            </td>
+            <td>
+            </td>
+
+        </tr>
+        <tr>
+            <td align="right" >
+                 <span class="medium">dataset id</span>
+            </td>
+            <td>
+                <input name="datasetID" type="text" size="140" value="" readonly />
+            </td>
+
+        </tr>
+        <tr>
+            <td align="right">
+                <input type="button" value="Data Request Form" onclick="dataRequestForm_button()"/>
+
+            </td>
+            <td>
+            </td>
+
+        </tr>
+    </table>
+    <hr />
+    <table>
+        <tr>
+            <td align="right"><span class="medium">DAP Responses</span></td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td align="right"></td>
+            <td>
+                <input type="button" value="DDX" onclick="ddx_button()"/>
+                <input type="button" value="RDF" onclick="rdf_button()"/>
+                <input type="button" value="DDS" onclick="dds_button()"/>
+                <input type="button" value="DAS" onclick="das_button()"/>
+                <input type="button" value="INFO" onclick="info_button()"/>
+            </td>
+
+        </tr>
+        <tr>
+            <td align="right"></td>
+            <td>
+                <input type="button" value="DAP2 Binary Data" onclick="dap2data_button()"/>
+                <input type="button" value="Ascii Data" onclick="ascii_button()"/>
+                <input type="button" value="DAP4 Data DDX" onclick="dataDDX_button()"/>
+                <input type="button" value="Xml Data" onclick="xmlData_button()"/>
+                <input type="button" value="NetCDF File Out" onclick="netcdfFileOut_button()"/>
+            </td>
+
+        </tr>
+    </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+
+
+
+
+    <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
+
+
+
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <pattern>${FORMAT}</pattern>
+        </encoder>
+
+    </appender>
+
+
+    <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/error.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>tests.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <pattern>${FORMAT}</pattern>
+        </encoder>
+
+    </appender>
+
+    <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/HyraxAccess.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%X{host} %X{ident} %X{userid} [%d{dd/MMM/yyyy:HH:mm:ss}] [%8X{ID}] [%X{SOURCE}]  %X{request} %m%n</pattern>
+        </encoder>
+
+    </appender>
+
+
+    <appender name="BESCommands" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/BESCommands.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logFile.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!-- keep 30 days worth of history -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{dd/MMM/yyyy:HH:mm:ss}] [request %X{ID}]      %m</pattern>
+        </encoder>
+
+    </appender>
+
+
+
+
+
+
+    <logger name="opendap" level="error">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+    
+    
+    
+    <logger name="opendap.coreServlet" level="error">
+        <appender-ref ref="stdout"/>
+    </logger>
+    
+    <logger name="opendap.coreServlet.DocServlet"         level="all"/>
+    <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
+    <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
+    <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>
+    <logger name="opendap.coreServlet.Scrub"              level="all"/>
+    <logger name="opendap.coreServlet.RequestCache"       level="all"/>
+    <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
+    
+    
+    
+    
+    <logger name="opendap.bes" level="error">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+
+    <logger name="opendap.bes.BESManager"               level="all"/>
+    <logger name="opendap.bes.BesXmlAPI"                level="all"/>
+    <logger name="opendap.bes.BES"                      level="all"/>
+    <logger name="opendap.bes.BESCrawlableDataset"      level="all"/>
+    <logger name="opendap.bes.DapDispatchHandler"       level="all"/>
+    <logger name="opendap.bes.DirectoryDispatchHandler" level="all"/>
+    <logger name="opendap.bes.ThreddsDispatchHandler"   level="all"/>
+    <logger name="opendap.bes.tdh2"                     level="all"/>
+    
+
+
+    <logger name="opendap.threddsHandler"         level="all"/>
+
+
+
+
+    
+    <logger name="opendap.WcsCatalog" level="all"/>
+    
+    <logger name="opendap.wcs" level="all">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.wcs.gatewayClient" level="all"/>
+    <logger name="opendap.wcs.v1_1_2" level="all"/>
+
+    
+    
+    
+    
+
+    <logger name="opendap.semantics" level="debug">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="DebugLog"/>
+    </logger>
+
+    <logger name="org.openrdf" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.xml" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+
+
+<!--
+    <logger name="opendap.semantics">
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.openrdf">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.xml">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+-->
+
+    <root level="error">
+        <appender-ref ref="ErrorLog"/>
+    </root>
+
+</configuration>

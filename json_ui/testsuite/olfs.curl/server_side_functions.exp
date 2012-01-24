@@ -1,0 +1,27 @@
+# Test the OLFS Server Side Functions 
+#
+# $Id$
+
+
+global comp_output		# contains output from das-test_start
+global verbose			# this and srcdir are set by runtest.exp
+global srcdir
+
+# The `1' in compare_stdout means call xfail if the test fails.
+
+
+
+
+curl_all "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat" "testsuite/ssfunc/1998-6-avhrr.dat.DateTimeConstraint_01" "DODS_URL&date_time(\\\"1998/160:17:45:00\\\")"
+curl_all "http://localhost:8080/opendap/data/ff/1998-6-avhrr.dat" "testsuite/ssfunc/1998-6-avhrr.dat.DateTimeRange_01"      "DODS_URL&date_time(\\\"1998/160:17:45:00\\\",\\\"1998/165:17:45:00\\\")"
+
+
+curl_all_but_ascii "http://localhost:8080/opendap/data/nc/coads_climatology.nc" "testsuite/ssfunc/coads_climatology.nc.geogrid().BadArgs"      "geogrid(SST)"
+curl_all "http://localhost:8080/opendap/data/nc/coads_climatology.nc" "testsuite/ssfunc/coads_climatology.nc.geogrid().Basic"        "geogrid(SST,61,-82,38,-19)"
+curl_all_but_ascii "http://localhost:8080/opendap/data/nc/coads_climatology.nc" "testsuite/ssfunc/coads_climatology.nc.geogrid().SwapCoords"   "geogrid(SST,-82,61,-19,38)"
+curl_all "http://localhost:8080/opendap/data/nc/coads_climatology.nc" "testsuite/ssfunc/coads_climatology.nc.geogrid().TimeSelect"   "geogrid(SST,61,-82,38,-19,\\\"TIME<1500\\\")"
+curl_all "http://localhost:8080/opendap/data/nc/coads_climatology.nc" "testsuite/ssfunc/coads_climatology.nc.geogrid().WholeArray"   "geogrid(SST,379,-89,0,89)"
+
+
+
+
