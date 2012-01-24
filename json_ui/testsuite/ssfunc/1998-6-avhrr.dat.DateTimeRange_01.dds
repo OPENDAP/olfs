@@ -1,5 +1,0 @@
-Dataset {
-    Sequence {
-        String DODS_URL;
-    } GSO_AVHRR;
-} 1998-6-avhrr.dat;

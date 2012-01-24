@@ -1,3 +1,0 @@
-Dataset {
-    Int32 Sea%20Surface%20Temperature[Longitude = 41][Latitude = 21];
-} 1990104h09da-gdm.hdf;
