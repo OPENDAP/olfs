@@ -32,13 +32,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  */
 public abstract class HttpResponder {
 
-    private Pattern _pattern;
+    private Pattern _requestMatchPattern;
     protected String _systemPath;
     private String pathPrefix;
 
@@ -52,23 +53,31 @@ public abstract class HttpResponder {
 
     private HttpResponder(){}
 
-    public HttpResponder(String sysPath, String pathPrefix, String regexPattern){
+    protected HttpResponder(String sysPath, String pathPrefix, String regexPattern){
         super();
-        _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
+        _requestMatchPattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
         _systemPath = sysPath;
         this.pathPrefix = pathPrefix;
     }
 
-    public Pattern getPattern(){ return _pattern;}
-    public void setPattern(String regexPattern){ _pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);}
+    public String getRequestMatchRegexString(){ return _requestMatchPattern.toString();}
+    protected void setRequestMatchRegex(String regexString){ _requestMatchPattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);}
+
+
+    protected Pattern getRequestMatchPattern(){
+        return _requestMatchPattern;
+    }
+
 
     public boolean matches(String s){
-       return _pattern.matcher(s).matches();
+       Matcher m = _requestMatchPattern.matcher(s);
+       return m.matches();
 
     }
 
 
     public void setPathPrefix(String prefix){ pathPrefix = prefix ;}
+
     public String getPathPrefix() { return pathPrefix; }
 
 
@@ -83,7 +92,7 @@ public abstract class HttpResponder {
 
 
     public void sendHttpErrorResponse(int HttpStatus, String errorMessage, String docsService, HttpServletResponse response) throws Exception {
-        String errorPageTemplate = _systemPath + "/docs/error.html.proto";
+        String errorPageTemplate = _systemPath + "/error/error.html.proto";
         sendHttpErrorResponse( HttpStatus,  errorMessage,  errorPageTemplate,  docsService, response);
     }
 

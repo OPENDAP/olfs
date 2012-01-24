@@ -23,11 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -37,37 +38,46 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
-public class DataDDX extends HttpResponder {
+public class DataDDX extends BesDapResponder {
 
 
 
     private Logger log;
 
-    private static String defaultRegex = ".*\\.dap";
+    private BesGatewayApi _besGatewayApi;
+
+    private static String defaultRequestSuffixRegex = "\\.dap";
 
 
-    public DataDDX(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DataDDX(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffixRegex, besApi);
     }
 
-    public DataDDX(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DataDDX(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffixRegex, besApi);
     }
 
+    public DataDDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        _besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
 
+
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
 
 
         MimeBoundary mb = new MimeBoundary();
@@ -83,7 +93,7 @@ public class DataDDX extends HttpResponder {
                                 "boundary=\""+mb.getBoundary()+"\"");
 
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dap4_data_ddx");
 
         // This header indicates to the client that the content of this response
@@ -107,14 +117,15 @@ public class DataDDX extends HttpResponder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesGatewayApi.getDataDDXRequest(dataSourceUrl,
+        Document reqDoc = _besGatewayApi.getDataDDXRequest(dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        maxRS,
                                                         xmlBase,
                                                         startID,
                                                         mb.getBoundary());
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());

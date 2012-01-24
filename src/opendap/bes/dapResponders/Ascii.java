@@ -24,10 +24,9 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Util;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -40,28 +39,24 @@ import java.io.OutputStream;
 
 
 
-public class Ascii extends HttpResponder {
+public class Ascii extends BesDapResponder {
 
     private Logger log;
 
-    private BesApi _besApi;
-
-
-    private static String defaultRegex = ".*\\.asc(ii)?";
+    private static String defaultRequestSuffixRegex = "\\.asc(ii)?";
 
 
     public Ascii(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
-
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public Ascii(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+    }
 
+    public Ascii(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
@@ -74,11 +69,13 @@ public class Ascii extends HttpResponder {
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String context = request.getContextPath();
 
+        BesApi besApi = getBesApi();
+
 
         log.debug("sendASCII() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ascii");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -92,12 +89,13 @@ public class Ascii extends HttpResponder {
         int maxRS = user.getMaxResponseSize();
 
 
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         Document reqDoc =
-                _besApi.getRequestDocument(
+                besApi.getRequestDocument(
                         BesApi.ASCII,
                         dataSource,
                         constraintExpression,
@@ -108,11 +106,11 @@ public class Ascii extends HttpResponder {
                         null,
                         BesApi.XML_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);
-            log.error("sendASCII() encountered a BESError: "+besError.getMessage());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
         }
 
 

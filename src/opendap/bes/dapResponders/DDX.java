@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -41,49 +41,44 @@ import java.io.OutputStream;
 
 
 
-public class DDX extends HttpResponder {
+public class DDX extends BesDapResponder {
 
 
 
     private Logger log;
-    private BesApi _besApi;
 
-
-
-    private static String defaultRegex = ".*\\.ddx";
-
+    private static String defaultRequestSuffixRegex = "\\.ddx";
 
     public DDX(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public DDX(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
+
+
+    public DDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
 
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-         sendDDX( request,  response);
-    }
-
-    public void sendDDX(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
 
 
+        BesApi besApi = getBesApi();
 
-
-        log.debug("sendDDX() for dataset: " + dataSource);
+        log.debug("Sending DDX for dataset: " + dataSource);
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ddx");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -91,12 +86,14 @@ public class DDX extends HttpResponder {
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
 
+
+
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
         Document reqDoc =
-                _besApi.getRequestDocument(
+                besApi.getRequestDocument(
                         BesApi.DDX,
                         dataSource,
                         constraintExpression,
@@ -112,9 +109,9 @@ public class DDX extends HttpResponder {
 
         log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

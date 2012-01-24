@@ -23,10 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.nciso;
 
-import opendap.bes.BESDataSource;
-import opendap.bes.BESError;
-import opendap.bes.BesXmlAPI;
-import opendap.bes.Version;
+import opendap.bes.*;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -59,6 +57,8 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 
     private Element _config;
 
+    private BesApi _besApi;
+
 
     public IsoDispatchHandler(){
         log = LoggerFactory.getLogger(getClass());
@@ -77,6 +77,8 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         isoRequestPatternRegexString = ".*\\.iso";
         isoRequestPattern = Pattern.compile(isoRequestPatternRegexString, Pattern.CASE_INSENSITIVE);
 
+
+        _besApi = new BesApi();
 
         initialized = true;
 
@@ -112,7 +114,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name);
+            DataSourceInfo dsi = new BESDataSource(name, _besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -156,7 +158,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         if(isoRequestPattern.matcher(requestURL).matches())   {
             String relativeUrl = ReqInfo.getLocalUrl(request);
             String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-            DataSourceInfo dsi = new BESDataSource(dataSource);
+            DataSourceInfo dsi = new BESDataSource(dataSource,_besApi);
 
             if (dsi.sourceExists() && dsi.isDataset()) {
                 isIsoResponse = true;
@@ -210,7 +212,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         else
             response.setContentType("text/xml");
 
-        Version.setOpendapMimeHeaders(request, response);
+        Version.setOpendapMimeHeaders(request, response, _besApi);
         response.setHeader("Content-Description", "text/xml");
 
 
@@ -224,7 +226,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         Document ddx = new Document();
 
 
-        if(!BesXmlAPI.getDDXDocument(
+        if(!_besApi.getDDXDocument(
                 dataSourceId,
                 constraintExpression,
                 xdap_accept,

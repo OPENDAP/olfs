@@ -42,6 +42,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -129,7 +132,7 @@ public class OlfsControlApi extends HttpResponder {
 
             }
             catch(NumberFormatException e){
-                log.error("Failed to parse the value of the parameter 'lines': {}",lines);
+                log.error("Failed to parse the value of the parameter 'lines': {}",Scrub.integerString(lines));
             }
 
         }
@@ -149,7 +152,8 @@ public class OlfsControlApi extends HttpResponder {
             LoggingEvent le;
             for (int i = 0; i < count; i++) {
                 le = (LoggingEvent) cyclicBufferAppender.get(i);
-                logContent.append(StringEscapeUtils.escapeHtml(formatLoggingEvent(le)));
+                //logContent.append(StringEscapeUtils.escapeHtml(formatLoggingEvent(le)));
+                logContent.append(formatLoggingEvent(le));
             }
         }
 
@@ -191,35 +195,54 @@ public class OlfsControlApi extends HttpResponder {
     }
 
 
+    private enum logLevels {all, error, warn, info, debug, off}
 
-    public String setLogLevel(HashMap<String, String> kvp){
+    public String setLogLevel(String loggerName, String level){
 
         StringBuilder sb = new StringBuilder();
-        String level = kvp.get("level");
-        String loggerName = kvp.get("logger");
-
 
         if(loggerName != null){
             Logger namedLog = (Logger) LoggerFactory.getLogger(loggerName);
-            if( level.equals("all") ){
-                namedLog.setLevel(Level.ALL);
-                sb.append(loggerName).append(" logging level set to: ").append(level);
-            }
-            else if( level.equals("error") ){
-                namedLog.setLevel(Level.ERROR);
-                sb.append(loggerName).append(" logging level set to: ").append(level);
-            }
-            else if( level.equals("warn") ){
-                namedLog.setLevel(Level.WARN);
-                sb.append(loggerName).append(" logging level set to: ").append(level);
-            }
-            else if( level.equals("info") ){
-                namedLog.setLevel(Level.INFO);
-                sb.append(loggerName).append(" logging level set to: ").append(level);
-            }
-            else if( level.equals("debug") ){
-                namedLog.setLevel(Level.DEBUG);
-                sb.append(loggerName).append(" logging level set to: ").append(level);
+
+            switch(logLevels.valueOf(level)){
+
+                case all:
+                    namedLog.setLevel(Level.ALL);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.all.toString());
+                    break;
+
+                case error:
+                    namedLog.setLevel(Level.ERROR);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.error.toString());
+                    break;
+
+                case warn:
+                    namedLog.setLevel(Level.WARN);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.warn.toString());
+                    break;
+
+                case info:
+                    namedLog.setLevel(Level.INFO);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.info.toString());
+                    break;
+
+                case debug:
+                    namedLog.setLevel(Level.DEBUG);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.debug.toString());
+                    break;
+
+                case off:
+                    namedLog.setLevel(Level.OFF);
+                    sb.append(loggerName).append(" logging level set to: ").append(logLevels.off.toString());
+                    break;
+
+                default:
+                    sb.append(loggerName).append(" ERROR! The logging level ")
+                            .append(Scrub.simpleString(level))
+                            .append(" is unrecognized. Nothing has been done.");
+                    break;
+
+
             }
         }
 
@@ -227,10 +250,9 @@ public class OlfsControlApi extends HttpResponder {
 
     }
 
-    public String getLogLevel(HashMap<String, String> kvp){
+    public String getLogLevel(String loggerName){
 
         StringBuilder sb = new StringBuilder();
-        String loggerName = kvp.get("logger");
 
 
         if(loggerName != null){
@@ -249,6 +271,15 @@ public class OlfsControlApi extends HttpResponder {
 
     }
 
+
+
+
+    private enum olfsCmds {
+        cmd, getLog, lines, getLogLevel, setLogLevel, logger, level
+    }
+
+
+
     /**
      *
      * @param kvp
@@ -256,35 +287,56 @@ public class OlfsControlApi extends HttpResponder {
      */
     public String processOlfsCommand(HashMap<String, String> kvp) {
 
+        String loggerName, logLevel;
         StringBuilder sb = new StringBuilder();
 
-        String olfsCmd = kvp.get("cmd");
+        String olfsCmd = kvp.get(olfsCmds.cmd.toString());
 
 
         if ( olfsCmd != null) {
+            switch(olfsCmds.valueOf(olfsCmd)){
+
+                case getLog :
+                    String lines = kvp.get(olfsCmds.lines.toString());
+
+                    if(lines!=null)
+                        lines = Scrub.integerString(lines);
+
+                    String log =  getOlfsLog(lines);
+                    log = StringEscapeUtils.escapeXml(log);
+                    sb.append(log);
+                    break;
 
 
-            if (olfsCmd.equals("getLog")) {
-                String lines = kvp.get("lines");
+                case getLogLevel:
+                    loggerName = getValidLoggerName(kvp.get(olfsCmds.logger.toString()));
+
+                    sb.append(getLogLevel(loggerName));
+                    break;
 
 
-                String log =  getOlfsLog(lines);
+                case setLogLevel:
+                    logLevel = kvp.get(olfsCmds.level.toString());
+                    loggerName = getValidLoggerName(kvp.get(olfsCmds.logger.toString()));
 
-                log = StringEscapeUtils.escapeXml(log);
+                    if(loggerName!=null  && logLevel!=null){
+                        sb.append(setLogLevel(loggerName, logLevel));
+                    }
+                    else {
+                        sb.append("Unable to set log level. ");
+                        sb.append("LoggerName: ").append(loggerName).append(" ");
+                        sb.append(" LogLevel: ").append(logLevel).append(" ");
+                    }
 
-                sb.append(log);
+                    break;
+
+
+                default:
+                    sb.append(" Unrecognized OLFS command: ").append(Scrub.simpleString(olfsCmd));
+                    break;
+
             }
-            else if (olfsCmd.equals("getLogLevel")){
 
-                sb.append(getLogLevel(kvp));
-            }
-            else if (olfsCmd.equals("setLogLevel")){
-
-                sb.append(setLogLevel(kvp));
-            }
-            else  {
-                sb.append(" Unrecognized OLFS command: ").append(Scrub.simpleString(olfsCmd));
-            }
         }
         else {
 
@@ -295,6 +347,34 @@ public class OlfsControlApi extends HttpResponder {
         return sb.toString();
 
 
+    }
+
+
+
+
+
+
+    private static String javaClassNameInclusionRegex = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*";
+    private static Pattern javaClassNameInclusionPattern = Pattern.compile(javaClassNameInclusionRegex);
+
+    private boolean isJavaClassName(String loggerName) {
+        Matcher m = javaClassNameInclusionPattern.matcher(loggerName);
+        return m.matches();
+    }
+
+
+    private String getValidLoggerName(String loggerName){
+
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        for (ch.qos.logback.classic.Logger logger : lc.getLoggerList()) {
+            if(logger.getName().equals(loggerName))
+                return logger.getName();
+        }
+
+
+
+        return null;
     }
 
 

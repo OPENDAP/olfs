@@ -500,8 +500,6 @@ public class XMLfromRDF {
 
     /**
      * Create the SeRQLquery string using the parent (URI) and the parent class (URI).
-     * @param parentstr
-     * @param parentclassstr
      * @return  a SeRQL query string
      */
 	private String createQueryString()  throws InterruptedException{		

@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Element;
@@ -48,6 +49,8 @@ public class VersionDispatchHandler implements DispatchHandler {
     private org.slf4j.Logger log;
     private boolean initialized;
 
+    private BesApi _besApi;
+
     public VersionDispatchHandler() {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -61,6 +64,7 @@ public class VersionDispatchHandler implements DispatchHandler {
         if (initialized) return;
 
 
+        _besApi = new BesApi();
 
         initialized = true;
 
@@ -154,7 +158,7 @@ public class VersionDispatchHandler implements DispatchHandler {
 
         PrintStream ps = new PrintStream(response.getOutputStream());
 
-        Document vdoc = BesXmlAPI.getCombinedVersionDocument();
+        Document vdoc = _besApi.getCombinedVersionDocument();
 
         if (vdoc == null) {
             throw new ServletException("Internal Error: Version Document not initialized.");

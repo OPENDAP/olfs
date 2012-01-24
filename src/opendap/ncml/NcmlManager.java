@@ -3,7 +3,7 @@ package opendap.ncml;
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.BesXmlAPI;
+import opendap.bes.dapResponders.BesApi;
 import opendap.namespaces.*;
 import opendap.ppt.PPTException;
 import opendap.threddsHandler.ThreddsCatalogUtil;
@@ -68,6 +68,10 @@ public class NcmlManager {
      *
      */
     private static ConcurrentHashMap<String, Long> _ncmlDatasetsLastModifiedTimes = new ConcurrentHashMap<String,Long>();
+
+
+
+    private static BesApi _besApi = new BesApi();
 
 
 
@@ -198,7 +202,7 @@ public class NcmlManager {
 
 
         try {
-            if(!BesXmlAPI.besTransaction(bes,besCmd,response)){
+            if(!_besApi.besTransaction(bes,besCmd,response)){
                 log.error("Failed to ingest NcML dataset '{}' BES Error Object: {}",dapAccessID,xmlo.outputString(response));
             }
         } catch (BadConfigurationException e) {

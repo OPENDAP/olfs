@@ -517,6 +517,10 @@ public class DispatchServlet extends HttpServlet {
                                                   HttpServletResponse res)
             throws IOException {
 
+
+
+        Util.probeRequest(this, req);
+
         if (ReqInfo.isServiceOnlyRequest(req)) {
             String reqURI = req.getRequestURI();
             String newURI = reqURI+"/";

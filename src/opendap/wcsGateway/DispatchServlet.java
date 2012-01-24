@@ -23,6 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcsGateway;
 
+import opendap.bes.dapResponders.BesApi;
+import opendap.dap.User;
 import opendap.logging.LogUtil;
 import org.slf4j.Logger;
 import org.jdom.Document;
@@ -34,13 +36,13 @@ import java.net.URL;
 import java.net.URISyntaxException;
 
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import opendap.coreServlet.*;
 import opendap.bes.Version;
 import opendap.bes.BESError;
-import opendap.wcs.gatewayClient.BesAPI;
 
 /**
  * User: ndp
@@ -53,13 +55,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
     private Logger log;
 
-    String systemPath;
+    private String systemPath;
+
+    private BesApi _besApi;
 
 
     private AtomicInteger reqNumber;
 
 
-    public void init() {
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        _besApi = new BesApi();
         reqNumber = new AtomicInteger(0);
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         systemPath = ServletUtil.getSystemPath(this,"");
@@ -84,11 +91,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             return true;
         }
         return false;
-    }
-
-
-    private String getName(HttpServletRequest req) {
-        return req.getPathInfo();
     }
 
 
@@ -151,7 +153,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
             if (!redirect(request, response)) {
 
-                String name = getName(request);
+                String name = request.getPathInfo();
 
                 log.debug("The client requested this: " + name);
 
@@ -245,7 +247,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendDDS() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -258,17 +260,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.DDS,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesAPI.DAP2_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.DDS,
+                wcsRequestURL,
+                constraintExpression,
+                xdap_accept,
+                0,
+                null,
+                null,
+                null,
+                BesApi.DAP2_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
 
             String msg = new String(erros.toByteArray());
             log.error("sendDDS() encountered a BESError: "+msg);
@@ -294,7 +297,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendDAS() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -306,17 +309,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.DAS,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesAPI.DAP2_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.DAS,
+                wcsRequestURL,
+                constraintExpression,
+                xdap_accept,
+                0,
+                null,
+                null,
+                null,
+                BesApi.DAP2_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAS() encountered a BESError: "+msg);
             os.write(msg.getBytes());
@@ -337,12 +341,14 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+
+        String requestUrl = request.getRequestURL().toString();
+        String xmlBase = requestUrl.substring(0,requestUrl.lastIndexOf(".ddx"));
 
         log.debug("sendDDX() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -354,17 +360,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.DDX,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        xmlBase,
-                                                        null,
-                                                        null,
-                                                        BesAPI.DAP2_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.DDX,
+                wcsRequestURL,
+                constraintExpression,
+                xdap_accept,
+                0,
+                xmlBase,
+                null,
+                null,
+                BesApi.DAP2_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDDX() encountered a BESError: "+msg);
             os.write(msg.getBytes());
@@ -386,10 +393,13 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
+
         log.debug("sendDAP2Data() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -401,17 +411,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.DAP2,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesAPI.DAP2_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.DAP2,
+                wcsRequestURL,
+                constraintExpression,
+                xdap_accept,
+                maxRS,
+                null,
+                null,
+                null,
+                BesApi.DAP2_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAP2Data() encountered a BESError: "+msg);
             os.write(msg.getBytes());
@@ -433,10 +444,13 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         String context = request.getContextPath();
 
+        User user = new User(request);
+        int maxRS = user.getMaxResponseSize();
+
         log.debug("sendASCII() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -448,17 +462,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.ASCII,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesAPI.XML_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.ASCII,
+                wcsRequestURL,
+                constraintExpression,
+                xdap_accept,
+                maxRS,
+                null,
+                null,
+                null,
+                BesApi.XML_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
 
             BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(systemPath, context, response);
@@ -483,7 +498,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendINFO() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -495,17 +510,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.INFO_PAGE,
-                                                        wcsRequestURL,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        BesAPI.XML_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.INFO_PAGE,
+                wcsRequestURL,
+                constraintExpression,
+                xdap_accept,
+                0,
+                null,
+                null,
+                null,
+                BesApi.XML_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
 
             BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(systemPath, context, response);
@@ -531,7 +547,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,_besApi);
         response.setHeader("Content-Description", "dods_form");
 
 
@@ -556,17 +572,18 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesAPI.getRequestDocument(
-                                                        BesAPI.HTML_FORM,
-                                                        wcsRequestURL,
-                                                        null,
-                                                        xdap_accept,
-                                                        null,
-                                                        url,
-                                                        null,
-                                                        BesAPI.XML_ERRORS);
+        Document reqDoc = _besApi.getRequestDocument(
+                BesApi.HTML_FORM,
+                wcsRequestURL,
+                null,
+                xdap_accept,
+                0,
+                null,
+                url,
+                null,
+                BesApi.XML_ERRORS);
 
-        if(!BesAPI.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besApi.besTransaction(dataSource, reqDoc, os, erros)){
 
             BESError besError = new BESError( new ByteArrayInputStream(erros.toByteArray()));
 

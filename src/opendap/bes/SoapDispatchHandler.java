@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
 import opendap.coreServlet.DispatchServlet;
@@ -293,7 +294,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                                       HttpServletResponse response)
             throws Exception{
 
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, new BesApi());
     }
 
 

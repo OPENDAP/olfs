@@ -183,7 +183,7 @@ public class LogUtil {
         if (isLogInit)
             return;
 
-        System.out.println("+++LogUtil.initLogging()");
+        System.out.println("+++LogUtil.initLogging() - path='"+path+"'");
 
         // set up the log path
         if (!path.endsWith("/"))

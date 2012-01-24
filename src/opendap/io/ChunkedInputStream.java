@@ -51,27 +51,50 @@ public class ChunkedInputStream  {
 
     private int currentChunkType;
 
+    private ChunkProtocol chunkProtocol;
+
 
     //private byte[] transferBuffer;
 
 
 
 
-    /**
+/**
      * Wraps an input stream and interprets it as a chunked stream.
      * @param stream to wrap
+     * @param chunkProtocol the chunking protocol
      */
-    public ChunkedInputStream(InputStream stream){
+    public ChunkedInputStream(InputStream stream, ChunkProtocol chunkProtocol){
+
         super();
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
+
+        this.chunkProtocol = chunkProtocol;
         is = stream;
         currentChunkHeader = new byte[Chunk.HEADER_SIZE];
         //transferBuffer     = new byte[Chunk.MAX_SIZE];
         currentChunkType   = Chunk.DATA;
         isClosed           = false;
     }
+
+
+    /**
+         * Wraps an input stream and interprets it as a chunked stream.
+         * @param stream to wrap
+         */
+        public ChunkedInputStream(InputStream stream){
+            super();
+
+            log = org.slf4j.LoggerFactory.getLogger(getClass());
+
+            is = stream;
+            currentChunkHeader = new byte[Chunk.HEADER_SIZE];
+            //transferBuffer     = new byte[Chunk.MAX_SIZE];
+            currentChunkType   = Chunk.DATA;
+            isClosed           = false;
+        }
 
 
 

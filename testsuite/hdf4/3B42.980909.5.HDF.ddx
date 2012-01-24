@@ -1,11 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Dataset name="3B42.980909.5.HDF"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xmlns="http://xml.opendap.org/ns/DAP2"
-xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/dap2.xsd">
-
-    <Attribute name="HDF_GLOBAL" type="Container">
-    </Attribute>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Dataset name="3B42.980909.5.HDF" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xml.opendap.org/ns/DAP2" xsi:schemaLocation="http://xml.opendap.org/ns/DAP2 http://xml.opendap.org/dap/dap2.xsd">
+    <Attribute name="HDF_GLOBAL" type="Container"/>
     <Attribute name="CoreMetadata" type="Container">
         <Attribute name="OrbitNumber" type="Container">
             <Attribute name="Value" type="Int32">
@@ -1332,7 +1327,6 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             </Attribute>
         </Attribute>
     </Attribute>
-
     <Structure name="DATA_GRANULE">
         <Structure name="PlanetaryGrid">
             <Array name="percipitate">
@@ -1379,6 +1373,5 @@ xsi:schemaLocation="http://xml.opendap.org/ns/DAP2  http://xml.opendap.org/dap/d
             </Array>
         </Structure>
     </Structure>
-
     <dataBLOB href=""/>
 </Dataset>

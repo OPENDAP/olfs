@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
 import org.jdom.Document;
@@ -42,40 +43,45 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DAS extends HttpResponder {
+public class DAS extends BesDapResponder {
 
 
     private Logger log;
 
 
-    private static String defaultRegex = ".*\\.das";
+    private BesGatewayApi _besGatewayApi;
+
+    private static String defaultRequestSuffixRegex = "\\.das";
 
 
-    public DAS(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DAS(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffixRegex, besApi);
     }
 
-    public DAS(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    public DAS(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffixRegex, besApi);
+    }
 
+    public DAS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        _besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
 
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
-
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
 
         log.debug("sendDAS() for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -87,17 +93,18 @@ public class DAS extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.DAS,
+        Document reqDoc = _besGatewayApi.getRequestDocument(
+                                                        BesApi.DAS,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.DAP2_ERRORS);
+                                                        BesApi.DAP2_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendDAS() encountered a BESError: "+msg);
             os.write(msg.getBytes());

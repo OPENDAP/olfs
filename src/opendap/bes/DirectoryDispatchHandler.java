@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServlet;
@@ -56,6 +57,9 @@ public class DirectoryDispatchHandler implements DispatchHandler {
     private String systemPath;
 
 
+    private BesApi _besApi;
+
+
     public DirectoryDispatchHandler() {
 
 
@@ -73,6 +77,8 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         dispatchServlet = s;
         systemPath = ServletUtil.getSystemPath(s,"");
+
+        _besApi = new BesApi();
 
 
 
@@ -110,7 +116,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name);
+            DataSourceInfo dsi = new BESDataSource(name,_besApi);
             log.debug("getLastModified():  Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -167,7 +173,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 isContentsRequest = true;
 
         } else {
-            DataSourceInfo dsi = new BESDataSource(dsName);
+            DataSourceInfo dsi = new BESDataSource(dsName,_besApi);
             if (dsi.sourceExists() &&
                     dsi.isNode() ) {
                     isDirectoryResponse = true;
@@ -251,19 +257,21 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Document showCatalogDoc = new Document();
 
-        if(BesXmlAPI.getCatalog(collectionName,showCatalogDoc)){
+        if(_besApi.getCatalog(collectionName,showCatalogDoc)){
 
             log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-            String xsltDoc = systemPath + "/docs/xsl/contents.xsl";
+            String xsltDoc = systemPath + "/xsl/contents.xsl";
 
             Transformer transformer = new Transformer(xsltDoc);
 
             transformer.setParameter("dapService",oreq.getDapServiceLocalID());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
             transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
+            if(FileDispatchHandler.allowDirectDataSourceAccess())
+                transformer.setParameter("allowDirectDataSourceAccess","true");
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(besCatalog, response.getOutputStream());

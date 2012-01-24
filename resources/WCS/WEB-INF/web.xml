@@ -7,7 +7,10 @@
 
         >
 
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    version="2.5">
 
 
 
@@ -34,6 +37,14 @@
 
     </servlet>
 
+    <servlet>
+        <servlet-name>docs_servlet</servlet-name>
+        <servlet-class>opendap.coreServlet.DocServlet </servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
 
     <servlet-mapping>
         <servlet-name>wcs</servlet-name>
@@ -41,10 +52,9 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>default</servlet-name>
+        <servlet-name>docs_servlet</servlet-name>
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
-
 
 
     <session-config>
@@ -57,31 +67,31 @@
     <!-- Default Error Page Definitions -->
     <error-page>
         <error-code>400</error-code>
-        <location>/docs/error400.jsp</location>
+        <location>/error/error400.jsp</location>
     </error-page>
     <error-page>
         <error-code>403</error-code>
-        <location>/docs/error403.jsp</location>
+        <location>/error/error403.jsp</location>
     </error-page>
     <error-page>
         <error-code>404</error-code>
-        <location>/docs/error404.jsp</location>
+        <location>/error/error404.jsp</location>
     </error-page>
     <error-page>
         <error-code>500</error-code>
-        <location>/docs/error500.jsp</location>
+        <location>/error/error500.jsp</location>
     </error-page>
     <error-page>
         <error-code>501</error-code>
-        <location>/docs/error501.jsp</location>
+        <location>/error/error501.jsp</location>
     </error-page>
     <error-page>
         <error-code>502</error-code>
-        <location>/docs/error502.jsp</location>
+        <location>/error/error502.jsp</location>
     </error-page>
     <error-page>
         <exception-type>java.lang.Throwable</exception-type>
-        <location>/docs/error500.jsp</location>
+        <location>/error/error500.jsp</location>
     </error-page>
 
 

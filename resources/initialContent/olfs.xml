@@ -86,7 +86,7 @@
             <Handler className="opendap.bes.FileDispatchHandler" >
 
                 <!-- AllowDirectDataSourceAccess
-                  - If this element is opresent then the server will allow users to request
+                  - If this element is present then the server will allow users to request
                   - the data source (file) directly. For example a user could just get the
                   - underlying NetCDF files located on the server without using the OPeNDAP
                   - request interface.

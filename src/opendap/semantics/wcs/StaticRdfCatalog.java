@@ -179,7 +179,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         try {
 
             catalog.resourcePath = workingDir;
-            catalog.catalogCacheDirectory = workingDir + "/repositorycache/";
+            catalog.catalogCacheDirectory = workingDir + "repositorycache/";
 
             String configFileName;
 
@@ -219,7 +219,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         }
 
     }
-    /*******************************************************/
+
 
     /**
      *
@@ -782,7 +782,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
 
         HashMap<String, String> lmtfc;
-        String contextLMT;
+        String coverageLMT;
         String coverageID;
         Element idElement;
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
@@ -791,12 +791,14 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         RepositoryConnection con = null;
 
 
+        // Get the children of the CoverageDescription element in buildDoc. jhrg 12/21/11
         List coverageDescriptions = buildDoc.getDoc().getRootElement().getChildren();
 
         try {
 
             con = repository.getConnection();
-            lmtfc = RepositoryOps.getLastModifiedTimesForContexts(con);
+            lmtfc = getLastModifiedTimesForWcsCoverages(con);
+
 
             for (Object o : coverageDescriptions) {
                 Element cde = (Element) o;
@@ -805,44 +807,51 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
                 if (idElement != null) {
                     coverageID = idElement.getTextTrim();
-                    contextLMT = lmtfc.get(coverageID);
+                    coverageLMT = lmtfc.get(coverageID);
 
-                    String dateTime = contextLMT.substring(0, 10) + " " + contextLMT.substring(11, 19) + " +0000";
-                    log.debug("ingestWcsCatalog(): CoverageDescription '" + coverageID + "' has a last modified time of " + dateTime);
-                    lastModifiedTime = sdf.parse(dateTime).getTime();
-                    CoverageDescription coverageDescription = ingestWcsCoverageDescription(cde, lastModifiedTime);
-
-                    if (_catalogLastModifiedTime < lastModifiedTime)
-                        _catalogLastModifiedTime = lastModifiedTime;
-
-                    if (coverageDescription != null) {
-
-                        for (String fieldID : coverageDescription.getFieldIDs()) {
-                            log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
-
-                            dapVariableID = getDapGridId(con, coverageID, fieldID);
-                            coverageDescription.setDapGridArrayId(fieldID, dapVariableID);
-
-                            dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
-
-                            dapVariableID = getLongitudeCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setLongitudeCoordinateDapId(fieldID, dapVariableID);
-
-                            dapVariableID = getElevationCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setElevationCoordinateDapId(fieldID, dapVariableID);
-
-                            dapVariableID = getTimeCoordinateDapId(con, coverageID, fieldID);
-                            coverageDescription.setTimeCoordinateDapId(fieldID, dapVariableID);
-
-                            String timeUnits = getTimeUnits(con, coverageID, fieldID);
-                            coverageDescription.setTimeUnits(fieldID, timeUnits);
-                        }
-
+                    if(coverageLMT == null){
+                        log.error("ingestWcsCatalog(): Failed to obtain last modified time for coverage "+coverageID);
+                        log.error("ingestWcsCatalog(): CoverageDescription "+coverageID+" cannot be ingested. Skipping...");
                     }
+                    else {
+                        String dateTime = coverageLMT.substring(0, 10) + " " + coverageLMT.substring(11, 19) + " +0000";
+                        log.debug("ingestWcsCatalog(): CoverageDescription '" + coverageID + "' has a last modified time of " + dateTime);
+                        lastModifiedTime = sdf.parse(dateTime).getTime();
+                        CoverageDescription coverageDescription = ingestWcsCoverageDescription(cde, lastModifiedTime);
 
-                    log.debug("ingestWcsCatalog(): Ingested CoverageDescription '" + coverageID + "'");
+                        if (_catalogLastModifiedTime < lastModifiedTime)
+                            _catalogLastModifiedTime = lastModifiedTime;
 
+                        if (coverageDescription != null) {
+
+                            for (String fieldID : coverageDescription.getFieldIDs()) {
+                                log.debug("Getting DAP Coordinate IDs for FieldID: " + fieldID);
+
+                                dapVariableID = getDapGridId(con, coverageID, fieldID);
+                                coverageDescription.setDapGridArrayId(fieldID, dapVariableID);
+
+                                dapVariableID = getLatitudeCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setLatitudeCoordinateDapId(fieldID, dapVariableID);
+
+                                dapVariableID = getLongitudeCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setLongitudeCoordinateDapId(fieldID, dapVariableID);
+
+                                dapVariableID = getElevationCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setElevationCoordinateDapId(fieldID, dapVariableID);
+
+                                dapVariableID = getTimeCoordinateDapId(con, coverageID, fieldID);
+                                coverageDescription.setTimeCoordinateDapId(fieldID, dapVariableID);
+
+                                String timeUnits = getTimeUnits(con, coverageID, fieldID);
+                                coverageDescription.setTimeUnits(fieldID, timeUnits);
+                            }
+
+                        }
+                        log.debug("ingestWcsCatalog(): Ingested CoverageDescription '" + coverageID + "'");
+                    }
+                }
+                else {
+                    log.error("ingestWcsCatalog(): Failed to obtain wcs:Identifier for a generated wcs:Coverage.");
                 }
 
             }
@@ -888,6 +897,82 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
 
         return cd;
     }
+
+
+
+    /**
+     * Returns a Hash containing last modified times of each context (URI) in the
+     * repository, keyed by the context name.
+     * @param con A connection to the repository from which to harvest the contexts and their associated last
+     * modified times.
+     * @return a HashMap of last modified times and context pair.
+     */
+    public HashMap<String, String> getLastModifiedTimesForWcsCoverages(RepositoryConnection con) throws InterruptedException {
+        TupleQueryResult result = null;
+        String ltmodstr = "";
+        String idstr = "";
+        HashMap<String, String> idltm = new HashMap<String, String>();
+        String queryString = "SELECT DISTINCT id, lmt "
+                + "FROM "
+                + "{doc} wcs:CoverageDescription {cd} wcs:Identifier {id},"
+                + "{doc} rdfcache:"+Terms.lastModified.getLocalId() +" {lmt} "
+                + "using namespace "
+                + "rdfcache = <"+ Terms.rdfCacheNamespace+">, "
+                + "wcs= <http://www.opengis.net/wcs/1.1#>";
+
+
+        try {
+
+            log.debug("Query for wcs:Coverage last modified times: {} ",queryString);
+
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SERQL,
+                    queryString);
+            result = tupleQuery.evaluate();
+
+            BindingSet bindingSet;
+            Value valueOfID = null;
+            Value valueOfLMT;
+
+
+            log.debug("Query for wcs:Coverage last modified times. result.hasNext(): {} ",result.hasNext());
+
+            while (result.hasNext()) {
+                bindingSet = (BindingSet) result.next();
+
+                valueOfLMT = (Value) bindingSet.getValue("lmt");
+                ltmodstr = valueOfLMT.stringValue();
+
+                valueOfID = (Value) bindingSet.getValue("id");
+                idstr = valueOfID.stringValue();
+
+                idltm.put(idstr, ltmodstr);
+
+                // log.debug("ID:" + valueOfID.stringValue());
+                // log.debug("LMT:" + valueOfLMT.stringValue());
+
+            }
+        } catch (QueryEvaluationException e) {
+            log.error("getLastModifiedTimesForWcsCoverages(): Caught a QueryEvaluationException! Msg: "
+                    + e.getMessage());
+        } catch (RepositoryException e) {
+            log.error("getLastModifiedTimesForWcsCoverages(): Caught a RepositoryException! Msg: " + e.getMessage());
+        } catch (MalformedQueryException e) {
+            log.error("getLastModifiedTimesForWcsCoverages(): Caught a MalformedQueryException! Msg: "
+                    + e.getMessage());
+        } finally {
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (Exception e) {
+                    log.error("getLastModifiedTimesForWcsCoverages(): Caught an "+e.getClass().getName()+" Msg: " + e.getMessage());
+                }
+            }
+        }
+
+        return idltm;
+    }
+    /*******************************************************/
+
 
     /**
      * Check if the coverage exists.
@@ -1092,7 +1177,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
     }
 
     /**
-     * Get the Dap Id of the dap Grid variable associated with the passed WCS filed ID.
+     * Get the Dap Id of the dap Grid variable associated with the passed WCS field ID.
      * @param con - connection to the repository.
      * @param coverageId - coverage ID.
      * @param fieldId - field ID.

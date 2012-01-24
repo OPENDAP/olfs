@@ -24,6 +24,7 @@
 
 package opendap.bes;
 
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.DataSourceInfo;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -58,14 +59,17 @@ public class BESDataSource implements DataSourceInfo {
 
     private String requestedDataSource;
 
+    private BesApi _besApi;
+
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
-    public BESDataSource(String dataSourceName) throws Exception {
+    public BESDataSource(String dataSourceName, BesApi besApi) throws Exception {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
+        _besApi = besApi;
 
         requestedDataSource = dataSourceName;
         exists              = false;
@@ -78,10 +82,22 @@ public class BESDataSource implements DataSourceInfo {
 
         Document info = new Document();
 
+        if(besApi == null){
+            exists        = false;
+            accessible    = false;
+            node          = false;
+            data          = false;
+            name          = null;
+            size          = -1;
+            lastModified  = null;
+            log.error("BESDataSource(): Received a null value for the BesApi instance!");
+
+            return;
+        }
 
 
 
-        if(BesXmlAPI.getInfo(dataSourceName,info)){
+        if(besApi.getInfo(dataSourceName,info)){
 
             exists      = true;
             accessible  = true;
@@ -122,11 +138,12 @@ public class BESDataSource implements DataSourceInfo {
         }
         else {
 
+
             BESError err = new BESError(info);
 
             exists        = !err.notFound();
             accessible    = !err.forbidden();
-            node = false;
+            node          = false;
             data          = false;
             name          = null;
             size          = -1;

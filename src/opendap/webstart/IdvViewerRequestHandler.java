@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.webstart;
 
-import opendap.bes.BesXmlAPI;
 import opendap.namespaces.DAP;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 
 import java.io.*;
 import java.util.Iterator;
-import java.util.Scanner;
 
 public class IdvViewerRequestHandler extends JwsHandler {
 

@@ -126,24 +126,26 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
         HttpResponder hr;
         Pattern p;
 
-        hr = new DDX(systemPath,_prefix);
+        BesGatewayApi besApi = new BesGatewayApi();
+
+        hr = new DDX(systemPath,_prefix,besApi);
 
         responders.add(hr);
 
-        responders.add(new DDS(systemPath,_prefix));
-        responders.add(new DAS(systemPath,_prefix));
-        responders.add(new RDF(systemPath,_prefix));
+        responders.add(new DDS(systemPath, _prefix, besApi));
+        responders.add(new DAS(systemPath,_prefix, besApi));
+        responders.add(new RDF(systemPath,_prefix,besApi));
 
-        responders.add(new HtmlDataRequestForm(systemPath,_prefix));
-        responders.add(new DatasetInfoHtmlPage(systemPath,_prefix));
+        responders.add(new HtmlDataRequestForm(systemPath,_prefix, besApi));
+        responders.add(new DatasetInfoHtmlPage(systemPath,_prefix, besApi));
 
-        responders.add(new Dap2Data(systemPath,_prefix));
-        responders.add(new Ascii(systemPath,_prefix));
+        responders.add(new Dap2Data(systemPath,_prefix, besApi));
+        responders.add(new Ascii(systemPath,_prefix, besApi));
 
 
-        responders.add(new DataDDX(systemPath,_prefix));
-        responders.add(new NetcdfFileOut(systemPath,_prefix));
-        responders.add(new XmlData(systemPath,_prefix));
+        responders.add(new DataDDX(systemPath,_prefix, besApi));
+        responders.add(new NetcdfFileOut(systemPath,_prefix, besApi));
+        responders.add(new XmlData(systemPath,_prefix, besApi));
 
         responders.add(new GatewayForm(systemPath,_prefix));
 
@@ -151,6 +153,8 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         _initialized = true;
     }
+
+
 
 
 
@@ -317,14 +321,12 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
         log.debug("The client requested this: " + name);
 
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-
         String requestURL = request.getRequestURL().toString();
 
         for (HttpResponder r : responders) {
             if (r.matches(requestURL)) {
                 log.info("The request URL: " + requestURL + " matches " +
-                        "the pattern: \"" + r.getPattern() + "\"");
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 r.respondToHttpGetRequest(request, response);
                 return;

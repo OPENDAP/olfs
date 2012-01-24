@@ -23,6 +23,7 @@ package opendap.hai;
 
 import opendap.bes.BES;
 import opendap.bes.BESManager;
+import opendap.bes.BesAdminFail;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.Scrub;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -38,10 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +50,9 @@ public class BesControlApi extends HttpResponder {
     private Logger log;
 
     private static String defaultRegex = ".*\\/besctl";
+
+
+
 
 
 
@@ -92,7 +93,7 @@ public class BesControlApi extends HttpResponder {
     }
 
 
-    private void controlApi(HttpServletRequest request, HttpServletResponse response, boolean isPost)throws Exception {
+    private void controlApi(HttpServletRequest request, HttpServletResponse response, boolean isPost) throws IOException {
 
 
 
@@ -111,8 +112,14 @@ public class BesControlApi extends HttpResponder {
 
         HashMap<String,String> kvp = Util.processQuery(request);
 
-        String status = processBesCommand(kvp, isPost);
+        String status = null;
+        try {
+            status = processBesCommand(kvp, isPost);
+        }
+        catch (BesAdminFail baf){
+            status = baf.getMessage();
 
+        }
         PrintWriter output = response.getWriter();
 
         //@todo work this out to not escape everything.
@@ -243,14 +250,27 @@ public class BesControlApi extends HttpResponder {
 
     }
 
+
+    private enum besCmds {
+        cmd, prefix,
+        Start, StopNice, StopNow,
+        getConfig, module, setConfig, CONFIGURATION,
+        getLog, lines, getLoggerState, setLoggerState, logger, state, setLoggerStates, enable, disable, on, off
+    }
+
+
+
+
     /**
      *
      * @param kvp
      * @return
      */
-    public String processBesCommand(HashMap<String, String> kvp, boolean isPost) {
+    public String processBesCommand(HashMap<String, String> kvp, boolean isPost) throws BesAdminFail {
 
         StringBuilder sb = new StringBuilder();
+        StringBuilder status = new StringBuilder();
+        String module, loggerName, loggerState;
 
         String besCmd = kvp.get("cmd");
         String currentPrefix = kvp.get("prefix");
@@ -260,107 +280,150 @@ public class BesControlApi extends HttpResponder {
 
             BES bes = BESManager.getBES(currentPrefix);
 
-            if (besCmd.equals("Start")) {
-                sb.append(processStatus(bes.start()));
-            }
-            else if (besCmd.equals("StopNice")) {
-                sb.append(processStatus(bes.stopNice(3000)));
-            }
-            else if (besCmd.equals("StopNow")) {
-                sb.append(processStatus(bes.stopNow()));
-            }
+            if(bes!=null){
+
+                switch(besCmds.valueOf(besCmd)){
+
+                    case Start:
+                        sb.append(processStatus(bes.start()));
+                        break;
+
+                    case StopNice:
+                        sb.append(processStatus(bes.stopNice(3000)));
+                        break;
+
+                    case StopNow:
+                        sb.append(processStatus(bes.stopNow()));
+                        break;
+
+                    case getConfig:
+                        module = kvp.get(besCmds.module.toString());
+                        /*
+                        sb.append("You issued a getConfig command");
+                        if(module!=null)
+                            sb.append(" for module '").append(module).append("'.\n");
+                        else
+                            sb.append(".\n");
+                         */
+                        status.append(bes.getConfiguration(module));
+                        sb.append(status);
+                        break;
 
 
-            else if (besCmd.equals("getConfig")) {
-                String module = kvp.get("module");
+                    case setConfig:
+                        String submittedConfiguration  = kvp.get(besCmds.CONFIGURATION.toString());
+                        if(isPost && submittedConfiguration!=null ){
+
+                            module = kvp.get(besCmds.module.toString());
+
+                            /*
+                            sb.append("You issued a setConfig command");
+                            if(module!=null)
+                                sb.append(" for module '").append(module).append("'.\n");
+                            else
+                                sb.append(".\n");
+
+                            sb.append("Your Configuration: \n");
+                            sb.append(submittedConfiguration);
+                             */
+
+                            status.append(bes.setConfiguration(module, submittedConfiguration));
+                            sb.append(processStatus(status.toString()));
+
+                        }
+                        else {
+                            sb.append("In order to use the setConfig command you MUST supply a configuration via HTTP POST content.\n");
+                        }
+                        break;
 
 
-                /*
-                sb.append("You issued a getConfig command");
-                if(module!=null)
-                    sb.append(" for module '").append(module).append("'.\n");
-                else
-                    sb.append(".\n");
-                 */
+                    case getLog:
+                        String logLines = kvp.get("lines");
+                        String logContent =  bes.getLog(logLines);
+                        logContent = besLogTailResponse(logContent);
 
-                String status = bes.getConfiguration(module);
-                sb.append(status);
-            }
+                        logContent = StringEscapeUtils.escapeXml(logContent);
+
+                        sb.append(logContent);
+                        break;
 
 
-            else if (besCmd.equals("setConfig")) {
-                String submittedConfiguration  = kvp.get("CONFIGURATION");
-                if(isPost && submittedConfiguration!=null ){
+                    case getLoggerState:
+                        loggerName = getValidLoggerName(bes, kvp.get(besCmds.logger.toString()));
 
-                    String module = kvp.get("module");
+                        status.append(bes.getLoggerState(loggerName));
 
-                    /*
-                    sb.append("You issued a setConfig command");
-                    if(module!=null)
-                        sb.append(" for module '").append(module).append("'.\n");
-                    else
-                        sb.append(".\n");
+                        sb.append(status);
+                        break;
 
-                    sb.append("Your Configuration: \n");
-                    sb.append(submittedConfiguration);
-                     */
 
-                    String status = bes.setConfiguration(module, submittedConfiguration);
-                    sb.append(processStatus(status));
+                    case setLoggerState:
+                        loggerName = getValidLoggerName(bes, kvp.get(besCmds.logger.toString()));
+
+                        if(loggerName != null){
+                            loggerState = getValidLoggerState(kvp.get(besCmds.state.toString()));
+
+                            status = new StringBuilder();
+
+                            status.append(bes.setLoggerState(loggerName,loggerState)).append("\n");
+
+                            sb.append(status);
+
+                        }
+                        else {
+                            sb.append("User requested an unknown logger.");
+                        }
+
+
+                        break;
+
+
+                    case setLoggerStates:
+                        String enabledLoggers = kvp.get(besCmds.enable.toString());
+
+                        String disabledLoggers = kvp.get(besCmds.disable.toString());
+
+
+                        status = new StringBuilder();
+                        for (String enabledLoggerName : enabledLoggers.split(",")) {
+
+                            loggerName = getValidLoggerName(bes, enabledLoggerName);
+
+                            if (loggerName != null)
+                                status.append(bes.setLoggerState(loggerName, besCmds.on.toString())).append("\n");
+                        }
+
+                        for (String disabledLoggerName : disabledLoggers.split(",")) {
+
+                            loggerName = getValidLoggerName(bes, disabledLoggerName);
+
+                            if (loggerName != null)
+                                status.append(bes.setLoggerState(loggerName, besCmds.off.toString())).append("\n");
+
+                        }
+
+                        sb.append(status);
+                        break;
+
+
+                    default:
+                        sb.append(" Unrecognized BES command: ").append(Scrub.simpleString(besCmd));
+                        break;
+
 
                 }
-                else {
-                    sb.append("In order to use the setConfig command you MUST supply a configuration via HTTP POST content.\n");
-                }
+
+
             }
-            else if (besCmd.equals("getLog")) {
-                String lines = kvp.get("lines");
-                String log =  bes.getLog(lines);
-                log = besLogTailResponse(log);
-
-                log = StringEscapeUtils.escapeXml(log);
-
-                sb.append(log);
+            else {
+                String cleanPrefix = Scrub.fileName(currentPrefix);
+                sb.append("There is no BES available for prefix '").append(cleanPrefix).append("'");
+                log.error("OUCH!! The BESManager failed to return a BES for the prefix '{}'. " +
+                        "This should never happen! " +
+                        "The BES with prefix '/' should always be available and it handle all unmapped prefix " +
+                        "values.",cleanPrefix);
             }
-            else if (besCmd.equals("getLoggerState")) {
-                String loggerName = kvp.get("logger");
 
-                String status =  bes.getLoggerState(loggerName);
-
-                sb.append(status);
-            }
-            else if (besCmd.equals("setLoggerState")) {
-                String loggerName = kvp.get("logger");
-
-                String loggerState = kvp.get("state");
-
-                String status =  bes.setLoggerState(loggerName,loggerState);
-
-                sb.append(status);
-            }
-            else if (besCmd.equals("setLoggerStates")) {
-                String enabled = cleanLoggerNames(kvp.get("enable"));
-
-                String disabled = cleanLoggerNames(kvp.get("disable"));
-
-                TreeMap<String, BES.BesLogger> validLoggers = bes.getBesLoggers();
-
-                StringBuilder status = new StringBuilder();
-                for(String enabledLoggerName : enabled.split(",")){
-                    if(validLoggers.containsKey(enabledLoggerName))
-                        status.append(bes.setLoggerState(enabledLoggerName,"on")).append("\n");
-                }
-
-                for(String disabledLoggerName : disabled.split(",")){
-                    if(validLoggers.containsKey(disabledLoggerName))
-                        status.append(bes.setLoggerState(disabledLoggerName,"off")).append("\n");
-                }
-
-                sb.append(status);
-            }
-            else  {
-                sb.append(" Unrecognized BES command: ").append(Scrub.simpleString(besCmd));
-            }
         }
         else {
 
@@ -375,23 +438,29 @@ public class BesControlApi extends HttpResponder {
 
 
 
-    private static String loggerNameInclusionRegex = "[a-zA-Z0-9_,]*";
-    private static String loggerNameExclusionRegex = "[^a-zA-Z0-9_,]";
-    private static Pattern loggerNameInclusionPattern = Pattern.compile(loggerNameInclusionRegex);
 
-    private String cleanLoggerNames(String s){
-        if(s==null)
-            return null;
-        Matcher m = loggerNameInclusionPattern.matcher(s);
-        log.debug("URL() - Scrubbing String: "+s+"   white list pattern: "+ loggerNameInclusionRegex +"    matches: "+m.matches());
-        if(m.matches()){
-            return s;
+    private String getValidLoggerName(BES bes, String loggerName) throws BesAdminFail {
+
+        TreeMap<String,BES.BesLogger> validLoggers = bes.getBesLoggers();
+        if(validLoggers.containsKey(loggerName)){
+            BES.BesLogger besLogger = validLoggers.get(loggerName);
+            return besLogger.getName();
         }
-        else {
-            return s.replaceAll(loggerNameExclusionRegex,"#");
-        }
+
+        log.debug("User requested unknown BES logger: '{}'", loggerName);
+
+        return null;
+
     }
 
+    private String getValidLoggerState(String loggerState) throws BesAdminFail {
+
+        if(!loggerState.equals(besCmds.on.toString()))
+            loggerState = besCmds.off.toString();
+
+        return besCmds.on.toString();
+
+    }
 
 
 

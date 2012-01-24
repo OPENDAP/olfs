@@ -1,30 +1,8 @@
-/////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
-//
-//
-// Copyright (c) 2011 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-/////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
-import opendap.bes.BesXmlAPI;
 import opendap.bes.BadConfigurationException;
+import opendap.bes.BesDapResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.namespaces.BES;
 import org.jdom.Document;
@@ -35,21 +13,21 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 
 /**
- * This child class of opendap.bes.BesXmlAPI provides an implementation of the
- * getRequestDocument method that utilizes the BES wcs_gateway_module. The
- * intention was to Animal the methd from the parent class but that didn't
- * work out (can't Animal static methods? I don't know why) So the
- * implementation of the DAP dispatch methods had to be recreated.
- *
- * @see opendap.wcs.gatewayClient.WcsDispatchHandler
- *
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: 11/28/11
+ * Time: 5:17 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class BesGatewayApi extends BesXmlAPI {
+public class BesGatewayApi extends BesApi {
 
 
-    private static Logger log;
-    static {
-        log = org.slf4j.LoggerFactory.getLogger(BesGatewayApi.class);
+    private Logger log;
+
+    public BesGatewayApi(){
+        super();
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     }
 
 
@@ -66,14 +44,35 @@ public class BesGatewayApi extends BesXmlAPI {
      * @param returnAs See opendap.bes.BesXmlAPI
      * @param errorContext See opendap.bes.BesXmlAPI
      * @return The request Document
-     * @throws BadConfigurationException When the bad things happen.
-     * @see opendap.bes.BesXmlAPI
+     * @throws opendap.bes.BadConfigurationException When the bad things happen.
+     *
+     *
+     *
+     *
+     *
+     *     public  Document getRequestDocument(String type,
+                                                String dataSource,
+                                                String ce,
+                                                String xdap_accept,
+                                                int maxResponseSize,
+                                                String xmlBase,
+                                                String formURL,
+                                                String returnAs,
+                                                String errorContext)
+                throws BadConfigurationException {
+
+     *
+     *
+     *
+     *
+     * @see opendap.bes.dapResponders.BesApi
      */
-   // @Override
-    public static  Document getRequestDocument(String type,
+    @Override
+    public Document getRequestDocument(String type,
                                                 String remoteDataSourceUrl,
                                                 String ce,
                                                 String xdap_accept,
+                                                int maxResponseSize,
                                                 String xmlBase,
                                                 String formURL,
                                                 String returnAs,
@@ -94,12 +93,16 @@ public class BesGatewayApi extends BesXmlAPI {
         else
             request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
-        request.addContent(setContextElement(EXPICIT_CONTAINERS_CONTEXT,"no"));
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
         request.addContent(setContextElement(ERRORS_CONTEXT,errorContext));
 
         if(xmlBase!=null)
             request.addContent(setContextElement(XMLBASE_CONTEXT,xmlBase));
+
+        if(maxResponseSize>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,maxResponseSize+""));
+
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
 
@@ -124,7 +127,7 @@ public class BesGatewayApi extends BesXmlAPI {
 
     }
 
-    public static String getDataSourceUrl(HttpServletRequest req, String pathPrefix) throws MalformedURLException {
+    public String getDataSourceUrl(HttpServletRequest req, String pathPrefix) throws MalformedURLException {
 
 
         String relativeURL = ReqInfo.getLocalUrl(req);
@@ -169,15 +172,16 @@ public class BesGatewayApi extends BesXmlAPI {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public static Document getDataDDXRequest(String dataSource,
+    public Document getDataDDXRequest(String dataSource,
                                          String ce,
                                          String xdap_accept,
+                                         int maxResponseSize,
                                          String xmlBase,
                                          String contentID,
                                          String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,xmlBase,null,null,XML_ERRORS);
+        Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,maxResponseSize,xmlBase,null,null,XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
 

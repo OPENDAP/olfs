@@ -110,7 +110,6 @@
     
     <logger name="opendap.dap.Request"         level="all"/>
     
-    <logger name="opendap.hai"         level="all"/>
 
     
     <logger name="opendap.coreServlet.ReqInfo"            level="info"/>

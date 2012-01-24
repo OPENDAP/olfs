@@ -24,8 +24,8 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.Version;
+import opendap.bes.BesDapResponder;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.HttpResponder;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -43,26 +43,30 @@ import java.io.*;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class XmlData extends HttpResponder {
+public class XmlData extends BesDapResponder {
     private Logger log;
 
-    private BesApi _besApi;
 
 
-    private static String defaultRegex = ".*\\.xdods";
 
+    private static String defaultRequestSuffixRegex = "\\.xdods";
 
     public XmlData(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
-    public XmlData(String sysPath, String pathPrefix,BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+    public XmlData(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
+
+
+
+    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -72,8 +76,9 @@ public class XmlData extends HttpResponder {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = request.getRequestURL().toString();
+        String xmlBase = getXmlBase(request);
 
+        BesApi besApi = getBesApi();
 
 
 
@@ -82,7 +87,7 @@ public class XmlData extends HttpResponder {
 
 
         response.setContentType("text/xml");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -100,7 +105,7 @@ public class XmlData extends HttpResponder {
 
 
         Document reqDoc =
-                _besApi.getRequestDocument(
+                besApi.getRequestDocument(
                         BesApi.XML_DATA,
                         dataSource,
                         constraintExpression,
@@ -114,11 +119,11 @@ public class XmlData extends HttpResponder {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("respondToHttpGetRequest() - _besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
-            log.error("sendDDX() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }

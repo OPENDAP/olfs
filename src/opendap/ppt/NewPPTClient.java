@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.ppt;
 
+import opendap.io.ChunkProtocol;
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -169,7 +170,9 @@ public class NewPPTClient {
         }
 
         _out = new BESChunkedOutputStream(_rawOut);
-        _in = new ChunkedInputStream(_rawIn);
+
+
+        _in = new ChunkedInputStream(_rawIn, new PPTSessionProtocol());
 
         return true;
     }

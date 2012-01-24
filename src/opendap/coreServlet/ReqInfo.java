@@ -38,9 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Provides utility methods that perform "analysis" of the user request and return important componet strings
  * for the OPeNDAP servlet.
  *
- * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+ * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
  * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
- * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+ * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
  * <p><b>Examples:</b>
  * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds?lat,lon,time&lat>72.0<br/>
  * Then the:</li>
@@ -122,20 +122,16 @@ public class ReqInfo {
 
         String pathInfo = request.getPathInfo();
 
+        String serviceContext = requestUri;
+        if(pathInfo != null)
+            serviceContext = requestUri.substring(0, requestUri.lastIndexOf(pathInfo));
 
-        String serviceContext = requestUri.substring(0, requestUri.lastIndexOf(pathInfo));
+
 
         return serviceContext;
 
     }
 
-    /**
-     * Returns the full source name for this request. This is essentially the same as the value
-     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
-     * is null then the full source name is "/".
-     * @param req The client request.
-     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
-     */
     public static String getLocalUrl(HttpServletRequest req){
 
         String name=req.getPathInfo();
@@ -149,27 +145,6 @@ public class ReqInfo {
     }
 
 
-    /**
-     * Returns the full source name for this request. This is essentially the same as the value
-     * of HttpServletRequest.getPathInfo() except that it is never null. If HttpServletRequest.getPathInfo()
-     * is null then the full source name is "/".
-     * @param req The client request.
-     * @return The FullSourceName = (HttpServletRequest.getPathInfo()==null?"/":HttpServletRequest.getPathInfo())
-     */
-    public static String getLocalUrl(HttpServletRequest req,String pathPrefix){
-
-
-
-
-        String name=req.getPathInfo();
-
-        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
-            name = "/";
-
-        }
-        return name;
-
-    }
 
 
 
@@ -251,7 +226,7 @@ public class ReqInfo {
 
         }
 
-        log.debug("  requestSuffix:  " + requestSuffix);
+        log.debug("  requestSuffixRegex:  " + requestSuffix);
 
         return requestSuffix;
 
@@ -306,16 +281,16 @@ public class ReqInfo {
 
 
     /**
-     * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+     * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
      * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
-     * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+     * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
      * <p><b>Examples:</b>
      * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
      * Then the:</li>
      * <ul>
      * <li> dataSetName = fnoc1.nc </li>
      * <li> dataSourceName = /opendap/nc/fnoc1.nc </li>
-     * <li> requestSuffix = dds </li>
+     * <li> requestSuffixRegex = dds </li>
      * </ul>
      *
      * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
@@ -323,7 +298,7 @@ public class ReqInfo {
      * <ul>
      * <li> dataSetName = null </li>
      * <li> dataSourceName = /opendap/nc/ </li>
-     * <li> requestSuffix = "" </li>
+     * <li> requestSuffixRegex = "" </li>
      * </ul>
      * </ul>
      *
@@ -363,16 +338,16 @@ public class ReqInfo {
 
 
     /**
-     * The dataSourceName is the local URL path of the request, minus any requestSuffix detected. So, if the request is
+     * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
      * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
-     * requestSuffix. If the request is for a collection, then the dataSourceName is the complete local path.
+     * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
      * <p><b>Examples:</b>
      * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
      * Then the:</li>
      * <ul>
      * <li> dataSetName = fnoc1.nc </li>
      * <li> dataSourceName = /opendap/nc/fnoc1.nc </li>
-     * <li> requestSuffix = dds </li>
+     * <li> requestSuffixRegex = dds </li>
      * </ul>
      *
      * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
@@ -380,7 +355,7 @@ public class ReqInfo {
      * <ul>
      * <li> dataSetName = null </li>
      * <li> dataSourceName = /opendap/nc/ </li>
-     * <li> requestSuffix = "" </li>
+     * <li> requestSuffixRegex = "" </li>
      * </ul>
      * </ul>
      *
@@ -486,11 +461,15 @@ public class ReqInfo {
     public static boolean isServiceOnlyRequest(HttpServletRequest req){
         String contextPath = req.getContextPath();
         String servletPath = req.getServletPath();
+
+
+
         String reqURI = req.getRequestURI();
 
         String serviceName = contextPath + servletPath;
 
-        if (reqURI.equals(serviceName)) {
+
+        if (reqURI.equals(serviceName) && !reqURI.endsWith("/")) {
             return true;
         }
         return false;

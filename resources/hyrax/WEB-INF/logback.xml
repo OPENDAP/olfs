@@ -82,19 +82,10 @@
     </logger>
 
 
-    <logger name="opendap.hai" level="debug" />
-
-
-
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="all">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
-
-    <logger name="DocServletAccess" level="all">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-
 
 
     <root level="error">

@@ -24,10 +24,11 @@
 package opendap.gateway.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -42,7 +43,7 @@ import java.io.OutputStream;
 
 
 
-public class DatasetInfoHtmlPage extends HttpResponder {
+public class DatasetInfoHtmlPage extends BesDapResponder {
 
 
 
@@ -50,34 +51,39 @@ public class DatasetInfoHtmlPage extends HttpResponder {
 
 
 
-    private static String defaultRegex = ".*\\.info";
+    private BesGatewayApi _besGatewayApi;
+
+    private static String defaultRequestSuffixRegex = "\\.info";
 
 
-    public DatasetInfoHtmlPage(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DatasetInfoHtmlPage(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffixRegex, besApi);
     }
 
-    public DatasetInfoHtmlPage(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffixRegex, besApi);
     }
 
+    public DatasetInfoHtmlPage(String sysPath, String pathPrefix,  String requestSuffixRegex, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        _besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    }
+
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
 
         log.debug("sendINFO() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -89,17 +95,18 @@ public class DatasetInfoHtmlPage extends HttpResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.INFO_PAGE,
+        Document reqDoc = _besGatewayApi.getRequestDocument(
+                                                        BesApi.INFO_PAGE,
                                                         dataSourceUrl,
                                                         constraintExpression,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         null,
                                                         null,
-                                                        BesGatewayApi.XML_ERRORS);
+                                                        BesApi.XML_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath, context, response);

@@ -24,8 +24,9 @@
 package opendap.gateway.dapResponders;
 
 import opendap.bes.BESError;
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
-import opendap.coreServlet.HttpResponder;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.gateway.BesGatewayApi;
 import org.jdom.Document;
@@ -44,30 +45,35 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class HtmlDataRequestForm extends HttpResponder {
+public class HtmlDataRequestForm extends BesDapResponder {
 
 
 
-    Logger log;
+    private Logger log;
 
 
-    private static String defaultRegex = ".*\\.html?";
+    private BesGatewayApi _besGatewayApi;
+
+    private static String defaultRequestSuffixRegex = "\\.html?";
 
 
-    public HtmlDataRequestForm(String sysPath) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+    public HtmlDataRequestForm(String sysPath, BesGatewayApi besApi) {
+        this(sysPath, null, defaultRequestSuffixRegex, besApi);
     }
 
-    public HtmlDataRequestForm(String sysPath, String pathPrefix) {
-        super(sysPath, pathPrefix, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    public HtmlDataRequestForm(String sysPath, String pathPrefix, BesGatewayApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffixRegex, besApi);
+    }
 
+    public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffixRegex, BesGatewayApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        _besGatewayApi = besApi;
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
 
 
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
@@ -75,14 +81,14 @@ public class HtmlDataRequestForm extends HttpResponder {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
-        String dataSourceUrl = BesGatewayApi.getDataSourceUrl(request, getPathPrefix());
+        String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();
 
 
         log.debug("sendHTMLRequestForm() for dataset: " + dataSource);
 
         response.setContentType("text/html");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response, _besGatewayApi);
         response.setHeader("Content-Description", "dods_form");
 
 
@@ -107,17 +113,18 @@ public class HtmlDataRequestForm extends HttpResponder {
 
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = BesGatewayApi.getRequestDocument(
-                                                        BesGatewayApi.HTML_FORM,
+        Document reqDoc = _besGatewayApi.getRequestDocument(
+                                                        BesApi.HTML_FORM,
                                                         dataSourceUrl,
                                                         null,
                                                         xdap_accept,
+                                                        0,
                                                         null,
                                                         url,
                                                         null,
-                                                        BesGatewayApi.XML_ERRORS);
+                                                        BesApi.XML_ERRORS);
 
-        if(!BesGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!_besGatewayApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
 

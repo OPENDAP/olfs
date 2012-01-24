@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
+import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.HttpResponder;
 import org.jdom.Document;
 import org.slf4j.Logger;
 
@@ -41,27 +41,28 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DDS extends HttpResponder {
+public class DDS extends BesDapResponder {
 
 
     private Logger log;
 
-    private BesApi _besApi;
 
 
-    private static String defaultRegex = ".*\\.dds";
+    private static String defaultRequestSuffixRegex = "\\.dds";
 
 
     public DDS(String sysPath, BesApi besApi) {
-        super(sysPath, null, defaultRegex);
-        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
+        this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
     public DDS(String sysPath, String pathPrefix, BesApi besApi) {
-        super(sysPath, pathPrefix, defaultRegex);
+        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+    }
+
+
+    public DDS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        _besApi = besApi;
     }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -74,12 +75,13 @@ public class DDS extends HttpResponder {
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
+        BesApi besApi = getBesApi();
 
 
-        log.debug("sendDDS() for dataset: " + dataSource);
+        log.debug("Sending DDS for dataset: " + dataSource);
 
         response.setContentType("text/plain");
-        Version.setOpendapMimeHeaders(request,response);
+        Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
@@ -88,11 +90,10 @@ public class DDS extends HttpResponder {
         String xdap_accept = request.getHeader("XDAP-Accept");
 
 
-
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = _besApi.getRequestDocument(
+        Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.DDS,
                                                         dataSource,
                                                         constraintExpression,
@@ -103,10 +104,10 @@ public class DDS extends HttpResponder {
                                                         null,
                                                         BesApi.DAP2_ERRORS);
 
-        if(!_besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
-            log.error("sendDDS() encountered a BESError: "+msg);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
         }
 

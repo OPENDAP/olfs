@@ -28,9 +28,15 @@
     <WcsCatalog>
         <useUpdateCatalogThread updateInterval="28800" firstUpdateDelay="3"/>
 
+        <RdfImport>http://iri.columbia.edu/~benno/opendaptest/daptestpreload.owl</RdfImport>
+
         <dataset>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
         <dataset>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
         <dataset>http://test.opendap.org:8080/opendap/ioos/mday_joinExist.ncml.ddx</dataset>
+
+        <dataset>http://test.opendap.org:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</dataset>
+        <dataset>http://test.opendap.org:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml</dataset>
+        <dataset>http://test.opendap.org:8090/opendap/ioos/mday_joinExist.ncml.ddx</dataset>
 
 
         <!--

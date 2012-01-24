@@ -59,12 +59,15 @@ public class DapDispatcher implements DispatchHandler {
     private Element _config;
     private Vector<HttpResponder> responders;
 
+    private BesApi _besApi;
+
 
     public DapDispatcher(){
         log = LoggerFactory.getLogger(getClass());
         responders = new Vector<HttpResponder>();
 
     }
+
 
 
 
@@ -83,6 +86,8 @@ public class DapDispatcher implements DispatchHandler {
 
         if(initialized) return;
 
+        _besApi = besApi;
+
         _config = config;
         Element besApiImpl = _config.getChild("BesApiImpl");
         if(besApiImpl!=null){
@@ -96,12 +101,17 @@ public class DapDispatcher implements DispatchHandler {
                 log.debug("Loading BesApi from configuration.");
                 besApi = (BesApi) classDefinition.newInstance();
             }
-            else {
-
-            }
             log.debug("Using BesApi implementation: {}",besApi.getClass().getName());
 
         }
+
+        //boolean allowDirectDataSourceAccess = false;
+        //Element dv = config.getChild("AllowDirectDataSourceAccess");
+        //if(dv!=null){
+        //    allowDirectDataSourceAccess = true;
+        //}
+
+
 
         dispatchServlet = servlet;
 
@@ -132,6 +142,9 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new NetcdfFileOut(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
 
+        //DatasetFileAccess  dfa = new DatasetFileAccess(systemPath, besApi);
+        //dfa.setAllowDirectDataSourceAccess(allowDirectDataSourceAccess);
+        //responders.add(dfa);
 
 
 
@@ -177,15 +190,15 @@ public class DapDispatcher implements DispatchHandler {
 
         DataSourceInfo dsi;
 
-        log.debug("The client requested this: " + besDataSourceId);
+        log.debug("The client requested this BES DataSource: " + besDataSourceId);
 
 
-        String requestURL = request.getRequestURL().toString();
 
         for (HttpResponder r : responders) {
-            if (r.matches(requestURL)) {
-                log.info("The request URL: " + requestURL + " matches " +
-                        "the pattern: \"" + r.getPattern() + "\"");
+            log.debug(r.getPathPrefix());
+            if (r.matches(relativeUrl)) {
+                log.info("The relative URL: " + relativeUrl + " matches " +
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
                 dsi = getDataSourceInfo(besDataSourceId);
                 if(dsi.isDataset()){
                     if(sendResponse)
@@ -222,7 +235,7 @@ public class DapDispatcher implements DispatchHandler {
         for (HttpResponder r : responders) {
             if (r.matches(requestURL)) {
                 log.info("The request URL: " + requestURL + " matches " +
-                        "the pattern: \"" + r.getPattern() + "\"");
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 try {
                     log.debug("getLastModified(): Getting datasource info for "+dataSource);
@@ -246,7 +259,7 @@ public class DapDispatcher implements DispatchHandler {
     }
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new BESDataSource(dataSourceName);
+        return new BESDataSource(dataSourceName,_besApi);
     }
 
 

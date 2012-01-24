@@ -31,15 +31,15 @@ time_origin: 1-JAN-0000 00:00:00<br>
 modulo:  <br>
 </td>
 </tr><tr><td align=right valign=top><b>SST</b>:</td>
-<td align=left valign=top>Grid<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: SEA SURFACE TEMPERATURE<br>
 history: From coads_climatology<br>
 units: Deg C<br>
 <table>
 <td align=right valign=top><b>SST</b>:</td>
-<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: SEA SURFACE TEMPERATURE<br>
 history: From coads_climatology<br>
 units: Deg C<br>
@@ -60,15 +60,15 @@ point_spacing: even<br>
 </td>
 </tr></table>
 </tr><tr><td align=right valign=top><b>AIRT</b>:</td>
-<td align=left valign=top>Grid<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: AIR TEMPERATURE<br>
 history: From coads_climatology<br>
 units: DEG C<br>
 <table>
 <td align=right valign=top><b>AIRT</b>:</td>
-<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: AIR TEMPERATURE<br>
 history: From coads_climatology<br>
 units: DEG C<br>
@@ -89,15 +89,15 @@ point_spacing: even<br>
 </td>
 </tr></table>
 </tr><tr><td align=right valign=top><b>UWND</b>:</td>
-<td align=left valign=top>Grid<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: ZONAL WIND<br>
 history: From coads_climatology<br>
 units: M/S<br>
 <table>
 <td align=right valign=top><b>UWND</b>:</td>
-<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: ZONAL WIND<br>
 history: From coads_climatology<br>
 units: M/S<br>
@@ -118,15 +118,15 @@ point_spacing: even<br>
 </td>
 </tr></table>
 </tr><tr><td align=right valign=top><b>VWND</b>:</td>
-<td align=left valign=top>Grid<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Grid<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: MERIDIONAL WIND<br>
 history: From coads_climatology<br>
 units: M/S<br>
 <table>
 <td align=right valign=top><b>VWND</b>:</td>
-<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.999999790e+33<br>
-_FillValue: -9.999999790e+33<br>
+<td align=left valign=top>Array of 32 bit Reals [TIME = 0..11][COADSY = 0..89][COADSX = 0..179]<br>missing_value: -9.99999979e+33<br>
+_FillValue: -9.99999979e+33<br>
 long_name: MERIDIONAL WIND<br>
 history: From coads_climatology<br>
 units: M/S<br>

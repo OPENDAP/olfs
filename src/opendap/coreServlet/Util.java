@@ -62,7 +62,7 @@ public class Util {
         msg += "    fullSourceName:            '" + ReqInfo.getLocalUrl(req) + "'\n";
         msg += "    dataSource:                '" + ReqInfo.getBesDataSourceID(ReqInfo.getLocalUrl(req)) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
-        msg += "    requestSuffix:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
+        msg += "    requestSuffixRegex:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
         msg += "\n";
@@ -237,149 +237,164 @@ public class Util {
 
         Enumeration e;
         int i;
-        ServletContext scntxt = servlet.getServletContext();
-        ServletConfig scnfg = servlet.getServletConfig();
 
 
-        String probeMsg = "####################### PROBE ##################################\n";
-        probeMsg += "\n";
-        probeMsg += "HttpServlet:"+ "\n" ;
-        probeMsg += "    getServletName(): "+servlet.getServletName() + "\n" ;
-        probeMsg += "    getServletInfo(): "+servlet.getServletInfo() + "\n" ;
-        probeMsg += "\n";
-        probeMsg += "\n";
-        probeMsg += "\n";
-        probeMsg += "\n";
-        probeMsg += "\n";
-        probeMsg += "\n";
-        probeMsg += "The HttpServletRequest object is actually an instance of:" + "\n" ;
-        probeMsg += "    " + request.getClass().getName() + "\n" ;
-        probeMsg += "\n";
-        probeMsg += "HttpServletRequest Interface:"+ "\n" ;
-        probeMsg += "    getAuthType:           " + request.getAuthType() + "\n" ;
-        probeMsg += "    getContextPath:        " + request.getContextPath() + "\n" ;
-        probeMsg += "    getMethod:             " + request.getMethod() + "\n" ;
-        probeMsg += "    getPathInfo:           " + request.getPathInfo() + "\n" ;
-        probeMsg += "    getPathTranslated:     " + request.getPathTranslated() + "\n" ;
-        probeMsg += "    getRequestURL:         " + request.getRequestURL() + "\n" ;
-        probeMsg += "    getQueryString:        " + request.getQueryString() + "\n" ;
-        probeMsg += "    getRemoteUser:         " + request.getRemoteUser() + "\n" ;
-        probeMsg += "    getRequestedSessionId: " + request.getRequestedSessionId() + "\n" ;
-        probeMsg += "    getRequestURI:         " + request.getRequestURI() + "\n" ;
-        probeMsg += "    getServletPath:        " + request.getServletPath() + "\n" ;
-        probeMsg += "    isRequestedSessionIdFromCookie: " + request.isRequestedSessionIdFromCookie() + "\n" ;
-        probeMsg += "    isRequestedSessionIdValid:      " + request.isRequestedSessionIdValid() + "\n" ;
-        probeMsg += "    isRequestedSessionIdFromURL:    " + request.isRequestedSessionIdFromURL() + "\n" ;
-        //ps.println("    isUserInRole:                   " + request.isUserInRole());
+        StringBuilder probeMsg = new StringBuilder();
+        probeMsg.append("####################### PROBE ##################################\n");
 
-        probeMsg += "\n";
-        probeMsg += "    Cookies:" + "\n";
+        probeMsg.append("\n");
+        probeMsg.append("The HttpServletRequest object is actually an instance of:").append("\n");
+        probeMsg.append("    ").append(request.getClass().getName()).append("\n");
+        probeMsg.append("\n");
+        probeMsg.append("HttpServletRequest Interface: \n");
+        probeMsg.append("    getAuthType:           ").append( request.getAuthType()).append( "\n");
+        probeMsg.append("    getContextPath:        ").append( request.getContextPath()).append( "\n");
+        probeMsg.append("    getMethod:             ").append( request.getMethod()).append( "\n");
+        probeMsg.append("    getPathInfo:           ").append( request.getPathInfo()).append( "\n");
+        probeMsg.append("    getPathTranslated:     ").append( request.getPathTranslated()).append( "\n");
+        probeMsg.append("    getRequestURL:         ").append( request.getRequestURL()).append( "\n");
+        probeMsg.append("    getQueryString:        ").append( request.getQueryString()).append( "\n");
+        probeMsg.append("    getRemoteUser:         ").append( request.getRemoteUser()).append( "\n");
+        probeMsg.append("    getRequestedSessionId: ").append( request.getRequestedSessionId()).append( "\n");
+        probeMsg.append("    getRequestURI:         ").append( request.getRequestURI()).append( "\n");
+        probeMsg.append("    getServletPath:        ").append( request.getServletPath()).append( "\n");
+        probeMsg.append("    isRequestedSessionIdFromCookie: ").append( request.isRequestedSessionIdFromCookie()).append( "\n");
+        probeMsg.append("    isRequestedSessionIdValid:      ").append( request.isRequestedSessionIdValid()).append( "\n");
+        probeMsg.append("    isRequestedSessionIdFromURL:    ").append( request.isRequestedSessionIdFromURL()).append( "\n");
+        probeMsg.append("\n");
+        probeMsg.append("    Cookies:\n");
+
         Cookie c[] = request.getCookies();
         if (c == null)
-            probeMsg += "   None." + "\n";
+            probeMsg.append("   None.").append("\n");
         else {
-            probeMsg += "\n";
+            probeMsg.append("\n");
             for (i = 0; i < c.length; i++)
-                probeMsg += "        cookie[" + i + "]: " + c[i] + "\n";
+                probeMsg.append("        cookie[").append(i).append("]: ").append(c[i]).append("\n");
         }
 
-        probeMsg += "\n";
+        probeMsg.append("\n");
         i = 0;
         e = request.getHeaderNames();
-        probeMsg += "    Header Names:"+ "\n" ;
+        probeMsg.append("    Header Names:").append("\n");
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            probeMsg += "       Header[" + i + "]: " + s;
-            probeMsg += ": " + request.getHeader(s)+ "\n" ;
+            probeMsg.append("       Header[").append(i).append("]: ").append(s);
+            probeMsg.append(": ").append(request.getHeader(s)).append("\n");
         }
 
-        probeMsg += "\n";
-        probeMsg += "ServletRequest Interface:"+ "\n" ;
-        probeMsg += "    getCharacterEncoding:  " + request.getCharacterEncoding()+ "\n" ;
-        probeMsg += "    getContentType:        " + request.getContentType()+ "\n" ;
-        probeMsg += "    getContentLength:      " + request.getContentLength()+ "\n" ;
-        probeMsg += "    getProtocol:           " + request.getProtocol()+ "\n" ;
-        probeMsg += "    getScheme:             " + request.getScheme()+ "\n" ;
-        probeMsg += "    getServerName:         " + request.getServerName()+ "\n" ;
-        probeMsg += "    getServerPort:         " + request.getServerPort()+ "\n" ;
-        probeMsg += "    getRemoteAddr:         " + request.getRemoteAddr()+ "\n" ;
-        probeMsg += "    getRemoteHost:         " + request.getRemoteHost()+ "\n" ;
-        //probeMsg += "    getRealPath:           "+request.getRealPath()+ "\n" ;
+        probeMsg.append("\n");
+        probeMsg.append("ServletRequest Interface:").append("\n");
+        probeMsg.append("    getCharacterEncoding:  ").append(request.getCharacterEncoding()).append("\n");
+        probeMsg.append("    getContentType:        ").append(request.getContentType()).append("\n");
+        probeMsg.append("    getContentLength:      ").append(request.getContentLength()).append("\n");
+        probeMsg.append("    getProtocol:           ").append(request.getProtocol()).append("\n");
+        probeMsg.append("    getScheme:             ").append(request.getScheme()).append("\n");
+        probeMsg.append("    getServerName:         ").append(request.getServerName()).append("\n");
+        probeMsg.append("    getServerPort:         ").append(request.getServerPort()).append("\n");
+        probeMsg.append("    getRemoteAddr:         ").append(request.getRemoteAddr()).append("\n");
+        probeMsg.append("    getRemoteHost:         ").append(request.getRemoteHost()).append("\n");
+        //probeMsg.append("    getRealPath:           "+request.getRealPath()).append("\n");
 
 
-        probeMsg += "............................."+ "\n" ;
-        probeMsg += "\n";
+        probeMsg.append(".............................").append("\n");
+        probeMsg.append("\n");
         i = 0;
         e = request.getAttributeNames();
-        probeMsg += "    Attribute Names:"+ "\n" ;
+        probeMsg.append("    Attribute Names:").append("\n");
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            probeMsg += "        Attribute[" + i + "]: " + s;
-            probeMsg += " Type: " + request.getAttribute(s)+ "\n" ;
+            probeMsg.append("        Attribute[").append(i).append("]: ").append(s);
+            probeMsg.append(" Value: ").append(request.getAttribute(s)).append("\n");
         }
 
-        probeMsg += "............................."+ "\n" ;
-        probeMsg += "\n";
+        probeMsg.append(".............................").append("\n");
+        probeMsg.append("\n");
         i = 0;
         e = request.getParameterNames();
-        probeMsg += "    Parameter Names:"+ "\n" ;
+        probeMsg.append("    Parameter Names:").append("\n");
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            probeMsg += "        Parameter[" + i + "]: " + s;
-            probeMsg += " Value: " + request.getParameter(s)+ "\n" ;
+            probeMsg.append("        Parameter[").append(i).append("]: ").append(s);
+            probeMsg.append(" Value: ").append(request.getParameter(s)).append("\n");
         }
 
-        probeMsg += "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"+ "\n" ;
-        probeMsg += " . . . . . . . . . Servlet Infomation API  . . . . . . . . . . . . . ."+ "\n" ;
-        probeMsg += "\n";
+        probeMsg.append("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").append("\n");
+        probeMsg.append(" . . . . . . . . . Servlet Infomation API  . . . . . . . . . . . . . .").append("\n");
+        probeMsg.append("\n");
 
-        probeMsg += "Servlet Context:"+ "\n" ;
 
-        probeMsg += "    getMajorVersion:       " + scntxt.getMajorVersion()+ "\n" ;
-        probeMsg += "    getMinorVersion:       " + scntxt.getMinorVersion()+ "\n" ;
-        probeMsg += "    getServerInfo:         " + scntxt.getServerInfo()+ "\n" ;
-        probeMsg += "    getServletContextName: " + scntxt.getServletContextName()+ "\n" ;
-        probeMsg += "\n";
 
-        i = 0;
-        e = scntxt.getAttributeNames();
-        probeMsg += "    Attribute Names:"+ "\n" ;
-        while (e.hasMoreElements()) {
-            i++;
-            String s = (String) e.nextElement();
-            probeMsg += "        Attribute[" + i + "]: " + s;
-            probeMsg += " Type: " + scntxt.getAttribute(s)+ "\n" ;
+        if(servlet == null){
+            probeMsg.append("Supplied reference to HttpServlet was null.\nNothing additional to report.").append("\n");
+
+        }
+        else {
+            probeMsg.append("HttpServlet:").append("\n");
+            probeMsg.append("    getServletName(): ").append(servlet.getServletName()).append("\n");
+            probeMsg.append("    getServletInfo(): ").append(servlet.getServletInfo()).append("\n");
+            probeMsg.append("\n");
+            probeMsg.append("\n");
+
+            ServletContext scntxt = servlet.getServletContext();
+            ServletConfig scnfg = servlet.getServletConfig();
+
+
+            probeMsg.append("Servlet Context:").append("\n");
+
+            probeMsg.append("    getMajorVersion:       ").append(scntxt.getMajorVersion()).append("\n");
+            probeMsg.append("    getMinorVersion:       ").append(scntxt.getMinorVersion()).append("\n");
+            probeMsg.append("    getServerInfo:         ").append(scntxt.getServerInfo()).append("\n");
+            probeMsg.append("    getServletContextName: ").append(scntxt.getServletContextName()).append("\n");
+            probeMsg.append("\n");
+
+            i = 0;
+            e = scntxt.getAttributeNames();
+            probeMsg.append("    Attribute Names:").append("\n");
+            while (e.hasMoreElements()) {
+                i++;
+                String s = (String) e.nextElement();
+                probeMsg.append("        Attribute[").append(i).append("]: ").append(s);
+                probeMsg.append(" Type: ").append(scntxt.getAttribute(s)).append("\n");
+            }
+
+            probeMsg.append("    ServletContext.getRealPath(\".\"): ").append(scntxt.getRealPath(".")).append("\n");
+            probeMsg.append("    ServletContext.getMajorVersion(): ").append(scntxt.getMajorVersion()).append("\n");
+    //        probeMsg.append("ServletContext.getMimeType():     ").append(scntxt.getMimeType()).append("\n");
+            probeMsg.append("    ServletContext.getMinorVersion(): ").append(scntxt.getMinorVersion()).append("\n");
+    //        probeMsg.append("ServletContext.getRealPath(): ").append(sc.getRealPath()).append("\n");
+
+
+
+
+            probeMsg.append(".............................").append("\n");
+
+
+
+            probeMsg.append("Servlet Config:").append("\n");
+            probeMsg.append("\n");
+
+
+            i = 0;
+            e = scnfg.getInitParameterNames();
+            probeMsg.append("    InitParameters:").append("\n");
+            while (e.hasMoreElements()) {
+                String p = (String) e.nextElement();
+                probeMsg.append("        InitParameter[").append(i).append("]: ").append(p);
+                probeMsg.append(" Value: ").append(scnfg.getInitParameter(p)).append("\n");
+                i++;
+            }
+
         }
 
-        probeMsg += "    ServletContext.getRealPath(\".\"): " + scntxt.getRealPath(".")+ "\n" ;
-        probeMsg += "    ServletContext.getMajorVersion(): " + scntxt.getMajorVersion()+ "\n" ;
-//        probeMsg += "ServletContext.getMimeType():     " + scntxt.getMimeType()+ "\n" ;
-        probeMsg += "    ServletContext.getMinorVersion(): " + scntxt.getMinorVersion()+ "\n" ;
-//        probeMsg += "ServletContext.getRealPath(): " + sc.getRealPath()+ "\n" ;
+        probeMsg.append("\n");
+        probeMsg.append("######################## END PROBE ###############################").append("\n");
+        probeMsg.append("\n");
 
-
-        probeMsg += "............................."+ "\n" ;
-        probeMsg += "Servlet Config:"+ "\n" ;
-        probeMsg += "\n";
-
-
-        i = 0;
-        e = scnfg.getInitParameterNames();
-        probeMsg += "    InitParameters:"+ "\n" ;
-        while (e.hasMoreElements()) {
-            String p = (String) e.nextElement();
-            probeMsg += "        InitParameter[" + i + "]: " + p;
-            probeMsg += " Value: " + scnfg.getInitParameter(p)+ "\n" ;
-            i++;
-        }
-        probeMsg += "\n";
-        probeMsg += "######################## END PROBE ###############################"+ "\n" ;
-        probeMsg += "\n";
-
-        return probeMsg;
+        return probeMsg.toString();
 
     }
 
