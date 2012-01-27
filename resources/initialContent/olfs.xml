@@ -95,7 +95,7 @@
                   - and allowing their transmission with out subsetting can put heavy loads
                   - on the network and the server.
                   -->
-                  <AllowDirectDataSourceAccess />
+                  <!-- AllowDirectDataSourceAccess / -->
 
                 
             </Handler>
