@@ -1,0 +1,7 @@
+<Envelope xmlns="http://www.w3.org/2003/05/soap-envelope" >
+    <Body>
+        <DescribeCoverage xmlns="http://www.opengis.net/wcs/1.1"  service="WCS" version="1.1.2">
+            <Identifier>S1/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</Identifier>
+        </DescribeCoverage>
+    </Body>
+</Envelope>
