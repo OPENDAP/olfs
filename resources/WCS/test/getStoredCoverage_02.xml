@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GetCoverage xmlns="http://www.opengis.net/wcs/1.1" xmlns:ows="http://www.opengis.net/ows/1.1" service="WCS" version="1.1.2">
+	<ows:Identifier>S1/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</ows:Identifier>
+	<DomainSubset>
+		<ows:BoundingBox>
+			<ows:LowerCorner>-80 30</ows:LowerCorner>
+			<ows:UpperCorner>-60 50</ows:UpperCorner>
+		</ows:BoundingBox>
+	</DomainSubset>
+    <RangeSubset>
+        <FieldSubset>
+            <ows:Identifier>v</ows:Identifier>
+        </FieldSubset>
+    </RangeSubset>
+	<Output format="application/netcdf" stored="true"/>
+</GetCoverage>
