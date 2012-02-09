@@ -113,7 +113,7 @@
      -
     -->
     <xsl:template name="localId">
-        <xsl:attribute name="localId">
+        <xsl:attribute name="dapObj:localId">
             <xsl:call-template name="localIdWorker"/>
         </xsl:attribute>
     </xsl:template>

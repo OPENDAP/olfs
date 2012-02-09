@@ -23,17 +23,15 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2.http;
 
+import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import opendap.namespaces.SOAP;
 import opendap.namespaces.NS;
 import opendap.coreServlet.DispatchServlet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.util.List;
 
 /**
@@ -59,50 +57,97 @@ public class SoapHandler extends XmlRequestHandler {
     }
 
 
-    public void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public Document parseWcsRequest(BufferedReader sis, String encoding) throws WcsException {
 
-        String serviceUrl = Util.getServiceUrlString(request,_prefix);
-        String dataAccessBase = Util.getServiceUrl(request);
-
-        // Parse the XML doc into a Document object.
-        SAXBuilder sb = new SAXBuilder();
-        Document wcsReq = sb.build(request.getInputStream());
-        Element clientReq;
-        Document soapResponseDoc;
-        Element responseEnvelope;
-        Element responseBody;
+        Document soapRequestDocument;
         Element soapEnvelope;
         Element soapBody;
-        Document wcsResponse;
-        Element wre;
 
-        responseEnvelope = new Element("Envelope",SOAP.NS);
-        responseBody = new Element("Body",SOAP.NS);
+        soapRequestDocument = super.parseWcsRequest(sis,encoding);
 
-        soapEnvelope = wcsReq.getRootElement();
+        soapEnvelope = soapRequestDocument.getRootElement();
 
         if(NS.checkNamespace(soapEnvelope,"Envelope", SOAP.NS)){
             soapBody = soapEnvelope.getChild("Body", SOAP.NS);
             List soapContents = soapBody.getChildren();
 
-            log.debug("Got " + soapContents.size() + " SOAP Body Elements.");
-            for (Object soapContent : soapContents) {
-                clientReq = (Element) soapContent;
+            log.debug("Got " + soapContents.size() + " child elements of SOAP body.");
 
-                wcsResponse = getWcsResponse(serviceUrl, this, clientReq);
-                wre = wcsResponse.getRootElement();
-                wre.detach();
-                responseBody.addContent(wre);
+
+            if(soapContents.size()!=1){
+                String msg = "SOAP message body contains "+soapContents.size()+" items. Only one item is allowed.";
+                log.error(msg);
+                throw new WcsException(msg,
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "WCS Request Document");
             }
 
-            response.setContentType("text/xml");
-            responseEnvelope.addContent(responseBody);
-            soapResponseDoc = new Document(responseEnvelope);
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            xmlo.output(soapResponseDoc,response.getOutputStream());
+            Element wcsRequest = (Element) soapContents.get(0);
+            wcsRequest.detach();
+            return new Document(wcsRequest);
+        }
+        else {
+            String msg = "Request document is not a SOAP envelope.";
+            log.error(msg);
+            throw new WcsException(msg,
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document");
         }
 
+
     }
+
+
+    @Override
+    public Document getCapabilities(GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
+
+        return wrapDocumentInSoapEnvelope(super.getCapabilities(wcsRequest, serviceUrl));
+
+    }
+
+
+    @Override
+    public Document describeCoverage(DescribeCoverageRequest wcsRequest) throws InterruptedException, WcsException {
+
+        return wrapDocumentInSoapEnvelope(super.describeCoverage(wcsRequest));
+
+    }
+
+
+    @Override
+    public Document getStoredCoverage(GetCoverageRequest req) throws InterruptedException, WcsException {
+
+        return wrapDocumentInSoapEnvelope(super.getStoredCoverage(req));
+
+    }
+
+    @Override
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException {
+
+        CoverageRequestProcessor.sendCoverageResponse(req, response, true );
+
+    }
+
+
+    public static  Document wrapDocumentInSoapEnvelope(Document doc){
+
+        Element soapEnvelope = new Element("Envelope",SOAP.NS);
+        Element soapBody = new Element("Body",SOAP.NS);
+
+        soapEnvelope.addContent(soapBody);
+
+
+        Element rootElem = doc.getRootElement();
+        rootElem.detach();
+
+        soapBody.addContent(rootElem);
+
+        return new Document(soapEnvelope);
+
+    }
+
+
 
 
 }

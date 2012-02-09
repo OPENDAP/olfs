@@ -92,16 +92,16 @@ public class BoundingBox {
 
         if (valCount < 2)
             throw new WcsException("The BoundingBox used in the request is " +
-                    "incorrect. It must specify both a lower corenr and an " +
+                    "incorrect. It must specify both a lower corner and an " +
                     "upper corner. This means at LEAST two numeric values.",
                     WcsException.INVALID_PARAMETER_VALUE,
                     "BoundingBox");
 
-        // Check to see if they inculded a CRS URI. If they did, then the number
+        // Check to see if they included a CRS URI. If they did, then the number
         // of elements in tmp must be odd. This is because the BB string must
         // contain a lower and upper corner. Every coordinate in the lower
         // corner has a mate in the upper corner, so there must be an even
-        // number of coordinate values. THis means that is the number of comma
+        // number of coordinate values. This means that is the number of comma
         // delimited items is odd then the user either bungled the URL, OR
         // they included a CRS URI at the end. We'll assume the latter...
         if ((valCount % 2) != 0) {
@@ -396,7 +396,7 @@ public class BoundingBox {
      * @return  True is the intersection of the two bounding boxes is empty.
      * @throws WcsException
      */
-    public boolean interesects(BoundingBox bb) throws WcsException {
+    public boolean intersects(BoundingBox bb) throws WcsException {
 
         boolean hasIntersection = true;
         boolean overlap;
@@ -406,13 +406,14 @@ public class BoundingBox {
         if(crs!=null &&
                 bb.getCRSURI()!=null &&
                 !crs.equals(bb.getCRSURI())){
-            log.error("Cannot check for BoundingBox intersections since the " +
+
+            String msg = "Cannot check for BoundingBox intersections since the " +
                     "passed BoundingBox is expressed in a different CRS. " +
                     "My CRS: "+crs.toASCIIString()+" " +
-                    "Passed CRS:"+bb.getCRSURI().toASCIIString());
-            throw new WcsException("Bounding Box CRS's do not match. " +
-                    "Comparison is invalid without a coordinate transformation, " +
-                    "which is not currently supported. ",
+                    "Passed CRS: "+bb.getCRSURI().toASCIIString();
+
+            log.error(msg);
+            throw new WcsException(msg,
                     WcsException.INVALID_PARAMETER_VALUE,
                     "ows:BoundingBox/@crs");
         }

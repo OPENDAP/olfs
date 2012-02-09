@@ -324,7 +324,7 @@ public class GetCoverageRequest {
         try {
             return xmlo.outputString(getRequestDoc());
         } catch (WcsException e) {
-            ExceptionReport er = new ExceptionReport(e);
+            WcsExceptionReport er = new WcsExceptionReport(e);
             return er.toString();
         }
 

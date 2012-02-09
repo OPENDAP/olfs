@@ -1,6 +1,5 @@
 package opendap.wcs.v1_1_2.http;
 
-import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -31,7 +30,7 @@ public class Servlet extends HttpServlet {
     private HttpGetHandler httpGetService = null;
 
     private FormHandler formService = null;
-    private PostHandler wcsPostService = null;
+    private XmlRequestHandler wcsPostService = null;
     private SoapHandler wcsSoapService = null;
 
     //private Document configDoc;
@@ -77,8 +76,8 @@ public class Servlet extends HttpServlet {
 
         // Build Handler Objects
         httpGetService = new HttpGetHandler(enableUpdateUrl);
-        formService = new FormHandler();
-        wcsPostService = new PostHandler();
+        formService    = new FormHandler();
+        wcsPostService = new XmlRequestHandler();
         wcsSoapService = new SoapHandler();
 
         // Build configuration elements

@@ -37,7 +37,7 @@ import java.io.IOException;
  * Date: Aug 14, 2008
  * Time: 1:15:27 PM
  */
-public class ExceptionReport {
+public class WcsExceptionReport {
 
     private static final Namespace _nameSpace = WCS.OWS_NS;
     private static final String _schemaLocation = WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsExceptionReport.xsd";
@@ -47,8 +47,8 @@ public class ExceptionReport {
 
     private final Document report;
 
-    public ExceptionReport(){
-        Element root = new Element("ExceptionReport", _nameSpace);
+    public WcsExceptionReport(){
+        Element root = new Element("WcsExceptionReport", _nameSpace);
         root.addNamespaceDeclaration(WCS.XSI_NS);
         root.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
 
@@ -56,7 +56,7 @@ public class ExceptionReport {
         report.setRootElement(root);
     }
 
-    public ExceptionReport(WcsException exp){
+    public WcsExceptionReport(WcsException exp){
         this();
         addException(exp);
     }

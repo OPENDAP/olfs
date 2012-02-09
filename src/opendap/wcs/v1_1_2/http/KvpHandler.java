@@ -30,6 +30,7 @@ import org.jdom.output.Format;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -46,27 +47,72 @@ public class KvpHandler {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(KvpHandler.class);
 
 
-    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, String query, ServletOutputStream os) throws InterruptedException, IOException {
+    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, String query, HttpServletResponse response) throws InterruptedException, IOException {
 
 
         HashMap<String,String> keyValuePairs = new HashMap<String,String>();
 
         Document wcsResponse;
+        XMLOutputter xmlo;
+
+        ServletOutputStream os = null;
+
 
         try {
 
-            switch(getRequestType(query,keyValuePairs)){
+            int wcsRequestType = getRequestType(query,keyValuePairs);
+
+
+
+
+            switch(wcsRequestType){
 
                 case  WCS.GET_CAPABILITIES:
                     wcsResponse = getCapabilities(keyValuePairs, serviceURL);
+                    xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    try {
+                        response.setContentType("text/xml");
+                        os = response.getOutputStream();
+                        xmlo.output(wcsResponse,os);
+                    } catch (IOException e) {
+                        throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
+                    }
+
                     break;
 
                 case  WCS.DESCRIBE_COVERAGE:
                     wcsResponse = describeCoverage(keyValuePairs);
+                    xmlo = new XMLOutputter(Format.getPrettyFormat());
+                    try {
+                        response.setContentType("text/xml");
+                        os = response.getOutputStream();
+                        xmlo.output(wcsResponse,os);
+                    } catch (IOException e) {
+                        throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
+                    }
+
                     break;
 
                 case WCS.GET_COVERAGE:
-                    wcsResponse = getCoverage(keyValuePairs);
+
+                    String store = keyValuePairs.get("store");
+                    if(store!=null && store.equals("true")){
+                        wcsResponse = getStoredCoverage(keyValuePairs);
+                        xmlo = new XMLOutputter(Format.getPrettyFormat());
+                        try {
+                            response.setContentType("text/xml");
+                            os = response.getOutputStream();
+                            xmlo.output(wcsResponse,os);
+                        } catch (IOException e) {
+                            throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
+                        }
+
+                    }
+                    else {
+
+                        getCoverage(keyValuePairs,response);
+
+                    }
                     break;
 
                 default:
@@ -74,18 +120,16 @@ public class KvpHandler {
                             WcsException.NO_APPLICABLE_CODE);
             }
 
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-            try {
-                xmlo.output(wcsResponse,os);
-            } catch (IOException e) {
-                throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
-            }
 
 
         }
         catch(WcsException e){
             log.error(e.getMessage());
-            ExceptionReport er = new ExceptionReport(e);
+            WcsExceptionReport er = new WcsExceptionReport(e);
+
+            if(os==null)
+                os = response.getOutputStream();
+
             os.println(er.toString());
         }
 
@@ -126,11 +170,39 @@ public class KvpHandler {
      * @param keyValuePairs    Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document getCoverage(HashMap<String,String> keyValuePairs)  throws InterruptedException, WcsException {
+    public static Document getStoredCoverage(HashMap<String, String> keyValuePairs)  throws InterruptedException, WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
 
-            return CoverageRequestProcessor.processCoverageRequest(req);
+            return CoverageRequestProcessor.getStoredCoverageResponse(req);
+    }
+
+
+
+    /**
+     *
+     * @param keyValuePairs    Key Value Pairs from WCS URL
+     * @throws WcsException  When bad things happen.
+     */
+    public static void getCoverage(HashMap<String, String> keyValuePairs, HttpServletResponse response)  throws InterruptedException, WcsException {
+
+        GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
+
+        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+
+    }
+
+
+    /**
+     *
+     * @param req    A GetCoverageREquest object.
+     * @throws WcsException  When bad things happen.
+     */
+    public static void getCoverage(GetCoverageRequest req, HttpServletResponse response)  throws InterruptedException, WcsException {
+
+
+        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+
     }
 
 

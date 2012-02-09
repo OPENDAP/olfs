@@ -27,12 +27,16 @@ import opendap.wcs.v1_1_2.*;
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLDecoder;
 
 import opendap.coreServlet.ReqInfo;
 
@@ -43,7 +47,7 @@ import opendap.coreServlet.ReqInfo;
  * Time: 4:50:49 PM
  * To change this template use File | Settings | File Templates.
  */
-public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, WcsResponder {
+public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, WcsResponder {
     protected Logger log;
     protected HttpServlet dispatchServlet;
 
@@ -112,8 +116,7 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
 
     private boolean wcsRequestDispatch(HttpServletRequest request,
                                        HttpServletResponse response,
-                                       boolean sendResponse)
-            throws Exception {
+                                       boolean sendResponse) throws InterruptedException {
 
         String relativeURL = ReqInfo.getLocalUrl(request);
 
@@ -125,8 +128,19 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
         if (relativeURL != null) {
             if (relativeURL.startsWith(_prefix)) {
                 isWcsEndPoint = true;
-                if (sendResponse)
-                    handleWcsRequest(request, response);
+                if (sendResponse){
+
+                    try {
+
+                        handleWcsRequest(request, response);
+                    }
+                    catch (WcsException wcse) {
+                        log.error(wcse.getMessage());
+                        WcsExceptionReport er = new WcsExceptionReport(wcse);
+                        handleWcsError(er,response);
+                    }
+
+                }
             }
         }
 
@@ -135,105 +149,181 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
     }
 
 
-    protected abstract void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    public void handleWcsRequest(HttpServletRequest request, HttpServletResponse response) throws WcsException, InterruptedException {
+
+        BufferedReader sis = getRequestReader(request);
+        String encoding = getEncoding(request);
+
+        Document wcsRequestDoc = parseWcsRequest(sis, encoding);
+
+        Element wcsRequest = wcsRequestDoc.getRootElement();
+        String serviceUrl = Util.getServiceUrlString(request, _prefix);
+
+        handleWcsRequest(wcsRequest,serviceUrl,response);
 
 
 
-    public Document getCapabilities(Element reqElem, String serviceUrl) throws InterruptedException, WcsException {
-        GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(reqElem);
-
-            return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
     }
 
+    public void handleWcsRequest(Element wcsRequest, String serviceUrl, HttpServletResponse response) throws WcsException, InterruptedException {
+
+        Document wcsResponse;
+        switch (getRequestType(wcsRequest)) {
+
+            case WCS.GET_CAPABILITIES:
+                GetCapabilitiesRequest getCapabilitiesRequest = new  GetCapabilitiesRequest(wcsRequest);
+                wcsResponse = getCapabilities(getCapabilitiesRequest, serviceUrl);
+                sendWcsResponse(wcsResponse,response);
+                break;
+
+            case WCS.DESCRIBE_COVERAGE:
+                DescribeCoverageRequest wcsDCR = new DescribeCoverageRequest(wcsRequest);
+                wcsResponse = describeCoverage(wcsDCR);
+                sendWcsResponse(wcsResponse,response);
+                break;
+
+            case WCS.GET_COVERAGE:
+
+                GetCoverageRequest wcsGCR = new GetCoverageRequest(wcsRequest);
+
+                if (wcsGCR.isStore()) {
+                    wcsResponse = getStoredCoverage(wcsGCR);
+                    sendWcsResponse(wcsResponse,response);
+                }
+                else {
+                    sendCoverageResponse(wcsGCR, response);
+                }
 
 
+                break;
 
-    public Document describeCoverage(Element reqElem) throws InterruptedException, WcsException {
-        DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(reqElem);
+            default:
+                throw new WcsException("The request document  was  invalid. " +
+                        "The root element was name: '" + wcsRequest.getName() + "' in namespace: '" + wcsRequest.getNamespace().getURI() + "'.",
+                        WcsException.MISSING_PARAMETER_VALUE, "wcs:GetCapabilities,wcs:DescribeCoverage,wcs:GetCoverage");
 
-            return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
-    }
-
-
-
-
-    public Document getCoverage( Element reqElem) throws InterruptedException, WcsException {
-
-        GetCoverageRequest req = new GetCoverageRequest(reqElem);
-
-        return CoverageRequestProcessor.processCoverageRequest(req);
-    }
-
-
-    public Document getWcsResponse(String serviceUrl, WcsResponder wcsResponder, Element wcsRequest) throws InterruptedException {
-
-
-        try {
-            Document wcsResponse;
-            switch (getRequestType(wcsRequest)) {
-
-                case WCS.GET_CAPABILITIES:
-                    wcsResponse = wcsResponder.getCapabilities(wcsRequest, serviceUrl);
-                    break;
-
-                case WCS.DESCRIBE_COVERAGE:
-                    wcsResponse = wcsResponder.describeCoverage(wcsRequest);
-                    break;
-
-                case WCS.GET_COVERAGE:
-                    //@todo The URL passed here is used to construct data access URLs for the WCS response.
-                    // The serviceURL + localID will produce the access URL.
-                    wcsResponse = wcsResponder.getCoverage(wcsRequest);
-                    break;
-
-                default:
-                    throw new WcsException("The request document  was  invalid. " +
-                            "The root element was name: '"+wcsRequest.getName()+"' in namespace: '"+wcsRequest.getNamespace().getURI()+"'.",
-                            WcsException.MISSING_PARAMETER_VALUE,"wcs:GetCapabilities,wcs:DescribeCoverage,wcs:GetCoverage");
-
-            }
-
-            return wcsResponse;
-
-        }
-        catch (WcsException e) {
-            log.error(e.getMessage());
-            ExceptionReport er = new ExceptionReport(e);
-            return er.getReport();
         }
 
 
     }
 
-    public Document getWcsResponse(String serviceUrl, WcsResponder responder, InputStream reqDoc) throws InterruptedException {
-
+    public void handleWcsError(WcsExceptionReport er, HttpServletResponse response) {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         try {
+            ServletOutputStream os = response.getOutputStream();
+            xmlo.output(er.getReport(),os);
+        } catch (IOException e) {
+            log.error("FAILED to transmit WcsException to client. Message: ",e.getMessage());
+        }
 
-            Document requestDoc;
+
+    }
+
+
+
+    public void sendWcsResponse(Document wcsResponse, HttpServletResponse response) throws WcsException {
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        try {
+            response.setContentType("text/xml");
+            ServletOutputStream os = response.getOutputStream();
+            xmlo.output(wcsResponse, os);
+        } catch (IOException e) {
+            throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
+        }
+
+    }
+
+
+    public Document parseWcsRequest(BufferedReader sis, String encoding) throws WcsException {
+
+
+        String sb = "";
+        String reqDoc = "";
+        int length;
+
+        while (sb != null) {
             try {
-                // Parse the XML doc into a Document object.
-                SAXBuilder sb = new SAXBuilder();
-                requestDoc = sb.build(reqDoc);
+                sb = sis.readLine();
+                if (sb != null) {
+
+                    length = sb.length() + reqDoc.length();
+                    if (length > WCS.MAX_REQUEST_LENGTH) {
+                        throw new WcsException("Post Body (WCS Request Document) too long. Try again with something smaller.",
+                                WcsException.INVALID_PARAMETER_VALUE,
+                                "WCS Request Document");
+                    }
+                    reqDoc += sb;
+                }
+            } catch (IOException e) {
+                throw new WcsException("Failed to read WCS Request Document. Mesg: " + e.getMessage(),
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "WCS Request Document");
             }
-            catch(Exception e){
-                throw new WcsException(e.getMessage(), WcsException.INVALID_PARAMETER_VALUE,"WCS Request Document");
-            }
-
-            return getWcsResponse(serviceUrl, responder,requestDoc.getRootElement());
-
-
-        }
-        catch (WcsException e) {
-            log.error(e.getMessage());
-            ExceptionReport er = new ExceptionReport(e);
-            return er.getReport();
         }
 
+        try {
+            reqDoc = URLDecoder.decode(reqDoc, encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new WcsException("Failed to URLDecode Wcs REquest Document. Attempted with encodeing '" + encoding + "'  Message: " + e.getMessage(),
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document.");
+        }
+
+
+        Document requestDoc;
+        try {
+            // Parse the XML doc into a Document object.
+            SAXBuilder saxBuilder = new SAXBuilder();
+
+            ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes());
+            requestDoc = saxBuilder.build(baos);
+            return requestDoc;
+        } catch (Exception e) {
+            throw new WcsException("Failed to parse WCS request. Message: " + e.getMessage(),
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document");
+        }
 
 
     }
 
-    private int getRequestType(Element req) throws WcsException{
+
+
+    public Document getCapabilities(GetCapabilitiesRequest wcsRequest, String serviceUrl) throws InterruptedException, WcsException {
+
+        return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+    }
+
+
+    public Document describeCoverage(DescribeCoverageRequest wcsRequest) throws InterruptedException, WcsException {
+
+        return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
+    }
+
+
+    public Document getStoredCoverage(GetCoverageRequest req) throws InterruptedException, WcsException {
+
+
+        return CoverageRequestProcessor.getStoredCoverageResponse(req);
+    }
+
+    /**
+     *
+     * @param req    A GetCoverageREquest object.
+     * @param response  The HttpServletResponse to which the coverage will be sent.
+     * @throws WcsException  When bad things happen.
+     * @throws InterruptedException When it gets interrupted.
+     */
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response)  throws InterruptedException, WcsException {
+
+        CoverageRequestProcessor.sendCoverageResponse(req, response, false );
+
+    }
+
+
+
+    public static int getRequestType(Element req) throws WcsException{
         if(req == null){
             throw new WcsException("Poorly formatted WCS request. Missing " +
                     "root element of document.",
@@ -257,4 +347,28 @@ public abstract class XmlRequestHandler implements opendap.coreServlet.DispatchH
                     WcsException.MISSING_PARAMETER_VALUE,"wcs:GetCapabilities,wcs:DescribeCoverage,wcs:GetCoverage");
         }
     }
+
+
+    public  String getEncoding(HttpServletRequest request){
+
+        String encoding = request.getCharacterEncoding();
+        if(encoding==null)
+            encoding = "UTF-8";
+
+        return encoding;
+    }
+
+    public  BufferedReader getRequestReader(HttpServletRequest request) throws WcsException {
+        BufferedReader sis;
+        try {
+            sis = request.getReader();
+        } catch (IOException e) {
+            throw new WcsException("Failed to retrieve WCS Request document input stream. Message: " + e.getMessage(),
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document");
+        }
+        return sis;
+
+    }
+
 }

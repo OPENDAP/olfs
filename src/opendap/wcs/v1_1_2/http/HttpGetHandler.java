@@ -164,9 +164,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                         log.debug("Sent redirect from / to "+_contextPath+"/");
                     }
                     else if(relativeURL.equals("") && q!=null){
-                        response.setContentType("text/xml");
-                        ServletOutputStream os = response.getOutputStream();
-                        KvpHandler.processKvpWcsRequest(serviceURL, dataAccessBase,query,os);
+                        KvpHandler.processKvpWcsRequest(serviceURL, dataAccessBase,query,response);
                         log.info("Sent WCS Response");
                     }
                     else if(relativeURL.startsWith(_testPath)){
@@ -368,7 +366,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         }
         catch(WcsException e){
             log.error(e.getMessage());
-            ExceptionReport er = new ExceptionReport(e);
+            WcsExceptionReport er = new WcsExceptionReport(e);
             response.getOutputStream().println(er.toString());
         }
 
@@ -435,7 +433,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         }
         catch(WcsException e){
             log.error(e.getMessage());
-            ExceptionReport er = new ExceptionReport(e);
+            WcsExceptionReport er = new WcsExceptionReport(e);
 
             page += "<h1>ERROR</h1>";
             page += "    After some deliberation we have rejected your request.";
@@ -523,7 +521,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         page += "    <h3>The WCS response: </h3>";
         page += "    <pre>";
 
-        Document wcsResponse = KvpHandler.getCoverage(keyValuePairs);
+        Document wcsResponse = KvpHandler.getStoredCoverage(keyValuePairs);
 
         page += xmlo.outputString(wcsResponse).replaceAll("<","&lt;").replaceAll(">","&gt;");
         page += "    </pre>";

@@ -24,8 +24,10 @@
 package opendap.wcs.v1_1_2.http;
 
 import opendap.wcs.v1_1_2.WCS;
+import opendap.wcs.v1_1_2.WcsException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 
@@ -59,19 +61,24 @@ public class FormHandler extends XmlRequestHandler {
         super.init(servlet,config);
     }
 
-    public void handleWcsRequest(HttpServletRequest request,
-                                       HttpServletResponse response) throws InterruptedException, IOException {
 
-        String serviceUrl = Util.getServiceUrlString(request,_prefix);
-        BufferedReader  sis = request.getReader();
-        ServletOutputStream os = response.getOutputStream();
+
+    @Override
+    public BufferedReader getRequestReader(HttpServletRequest request) throws WcsException {
+
+
+        BufferedReader sis;
+        try {
+            sis = request.getReader();
+        } catch (IOException e) {
+            throw new WcsException("Failed to retrieve WCS Request document input stream. Message: " + e.getMessage(),
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document");
+        }
+
+
+
         int length;
-
-
-        String encoding = request.getCharacterEncoding();
-        if(encoding==null)
-            encoding = "UTF-8";
-
 
         String formTag = "WCS_QUERY=";
 
@@ -79,23 +86,40 @@ public class FormHandler extends XmlRequestHandler {
         String reqDoc = "";
 
         //  Slurp up the document.
-        while(sb!= null){
-            if(sb != null){
+        try {
+            while(sb!= null){
                 length =  sb.length() + reqDoc.length();
-                if( length > WCS.MAX_REQUEST_LENGTH)
-                    throw new IOException("Form Content Body too long. Try again with something smaller.");
+                if( length > WCS.MAX_REQUEST_LENGTH){
+                    throw new WcsException("Form Content Body too long. Try again with something smaller.",
+                            WcsException.INVALID_PARAMETER_VALUE,
+                            "WCS Request Document");
+
+                }
                 reqDoc += sb;
+                sb = sis.readLine();
             }
-            sb = sis.readLine();
+        } catch (IOException e) {
+            throw new WcsException("Failed to read request document. Message:"+e.getMessage(),
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document");
         }
 
         log.debug("Form Interface received: " +reqDoc);
 
+
+        String encoding = getEncoding(request);
+
         // If you got a document,
         if(reqDoc!=null){
 
+            try {
             // Decode it, because browsers seem to want to URL encode their post content. Whatever...
             reqDoc = URLDecoder.decode(reqDoc,encoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new WcsException("Failed to Decode request document. Message:"+e.getMessage(),
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "WCS Request Document");
+            }
 
             // Strip off the form  name
             if(reqDoc.startsWith(formTag)) {
@@ -103,20 +127,32 @@ public class FormHandler extends XmlRequestHandler {
             }
             log.debug("XML to Parse: " +reqDoc);
 
-            ByteArrayInputStream baos = new ByteArrayInputStream(reqDoc.getBytes());
+            InputStreamReader isr = new InputStreamReader(new ByteArrayInputStream(reqDoc.getBytes()));
 
-            response.setContentType("text/xml");
+            return new BufferedReader(isr);
 
-            Document wcsResponse = getWcsResponse(serviceUrl,this,baos);
-
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-            xmlo.output(wcsResponse,os);
 
 
         }
+        else {
+            throw new WcsException("Failed locate request document.",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "WCS Request Document");
+
+        }
+
+
+
+
 
     }
+
+
+
+
+
+
+
 
 
 }

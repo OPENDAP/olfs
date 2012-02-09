@@ -1203,14 +1203,14 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         String qString = "select grid, gridid " +
                 "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
                 "{field} wcs:Identifier {fieldid}, " +
-                "{grid} cf2wcs:hasPart {field} ; rdf:type {dapns:Grid} ; dap:localId {gridid} " +
+                "{grid} cf2wcs:hasPart {field} ; rdf:type {dapns:Grid} ; dapObj:localId {gridid} " +
                 "WHERE covid= \"" + coverageStr + "\" " +
                 "AND fieldid=\"" + fieldStr + "\" " +
                 "UNION " +
                 "select field, gridid " +
                 "FROM " +
                 "{cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
-                "{field} wcs:Identifier {fieldid} ; rdf:type {dapns:Grid} ; dap:localId {gridid} " +
+                "{field} wcs:Identifier {fieldid} ; rdf:type {dapns:Grid} ; dapObj:localId {gridid} " +
                 "WHERE covid= \"" + coverageStr + "\" " +
                 "AND fieldid=\"" + fieldStr + "\" " +
                 "USING NAMESPACE " +
@@ -1219,7 +1219,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
                 "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, " +
                 "cf2wcs=<http://iridl.ldeo.columbia.edu/ontologies/cf2wcs.owl#>, " +
                 "dapns=<http://xml.opendap.org/ns/DAP/3.2#>, " +
-                "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>";
+                "dapObj=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>";
 
         log.debug("createDapGridIdQuery: Built query string: '" + qString + "'");
         return qString;
@@ -1356,14 +1356,14 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         String qString = "select cid,cidid " +
                 "FROM {cover} wcs:Identifier {covid} ; wcs:Range {} wcs:Field " +
                 "{field} wcs:Identifier {fieldid}, " +
-                "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:" + coordinateName + "}; dap:localId {cidid} " +
+                "{field} ncobj:hasCoordinate {cid} rdf:type {cfobj:" + coordinateName + "}; dapObj:localId {cidid} " +
                 "WHERE covid= \"" + coverageStr + "\" " +
                 "AND fieldid=\"" + fieldStr + "\" " +
                 "USING NAMESPACE " +
                 "wcs=<http://www.opengis.net/wcs/1.1#>, " +
                 "ncobj=<http://iridl.ldeo.columbia.edu/ontologies/netcdf-obj.owl#>, " +
                 "cfobj=<http://iridl.ldeo.columbia.edu/ontologies/cf-obj.owl#>, " +
-                "dap=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>";
+                "dapObj=<http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#>";
 
 
         log.debug("createCoordinateIdQuery: Built query string: '" + qString + "'");

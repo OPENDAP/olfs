@@ -422,8 +422,8 @@ public class CoverageDescription {
      * @param  dapGridId The DAP Variable ID of the Grid variable data array that is associated with the wcs:Field's
      * wcs:Identifier represented by filedID.
      */
-    public String setDapGridArrayId(String fieldID, String dapGridId){
-        return _dapGridId.put(fieldID,dapGridId);
+    public void setDapGridArrayId(String fieldID, String dapGridId){
+        _dapGridId.put(fieldID,dapGridId);
     }
 
     /**
