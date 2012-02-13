@@ -122,13 +122,27 @@ public class CoverageRequestProcessor {
         String format = req.getFormat();
 
 
-        String dataAccessURL = getNetcdfDataAccessURL(req);
+        String dataAccessURL;
+        String mime_type;
+
+        if(format.contains("netcdf")){
+            dataAccessURL = getNetcdfDataAccessURL(req);
+            mime_type = "application/x-netcdf-cf";
+        }
+        else if (format.contains("dap")){
+            dataAccessURL = getDapDataAccessURL(req);
+            mime_type = "application/octet-stream";
+        }
+        else {
+            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        }
 
         String metadataAccessURL = getMetadataAccessURL(req);
 
         Logger log = LoggerFactory.getLogger(CoverageRequestProcessor.class);
 
-        log.debug("Building Multipart Response...");
+        log.debug("Building multi-part Response...");
 
         MultipartResponse mpr = new MultipartResponse();
 
@@ -157,7 +171,7 @@ public class CoverageRequestProcessor {
 
 
         mpr.addAttachment("text/xml; charset=UTF-8",coveragesContentID,doc);
-        mpr.addAttachment("application/netcdf",dataPartID, dataAccessURL);
+        mpr.addAttachment(mime_type,dataPartID, dataAccessURL);
 
 
 

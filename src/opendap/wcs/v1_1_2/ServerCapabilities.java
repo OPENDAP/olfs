@@ -38,7 +38,7 @@ import java.util.Vector;
  */
 public class ServerCapabilities {
 
-    private static String[] sf = {"application/x-netcdf-cf1.0","application/x-dap-3.2"};
+    private static String[] sf = {"netcdf-cf","dap-2.0"};
 
 
 
