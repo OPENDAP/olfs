@@ -7,11 +7,15 @@ First:
 
 Check it out:
 
-    svn co http://scm.opendap.org:8090/svn/trunk/olfs
+    svn co http://scm.opendap.org/svn/trunk/olfs
 
 Build it:
 
     ant server
+
+Make a distribution for release:
+
+    ant server -DHYRAX_VERSION=<num> -DOLFS_VERSION=<num>
 
 Install it:
 
