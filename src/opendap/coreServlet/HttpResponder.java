@@ -157,6 +157,9 @@ public abstract class HttpResponder {
     }
 
 
+    public void destroy(){
+
+    }
 
 
 
