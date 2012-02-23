@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
-import opendap.coreServlet.DispatchHandler;
 import opendap.gateway.dapResponders.DDX;
 import opendap.logging.LogUtil;
 import org.jdom.JDOMException;
@@ -68,6 +67,8 @@ public class DispatchServlet extends HttpServlet {
 
 
     private Vector<HttpResponder> responders;
+
+
 
 
     public void init() {
@@ -316,9 +317,11 @@ public class DispatchServlet extends HttpServlet {
 
         LogUtil.logServerShutdown("destroy()");
 
-        for (HttpResponder r : responders) {
-            log.debug("Shutting down HttpResponder: " + r.getClass().getName());
-            r.destroy();
+        if(responders != null){
+            for (HttpResponder r : responders) {
+                log.debug("Shutting down HttpResponder: " + r.getClass().getName());
+                r.destroy();
+            }
         }
 
 
