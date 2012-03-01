@@ -357,57 +357,67 @@ public class InheritedMetadataManager {
             // Get all of the metadataRootPaths that were tied to this catalogKey
             String[] metadataRootPathsInThisCatalog = _catalog2MetadataMap.get(catalogKey);
 
-            // Look at each of those metadataRootPaths
-            for (String metadataRootPath : metadataRootPathsInThisCatalog) {
+            if(metadataRootPathsInThisCatalog!=null){
+                // Look at each of those metadataRootPaths
+                for (String metadataRootPath : metadataRootPathsInThisCatalog) {
 
-                // Get the metadata collection for this metadataRootPath
-                metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
+                    // Get the metadata collection for this metadataRootPath
+                    metadataForThisRootPath = _inheritedMetadata.get(metadataRootPath);
 
-                if(metadataForThisRootPath!=null){
+                    if(metadataForThisRootPath!=null){
 
-                    // Remove all of the metadata elements from this metadataRootPath that came from this catalogKey
-                    log.debug("purgeInheritedMetadata(): Removing all metadata in metadataRootPath '"+metadataRootPath +
-                            " that was ingested from the catalog '"+catalogKey+"' (catalogKey)");
-                    metadataForThisRootPath.remove(catalogKey);
+                        // Remove all of the metadata elements from this metadataRootPath that came from this catalogKey
+                        log.debug("purgeInheritedMetadata(): Removing all metadata in metadataRootPath '"+metadataRootPath +
+                                " that was ingested from the catalog '"+catalogKey+"' (catalogKey)");
+                        metadataForThisRootPath.remove(catalogKey);
 
-                    // If the metadataRootPath is now empty (no more metadata associated with it) remove it from the collection.
-                    if (metadataForThisRootPath.isEmpty()){
-                        log.debug("purgeInheritedMetadata(): Removing metadata container for metadataRootPath '"+metadataRootPath +
-                                " from inventory (it's now empty)");
+                        // If the metadataRootPath is now empty (no more metadata associated with it) remove it from the collection.
+                        if (metadataForThisRootPath.isEmpty()){
+                            log.debug("purgeInheritedMetadata(): Removing metadata container for metadataRootPath '"+metadataRootPath +
+                                    " from inventory (it's now empty)");
 
-                        _inheritedMetadata.remove(metadataRootPath);
-                    }
-                }
-
-                // Purge the inherited service definitions for this metadataRootPath.
-                servicesForThisRootPath = _inheritedServices.get(metadataRootPath);
-
-                if(servicesForThisRootPath!=null){
-
-
-                    // Remove  the service element from this metadataRootPath that came from this catalogKey
-                    log.debug("purgeInheritedMetadata(): Removing service defintions in metadataRootPath '"+metadataRootPath +
-                            " that were ingested from the catalog '"+catalogKey+"' (catalogKey)");
-
-                    servicesForThisRootPath.remove(catalogKey);
-
-                    // If the metadataRootPath is now empty (no more services associated with it) remove it from the collection.
-                    if (servicesForThisRootPath.isEmpty()){
-                        log.debug("purgeInheritedMetadata(): Removing inherited services container for metadataRootPath '"+metadataRootPath +
-                                " from inventory (it's now empty)");
-                        _inheritedServices.remove(metadataRootPath);
+                            _inheritedMetadata.remove(metadataRootPath);
+                        }
                     }
 
+                    // Purge the inherited service definitions for this metadataRootPath.
+                    servicesForThisRootPath = _inheritedServices.get(metadataRootPath);
+
+                    if(servicesForThisRootPath!=null){
+
+
+                        // Remove  the service element from this metadataRootPath that came from this catalogKey
+                        log.debug("purgeInheritedMetadata(): Removing service defintions in metadataRootPath '"+metadataRootPath +
+                                " that were ingested from the catalog '"+catalogKey+"' (catalogKey)");
+
+                        servicesForThisRootPath.remove(catalogKey);
+
+                        // If the metadataRootPath is now empty (no more services associated with it) remove it from the collection.
+                        if (servicesForThisRootPath.isEmpty()){
+                            log.debug("purgeInheritedMetadata(): Removing inherited services container for metadataRootPath '"+metadataRootPath +
+                                    " from inventory (it's now empty)");
+                            _inheritedServices.remove(metadataRootPath);
+                        }
+
+
+                    }
+
 
                 }
 
+                // Remove the inherited metadata associations for this catalogKey
+                log.debug("purgeInheritedMetadata(): Removing catalog '"+catalogKey+"' (catalogKey) from " +
+                        "inheritedMetadataInventory");
+
+                _catalog2MetadataMap.remove(catalogKey);
+            }
+            else {
+                // Remove the inherited metadata associations for this catalogKey
+                log.debug("purgeInheritedMetadata(): No Metadata root paths found in catalog '"+catalogKey+"' (catalogKey) in " +
+                        "inheritedMetadataInventory");
 
             }
-            // Remove the inherited metadata associations for this catalogKey
-            log.debug("purgeInheritedMetadata(): Removing catalog '"+catalogKey+"' (catalogKey) from " +
-                    "inheritedMetadataInventory");
 
-            _catalog2MetadataMap.remove(catalogKey);
 
         }
         finally {
