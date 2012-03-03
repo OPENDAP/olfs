@@ -12,5 +12,5 @@
             <ows:Identifier>v</ows:Identifier>
         </FieldSubset>
     </RangeSubset>
-	<Output format="application/netcdf" stored="true"/>
+	<Output format="application/netcdf" store="true"/>
 </GetCoverage>

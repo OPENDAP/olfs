@@ -30,7 +30,7 @@
 
         <init-param>
             <param-name>EnableUpdateUrl</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
 
         <load-on-startup>1</load-on-startup> 

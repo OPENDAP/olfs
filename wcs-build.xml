@@ -269,6 +269,75 @@
 
 
 
+
+
+    <target  name="PreProcessSourceCode"
+             depends="init"
+             description="Moves selected source code from the development tree into
+             the build/src directory. The code text is filtered to update version numbers.">
+
+        <echo level="info" message="AntFile: ${ant.file} Moving and filtering Source code."/>
+        <echo level="info" message=""/>
+
+
+        <copy todir="${build.src}" filtering="true">
+            <fileset dir="${src.dir}">
+                <!-- include all the java files -->
+                <include name="opendap/**"/>
+
+
+                <!-- Exclude the old hao code  -->
+                <exclude name="hao/**"/>
+
+
+                <!-- Exclude the experimental code  -->
+                <exclude name="opendap/experiments/**"/>
+
+                <!-- Exclude the Metacat code  -->
+                <exclude name="opendap/metacat/**"/>
+
+                <!-- Exclude the WCS and semantics code  -->
+                <exclude name="opendap/wcsGateway/**"/>
+                <exclude name="opendap/wcs/**"/>
+                <exclude name="opendap/semantics/**"/>
+
+
+                <!-- Exclude the Hyrax Admin Interface code  -->
+                <!-- <exclude name="opendap/hai/**"/>  -->
+
+
+            </fileset>
+
+        </copy>
+
+
+    </target>
+
+    <target
+            name="compile_new"
+            depends="PreProcessSourceCode"
+            description="Compiles the OLFS."
+            >
+        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info"
+              message="Using the ${build.compiler} javac compiler"/>
+        <echo level="info" message=""/>
+
+        <javac compiler="${build.compiler}"
+               destdir="${build.classes}"
+               debug="${compile.debug}"
+               debuglevel="${compile.debuglevel}"
+               deprecation="${compile.deprecation}">
+
+            <classpath refid="compile.classpath"/>
+
+            <src path="${build.src}"/>
+
+        </javac>
+
+    </target>
+
+
     <target
             name="compile"
             depends="init"
@@ -284,12 +353,13 @@
                debuglevel="${compile.debuglevel}"
                deprecation="${compile.deprecation}">
 
-            <compilerarg value="-Xlint:unchecked"/> 
+            <compilerarg value="-Xlint:unchecked"/>
             <classpath refid="compile.classpath"/>
 
             <src path="${src.dir}"/>
             <include name="opendap/wcs/v1_1_2/**/*.java"/>
             <include name="opendap/semantics/**/*.java"/>
+            <include name="opendap/coreServlet/DocServlet.java"/>
 
         </javac>
 
@@ -434,6 +504,7 @@
             >
         <copy todir="${build.src}" filtering="false" >
             <fileset dir="${src.dir}">
+                <exclude name="ornl/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="hao/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/bes/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
                 <exclude name="opendap/experiments/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
