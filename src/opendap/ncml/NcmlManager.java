@@ -122,14 +122,20 @@ public class NcmlManager {
 
     public static  void purgeNcmlDatasets(Catalog catalog)  {
 
-        Vector<String> ncmlDatasetIds =  _ncmlDatasetIdsByCatalogKey.remove(catalog.getCatalogKey());
+        if(catalog != null){
 
-        if(ncmlDatasetIds!=null){
-            for(String ncmlDatasetId: ncmlDatasetIds){
-                _ncmlDatasets.remove(ncmlDatasetId);
-                _ncmlDatasetsLastModifiedTimes.remove(ncmlDatasetId);
+            Vector<String> ncmlDatasetIds =  _ncmlDatasetIdsByCatalogKey.remove(catalog.getCatalogKey());
 
+            if(ncmlDatasetIds!=null){
+                for(String ncmlDatasetId: ncmlDatasetIds){
+                    _ncmlDatasets.remove(ncmlDatasetId);
+                    _ncmlDatasetsLastModifiedTimes.remove(ncmlDatasetId);
+
+                }
             }
+        }
+        else {
+            log.warn("purgeNcmlDatasets() - Received a null Catalog instance!");
         }
 
 

@@ -191,9 +191,10 @@ public class FileDispatchHandler implements DispatchHandler {
 
         log.debug("sendFile() downloadFileName: " + downloadFileName );
 
-        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-
-        response.setHeader("Content-Disposition",contentDisposition);
+        // I commented these two lines  out because it was incorrectly causing browsers to download
+        // (as opposed to display) EVERY file retrieved.
+        //String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+        //response.setHeader("Content-Disposition",contentDisposition);
 
 
         String suffix = ReqInfo.getRequestSuffix(req);

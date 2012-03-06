@@ -669,9 +669,11 @@ public class DispatchServlet extends HttpServlet {
 
         LogUtil.logServerShutdown("destroy()");
 
-        for (DispatchHandler dh : httpGetDispatchHandlers) {
-            log.debug("Shutting down handler: " + dh.getClass().getName());
-            dh.destroy();
+        if(httpGetDispatchHandlers != null){
+            for (DispatchHandler dh : httpGetDispatchHandlers) {
+                log.debug("Shutting down handler: " + dh.getClass().getName());
+                dh.destroy();
+            }
         }
 
 

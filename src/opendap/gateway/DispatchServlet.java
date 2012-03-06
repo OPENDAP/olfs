@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,7 +50,7 @@ import opendap.gateway.dapResponders.*;
  * Date: Apr 22, 2008
  * Time: 3:36:36 PM
  */
-public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
+public class DispatchServlet extends HttpServlet {
 
 
     private Logger log;
@@ -68,10 +69,15 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private Vector<HttpResponder> responders;
 
 
+
+
     public void init() {
 
         if (isInitialized)
             return;
+
+        LogUtil.logServerStartup("init()");
+
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
@@ -82,15 +88,15 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         responders = new Vector<HttpResponder>();
 
 
-        // dapResponders.add(new DDX(getMethod(,HttpServletRequest.class,HttpServletResponse.class)));
 
-
+        /*
         try {
             _config = loadConfig();
 
         } catch (Exception e) {
             log.error("init() Failed to load it's configuration! Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
+        */
 
 
         BesGatewayApi besApi = new BesGatewayApi();
@@ -304,6 +310,26 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             LogUtil.logServerAccessEnd(0, -1, "GATEWAY_SERVICE_ACCESS");
         }
     }
+
+
+
+    public void destroy() {
+
+        LogUtil.logServerShutdown("destroy()");
+
+        if(responders != null){
+            for (HttpResponder r : responders) {
+                log.debug("Shutting down HttpResponder: " + r.getClass().getName());
+                r.destroy();
+            }
+        }
+
+
+        super.destroy();
+
+        log.info("Gateway service shutdown complete.");
+    }
+
 
 
 }
