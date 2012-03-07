@@ -39,7 +39,8 @@
 
     <xsl:strip-space elements="*"/>
 
-    <xsl:variable name="WcsServiceVersion">1.0.0</xsl:variable>
+    <xsl:variable name="WcsSoftwareVersion">@WCS_SOFTWARE_VERSION@</xsl:variable>
+    <xsl:variable name="WcsServiceVersion">1.1</xsl:variable>
 
 
 
@@ -151,9 +152,12 @@
                 <!-- ****************************************************** -->
                 <!--         HERE IS THE HYRAX VERSION NUMBER               -->
                 <!--                                                        -->
-                <h3>OPeNDAP WCS Service - <xsl:value-of select="$WcsServiceVersion"/><br/>
+                <h3>WCS-<xsl:value-of select="$WcsServiceVersion"/>
+                    <span class="small"> (OPeNDAP WCS service implementation version
+                        <xsl:value-of select="$WcsSoftwareVersion"/>)</span>
+                    <br />
                     <span class="uuid">
-                        ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-contents
+                        ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-WCS
                     </span>
                 </h3>
 

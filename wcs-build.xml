@@ -46,7 +46,7 @@
          line by the distribution build script using
          tag information from CVS.
     -->
-    <property name="VERSION" value="Not.A.Release"/>
+    <property name="WCS_SOFTWARE_VERSION" value="Not.A.Release"/>
     <property name="CONFIG_FILE" value="ConfigFileNotSpecified"/>
 
 
@@ -115,9 +115,9 @@
 
     <target name="show" description="Show build settings.">
 
-        <echo level="info" message="Project Name:       ${ant.project.name}"/>
-        <echo level="info" message="Project File:       ${ant.file}"/>
-        <echo level="info" message="VERSION:            ${VERSION}"/>
+        <echo level="info" message="Project Name:         ${ant.project.name}"/>
+        <echo level="info" message="Project File:         ${ant.file}"/>
+        <echo level="info" message="WCS_SOFTWARE_VERSION: ${WCS_SOFTWARE_VERSION}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="    src.dir:       ${src.dir}"/>
@@ -171,6 +171,7 @@
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
+    <property name="build.resources" location="${build.dir}/resources"/>
 
 
     <!-- Libraries -->
@@ -260,8 +261,9 @@
         <mkdir dir="${build.lib}"/>
         <mkdir dir="${build.run}"/>
         <mkdir dir="${build.src}"/>
+        <mkdir dir="${build.resources}"/>
 
-        <filter token="HyraxVersion" value="${VERSION}"/>
+        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_SOFTWARE_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -283,28 +285,39 @@
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
-                <include name="opendap/**"/>
+                <include name="opendap/wcs/v1_1_2/**/*.java"/>
+                <include name="opendap/semantics/**/*.java"/>
 
+                <include name="opendap/coreServlet/DocServlet.java"/>
+                <include name="opendap/coreServlet/ServletUtil.java"/>
+                <include name="opendap/coreServlet/Scrub.java"/>
+                <include name="opendap/coreServlet/ReqInfo.java"/>
+                <include name="opendap/coreServlet/DispatchHandler.java"/>
+                <include name="opendap/coreServlet/DispatchServlet.java"/>
+                <include name="opendap/coreServlet/OPeNDAPException.java"/>
+                <include name="opendap/coreServlet/OpendapHttpDispatchHandler.java"/>
+                <include name="opendap/coreServlet/DataSourceInfo.java"/>
+                <include name="opendap/coreServlet/PersistentContentHandler.java"/>
+                <include name="opendap/coreServlet/Debug.java"/>
+                <include name="opendap/coreServlet/RequestCache.java"/>
+                <include name="opendap/coreServlet/Util.java"/>
+                <include name="opendap/coreServlet/MimeTypes.java"/>
 
-                <!-- Exclude the old hao code  -->
-                <exclude name="hao/**"/>
+                <include name="opendap/dap/Request.java"/>
 
+                <include name="opendap/namespaces/**/*.java"/>
+                <include name="opendap/logging/**/*.java"/>
+                <include name="opendap/xml/**/*.java"/>
+                <include name="opendap/threddsHandler/ThreddsCatalogUtil.java"/>
 
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
+            </fileset>
 
-                <!-- Exclude the Metacat code  -->
-                <exclude name="opendap/metacat/**"/>
+        </copy>
 
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcsGateway/**"/>
-                <exclude name="opendap/wcs/**"/>
-                <exclude name="opendap/semantics/**"/>
-
-
-                <!-- Exclude the Hyrax Admin Interface code  -->
-                <!-- <exclude name="opendap/hai/**"/>  -->
-
+        <copy todir="${build.resources}" filtering="true">
+            <fileset dir="${resources.dir}/WCS">
+                <!-- include all the java files -->
+                <include name="**"/>
 
             </fileset>
 
@@ -314,7 +327,7 @@
     </target>
 
     <target
-            name="compile_new"
+            name="compile"
             depends="PreProcessSourceCode"
             description="Compiles the OLFS."
             >
@@ -339,7 +352,7 @@
 
 
     <target
-            name="compile"
+            name="compile_old"
             depends="init"
             description="Compiles the Web Coverage Service."
             >
@@ -376,11 +389,11 @@
             description="Builds source distribution"
             >
 
-        <tar destfile="${build.dist}/wcs-${VERSION}-src.tgz"
+        <tar destfile="${build.dist}/wcs-${WCS_SOFTWARE_VERSION}-src.tgz"
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="wcs-${VERSION}-src">
+            <zipfileset dir="." prefix="wcs-${WCS_SOFTWARE_VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
                 <exclude name="doc/admin/**"/>
@@ -404,10 +417,10 @@
         <copy file="${distributionResources.dir}/README"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/wcs-${VERSION}-webapp.tgz"
+        <tar destfile="${build.dist}/wcs-${WCS_SOFTWARE_VERSION}-webapp.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.dist}" prefix="wcs-${VERSION}-webapp">
+            <zipfileset dir="${build.dist}" prefix="wcs-${WCS_SOFTWARE_VERSION}-webapp">
                 <include name="WCS.war"/>
                 <include name="README"/>
             </zipfileset>
@@ -477,13 +490,13 @@
                 <exclude name="_notes"/>
             </zipfileset>
             
-            <zipfileset dir="${resources.dir}/WCS" prefix="">
+            <zipfileset dir="${build.resources}" prefix="">
                 <include name="**/*"/>
                 <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
 
 
-            <webinf dir="${resources.dir}/WCS/WEB-INF">
+            <webinf dir="${build.resources}/WEB-INF">
                 <include name="logback-test.xml"/>
                 <include name="logback.xml"/>
             </webinf>
@@ -498,27 +511,10 @@
 
     <target
             name="doc"
-            depends="clean,init"
+            depends="clean,PreProcessSourceCode"
             description="Builds JavaDoc for the WCS Service software packages, if missing or out of date."
             unless="JavaDocIsUpToDate"
             >
-        <copy todir="${build.src}" filtering="false" >
-            <fileset dir="${src.dir}">
-                <exclude name="ornl/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="hao/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/bes/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/experiments/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/io/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/metacat/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/ppt/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/soap/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/thredds/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/threddsHandler/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/wcsGateway/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/wcs/gatewayClient/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="opendap/webstart/**"/><!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-            </fileset>
-        </copy>
 
         <javadoc destdir="${build.doc}/javadoc"
                  Author="true"
@@ -546,9 +542,9 @@
 
     <target  name="test" depends="compile">
 
-        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
-        <copy file="${resources.dir}/WCS/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
-        <copy file="${resources.dir}/WCS/WEB-INF/logback-test.xml"  tofile="${build.run}/logback-test.xml"/>
+        <copy file="${build.resources}/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl-functions.xsl"/>
+        <copy file="${build.resources}/xsl/xsd2owl-functions.xsl" tofile="${build.run}/xsd2owl.xsl"/>
+        <copy file="${build.resources}/WEB-INF/logback-test.xml"  tofile="${build.run}/logback-test.xml"/>
 
         <java classname="opendap.semantics.wcs.StaticRdfCatalog"
               fork="true"
