@@ -927,13 +927,12 @@ public class BES {
         try {
             if (_clientCheckoutLock.tryLock(10, TimeUnit.SECONDS)) {
                 gotClientCheckoutLock = true;
-                Semaphore permits = _checkOutFlag;
 
                 log.debug("destroy() Attempting to acquire all clients...");
 
 
-                if (permits.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
-                    log.debug("destroy() All clients aquired.");
+                if (_checkOutFlag.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
+                    log.debug("destroy() All "+getMaxClients()+" client permits acquired.");
 
                     log.debug("destroy() " + _clientQueue.size() +
                             " client(s) to shutdown.");
@@ -955,6 +954,7 @@ public class BES {
 
 
                     }
+                    _checkOutFlag.release(getMaxClients());
                     nicely = true;
                 }
 
@@ -963,7 +963,7 @@ public class BES {
         } catch (Throwable e) {
             log.error("destroy() OUCH! Problem shutting down BESPool", e);
         } finally {
-            _checkOutFlag = null;
+            //_checkOutFlag = null;
             if (gotClientCheckoutLock)
                 _clientCheckoutLock.unlock();
         }
