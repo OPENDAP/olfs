@@ -25,6 +25,7 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
@@ -722,7 +723,7 @@ public class BES {
      * @throws BadConfigurationException .
      */
     public OPeNDAPClient getClient()
-            throws PPTException, BadConfigurationException {
+            throws PPTException {
 
         OPeNDAPClient besClient = null;
         String clientId;
@@ -756,9 +757,15 @@ public class BES {
 
                 }
                 catch (PPTException ppte){
-                    besClient.setID(new Date().toString() + "BES Client Failed To Start: " + ppte.getMessage());
-                    log.error("getClient() - Failed to start BES Client. msg:'{}'",ppte.getMessage());
-                    throw new PPTException(ppte);
+
+                    _checkOutFlag.release(); // Release the client permit because this client is hosed...
+
+                    StringBuilder msg = new StringBuilder().append("BES Client Failed To Start.");
+                    msg.append(" msg: '").append(ppte.getMessage()).append("'");
+                    besClient.setID(new Date().toString() + msg);
+                    msg.insert(0, "getClient() - ");
+                    log.error(msg.toString());
+                    throw new PPTException(msg.toString(),ppte);
                 }
 
 
@@ -796,6 +803,7 @@ public class BES {
             if (besClient != null) {
                 log.error("getClient() - Attempting to discard BES Client id: " + besClient.getID());
                 discardClient(besClient);
+                _checkOutFlag.release(); // Release the client permit because this client is hosed...
             }
             throw new PPTException(e);
         } finally {
