@@ -25,6 +25,7 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
@@ -722,7 +723,7 @@ public class BES {
      * @throws BadConfigurationException .
      */
     public OPeNDAPClient getClient()
-            throws PPTException, BadConfigurationException {
+            throws PPTException {
 
         OPeNDAPClient besClient = null;
         String clientId;
@@ -756,9 +757,15 @@ public class BES {
 
                 }
                 catch (PPTException ppte){
-                    besClient.setID(new Date().toString() + "BES Client Failed To Start: " + ppte.getMessage());
-                    log.error("getClient() - Failed to start BES Client. msg:'{}'",ppte.getMessage());
-                    throw new PPTException(ppte);
+
+                    _checkOutFlag.release(); // Release the client permit because this client is hosed...
+
+                    StringBuilder msg = new StringBuilder().append("BES Client Failed To Start.");
+                    msg.append(" msg: '").append(ppte.getMessage()).append("'");
+                    besClient.setID(new Date().toString() + msg);
+                    msg.insert(0, "getClient() - ");
+                    log.error(msg.toString());
+                    throw new PPTException(msg.toString(),ppte);
                 }
 
 
@@ -796,6 +803,7 @@ public class BES {
             if (besClient != null) {
                 log.error("getClient() - Attempting to discard BES Client id: " + besClient.getID());
                 discardClient(besClient);
+                _checkOutFlag.release(); // Release the client permit because this client is hosed...
             }
             throw new PPTException(e);
         } finally {
@@ -927,13 +935,12 @@ public class BES {
         try {
             if (_clientCheckoutLock.tryLock(10, TimeUnit.SECONDS)) {
                 gotClientCheckoutLock = true;
-                Semaphore permits = _checkOutFlag;
 
                 log.debug("destroy() Attempting to acquire all clients...");
 
 
-                if (permits.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
-                    log.debug("destroy() All clients aquired.");
+                if (_checkOutFlag.tryAcquire(getMaxClients(), 10, TimeUnit.SECONDS)) {
+                    log.debug("destroy() All "+getMaxClients()+" client permits acquired.");
 
                     log.debug("destroy() " + _clientQueue.size() +
                             " client(s) to shutdown.");
@@ -955,6 +962,7 @@ public class BES {
 
 
                     }
+                    _checkOutFlag.release(getMaxClients());
                     nicely = true;
                 }
 
@@ -963,7 +971,7 @@ public class BES {
         } catch (Throwable e) {
             log.error("destroy() OUCH! Problem shutting down BESPool", e);
         } finally {
-            _checkOutFlag = null;
+            //_checkOutFlag = null;
             if (gotClientCheckoutLock)
                 _clientCheckoutLock.unlock();
         }

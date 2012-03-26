@@ -9,5 +9,7 @@
         <JnlpFileName>idv.jnlp</JnlpFileName>
     </JwsHandler>
 
+    <JwsHandler className="opendap.webstart.AutoplotRequestHandler" />
+
 </WebStartConfig>
 
