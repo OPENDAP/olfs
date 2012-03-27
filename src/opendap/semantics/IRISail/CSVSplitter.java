@@ -28,8 +28,8 @@ package opendap.semantics.IRISail;
 
 import org.slf4j.Logger;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Comma Separated Values (CSV) Splitter.

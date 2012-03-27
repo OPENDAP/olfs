@@ -23,9 +23,10 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2.http;
 
+import opendap.coreServlet.ReqInfo;
 import opendap.wcs.v1_1_2.*;
-import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -35,10 +36,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-
-import opendap.coreServlet.ReqInfo;
 
 /**
  * Created by IntelliJ IDEA.

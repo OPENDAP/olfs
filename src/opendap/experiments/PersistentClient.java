@@ -24,12 +24,11 @@
 
 package opendap.experiments;
 
-import java.net.Socket;
-import java.net.InetSocketAddress;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Random;
 
 /**

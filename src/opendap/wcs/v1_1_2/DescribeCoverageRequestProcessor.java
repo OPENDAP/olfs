@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
+import opendap.coreServlet.Scrub;
 import org.jdom.Document;
 import org.jdom.Element;
-import opendap.coreServlet.Scrub;
 
 /**
  * Created by IntelliJ IDEA.

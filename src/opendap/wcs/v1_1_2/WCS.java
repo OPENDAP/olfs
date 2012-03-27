@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Namespace;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.slf4j.Logger;
 
 import java.util.Iterator;

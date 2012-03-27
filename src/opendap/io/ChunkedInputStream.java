@@ -23,13 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.io;
 
-import opendap.bes.DevNull;
-
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * User: ndp

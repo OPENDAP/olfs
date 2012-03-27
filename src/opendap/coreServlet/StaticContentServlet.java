@@ -24,10 +24,10 @@
 package opendap.coreServlet;
 
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.catalina.Globals;
 import org.slf4j.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Provides access to

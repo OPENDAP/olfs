@@ -26,45 +26,24 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.ProcessingInstruction;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
-import org.openrdf.model.URI;
-import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.impl.LiteralImpl;
-import org.openrdf.model.util.LiteralUtil;
-
-import org.openrdf.query.algebra.IsLiteral;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.*;
 import org.openrdf.query.impl.MapBindingSet;
-
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * This class is used to create a JDOM document by querying against Sesame-OWLIM RDF store.

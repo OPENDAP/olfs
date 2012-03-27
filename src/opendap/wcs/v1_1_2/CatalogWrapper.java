@@ -23,21 +23,20 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
+import opendap.xml.Util;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Date;
-import java.util.Vector;
-import java.util.concurrent.atomic.AtomicReference;
 import java.io.File;
 import java.io.IOException;
-
-import opendap.xml.Util;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * User: ndp

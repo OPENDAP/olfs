@@ -23,8 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Element;
-
 /**
  * Created by IntelliJ IDEA.
  * User: ndp

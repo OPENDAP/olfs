@@ -1,11 +1,8 @@
 package opendap.experiments;
 
 import net.sf.saxon.s9api.*;
-import opendap.bes.Version;
-import opendap.xml.Transformer;
 
 import javax.xml.transform.stream.StreamSource;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.

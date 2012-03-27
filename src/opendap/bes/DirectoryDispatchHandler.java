@@ -27,20 +27,18 @@ package opendap.bes;
 import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.*;
+import opendap.dap.Request;
+import opendap.xml.Transformer;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import opendap.dap.Request;
-import opendap.xml.Transformer;
-import org.jdom.Element;
-import org.jdom.Document;
-import org.jdom.transform.JDOMSource;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-import org.slf4j.Logger;
-
 import java.util.Date;
 
 

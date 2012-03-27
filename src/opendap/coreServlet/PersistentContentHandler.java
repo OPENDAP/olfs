@@ -25,10 +25,10 @@
 package opendap.coreServlet;
 
 
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpServlet;
 import java.io.*;
-
-import org.slf4j.Logger;
 
 /**
  * Provides methods for detecting the presence of the peristent content directory and moving an initial

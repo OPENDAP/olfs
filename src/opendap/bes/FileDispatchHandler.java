@@ -26,17 +26,16 @@ package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
+import org.jdom.Element;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletOutputStream;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Date;
-
-import org.jdom.Element;
 
 /**
  * User: ndp

@@ -24,17 +24,16 @@
 
 package opendap.bes;
 
+import opendap.coreServlet.Scrub;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Attribute;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import java.io.*;
-
-import opendap.coreServlet.Scrub;
 
 /**
  * Holds a configuarrtion for the BES. The persistent representation of this is an XML element, usually incorporated

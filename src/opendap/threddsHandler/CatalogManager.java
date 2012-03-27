@@ -23,18 +23,17 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
+import opendap.namespaces.THREDDS;
 import opendap.ncml.NcmlManager;
-import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
+import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
-
-import opendap.namespaces.THREDDS;
 
 
 /**

@@ -25,11 +25,9 @@
 
 package opendap.ppt;
 
-import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
+import org.slf4j.Logger;
 
 import java.io.*;
 

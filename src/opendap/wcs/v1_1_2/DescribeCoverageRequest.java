@@ -25,15 +25,14 @@ package opendap.wcs.v1_1_2;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Iterator;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * User: ndp

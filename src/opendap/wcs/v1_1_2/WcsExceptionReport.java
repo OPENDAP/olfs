@@ -24,13 +24,13 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Document;
-import org.jdom.Namespace;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
+import org.jdom.Namespace;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * User: ndp

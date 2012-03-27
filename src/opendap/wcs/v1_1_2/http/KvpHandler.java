@@ -25,8 +25,8 @@ package opendap.wcs.v1_1_2.http;
 
 import opendap.wcs.v1_1_2.*;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;

@@ -27,9 +27,6 @@ package opendap.soap;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 /**
  *
  * Provides XML representaions of Java exceptions.

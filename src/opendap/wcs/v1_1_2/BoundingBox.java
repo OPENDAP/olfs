@@ -30,8 +30,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import opendap.coreServlet.Scrub;
-
 /**
  *
  * This class represents a ows:BoundingBox with additional properties and methods to

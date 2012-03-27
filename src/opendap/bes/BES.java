@@ -25,30 +25,26 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.OPeNDAPException;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.io.IOException;
-
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.slf4j.Logger;
-import org.jdom.JDOMException;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
 
 /**
  * User: ndp

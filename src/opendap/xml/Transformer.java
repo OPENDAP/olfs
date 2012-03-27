@@ -24,26 +24,21 @@
 package opendap.xml;
 
 
-
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
 import net.sf.saxon.s9api.*;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-import org.jdom.transform.XSLTransformer;
 import org.jdom.input.SAXBuilder;
-
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.XSLTransformer;
 import org.slf4j.Logger;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.Date;
 import java.util.HashMap;

@@ -23,26 +23,29 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcsGateway;
 
+import opendap.bes.BESError;
+import opendap.bes.Version;
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.dap.User;
 import opendap.logging.LogUtil;
-import org.slf4j.Logger;
 import org.jdom.Document;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URISyntaxException;
-
+import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import opendap.coreServlet.*;
-import opendap.bes.Version;
-import opendap.bes.BESError;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * User: ndp

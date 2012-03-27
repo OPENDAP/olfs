@@ -26,6 +26,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
+import com.ontotext.trree.owlim_ext.SailImpl;
 import opendap.coreServlet.Scrub;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.URIImpl;
@@ -45,8 +46,6 @@ import org.openrdf.sail.memory.MemoryStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ontotext.trree.owlim_ext.SailImpl;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -57,7 +56,8 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Vector;
 
 /**
  * This class is the major class that manipulates and maintains the repository up to date.

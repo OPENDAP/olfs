@@ -23,9 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.experiments;
 
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Attribute;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;

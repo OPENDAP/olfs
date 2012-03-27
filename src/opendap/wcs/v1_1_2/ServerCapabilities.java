@@ -23,11 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Element;
-
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.

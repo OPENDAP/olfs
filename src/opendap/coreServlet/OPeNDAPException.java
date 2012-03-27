@@ -25,16 +25,13 @@
 package opendap.coreServlet;
 
 
-
-import org.slf4j.Logger;
+import opendap.namespaces.DAP;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-
-import opendap.namespaces.DAP;
 
 /**
  * Wraps the Exception class so that it can be serialized as a DAP2 error object.

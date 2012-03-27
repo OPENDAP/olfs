@@ -24,9 +24,9 @@
 
 package opendap.experiments;
 
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 import java.io.*;
 

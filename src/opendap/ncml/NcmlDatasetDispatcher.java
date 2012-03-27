@@ -23,18 +23,15 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.ncml;
 
-import opendap.bes.BESDataSource;
-import opendap.coreServlet.*;
-import opendap.bes.dapResponders.*;
+import opendap.bes.dapResponders.DapDispatcher;
+import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.HttpResponder;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 /**
  * IsoDispatchHandler for ISO responses from Hyrax

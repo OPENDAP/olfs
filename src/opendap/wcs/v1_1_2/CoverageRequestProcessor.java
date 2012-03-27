@@ -24,21 +24,18 @@
 package opendap.wcs.v1_1_2;
 
 
+import opendap.coreServlet.Scrub;
 import opendap.wcs.v1_1_2.http.MultipartResponse;
 import opendap.wcs.v1_1_2.http.SoapHandler;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.Document;
-
-import java.util.Iterator;
-import java.util.Vector;
-
-
-import opendap.coreServlet.Scrub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Process GetCoverage requests. Static methods are used to construct a wcs:Coverages

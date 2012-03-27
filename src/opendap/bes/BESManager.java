@@ -24,19 +24,16 @@
 
 package opendap.bes;
 
+import opendap.coreServlet.DispatchHandler;
 import org.jdom.Document;
 import org.jdom.Element;
-
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.List;
-
-import opendap.coreServlet.DispatchHandler;
-import opendap.coreServlet.DispatchServlet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 
 /**

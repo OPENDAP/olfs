@@ -23,22 +23,18 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.Element;
-import org.slf4j.Logger;
-
-import java.util.Enumeration;
-import java.util.Vector;
-import java.util.Date;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.File;
-
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.s9api.XdmNode;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.slf4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Date;
 
 /**
  * User: ndp

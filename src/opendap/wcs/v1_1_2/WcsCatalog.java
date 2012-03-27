@@ -24,11 +24,7 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.rio.RDFParseException;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 

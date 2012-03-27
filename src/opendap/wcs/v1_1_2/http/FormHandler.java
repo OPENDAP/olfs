@@ -25,16 +25,10 @@ package opendap.wcs.v1_1_2.http;
 
 import opendap.wcs.v1_1_2.WCS;
 import opendap.wcs.v1_1_2.WcsException;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletOutputStream;
 import java.io.*;
 import java.net.URLDecoder;
 

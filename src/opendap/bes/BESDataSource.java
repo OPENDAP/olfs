@@ -31,10 +31,10 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.slf4j.Logger;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.text.SimpleDateFormat;
 
 
 /**

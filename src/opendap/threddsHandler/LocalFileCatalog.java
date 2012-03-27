@@ -23,21 +23,22 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
+import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmNode;
 import opendap.xml.Transformer;
-import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-
-import java.io.*;
-import java.util.Date;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
-
-import net.sf.saxon.s9api.*;
+import org.slf4j.Logger;
 
 import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.util.Date;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * User: ndp

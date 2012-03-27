@@ -29,13 +29,15 @@ package opendap.semantics.IRISail;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import opendap.xml.Transformer;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.openrdf.model.*;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.*;
 import org.openrdf.repository.Repository;
@@ -46,13 +48,14 @@ import org.openrdf.rio.RDFParseException;
 import org.slf4j.Logger;
 
 import javax.activation.FileDataSource;
-import javax.activation.FileTypeMap;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Vector;
 
 /**
  * This class is used to populate the repository. A particular URL is only

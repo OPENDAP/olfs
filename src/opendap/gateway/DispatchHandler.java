@@ -23,18 +23,21 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
+import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.Util;
 import opendap.gateway.dapResponders.*;
-import org.slf4j.Logger;
 import org.jdom.Element;
-import opendap.coreServlet.*;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URISyntaxException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;

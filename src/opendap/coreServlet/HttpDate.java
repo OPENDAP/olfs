@@ -24,11 +24,11 @@
 
 package opendap.coreServlet;
 
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.SimpleTimeZone;
-import java.text.SimpleDateFormat;
-import java.text.ParsePosition;
-import java.text.FieldPosition;
 
 /**
  * This class provides methods for dealing with HTTP/1.1 dates.

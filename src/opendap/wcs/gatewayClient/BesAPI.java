@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import opendap.bes.BesXmlAPI;
 import opendap.bes.BadConfigurationException;
+import opendap.bes.BesXmlAPI;
 import opendap.namespaces.BES;
 import org.jdom.Document;
 import org.jdom.Element;

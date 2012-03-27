@@ -23,29 +23,32 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.*;
-import opendap.bes.Version;
 import opendap.bes.BESError;
+import opendap.bes.Version;
+import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.DispatchHandler;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
 import opendap.xml.Transformer;
-import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 
 
 /**

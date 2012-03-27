@@ -24,7 +24,6 @@
 package opendap.wcs.v1_1_2;
 
 import org.jdom.Document;
-import org.jdom.Element;
 
 /**
  *

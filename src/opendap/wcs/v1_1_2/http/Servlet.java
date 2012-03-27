@@ -5,7 +5,7 @@ import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import opendap.semantics.wcs.StaticRdfCatalog;
-import opendap.wcs.v1_1_2.*;
+import opendap.wcs.v1_1_2.CatalogWrapper;
 import org.jdom.Element;
 import org.slf4j.Logger;
 

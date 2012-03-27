@@ -23,16 +23,18 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Element;
+import opendap.coreServlet.Scrub;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
+import org.jdom.Element;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
-import java.util.*;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import opendap.coreServlet.Scrub;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * User: ndp

@@ -25,9 +25,9 @@ package opendap.io;
 
 import org.slf4j.Logger;
 
-import java.io.OutputStream;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  *

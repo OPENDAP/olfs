@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import org.jdom.Element;
 import org.jdom.Attribute;
+import org.jdom.Element;
 import org.slf4j.Logger;
 
 import java.util.List;

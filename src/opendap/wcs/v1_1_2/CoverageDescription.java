@@ -23,15 +23,16 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2;
 
-import org.jdom.Element;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
-import java.io.*;
 
 /**
  * An implementation of a wcs:CoverageDescription object. This implementation includes methods that assist in the

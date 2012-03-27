@@ -25,7 +25,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.semantics.IRISail;
 
-import opendap.wcs.v1_1_2.CatalogWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

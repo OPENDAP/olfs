@@ -25,8 +25,8 @@ package opendap.wcs.v1_1_2;
 
 import org.jdom.Element;
 
-import java.util.Vector;
 import java.net.URI;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.

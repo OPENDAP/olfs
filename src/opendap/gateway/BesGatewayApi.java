@@ -1,7 +1,6 @@
 package opendap.gateway;
 
 import opendap.bes.BadConfigurationException;
-import opendap.bes.BesDapResponder;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.namespaces.BES;

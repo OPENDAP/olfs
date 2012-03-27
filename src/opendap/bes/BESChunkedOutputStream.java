@@ -23,14 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes;
 
-import opendap.io.ChunkedOutputStream;
 import opendap.io.Chunk;
+import opendap.io.ChunkedOutputStream;
 import opendap.ppt.PPTSessionProtocol;
-
-import java.io.OutputStream;
-import java.io.IOException;
-
 import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * User: ndp

@@ -23,12 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v1_1_2.http;
 
-import opendap.wcs.v1_1_2.*;
-import org.jdom.Element;
-import org.jdom.Document;
-import opendap.namespaces.SOAP;
-import opendap.namespaces.NS;
 import opendap.coreServlet.DispatchServlet;
+import opendap.namespaces.NS;
+import opendap.namespaces.SOAP;
+import opendap.wcs.v1_1_2.*;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;

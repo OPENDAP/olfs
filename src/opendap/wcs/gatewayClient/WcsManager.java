@@ -23,18 +23,18 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import org.jdom.input.SAXBuilder;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.FileInputStream;
-import java.util.List;
-import java.util.Iterator;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * User: ndp

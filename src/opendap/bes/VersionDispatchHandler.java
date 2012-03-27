@@ -27,15 +27,15 @@ package opendap.bes;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
-import org.jdom.Element;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
+import org.jdom.Element;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
 import java.io.PrintStream;
 
 /**

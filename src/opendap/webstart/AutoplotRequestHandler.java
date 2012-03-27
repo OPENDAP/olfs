@@ -24,21 +24,17 @@
 package opendap.webstart;
 
 import opendap.namespaces.DAP;
-
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.slf4j.Logger;
 
-
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;

@@ -23,25 +23,26 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcsGateway;
 
+import opendap.bes.BESError;
+import opendap.bes.Version;
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ServletUtil;
 import opendap.dap.User;
 import opendap.gateway.BesGatewayApi;
-import org.slf4j.Logger;
-import org.jdom.Element;
 import org.jdom.Document;
-import opendap.coreServlet.*;
-import opendap.bes.Version;
-import opendap.bes.BESError;
+import org.jdom.Element;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.net.URL;
-import java.net.URISyntaxException;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 

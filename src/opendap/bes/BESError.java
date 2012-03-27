@@ -26,21 +26,20 @@ package opendap.bes;
 
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.DispatchServlet;
-import opendap.coreServlet.ServletUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-import org.jdom.transform.XSLTransformer;
-import org.jdom.input.SAXBuilder;
 import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.XSLTransformer;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
-import java.io.*;
 
 
 /**

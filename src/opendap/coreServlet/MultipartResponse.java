@@ -24,20 +24,20 @@
 
 package opendap.coreServlet;
 
-import org.jdom.Element;
+import opendap.soap.XMLNamespaces;
 import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
+import org.jdom.Element;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.server.UID;
-import java.io.*;
 import java.util.Vector;
-
-import opendap.soap.XMLNamespaces;
 
 /**
  * This is used to hold the various parts of a MutlipartMIME response used by the OPeNDAP

@@ -25,19 +25,17 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import org.jdom.Element;
-import org.jdom.Text;
+import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.Text;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import opendap.coreServlet.ReqInfo;
-
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Contains the Version and UUID information for Hyrax Server.

@@ -26,9 +26,9 @@ package opendap.coreServlet;
 
 import org.jdom.Element;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.ServletException;
 
 /**
  * Impelmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to

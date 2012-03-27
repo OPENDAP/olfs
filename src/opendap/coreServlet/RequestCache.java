@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.coreServlet;
 
-import org.jdom.Document;
 import org.slf4j.Logger;
 
 import java.util.Date;

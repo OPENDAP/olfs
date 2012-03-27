@@ -24,23 +24,25 @@
 
 package opendap.coreServlet;
 
+import opendap.soap.ExceptionElementUtil;
+import opendap.soap.XMLNamespaces;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
-import org.jdom.*;
-import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 import java.util.Iterator;
-
-import opendap.soap.XMLNamespaces;
-import opendap.soap.ExceptionElementUtil;
+import java.util.List;
 
 /**
  * Handles SOAP requests that arrive via HTTP POST.

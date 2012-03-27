@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
-import opendap.bes.Version;
 import opendap.coreServlet.HttpResponder;
 import org.slf4j.Logger;
 

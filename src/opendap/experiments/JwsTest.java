@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 
 import javax.swing.*;
 import javax.swing.text.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Vector;
 
 /**

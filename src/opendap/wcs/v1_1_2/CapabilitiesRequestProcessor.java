@@ -28,8 +28,6 @@ import org.jdom.Element;
 
 import java.util.Iterator;
 
-import opendap.coreServlet.Scrub;
-
 /**
  *
  * This class houses methods that return the wcs:Capabilities response for the service.

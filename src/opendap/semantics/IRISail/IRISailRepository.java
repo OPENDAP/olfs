@@ -27,13 +27,13 @@
 
 package opendap.semantics.IRISail;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sail.SailRepository;
-
 import org.openrdf.sail.Sail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *  A local SailRepository. The state (up/down) of the repository is

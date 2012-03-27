@@ -7,9 +7,6 @@ import opendap.dap.DapResponder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Matcher;
-
 /**
  * Created by IntelliJ IDEA.
  * User: ndp

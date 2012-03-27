@@ -24,32 +24,27 @@
 
 package opendap.threddsHandler;
 
-import org.apache.commons.cli.*;
-import org.jdom.input.SAXBuilder;
+import opendap.namespaces.THREDDS;
+import opendap.namespaces.XLINK;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.XMLOutputter;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
 import java.io.IOException;
-
-import java.util.EmptyStackException;
-import java.util.Enumeration;
-import java.util.Stack;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Iterator;
-
-import java.net.URL;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
-
-import opendap.namespaces.THREDDS;
-import opendap.namespaces.XLINK;
+import java.net.URL;
+import java.util.*;
 
 /**
  * This class is a thredds catalog utility. 

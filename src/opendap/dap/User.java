@@ -1,6 +1,5 @@
 package opendap.dap;
 
-import opendap.bes.BES;
 import opendap.bes.BESManager;
 import opendap.coreServlet.ReqInfo;
 

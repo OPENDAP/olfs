@@ -24,7 +24,9 @@
 
 package opendap.bes;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The HeaderInputStream filters the input to only read lines of text until

@@ -25,24 +25,27 @@
 package opendap.experiments;
 
 
+import opendap.coreServlet.OPeNDAPException;
+import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.Util;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import java.io.*;
-import java.nio.channels.SocketChannel;
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.Util;
-import opendap.coreServlet.ServletUtil;
 
 
 /**

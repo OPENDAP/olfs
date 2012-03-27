@@ -23,11 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.gatewayClient;
 
-import org.slf4j.Logger;
 import org.jdom.Element;
+import org.slf4j.Logger;
 
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * User: ndp

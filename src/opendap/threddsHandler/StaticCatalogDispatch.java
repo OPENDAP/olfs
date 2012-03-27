@@ -23,26 +23,29 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
-import opendap.coreServlet.*;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XdmNode;
+import opendap.coreServlet.DispatchHandler;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.dap.Request;
 import opendap.xml.Transformer;
-import org.slf4j.Logger;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.HttpClient;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
-import java.io.*;
-
-
-import net.sf.saxon.s9api.*;
 
 /**
  * Provides Dispatch Services for the XSLT based THREDDS catalog Handler.

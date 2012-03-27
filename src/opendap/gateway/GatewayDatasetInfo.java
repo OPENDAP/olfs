@@ -27,7 +27,6 @@
 package opendap.gateway;
 
 import opendap.coreServlet.DataSourceInfo;
-import opendap.ncml.NcmlManager;
 
 /**
  * Created by IntelliJ IDEA.

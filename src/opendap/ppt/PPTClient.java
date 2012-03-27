@@ -25,10 +25,16 @@
 package opendap.ppt;
 
 
-import java.io.*;
-import java.net.*;
-
 import org.slf4j.Logger;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
  * @deprecated

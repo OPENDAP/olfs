@@ -23,24 +23,20 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.ppt;
 
-import opendap.io.ChunkProtocol;
-import org.slf4j.Logger;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
-
-import java.net.Socket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.net.SocketException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.InputStream;
-
 import opendap.bes.BESChunkedOutputStream;
 import opendap.io.ChunkedInputStream;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
  * User: ndp

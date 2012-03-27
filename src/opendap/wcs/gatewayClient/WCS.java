@@ -24,7 +24,6 @@
 package opendap.wcs.gatewayClient;
 
 import org.jdom.Namespace;
-import org.jdom.Element;
 
 /**
  * WCS Namespaces and vocabulary.
