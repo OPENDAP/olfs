@@ -1,11 +1,14 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ReqInfo;
 import opendap.dap.DapResponder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Matcher;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,6 +38,38 @@ public abstract class BesDapResponder extends DapResponder {
         _besApi = besApi;
 
     }
+
+
+
+    /**
+     *
+     * @param relativeUrl
+     * @return
+     */
+    @Override
+    public boolean matches(String relativeUrl) {
+        if (super.matches(relativeUrl)) {
+
+            String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
+            try {
+                DataSourceInfo dsi = new BESDataSource(besDataSourceId, _besApi);
+                if (dsi.isDataset()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
+            }
+
+
+        }
+
+
+        return false;
+
+    }
+
+    //public abstract boolean needsBesToMatch();
+    //public abstract boolean needsBesToRespond();
 
 
     public BesApi getBesApi(){

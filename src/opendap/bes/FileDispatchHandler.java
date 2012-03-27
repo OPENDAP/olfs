@@ -46,7 +46,7 @@ import org.jdom.Element;
 public class FileDispatchHandler implements DispatchHandler {
 
     private org.slf4j.Logger log;
-    private static boolean allowDirectDataSourceAccess = false;
+    //private static boolean allowDirectDataSourceAccess = false;
     private boolean initialized;
 
     private BesApi _besApi;
@@ -58,9 +58,9 @@ public class FileDispatchHandler implements DispatchHandler {
     }
 
 
-    public static boolean allowDirectDataSourceAccess(){
-        return allowDirectDataSourceAccess;
-    }
+    //public static boolean allowDirectDataSourceAccess(){
+    //    return allowDirectDataSourceAccess;
+    //}
 
 
     public void init(HttpServlet servlet,Element config) throws Exception {
@@ -68,16 +68,16 @@ public class FileDispatchHandler implements DispatchHandler {
         if(initialized) return;
 
 
-        Element dv = config.getChild("AllowDirectDataSourceAccess");
-        if(dv!=null){
-            allowDirectDataSourceAccess = true;
-        }
+        //Element dv = config.getChild("AllowDirectDataSourceAccess");
+        //if(dv!=null){
+        //    allowDirectDataSourceAccess = true;
+        //}
 
 
         _besApi = new BesApi();
 
 
-        log.info("Initialized. Direct Data Source Access: " + (allowDirectDataSourceAccess?"Enabled":"Disabled") );
+        //log.info("Initialized. Direct Data Source Access: " + (allowDirectDataSourceAccess?"Enabled":"Disabled") );
 
 
         initialized = true;
@@ -158,7 +158,7 @@ public class FileDispatchHandler implements DispatchHandler {
                 isFileResponse = true;
                 if (sendResponse) {
                     if(dsi.sourceIsAccesible()){
-                        if (!dsi.isDataset() || allowDirectDataSourceAccess) {
+                        if (!dsi.isDataset() ){ // || allowDirectDataSourceAccess) {
                             sendFile(request, response);
                         } else {
                             sendDirectAccessDenied(request, response);

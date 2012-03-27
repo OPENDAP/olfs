@@ -45,6 +45,8 @@ import java.util.regex.Pattern;
 
 /**
  * IsoDispatchHandler for Metadata Rubric responses from Hyrax
+ *
+ * @deprecated
  */
 public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandler {
 

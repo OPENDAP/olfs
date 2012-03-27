@@ -29,10 +29,14 @@ package opendap.ncml;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.namespaces.BES;
+import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 
 /**
@@ -134,6 +138,58 @@ public class NcmlDatasetBesApi extends BesApi {
         return new Document(request);
 
     }
+
+
+     /*
+    <showInfo>
+        <dataset catalog="catalog" lastModified="2008-05-29T23:31:56" name="NWAtlanticDec_1km.nc" node="false" size="852">
+            <serviceRef>dap</serviceRef>
+        </dataset>
+    </showInfo>
+    */
+
+    @Override
+    public boolean getInfo(String dataSource, Document response) throws
+            PPTException,
+                        BadConfigurationException,
+                        IOException,
+                        JDOMException {
+
+
+
+        if(NcmlManager.isNcmlDataset(dataSource)){
+            Element showInfo = new Element("showInfo",BES.BES_NS);
+            Element dataset = new Element("dataset",BES.BES_NS);
+            Element srvcRef = new Element("serviceRef",BES.BES_NS);
+
+            showInfo.addContent(dataset);
+            dataset.addContent(srvcRef);
+
+            dataset.setAttribute("name",dataSource);
+            dataset.setAttribute("catalog","catalog");
+            dataset.setAttribute("lastModified","2008-05-29T23:31:56");
+            dataset.setAttribute("node","false");
+            dataset.setAttribute("size","-1");
+            dataset.setAttribute("prefix", getBESprefix(dataSource));
+
+            srvcRef.setText("dap");
+
+            return true;
+
+        }
+
+        return false;
+
+
+
+
+
+
+
+
+    }
+
+
 
 
 

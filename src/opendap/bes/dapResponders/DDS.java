@@ -51,6 +51,14 @@ public class DDS extends BesDapResponder {
     private static String defaultRequestSuffixRegex = "\\.dds";
 
 
+    public boolean needsBesToMatch(){
+        return true;
+    }
+
+    public boolean needsBesToRespond(){
+        return true;
+    }
+
     public DDS(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }

@@ -25,6 +25,7 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.*;
 
 import javax.servlet.http.HttpServlet;
@@ -263,14 +264,17 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 
-            String xsltDoc = systemPath + "/xsl/contents.xsl";
+            String xsltDoc = systemPath + "/xsl/dap4Contents.xsl";
+
+            if(DapDispatcher.useDAP2ResourceUrlResponse())
+                xsltDoc = systemPath + "/xsl/contents.xsl";
 
             Transformer transformer = new Transformer(xsltDoc);
 
             transformer.setParameter("dapService",oreq.getDapServiceLocalID());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
             transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
-            if(FileDispatchHandler.allowDirectDataSourceAccess())
+            if(DapDispatcher.allowDirectDataSourceAccess())
                 transformer.setParameter("allowDirectDataSourceAccess","true");
 
             // Transform the BES  showCatalog response into a HTML page for the browser

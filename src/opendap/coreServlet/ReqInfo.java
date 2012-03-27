@@ -214,21 +214,39 @@ public class ReqInfo {
         log.debug("getRequestSuffix() - relativeUrl(request): " + relativeUrl);
 
 
-        // Is it a dataset and not a collection?
-        if (relativeUrl!=null && !relativeUrl.endsWith("/")) {
-
-            // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
-            // and strip it off the dataSetName
-
-            if(relativeUrl.lastIndexOf("/") < relativeUrl.lastIndexOf(".")){
-                requestSuffix = relativeUrl.substring(relativeUrl.lastIndexOf('.') + 1);
-            }
-
-        }
+        requestSuffix = getSuffix(relativeUrl);
 
         log.debug("  requestSuffixRegex:  " + requestSuffix);
 
         return requestSuffix;
+
+    }
+
+
+    /**
+     * If a dot is found in the last path element take the stuff after the last dot as the file suffix
+     *
+     *
+     * @param s
+     * @return
+     */
+    public static String getSuffix(String s){
+
+        String suffix="";
+
+        if (s!=null && !s.endsWith("/")) {
+
+            // If a dot is found in the last path element take the stuff after the last dot as the OPeNDAP suffix
+            // and strip it off the dataSetName
+
+            if(s.lastIndexOf("/") < s.lastIndexOf(".")){
+
+                suffix = s.substring(s.lastIndexOf('.') + 1);
+            }
+
+
+        }
+        return suffix;
 
     }
 

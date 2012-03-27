@@ -3,30 +3,12 @@ package opendap.experiments;
 
 
 
-import opendap.coreServlet.DispatchHandler;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.Scrub;
-import opendap.coreServlet.ServletUtil;
-import opendap.logging.LogUtil;
-import opendap.semantics.wcs.StaticRdfCatalog;
-import opendap.wcs.v1_1_2.*;
-import opendap.wcs.v1_1_2.http.FormHandler;
-import opendap.wcs.v1_1_2.http.HttpGetHandler;
-import opendap.wcs.v1_1_2.http.PostHandler;
-import opendap.wcs.v1_1_2.http.SoapHandler;
-import org.jdom.Element;
 import org.slf4j.Logger;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -39,11 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WorkerThreadServlet extends HttpServlet {
 
     private Logger log;
-    private HttpGetHandler httpGetService = null;
-
-    private FormHandler formService = null;
-    private PostHandler wcsPostService = null;
-    private SoapHandler wcsSoapService = null;
 
     private AtomicInteger hitCounter;
 

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
@@ -184,9 +185,13 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             String xsltDoc = _systemPath + "/xsl/catalog.xsl";
             Transformer showCatalogToThreddsCatalog = new Transformer(xsltDoc);
 
+
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
-            if(FileDispatchHandler.allowDirectDataSourceAccess())
+            if(DapDispatcher.allowDirectDataSourceAccess())
                 showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
+
+            if(DapDispatcher.useDAP2ResourceUrlResponse())
+                showCatalogToThreddsCatalog.setParameter("useDAP2ResourceUrlResponse","true");
 
             JDOMSource besCatalog = new JDOMSource(showCatalogDoc);
 

@@ -28,6 +28,7 @@ import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.FileDispatchHandler;
 import opendap.bes.dapResponders.BesApi;
+import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.*;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -158,7 +159,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
             String relativeUrl = ReqInfo.getLocalUrl(request);
             DataSourceInfo dsi = new BESDataSource(relativeUrl,_besApi);
 
-            if (dsi.sourceExists() && dsi.isDataset() && FileDispatchHandler.allowDirectDataSourceAccess()) {
+            if (dsi.sourceExists() && dsi.isDataset() && DapDispatcher.allowDirectDataSourceAccess()) {
                 isNcmlRequest = true;
                 if (sendResponse) {
                     sendNcmlResponse(request, response);

@@ -65,6 +65,13 @@ public class Dap2Data extends BesDapResponder {
     }
 
 
+    public boolean needsBesToMatch(){
+        return true;
+    }
+
+    public boolean needsBesToRespond(){
+        return true;
+    }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 

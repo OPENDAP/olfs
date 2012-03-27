@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 
 /**
  * IsoDispatchHandler for ISO responses from Hyrax
+ * @deprecated
  */
 public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 

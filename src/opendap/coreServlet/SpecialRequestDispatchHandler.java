@@ -29,8 +29,7 @@ import org.jdom.Element;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
-import java.io.IOException;
+
 
 /**
  * Performs dispatching for "special" server requests.
@@ -40,7 +39,7 @@ import java.io.IOException;
  * <li> debug -   </li>
  * <li> status -    </li>
  * </ui>
- *
+ * @deprecated
  */
 public class SpecialRequestDispatchHandler implements DispatchHandler {
 
@@ -71,7 +70,7 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
 
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception {
-        return specialRequestDispatch(request,null,false);
+        return false;
 
     }
 
@@ -80,8 +79,7 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
                               HttpServletResponse response)
             throws Exception {
 
-        specialRequestDispatch(request,response,true);
-
+        return;
     }
 
     public long getLastModified(HttpServletRequest req) {
@@ -104,117 +102,6 @@ public class SpecialRequestDispatchHandler implements DispatchHandler {
 
 
 
-
-
-
-
-    private boolean specialRequestDispatch(HttpServletRequest request,
-                                          HttpServletResponse response,
-                                          boolean sendResponse)
-            throws Exception {
-
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
-
-
-        boolean specialRequest = false;
-
-        if (dataSource != null) {
-
-            if ( // Help Response?
-                    dataSource.equalsIgnoreCase("/help") ||
-                            dataSource.equalsIgnoreCase("/help/") ||
-                            ((requestSuffix != null) &&
-                                    requestSuffix.equalsIgnoreCase("help"))
-                    ) {
-                specialRequest = true;
-                if(sendResponse){
-                    sendHelpPage(request, response);
-                    log.info("Sent Help Page");
-                }
-
-            }
- //@todo add these commented out responses to the as yet to be implemented admin interface
-/*
-            else if ( // System Properties Response?
-                //Debug.isSet("SystemProperties") &&
-
-                    dataSource.equalsIgnoreCase("/systemproperties")
-                    ) {
-                specialRequest = true;
-                if(sendResponse){
-                    Util.sendSystemProperties(request, response);
-                    log.info("Sent System Properties");
-                }
-
-            }
-            else if (  // Status Response?
-
-                    dataSource.equalsIgnoreCase("/status")) {
-
-                specialRequest = true;
-                if(sendResponse){
-                    doGetStatus(request, response);
-                    log.info("Sent Status");
-                }
-
-            }
-*/
-
-
-        }
-
-        return specialRequest;
-
-    }
-
-
-    /**
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
-     * used only for debugging
-     *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
-     * @param response The server's <code> HttpServletResponse</code> response
-     *                 object.
-     * @throws java.io.IOException If unablde to right to the response.
-     */
-    public void doGetStatus(HttpServletRequest request,
-                            HttpServletResponse response)
-            throws Exception {
-
-
-        response.setContentType("text/html");
-        response.setHeader("Content-Description", "dods_status");
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        PrintWriter pw = new PrintWriter(response.getOutputStream());
-        pw.println("<title>Server Status</title>");
-        pw.println("<body><ul>");
-        printStatus(pw);
-        pw.println("</ul></body>");
-        pw.flush();
-
-    }
-
-    // to be overridden by servers that implement status report
-    protected void printStatus(PrintWriter os) throws IOException {
-        os.println("<h2>Status not implemented.</h2>");
-    }
-
-
-    public void sendHelpPage(HttpServletRequest request,
-                             HttpServletResponse response)
-            throws Exception {
-
-        String context = request.getContextPath();
-        String helpPage = context+"/jsp/help.jsp";
-
-        response.sendRedirect(helpPage);
-        log.debug("Sent redirect to help page: "+helpPage);
-
-    }
 
 
 

@@ -37,6 +37,6 @@ public class XLINK {
     public static final String NAMESPACE_STRING = "http://www.w3.org/1999/xlink";
     public static final String NAMESPACE_PREFIX = "xlink";
 
-    public static final Namespace NS =  Namespace.getNamespace(NAMESPACE_STRING);
+    public static final Namespace NS =  Namespace.getNamespace(NAMESPACE_PREFIX,NAMESPACE_STRING);
     
 }

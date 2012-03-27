@@ -67,6 +67,13 @@ public class HtmlDataRequestForm extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
+    public boolean needsBesToMatch(){
+        return true;
+    }
+
+    public boolean needsBesToRespond(){
+        return true;
+    }
 
 
 

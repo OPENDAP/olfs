@@ -64,6 +64,15 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
 
+
+    public boolean needsBesToMatch(){
+        return true;
+    }
+
+    public boolean needsBesToRespond(){
+        return true;
+    }
+
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
