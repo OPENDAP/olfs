@@ -1,12 +1,6 @@
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESDataSource;
-import opendap.bes.BESError;
 import opendap.bes.BesDapResponder;
-import opendap.bes.Version;
-import opendap.coreServlet.DataSourceInfo;
-import opendap.coreServlet.ReqInfo;
-import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -15,9 +9,6 @@ import org.slf4j.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

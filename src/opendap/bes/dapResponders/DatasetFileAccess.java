@@ -1,6 +1,5 @@
 package opendap.bes.dapResponders;
 
-import com.sun.deploy.net.HttpResponse;
 import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.DataSourceInfo;

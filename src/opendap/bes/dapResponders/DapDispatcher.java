@@ -26,8 +26,8 @@
 
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.BESDataSource;
+import opendap.bes.BesDapResponder;
 import opendap.coreServlet.*;
 import org.jdom.Element;
 import org.slf4j.Logger;

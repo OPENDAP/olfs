@@ -37,6 +37,7 @@
                 >
     <xsl:param name="dapService"/>
     <xsl:param name="allowDirectDataSourceAccess"/>
+    <xsl:param name="useDAP2ResourceUrlResponse"/>
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -187,7 +188,10 @@
                 <xsl:if test="$allowDirectDataSourceAccess='true'">
                     <thredds:access>
                         <xsl:attribute name="serviceName">file</xsl:attribute>
-                        <xsl:attribute name="urlPath"><xsl:value-of select="$urlPath" /></xsl:attribute>
+                        <xsl:attribute name="urlPath">
+                            <xsl:value-of select="$urlPath" />
+                            <xsl:if test="$useDAP2ResourceUrlResponse!='true'">.file</xsl:if>
+                        </xsl:attribute>
                     </thredds:access>
                 </xsl:if>
             </xsl:when>

@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.Version;
 import opendap.bes.BesDapResponder;
+import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import org.jdom.Document;
@@ -34,7 +34,8 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
