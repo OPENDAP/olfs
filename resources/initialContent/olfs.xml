@@ -71,8 +71,36 @@
                 <prefix>gateway</prefix>
             </Handler>
 
-            <Handler className="opendap.ncml.NcmlFileDispatcher" />
 
+            <!--
+                Provides all DAP responses.
+
+                This includes a DatasetServices response that is returned for every resource URL. The
+                DatasetServices response is an XML document with a toplevel DatasetServices which
+                holds:
+
+                 * One or more Service elements each of which has
+                     * A required xlink:href attribute that has as its value the service URL.
+                     * An optional child element Description that contains
+                         * An optional xlink:href attribute that points to a human/browser readable description of the service.
+                         * And the required content of a brief description of the service.
+
+                 * An optional ServerSideFunction element that holds
+                     * One or more Function elements each of which has
+                         * An optional xlink:href attribute that has as its value a URL that points to a
+                           human readable description of the function.
+                         * An optional child element Description that contains
+                             * And the required content of a brief description of the service.
+
+                The DatasetServices response is obtained by de-referencing the Dataset URL (aka the DAP
+                resource URL, aka the file URL).
+
+
+                Returning the Service Description in response to requests for the dataset URL eliminates a long
+                standing ambiguity and lack of REST(ful) behavior in the Hyrax DAP servers.
+
+
+            -->
             <Handler className="opendap.bes.dapResponders.DapDispatcher" >
 
                 <!-- AllowDirectDataSourceAccess
