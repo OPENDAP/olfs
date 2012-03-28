@@ -51,7 +51,9 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 /**
- * IsoDispatchHandler for ISO responses from Hyrax
+ * NcmlFileDispatcher for NcML files held in Hyrax
+ *
+ * @deprecated No longer used. Replaced by code in opendap.bes.dapResponders.DatasetFileAccess
  */
 public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 

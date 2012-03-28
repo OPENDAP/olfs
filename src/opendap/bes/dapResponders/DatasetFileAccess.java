@@ -1,20 +1,28 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESDataSource;
+import opendap.bes.BESError;
+import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.DataSourceInfo;
 import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
+import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +40,9 @@ public class DatasetFileAccess extends BesDapResponder {
     private static String defaultRequestSuffixRegex = "\\.file";
 
     private boolean allowDirectDataSourceAccess;
+
+    private String  ncmlFilePatternRegexString = ".*\\.ncml";
+    private Pattern ncmlRequestPattern = Pattern.compile(ncmlFilePatternRegexString, Pattern.CASE_INSENSITIVE);
 
 
     public DatasetFileAccess(String sysPath, BesApi besApi) {
@@ -111,7 +122,9 @@ public class DatasetFileAccess extends BesDapResponder {
 
     public void respondToHttpGetRequest(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
+        String requestUrl = req.getRequestURL().toString();
         String dataSourceId = ReqInfo.getLocalUrl(req);
+        String serviceUrl = ReqInfo.getFullServiceContext(req);
 
         if(!isDap2Response()){
             dataSourceId = ReqInfo.getBesDataSourceID(dataSourceId);
@@ -119,9 +132,8 @@ public class DatasetFileAccess extends BesDapResponder {
 
 
 
-        String requestUrl = req.getRequestURL().toString();
-
         BesApi besApi = getBesApi();
+
         try {
             DataSourceInfo dsi = new BESDataSource(dataSourceId, besApi);
             if (dsi.sourceExists()) {
@@ -131,37 +143,11 @@ public class DatasetFileAccess extends BesDapResponder {
                             if (allowDirectDataSourceAccess()) {
 
 
-                                log.debug("respondToHttpGetRequest() - Sending file \"" + dataSourceId + "\"");
-
-                                String downloadFileName = Scrub.fileName(dataSourceId.substring(dataSourceId.lastIndexOf("/") + 1));
-
-                                log.debug("respondToHttpGetRequest() - downloadFileName: " + downloadFileName);
-
-                                String contentDisposition = " attachment; filename=\"" + downloadFileName + "\"";
-
-                                response.setHeader("Content-Disposition", contentDisposition);
-
-
-                                String suffix = ReqInfo.getSuffix(dataSourceId);
-
-                                if (suffix != null) {
-                                    String mType = MimeTypes.getMimeType(suffix);
-
-                                    if (mType != null)
-                                        response.setContentType(mType);
-
-                                    log.debug("respondToHttpGetRequest() -    MIME type: " + mType + "  ");
+                                if(ncmlRequestPattern.matcher(dataSourceId).matches())   {
+                                    sendNcmlFile(dataSourceId, serviceUrl, response);
+                                } else {
+                                    sendDatasetFile(dataSourceId, response);
                                 }
-
-                                ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-                                ServletOutputStream sos = response.getOutputStream();
-                                if (!besApi.writeFile(dataSourceId, sos, erros)) {
-                                    String msg = new String(erros.toByteArray());
-                                    log.error(msg);
-                                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
-                                }
-
 
                             }
                             else {
@@ -191,20 +177,135 @@ public class DatasetFileAccess extends BesDapResponder {
                 }
 
             }
+            else {
+                String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(dataSourceId);
+                log.info("matches() - {}", errMsg);
+                sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+            }
 
 
         } catch (Exception e) {
             log.error("Problem communicating with BES meg: {}", e.getMessage());
         }
 
-        String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(dataSourceId);
-        log.info("matches() - {}", errMsg);
-        sendHttpErrorResponse(404, errMsg, "docs", response);
 
 
 
 
     }
+
+
+
+
+    private void sendDatasetFile(String dataSourceId, HttpServletResponse response) throws IOException, BESError, BadConfigurationException, PPTException {
+        log.debug("sendDatasetFile() - Sending dataset file \"" + dataSourceId + "\"");
+
+        String downloadFileName = Scrub.fileName(dataSourceId.substring(dataSourceId.lastIndexOf("/") + 1));
+
+        log.debug("respondToHttpGetRequest() - downloadFileName: " + downloadFileName);
+
+        String contentDisposition = " attachment; filename=\"" + downloadFileName + "\"";
+
+        response.setHeader("Content-Disposition", contentDisposition);
+
+
+        String suffix = ReqInfo.getSuffix(dataSourceId);
+
+        if (suffix != null) {
+            String mType = MimeTypes.getMimeType(suffix);
+
+            if (mType != null)
+                response.setContentType(mType);
+
+            log.debug("respondToHttpGetRequest() -    MIME type: " + mType + "  ");
+        }
+
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+        BesApi besApi = getBesApi();
+
+        ServletOutputStream sos = response.getOutputStream();
+        if (!besApi.writeFile(dataSourceId, sos, erros)) {
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+        }
+
+    }
+
+
+
+
+
+    private void sendNcmlFile(String name, String serviceUrl, HttpServletResponse response) throws JDOMException, BESError, IOException, BadConfigurationException, PPTException {
+        log.debug("sendNcmlFile() - Sending NcML File response for  \"" + name + "\"");
+
+
+        Document ncml = getNcmlDocument(name);
+
+        BesApi besApi = getBesApi();
+        String besPrefix = besApi.getBESprefix(name);
+
+        String location;
+        Element e;
+
+        Iterator i = ncml.getDescendants(new ElementFilter());
+        while(i.hasNext()){
+            e  = (Element) i.next();
+            location = e.getAttributeValue("location");
+            if(location!=null){
+                while(location.startsWith("/"))
+                    location = location.substring(1);
+                location = serviceUrl + besPrefix + location;
+                e.setAttribute("location",location);
+            }
+        }
+
+
+
+        XMLOutputter xmlo = new XMLOutputter();
+
+
+        xmlo.output(ncml,response.getOutputStream());
+
+
+
+
+    }
+
+    private Document getNcmlDocument(String name)
+            throws BESError, IOException, BadConfigurationException, PPTException, JDOMException {
+
+        SAXBuilder sb = new SAXBuilder();
+
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+        Document ncmlDocument;
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        BesApi besApi = getBesApi();
+
+
+        if(!besApi.writeFile(name, baos, erros)){
+            String msg = new String(erros.toByteArray());
+            log.error(msg);
+            ByteArrayInputStream errorDoc = new ByteArrayInputStream(erros.toByteArray());
+            ncmlDocument = sb.build(errorDoc);
+        }
+        else {
+            ByteArrayInputStream is = new ByteArrayInputStream(baos.toByteArray());
+            ncmlDocument = sb.build(is);
+        }
+
+        return ncmlDocument;
+
+    }
+
+
+
+
+
 
     private void sendDirectAccessDenied(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -261,16 +362,6 @@ public class DatasetFileAccess extends BesDapResponder {
         */
 
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
