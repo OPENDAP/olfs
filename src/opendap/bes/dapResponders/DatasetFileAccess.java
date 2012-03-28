@@ -134,63 +134,53 @@ public class DatasetFileAccess extends BesDapResponder {
 
         BesApi besApi = getBesApi();
 
-        try {
-            DataSourceInfo dsi = new BESDataSource(dataSourceId, besApi);
-            if (dsi.sourceExists()) {
-                if (!dsi.isNode()) {
-                    if (dsi.sourceIsAccesible()) {
-                        if (dsi.isDataset()) {
-                            if (allowDirectDataSourceAccess()) {
+        DataSourceInfo dsi = new BESDataSource(dataSourceId, besApi);
+        if (dsi.sourceExists()) {
+            if (!dsi.isNode()) {
+                if (dsi.sourceIsAccesible()) {
+                    if (dsi.isDataset()) {
+                        if (allowDirectDataSourceAccess()) {
 
 
-                                if(ncmlRequestPattern.matcher(dataSourceId).matches())   {
-                                    sendNcmlFile(dataSourceId, serviceUrl, response);
-                                } else {
-                                    sendDatasetFile(dataSourceId, response);
-                                }
-
-                            }
-                            else {
-                                log.warn("respondToHttpGetRequest() - Sending Access Denied for resource: "+Scrub.completeURL(requestUrl));
-                                sendDirectAccessDenied(req,response);
-
+                            if(ncmlRequestPattern.matcher(dataSourceId).matches())   {
+                                sendNcmlFile(dataSourceId, serviceUrl, response);
+                            } else {
+                                sendDatasetFile(dataSourceId, response);
                             }
 
                         }
                         else {
-                            String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(dataSourceId);
-                            log.info("respondToHttpGetRequest() - {}", errMsg);
-                            sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+                            log.warn("respondToHttpGetRequest() - Sending Access Denied for resource: "+Scrub.completeURL(requestUrl));
+                            sendDirectAccessDenied(req,response);
+
                         }
+
                     }
                     else {
-                        String errMsg = "BES data source {} is not accessible." + Scrub.completeURL(dataSourceId);
+                        String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(dataSourceId);
                         log.info("respondToHttpGetRequest() - {}", errMsg);
                         sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
                     }
-
                 }
                 else {
-                    String errMsg = "You may not download nodes/directories, only files." + Scrub.completeURL(dataSourceId);
+                    String errMsg = "BES data source {} is not accessible." + Scrub.completeURL(dataSourceId);
                     log.info("respondToHttpGetRequest() - {}", errMsg);
-                    sendHttpErrorResponse(HttpStatus.SC_FORBIDDEN, errMsg, "docs", response);
+                    sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
                 }
 
             }
             else {
-                String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(dataSourceId);
-                log.info("matches() - {}", errMsg);
-                sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+                String errMsg = "You may not download nodes/directories, only files." + Scrub.completeURL(dataSourceId);
+                log.info("respondToHttpGetRequest() - {}", errMsg);
+                sendHttpErrorResponse(HttpStatus.SC_FORBIDDEN, errMsg, "docs", response);
             }
 
-
-        } catch (Exception e) {
-            log.error("Problem communicating with BES meg: {}", e.getMessage());
         }
-
-
-
-
+        else {
+            String errMsg = "Unable to locate BES resource: " + Scrub.completeURL(dataSourceId);
+            log.info("matches() - {}", errMsg);
+            sendHttpErrorResponse(HttpStatus.SC_NOT_FOUND, errMsg, "docs", response);
+        }
 
     }
 
