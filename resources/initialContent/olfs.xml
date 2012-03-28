@@ -72,32 +72,56 @@
             </Handler>
 
 
-            <!--
-                Provides all DAP responses.
+            <!--  opendap.bes.dapResponders.DapDispatcher
 
-                This includes a DatasetServices response that is returned for every resource URL. The
-                DatasetServices response is an XML document with a toplevel DatasetServices which
-                holds:
 
-                 * One or more Service elements each of which has
-                     * A required xlink:href attribute that has as its value the service URL.
+            Provides all DAP responses.
+
+            This includes a DatasetServices response that is returned for every data resource URL. The
+            DatasetServices response is an XML document with a
+
+            * A root level DatasetServices element which has:
+                * A required xml:base attribute the holds as it's value the URL de-referenced to generate the
+                  document. This would be the data resource URL.
+
+                * One or more Service elements each of which has
+                    * A name attribute that has as its value the name of the service.
+                    * A required xlink:href attribute that has as its value the service URL.
+                    * An optional child element Description that contains
+                        * An optional xlink:href attribute that points to a human/browser readable description of the service.
+                        * And the required content of a brief description of the service.
+
+                * An optional ServerSideFunction element that holds
+                 * One or more Function elements each of which has
+                     * A name attribute that has as its value the name of the function.
+                     * An optional xlink:href attribute that has as its value a URL that points to a
+                       human readable description of the function.
                      * An optional child element Description that contains
-                         * An optional xlink:href attribute that points to a human/browser readable description of the service.
                          * And the required content of a brief description of the service.
 
-                 * An optional ServerSideFunction element that holds
-                     * One or more Function elements each of which has
-                         * An optional xlink:href attribute that has as its value a URL that points to a
-                           human readable description of the function.
-                         * An optional child element Description that contains
-                             * And the required content of a brief description of the service.
 
-                The DatasetServices response is obtained by de-referencing the Dataset URL (aka the DAP
-                resource URL, aka the file URL).
+            Example:
+
+            <DatasetServices xml:base="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml">
+
+                <Service name="FileAccess" xlink:href="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml.file">
+                    <Description xlink:href="http://services.opendap.org/dataset_file_access.html">Access to dataset file.</Description>
+                </Service>
+                <ServerSideFunctions>
+                    <Function name="geogrid"
+                              xlink:href="http://docs.opendap.org/index.php/Server_Side_Processing_Functions#geogrid">
+                        <Description>Allows a DAP Grid variable to be sub-sampled using georeferenced values.</Description>
+                    </Function>
+                </ServerSideFunctions>
+            </DatasetServices>
 
 
-                Returning the Service Description in response to requests for the dataset URL eliminates a long
-                standing ambiguity and lack of REST(ful) behavior in the Hyrax DAP servers.
+            The DatasetServices response is obtained by de-referencing the data resource URL (aka the
+            dataset URL, aka the file URL).
+
+
+            Returning the Service Description in response to requests for the dataset URL eliminates a long
+            standing ambiguity and lack of REST(ful) behavior in the Hyrax DAP servers.
 
 
             -->
