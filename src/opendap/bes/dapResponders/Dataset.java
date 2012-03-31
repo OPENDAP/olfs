@@ -94,19 +94,16 @@ public class Dataset extends BesDapResponder {
 
         response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_ddx");
+        response.setHeader("Content-Description", "dap4:Dataset");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        String xdap_accept = "3.2";
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,

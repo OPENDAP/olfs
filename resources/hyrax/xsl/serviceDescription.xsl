@@ -120,13 +120,27 @@
     </xsl:template>
 
 
-
     <xsl:template match="Service">
 
         <tr>
-            <td><a href="{@xlink:href}"><xsl:value-of select="@title"/></a></td>
-            <td> </td>
-          <td><xsl:value-of select="Description"/> (<a href="{Description/@xlink:href}">more</a>)</td>
+            <td>
+                <a href="{@xlink:href}">
+                    <xsl:value-of select="@title"/>
+                </a>
+            </td>
+            <td></td>
+            <td>
+                <dt>
+                    <xsl:value-of select="Description"/> (<a href="{Description/@xlink:href}">more</a>)
+                </dt>
+
+                <dd>
+                    <font color="lightgrey">
+                        <div class="small">role:<xsl:value-of select="@xlink:role"/>
+                        </div>
+                    </font>
+                </dd>
+            </td>
         </tr>
 
     </xsl:template>

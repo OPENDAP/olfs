@@ -144,12 +144,16 @@ public class DapDispatcher implements DispatchHandler {
 
         BesDapResponder hr;
 
+        responders.add(new HtmlDataRequestForm(systemPath, besApi));
         responders.add(new Dataset(systemPath, besApi));
         responders.add(new DataDDX(systemPath, besApi));
+        responders.add(new Dap2Data(systemPath, besApi));
+        responders.add(new Ascii(systemPath, besApi));
+        responders.add(new NetcdfFileOut(systemPath, besApi));
+        responders.add(new XmlData(systemPath, besApi));
 
 
         hr = new DDX(systemPath,besApi);
-
         responders.add(hr);
 
 
@@ -157,15 +161,10 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new DAS(systemPath, besApi));
         responders.add(new RDF(systemPath, besApi));
 
-        responders.add(new HtmlDataRequestForm(systemPath, besApi));
         responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
 
-        responders.add(new Dap2Data(systemPath, besApi));
-        responders.add(new Ascii(systemPath, besApi));
 
 
-        responders.add(new NetcdfFileOut(systemPath, besApi));
-        responders.add(new XmlData(systemPath, besApi));
         responders.add(new VersionResponse(systemPath, besApi));
         responders.add(new IsoMetadata(systemPath, besApi));
         responders.add(new IsoRubric(systemPath, besApi));
