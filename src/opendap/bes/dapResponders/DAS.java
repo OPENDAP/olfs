@@ -48,7 +48,8 @@ public class DAS extends BesDapResponder {
 
 
 
-    private static String defaultRequestSuffixRegex = "\\.das";
+    private static String _preferredRequestSuffix = ".das";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public DAS(String sysPath, BesApi besApi) {
@@ -63,6 +64,12 @@ public class DAS extends BesDapResponder {
     public DAS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap2/das#");
+        setServiceTitle("DAS");
+        setServiceDescription("OPeNDAP Dataset Attribute Structure.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DAS_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
     public boolean needsBesToMatch(){

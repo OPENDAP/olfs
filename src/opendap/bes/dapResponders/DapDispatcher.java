@@ -29,6 +29,9 @@ package opendap.bes.dapResponders;
 import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.*;
+import opendap.dap.DapResponder;
+import opendap.namespaces.XLINK;
+import opendap.namespaces.XML;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,9 +144,14 @@ public class DapDispatcher implements DispatchHandler {
 
         BesDapResponder hr;
 
+        responders.add(new Dataset(systemPath, besApi));
+        responders.add(new DataDDX(systemPath, besApi));
+
+
         hr = new DDX(systemPath,besApi);
 
         responders.add(hr);
+
 
         responders.add(new DDS(systemPath, besApi));
         responders.add(new DAS(systemPath, besApi));
@@ -156,7 +164,6 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new Ascii(systemPath, besApi));
 
 
-        responders.add(new DataDDX(systemPath, besApi));
         responders.add(new NetcdfFileOut(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
         responders.add(new VersionResponse(systemPath, besApi));
@@ -177,8 +184,10 @@ public class DapDispatcher implements DispatchHandler {
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             responders.add(dfa);
 
-            ServiceDescription sd = new ServiceDescription(systemPath, besApi);
+            DatasetServices sd = new DatasetServices(systemPath, besApi);
             responders.add(sd);
+
+            sd.setDapResponders(responders);
 
         }
 
@@ -336,6 +345,11 @@ public class DapDispatcher implements DispatchHandler {
         log.info("Destroy complete.");
 
     }
+
+
+
+
+
 
 
 

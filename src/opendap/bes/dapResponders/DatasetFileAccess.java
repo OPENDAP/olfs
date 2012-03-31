@@ -37,7 +37,8 @@ public class DatasetFileAccess extends BesDapResponder {
 
     private Logger log;
 
-    private static String defaultRequestSuffixRegex = "\\.file";
+    private static String _preferredRequestSuffix = ".file";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
     private boolean allowDirectDataSourceAccess;
 
@@ -56,6 +57,12 @@ public class DatasetFileAccess extends BesDapResponder {
     public DatasetFileAccess(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/file#");
+        setServiceTitle("File Access");
+        setServiceDescription("Access to dataset file.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Native_File_Access_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
     public boolean needsBesToMatch(){

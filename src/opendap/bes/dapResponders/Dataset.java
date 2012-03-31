@@ -23,46 +23,49 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESError;
 import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
-import opendap.dap.User;
 import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
 
-public class Ascii extends BesDapResponder {
+
+
+
+public class Dataset extends BesDapResponder {
+
+
 
     private Logger log;
+    private static String _preferredRequestSuffix = ".xml";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
-    private static String _preferredRequestSuffix = ".asc";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix+"(ii)?";
-
-
-    public Ascii(String sysPath, BesApi besApi) {
+    public Dataset(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
-    public Ascii(String sysPath, String pathPrefix, BesApi besApi) {
+    public Dataset(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
-    public Ascii(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+
+    public Dataset(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/ascii#");
-        setServiceTitle("ASCII Data");
-        setServiceDescription("The DAP4 Data response in ASCII form.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ASCII_Data_Service");
+        setServiceRoleId("http://services.opendap.org/dap4/dataset#");
+        setServiceTitle("Dataset");
+        setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
@@ -78,29 +81,25 @@ public class Ascii extends BesDapResponder {
 
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String context = request.getContextPath();
+        String xmlBase = getXmlBase(request);
+
 
         BesApi besApi = getBesApi();
 
+        log.debug("Sending DDX for dataset: " + dataSource);
 
-        log.debug("sendASCII() for dataset: " + dataSource);
-
-        response.setContentType("text/plain");
+        response.setContentType("text/xml");
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_ascii");
+        response.setHeader("Content-Description", "dods_ddx");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
-
-
-
-        User user = new User(request);
-        int maxRS = user.getMaxResponseSize();
 
 
 
@@ -110,26 +109,32 @@ public class Ascii extends BesDapResponder {
 
         Document reqDoc =
                 besApi.getRequestDocument(
-                        BesApi.ASCII,
+                        BesApi.DDX,
                         dataSource,
                         constraintExpression,
                         xdap_accept,
-                        maxRS,
-                        null,
+                        0,
+                        xmlBase,
                         null,
                         null,
                         BesApi.XML_ERRORS);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
 
-            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
-            besError.sendErrorResponse(_systemPath,context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+
+        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
         }
 
 
+
         os.flush();
-        log.debug("Sent DAP ASCII data response.");
+        log.info("Sent DAP DDX.");
 
 
     }

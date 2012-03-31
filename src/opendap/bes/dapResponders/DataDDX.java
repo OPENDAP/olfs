@@ -44,7 +44,8 @@ public class DataDDX extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffixRegex = "\\.dap";
+    private static String _preferredRequestSuffix = ".dap";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public DataDDX(String sysPath, BesApi besApi) {
@@ -60,6 +61,12 @@ public class DataDDX extends BesDapResponder {
     public DataDDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/data#");
+        setServiceTitle("DAP4 Data");
+        setServiceDescription("DAP4 Data object.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
     public boolean needsBesToMatch(){

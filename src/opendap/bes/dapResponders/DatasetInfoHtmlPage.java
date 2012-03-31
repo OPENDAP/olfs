@@ -48,7 +48,8 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffixRegex = "\\.info";
+    private static String _preferredRequestSuffix = ".info";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public DatasetInfoHtmlPage(String sysPath, BesApi besApi) {
@@ -62,6 +63,12 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
     public DatasetInfoHtmlPage(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap2/info#");
+        setServiceTitle("INFO");
+        setServiceDescription("OPeNDAP Dataset Information Page.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Info_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 

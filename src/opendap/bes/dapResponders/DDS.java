@@ -48,7 +48,8 @@ public class DDS extends BesDapResponder {
 
 
 
-    private static String defaultRequestSuffixRegex = "\\.dds";
+    private static String _preferredRequestSuffix = ".dds";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public boolean needsBesToMatch(){
@@ -71,6 +72,12 @@ public class DDS extends BesDapResponder {
     public DDS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap2/dds#");
+        setServiceTitle("DDS");
+        setServiceDescription("OPeNDAP Data Description Structure.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDS_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

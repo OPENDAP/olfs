@@ -51,7 +51,8 @@ public class NetcdfFileOut extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffixRegex = "\\.nc";
+    private static String _preferredRequestSuffix = ".nc";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
     public NetcdfFileOut(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
@@ -65,6 +66,11 @@ public class NetcdfFileOut extends BesDapResponder {
     public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        setServiceRoleId("http://services.opendap.org/dap4/netcdf-3#");
+        setServiceTitle("NetCDF-File");
+        setServiceDescription("NetCDF file-out response.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_NetCDF_File-out_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
     public boolean needsBesToMatch(){

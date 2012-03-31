@@ -24,24 +24,33 @@ public class VersionResponse extends BesDapResponder {
 
     private Logger log;
 
-    private static String defaultRequestSuffixRegex = "\\.ver";
-    private static String defaultRequestRegex = "/version/?|.*\\.ver";
+    private static String _matchAnythingRegex = ".*";
+    private static String _preferredRequestSuffix = ".ver";
+    private static String _defaultRequestSuffixRegex = "\\"+_preferredRequestSuffix;
+    private static String _defaultRequestRegex = "/version/?|"+ _matchAnythingRegex + _defaultRequestSuffixRegex;
 
 
     public VersionResponse(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffixRegex,besApi);
     }
 
     public VersionResponse(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffixRegex,besApi);
     }
 
     public VersionResponse(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
 
-        setRequestMatchRegex(defaultRequestRegex);
+        setRequestMatchRegex(_defaultRequestRegex);
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/version#");
+        setServiceTitle("Server Version");
+        setServiceDescription("An XML document containing information about the software version of the server..");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Server_Version_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
+
     }
 
 

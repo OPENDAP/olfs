@@ -49,8 +49,9 @@ public class XmlData extends BesDapResponder {
 
 
 
+    private static String _preferredRequestSuffix = ".xdap";
 
-    private static String defaultRequestSuffixRegex = "\\.xdods";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
     public XmlData(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
@@ -65,6 +66,13 @@ public class XmlData extends BesDapResponder {
     public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/XmlData#");
+        setServiceTitle("XML Data Response");
+        setServiceDescription("An XML document containing both the dataset's structural metadata along with data values.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_XML_Data_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
+
     }
 
 

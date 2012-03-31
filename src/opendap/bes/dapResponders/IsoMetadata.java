@@ -24,7 +24,8 @@ public class IsoMetadata extends BesDapResponder {
 
     private Logger log;
 
-    private static String defaultRequestSuffixRegex = "\\.iso";
+    private static String _preferredRequestSuffix = ".iso";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public IsoMetadata(String sysPath, BesApi besApi) {
@@ -38,6 +39,11 @@ public class IsoMetadata extends BesDapResponder {
     public IsoMetadata(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        setServiceRoleId("http://services.opendap.org/dap4/iso-19115#");
+        setServiceTitle("ISO-19115");
+        setServiceDescription("ISO 19115 Metadata Representation of the Dataset (DDX) response.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ISO_19115_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 

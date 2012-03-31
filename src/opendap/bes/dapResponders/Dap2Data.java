@@ -47,7 +47,8 @@ public class Dap2Data extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffixRegex = "\\.dods";
+    private static String _preferredRequestSuffix = ".dods";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public Dap2Data(String sysPath, BesApi besApi) {
@@ -62,6 +63,12 @@ public class Dap2Data extends BesDapResponder {
     public Dap2Data(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap2/dods#");
+        setServiceTitle("DAP2 Data");
+        setServiceDescription("DAP2 Data Object.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 

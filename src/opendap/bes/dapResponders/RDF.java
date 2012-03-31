@@ -45,7 +45,8 @@ public class RDF extends BesDapResponder {
     private Logger log;
 
 
-    private static String defaultRequestSuffixRegex = "\\.rdf";
+    private static String _preferredRequestSuffix = ".rdf";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
     public RDF(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
@@ -59,6 +60,11 @@ public class RDF extends BesDapResponder {
     public RDF(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        setServiceRoleId("http://services.opendap.org/dap4/rdf#");
+        setServiceTitle("RDF");
+        setServiceDescription("An RDF representation of the Dataset response (DDX) document.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_RDF_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 

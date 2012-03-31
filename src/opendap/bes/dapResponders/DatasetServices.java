@@ -4,6 +4,7 @@ import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.DataSourceInfo;
 import opendap.coreServlet.ReqInfo;
+import opendap.dap.DapResponder;
 import opendap.namespaces.XLINK;
 import opendap.namespaces.XML;
 import org.jdom.Document;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,28 +28,40 @@ import java.util.regex.Pattern;
  * Time: 11:02 AM
  * To change this template use File | Settings | File Templates.
  */
-public class ServiceDescription extends BesDapResponder {
+public class DatasetServices extends BesDapResponder {
 
     private Logger log;
 
     private static String defaultRequestSuffixRegex = ".*";
 
+    private Vector<BesDapResponder> _responders = null;
 
-    public ServiceDescription(String sysPath, BesApi besApi) {
+
+    public DatasetServices(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
-    public ServiceDescription(String sysPath, String pathPrefix, BesApi besApi) {
+    public DatasetServices(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
-    public ServiceDescription(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+    public DatasetServices(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
+
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/DatasetServices#");
+        setServiceTitle("Dataset Services Description");
+        setServiceDescription("An XML document itemizing the Services available for this dataset.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
+        setPreferredServiceSuffix("");
+
     }
 
 
-
+     public void setDapResponders(Vector<BesDapResponder> responders){
+        _responders = responders;
+     }
 
 
 
@@ -90,7 +104,7 @@ public class ServiceDescription extends BesDapResponder {
     public void respondToHttpGetRequest(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         String name = ReqInfo.getLocalUrl(req);
-        String requestUrl = req.getRequestURL().toString();
+        String datasetUrl = req.getRequestURL().toString();
 
         String context = req.getContextPath()+"/";
 
@@ -107,7 +121,7 @@ public class ServiceDescription extends BesDapResponder {
 
         serviceDescription.addContent( pi );
 
-        Element datasetServices = getDatasetServices(requestUrl);
+        Element datasetServices = getDatasetServicesElement(datasetUrl);
 
 
         serviceDescription.setRootElement(datasetServices);
@@ -129,30 +143,69 @@ public class ServiceDescription extends BesDapResponder {
     }
 
 
-    private Element getDatasetServices(String requestUrl){
+
+
+
+
+    public Element getDatasetServicesElement(String datasetUrl) {
+
+        Element datasetServices = new Element("DatasetServices");
+        datasetServices.setAttribute("base",datasetUrl, XML.NS);
+        datasetServices.addNamespaceDeclaration(XLINK.NS);
+
+        if(_responders!=null){
+            for(DapResponder service : _responders ){
+                 datasetServices.addContent(service.getServiceElement(datasetUrl));
+            }
+        }
+
+        datasetServices.addContent(getServerSideFunctions(datasetUrl));
+
+        return datasetServices;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private Element getDatasetServices(String datsetUrl){
 
 
 
         Element datasetServices = new Element("DatasetServices");
+        datasetServices.setAttribute("base",datsetUrl, XML.NS);
+        datasetServices.addNamespaceDeclaration(XLINK.NS);
 
-        datasetServices.setAttribute("base",requestUrl, XML.NS);
         String suffix;
         Element service;
         Element description;
         Element serverSideFunctions;
         Element function;
 
+        String role_id;
 
         suffix = ".html";
+        role_id = "http://services.opendap.org/dap4/Dataset#";
         service = new Element("Service");
-        service.setAttribute("name","HTML Data Request Form");
+        service.setAttribute("title","HTML Data Request Form");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/dataRequestForm.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("OPeNDAP HTML Data Request Form for data constraints and access");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -160,15 +213,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".dap";
+        role_id = "http://services.opendap.org/dap4/Data#";
         service = new Element("Service");
-        service.setAttribute("name","DAP4 Data");
+        service.setAttribute("title","DAP4 Data");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/dap4_data.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("DAP4 Data Object");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -176,15 +229,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".dods";
+        role_id = "http://services.opendap.org/dap2/Data#";
         service = new Element("Service");
-        service.setAttribute("name","DAP2 Data");
+        service.setAttribute("title","DAP2 Data");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/dap2_data.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("DAP2 Data Object");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -192,15 +245,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".ddx";
+        role_id = "http://services.opendap.org/dap2/DDX#";
         service = new Element("Service");
-        service.setAttribute("name","DDX");
+        service.setAttribute("title","DDX");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/ddx.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("OPeNDAP Data Description and Attribute XML Document");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -208,15 +261,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".dds";
+        role_id = "http://services.opendap.org/dap2/DDS#";
         service = new Element("Service");
-        service.setAttribute("name","DDS");
+        service.setAttribute("title","DDS");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/dds.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("OPeNDAP Dataset Description Structure");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -224,15 +277,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".das";
+        role_id = "http://services.opendap.org/dap2/DAS#";
         service = new Element("Service");
-        service.setAttribute("name","DAS");
+        service.setAttribute("title","DAS");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/das.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("OPeNDAP Dataset Attribute Structure (DAS)");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -240,15 +293,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".info";
+        role_id = "http://services.opendap.org/dap2/INFO#";
         service = new Element("Service");
-        service.setAttribute("name","INFO");
+        service.setAttribute("title","INFO");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/info.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("OPeNDAP Dataset Information Page");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -256,15 +309,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".rdf";
+        role_id = "http://services.opendap.org/dap4/RDF#";
         service = new Element("Service");
-        service.setAttribute("name","RDF");
+        service.setAttribute("title","RDF");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/rdf.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("An RDF representation of the DDX document.");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -272,15 +325,15 @@ public class ServiceDescription extends BesDapResponder {
         // - - - - - - - - - - - - - - - - - - - - -
 
         suffix = ".nc";
+        role_id = "http://services.opendap.org/dap4/NetCDF3#";
         service = new Element("Service");
-        service.setAttribute("name","NetCDF-File");
+        service.setAttribute("title","NetCDF-File");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/netcdf_fileout.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("NetCDF file-out response.");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -289,15 +342,15 @@ public class ServiceDescription extends BesDapResponder {
 
 
         suffix = ".iso";
+        role_id = "http://services.opendap.org/dap4/ISO-19115#";
         service = new Element("Service");
-        service.setAttribute("name","ISO-19115");
+        service.setAttribute("title","ISO-19115");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/iso_metedata.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("ISO 19115 Metadata Representation of the DDX.");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -306,15 +359,15 @@ public class ServiceDescription extends BesDapResponder {
 
 
         suffix = ".rubric";
+        role_id = "http://services.opendap.org/dap4/ISO-19115-Score#";
         service = new Element("Service");
-        service.setAttribute("name","ISO-19115-Score");
+        service.setAttribute("title","ISO-19115-Score");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
-        description.setAttribute("href","http://services.opendap.org/iso_rubric.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
+        description.setAttribute("href","http://services.opendap.org/iso_score.html",XLINK.NS);
         description.setText("ISO 19115 Metadata Representation conformance score for this dataset.");
         service.addContent(description);
         datasetServices.addContent(service);
@@ -324,15 +377,15 @@ public class ServiceDescription extends BesDapResponder {
         if(DapDispatcher.allowDirectDataSourceAccess()){
 
             suffix = ".file";
+            role_id = "http://services.opendap.org/dap4/FileAccess#";
             service = new Element("Service");
-            service.setAttribute("name","FileAccess");
+            service.setAttribute("title","FileAccess");
             //service.setAttribute("suffix",suffix);
-            service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-            service.setAttribute("type","simple", XLINK.NS);
+            service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+            service.setAttribute("role",role_id, XLINK.NS);
 
             description = new Element("Description");
             description.setAttribute("href","http://services.opendap.org/dataset_file_access.html",XLINK.NS);
-            description.setAttribute("type","simple", XLINK.NS);
             description.setText("Access to dataset file.");
             service.addContent(description);
             datasetServices.addContent(service);
@@ -343,22 +396,22 @@ public class ServiceDescription extends BesDapResponder {
 
 
         suffix = "";
+        role_id = "http://services.opendap.org/dap4/DatasetServices#";
         service = new Element("Service");
-        service.setAttribute("name","ServiceDescription");
+        service.setAttribute("title","Service Description");
         //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",requestUrl+suffix, XLINK.NS);
-        service.setAttribute("type","simple", XLINK.NS);
+        service.setAttribute("href",datsetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
 
         description = new Element("Description");
         description.setAttribute("href","http://services.opendap.org/service_description.html",XLINK.NS);
-        description.setAttribute("type","simple", XLINK.NS);
         description.setText("Service Description response.");
         service.addContent(description);
         datasetServices.addContent(service);
 
         // - - - - - - - - - - - - - - - - - - - - -
 
-        serverSideFunctions = getServerSideFunctions(requestUrl);
+        serverSideFunctions = getServerSideFunctions(datsetUrl);
         datasetServices.addContent(serverSideFunctions);
 
 
@@ -371,7 +424,7 @@ public class ServiceDescription extends BesDapResponder {
     }
 
 
-    private Element getServerSideFunctions(String requestUrl){
+    private Element getServerSideFunctions(String datasetUrl){
 
 
 
@@ -422,7 +475,6 @@ public class ServiceDescription extends BesDapResponder {
         return serverSideFunctions;
 
     }
-
 
 
 

@@ -51,7 +51,8 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
 
 
-    private static String defaultRequestSuffixRegex = "\\.html?";
+    private static String _preferredRequestSuffix = ".html";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix+"?";
 
     public HtmlDataRequestForm(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
@@ -65,6 +66,11 @@ public class HtmlDataRequestForm extends BesDapResponder {
     public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        setServiceRoleId("http://services.opendap.org/dap4/data-request-form#");
+        setServiceTitle("Data Request Form");
+        setServiceDescription("OPeNDAP HTML Data Request Form for data sub-setting and access.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_HTML_DATA_Request_Form_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
     public boolean needsBesToMatch(){

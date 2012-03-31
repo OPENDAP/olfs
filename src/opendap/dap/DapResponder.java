@@ -1,6 +1,8 @@
 package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
+import opendap.namespaces.XLINK;
+import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,18 +21,23 @@ public abstract class DapResponder extends HttpResponder  {
 
     private Logger log;
 
+    private String _serviceRoleId = null;
+    private String _serviceTitle = null;
+    private String _serviceDescription = null;
+    private String _serviceDescriptionLink = null;
+    private String _preferredServiceSuffix = null;
+
 
     public DapResponder(String sysPath, String requestSuffix) {
         this(sysPath,null,requestSuffix);
     }
 
-    public DapResponder(String sysPath, String pathPrefix, String reqSuffix) {
+    public DapResponder(String sysPath, String pathPrefix, String reqSuffixRegex) {
         super(sysPath, pathPrefix, matchAnythingRegex);
 
         log = LoggerFactory.getLogger(this.getClass());
 
-
-        setRequestSuffixRegex(reqSuffix);
+        setRequestSuffixRegex(reqSuffixRegex);
     }
 
 
@@ -62,7 +69,7 @@ public abstract class DapResponder extends HttpResponder  {
         }
 
 
-        String xmlBase = trimRequestSuffix(requestUrl);
+        String xmlBase = removeRequestSuffixFromString(requestUrl);
 
 
         log.debug("@xml:base='{}'",xmlBase);
@@ -70,9 +77,7 @@ public abstract class DapResponder extends HttpResponder  {
     }
 
 
-    public String trimRequestSuffix(String requestString){
-
-
+    public String removeRequestSuffixFromString(String requestString){
         String trimmedRequestString = requestString;
         String regex = requestSuffixRegex;
 
@@ -80,7 +85,7 @@ public abstract class DapResponder extends HttpResponder  {
         Matcher matcher = pattern.matcher(requestString);
 
         while (matcher.find()) {
-            log.debug("trimRequestSuffix() - matcher.find() found the text \""+matcher.group()+"\" starting at " +
+            log.debug("removeRequestSuffixFromString() - matcher.find() found the text \""+matcher.group()+"\" starting at " +
                "index "+matcher.start()+" and ending at index "+matcher.end());
 
             if(matcher.end() == requestString.length()){
@@ -88,12 +93,80 @@ public abstract class DapResponder extends HttpResponder  {
             }
 
         }
-
-
          return trimmedRequestString;
+    }
 
+
+
+    public Element getServiceElement(String datasetUrl){
+        Element service;
+
+        String role_id;
+
+        String suffix = getPreferredServiceSuffix();
+        role_id = getServiceRoleId();
+        String title = getServiceTitle();
+        service = new org.jdom.Element("Service");
+        service.setAttribute("title",title);
+        //service.setAttribute("suffix",suffix);
+        service.setAttribute("href",datasetUrl+suffix, XLINK.NS);
+        service.setAttribute("role",role_id, XLINK.NS);
+
+        String descriptionText = getServiceDescription();
+        String descriptionLink = getServiceDescriptionLink();
+
+        if(descriptionText!=null  ||  descriptionLink!=null){
+
+            Element description = new org.jdom.Element("Description");
+
+            if(descriptionLink!=null)
+                description.setAttribute("href",descriptionLink,XLINK.NS);
+
+            if(descriptionText!=null)
+                description.setText(descriptionText);
+
+            service.addContent(description);
+        }
+
+        return service;
 
     }
+
+
+    public String getServiceRoleId(){
+        return _serviceRoleId;
+    }
+    public String getServiceTitle(){
+        return _serviceTitle;
+    }
+    public String getServiceDescription(){
+        return _serviceDescription;
+    }
+    public String getServiceDescriptionLink(){
+        return _serviceDescriptionLink;
+    }
+    public String getPreferredServiceSuffix(){
+        return _preferredServiceSuffix;
+    }
+
+    protected void setServiceRoleId(String serviceRoleId){
+        _serviceRoleId = serviceRoleId;
+    }
+    protected void setServiceTitle(String serviceTitle){
+        _serviceTitle = serviceTitle;
+    }
+    protected void setServiceDescription(String serviceDescription){
+        _serviceDescription = serviceDescription;
+    }
+    protected void setServiceDescriptionLink(String serviceDescriptionLink){
+        _serviceDescriptionLink =  serviceDescriptionLink;
+    }
+    protected void setPreferredServiceSuffix(String preferredServiceSuffix){
+        _preferredServiceSuffix = preferredServiceSuffix;
+    }
+
+
+
 
 
 }

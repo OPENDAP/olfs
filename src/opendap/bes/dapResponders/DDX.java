@@ -46,8 +46,8 @@ public class DDX extends BesDapResponder {
 
 
     private Logger log;
-
-    private static String defaultRequestSuffixRegex = "\\.ddx";
+    private static String _preferredRequestSuffix = ".ddx";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
     public DDX(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
@@ -61,6 +61,12 @@ public class DDX extends BesDapResponder {
     public DDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap2/ddx#");
+        setServiceTitle("DDX");
+        setServiceDescription("OPeNDAP Data Description and Attribute XML Document.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDX_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 

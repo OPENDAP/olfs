@@ -24,7 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 public class IsoRubric extends BesDapResponder {
     private Logger log;
 
-    private static String defaultRequestSuffixRegex = "\\.rubric";
+    private static String _preferredRequestSuffix = ".rubric";
+    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
     public IsoRubric(String sysPath, BesApi besApi) {
@@ -38,6 +39,11 @@ public class IsoRubric extends BesDapResponder {
     public IsoRubric(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        setServiceRoleId("http://services.opendap.org/dap4/iso-19115-score#");
+        setServiceTitle("ISO-19115-Score");
+        setServiceDescription("ISO 19115 Metadata Representation conformance score for this dataset.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ISO_Conformance_Score_Service");
+        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 
