@@ -50,7 +50,7 @@ public class DatasetServices extends BesDapResponder {
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/DatasetServices#");
+        setServiceRoleId("http://services.opendap.org/dap4/dataset-services#");
         setServiceTitle("Dataset Services Description");
         setServiceDescription("An XML document itemizing the Services available for this dataset.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");

@@ -67,7 +67,7 @@ public class XmlData extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/XmlData#");
+        setServiceRoleId("http://services.opendap.org/dap4/xml-data#");
         setServiceTitle("XML Data Response");
         setServiceDescription("An XML document containing both the dataset's structural metadata along with data values.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_XML_Data_Service");
