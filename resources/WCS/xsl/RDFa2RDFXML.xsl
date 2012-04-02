@@ -355,7 +355,7 @@
 	  <when test="$nonprefixed='last' or $nonprefixed='license' or $nonprefixed='meta' or $nonprefixed='next'">true</when>
 	  <when test="$nonprefixed='p3pv1' or $nonprefixed='prev' or $nonprefixed='role' or $nonprefixed='section'">true</when>
 	  <when test="$nonprefixed='stylesheet' or $nonprefixed='subsection' or $nonprefixed='start' or $nonprefixed='top'">true</when>
-	  <when test="$nonprefixed='up'">true</when>
+	  <when test="$nonprefixed='up' or $nonprefixed='canonical'" >true</when>
 	  <when test="$nonprefixed='made' or $nonprefixed='previous' or $nonprefixed='search'">true</when>  <!-- added because they are frequent -->
 	  <otherwise>false</otherwise>
 	</choose>
