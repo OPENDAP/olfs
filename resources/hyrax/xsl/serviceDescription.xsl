@@ -136,7 +136,7 @@
 
                 <dd>
                     <font color="lightgrey">
-                        <div class="small">role:<xsl:value-of select="@xlink:role"/>
+                        <div class="small">xlink:role="<xsl:value-of select="@xlink:role"/>"
                         </div>
                     </font>
                 </dd>
