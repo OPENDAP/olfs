@@ -30,8 +30,6 @@ import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.*;
 import opendap.dap.DapResponder;
-import opendap.namespaces.XLINK;
-import opendap.namespaces.XML;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +58,7 @@ public class DapDispatcher implements DispatchHandler {
 
     private String systemPath;
     private Element _config;
-    private Vector<BesDapResponder> responders;
+    private Vector<DapResponder> responders;
     private static boolean _allowDirectDataSourceAccess = false;
     private static boolean _useDAP2ResourceUrlResponse = false;
 
@@ -69,7 +67,7 @@ public class DapDispatcher implements DispatchHandler {
 
     public DapDispatcher(){
         log = LoggerFactory.getLogger(getClass());
-        responders = new Vector<BesDapResponder>();
+        responders = new Vector<DapResponder>();
 
     }
 
@@ -84,6 +82,17 @@ public class DapDispatcher implements DispatchHandler {
     }
 
 
+    protected Vector<DapResponder> getResponders(){
+        return responders;
+    }
+
+    protected void addResponder(DapResponder r){
+        responders.add(r);
+    }
+
+    public Element getConfig(){
+        return _config;
+    }
 
     public void init(HttpServlet servlet,Element config) throws Exception {
 
@@ -241,11 +250,14 @@ public class DapDispatcher implements DispatchHandler {
         for (HttpResponder r : responders) {
             log.debug(r.getClass().getSimpleName()+ ".getPathPrefix(): "+r.getPathPrefix());
             if (r.matches(relativeUrl)) {
+
                 log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
-                    if(sendResponse)
-                        r.respondToHttpGetRequest(request, response);
-                    return true;
+
+                if(sendResponse)
+                    r.respondToHttpGetRequest(request, response);
+
+                return true;
             }
         }
 

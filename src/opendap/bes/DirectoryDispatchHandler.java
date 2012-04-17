@@ -228,7 +228,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_directory");
 
-        response.setStatus(HttpServletResponse.SC_OK);
+        // response.setStatus(HttpServletResponse.SC_OK);
 
         Request oreq = new Request(null,request);
 

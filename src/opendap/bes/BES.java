@@ -98,6 +98,9 @@ public class BES {
     }
 
 
+
+
+
     public Vector<BesConfigurationModule> getConfigurationModules() throws BesAdminFail {
 
         Vector<BesConfigurationModule> configurationModules = new Vector<BesConfigurationModule>();

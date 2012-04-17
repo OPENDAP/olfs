@@ -48,6 +48,8 @@ public class BESManager implements DispatchHandler {
 
     private static boolean _isConfigured = false;
 
+    private static Element _config;
+
     private static  org.slf4j.Logger log = null;
 
     private static boolean initialized;
@@ -64,9 +66,12 @@ public class BESManager implements DispatchHandler {
 
     public void init(HttpServlet servlet, Element config) throws Exception{
 
+
         if(initialized) return;
 
-        configure(config);
+        _config = (Element) config.clone();
+
+        configure();
 
         log.info("Initialized.");
 
@@ -74,6 +79,10 @@ public class BESManager implements DispatchHandler {
 
     }
 
+
+    public static Element getConfig(){
+        return (Element) _config.clone();
+    }
 
 
 
@@ -106,13 +115,13 @@ public class BESManager implements DispatchHandler {
 
 
 
-    public static void configure(Element besConfiguration) throws Exception {
+    public static void configure() throws Exception {
 
         if(_isConfigured) return;
 
         _besCollection  = new Vector<BES>();
 
-        List besList = besConfiguration.getChildren("BES");
+        List besList = _config.getChildren("BES");
 
         if(besList.isEmpty())
             throw new BadConfigurationException("OLFS Configuration must " +
@@ -146,11 +155,11 @@ public class BESManager implements DispatchHandler {
     }
 
 
-    //public static void configure(OLFSConfig olfsConfig) throws Exception {
+    public static void addBes(BES bes) throws Exception {
 
-    //    configure(olfsConfig.getBESConfig());
+        _besCollection.add(bes);
 
-    //}
+    }
 
 
     public static boolean isConfigured(){

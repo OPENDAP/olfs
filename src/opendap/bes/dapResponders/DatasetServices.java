@@ -3,6 +3,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.DapResponder;
 import opendap.namespaces.XLINK;
@@ -34,7 +35,7 @@ public class DatasetServices extends BesDapResponder {
 
     private static String defaultRequestSuffixRegex = ".*";
 
-    private Vector<BesDapResponder> _responders = null;
+    private Vector<DapResponder> _responders = null;
 
 
     public DatasetServices(String sysPath, BesApi besApi) {
@@ -59,7 +60,7 @@ public class DatasetServices extends BesDapResponder {
     }
 
 
-     public void setDapResponders(Vector<BesDapResponder> responders){
+     public void setDapResponders(Vector<DapResponder> responders){
         _responders = responders;
      }
 

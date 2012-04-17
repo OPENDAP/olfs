@@ -85,8 +85,11 @@
                   document. This would be the data resource URL.
 
                 * One or more Service elements each of which has
-                    * A name attribute that has as its value the name of the service.
+                    * A title attribute that has as its value the a human readable name.
                     * A required xlink:href attribute that has as its value the service URL.
+                    * A required xlink:role that provides a namespace ID that is uniquely associated with the service
+                      behavior. For example every DAP2 data service response should always have the same value of
+                      xlink:role="http://services.opendap.org/dap2/dods#"
                     * An optional child element Description that contains
                         * An optional xlink:href attribute that points to a human/browser readable description of the service.
                         * And the required content of a brief description of the service.
@@ -102,20 +105,27 @@
 
             Example:
 
-            <DatasetServices xml:base="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml">
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <?xml-stylesheet type="text/xsl" href="/opendap/xsl/serviceDescription.xsl"?>
+            <DatasetServices
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xml:base="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml">
 
-                <Service name="FileAccess" xlink:href="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml.file">
-                    <Description xlink:href="http://services.opendap.org/dataset_file_access.html">Access to dataset file.</Description>
+
+                <Service title="DAP2 Data"
+                         xlink:href="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml.dods"
+                         xlink:role="http://services.opendap.org/dap2/dods#">
+                    <Description xlink:href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service">DAP2 Data Object.</Description>
                 </Service>
-                <ServerSideFunctions>
-                    <Function name="geogrid"
-                              xlink:href="http://docs.opendap.org/index.php/Server_Side_Processing_Functions#geogrid">
-                        <Description>Allows a DAP Grid variable to be sub-sampled using georeferenced values.</Description>
-                    </Function>
-                </ServerSideFunctions>
-            </DatasetServices>
+
+                <Service title="Data Request Form"
+                         xlink:href="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml.html"
+                         xlink:role="http://services.opendap.org/dap4/data-request-form#">
+                    <Description xlink:href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_HTML_DATA_Request_Form_Service">OPeNDAP HTML Data Request Form for data sub-setting and access.</Description>
+                </Service>
 
 
+            </Dataset>
             The DatasetServices response is obtained by de-referencing the data resource URL (aka the
             dataset URL, aka the file URL).
 

@@ -588,9 +588,9 @@ public class BesApi {
 
         if(o == null){
 
-            ret = besTransaction(dataSource,
-                    showCatalogRequest(dataSource),
-                    response);
+            Document getCatalogRequest = showCatalogRequest(dataSource);
+
+            ret = besTransaction(dataSource, getCatalogRequest, response);
 
             if(ret){
                 // Get the root element.

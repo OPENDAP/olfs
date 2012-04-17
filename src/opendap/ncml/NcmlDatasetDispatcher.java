@@ -50,6 +50,7 @@ public class NcmlDatasetDispatcher extends DapDispatcher {
 
 
     public NcmlDatasetDispatcher(){
+        //super();
         log = LoggerFactory.getLogger(getClass());
         responders = new Vector<HttpResponder>();
 
