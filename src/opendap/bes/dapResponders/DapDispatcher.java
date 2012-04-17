@@ -202,7 +202,7 @@ public class DapDispatcher implements DispatchHandler {
 
 
 
-        log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ?"Enabled":"Disabled")+
+        log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ?"Enabled":"Disabled")+"  "+
                  "Resource URL returns: " + (_useDAP2ResourceUrlResponse ?"DAP2 File Response":"DAP4 Service Description"));
 
         initialized = true;

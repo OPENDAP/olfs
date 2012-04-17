@@ -66,14 +66,18 @@ public class AsyncDispatcher extends DapDispatcher {
 
     private String _prefix = "async/";
 
-    private int cachePersistTime = 3600000; // In milliseconds
-    private int responseDelay    = 60000; // In milliseconds
+    private int cachePersistTime; // In milliseconds
+    private int responseDelay; // In milliseconds
 
 
     public AsyncDispatcher(){
         log = LoggerFactory.getLogger(getClass());
 
         asyncCache = new ConcurrentHashMap<String, Date>();
+
+        cachePersistTime = 3600000; // In milliseconds
+        responseDelay    = 60000;   // In milliseconds
+
         initialized = false;
     }
 
@@ -89,7 +93,8 @@ public class AsyncDispatcher extends DapDispatcher {
         init(servlet, config ,besApi);
 
         ingestPrefix();
-
+        ingestCachePersistTime();
+        ingestResponseDelay();
 
 
         Element besManagerConfig = BESManager.getConfig();
@@ -150,7 +155,57 @@ public class AsyncDispatcher extends DapDispatcher {
         if(!_prefix.startsWith("/"))
             _prefix = "/" + _prefix;
 
-        log.info("Initialized. prefix="+ _prefix);
+        log.info("prefix="+ _prefix);
+
+    }
+
+    private void ingestCachePersistTime() throws Exception{
+
+        String msg;
+
+        Element config = getConfig();
+
+        Element e = config.getChild("cachePersistTime");
+
+
+        if(e!=null)
+            cachePersistTime = Integer.parseInt(e.getTextTrim());
+
+        if(cachePersistTime < 0){
+            msg = "Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide a <cachePersistTime>  " +
+                    "child element whose value may not be less than 0";
+            log.error(msg);
+            throw new Exception(msg);
+        }
+        log.info("cachePersistTime="+ cachePersistTime);
+
+    }
+
+
+
+    private void ingestResponseDelay() throws Exception{
+
+        String msg;
+
+        Element config = getConfig();
+
+        Element e = config.getChild("responseDelay");
+
+
+        if(e!=null)
+            responseDelay = Integer.parseInt(e.getTextTrim());
+
+        if(responseDelay < 0){
+            msg = "Bad Configuration. The <Handler> " +
+                    "element that declares " + this.getClass().getName() +
+                    " MUST provide a <responseDelay>  " +
+                    "child element whose value may not be less than 0";
+            log.error(msg);
+            throw new Exception(msg);
+        }
+        log.info("responseDelay="+ responseDelay);
 
     }
 
@@ -295,8 +350,11 @@ public class AsyncDispatcher extends DapDispatcher {
             else {
                long timeTillReady = startTime.getTime() - now.getTime();
 
-               if(timeTillReady>0)
-                   Thread.sleep(timeTillReady);
+               if(timeTillReady>0){
+                   log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
+                   try { Thread.sleep(timeTillReady);}
+                   catch(InterruptedException e){ log.error("Thread Interrupted. msg: "+e.getMessage());}
+               }
 
                return(super.requestDispatch(request,response,true));
             }
@@ -345,7 +403,6 @@ public class AsyncDispatcher extends DapDispatcher {
 
         dataset.setAttribute("base",xmlBase, XML.NS);
         async.setAttribute("href",requestUrl, XLINK.NS);
-        async.setAttribute("role","role:is:not:yet:supported", XLINK.NS);
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssz");
