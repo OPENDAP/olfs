@@ -35,6 +35,7 @@ import opendap.namespaces.XLINK;
 import opendap.namespaces.XML;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -340,8 +342,14 @@ public class AsyncDispatcher extends DapDispatcher {
         else {
 
             if(!isDap2Request){
+
+
                 Document asyncResponse = getAsynchronousResponseDoc(request,startTime,endTime);
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+
+
+
                 System.out.println(xmlo.outputString(asyncResponse));
                 response.setContentType("text/xml");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
@@ -389,11 +397,16 @@ public class AsyncDispatcher extends DapDispatcher {
 
     public Document getAsynchronousResponseDoc(HttpServletRequest request, Date firstTimeAvailable, Date lastTimeAvailable){
 
+
+        String context  = request.getContextPath()+"/";
+
         Element dataset = new Element("Dataset", DAP.DAPv40_NS);
         Element async   = new Element("async",DAP.DAPv40_NS);
-        Element date    = new Element("date", DublinCore.NS);
+        Element beginAccess  = new Element("beginAccess", DAP.DAPv40_NS);
+        Element endAccess    = new Element("endAccess", DAP.DAPv40_NS);
 
-        async.addContent(date);
+        async.addContent(beginAccess);
+        async.addContent(endAccess);
         dataset.addContent(async);
         dataset.addNamespaceDeclaration(DublinCore.NS);
         dataset.addNamespaceDeclaration(XLINK.NS);
@@ -405,7 +418,7 @@ public class AsyncDispatcher extends DapDispatcher {
         async.setAttribute("href",requestUrl, XLINK.NS);
 
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssz");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ");
 
         StringBuffer startTime = new StringBuffer();
 
@@ -415,10 +428,21 @@ public class AsyncDispatcher extends DapDispatcher {
 
         endTime = sdf.format(lastTimeAvailable,endTime,new FieldPosition(DateFormat.YEAR_FIELD));
 
-        date.setText(startTime.append("/").append(endTime).toString());
+        beginAccess.setText(startTime.toString());
+        endAccess.setText(endTime.toString());
+
+        HashMap<String,String> piMap = new HashMap<String,String>( 2 );
+        piMap.put( "type", "text/xsl" );
+        piMap.put( "href", context+"xsl/asyncResponse.xsl" );
+        ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
+
+        Document asyncResponse = new Document() ;
+        asyncResponse.addContent( pi );
+
+        asyncResponse.setRootElement(dataset);
 
 
-        return new Document(dataset);
+        return asyncResponse;
 
     }
 

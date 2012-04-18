@@ -375,8 +375,8 @@ public class Transformer {
 
         Element e = new Element("test");
         char c = 0x18;
-        e.setText("Here is that bad thing: "+c);
-        System.out.println(xmlo.outputString(e));
+        //e.setText("Here is that bad thing: "+c);
+        //System.out.println(xmlo.outputString(e));
 
 
         Document sourceDoc, xsltDoc;
@@ -439,13 +439,13 @@ public class Transformer {
                 // Execute the method.
                 int statusCode = httpClient.executeMethod(request);
 
-                if (statusCode != HttpStatus.SC_OK) {
-                    log.error("HttpClient failed to executeMethod(). Status: " + request.getStatusLine());
-                    doc = null;
+                if (statusCode == HttpStatus.SC_OK || statusCode==HttpStatus.SC_ACCEPTED) {
+                    is = request.getResponseBodyAsStream();
+                    doc = parser.build(is);
                 }
                 else {
-                	is = request.getResponseBodyAsStream();
-                	doc = parser.build(is);
+                    log.error("HttpClient failed to executeMethod(). Status: " + request.getStatusLine());
+                    doc = null;
                 }
 
                 return doc;
@@ -537,6 +537,8 @@ public class Transformer {
         trans.setInitialContextNode(source);
         trans.setDestination(out);
         trans.transform();
+
+        os.write(0x0a);
 
         log.debug("Output written to: "+os);
 
