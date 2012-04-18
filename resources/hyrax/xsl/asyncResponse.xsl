@@ -108,6 +108,7 @@
                 <br />
                 <br />
 
+                <div id="debug"></div>
 
 
                 <!-- ****************************************************** -->
@@ -144,18 +145,21 @@
             </body>
 
             <script type="text/javascript">
-                  beginAccessTime="<xsl:value-of select="$beginTime"/>";
-                  endAccessTime="<xsl:value-of select="$endTime"/>";
-                  var startTime = Date.parse(beginAccessTime);
-                  var endTime = Date.parse(endAccessTime);
-                  var endDate = new Date(endTime);
-                  var dataAccessUrl="<xsl:value-of select="$dataAccessUrl"/>"
+                beginAccessTime="<xsl:value-of select="$beginTime"/>";
+                endAccessTime="<xsl:value-of select="$endTime"/>";
+                var startTime = Date.parse(beginAccessTime);
+                var endTime = Date.parse(endAccessTime);
+                var endDate = new Date(endTime);
+                var dataAccessUrl="<xsl:value-of select="$dataAccessUrl"/>"
 
-                  updateProgessBar();
+                updateProgessBar();
+                // updateDebugInfo();
             </script>
 
         </html>
     </xsl:template>
+
+
 
 
 
@@ -269,7 +273,7 @@
                 var percentComplete = 100*(totalWaitTime - remainingWaitTime)/totalWaitTime;
                 pbar.style.width = percentComplete + '%';
 
-                tR.innerHTML = "<strong>"+remainingWaitTime/1000 +"</strong> seconds";
+                tR.innerHTML = "<strong>"+ Math.round(remainingWaitTime/1000) +"</strong> seconds";
 
             }
             else if (startTime<=now && now<=endTime) {
@@ -294,6 +298,17 @@
             besLogTailTimer = setTimeout("updateProgessBar()", 1000);
 
         }
+
+        function updateDebugInfo() {
+            var dbg = document.getElementById("debug");
+
+            debug.innerHTML =
+                "StartTime: " + startTime + "<br />" +
+                "EndTime: " + endTime + "<br />" +
+                "EndDate: " + endDate.toLocaleString() + "<br />";
+        }
+
+
         ]]>
         </script>
 
