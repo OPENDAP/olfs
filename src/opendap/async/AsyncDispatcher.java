@@ -350,7 +350,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
-                System.out.println(xmlo.outputString(asyncResponse));
+                //System.out.println(xmlo.outputString(asyncResponse));
                 response.setContentType("text/xml");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 response.getOutputStream().print(xmlo.outputString(asyncResponse));
