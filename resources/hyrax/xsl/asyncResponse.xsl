@@ -43,6 +43,7 @@
     <xsl:variable name="beginTime" select="/dap:Dataset/dap:async/dap:beginAccess" />
     <xsl:variable name="endTime" select="/dap:Dataset/dap:async/dap:endAccess" />
 
+    <xsl:variable name="dataAccessUrl" select="/dap:Dataset/dap:async/@xlink:href" />
 
 
 
@@ -97,9 +98,15 @@
                     <div id="timeRemaining"> </div>
                     <div id="progress" style="width: 0%"></div>
                 </div>
+                <br />
+
+                <div id="dataAccessLink">
+                    <font color="grey">Data Access:  <xsl:value-of select="$dataAccessUrl"/></font>
+                </div>
                 </center>
 
-
+                <br />
+                <br />
 
 
 
@@ -142,6 +149,7 @@
                   var startTime = Date.parse(beginAccessTime);
                   var endTime = Date.parse(endAccessTime);
                   var endDate = new Date(endTime);
+                  var dataAccessUrl="<xsl:value-of select="$dataAccessUrl"/>"
 
                   updateProgessBar();
             </script>
@@ -252,6 +260,7 @@
             var now = currentDate.getTime();
             var pbar = document.getElementById("progress");
             var tR = document.getElementById("timeRemaining");
+            var dAL = document.getElementById("dataAccessLink");
             var totalWaitTime = startTime - pageLoadTime;
 
 
@@ -268,12 +277,16 @@
                 pbar.style.width = '100%';
                 pbar.innerHTML = currentDate.toLocaleString();
                 tR.innerHTML = "Your Data Should Be Available For Access Until: "+endDate.toLocaleString();
+
+                dAL.innerHTML = "<a href='"+dataAccessUrl+"'>Data Access: " + dataAccessUrl + "</a>";
+
             }
             else {
                 pbar.style.background = '#000000';
                 pbar.style.width = '100%';
                 pbar.innerHTML = '';
                 tR.innerHTML = "Your response has expired.";
+                dAL.innerHTML = "<font color='grey'>Data Access: " + dataAccessUrl + "</font>";
 
             }
 
