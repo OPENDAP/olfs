@@ -148,7 +148,7 @@
                 var beginAccessTime="<xsl:value-of select="$beginTime"/>";
                 var endAccessTime="<xsl:value-of select="$endTime"/>";
                 var startTime = Date.parse(beginAccessTime);
-                var endTime = Date.parse(endAccessTime);
+                var endTime   =   Date.parse(endAccessTime);
 
                 //startTime = pageLoadTime + 5000;
                 //endTime = startTime + 10000;

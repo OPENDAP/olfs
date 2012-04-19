@@ -62,7 +62,7 @@ public class AsyncDispatcher extends DapDispatcher {
     private Logger log;
     private boolean initialized;
 
-    private ConcurrentHashMap<String,GregorianCalendar> asyncCache;
+    private ConcurrentHashMap<String,Date> asyncCache;
 
     private String _prefix = "async/";
 
@@ -73,7 +73,7 @@ public class AsyncDispatcher extends DapDispatcher {
     public AsyncDispatcher(){
         log = LoggerFactory.getLogger(getClass());
 
-        asyncCache = new ConcurrentHashMap<String, GregorianCalendar>();
+        asyncCache = new ConcurrentHashMap<String, Date>();
 
         cachePersistTime = 3600000; // In milliseconds
         responseDelay    = 60000;   // In milliseconds
@@ -298,13 +298,16 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
+
+
+
+
+
     public boolean asyncResponse(HttpServletRequest request, HttpServletResponse response, boolean isDap2Request) throws Exception {
 
-        GregorianCalendar now = getCurrentUtcTime();
-        GregorianCalendar beginAccess = getCurrentUtcTime();
-        GregorianCalendar endAccess =  getCurrentUtcTime();
-        beginAccess.add(Calendar.MILLISECOND, getResponseDelay());
-        endAccess.add(Calendar.MILLISECOND, getResponseDelay()+cachePersistTime);
+        Date now = new Date();
+        Date startTime = new Date(now.getTime()+getResponseDelay());
+        Date endTime = new Date(startTime.getTime()+cachePersistTime);
 
         String xmlBase = getXmlBase(request);
 
@@ -312,19 +315,17 @@ public class AsyncDispatcher extends DapDispatcher {
 
         if(asyncCache.containsKey(xmlBase)) {
 
-            beginAccess = asyncCache.get(xmlBase);
+            startTime = asyncCache.get(xmlBase);
 
-            endAccess = getCurrentUtcTime();
-
-            endAccess.setTimeInMillis(beginAccess.getTimeInMillis() + cachePersistTime);
+            endTime = new Date(startTime.getTime()+cachePersistTime);
 
 
 
-            if(now.after(beginAccess)){
-                if(now.before(endAccess) ){
+            if(now.after(startTime)){
+                if(now.before(endTime) ){
                     cacheIsReady = true;
                 }
-                else if(now.after(endAccess)){
+                else if(now.after(endTime)){
                     asyncCache.remove(xmlBase);
                 }
             }
@@ -332,9 +333,9 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
         if(!asyncCache.containsKey(xmlBase)) {
-            beginAccess = getCurrentUtcTime();
-            beginAccess.add(Calendar.MILLISECOND, getResponseDelay());
-            asyncCache.put(xmlBase,beginAccess);
+            startTime = new Date(now.getTime()+getResponseDelay());
+            endTime = new Date(startTime.getTime()+cachePersistTime);
+            asyncCache.put(xmlBase,startTime);
         }
 
 
@@ -347,19 +348,19 @@ public class AsyncDispatcher extends DapDispatcher {
             if(!isDap2Request){
 
 
-                Document asyncResponse = getAsynchronousResponseDoc(request,beginAccess,endAccess);
+                Document asyncResponse = getAsynchronousResponseDoc(request,startTime,endTime);
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
 
 
-                //System.out.println(xmlo.outputString(asyncResponse));
+                System.out.println(xmlo.outputString(asyncResponse));
                 response.setContentType("text/xml");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 response.getOutputStream().print(xmlo.outputString(asyncResponse));
             }
             else {
-               long timeTillReady = beginAccess.getTimeInMillis() - now.getTimeInMillis();
+               long timeTillReady = startTime.getTime() - now.getTime();
 
                if(timeTillReady>0){
                    log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
@@ -378,6 +379,9 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
+
+
+
     private int getResponseDelay(){
 
 
@@ -386,15 +390,8 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
-    GregorianCalendar getCurrentUtcTime(){
-        TimeZone utc = TimeZone.getTimeZone("UTC");
-        GregorianCalendar c = new GregorianCalendar(utc);
-        return c;
-    }
 
-
-
-    public Document getAsynchronousResponseDoc(HttpServletRequest request, GregorianCalendar firstTimeAvailable, GregorianCalendar lastTimeAvailable){
+    public Document getAsynchronousResponseDoc(HttpServletRequest request, Date firstTimeAvailable, Date lastTimeAvailable){
 
 
         String context  = request.getContextPath()+"/";
@@ -412,20 +409,24 @@ public class AsyncDispatcher extends DapDispatcher {
 
         String xmlBase =  getXmlBase(request);
         String requestUrl = request.getRequestURL().toString();
+        String ce = request.getQueryString();
 
         dataset.setAttribute("base",xmlBase, XML.NS);
-        async.setAttribute("href",requestUrl, XLINK.NS);
+        async.setAttribute("href",requestUrl+"?"+ce, XLINK.NS);
 
+
+        log.debug("firstTime: "+firstTimeAvailable.getTime());
+        log.debug("lastTime:  "+lastTimeAvailable.getTime());
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
         StringBuffer startTime = new StringBuffer();
 
-        startTime = sdf.format(new Date(firstTimeAvailable.getTimeInMillis()),startTime, new FieldPosition(DateFormat.AM_PM_FIELD));
+        startTime = sdf.format(firstTimeAvailable,startTime, new FieldPosition(DateFormat.YEAR_FIELD));
 
         StringBuffer endTime = new StringBuffer();
 
-        endTime = sdf.format(new Date(lastTimeAvailable.getTimeInMillis()),endTime,new FieldPosition(DateFormat.YEAR_FIELD));
+        endTime = sdf.format(lastTimeAvailable,endTime,new FieldPosition(DateFormat.YEAR_FIELD));
 
         beginAccess.setText(startTime.toString());
         endAccess.setText(endTime.toString());
