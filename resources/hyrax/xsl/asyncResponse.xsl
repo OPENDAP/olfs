@@ -145,15 +145,20 @@
             </body>
 
             <script type="text/javascript">
-                beginAccessTime="<xsl:value-of select="$beginTime"/>";
-                endAccessTime="<xsl:value-of select="$endTime"/>";
+                var beginAccessTime="<xsl:value-of select="$beginTime"/>";
+                var endAccessTime="<xsl:value-of select="$endTime"/>";
                 var startTime = Date.parse(beginAccessTime);
                 var endTime = Date.parse(endAccessTime);
+
+                //startTime = pageLoadTime + 5000;
+                //endTime = startTime + 10000;
+
+
+                var startDate = new Date(startTime);
                 var endDate = new Date(endTime);
                 var dataAccessUrl="<xsl:value-of select="$dataAccessUrl"/>"
 
-                updateProgessBar();
-                // updateDebugInfo();
+                updateProgressBar();
             </script>
 
         </html>
@@ -205,6 +210,10 @@
         </STYLE>
         <script type="text/javascript">
         <![CDATA[
+
+        var pageLoadDate = new Date();
+        var pageLoadTime = pageLoadDate.getTime();
+
         /**
          * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
          * NON-CONFORMANT EDITION.
@@ -255,32 +264,32 @@
         }(Date));
 
 
-        var d = new Date();
-        var pageLoadTime = d.getTime();
 
-        function updateProgessBar() {
+        function updateProgressBar() {
 
-            var currentDate   = new Date();
-            var now = currentDate.getTime();
+
+            var currentDate = new Date();
+            var currentTime = currentDate.getTime();
             var pbar = document.getElementById("progress");
             var tR = document.getElementById("timeRemaining");
             var dAL = document.getElementById("dataAccessLink");
             var totalWaitTime = startTime - pageLoadTime;
 
 
-            if(startTime>now){
-                var remainingWaitTime = startTime - now;
+            if(startTime > currentTime){
+                //alert("start > current");
+                var remainingWaitTime = startTime - currentTime;
                 var percentComplete = 100*(totalWaitTime - remainingWaitTime)/totalWaitTime;
                 pbar.style.width = percentComplete + '%';
 
                 tR.innerHTML = "<strong>"+ Math.round(remainingWaitTime/1000) +"</strong> seconds";
 
             }
-            else if (startTime<=now && now<=endTime) {
+            else if(startTime<=currentTime && currentTime<=endTime) {
                 pbar.style.background = '#00FF00';
                 pbar.style.width = '100%';
                 pbar.innerHTML = currentDate.toLocaleString();
-                tR.innerHTML = "Your Data Should Be Available For Access Until: "+endDate.toLocaleString();
+                tR.innerHTML = "Your data should be available for access until: "+endDate.toLocaleString();
 
                 dAL.innerHTML = "<a href='"+dataAccessUrl+"'>Data Access: " + dataAccessUrl + "</a>";
 
@@ -294,8 +303,9 @@
 
             }
 
+
             // Now that we have updated the progress bar, start the cycle again...
-            besLogTailTimer = setTimeout("updateProgessBar()", 1000);
+            besLogTailTimer = setTimeout("updateProgressBar()", 1000);
 
         }
 
@@ -303,9 +313,20 @@
             var dbg = document.getElementById("debug");
 
             debug.innerHTML =
-                "StartTime: " + startTime + "<br />" +
-                "EndTime: " + endTime + "<br />" +
-                "EndDate: " + endDate.toLocaleString() + "<br />";
+                "<table>" +
+                "<tr><td>BeginAccessTime</td><td>" + beginAccessTime +"</td></tr>" +
+                "<tr><td>StartDate</td><td>" + startDate.toLocaleString() +"</td></tr>" +
+                "<tr><td>EndAccessTime</td><td>" + endAccessTime +"</td></tr>" +
+                "<tr><td>EndDate</td><td>" + endDate.toLocaleString() + "</td></tr>" +
+                "<tr><td>PageLoadDate</td><td>" + pageLoadDate.toLocaleString() +"</td></tr>" +
+                "<tr><td>CurrentDate</td><td>" + currentDate.toLocaleString() + "</td></tr>" +
+                "<tr><td>PageLoadTime</td><td>" + pageLoadTime + "</td></tr>" +
+                "<tr><td>CurrentTime</td><td>" + currentTime + "</td></tr>" +
+                "<tr><td>StartTime</td><td>" + startTime + "</td></tr>" +
+                "<tr><td>EndTime</td><td>" + endTime + "</td></tr>"  +
+                "<tr><td>start-current</td><td>" + (startTime - currentTime) + "</td></tr>" +
+                "<tr><td>end-current</td><td>" + (endTime - currentTime) + "</td></tr>" +
+                "</table>" ;
         }
 
 
