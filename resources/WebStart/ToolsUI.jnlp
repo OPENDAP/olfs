@@ -14,13 +14,13 @@
      <all-permissions/>
    </security>
 
-  <resources>
-   <j2se version="1.6+" max-heap-size="1024m"/>
-   <jar href="netcdfUI.jar"/>
-   <extension name="netcdfUI Extra" href="netcdfToolsExtraJars.jnlp"/>
+   <resources>
+     <j2se version="1.6+" max-heap-size="1024m"/>
+     <jar href="netcdfUI.jar"/>
+     <extension name="netcdfUI Extra" href="netCDFtoolsExtraJars.jnlp"/>
    </resources>
 
    <application-desc main-class="ucar.nc2.ui.ToolsUI">
-     <argument>{catalogURL}#{datasetID}</argument>
+       <argument>{catalogURL}#{datasetID}</argument>
    </application-desc>
 </jnlp>
