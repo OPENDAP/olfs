@@ -243,7 +243,7 @@ public class LogUtil {
         System.out.println("+++LogUtil.initLogging() - Logback configured.");
 
 
-        System.out.print("+++LogUtil.initLogging() - Insiantiating Logger...");
+        System.out.print("+++LogUtil.initLogging() - Instantiating Logger...");
 
         try {
             log = org.slf4j.LoggerFactory.getLogger(LogUtil.class);

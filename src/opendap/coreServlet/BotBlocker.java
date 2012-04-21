@@ -50,12 +50,17 @@ public class BotBlocker implements DispatchHandler {
     private Vector<Pattern> ipMatchPatterns;
 
 
+    private Vector<Pattern> responseBlockingPatterns;
+    private boolean requestBlocking;
+
 
     BotBlocker() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
         ipAddresses = new HashSet<String>();
         ipMatchPatterns = new Vector<Pattern>();
+        responseBlockingPatterns = new Vector<Pattern>();
+        requestBlocking = false;
     }
 
     /**
@@ -103,6 +108,13 @@ public class BotBlocker implements DispatchHandler {
             ipMatchPatterns.add(ipP);
         }
 
+        for (Object o : config.getChildren("responseBlockingRegex")) {
+            String ipMatch = ((Element) o).getTextTrim();
+            Pattern ipP = Pattern.compile(ipMatch);
+            responseBlockingPatterns.add(ipP);
+            requestBlocking = true;
+        }
+
 
 
 
@@ -126,23 +138,42 @@ public class BotBlocker implements DispatchHandler {
 
         if(ipAddresses.contains(remoteAddr)){
             log.info("The ip address: "+request.getRemoteAddr()+" is " +
-                    "on the list of blocked adresses");
-            return true;
+                    "on the list of blocked addresses");
+
+            if(requestBlocking)
+                return isResponseBlocked(request);
         }
 
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
                 log.info("The ip address: "+request.getRemoteAddr()+" matches " +
-                        "the the pattern: \""+p.pattern());
+                        "the the pattern: \"" + p.pattern() + "\"");
 
+                if(requestBlocking)
+                    return isResponseBlocked(request);
+            }
+        }
+
+
+        return false;
+
+
+    }
+
+    public boolean isResponseBlocked(HttpServletRequest request){
+
+        String requestUrl = request.getRequestURL().toString();
+        for(Pattern p: responseBlockingPatterns){
+            if(p.matcher(requestUrl).matches()){
+                log.info("The request matches the response blocking regex pattern: \""+p.pattern()+"\"");
                 return true;
             }
         }
 
         return false;
 
-
     }
+
 
     /**
      *
@@ -155,12 +186,7 @@ public class BotBlocker implements DispatchHandler {
                               HttpServletResponse response)
             throws Exception {
 
-
-        //response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-
-        // For some reason using sendError() causes the HTTP heieaders to say
-        // return status is 200 OK and not 403 Forbidden... Weird.
-        //response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
 
         log.info("Denied access to "+request.getRemoteAddr()+" because it is " +
                 "either on the list, or matches a blocking pattern.");
