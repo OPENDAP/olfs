@@ -147,7 +147,7 @@
 
         <init-param>
             <param-name>DebugOn</param-name>
-            <param-value>true</param-value>
+            <param-value>false</param-value>
         </init-param>
 
         <init-param>

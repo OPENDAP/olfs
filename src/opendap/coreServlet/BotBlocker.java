@@ -49,9 +49,11 @@ public class BotBlocker implements DispatchHandler {
     private HashSet<String> ipAddresses;
     private Vector<Pattern> ipMatchPatterns;
 
+    private Vector<Pattern> blockedResponsePatterns;
 
-    private Vector<Pattern> responseBlockingPatterns;
-    private boolean requestBlocking;
+
+    private Vector<Pattern> allowedResponsePatterns;
+    private boolean responseFiltering;
 
 
     BotBlocker() {
@@ -59,8 +61,9 @@ public class BotBlocker implements DispatchHandler {
         initialized = false;
         ipAddresses = new HashSet<String>();
         ipMatchPatterns = new Vector<Pattern>();
-        responseBlockingPatterns = new Vector<Pattern>();
-        requestBlocking = false;
+        allowedResponsePatterns = new Vector<Pattern>();
+        blockedResponsePatterns = new Vector<Pattern>();
+        responseFiltering = false;
     }
 
     /**
@@ -108,11 +111,19 @@ public class BotBlocker implements DispatchHandler {
             ipMatchPatterns.add(ipP);
         }
 
-        for (Object o : config.getChildren("responseBlockingRegex")) {
+
+        for (Object o : config.getChildren("allowedResponseRegex")) {
             String ipMatch = ((Element) o).getTextTrim();
             Pattern ipP = Pattern.compile(ipMatch);
-            responseBlockingPatterns.add(ipP);
-            requestBlocking = true;
+            allowedResponsePatterns.add(ipP);
+            responseFiltering = true;
+        }
+
+        for (Object o : config.getChildren("blockedResponseRegex")) {
+            String ipMatch = ((Element) o).getTextTrim();
+            Pattern ipP = Pattern.compile(ipMatch);
+            blockedResponsePatterns.add(ipP);
+            responseFiltering = true;
         }
 
 
@@ -140,7 +151,7 @@ public class BotBlocker implements DispatchHandler {
             log.info("The ip address: "+request.getRemoteAddr()+" is " +
                     "on the list of blocked addresses");
 
-            if(requestBlocking)
+            if(responseFiltering)
                 return isResponseBlocked(request);
         }
 
@@ -149,7 +160,7 @@ public class BotBlocker implements DispatchHandler {
                 log.info("The ip address: "+request.getRemoteAddr()+" matches " +
                         "the the pattern: \"" + p.pattern() + "\"");
 
-                if(requestBlocking)
+                if(responseFiltering)
                     return isResponseBlocked(request);
             }
         }
@@ -160,17 +171,48 @@ public class BotBlocker implements DispatchHandler {
 
     }
 
-    public boolean isResponseBlocked(HttpServletRequest request){
+    public boolean isResponseBlocked(HttpServletRequest request) {
 
         String requestUrl = request.getRequestURL().toString();
-        for(Pattern p: responseBlockingPatterns){
-            if(p.matcher(requestUrl).matches()){
-                log.info("The request matches the response blocking regex pattern: \""+p.pattern()+"\"");
-                return true;
+
+        boolean isBlocked;
+
+        if (allowedResponsePatterns.isEmpty()) {
+
+            isBlocked = false;
+
+            for (Pattern blockedResponsePattern : blockedResponsePatterns) {
+                log.info("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
+                if (blockedResponsePattern.matcher(requestUrl).matches()) {
+                    isBlocked = true;
+                }
+            }
+        }
+        else {
+
+            isBlocked = true;
+
+            for (Pattern allowedResponsePattern : allowedResponsePatterns) {
+
+                boolean allowedResponse = allowedResponsePattern.matcher(requestUrl).matches();
+
+                if (allowedResponse) {
+
+                    isBlocked = false;
+
+                    log.info("The request matches the allowed response regex pattern: \"" + allowedResponsePattern.pattern() + "\"");
+                    for (Pattern blockedResponsePattern : blockedResponsePatterns) {
+                        boolean blockedResponse = blockedResponsePattern.matcher(requestUrl).matches();
+                        if (blockedResponse) {
+                            log.info("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
+                            isBlocked = true;
+                        }
+                    }
+                }
             }
         }
 
-        return false;
+        return isBlocked;
 
     }
 

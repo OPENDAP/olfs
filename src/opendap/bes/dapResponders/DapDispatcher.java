@@ -143,9 +143,6 @@ public class DapDispatcher implements DispatchHandler {
         }
 
 
-
-        dispatchServlet = servlet;
-
         dispatchServlet = servlet;
 
         systemPath = ServletUtil.getSystemPath(dispatchServlet,"");
@@ -248,7 +245,7 @@ public class DapDispatcher implements DispatchHandler {
         log.debug("The client requested this BES DataSource: " + besDataSourceId);
 
         for (HttpResponder r : responders) {
-            log.debug(r.getClass().getSimpleName()+ ".getPathPrefix(): "+r.getPathPrefix());
+            //log.debug(r.getClass().getSimpleName()+ ".getPathPrefix(): "+r.getPathPrefix());
             if (r.matches(relativeUrl)) {
 
                 log.info("The relative URL: " + relativeUrl + " matches " +
