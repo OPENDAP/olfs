@@ -76,6 +76,7 @@ public class Dap2Data extends BesDapResponder {
         return true;
     }
 
+
     public boolean needsBesToRespond(){
         return true;
     }
