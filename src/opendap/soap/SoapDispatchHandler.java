@@ -185,7 +185,6 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
 
         mpr.addSoapBodyPart(respElement);
 
-
         log.debug("getDDX() completed.");
 
     }
