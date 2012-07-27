@@ -70,7 +70,7 @@ public class MultipartResponse {
      * @param response The HttpServletResponse that we are going to send back.
      * @param omhInstance An instance of a class that implements the OpendapMimeHeaders interface.
      */
-    MultipartResponse(HttpServletRequest request, HttpServletResponse response, OpendapMimeHeaders omhInstance){
+    public MultipartResponse(HttpServletRequest request, HttpServletResponse response, OpendapMimeHeaders omhInstance){
         servResponse = response;
         servRequest = request;
         omhi = omhInstance;

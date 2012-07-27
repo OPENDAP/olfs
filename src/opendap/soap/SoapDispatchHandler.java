@@ -22,8 +22,10 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.bes;
+package opendap.soap;
 
+import opendap.bes.BesXmlAPI;
+import opendap.bes.Version;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.OpendapSoapDispatchHandler;
 import opendap.coreServlet.MultipartResponse;
@@ -258,7 +260,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                     respElement = ExceptionElementUtil.makeExceptionElement(
                             "BadSOAPRequest",
                             "Requested catalog (" + path + " is not availableInChunk.",
-                            "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+                            "opendap.soap.SOAPRequestDispatcher.soapDispatcher()"
                     );
                 } else {
                     respElement = new Element("Response", osnms);
@@ -277,7 +279,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                 respElement = ExceptionElementUtil.makeExceptionElement(
                         "BadSOAPRequest",
                         msg,
-                        "opendap.coreServlet.SOAPRequestDispatcher.soapDispatcher()"
+                        "opendap.soap.SOAPRequestDispatcher.soapDispatcher()"
                 );
 
             }
@@ -294,7 +296,7 @@ public class SoapDispatchHandler implements OpendapSoapDispatchHandler {
                                       HttpServletResponse response)
             throws Exception{
 
-        Version.setOpendapMimeHeaders(request,response, new BesApi());
+        Version.setOpendapMimeHeaders(request, response, new BesApi());
     }
 
 

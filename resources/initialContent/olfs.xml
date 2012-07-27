@@ -107,8 +107,8 @@
 
 
         <HttpPostHandlers>
-            <Handler className="opendap.coreServlet.SOAPRequestDispatcher" >
-                <OpendapSoapDispatchHandler>opendap.bes.SoapDispatchHandler</OpendapSoapDispatchHandler>
+            <Handler className="opendap.soap.SOAPRequestDispatcher" >
+                <OpendapSoapDispatchHandler>opendap.soap.SoapDispatchHandler</OpendapSoapDispatchHandler>
             </Handler>
         </HttpPostHandlers>
 
