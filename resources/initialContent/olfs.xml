@@ -106,13 +106,6 @@
         </HttpGetHandlers>
 
 
-        <HttpPostHandlers>
-            <Handler className="opendap.soap.SOAPRequestDispatcher" >
-                <OpendapSoapDispatchHandler>opendap.soap.SoapDispatchHandler</OpendapSoapDispatchHandler>
-            </Handler>
-        </HttpPostHandlers>
-
-
     </DispatchHandlers>
 
 
