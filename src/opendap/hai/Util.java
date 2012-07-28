@@ -21,6 +21,7 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 package opendap.hai;
 
+import opendap.coreServlet.Scrub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,21 +46,22 @@ public class Util {
 
         StringBuilder sb = new StringBuilder();
         Map<String,String[]> params = request.getParameterMap();
-        for(String name: params.keySet()){
-            sb.append(name).append(" = ");
-            String[] values = params.get(name);
-            if(values.length>1){
-                log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", name);
+        if(params != null){
+            for(String name: params.keySet()){
+                sb.append(name).append(" = ");
+                String[] values = params.get(name);
+                if(values.length>1){
+                    log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", Scrub.urlContent(name));
+                }
+                for(String value: values){
+                    sb.append("'").append(value).append("' ");
+                    kvp.put(name,value);
+                }
+                sb.append("\n");
             }
-            for(String value: values){
-                sb.append("'").append(value).append("' ");
-                kvp.put(name,value);
-            }
-            sb.append("\n");
+
+            log.debug("Parameters:\n{}",sb);
         }
-
-        log.debug("Parameters:\n{}",sb);
-
 
 
         return kvp;

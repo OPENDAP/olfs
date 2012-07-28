@@ -283,7 +283,7 @@ public class DispatchServlet extends HttpServlet {
 
                 for (HttpResponder r : responders) {
                     if (r.matches(requestURL)) {
-                        log.info("The request URL: " + requestURL + " matches " +
+                        log.debug("The request URL: " + requestURL + " matches " +
                                 "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                         //dsi = new BESDataSource(dataSource);

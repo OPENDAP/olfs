@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes;
 
+import opendap.coreServlet.Scrub;
 import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -925,7 +926,7 @@ public class BesXmlAPI {
         BES bes = BESManager.getBES(dataSource);
 
         if (bes == null) {
-            String msg = "There is no BES to handle the requested data source: " + dataSource;
+            String msg = "There is no BES to handle the requested data source: " + Scrub.urlContent(dataSource);
             log.error(msg);
             throw new BadConfigurationException(msg);
         }

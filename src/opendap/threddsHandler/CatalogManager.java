@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
+import opendap.coreServlet.Scrub;
 import opendap.ncml.NcmlManager;
 import org.slf4j.Logger;
 import org.jdom.Document;
@@ -320,7 +321,7 @@ public class CatalogManager {
             catalog = _catalogs.remove(catalogKey);
 
             if (catalog == null) {
-                _log.warn("purgeCatalog(): Catalog '" + catalogKey + "' not in catalog collection!!");
+                _log.warn("purgeCatalog(): Catalog '" + Scrub.urlContent(catalogKey) + "' not in catalog collection!!");
             }
 
             childCatalogKeys = _children.get(catalogKey);
@@ -334,7 +335,7 @@ public class CatalogManager {
 
                 _children.remove(catalogKey);
             } else {
-                _log.info("purgeCatalog(): Catalog '" + catalogKey + "' has no childCatalogKeys.");
+                _log.info("purgeCatalog(): Catalog '" + Scrub.urlContent(catalogKey) + "' has no childCatalogKeys.");
             }
 
             _log.debug("purgeCatalog(): Purging inherited metadata (if any) for catalogKey: " +catalogKey);

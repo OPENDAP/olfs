@@ -413,7 +413,7 @@ public class DispatchServlet extends HttpServlet {
                     return;
 
 
-                log.info("Requested dataSource: '" + dataSource +
+                log.debug("Requested dataSource: '" + dataSource +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
@@ -563,7 +563,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.showRequest(request, reqno));
 
 
-                log.info("Requested dataSource: '" + dataSource +
+                log.debug("Requested dataSource: '" + dataSource +
                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 

@@ -28,6 +28,7 @@ package opendap.bes.dapResponders;
 
 import opendap.bes.*;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Scrub;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -661,13 +662,12 @@ public class BesApi {
         boolean ret;
         String responseCacheKey = this.getClass().getName()+".showInfo(\""+dataSource+"\")";
 
-
-        log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \""+dataSource+"\"  (responseCacheKey=\""+responseCacheKey+"\")");
+        log.info("getInfo(): Looking for cached copy of BES showInfo response for data source: \""+ Scrub.urlContent(dataSource)+"\"  (responseCacheKey=\""+Scrub.urlContent(responseCacheKey)+"\")");
 
         Object o = RequestCache.get(responseCacheKey);
 
         if(o == null){
-            log.info("getInfo(): Copy of BES showInfo for  responseCacheKey=\""+responseCacheKey+"\"  not found in cache.");
+            log.info("getInfo(): Copy of BES showInfo for  responseCacheKey=\""+Scrub.urlContent(responseCacheKey)+"\"  not found in cache.");
 
 
             Document request = showInfoRequest(dataSource);
@@ -688,17 +688,17 @@ public class BesApi {
                 topDataset.setAttribute("prefix", getBESprefix(dataSource));
 
                 RequestCache.put(responseCacheKey, response.clone());
-                log.info("getInfo(): Cached copy of BES showInfo response. responseCacheKey=\""+responseCacheKey+"\"");
+                log.info("getInfo(): Cached copy of BES showInfo response. responseCacheKey=\""+Scrub.urlContent(responseCacheKey)+"\"");
 
             }
             else {
                 RequestCache.put(responseCacheKey, new NoSuchDatasource((Document)response.clone()));
-                log.info("getInfo():  BES showInfo response failed, cached the BES (error) response Document. responseCacheKey=\""+responseCacheKey+"\"");
+                log.info("getInfo():  BES showInfo response failed, cached the BES (error) response Document. responseCacheKey=\""+Scrub.urlContent(responseCacheKey)+"\"");
             }
 
         }
         else {
-            log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\""+responseCacheKey+"\" returned an object of type "+o.getClass().getName());
+            log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\""+Scrub.urlContent(responseCacheKey)+"\" returned an object of type "+o.getClass().getName());
 
             Document result;
 
@@ -955,7 +955,7 @@ public class BesApi {
         BES bes = BESManager.getBES(dataSource);
 
         if (bes == null) {
-            String msg = "There is no BES to handle the requested data source: " + dataSource;
+            String msg = "There is no BES to handle the requested data source: " + Scrub.urlContent(dataSource);
             log.error(msg);
             throw new BadConfigurationException(msg);
         }

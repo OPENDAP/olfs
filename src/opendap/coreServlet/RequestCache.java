@@ -108,10 +108,10 @@ public class RequestCache {
 
 
         if(co != null){
-            log.info("Response cache NOT updated, key already present: \"" + key + "\"");
+            log.debug("Response cache NOT updated, key already present: \"" + key + "\"");
         }
         else {
-            log.info("Response cache updated by adding new object to cache using key \"" +
+            log.debug("Response cache updated by adding new object to cache using key \"" +
                     key + "\"");
 
         }
@@ -149,7 +149,7 @@ public class RequestCache {
 
 
         if(co!=null) {
-            log.info("Found cached document for key \""+ key+"\"");
+            log.debug("Found cached document for key \""+ key+"\"");
 
             /*
             long now = new Date().getTime();
@@ -166,7 +166,7 @@ public class RequestCache {
 
         }
         else {
-            log.info("No Document cached for key \""+ key+"\"");
+            log.debug("No Document cached for key \""+ key+"\"");
         }
 
 

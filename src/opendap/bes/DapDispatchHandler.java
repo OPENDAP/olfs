@@ -177,7 +177,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         for(Pattern p: dispatchMethods.keySet()){
 
             if(p.matcher(requestURL).matches()){
-                log.info("The request URL: "+requestURL+" matches " +
+                log.info("The request URL: "+ Scrub.completeURL(requestURL)+" matches " +
                         "the pattern: \""+p.pattern()+"\"");
 
                 try {
@@ -257,7 +257,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String requestURL = request.getRequestURL().toString();
         for(Pattern p: dispatchMethods.keySet()){
             if(p.matcher(requestURL).matches()){
-                log.info("The request URL: "+requestURL+" matches " +
+                log.info("The request URL: "+ Scrub.completeURL(requestURL)+" matches " +
                         "the pattern: \""+p.pattern()+"\"");
 
                 dsi = getDataSourceInfo(dataSource);
