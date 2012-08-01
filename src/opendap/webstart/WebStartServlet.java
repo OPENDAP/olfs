@@ -373,7 +373,7 @@ public class WebStartServlet extends HttpServlet {
             // Condition applicationID.
             if (applicationID != null)
             {
-                while (applicationID != null && applicationID.startsWith("/")) { // Strip leading slashes
+                while (applicationID.startsWith("/")) { // Strip leading slashes
                     applicationID = applicationID.substring(1, applicationID.length());
                 }
                 if (applicationID.equals(""))

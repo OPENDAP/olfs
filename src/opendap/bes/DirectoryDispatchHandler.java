@@ -111,7 +111,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         if(name.endsWith("contents.html"))
             name = name.substring(0,name.lastIndexOf("contents.html"));
 
-        log.info("getLastModified():  Tomcat requesting getlastModified() for collection: " + name );
+        log.debug("getLastModified():  Tomcat requesting getlastModified() for collection: " + name );
 
 
         try {

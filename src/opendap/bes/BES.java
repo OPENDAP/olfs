@@ -894,19 +894,25 @@ public class BES {
         // removing the client from the _clients Map the client is
         // discarded.
 
-        log.debug("discardClient() Discarding OPeNDAPClient #" + dapClient.getID());
 
-        try {
-            _clientsMapLock.lock();
-            if (dapClient != null && dapClient.getID() != null)
-                _clients.remove(dapClient.getID());
-        } finally {
-            _clientsMapLock.unlock();
+        if(dapClient != null){
+            log.debug("discardClient() Discarding OPeNDAPClient #" + dapClient.getID());
+
+            try {
+                _clientsMapLock.lock();
+                if (dapClient.getID() != null)
+                    _clients.remove(dapClient.getID());
+            } finally {
+                _clientsMapLock.unlock();
+            }
+
+
+            if (dapClient.isRunning()) {
+                shutdownClient(dapClient);
+            }
         }
-
-
-        if (dapClient.isRunning()) {
-            shutdownClient(dapClient);
+        else {
+            log.error("discardClient() received a null value.");
         }
 
     }

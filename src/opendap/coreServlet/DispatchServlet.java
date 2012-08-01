@@ -34,6 +34,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -144,6 +145,10 @@ public class DispatchServlet extends HttpServlet {
 
         buildHandlers("HttpPostHandlers", httpPostDispatchHandlers, httpPostHandlerConfig);
         intitializeHandlers(httpPostDispatchHandlers, httpPostHandlerConfig);
+        if(httpPostDispatchHandlers.size()==0){
+            log.info("No POST handlers configured. Adding the NoPostHandler.");
+            httpPostDispatchHandlers.add(new NoPostHandler());
+        }
 
         log.info("init() complete.");
 
@@ -228,47 +233,49 @@ public class DispatchServlet extends HttpServlet {
         String msg;
 
 
-        Element httpGetHandlerElements = configDoc.getRootElement().getChild("DispatchHandlers").getChild(type);
+        Element httpHandlerElements = configDoc.getRootElement().getChild("DispatchHandlers").getChild(type);
 
         log.debug("Building "+ type);
 
+        if(httpHandlerElements!=null){
 
-        for (Object o : httpGetHandlerElements.getChildren("Handler")) {
-            Element handlerElement = (Element) o;
-            handlerConfigs.add(handlerElement);
-            String className = handlerElement.getAttribute("className").getValue();
-            DispatchHandler dh;
-            try {
+            for (Object o : httpHandlerElements.getChildren("Handler")) {
+                Element handlerElement = (Element) o;
+                handlerConfigs.add(handlerElement);
+                String className = handlerElement.getAttribute("className").getValue();
+                DispatchHandler dh;
+                try {
 
-                log.debug("Building Handler: " + className);
-                Class classDefinition = Class.forName(className);
-                dh = (DispatchHandler) classDefinition.newInstance();
+                    log.debug("Building Handler: " + className);
+                    Class classDefinition = Class.forName(className);
+                    dh = (DispatchHandler) classDefinition.newInstance();
 
 
-            } catch (ClassNotFoundException e) {
-                msg = "Cannot find class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (InstantiationException e) {
-                msg = "Cannot instantiate class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (IllegalAccessException e) {
-                msg = "Cannot access class: " + className;
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (ClassCastException e) {
-                msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
-                log.error(msg);
-                throw new ServletException(msg, e);
-            } catch (Exception e) {
-                msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
-                log.error(msg);
-                throw new ServletException(msg, e);
+                } catch (ClassNotFoundException e) {
+                    msg = "Cannot find class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (InstantiationException e) {
+                    msg = "Cannot instantiate class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (IllegalAccessException e) {
+                    msg = "Cannot access class: " + className;
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (ClassCastException e) {
+                    msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
+                    log.error(msg);
+                    throw new ServletException(msg, e);
+                } catch (Exception e) {
+                    msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+                    log.error(msg);
+                    throw new ServletException(msg, e);
 
+                }
+
+                dispatchHandlers.add(dh);
             }
-
-            dispatchHandlers.add(dh);
         }
 
         log.debug(type + " Built.");
@@ -409,7 +416,7 @@ public class DispatchServlet extends HttpServlet {
                     return;
 
 
-                log.info("Requested dataSource: '" + dataSource +
+                log.debug("Requested dataSource: '" + dataSource +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
@@ -539,8 +546,6 @@ public class DispatchServlet extends HttpServlet {
     /**
      * @param request  .
      * @param response .
-     * @throws IOException       .
-     * @throws ServletException    .
      */
     @Override
     public void doPost(HttpServletRequest request,
@@ -561,7 +566,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.showRequest(request, reqno));
 
 
-                log.info("Requested dataSource: '" + dataSource +
+                log.debug("Requested dataSource: '" + dataSource +
                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
@@ -576,10 +581,13 @@ public class DispatchServlet extends HttpServlet {
                     LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
                 } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    log.info("Sent Resource Not Found (404) - nothing left to check.");
-                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_NOT_FOUND, -1, "HyraxAccess");
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    log.error("Failed to locate default NoPostHandler!!");
+                    LogUtil.logServerAccessEnd(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, -1, "HyraxAccess");
                 }
+
+
+
             }
             finally {
                 RequestCache.endRequest();

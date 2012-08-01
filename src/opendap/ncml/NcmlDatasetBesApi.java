@@ -28,6 +28,7 @@ package opendap.ncml;
 
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.Scrub;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -115,7 +116,7 @@ public class NcmlDatasetBesApi extends BesApi {
         if(ncmlDatasetContainer!=null)
             request.addContent(ncmlDatasetContainer);
         else
-            log.error("Failed to locate ncml dataset: {}",localDataSourceId);
+            log.error("Failed to locate ncml dataset: {}", Scrub.urlContent(localDataSourceId));
 
 
         Element def = defineElement("d1","default");

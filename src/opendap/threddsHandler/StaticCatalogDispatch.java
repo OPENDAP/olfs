@@ -436,7 +436,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 catDoc = cat.getCatalogAsXdmNode(datasetToHtmlTransform.getProcessor());
                 log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
             } else {
-                log.error("Can't find catalog: " + catalogKey + "   " +
+                log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
                         "    prefix: " + _prefix
                 );
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
@@ -495,7 +495,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 catDoc = cat.getCatalogAsXdmNode(catalogToHtmlTransform.getProcessor());
                 log.debug("catDoc.getServiceUrl(): " + catDoc.getBaseURI());
             } else {
-                log.error("Can't find catalog: " + catalogKey + "   " +
+                log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
                         "    prefix: " + _prefix
                 );
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Can't find catalog: " + Scrub.urlContent(catalogKey));
@@ -544,7 +544,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             log.debug("Sent THREDDS catalog XML.");
 
         } else {
-            log.error("Can't find catalog: " + catalogKey + "   " +
+            log.error("Can't find catalog: " + Scrub.urlContent(catalogKey) + "   " +
                     "    prefix: " + _prefix
             );
 
@@ -762,7 +762,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             }
         }
         catch (Exception e) {
-            log.error("Failed to get a last modified time for '"+catalogKey+"'  msg: "+e.getMessage());
+            log.error("Failed to get a last modified time for '"+ Scrub.urlContent(catalogKey)+"'  msg: "+e.getMessage());
         }
         return -1;
     }

@@ -251,7 +251,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 for (HttpResponder r : responders) {
                     boolean match = r.matches(requestURL);
                     if (match) {
-                        log.info("The request URL: " + requestURL + " matches " +
+                        log.debug("The request URL: " + requestURL + " matches " +
                                 "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                         //dsi = new BESDataSource(dataSource);
@@ -302,7 +302,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
                 for (HttpResponder r : responders) {
                     if (r.matches(requestURL)) {
-                        log.info("The request URL: " + requestURL + " matches " +
+                        log.debug("The request URL: " + requestURL + " matches " +
                                 "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                         //dsi = new BESDataSource(dataSource);

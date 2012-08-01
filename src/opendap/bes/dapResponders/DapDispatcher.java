@@ -271,7 +271,7 @@ public class DapDispatcher implements DispatchHandler {
         for (HttpResponder r : responders) {
             log.debug(r.getPathPrefix());
             if (r.matches(relativeUrl)) {
-                log.info("The relative URL: " + relativeUrl + " matches " +
+                log.debug("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
                 dsi = getDataSourceInfo(besDataSourceId);
                 if (dsi.isDataset()) {
@@ -295,19 +295,23 @@ public class DapDispatcher implements DispatchHandler {
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
 
 
-        if (!initialized)
+        if(!initialized)
             return -1;
 
         log.debug("getLastModified(): Tomcat requesting getlastModified() " +
-                "for collection: " + dataSource);
+                "for collection: " + dataSource );
+
+
+        String requestURL = req.getRequestURL().toString();
+
 
         for (HttpResponder r : responders) {
-            if (r.matches(relativeUrl)) {
-                log.info("The relative URL: " + relativeUrl + " matches " +
+            if (r.matches(requestURL)) {
+                log.debug("The request URL: " + requestURL + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 try {
-                    log.debug("getLastModified(): Getting datasource info for " + dataSource);
+                    log.debug("getLastModified(): Getting datasource info for "+dataSource);
                     DataSourceInfo dsi = getDataSourceInfo(dataSource);
                     log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
