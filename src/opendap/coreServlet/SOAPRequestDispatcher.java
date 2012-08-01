@@ -1,12 +1,5 @@
 package opendap.coreServlet;
 
-import org.jdom.Element;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
