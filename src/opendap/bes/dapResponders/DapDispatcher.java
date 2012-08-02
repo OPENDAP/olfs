@@ -301,13 +301,9 @@ public class DapDispatcher implements DispatchHandler {
         log.debug("getLastModified(): Tomcat requesting getlastModified() " +
                 "for collection: " + dataSource );
 
-
-        String requestURL = req.getRequestURL().toString();
-
-
         for (HttpResponder r : responders) {
-            if (r.matches(requestURL)) {
-                log.debug("The request URL: " + requestURL + " matches " +
+            if (r.matches(relativeUrl)) {
+                log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 try {
