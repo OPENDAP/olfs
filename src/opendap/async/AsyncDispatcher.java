@@ -376,8 +376,8 @@ public class AsyncDispatcher extends DapDispatcher {
     public boolean asyncResponse(HttpServletRequest request, HttpServletResponse response, boolean isDap2Request) throws Exception {
 
         Date now = new Date();
-        Date startTime = new Date(now.getTime()+getResponseDelay());
-        Date endTime = new Date(startTime.getTime()+cachePersistTime);
+
+        Date startTime;
 
         String xmlBase = DocFactory.getXmlBase(request);
 
@@ -405,6 +405,7 @@ public class AsyncDispatcher extends DapDispatcher {
             if(asyncCache.containsKey(xmlBase)) {
 
                 startTime = asyncCache.get(xmlBase);
+                Date endTime = new Date(startTime.getTime()+cachePersistTime);
 
                 if(now.after(startTime)){
                     if(now.before(endTime) ){
@@ -434,11 +435,9 @@ public class AsyncDispatcher extends DapDispatcher {
             }
 
 
+            startTime = asyncCache.get(xmlBase);
 
             if(cacheIsReady){
-
-
-
                 return(super.requestDispatch(request,response,true));
             }
             else {
