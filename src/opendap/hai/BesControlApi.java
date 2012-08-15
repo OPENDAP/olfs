@@ -124,9 +124,9 @@ public class BesControlApi extends HttpResponder {
         PrintWriter output = response.getWriter();
 
         //@todo work this out to not escape everything.
-        //output.append(StringEscapeUtils.escapeHtml(status));
+        //output.append(StringEscapeUtils.escapeHtml(asyncStatus));
 
-        //String s = processStatus(status);
+        //String s = processStatus(asyncStatus);
 
 
         output.append(status);

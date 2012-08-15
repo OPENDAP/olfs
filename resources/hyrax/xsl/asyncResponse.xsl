@@ -40,20 +40,22 @@
     <xsl:variable name="docsService">/opendap/docs</xsl:variable>
 
 
-    <xsl:variable name="beginTime" select="/dap:Dataset/dap:async/dap:beginAccess" />
-    <xsl:variable name="endTime" select="/dap:Dataset/dap:async/dap:endAccess" />
+    <xsl:variable name="expectedDelay" select="/dap:AsynchronousResponse/dap:expectedDelay" />
+    <xsl:variable name="responseLifeTime" select="/dap:AsynchronousResponse/dap:responseLifeTime" />
 
-    <xsl:variable name="dataAccessUrl" select="/dap:Dataset/dap:async/@xlink:href" />
+    <xsl:variable name="dataAccessUrl" select="/dap:AsynchronousResponse/dap:link/@href" />
+    <xsl:variable name="status" select="/dap:AsynchronousResponse/@status" />
 
 
+    <xsl:variable name="reasonCode" select="/dap:AsynchronousResponse/dap:reason/@code" />
+    <xsl:variable name="description" select="/dap:AsynchronousResponse/dap:description" />
 
-    <xsl:template match="dap:Dataset">
+    <xsl:template match="dap:AsynchronousResponse">
         <html>
             <xsl:call-template name="StyleAndScript"/>
             <head>
-                <link rel='stylesheet' href='{$docsService}/css/contents.css'
-                      type='text/css'/>
-                <title>OPeNDAP Hyrax: Dataset Service Description for <xsl:value-of select="@xml:base"/></title>
+                <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
+                <title>OPeNDAP Hyrax: Asynchronous Response<xsl:value-of select="@xml:base"/></title>
             </head>
             <body>
 
@@ -74,7 +76,9 @@
 
                 <h1>
                     Dataset: <xsl:value-of select="@xml:base"/>
-                    <div class="small">Request Url: <xsl:value-of select="dap:async/@xlink:href"/> </div>
+                    <xsl:if test="$dataAccessUrl">
+                        <div class="small">Request Url: <xsl:value-of select="$dataAccessUrl"/> </div>
+                    </xsl:if>
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
@@ -82,28 +86,39 @@
                 <!--                       PAGE BODY                        -->
                 <!--                                                        -->
                 <!--                                                        -->
-                <div class="large_bold">Congratulations! The server has accepted your request.</div>
-                <div class="medium">
-                    However, the thing you asked for is going to take a while to produce. <br/>
-                    Please wait...
-                </div>
-                <br/>
-                <div class="medium">
-                  I estimate that your data may be accessed in roughly:
-                </div>
-                <br/>
 
-                <center>
-                <div id="progress_container">
-                    <div id="timeRemaining"> </div>
-                    <div id="progress" style="width: 0%"></div>
-                </div>
-                <br />
 
-                <div id="dataAccessLink">
-                    <font color="grey">Data Access:  <xsl:value-of select="$dataAccessUrl"/></font>
-                </div>
-                </center>
+                <xsl:choose>
+                    <xsl:when test="$status='required'">
+                        <xsl:call-template name="required"/>
+                    </xsl:when>
+
+                    <xsl:when test="$status='accepted'">
+                        <xsl:call-template name="accepted"/>
+                    </xsl:when>
+
+                    <xsl:when test="$status='pending'">
+                        <xsl:call-template name="pending"/>
+                    </xsl:when>
+
+                    <xsl:when test="$status='gone'">
+                        <xsl:call-template name="gone"/>
+                    </xsl:when>
+
+                    <xsl:when test="$status='rejected'">
+                        <xsl:call-template name="rejected"/>
+                    </xsl:when>
+
+                    <xsl:otherwise>
+                        <xsl:call-template name="error"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+
+
+
+
+
 
                 <br />
                 <br />
@@ -145,17 +160,15 @@
             </body>
 
             <script type="text/javascript">
-                var beginAccessTime="<xsl:value-of select="$beginTime"/>";
-                var endAccessTime="<xsl:value-of select="$endTime"/>";
-                var startTime = Date.parse(beginAccessTime);
-                var endTime   =   Date.parse(endAccessTime);
 
-                //startTime = pageLoadTime + 5000;
-                //endTime = startTime + 10000;
+                var expectedAccessDelay=parseInt("<xsl:value-of select="$expectedDelay"/>");
+                var responseLifeTime=parseInt("<xsl:value-of select="$responseLifeTime"/>");
 
+                var startTime = pageLoadTime + expectedAccessDelay;
+                var endTime = startTime + responseLifeTime
+                var startDate= new Date(startTime);
+                var endDate= new Date(endTime) ;
 
-                var startDate = new Date(startTime);
-                var endDate = new Date(endTime);
                 var dataAccessUrl="<xsl:value-of select="$dataAccessUrl"/>"
 
                 updateProgressBar();
@@ -163,6 +176,93 @@
 
         </html>
     </xsl:template>
+
+
+
+
+
+    <xsl:template name="required">
+        <div class="large_bold">The server has indicated the its response will be asynchronous.</div>
+        <br/>
+        <div class="medium">
+          I estimate that your data may be accessed in roughly <xsl:value-of select="$expectedDelay"/> ms.
+        </div>
+        <br/>
+        <div class="medium">
+            Because thing you asked for is going to take a while to produce you must indicate to the
+            server that you are willing to wait for the response. <br/>
+        </div>
+        <br/>
+
+        <div id="dataAccessLink">
+            <a href="{$dataAccessUrl}?async=0">Click this link to initiate an asynchronous data access transaction.</a>
+        </div>
+
+
+    </xsl:template>
+
+
+    <xsl:template name="accepted">
+        <div class="large_bold">Congratulations! The server has accepted your request.</div>
+        <div class="medium">
+            However, the thing you asked for is going to take a while to produce. <br/>
+            Please wait...
+        </div>
+        <br/>
+        <div class="medium">
+          I estimate that your data may be accessed in roughly:
+        </div>
+        <br/>
+
+        <center>
+        <div id="progress_container">
+            <div id="timeRemaining"> </div>
+            <div id="progress" style="width: 0%"></div>
+        </div>
+        <br />
+
+        <div id="dataAccessLink">
+            <font color="grey">Data Access:  <xsl:value-of select="$dataAccessUrl"/></font>
+        </div>
+        </center>
+
+    </xsl:template>
+
+
+    <xsl:template name="pending">
+        <br/>
+        <div class="large_bold">The requested resource is a pending asynchronous response. Please try again later..</div>
+        <br/>
+    </xsl:template>
+
+
+    <xsl:template name="gone">
+        <br/>
+        <div class="large_bold">The requested resource was a cached asynchronous response. It's GONE.</div>
+        <br/>
+
+    </xsl:template>
+
+
+    <xsl:template name="rejected">
+        <br/>
+        <div class="large_bold">The request for an asynchronous response has be rejected.</div>
+        <br/>
+
+        <div class="medium"><span class="medium_bold">Reason Code: </span> <xsl:value-of select="$reasonCode"/></div>
+        <div class="medium"><span class="medium_bold">Description: </span> <xsl:value-of select="$description"/></div>
+
+    </xsl:template>
+
+
+    <xsl:template name="error">
+        <br/>
+        <div class="large_bold">OUCH! The server returned unexpected content.</div>
+        <br/>
+
+    </xsl:template>
+
+
 
 
 
@@ -214,57 +314,6 @@
         var pageLoadDate = new Date();
         var pageLoadTime = pageLoadDate.getTime();
 
-        /**
-         * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
-         * NON-CONFORMANT EDITION.
-         * © 2011 Colin Snover <http://zetafleet.com>
-         * Released under MIT license.
-         */
-        (function (Date, undefined) {
-            var origParse = Date.parse, numericKeys = [ 1, 4, 5, 6, 10, 11 ];
-            Date.parse = function (date) {
-                var timestamp, struct, minutesOffset = 0;
-
-                //              1 YYYY                 2 MM        3 DD              4 HH     5 mm        6 ss            7 msec         8 Z 9 ±    10 tzHH    11 tzmm
-                if ((struct = /^(\d{4}|[+\-]\d{6})(?:-?(\d{2})(?:-?(\d{2}))?)?(?:[ T]?(\d{2}):?(\d{2})(?::?(\d{2})(?:[,\.](\d{3,}))?)?(?:(Z)|([+\-])(\d{2})(?::?(\d{2}))?)?)?$/.exec(date))) {
-                    // avoid NaN timestamps caused by ?undefined? values being passed to Date.UTC
-                    for (var i = 0, k; (k = numericKeys[i]); ++i) {
-                        struct[k] = +struct[k] || 0;
-                    }
-
-                    // allow undefined days and months
-                    struct[2] = (+struct[2] || 1) - 1;
-                    struct[3] = +struct[3] || 1;
-
-                    // allow arbitrary sub-second precision beyond milliseconds
-                    struct[7] = struct[7] ? +struct[7].substr(0, 3) : 0;
-
-                    // timestamps without timezone identifiers should be considered local time
-                    if (struct[8] === undefined && struct[9] === undefined) {
-                        timestamp = +new Date(struct[1], struct[2], struct[3], struct[4], struct[5], struct[6], struct[7]);
-                    }
-                    else {
-                        if (struct[8] !== 'Z' && struct[9] !== undefined) {
-                            minutesOffset = struct[10] * 60 + struct[11];
-
-                            if (struct[9] === '+') {
-                                minutesOffset = 0 - minutesOffset;
-                            }
-                        }
-
-                        timestamp = Date.UTC(struct[1], struct[2], struct[3], struct[4], struct[5] + minutesOffset, struct[6], struct[7]);
-                    }
-                }
-                else {
-                    timestamp = origParse ? origParse(date) : NaN;
-                }
-
-                return timestamp;
-            };
-        }(Date));
-
-
-
         function updateProgressBar() {
 
 
@@ -306,6 +355,9 @@
 
             // Now that we have updated the progress bar, start the cycle again...
             besLogTailTimer = setTimeout("updateProgressBar()", 1000);
+            
+
+
 
         }
 
@@ -314,9 +366,9 @@
 
             debug.innerHTML =
                 "<table>" +
-                "<tr><td>BeginAccessTime</td><td>" + beginAccessTime +"</td></tr>" +
+                "<tr><td>expectedAccessDelay</td><td>" + expectedAccessDelay +"</td></tr>" +
+                "<tr><td>responseLifeTime</td><td>" + responseLifeTime +"</td></tr>" +
                 "<tr><td>StartDate</td><td>" + startDate.toLocaleString() +"</td></tr>" +
-                "<tr><td>EndAccessTime</td><td>" + endAccessTime +"</td></tr>" +
                 "<tr><td>EndDate</td><td>" + endDate.toLocaleString() + "</td></tr>" +
                 "<tr><td>PageLoadDate</td><td>" + pageLoadDate.toLocaleString() +"</td></tr>" +
                 "<tr><td>CurrentDate</td><td>" + currentDate.toLocaleString() + "</td></tr>" +

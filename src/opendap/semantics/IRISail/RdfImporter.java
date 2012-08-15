@@ -478,19 +478,19 @@ public class RdfImporter {
                 rsCode = httpConnection.getResponseCode();
                 contentType = httpConnection.getContentType();
 
-                log.debug("importRdfDocuments(): Got HTTP status code: "
+                log.debug("importRdfDocuments(): Got HTTP asyncStatus code: "
                         + rsCode);
                 log.debug("importRdfDocuments(): Got Content Type:     "
                         + contentType);
 
                 if (rsCode == -1) {
-                    log.error("importRdfDocuments(): Unable to get an HTTP status code for resource "
+                    log.error("importRdfDocuments(): Unable to get an HTTP asyncStatus code for resource "
                             + documentURL + " WILL NOT IMPORT!");
                     urlsToBeIgnored.add(documentURL);
                     URL inUrlHost = new URL(documentURL);
                     serversDown.add(inUrlHost.getHost());
                 } else if (rsCode != 200) {
-                    log.error("importRdfDocuments(): Error!  HTTP status code "
+                    log.error("importRdfDocuments(): Error!  HTTP asyncStatus code "
                             + rsCode + " Skipping documentURL " + documentURL);
                     urlsToBeIgnored.add(documentURL);
                     URL inUrlHost = new URL(documentURL);

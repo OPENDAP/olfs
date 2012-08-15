@@ -561,7 +561,7 @@ public class BesApi {
 
 
     /**
-     * Returns the BES INFO document for the spcified dataSource.
+     * Returns the BES catalog document for the specified dataSource.
      *
      * @param dataSource The data source whose information is to be retrieved
      * @param response The document where the response (be it a catalog
@@ -640,7 +640,7 @@ public class BesApi {
 
 
     /**
-     * Returns the BES INFO document for the spcified dataSource.
+     * Returns the BES INFO document for the specified dataSource.
      *
      * @param dataSource The data source whose information is to be retrieved
      * @param response The document where the response (be it datasource
@@ -732,88 +732,6 @@ public class BesApi {
         Document getErrDoc(){
             return (Document)err.clone();
         }
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Returns an InputStream that holds an OPeNDAP DAP2 data for the requested
-     * dataSource. The DDS header is stripped, so the InputStream holds ONLY
-     * the XDR encoded binary data.
-     *
-     * Written to support SOAP responses. This implementation is deeply flawed
-     * because it caches the response data in a memory object.
-     *
-     * @param dataSource           The requested DataSource
-     * @param constraintExpression .
-     * @param xdap_accept The version of the DAP to use in building the response.
-     * @return A DAP2 data stream, no DDS just the XDR encoded binary data.
-     * @throws BadConfigurationException .
-     * @throws BESError              .
-     * @throws IOException               .
-     * @throws PPTException              .
-     */
-    public InputStream getDap2DataStream(String dataSource,
-                                                String constraintExpression,
-                                                String xdap_accept,
-                                                int maxResponseSize)
-            throws BadConfigurationException, BESError, PPTException, IOException {
-
-        //@todo Make this more efficient by adding support to the BES that reurns this stream. Caching the resposnse in memory is a BAD BAD thing.
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        writeDap2Data(dataSource, constraintExpression, xdap_accept, maxResponseSize, baos, baos);
-
-        InputStream is = new ByteArrayInputStream(baos.toByteArray());
-
-        HeaderInputStream his = new HeaderInputStream(is);
-
-        boolean done = false;
-        int val;
-        while (!done) {
-            val = his.read();
-            if (val == -1)
-                done = true;
-
-        }
-
-        return is;
 
     }
 
@@ -944,13 +862,6 @@ public class BesApi {
 
         log.debug("besTransaction started.");
         log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
-
-        boolean trouble = false;
-        Document doc;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-        SAXBuilder sb = new SAXBuilder();
 
         BES bes = BESManager.getBES(dataSource);
 

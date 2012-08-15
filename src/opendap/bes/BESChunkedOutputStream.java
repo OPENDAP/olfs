@@ -41,7 +41,7 @@ public class BESChunkedOutputStream  extends ChunkedOutputStream {
 
     private Logger log;
 
-    private String exitMsg = "status="+PPTSessionProtocol.PPT_EXIT_NOW+";";
+    private String exitMsg = "asyncStatus="+PPTSessionProtocol.PPT_EXIT_NOW+";";
 
     public BESChunkedOutputStream(OutputStream stream){
         super(stream);

@@ -235,7 +235,7 @@ public class ChunkedInputStream  {
                         bytesReceived = Chunk.readFully(is,buffer,0, availableInChunk());
 
                         // write the data out to the appropriate stream,
-                        // depending on the error status.
+                        // depending on the error asyncStatus.
                         (isError?errStream:dStream).write(buffer,0,bytesReceived);
                         (isError?errStream:dStream).flush();
 
@@ -271,7 +271,7 @@ public class ChunkedInputStream  {
     /**
      *
      *
-     * @return Ture if the extension contains the "status=error;"
+     * @return Ture if the extension contains the "asyncStatus=error;"
      * extension name value pair, false otherwise.
      *
      * @throws IOException When there are problems reading from or interpreting
@@ -300,15 +300,15 @@ public class ChunkedInputStream  {
 
         for(String extension : extensions){
 
-            // Is it a "status" extension?
+            // Is it a "asyncStatus" extension?
             if(extension.startsWith(Chunk.STATUS_EXTENSION)){
 
                 String status = extension.substring(extension.indexOf('=')+1,extension.length());
-                //log.debug("status: "+status);
+                //log.debug("asyncStatus: "+asyncStatus);
 
-                // Is the status an error?
+                // Is the asyncStatus an error?
                 if(status.equalsIgnoreCase(Chunk.ERROR_STATUS)){
-                    //log.error("status: error");
+                    //log.error("asyncStatus: error");
                     isError =  true;
                     if(status.equalsIgnoreCase(Chunk.EMERGENCY_EXIT_STATUS)){
                         log.error("Stream source requested an emergency exit! Closing connection immediately.");
@@ -317,7 +317,7 @@ public class ChunkedInputStream  {
                     }
 
                 }
-                // Is the status a mandatory exit?
+                // Is the asyncStatus a mandatory exit?
                 else if(status.equalsIgnoreCase(Chunk.EXIT_STATUS)){
                     int ret = readChunkHeader();
                     if(ret == -1 || isLastChunk()){
@@ -327,7 +327,7 @@ public class ChunkedInputStream  {
 
                 }
                 else {
-                    log.debug("Received status extension: "+extension);
+                    log.debug("Received asyncStatus extension: "+extension);
                 }
             }
             else {

@@ -73,7 +73,7 @@
     System.out.println("currentBesTask: "+currentBesTask);
     System.out.println("currentModuleId: "+currentModuleId);
     System.out.println("besCtlApi: "+besCtlApi);
-    System.out.println("status: "+status);
+    System.out.println("asyncStatus: "+asyncStatus);
     */
 
 

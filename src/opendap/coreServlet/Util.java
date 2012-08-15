@@ -114,7 +114,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * Default handler for OPeNDAP asyncStatus requests; not publically availableInChunk,
      * used only for debugging
      *
      * @param request  The client's <code> HttpServletRequest</code> request
@@ -167,7 +167,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * Default handler for OPeNDAP asyncStatus requests; not publically availableInChunk,
      * used only for debugging
      *
      * @param request  The client's <code> HttpServletRequest</code> request

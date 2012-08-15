@@ -272,7 +272,7 @@ public class BESError extends OPeNDAPException {
     /**
      *
      * @param response
-     * @return The HTTP status code returned to client.
+     * @return The HTTP asyncStatus code returned to client.
      * @throws IOException
      */
     public int sendErrorResponse(String systemPath, String context, HttpServletResponse response)

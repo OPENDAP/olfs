@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
@@ -97,6 +98,11 @@ public class AsyncDispatcher extends DapDispatcher {
         ingestResponseDelay();
 
 
+
+        // What follows is a hack to get a particular BES, the BES with prefix, to service these requests.
+        //
+        // We know the that BESManager.getConfig() returns a clone of the config so that we can abuse
+        // it as we see fit.
         Element besManagerConfig = BESManager.getConfig();
         List besList = besManagerConfig.getChildren("BES");
 
@@ -111,17 +117,23 @@ public class AsyncDispatcher extends DapDispatcher {
             if(prefixElement!=null)
                 prefix = prefixElement.getTextTrim();
 
+            // Find the BESs whose prefix is "/" note that there may be more than one
+            // And that's fine. This will just cause the BESManager to form another BESGroup with
+            // the new prefix.
             if(prefix!=null && prefix.equals("/")){
 
+                // Change the prefix to be the prefix for our async responder.
                 prefixElement.setText(_prefix);
 
                 besConfig = new BESConfig(besConfigElement);
+
+                // Add the new BES to the BESManager
                 bes = new BES(besConfig);
                 BESManager.addBes(bes);
                 log.info("Added BES to service asynchronous responses. BES prefix: '"+_prefix+"'");
 
+
                 initialized = true;
-                return;
             }
         }
 
@@ -246,11 +258,6 @@ public class AsyncDispatcher extends DapDispatcher {
 
         return isMyRequest;
 
-
-
-
-
-
     }
 
 
@@ -297,9 +304,67 @@ public class AsyncDispatcher extends DapDispatcher {
     }
 
 
+    /**
+     *
+     * @param request
+     * @return  Returns -1 if the client has not indicated that -1 if it can accept an asynchronous response.
+     * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
+     * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
+     */
+    public long clientAcceptsAsync(HttpServletRequest request){
+
+        String asyncAccept;
+        long acceptableDelay = -1;
 
 
 
+        // Check the constraint expression for the async control
+        // @todo Prune this parameter from the query String! OMFG!
+        asyncAccept = request.getParameter("async");
+        if(asyncAccept!=null){
+
+            if(asyncAccept.equals("")){
+                acceptableDelay = 0;
+            }
+
+            try {
+                acceptableDelay = Long.parseLong(asyncAccept);
+            }
+            catch(NumberFormatException e){
+                log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
+                        " header. msg: "+e.getMessage());
+                acceptableDelay = -1;
+            }
+        }
+
+
+        // Check HTTP headers for Async Control
+        asyncAccept = request.getHeader(HttpHeaders.ASYNC_ACCEPT);
+        if(asyncAccept!=null){
+
+
+
+            if(acceptableDelay == -1){
+                if(asyncAccept.equals("")){
+                    acceptableDelay = 0;
+                }
+
+                try {
+                    acceptableDelay = Long.parseLong(asyncAccept);
+                }
+                catch(NumberFormatException e){
+                    log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
+                            " header. msg: "+e.getMessage());
+                    acceptableDelay = -1;
+                }
+
+            }
+        }
+
+
+
+        return acceptableDelay;
+    }
 
 
 
@@ -309,71 +374,126 @@ public class AsyncDispatcher extends DapDispatcher {
         Date startTime = new Date(now.getTime()+getResponseDelay());
         Date endTime = new Date(startTime.getTime()+cachePersistTime);
 
-        String xmlBase = getXmlBase(request);
-
-        boolean cacheIsReady = false;
-
-        if(asyncCache.containsKey(xmlBase)) {
-
-            startTime = asyncCache.get(xmlBase);
-
-            endTime = new Date(startTime.getTime()+cachePersistTime);
+        String xmlBase = DocFactory.getXmlBase(request);
 
 
 
-            if(now.after(startTime)){
-                if(now.before(endTime) ){
-                    cacheIsReady = true;
-                }
-                else if(now.after(endTime)){
-                    asyncCache.remove(xmlBase);
-                }
-            }
+        long clientsAsyncVal = clientAcceptsAsync(request);
+
+        if(clientsAsyncVal == -1){
+            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request,getResponseDelay(),getCachePersistTime());
+            response.setHeader(HttpHeaders.ASYNC_REQUIRED, "");
+            sendDocument(response, asyncResponse, HttpServletResponse.SC_BAD_REQUEST);
+            return true;
         }
+        else if(clientsAsyncVal>0 && clientsAsyncVal < getResponseDelay()){
+            Document asyncResponse = DocFactory.getAsynchronousResponseRejected(request, DocFactory.reasonCode.TIME,"Acceptable access delay was less than estimated delay.");
+            sendDocument(response, asyncResponse, HttpServletResponse.SC_PRECONDITION_FAILED);
+            return true;
 
-
-        if(!asyncCache.containsKey(xmlBase)) {
-            startTime = new Date(now.getTime()+getResponseDelay());
-            endTime = new Date(startTime.getTime()+cachePersistTime);
-            asyncCache.put(xmlBase,startTime);
-        }
-
-
-
-        if(cacheIsReady){
-            return(super.requestDispatch(request,response,true));
         }
         else {
 
-            if(!isDap2Request){
+            boolean cacheIsReady = false;
+
+            if(asyncCache.containsKey(xmlBase)) {
+
+                startTime = asyncCache.get(xmlBase);
+
+                endTime = new Date(startTime.getTime()+cachePersistTime);
 
 
-                Document asyncResponse = getAsynchronousResponseDoc(request,startTime,endTime);
-                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+                if(now.after(startTime)){
+                    if(now.before(endTime) ){
+                        cacheIsReady = true;
+                    }
+                    else if(now.after(endTime)){
+                        // Response is GONE!
+                        Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
+                        sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
+                        asyncCache.remove(xmlBase);
+                        return true;
+                    }
+                }
+                else {
+                    // Response is PENDING!
+                    Document asyncResponse = DocFactory.getAsynchronousResponsePending(request);
+                    sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
+                    return true;
+
+                }
+            }
+
+
+            if(!asyncCache.containsKey(xmlBase)) {
+                startTime = new Date(now.getTime()+getResponseDelay());
+                endTime = new Date(startTime.getTime()+cachePersistTime);
+                asyncCache.put(xmlBase,startTime);
+            }
 
 
 
+            if(cacheIsReady){
 
-                System.out.println(xmlo.outputString(asyncResponse));
-                response.setContentType("text/xml");
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                response.getOutputStream().print(xmlo.outputString(asyncResponse));
+
+
+                return(super.requestDispatch(request,response,true));
             }
             else {
-               long timeTillReady = startTime.getTime() - now.getTime();
 
-               if(timeTillReady>0){
-                   log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
-                   try { Thread.sleep(timeTillReady);}
-                   catch(InterruptedException e){ log.error("Thread Interrupted. msg: "+e.getMessage());}
-               }
+                if(isDap2Request){
 
-               return(super.requestDispatch(request,response,true));
+                    long timeTillReady = startTime.getTime() - now.getTime();
+
+                    if(timeTillReady>0){
+                        log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
+                        try { Thread.sleep(timeTillReady);}
+                        catch(InterruptedException e){ log.error("Thread Interrupted. msg: "+e.getMessage());}
+                    }
+
+                    return(super.requestDispatch(request,response,true));
+
+                }
+                else {
+
+
+
+                    response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay()+"");
+
+                    String requestUrl = request.getRequestURL().toString();
+                    String ce = request.getQueryString();
+                    String resultLinkUrl = requestUrl+"?"+ce;
+
+                   // @todo Prune the "async"  parameter from the query String! OMFG!
+
+
+                    Document asyncResponse = DocFactory.getAsynchronousResponseAccepted(request, resultLinkUrl, getResponseDelay(),getCachePersistTime());
+                    sendDocument(response, asyncResponse, HttpServletResponse.SC_ACCEPTED);
+
+
+                    return true;
+
+
+
+                }
             }
+
+
+
+
+
         }
 
-        return(true);
+    }
 
+
+    public static void sendDocument(HttpServletResponse response, Document doc, int httpStatus) throws IOException {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        response.setStatus(httpStatus);
+        response.setContentType("text/xml");
+
+        response.getOutputStream().print(xmlo.outputString(doc));
 
     }
 
@@ -386,6 +506,13 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
         return responseDelay;
+    }
+
+
+    private int getCachePersistTime(){
+
+
+        return cachePersistTime;
     }
 
 
@@ -407,7 +534,7 @@ public class AsyncDispatcher extends DapDispatcher {
         dataset.addNamespaceDeclaration(DublinCore.NS);
         dataset.addNamespaceDeclaration(XLINK.NS);
 
-        String xmlBase =  getXmlBase(request);
+        String xmlBase =  DocFactory.getXmlBase(request);
         String requestUrl = request.getRequestURL().toString();
         String ce = request.getQueryString();
 
@@ -445,38 +572,6 @@ public class AsyncDispatcher extends DapDispatcher {
         return asyncResponse;
 
     }
-
-
-
-    public String getXmlBase(HttpServletRequest req){
-
-        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
-        String requestUrl = req.getRequestURL().toString();
-
-
-        if(forwardRequestUri != null){
-            String server = req.getServerName();
-            int port = req.getServerPort();
-            String scheme = req.getScheme();
-            requestUrl = scheme + "://" + server + ":" + port + forwardRequestUri;
-        }
-
-
-        String xmlBase = removeRequestSuffixFromString(requestUrl);
-
-
-        log.debug("@xml:base='{}'",xmlBase);
-        return xmlBase;
-    }
-
-    public String removeRequestSuffixFromString(String requestString){
-        String trimmedRequestString;
-
-        trimmedRequestString = requestString.substring(0,requestString.lastIndexOf("."));
-
-        return trimmedRequestString;
-    }
-
 
 
 
