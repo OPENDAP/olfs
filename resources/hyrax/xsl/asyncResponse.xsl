@@ -189,7 +189,7 @@
         </div>
         <br/>
         <div class="medium">
-            Because thing you asked for is going to take a while to produce you must indicate to the
+            Because the thing you asked for is going to take a while to produce you must indicate to the
             server that you are willing to wait for the response. <br/>
         </div>
         <br/>

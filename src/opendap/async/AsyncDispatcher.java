@@ -306,65 +306,70 @@ public class AsyncDispatcher extends DapDispatcher {
 
     /**
      *
-     * @param request
+     * @param ceAsyncAccept The value (possibly null) of the "async=xx" term of the constraint expression
+     * @param headerAsyncAccept The value (possibly null) of the X-DAP-Async-Accept HTTP header.
      * @return  Returns -1 if the client has not indicated that -1 if it can accept an asynchronous response.
      * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
      * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
      */
-    public long clientAcceptsAsync(HttpServletRequest request){
+    public long clientAcceptsAsync(String ceAsyncAccept, String headerAsyncAccept){
 
-        String asyncAccept;
-        long acceptableDelay = -1;
+        long acceptableDelay;
 
+        long headerAcceptDelay = -1;
+        long ceAcceptDelay = -1;
 
 
         // Check the constraint expression for the async control
         // @todo Prune this parameter from the query String! OMFG!
-        asyncAccept = request.getParameter("async");
-        if(asyncAccept!=null){
+        if(ceAsyncAccept!=null){
 
-            if(asyncAccept.equals("")){
-                acceptableDelay = 0;
+            if(ceAsyncAccept.equals("")){
+                ceAcceptDelay = 0;
             }
 
             try {
-                acceptableDelay = Long.parseLong(asyncAccept);
+                ceAcceptDelay = Long.parseLong(ceAsyncAccept);
             }
             catch(NumberFormatException e){
                 log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
                         " header. msg: "+e.getMessage());
-                acceptableDelay = -1;
+                ceAcceptDelay = -1;
             }
         }
 
-
         // Check HTTP headers for Async Control
-        asyncAccept = request.getHeader(HttpHeaders.ASYNC_ACCEPT);
-        if(asyncAccept!=null){
-
-
-
-            if(acceptableDelay == -1){
-                if(asyncAccept.equals("")){
-                    acceptableDelay = 0;
+        if(headerAsyncAccept!=null){
+                if(headerAsyncAccept.equals("")){
+                    headerAcceptDelay = 0;
                 }
 
                 try {
-                    acceptableDelay = Long.parseLong(asyncAccept);
+                    headerAcceptDelay = Long.parseLong(headerAsyncAccept);
                 }
                 catch(NumberFormatException e){
                     log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
                             " header. msg: "+e.getMessage());
-                    acceptableDelay = -1;
+                    headerAcceptDelay = -1;
                 }
 
-            }
         }
 
+        // The constraint expression asnycAccept value takes precedence.
+
+        acceptableDelay = headerAcceptDelay;
+
+        if(ceAcceptDelay>=0){
+            acceptableDelay = ceAcceptDelay;
+        }
 
 
         return acceptableDelay;
     }
+
+
+
+
 
 
 
@@ -376,12 +381,13 @@ public class AsyncDispatcher extends DapDispatcher {
 
         String xmlBase = DocFactory.getXmlBase(request);
 
+        String ceAsyncAccept     = request.getParameter("async");
+        String headerAsyncAccept = request.getHeader(HttpHeaders.ASYNC_ACCEPT);
 
+        long clientsAsyncVal = clientAcceptsAsync(ceAsyncAccept,headerAsyncAccept);
 
-        long clientsAsyncVal = clientAcceptsAsync(request);
-
-        if(clientsAsyncVal == -1){
-            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request,getResponseDelay(),getCachePersistTime());
+        if(clientsAsyncVal<0){
+            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request, getResponseDelay(), getCachePersistTime());
             response.setHeader(HttpHeaders.ASYNC_REQUIRED, "");
             sendDocument(response, asyncResponse, HttpServletResponse.SC_BAD_REQUEST);
             return true;
@@ -399,10 +405,6 @@ public class AsyncDispatcher extends DapDispatcher {
             if(asyncCache.containsKey(xmlBase)) {
 
                 startTime = asyncCache.get(xmlBase);
-
-                endTime = new Date(startTime.getTime()+cachePersistTime);
-
-
 
                 if(now.after(startTime)){
                     if(now.before(endTime) ){
@@ -428,7 +430,6 @@ public class AsyncDispatcher extends DapDispatcher {
 
             if(!asyncCache.containsKey(xmlBase)) {
                 startTime = new Date(now.getTime()+getResponseDelay());
-                endTime = new Date(startTime.getTime()+cachePersistTime);
                 asyncCache.put(xmlBase,startTime);
             }
 
@@ -457,32 +458,24 @@ public class AsyncDispatcher extends DapDispatcher {
                 }
                 else {
 
-
-
                     response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay()+"");
 
                     String requestUrl = request.getRequestURL().toString();
                     String ce = request.getQueryString();
-                    String resultLinkUrl = requestUrl+"?"+ce;
 
-                   // @todo Prune the "async"  parameter from the query String! OMFG!
+                    if(ceAsyncAccept==null && headerAsyncAccept!=null){
+                        ce="async="+ clientsAsyncVal + "&" + ce;
+                    }
 
+                    String resultLinkUrl = requestUrl + "?" + ce;
 
                     Document asyncResponse = DocFactory.getAsynchronousResponseAccepted(request, resultLinkUrl, getResponseDelay(),getCachePersistTime());
                     sendDocument(response, asyncResponse, HttpServletResponse.SC_ACCEPTED);
 
 
                     return true;
-
-
-
                 }
             }
-
-
-
-
-
         }
 
     }
@@ -517,6 +510,11 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
+
+
+
+
+    /* Mothballed First version
 
     public Document getAsynchronousResponseDoc(HttpServletRequest request, Date firstTimeAvailable, Date lastTimeAvailable){
 
@@ -572,6 +570,10 @@ public class AsyncDispatcher extends DapDispatcher {
         return asyncResponse;
 
     }
+
+
+
+    */
 
 
 
