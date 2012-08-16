@@ -45,6 +45,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
     private Logger log;
     private boolean initialized;
+    private ReentrantLock cacheLock;
 
     private ConcurrentHashMap<String,Date> asyncCache;
 
@@ -70,6 +72,7 @@ public class AsyncDispatcher extends DapDispatcher {
         log = LoggerFactory.getLogger(getClass());
 
         asyncCache = new ConcurrentHashMap<String, Date>();
+        cacheLock = new ReentrantLock();
 
         cachePersistTime = 3600000; // In milliseconds
         responseDelay    = 60000;   // In milliseconds
@@ -257,18 +260,15 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
+    //private String dapMetadataRegex = ".*\\.xml|.*\\.iso|.*\\.rubric|.*\\.ver|.*\\.ddx|.*\\.dds|.*\\.das|.*\\.info|.*\\.html?";
+    //private Pattern dapMetadataPattern = Pattern.compile(dapMetadataRegex, Pattern.CASE_INSENSITIVE);
 
     private String dap4DataRegex = ".*\\.dap|.*\\.xdods";
-    private String dap4MetadataRegex = ".*\\.xml|.*\\.iso|.*\\.rubric|.*\\.ver|.*\\.ddx|.*\\.dds|.*\\.das|.*\\.info|.*\\.html?";
-    private String dap2Regex = ".*\\.dods|.*\\.asc(ii)?";
-
-    private String servicesRegex = dap4DataRegex + "|" + dap4MetadataRegex + "|" + dap2Regex;
-
     private Pattern dap4DataPattern = Pattern.compile(dap4DataRegex, Pattern.CASE_INSENSITIVE);
-    private Pattern dap4MetadataPattern = Pattern.compile(dap4MetadataRegex, Pattern.CASE_INSENSITIVE);
-    private Pattern dap2Pattern = Pattern.compile(dap2Regex, Pattern.CASE_INSENSITIVE);
 
-    private Pattern servicesPattern = Pattern.compile(servicesRegex, Pattern.CASE_INSENSITIVE);
+    private String dap2DataRegex = ".*\\.dods|.*\\.asc(ii)?";
+    private Pattern dap2DataPattern = Pattern.compile(dap2DataRegex, Pattern.CASE_INSENSITIVE);
+
 
 
 
@@ -277,37 +277,51 @@ public class AsyncDispatcher extends DapDispatcher {
 
         log.info("Sending Asynchronous Response");
 
+        // If it's a DAP4 Data request then do the asynchronous dance.
+        if(isDap4DataRequest(request))
+            return(asyncDap4DataResponse(request, response));
 
-
-        String relativeURL = ReqInfo.getLocalUrl(request);
-
-        Matcher m;
-
-        m = dap4DataPattern.matcher(relativeURL);
-        if(m.matches()){
-            return(asyncResponse(request, response, false));
-        }
-
-        m = dap2Pattern.matcher(relativeURL);
-        if(m.matches()){
-            return(asyncResponse(request, response, true));
-        }
+        // If it's a DAP2 Data request then do the asynchronous dance.
+        else if(isDap2DataRequest(request))
+            return(asyncDap2DataResponse(request, response));
 
         return(super.requestDispatch(request,response,true));
+    }
 
 
+
+    public boolean isDap4DataRequest(HttpServletRequest req){
+        String relativeURL = ReqInfo.getLocalUrl(req);
+        Matcher m = dap4DataPattern.matcher(relativeURL);
+        return m.matches();
+    }
+
+    public boolean isDap2DataRequest(HttpServletRequest req){
+        String relativeURL = ReqInfo.getLocalUrl(req);
+        Matcher m = dap2DataPattern.matcher(relativeURL);
+        return m.matches();
     }
 
 
     /**
      *
-     * @param ceAsyncAccept The value (possibly null) of the "async=xx" term of the constraint expression
-     * @param headerAsyncAccept The value (possibly null) of the X-DAP-Async-Accept HTTP header.
+     * @param request The request to evaluate for the client headers and CE syntax
      * @return  Returns -1 if the client has not indicated that -1 if it can accept an asynchronous response.
      * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
      * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
      */
-    public long clientAcceptsAsync(String[] ceAsyncAccept, String[] headerAsyncAccept){
+    public long getClientAsyncAcceptVal(HttpServletRequest request){
+
+        // Get the values of the "async" parameter in the query string.
+        String[] ceAsyncAccept     = request.getParameterValues("async");
+
+
+        // Get the values of the (possibly repeated) DAP Async Accept header
+        Enumeration enm = request.getHeaders(HttpHeaders.ASYNC_ACCEPT);
+        Vector<String> v  = new Vector<String>();
+        while(enm.hasMoreElements())
+            v.add((String)enm.nextElement());
+
 
         long acceptableDelay;
 
@@ -315,8 +329,7 @@ public class AsyncDispatcher extends DapDispatcher {
         long ceAcceptDelay = -1;
 
 
-        // Check the constraint expression for the async control
-        // @todo Prune this parameter from the query String! OMFG!
+        // Check the constraint expression for the async control parameter
         if(ceAsyncAccept!=null && ceAsyncAccept.length>0){
 
 
@@ -332,11 +345,10 @@ public class AsyncDispatcher extends DapDispatcher {
         }
 
         // Check HTTP headers for Async Control
-        if(headerAsyncAccept!=null && headerAsyncAccept.length>0){
-
+        if(v.size()>0){
                 try {
                     // Only look at the first value.
-                    headerAcceptDelay = Long.parseLong(headerAsyncAccept[0]);
+                    headerAcceptDelay = Long.parseLong(v.get(0));
                 }
                 catch(NumberFormatException e){
                     log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
@@ -358,13 +370,34 @@ public class AsyncDispatcher extends DapDispatcher {
         return acceptableDelay;
     }
 
+    /**
+     *
+     * @param request The client request to evaluate to see if the target URL needs to have the async parameter added
+     * the query string
+     * @return  Returns -1 if the client has not indicated that -1 if it can accept an asynchronous response.
+     * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
+     * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
+     */
+    public boolean addAsyncParameterToCE(HttpServletRequest request){
+
+        // Get the values of the async parameter in the query string.
+        String[] ceAsyncAccept     = request.getParameterValues("async");
+
+
+        // Get the values of the (possibly repeated) DAP Async Accept header
+        Enumeration enm = request.getHeaders(HttpHeaders.ASYNC_ACCEPT);
+        Vector<String> acceptAsyncHeaderValues  = new Vector<String>();
+        while(enm.hasMoreElements())
+            acceptAsyncHeaderValues.add((String)enm.nextElement());
+
+
+        return ceAsyncAccept==null && acceptAsyncHeaderValues.size()>0;
+    }
 
 
 
 
-
-
-    public boolean asyncResponse(HttpServletRequest request, HttpServletResponse response, boolean isDap2Request) throws Exception {
+    public boolean asyncDap2DataResponse(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         Date now = new Date();
 
@@ -372,53 +405,101 @@ public class AsyncDispatcher extends DapDispatcher {
 
         String xmlBase = DocFactory.getXmlBase(request);
 
-        String[] ceAsyncAccept     = request.getParameterValues("async");
-        Enumeration enm = request.getHeaders(HttpHeaders.ASYNC_ACCEPT);
-        Vector<String> v  = new Vector<String>();
-        while(enm.hasMoreElements()){
-            v.add((String)enm.nextElement());
+        startTime = addResourceToCacheAsNeeded(xmlBase);
+
+        long timeTillReady = startTime.getTime() - now.getTime();
+
+        if(timeTillReady>0){
+            log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
+            try { Thread.sleep(timeTillReady);}
+            catch(InterruptedException e){ log.error("Thread Interrupted. msg: "+e.getMessage());}
         }
-        String[] headerAsyncAccept = new String[v.size()];
 
-        headerAsyncAccept = v.toArray(headerAsyncAccept);
+        return(super.requestDispatch(request,response,true));
 
-        long clientsAsyncVal = clientAcceptsAsync(ceAsyncAccept,headerAsyncAccept);
+
+    }
+
+
+    /**
+     *
+     * @param id  The resource ID
+     * @return  The time at which the resource will be available.
+     */
+    private Date addResourceToCacheAsNeeded(String id){
+
+        Date now = new Date();
+        Date startTime;
+
+        startTime = new Date(now.getTime()+getResponseDelay());
+
+        startTime = asyncCache.putIfAbsent(id,startTime);
+
+        return startTime;
+
+    }
+
+
+
+
+    public boolean asyncDap4DataResponse(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        Date now = new Date();
+        Date startTime;
+        String xmlBase = DocFactory.getXmlBase(request);
+
+
+        long clientsAsyncVal = getClientAsyncAcceptVal(request);
 
         if(clientsAsyncVal<0){
+            // There was no indication that the client can accept an asynchronous response, so tell that
+            // it's required that they indicate their willingness to accept async in order to get the resource.
             Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request, getResponseDelay(), getCachePersistTime());
             response.setHeader(HttpHeaders.ASYNC_REQUIRED, "");
             sendDocument(response, asyncResponse, HttpServletResponse.SC_BAD_REQUEST);
             return true;
         }
         else if(clientsAsyncVal>0 && clientsAsyncVal < getResponseDelay()){
-            Document asyncResponse = DocFactory.getAsynchronousResponseRejected(request, DocFactory.reasonCode.TIME,"Acceptable access delay was less than estimated delay.");
+            // The client indicated that amount of time that they are willing to wait for the
+            // asynchronous response is less than the expected delay.
+            // So - tell them that the request is REJECTED!
+            Document asyncResponse = DocFactory.getAsynchronousResponseRejected(request,
+                    DocFactory.reasonCode.TIME,
+                    "Acceptable access delay was less than estimated delay.");
             sendDocument(response, asyncResponse, HttpServletResponse.SC_PRECONDITION_FAILED);
             return true;
 
         }
         else {
 
-            boolean cacheIsReady = false;
+            // Looks like the client wants an async response!
 
-            if(asyncCache.containsKey(xmlBase)) {
+            // First, let's figure out if the request is for a pending, or expired resource.
+            startTime = asyncCache.get(xmlBase);
+            if(startTime!=null) {
 
-                startTime = asyncCache.get(xmlBase);
                 Date endTime = new Date(startTime.getTime()+cachePersistTime);
 
                 if(now.after(startTime)){
                     if(now.before(endTime) ){
-                        cacheIsReady = true;
+                        // The request if for an available resource. I.e. The requested resource is in the cache,
+                        // it's start has past and it's end time has not yet arrived. So - send the data.
+
+                        // And because this is hack to add DAP4 functionality to a DAP2 server, make the request
+                        // palatable to the underlying DAP2 service.
+                        Dap4RequestToDap2Request dap2Request = new Dap4RequestToDap2Request(request);
+                        return(super.requestDispatch(dap2Request,response,true));
                     }
                     else if(now.after(endTime)){
-                        // Response is GONE!
+                        // Async Response is expired. Return GONE!
                         Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
                         sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
-                        asyncCache.remove(xmlBase);
+                        asyncCache.remove(xmlBase, startTime);
                         return true;
                     }
                 }
                 else {
-                    // Response is PENDING!
+                    // Async Response is PENDING!
                     Document asyncResponse = DocFactory.getAsynchronousResponsePending(request);
                     sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
                     return true;
@@ -426,62 +507,34 @@ public class AsyncDispatcher extends DapDispatcher {
                 }
             }
 
+            // The resource is not in the cache, so add the resource to the cache. and then
+            // tell the client that the request is accepted.
+            addResourceToCacheAsNeeded(xmlBase);
+            sendAsyncRequestAccepted(request,response);
 
-            if(!asyncCache.containsKey(xmlBase)) {
-                startTime = new Date(now.getTime()+getResponseDelay());
-                asyncCache.put(xmlBase,startTime);
-            }
-
-
-            startTime = asyncCache.get(xmlBase);
-
-            if(cacheIsReady){
-
-
-                Dap4RequestToDap2Request myReq = new Dap4RequestToDap2Request(request);
-
-
-
-                return(super.requestDispatch(myReq,response,true));
-            }
-            else {
-
-                if(isDap2Request){
-
-                    long timeTillReady = startTime.getTime() - now.getTime();
-
-                    if(timeTillReady>0){
-                        log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
-                        try { Thread.sleep(timeTillReady);}
-                        catch(InterruptedException e){ log.error("Thread Interrupted. msg: "+e.getMessage());}
-                    }
-
-                    return(super.requestDispatch(request,response,true));
-
-                }
-                else {
-
-                    response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay()+"");
-
-                    String requestUrl = request.getRequestURL().toString();
-                    String ce = request.getQueryString();
-
-                    if(ceAsyncAccept==null && headerAsyncAccept!=null){
-
-                        ce="async="+ clientsAsyncVal + "&" + ce;
-                    }
-
-                    String resultLinkUrl = requestUrl + "?" + ce;
-
-                    Document asyncResponse = DocFactory.getAsynchronousResponseAccepted(request, resultLinkUrl, getResponseDelay(),getCachePersistTime());
-                    sendDocument(response, asyncResponse, HttpServletResponse.SC_ACCEPTED);
-
-
-                    return true;
-                }
-            }
+            return true;
         }
 
+    }
+
+    public void sendAsyncRequestAccepted(HttpServletRequest request,
+                                          HttpServletResponse response)
+            throws IOException {
+
+
+        // Async Request is accepted.
+        response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay()+"");
+
+        String requestUrl = request.getRequestURL().toString();
+        String ce = request.getQueryString();
+
+        if(addAsyncParameterToCE(request))
+            ce="async="+ getClientAsyncAcceptVal(request) + "&" + ce;
+
+        String resultLinkUrl = requestUrl + "?" + ce;
+
+        Document asyncResponse = DocFactory.getAsynchronousResponseAccepted(request, resultLinkUrl, getResponseDelay(),getCachePersistTime());
+        sendDocument(response, asyncResponse, HttpServletResponse.SC_ACCEPTED);
     }
 
 
@@ -489,9 +542,7 @@ public class AsyncDispatcher extends DapDispatcher {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         response.setStatus(httpStatus);
         response.setContentType("text/xml");
-
         response.getOutputStream().print(xmlo.outputString(doc));
-
     }
 
 
@@ -500,84 +551,17 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
     private int getResponseDelay(){
-
-
         return responseDelay;
     }
 
 
     private int getCachePersistTime(){
-
-
         return cachePersistTime;
     }
 
 
 
 
-
-
-
-    /* Mothballed First version
-
-    public Document getAsynchronousResponseDoc(HttpServletRequest request, Date firstTimeAvailable, Date lastTimeAvailable){
-
-
-        String context  = request.getContextPath()+"/";
-
-        Element dataset = new Element("Dataset", DAP.DAPv40_NS);
-        Element async   = new Element("async",DAP.DAPv40_NS);
-        Element beginAccess  = new Element("beginAccess", DAP.DAPv40_NS);
-        Element endAccess    = new Element("endAccess", DAP.DAPv40_NS);
-
-        async.addContent(beginAccess);
-        async.addContent(endAccess);
-        dataset.addContent(async);
-        dataset.addNamespaceDeclaration(DublinCore.NS);
-        dataset.addNamespaceDeclaration(XLINK.NS);
-
-        String xmlBase =  DocFactory.getXmlBase(request);
-        String requestUrl = request.getRequestURL().toString();
-        String ce = request.getQueryString();
-
-        dataset.setAttribute("base",xmlBase, XML.NS);
-        async.setAttribute("href",requestUrl+"?"+ce, XLINK.NS);
-
-
-        log.debug("firstTime: "+firstTimeAvailable.getTime());
-        log.debug("lastTime:  "+lastTimeAvailable.getTime());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
-        StringBuffer startTime = new StringBuffer();
-
-        startTime = sdf.format(firstTimeAvailable,startTime, new FieldPosition(DateFormat.YEAR_FIELD));
-
-        StringBuffer endTime = new StringBuffer();
-
-        endTime = sdf.format(lastTimeAvailable,endTime,new FieldPosition(DateFormat.YEAR_FIELD));
-
-        beginAccess.setText(startTime.toString());
-        endAccess.setText(endTime.toString());
-
-        HashMap<String,String> piMap = new HashMap<String,String>( 2 );
-        piMap.put( "type", "text/xsl" );
-        piMap.put( "href", context+"xsl/asyncResponse.xsl" );
-        ProcessingInstruction pi = new ProcessingInstruction( "xml-stylesheet", piMap );
-
-        Document asyncResponse = new Document() ;
-        asyncResponse.addContent( pi );
-
-        asyncResponse.setRootElement(dataset);
-
-
-        return asyncResponse;
-
-    }
-
-
-
-    */
 
     class Dap4RequestToDap2Request implements HttpServletRequest {
 
@@ -625,11 +609,26 @@ public class AsyncDispatcher extends DapDispatcher {
         }
 
 
+        /**
+         * This prunes the async control by simply ignoring it.
+         * Since the DAP4 query string utilizes a regular KVP structure with the DAP4 projection held
+         * in a parameter/key named "proj" and the DAP4 selection held in a series of zero or more
+         * instances of the parameter/key named "sel". <br/>
+         * This gives us the ability to:
+         * <ul>
+         *     <li>Quickly extract the projection and selection.</li>
+         *     <li>utilize other key/parameter names for other purposes.</li>
+         * </ul>
+         * The async parameter is an example of one of these other keys.
+         * @param req The request to use as the source of the DAP4 constraint expression
+         * @return A DAP2 constraint expression
+         */
         public String convertDap4ceToDap2ce(HttpServletRequest req){
 
             StringBuilder dap2Query   = new StringBuilder();
             String projection         = req.getParameter("proj");
             String[] selectionClauses = req.getParameterValues("sel");
+
 
 
             if(projection!=null)
