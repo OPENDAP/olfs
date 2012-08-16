@@ -74,8 +74,8 @@ public class AsyncDispatcher extends DapDispatcher {
         asyncCache = new ConcurrentHashMap<String, Date>();
         cacheLock = new ReentrantLock();
 
-        cachePersistTime = 3600000; // In milliseconds
-        responseDelay    = 60000;   // In milliseconds
+        cachePersistTime = 3600000; // In seconds
+        responseDelay    = 60000;   // In seconds
 
         initialized = false;
     }
@@ -179,7 +179,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
         if(e!=null)
-            cachePersistTime = Integer.parseInt(e.getTextTrim());
+            cachePersistTime = Integer.parseInt(e.getTextTrim()) * 1000; // Make it into milliseconds
 
         if(cachePersistTime < 0){
             msg = "Bad Configuration. The <Handler> " +
@@ -205,7 +205,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
         if(e!=null)
-            responseDelay = Integer.parseInt(e.getTextTrim());
+            responseDelay = Integer.parseInt(e.getTextTrim()) * 10000; // Make it into milliseconds
 
         if(responseDelay < 0){
             msg = "Bad Configuration. The <Handler> " +
@@ -310,7 +310,7 @@ public class AsyncDispatcher extends DapDispatcher {
      * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
      * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
      */
-    public long getClientAsyncAcceptVal(HttpServletRequest request){
+    public long getClientAsyncAcceptVal_ms(HttpServletRequest request){
 
         // Get the values of the "async" parameter in the query string.
         String[] ceAsyncAccept     = request.getParameterValues("async");
@@ -335,7 +335,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
             try {
                 // Only look at the first value.
-                ceAcceptDelay = Long.parseLong(ceAsyncAccept[0]);
+                ceAcceptDelay = Long.parseLong(ceAsyncAccept[0])*1000; // Value comes as seconds, make it milliseconds
             }
             catch(NumberFormatException e){
                 log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
@@ -348,7 +348,7 @@ public class AsyncDispatcher extends DapDispatcher {
         if(v.size()>0){
                 try {
                     // Only look at the first value.
-                    headerAcceptDelay = Long.parseLong(v.get(0));
+                    headerAcceptDelay = Long.parseLong(v.get(0))*1000; // Value comes as seconds, make it milliseconds
                 }
                 catch(NumberFormatException e){
                     log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
@@ -431,7 +431,7 @@ public class AsyncDispatcher extends DapDispatcher {
         Date now = new Date();
         Date startTime;
 
-        startTime = new Date(now.getTime()+getResponseDelay());
+        startTime = new Date(now.getTime()+ getResponseDelay_ms());
 
         startTime = asyncCache.putIfAbsent(id,startTime);
 
@@ -449,17 +449,17 @@ public class AsyncDispatcher extends DapDispatcher {
         String xmlBase = DocFactory.getXmlBase(request);
 
 
-        long clientsAsyncVal = getClientAsyncAcceptVal(request);
+        long clientAcceptableDelay_ms = getClientAsyncAcceptVal_ms(request);
 
-        if(clientsAsyncVal<0){
+        if(clientAcceptableDelay_ms<0){
             // There was no indication that the client can accept an asynchronous response, so tell that
             // it's required that they indicate their willingness to accept async in order to get the resource.
-            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request, getResponseDelay(), getCachePersistTime());
+            Document asyncResponse = DocFactory.getAsynchronousResponseRequired(request, getResponseDelay_s(), getCachePersistTime_s());
             response.setHeader(HttpHeaders.ASYNC_REQUIRED, "");
             sendDocument(response, asyncResponse, HttpServletResponse.SC_BAD_REQUEST);
             return true;
         }
-        else if(clientsAsyncVal>0 && clientsAsyncVal < getResponseDelay()){
+        else if(clientAcceptableDelay_ms>0 && clientAcceptableDelay_ms < getResponseDelay_ms()){
             // The client indicated that amount of time that they are willing to wait for the
             // asynchronous response is less than the expected delay.
             // So - tell them that the request is REJECTED!
@@ -523,17 +523,24 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
         // Async Request is accepted.
-        response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay()+"");
+        response.setHeader(HttpHeaders.ASYNC_ACCEPTED, getResponseDelay_s()+"");
 
         String requestUrl = request.getRequestURL().toString();
         String ce = request.getQueryString();
 
         if(addAsyncParameterToCE(request))
-            ce="async="+ getClientAsyncAcceptVal(request) + "&" + ce;
+            ce="async="+ getClientAsyncAcceptVal_ms(request) + "&" + ce;
 
         String resultLinkUrl = requestUrl + "?" + ce;
 
-        Document asyncResponse = DocFactory.getAsynchronousResponseAccepted(request, resultLinkUrl, getResponseDelay(),getCachePersistTime());
+        Document asyncResponse =
+                DocFactory.getAsynchronousResponseAccepted(
+                        request,
+                        resultLinkUrl,
+                        getResponseDelay_s(),
+                        getCachePersistTime_s());
+
+
         sendDocument(response, asyncResponse, HttpServletResponse.SC_ACCEPTED);
     }
 
@@ -550,12 +557,22 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
-    private int getResponseDelay(){
+    private int getResponseDelay_s(){
+        return responseDelay/1000;
+    }
+
+
+    private int getCachePersistTime_s(){
+        return cachePersistTime/1000;
+    }
+
+
+    private int getResponseDelay_ms(){
         return responseDelay;
     }
 
 
-    private int getCachePersistTime(){
+    private int getCachePersistTime_ms(){
         return cachePersistTime;
     }
 
