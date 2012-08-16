@@ -161,8 +161,8 @@
 
             <script type="text/javascript">
 
-                var expectedAccessDelay=parseInt("<xsl:value-of select="$expectedDelay"/>");
-                var responseLifeTime=parseInt("<xsl:value-of select="$responseLifeTime"/>");
+                var expectedAccessDelay=parseInt("<xsl:value-of select="$expectedDelay"/>")*1000; // seconds -> milliseconds
+                var responseLifeTime=parseInt("<xsl:value-of select="$responseLifeTime"/>")*1000; // seconds -> milliseconds
 
                 var startTime = pageLoadTime + expectedAccessDelay;
                 var endTime = startTime + responseLifeTime

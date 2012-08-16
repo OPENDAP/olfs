@@ -58,6 +58,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
     private Logger log;
     private boolean initialized;
+    private boolean usePendingAndGoneResponses;
     private ReentrantLock cacheLock;
 
     private ConcurrentHashMap<String,Date> asyncCache;
@@ -74,8 +75,10 @@ public class AsyncDispatcher extends DapDispatcher {
         asyncCache = new ConcurrentHashMap<String, Date>();
         cacheLock = new ReentrantLock();
 
-        cachePersistTime = 3600000; // In seconds
-        responseDelay    = 60000;   // In seconds
+        cachePersistTime = 3600000; // In milliseconds
+        responseDelay    = 60000;   // In milliseconds
+
+        usePendingAndGoneResponses = true;
 
         initialized = false;
     }
@@ -94,7 +97,7 @@ public class AsyncDispatcher extends DapDispatcher {
         ingestPrefix();
         ingestCachePersistTime();
         ingestResponseDelay();
-
+        ingestUsePendingGone();
 
 
         // What follows is a hack to get a particular BES, the BES with prefix, to service these requests.
@@ -195,6 +198,24 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
+    private void ingestUsePendingGone() throws Exception{
+
+        String msg;
+
+        Element config = getConfig();
+
+        Element e = config.getChild("usePendingAndGoneResponses");
+
+
+        if(e!=null)
+            usePendingAndGoneResponses = e.getTextTrim().equalsIgnoreCase("true");
+
+        log.info("usePendingAndGoneResponses="+ usePendingAndGoneResponses);
+
+    }
+
+
+
     private void ingestResponseDelay() throws Exception{
 
         String msg;
@@ -205,7 +226,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
         if(e!=null)
-            responseDelay = Integer.parseInt(e.getTextTrim()) * 10000; // Make it into milliseconds
+            responseDelay = Integer.parseInt(e.getTextTrim()) * 1000; // Make it into milliseconds
 
         if(responseDelay < 0){
             msg = "Bad Configuration. The <Handler> " +
@@ -491,17 +512,30 @@ public class AsyncDispatcher extends DapDispatcher {
                         return(super.requestDispatch(dap2Request,response,true));
                     }
                     else if(now.after(endTime)){
-                        // Async Response is expired. Return GONE!
-                        Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
-                        sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
+
+
+                        if(usePendingAndGoneResponses){
+                            // Async Response is expired. Return GONE!
+                            Document asyncResponse = DocFactory.getAsynchronousResponseGone(request);
+                            sendDocument(response, asyncResponse, HttpServletResponse.SC_GONE);
+                        }
+                        else {
+                            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        }
                         asyncCache.remove(xmlBase, startTime);
+
                         return true;
                     }
                 }
                 else {
-                    // Async Response is PENDING!
-                    Document asyncResponse = DocFactory.getAsynchronousResponsePending(request);
-                    sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
+                    if(usePendingAndGoneResponses){
+                        // Async Response is PENDING!
+                        Document asyncResponse = DocFactory.getAsynchronousResponsePending(request);
+                        sendDocument(response, asyncResponse, HttpServletResponse.SC_CONFLICT);
+                    }
+                    else {
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    }
                     return true;
 
                 }
