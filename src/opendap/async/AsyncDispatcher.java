@@ -29,25 +29,20 @@ import opendap.bes.BESManager;
 import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.ReqInfo;
-import opendap.namespaces.DAP;
-import opendap.namespaces.DublinCore;
-import opendap.namespaces.XLINK;
-import opendap.namespaces.XML;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.*;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.SimpleDateFormat;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -312,7 +307,7 @@ public class AsyncDispatcher extends DapDispatcher {
      * Returns 0 if the client has indicated that it will accept any length delay. A return value greater than
      * 0 indicates the time, in milliseconds, that client is willing to wait for a response.
      */
-    public long clientAcceptsAsync(String ceAsyncAccept, String headerAsyncAccept){
+    public long clientAcceptsAsync(String[] ceAsyncAccept, String[] headerAsyncAccept){
 
         long acceptableDelay;
 
@@ -322,14 +317,12 @@ public class AsyncDispatcher extends DapDispatcher {
 
         // Check the constraint expression for the async control
         // @todo Prune this parameter from the query String! OMFG!
-        if(ceAsyncAccept!=null){
+        if(ceAsyncAccept!=null && ceAsyncAccept.length>0){
 
-            if(ceAsyncAccept.equals("")){
-                ceAcceptDelay = 0;
-            }
 
             try {
-                ceAcceptDelay = Long.parseLong(ceAsyncAccept);
+                // Only look at the first value.
+                ceAcceptDelay = Long.parseLong(ceAsyncAccept[0]);
             }
             catch(NumberFormatException e){
                 log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
@@ -339,13 +332,11 @@ public class AsyncDispatcher extends DapDispatcher {
         }
 
         // Check HTTP headers for Async Control
-        if(headerAsyncAccept!=null){
-                if(headerAsyncAccept.equals("")){
-                    headerAcceptDelay = 0;
-                }
+        if(headerAsyncAccept!=null && headerAsyncAccept.length>0){
 
                 try {
-                    headerAcceptDelay = Long.parseLong(headerAsyncAccept);
+                    // Only look at the first value.
+                    headerAcceptDelay = Long.parseLong(headerAsyncAccept[0]);
                 }
                 catch(NumberFormatException e){
                     log.error("Unable to ingest the value of the "+ HttpHeaders.ASYNC_ACCEPT+
@@ -355,7 +346,7 @@ public class AsyncDispatcher extends DapDispatcher {
 
         }
 
-        // The constraint expression asnycAccept value takes precedence.
+        // The constraint expression parameter "asnyc=seconds" takes precedence.
 
         acceptableDelay = headerAcceptDelay;
 
@@ -381,8 +372,15 @@ public class AsyncDispatcher extends DapDispatcher {
 
         String xmlBase = DocFactory.getXmlBase(request);
 
-        String ceAsyncAccept     = request.getParameter("async");
-        String headerAsyncAccept = request.getHeader(HttpHeaders.ASYNC_ACCEPT);
+        String[] ceAsyncAccept     = request.getParameterValues("async");
+        Enumeration enm = request.getHeaders(HttpHeaders.ASYNC_ACCEPT);
+        Vector<String> v  = new Vector<String>();
+        while(enm.hasMoreElements()){
+            v.add((String)enm.nextElement());
+        }
+        String[] headerAsyncAccept = new String[v.size()];
+
+        headerAsyncAccept = v.toArray(headerAsyncAccept);
 
         long clientsAsyncVal = clientAcceptsAsync(ceAsyncAccept,headerAsyncAccept);
 
@@ -438,7 +436,13 @@ public class AsyncDispatcher extends DapDispatcher {
             startTime = asyncCache.get(xmlBase);
 
             if(cacheIsReady){
-                return(super.requestDispatch(request,response,true));
+
+
+                Dap4RequestToDap2Request myReq = new Dap4RequestToDap2Request(request);
+
+
+
+                return(super.requestDispatch(myReq,response,true));
             }
             else {
 
@@ -463,6 +467,7 @@ public class AsyncDispatcher extends DapDispatcher {
                     String ce = request.getQueryString();
 
                     if(ceAsyncAccept==null && headerAsyncAccept!=null){
+
                         ce="async="+ clientsAsyncVal + "&" + ce;
                     }
 
@@ -574,9 +579,161 @@ public class AsyncDispatcher extends DapDispatcher {
 
     */
 
+    class Dap4RequestToDap2Request implements HttpServletRequest {
+
+        HttpServletRequest r;
+
+        public Dap4RequestToDap2Request(HttpServletRequest request) {
+            r = request;
+        }
 
 
+        
+        public String getAuthType() { return r.getAuthType(); }
 
+        public Cookie[] getCookies() {  return r.getCookies(); }
+
+        public long getDateHeader(String s) { return r.getDateHeader(s); }
+
+        public String getHeader(String s) { return r.getHeader(s); }
+
+        public Enumeration getHeaders(String s) { return r.getHeaders(s); }
+
+        public Enumeration getHeaderNames() { return r.getHeaderNames(); }
+
+        public int getIntHeader(String s) { return r.getIntHeader(s); }
+
+        public String getMethod() { return r.getMethod(); }
+
+        public String getPathInfo() { return r.getPathInfo(); }
+
+        public String getPathTranslated() { return r.getPathTranslated(); }
+
+        public String getContextPath() { return r.getContextPath(); }
+
+        public String getQueryString() {
+
+            String query = r.getQueryString();
+
+            log.debug("dap4 query: "+query);
+
+            String dap2Query = convertDap4ceToDap2ce(r);
+
+            log.debug("dap2 query: "+dap2Query);
+
+            return dap2Query;
+        }
+
+
+        public String convertDap4ceToDap2ce(HttpServletRequest req){
+
+            StringBuilder dap2Query   = new StringBuilder();
+            String projection         = req.getParameter("proj");
+            String[] selectionClauses = req.getParameterValues("sel");
+
+
+            if(projection!=null)
+                dap2Query.append(projection);
+
+            if(selectionClauses!=null){
+                for(String selClause:selectionClauses){
+                    if(dap2Query.length()>0)
+                        dap2Query.append("&");
+                    dap2Query.append(selClause);
+                }
+            }
+
+            return dap2Query.toString();
+        }
+
+
+        
+        public String getRemoteUser() { return r.getRemoteUser(); }
+
+        public boolean isUserInRole(String s) { return r.isUserInRole(s); }
+
+        public Principal getUserPrincipal() { return r.getUserPrincipal(); }
+
+        public String getRequestedSessionId() { return r.getRequestedSessionId(); }
+
+        public String getRequestURI() { return r.getRequestURI(); }
+
+        public StringBuffer getRequestURL() { return r.getRequestURL(); }
+
+        public String getServletPath() { return r.getServletPath(); }
+
+        public HttpSession getSession(boolean b) { return r.getSession(b); }
+
+        public HttpSession getSession() { return r.getSession(); }
+
+        public boolean isRequestedSessionIdValid() { return r.isRequestedSessionIdValid(); }
+
+        public boolean isRequestedSessionIdFromCookie() { return r.isRequestedSessionIdFromCookie(); }
+
+        public boolean isRequestedSessionIdFromURL() { return r.isRequestedSessionIdFromURL(); }
+
+        @Deprecated
+        public boolean isRequestedSessionIdFromUrl() { return r.isRequestedSessionIdFromUrl(); }
+
+        public Object getAttribute(String s) { return r.getAttribute(s); }
+
+        public Enumeration getAttributeNames() { return r.getAttributeNames(); }
+
+        public String getCharacterEncoding() { return r.getCharacterEncoding(); }
+
+        public void setCharacterEncoding(String s) throws UnsupportedEncodingException { r.setCharacterEncoding(s); }
+
+        public int getContentLength() { return r.getContentLength(); }
+
+        public String getContentType() { return r.getContentType(); }
+
+        public ServletInputStream getInputStream() throws IOException { return r.getInputStream(); }
+
+        public String getParameter(String s) { return r.getParameter(s); }
+
+        public Enumeration getParameterNames() { return r.getParameterNames(); }
+
+        public String[] getParameterValues(String s) { return r.getParameterValues(s); }
+
+        public Map getParameterMap() { return r.getParameterMap(); }
+
+        public String getProtocol() { return r.getProtocol(); }
+
+        public String getScheme() { return r.getScheme(); }
+
+        public String getServerName() { return r.getServerName(); }
+
+        public int getServerPort() { return r.getServerPort(); }
+
+        public BufferedReader getReader() throws IOException { return r.getReader(); }
+
+        public String getRemoteAddr() { return r.getRemoteAddr(); }
+
+        public String getRemoteHost() { return r.getRemoteHost(); }
+
+        public void setAttribute(String s, Object o) { r.setAttribute(s, o); }
+
+        public void removeAttribute(String s) { r.removeAttribute(s); }
+
+        public Locale getLocale() { return r.getLocale(); }
+
+        public Enumeration getLocales() { return r.getLocales(); }
+
+        public boolean isSecure() { return r.isSecure(); }
+
+        public RequestDispatcher getRequestDispatcher(String s) { return r.getRequestDispatcher(s); }
+
+        @Deprecated
+        public String getRealPath(String s) { return r.getRealPath(s); }
+
+        public int getRemotePort() { return r.getRemotePort(); }
+
+        public String getLocalName() { return r.getLocalName(); }
+
+        public String getLocalAddr() { return r.getLocalAddr(); }
+
+        public int getLocalPort() { return r.getLocalPort(); }
+    }
 
 
 }

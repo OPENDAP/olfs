@@ -25,6 +25,7 @@
 package opendap.bes;
 
 import opendap.coreServlet.DispatchHandler;
+import org.apache.catalina.connector.Request;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -259,7 +260,6 @@ public class BESManager implements DispatchHandler {
 //        threadCache.remove(t);
 //        log.info("Removing ThreadCache for thread "+t.getName());
 //    }
-
 
 
 
