@@ -37,6 +37,7 @@
     Logger log = LoggerFactory.getLogger("opendap.hai.jsp.besLogConfig");
 
 
+
     String contextPath = request.getContextPath();
 
     HashMap<String, String> kvp = Util.processQuery(request);
