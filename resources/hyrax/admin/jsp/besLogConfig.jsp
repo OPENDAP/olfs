@@ -27,10 +27,15 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page import="opendap.bes.BesAdminFail" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="org.slf4j.Logger" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <%
+
+    Logger log = LoggerFactory.getLogger("opendap.hai.jsp.besLogConfig");
+
 
     String contextPath = request.getContextPath();
 
@@ -42,11 +47,13 @@
         currentPrefix = "/";
 
 
+    log.debug("BES prefix: "+currentPrefix);
 
     String currentBesTask = kvp.get("task");
     if (currentBesTask == null)
         currentBesTask = "";
 
+    log.debug("BES Task: "+currentBesTask);
 
     BES bes = BESManager.getBES(currentPrefix);
 
@@ -87,10 +94,13 @@
                           method="get">
 
                     <%
-                        TreeMap<String, BES.BesLogger> besLoggers = null;
+                        TreeMap<String, BES.BesLogger> besLoggers;
                         try {
+                            log.debug("Retrieving BES logger names...");
                             besLoggers = bes.getBesLoggers();
                             for (BES.BesLogger logger : besLoggers.values()) {
+                                log.debug("Processing BES logger {} enabled: {}",logger.getName(),logger.getIsEnabled());
+
                                 out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
 
                                 if (logger.getIsEnabled()) {

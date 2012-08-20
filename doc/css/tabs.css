@@ -36,7 +36,7 @@ ol li.current a {
 }
 
 ol li {
-	background: #527CC1 #ffffff ;
+	background: #527CC1;
 	float: left;
 	margin: 0 1px 0 0;
 	padding-left: 10px;

@@ -1,3 +1,5 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 /////////////////////////////////////////////////////////////////////////////
 // This file is part of the "Hyrax" project, a Java implementation
@@ -31,8 +33,6 @@
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Vector" %>
 <%@ page import="opendap.bes.BesAdminFail" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <%
 
@@ -99,7 +99,7 @@
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
         <td>
-            <div style='v-align:center;font-size:large;'><a href="<%= contextPath%>/admin/index.html">Hyrax Admin Interface</a></div>
+            <div style='font-size:large;'><a href="<%= contextPath%>/admin/index.html">Hyrax Admin Interface</a></div>
         </td>
     </tr>
 </table>
