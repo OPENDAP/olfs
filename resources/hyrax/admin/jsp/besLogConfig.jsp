@@ -100,7 +100,7 @@
                             log.debug("Retrieving BES logger names...");
                             besLoggers = bes.getBesLoggers();
                             for (BES.BesLogger logger : besLoggers.values()) {
-                                log.debug("Processing BES logger {} enabled: {}",logger.getName(),logger.getIsEnabled());
+                                log.debug("BES logger '{}' is currently {}",logger.getName(),logger.getIsEnabled()?"enabled":"disabled");
 
                                 out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
 
