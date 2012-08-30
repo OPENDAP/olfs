@@ -167,7 +167,7 @@ public class DocServlet extends HttpServlet {
                             log.debug("   MIME type: " + mType + "  ");
                         }
 
-                        // Gah! Don't do a setStatus()!!!! Doing so breaks the HTTP asyncStatus value for <error-page>
+                        // Gah! Don't do a setStatus()!!!! Doing so breaks the HTTP status value for <error-page>
                         // declarations in the web.xml file.
                         //response.setStatus(HttpServletResponse.SC_OK);
 

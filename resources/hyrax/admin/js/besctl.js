@@ -31,7 +31,7 @@ function startBes(prefix,besctlUrl) {
 
 function startBes_worker(prefix,besctlUrl, stateChangeHandler) {
 
-    document.getElementById("asyncStatus").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
+    document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
     var startRequest = createRequest();
 
@@ -53,7 +53,7 @@ function stopBesNicely(prefix,besctlUrl) {
 function stopBesNicely_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 
 
-    var status = document.getElementById("asyncStatus");
+    var status = document.getElementById("status");
     status.innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
     var stopRequest = createRequest();
@@ -61,25 +61,25 @@ function stopBesNicely_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 
     if(isAsync) {
         status.innerHTML = "Is Async";
-        //alert(asyncStatus.innerHTML.valueOf());
+        //alert(status.innerHTML.valueOf());
         stopRequest.open("GET", url, true);
         stopRequest.onreadystatechange = function() { stateChangeHandler(stopRequest); };
         stopRequest.send(null);
     }
     else {
         status.innerHTML = "Is Sync";
-        //alert(asyncStatus.innerHTML.valueOf());
+        //alert(status.innerHTML.valueOf());
         stopRequest.open("GET", url, false);
         stopRequest.send(null);
         status.innerHTML = "<pre> "+stopRequest.responseText+"</pre>";
-        //alert(asyncStatus.innerHTML.valueOf());
+        //alert(status.innerHTML.valueOf());
         //stateChangeHandler(request);
     }
 }
 
 
 function stopBesNow(prefix,besctlUrl) {
-    document.getElementById("asyncStatus").innerHTML = "<pre> Stopping BES '"+prefix+"' NOW.</pre>";
+    document.getElementById("status").innerHTML = "<pre> Stopping BES '"+prefix+"' NOW.</pre>";
     var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
     var request = createRequest();
 
@@ -100,7 +100,7 @@ function getBesConfig(module,prefix,besctlUrl) {
 
 function setBesConfig(module,prefix,besctlUrl) {
 
-    document.getElementById("asyncStatus").innerHTML = "<pre> Setting configuration for "+module+"</pre>";
+    document.getElementById("status").innerHTML = "<pre> Setting configuration for "+module+"</pre>";
 
     var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=setConfig";
 
@@ -122,7 +122,7 @@ function setBesConfig(module,prefix,besctlUrl) {
 
 
 function showBes() {
-    document.getElementById("asyncStatus").innerHTML="New BES TIME...";
+    document.getElementById("status").innerHTML="New BES TIME...";
 }
 
 
@@ -134,10 +134,10 @@ function updateBesConfig(request) {
         if (request.status == 200) {
 
             alert(request.responseText);
-            document.getElementById("asyncStatus").innerHTML = "<pre> "+request.responseText+"</pre>";
+            document.getElementById("status").innerHTML = "<pre> "+request.responseText+"</pre>";
 
         } else
-            alert("updateConfig(): Error! Hyrax returned an HTTP asyncStatus of " + request.status+" Along with the following content: "+request.responseText);
+            alert("updateConfig(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
     }
 }
 
@@ -175,7 +175,7 @@ function stopBesLogTailing() {
     stopUpdatingBesLogView = true;
     clearTimeout(besLogTailTimer);
     var d = new Date();
-    document.getElementById("asyncStatus").innerHTML =  d.toTimeString() + " "+
+    document.getElementById("status").innerHTML =  d.toTimeString() + " "+
             "The log viewer has been paused. " +
             "To begin viewing again, click the Start button.";
 
@@ -204,7 +204,7 @@ function getBesLog(logTailerUrl, besPrefix) {
 
     var d = new Date();
 
-    document.getElementById("asyncStatus").innerHTML = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
+    document.getElementById("status").innerHTML = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
 
 
@@ -232,7 +232,7 @@ function updateBesLogContent(request, url) {
 
 
         } else
-            alert("updateBesLogContent(): Error! BES log request returned HTTP asyncStatus of '" + request.status+"'  url: '"+url+"'");
+            alert("updateBesLogContent(): Error! BES log request returned HTTP status of '" + request.status+"'  url: '"+url+"'");
     }
 }
 
@@ -288,8 +288,8 @@ function commitBesLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
     var d = new Date();
     var status = "Enabling loggers: '"+enabled+"'\n Disabling loggers: '"+disabled+"'\n" +"   <a href='"+url+"'>"+url+"</a>";
-    //alert(asyncStatus);
-    document.getElementById("asyncStatus").innerHTML = status;
+    //alert(status);
+    document.getElementById("status").innerHTML = status;
 
     var setLoggerStatesRequest = createRequest();
     setLoggerStatesRequest.open("GET", url, true);
@@ -311,7 +311,7 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
 
             /* I worked this over to use a 'closure' function. This allows me to daisy chain the async AJAX calls
               and prevents commands from being sent in the wrong order. So StopNice is called and ONLY when it is
-              completed the closure function defined below is called. The closure function updates the asyncStatus block and
+              completed the closure function defined below is called. The closure function updates the status block and
               then calls start. Sweet! Right?
              */
 
@@ -323,13 +323,13 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
                 function(stopRequest) {
                     if (stopRequest.readyState == 4) {
                         if (stopRequest.status == 200) {
-                            var status = document.getElementById("asyncStatus");
+                            var status = document.getElementById("status");
                             status.innerHTML = "<pre> " + stopRequest.responseText + "</pre>";
 
                             //alert("About to start BES...");
                             //
                             // I used another closure here because I want to close the window after I start the BES.
-                            // To do this I need to ensure that the BES is started and all of the asyncStatus updates are
+                            // To do this I need to ensure that the BES is started and all of the status updates are
                             // done before I close the window. Failing to do this in a sequential order will crash the
                             // browser (or at least Safari)
                             startBes_worker(
@@ -340,13 +340,13 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
 
                                         if (startRequest.status == 200) {
 
-                                            var status = document.getElementById("asyncStatus");
+                                            var status = document.getElementById("status");
                                             status.innerHTML = "<pre> " + startRequest.responseText + "</pre>";
 
                                             self.close();
 
                                         } else {
-                                            alert("confirmCommit(stopBesNicely_worker(startBes_worker())): Error! Hyrax returned an HTTP asyncStatus of " + startRequest.status + " Along with the following content: " + startRequest.responseText);
+                                            alert("confirmCommit(stopBesNicely_worker(startBes_worker())): Error! Hyrax returned an HTTP status of " + startRequest.status + " Along with the following content: " + startRequest.responseText);
 
                                         }
                                     }
@@ -354,7 +354,7 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
                             );
                         }
                         else {
-                            alert("confirmCommit(stopBesNicely_worker()): Error! Hyrax returned an HTTP asyncStatus of " + stopRequest.status + " Along with the following content: " + stopRequest.responseText);
+                            alert("confirmCommit(stopBesNicely_worker()): Error! Hyrax returned an HTTP status of " + stopRequest.status + " Along with the following content: " + stopRequest.responseText);
                         }
 
                     }
@@ -364,12 +364,12 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
         }
         else {
             var d = new Date();
-            document.getElementById("asyncStatus").innerHTML = d.toTimeString() + " Logging Commit aborted!";
+            document.getElementById("status").innerHTML = d.toTimeString() + " Logging Commit aborted!";
         }
 
     }
     else {
-        alert("confirmCommit(): Error! Failed to set the BES logger state. Hyrax returned an Http Request asyncStatus of " + setLoggerStatesRequest.status);
+        alert("confirmCommit(): Error! Failed to set the BES logger state. Hyrax returned an Http Request status of " + setLoggerStatesRequest.status);
     }
 
 }
@@ -382,11 +382,11 @@ function updateStatus(request) {
 
         if (request.status == 200) {
 
-            var status = document.getElementById("asyncStatus");
+            var status = document.getElementById("status");
             status.innerHTML = request.responseText;
 
         } else
-            alert("updateStatus(): Error! Failed to get the BES logger state. Hyrax returned an Http Request asyncStatus of " + request.status);
+            alert("updateStatus(): Error! Failed to get the BES logger state. Hyrax returned an Http Request status of " + request.status);
     }
 }
 
@@ -396,12 +396,12 @@ function preformattedStatusUpdate(request) {
 
         if (request.status == 200) {
 
-            var status = document.getElementById("asyncStatus");
+            var status = document.getElementById("status");
             status.innerHTML = "<pre> "+request.responseText+"</pre>";
             //document.getElementById("besDetail").innerHTML = "<h1>Select BES to view...</h1>";
 
 
         } else
-            alert("preformattedStatusUpdate(): Error! Hyrax returned an HTTP asyncStatus of " + request.status+" Along with the following content: "+request.responseText);
+            alert("preformattedStatusUpdate(): Error! Hyrax returned an HTTP status of " + request.status+" Along with the following content: "+request.responseText);
     }
 }

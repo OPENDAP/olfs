@@ -51,7 +51,7 @@ function stopOlfsLogTailing() {
             "To begin viewing again, click the Start button.";
 
 
-    document.getElementById("asyncStatus").innerHTML = status;
+    document.getElementById("status").innerHTML = status;
 
 }
 
@@ -76,7 +76,7 @@ function getOlfsLog(olfsLogTailUrl) {
     var d = new Date();
     var status = d.toTimeString() + " Polling log: <a href='"+url+"'>"+url+"</a>";
 
-    document.getElementById("asyncStatus").innerHTML = status;
+    document.getElementById("status").innerHTML = status;
     var request = createRequest();
     request.open("GET", url, true);
     request.onreadystatechange = function(){ updateOlfsLoggerPage(request, olfsLogTailUrl) };
@@ -99,7 +99,7 @@ function updateOlfsLoggerPage(request, olfsLogTailUrl) {
 
 
         } else
-            alert("Error! Request asyncStatus is " + request.status);
+            alert("Error! Request status is " + request.status);
     }
 }
 
@@ -127,7 +127,7 @@ function setOlfsLogLevel(olfsCtlApi){
     var d = new Date();
     var status = d.toTimeString() + " Setting "+olfsLoggerName+" log level to "+olfsLoggerLevel+".   <a href='"+url+"'>"+url+"</a>";
 
-    document.getElementById("asyncStatus").innerHTML = status;
+    document.getElementById("status").innerHTML = status;
     var request = createRequest();
     request.open("GET", url, true);
     request.onreadystatechange = function() { updateStatus(request) };
@@ -146,7 +146,7 @@ function updateOlfsLogLevelSelection(olfsCtlApi) {
     var d = new Date();
     var status = d.toTimeString() + " Getting "+olfsLoggerName+" log level.   <a href='"+url+"'>"+url+"</a>";
 
-    document.getElementById("asyncStatus").innerHTML = status;
+    document.getElementById("status").innerHTML = status;
     var request = createRequest();
     request.open("GET", url, true);
     request.onreadystatechange = function() { updateOlfsLoggerLevel(request) };
@@ -164,7 +164,7 @@ function updateOlfsLoggerLevel(request) {
             olfsLoggerLevel.value = request.responseText;
 
         } else {
-            alert("Error! Request asyncStatus is " + request.status);
+            alert("Error! Request status is " + request.status);
         }
     }
 }
@@ -173,12 +173,12 @@ function updateStatus(request) {
     if (request.readyState == 4) {
         if (request.status == 200) {
 
-            logDiv = document.getElementById("asyncStatus");
+            logDiv = document.getElementById("status");
 
             logDiv.innerHTML = "<pre>"+request.responseText+"</pre>";
 
         } else
-            alert("Error! Request asyncStatus is " + request.status);
+            alert("Error! Request status is " + request.status);
     }
 }
 

@@ -1071,7 +1071,7 @@ public class RepositoryOps {
 
     }
     /**
-     * Introduce statement declaring upload_complete asyncStatus of the repository.
+     * Introduce statement declaring upload_complete status of the repository.
      *
      * 
      * @param repo - repository.
@@ -1098,7 +1098,7 @@ public class RepositoryOps {
         }
     }
     /**
-     * Introduce statement declaring upload_complete asyncStatus of the repository.
+     * Introduce statement declaring upload_complete status of the repository.
      *
      * 
      * @param con - connection to the repository.
@@ -1129,7 +1129,7 @@ public class RepositoryOps {
 
     }
     /**
-     * Remove statement declaring upload_complete asyncStatus of the repository.
+     * Remove statement declaring upload_complete status of the repository.
      */
     public  static void removeUploadComplete(Repository repo) throws InterruptedException{
             RepositoryConnection con = null;
@@ -1152,7 +1152,7 @@ public class RepositoryOps {
             }
     }
     /**
-     * Remove statement declaring upload_complete asyncStatus of the repository.
+     * Remove statement declaring upload_complete status of the repository.
      *
      * 
      * @param con - connection to the repository.

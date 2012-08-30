@@ -57,7 +57,7 @@ public class Terms {
     public static final SemanticResource lastModified = new SemanticResource(rdfCacheNamespace,"last_modified");
 
      /**
-     * is the property used to hold the asyncStatus of the repository.
+     * is the property used to hold the status of the repository.
      * When the repository is fully loaded, it is set to true.
      */
     public static final SemanticResource uploadComplete = new SemanticResource(rdfCacheNamespace,"upload_complete");

@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  * <li> help - returns the help page for Hyrax  </li>
  * <li> systemproperties - returns an html document describing the state of the "system" </li>
  * <li> debug -   </li>
- * <li> asyncStatus -    </li>
+ * <li> status -    </li>
  * </ui>
  * @deprecated
  */

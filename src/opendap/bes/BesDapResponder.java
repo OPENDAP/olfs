@@ -45,6 +45,7 @@ public abstract class BesDapResponder extends DapResponder {
      */
     @Override
     public boolean matches(String relativeUrl) {
+
         if (super.matches(relativeUrl)) {
 
             String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
