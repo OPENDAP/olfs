@@ -23,17 +23,18 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-function startBes(prefix,besctlUrl) {
+function startBes(prefix,besName,besctlUrl) {
 
-    startBes_worker(prefix,besctlUrl,preformattedStatusUpdate);
+    startBes_worker(prefix,besName,besctlUrl,preformattedStatusUpdate);
 
 }
 
-function startBes_worker(prefix,besctlUrl, stateChangeHandler) {
+function startBes_worker(prefix, besName, besctlUrl, stateChangeHandler) {
 
-    document.getElementById("status").innerHTML = "<pre> Starting BES '"+prefix+"'...</pre>";
-    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=Start";
+    document.getElementById("status").innerHTML = "<pre> Starting BES '"+besName+"' in BesGroup '"+prefix+"'...</pre>";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"besName="+besName+"&"+"cmd=Start";
     var startRequest = createRequest();
+    // alert("Start: \n stateChangeHandler: "+stateChangeHandler+"\n url: "+url);
 
     startRequest.open("GET", url, true);
     startRequest.onreadystatechange = function() { stateChangeHandler(startRequest); };
@@ -43,21 +44,21 @@ function startBes_worker(prefix,besctlUrl, stateChangeHandler) {
 
 
 
-function stopBesNicely(prefix,besctlUrl) {
+function stopBesNicely(prefix,besName,besctlUrl) {
 
 
-    stopBesNicely_worker(prefix,besctlUrl,true,preformattedStatusUpdate);
+    stopBesNicely_worker(prefix,besName,besctlUrl,true,preformattedStatusUpdate);
 
 }
 
-function stopBesNicely_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
+function stopBesNicely_worker(prefix, besName, besctlUrl, isAsync, stateChangeHandler) {
 
 
     var status = document.getElementById("status");
     status.innerHTML = "<pre> Gently stopping BES '"+prefix+"'...</pre>";
-    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNice";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"besName="+besName+"&"+"cmd=StopNice";
     var stopRequest = createRequest();
-    //alert("StopNice: \n stateChangeHandler: "+stateChangeHandler+"\n url: "+url);
+    // alert("StopNice: \n stateChangeHandler: "+stateChangeHandler+"\n url: "+url);
 
     if(isAsync) {
         status.innerHTML = "Is Async";
@@ -78,10 +79,11 @@ function stopBesNicely_worker(prefix,besctlUrl,isAsync, stateChangeHandler) {
 }
 
 
-function stopBesNow(prefix,besctlUrl) {
+function stopBesNow(prefix,besName, besctlUrl) {
     document.getElementById("status").innerHTML = "<pre> Stopping BES '"+prefix+"' NOW.</pre>";
-    var url = besctlUrl+"?prefix="+prefix+"&"+"cmd=StopNow";
+    var url = besctlUrl+"?prefix="+prefix+"&"+"besName="+besName+"&"+"cmd=StopNow";
     var request = createRequest();
+    // alert("StopNow: \n stateChangeHandler: "+stateChangeHandler+"\n url: "+url);
 
     request.open("GET", url, true);
     request.onreadystatechange = function() { preformattedStatusUpdate(request); };
@@ -89,8 +91,8 @@ function stopBesNow(prefix,besctlUrl) {
 
 }
 
-function getBesConfig(module,prefix,besctlUrl) {
-    var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=getConfig";
+function getBesConfig(module,prefix, besName,besctlUrl) {
+    var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"besName="+besName+"&"+"cmd=getConfig";
     var request = createRequest();
 
     request.open("GET", url, true);
@@ -98,11 +100,11 @@ function getBesConfig(module,prefix,besctlUrl) {
     request.send(null);
 }
 
-function setBesConfig(module,prefix,besctlUrl) {
+function setBesConfig(prefix,besName,module,besctlUrl) {
 
     document.getElementById("status").innerHTML = "<pre> Setting configuration for "+module+"</pre>";
 
-    var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"cmd=setConfig";
+    var url = besctlUrl+"?module="+module+"&"+"prefix="+prefix+"&"+"besName="+besName+"&"+"cmd=setConfig";
 
     var configElement =   document.getElementById("besConfiguration");
 
@@ -148,15 +150,16 @@ function updateBesConfig(request) {
 
 
 
-var besLogUrl;
-var logBesPrefix;
+//var besLogUrl;
+//var logBesPrefix;
+//var logBesName;
 
 var stopUpdatingBesLogView;
 var besLogTailTimer;
-var besLoggingStarted = false;;
+var besLoggingStarted = false;
 
 
-function startBesLogTailing(tailURL,besPrefix) {
+function startBesLogTailing(besApiUrl,besPrefix,besName) {
 
     if(!besLoggingStarted){
         // Make sure that log viewing is enabled.
@@ -164,7 +167,7 @@ function startBesLogTailing(tailURL,besPrefix) {
         besLoggingStarted = true;
 
         // Go get the log and start the log tailing cycle.
-        getBesLog(tailURL,besPrefix);
+        getBesLog(besApiUrl,besPrefix,besName);
     }
 }
 
@@ -188,17 +191,15 @@ function stopBesLogTailing() {
  * @param besLogUrl
  * @param besPrefix
  */
-function getBesLog(logTailerUrl, besPrefix) {
+function getBesLog(besApiUrl, besPrefix, besName) {
 
-    besLogUrl = logTailerUrl;
-    logBesPrefix = besPrefix;
 
     var logLines = document.getElementById("logLines").value;
 
     if(logLines=="all")
         logLines=0;
 
-    var url = besLogUrl+"?cmd=getLog&prefix="+besPrefix+"&lines="+logLines;
+    var url = constructBesLogTailUrl(besApiUrl, besPrefix, besName, logLines);
 
     //alert(url);
 
@@ -213,13 +214,17 @@ function getBesLog(logTailerUrl, besPrefix) {
     // getBesLog() )
     var request = createRequest();
     request.open("GET", url, true);
-    request.onreadystatechange = function() { updateBesLogContent(request, url); };
+    request.onreadystatechange = function() { updateBesLogContent(request, besApiUrl, besPrefix, besName); };
     request.send(null);
+}
+
+function constructBesLogTailUrl(besApiUrl, besPrefix, besName, lineCount){
+    return besApiUrl+"?cmd=getLog&prefix="+besPrefix+"&besName="+besName+"&lines="+lineCount;
 }
 
 
 
-function updateBesLogContent(request, url) {
+function updateBesLogContent(request, besApiUrl, besPrefix, besName) {
     if (request.readyState == 4) {
         if (request.status == 200) {
 
@@ -228,20 +233,21 @@ function updateBesLogContent(request, url) {
             logDiv.innerHTML = "<pre>"+request.responseText+"</pre>" ;
 
             // Now that we have the log and have updated the display, start the cycle again...
-            besLogTail_worker(besLogUrl, logBesPrefix);
+            besLogTail_worker(besApiUrl, besPrefix, besName);
 
 
         } else
-            alert("updateBesLogContent(): Error! BES log request returned HTTP status of '" + request.status+"'  url: '"+url+"'");
+            alert("updateBesLogContent(): Error! BES log request returned HTTP status of '" + request.status+"'  url: '"+request.url+"'");
     }
 }
 
 
-function besLogTail_worker(tailURL,besPrefix) {
+function besLogTail_worker(besApiUrl, besPrefix, besName) {
 
     // When the timeout expires getBesLog will be called...
-    if(!stopUpdatingBesLogView)
-        besLogTailTimer = setTimeout("getBesLog('"+tailURL+"','"+besPrefix+"')", 1000);
+    if(!stopUpdatingBesLogView) {
+        besLogTailTimer = setTimeout(function(){getBesLog(besApiUrl,besPrefix,besName)},1000);
+    }
 }
 
 
@@ -260,7 +266,7 @@ function launchBesLoggingConfigurationWindow(logConfigUrl, name, size){
     window.open(logConfigUrl, name, size);
 }
 
-function commitBesLoggingChanges(besCtlApi, besPrefix, loggerSelect){
+function commitBesLoggingChanges(besCtlApi, besPrefix, besName, loggerSelect){
 
 
     var enabled = "";
@@ -282,24 +288,24 @@ function commitBesLoggingChanges(besCtlApi, besPrefix, loggerSelect){
 
     }
 
-    var url = besCtlApi+"?prefix="+besPrefix+"&cmd=setLoggerStates&enable="+enabled+"&disable="+disabled;
+    var url = besCtlApi+"?prefix="+besPrefix+"&besName="+besName+"&cmd=setLoggerStates&enable="+enabled+"&disable="+disabled;
 
 
 
     var d = new Date();
-    var status = "Enabling loggers: '"+enabled+"'\n Disabling loggers: '"+disabled+"'\n" +"   <a href='"+url+"'>"+url+"</a>";
+    var status = "BesGroup: '"+besPrefix+"' Bes: '"+besName+"'-- Enabling loggers: '"+enabled+"'\n Disabling loggers: '"+disabled+"'\n" +"   <a href='"+url+"'>"+url+"</a>";
     //alert(status);
     document.getElementById("status").innerHTML = status;
 
     var setLoggerStatesRequest = createRequest();
     setLoggerStatesRequest.open("GET", url, true);
-    setLoggerStatesRequest.onreadystatechange = function() {confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerStatesRequest); };
+    setLoggerStatesRequest.onreadystatechange = function() {confirmBesLoggingConfigurationCommit(besPrefix,besName,besCtlApi,setLoggerStatesRequest); };
     setLoggerStatesRequest.send(null);
 
 
 }
 
-function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerStatesRequest) {
+function confirmBesLoggingConfigurationCommit(besPrefix,besName,besCtlApi,setLoggerStatesRequest) {
 
     if (setLoggerStatesRequest.readyState != 4)
         return;
@@ -318,6 +324,7 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
 
             stopBesNicely_worker(
                 besPrefix,
+                besName,
                 besCtlApi,
                 true,
                 function(stopRequest) {
@@ -334,6 +341,7 @@ function confirmBesLoggingConfigurationCommit(besPrefix,besCtlApi,setLoggerState
                             // browser (or at least Safari)
                             startBes_worker(
                                 besPrefix,
+                                besName,
                                 besCtlApi,
                                 function(startRequest) {
                                     if (startRequest.readyState == 4) {

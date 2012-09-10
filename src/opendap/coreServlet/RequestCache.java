@@ -72,13 +72,8 @@ public class RequestCache {
     }
 
 
-    public static void startRequest(){
-        HashMap<String, CachedObj> hm = new HashMap<String, CachedObj>();
-        cache.put(Thread.currentThread(),hm);
-        log.info("Created request cache for thread: "+Thread.currentThread());
-    }
 
-    public static void startRequestIfNeeded(){
+    public static void openThreadCache(){
 
         if(cache.containsKey(Thread.currentThread())){
             log.info("Request cache for thread: "+Thread.currentThread() +
@@ -91,7 +86,7 @@ public class RequestCache {
         log.info("Created request cache for thread: "+Thread.currentThread());
     }
 
-    public static void endRequest(){
+    public static void closeThreadCache(){
         cache.remove(Thread.currentThread());
         log.info("Destroyed request cache for thread: "+Thread.currentThread());
     }
@@ -145,6 +140,10 @@ public class RequestCache {
     public static Object get(String key){
 
         HashMap<String, CachedObj> hm = cache.get(Thread.currentThread());
+
+        //if(hm==null)
+        //    return null;
+
         CachedObj co = hm.get(key);
 
 

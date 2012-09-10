@@ -32,7 +32,6 @@ import java.util.Vector;
 import java.util.List;
 
 import opendap.coreServlet.DispatchHandler;
-import opendap.coreServlet.DispatchServlet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 public class BESManager implements DispatchHandler {
 
 
-    private static Vector<BES> _besCollection;
+    private static Vector<BesGroup> _besCollection;
 
     private static boolean _isConfigured = false;
 
@@ -109,11 +108,11 @@ public class BESManager implements DispatchHandler {
 
 
 
-    public static void configure(Element besConfiguration) throws Exception {
+    public void configure(Element besConfiguration) throws Exception {
 
         if(_isConfigured) return;
 
-        _besCollection  = new Vector<BES>();
+        _besCollection  = new Vector<BesGroup>();
 
         List besList = besConfiguration.getChildren("BES");
 
@@ -132,9 +131,17 @@ public class BESManager implements DispatchHandler {
             besConfig   = new BESConfig(besConfigElement);
             bes = new BES(besConfig);
 
-            _besCollection.add(bes);
+            BesGroup groupForThisPrefix = getBesGroup(bes.getPrefix());
 
-            if(bes.getPrefix().equals("/"))
+            if(groupForThisPrefix == null){
+                groupForThisPrefix = new BesGroup(bes.getPrefix());
+                _besCollection.add(groupForThisPrefix);
+            }
+
+            groupForThisPrefix.add(bes);
+
+
+            if(groupForThisPrefix.getGroupPrefix().equals("/"))
                 foundRootBES = true;
         }
 
@@ -163,7 +170,9 @@ public class BESManager implements DispatchHandler {
 
 
 
-    public static BES getBES(String path){
+
+
+    public static BES getBES(String path) {
 
         if(path==null)
             path = "/";
@@ -173,28 +182,66 @@ public class BESManager implements DispatchHandler {
             path = "/"+path;
         }
 
-        BES result = null;
+        BesGroup besGroupToServicePath = null;
         String prefix;
-        for(BES bes : _besCollection){
-            prefix = bes.getPrefix();
+        for(BesGroup besGroup : _besCollection){
+            prefix = besGroup.getGroupPrefix();
+
+            if(path.indexOf(prefix) == 0){
+                if(besGroupToServicePath == null){
+                    besGroupToServicePath = besGroup;
+                }
+                else {
+                    if(prefix.length() > besGroupToServicePath.getGroupPrefix().length())
+                        besGroupToServicePath = besGroup;
+                }
+
+            }
+        }
+
+        if(besGroupToServicePath==null)
+            return null;
+        else
+            return besGroupToServicePath.getNext();
+
+    }
+
+
+
+
+
+    public static BesGroup getBesGroup(String path){
+
+        if(path==null)
+            path = "/";
+
+        if(path.indexOf("/")!=0){
+            log.debug("Pre-pending / to path: "+ path);
+            path = "/"+path;
+        }
+
+        BesGroup result = null;
+        String prefix;
+        for(BesGroup besGroup : _besCollection){
+            prefix = besGroup.getGroupPrefix();
 
             if(path.indexOf(prefix) == 0){
                 if(result == null){
-                    result = bes;
+                    result = besGroup;
                 }
                 else {
-                    if(prefix.length() > result.getPrefix().length())
-                        result = bes;
+                    if(prefix.length() > result.getGroupPrefix().length())
+                        result = besGroup;
                 }
 
             }
         }
 
         return result;
-
     }
 
-    public static Iterator<BES> getBES(){
+
+    public static Iterator<BesGroup> getBesGroups(){
 
         return _besCollection.listIterator();
 
@@ -202,11 +249,11 @@ public class BESManager implements DispatchHandler {
 
 
     public static void shutdown(){
-        for(BES bes : _besCollection){
-            log.debug("Shutting down BesPool " + bes);
-            bes.destroy();
+        for(BesGroup besGroup : _besCollection){
+            log.debug("Shutting down BesGroup for prefix '" + besGroup.getGroupPrefix()+"'");
+            besGroup.destroy();
         }
-        log.debug("All BesPools have been shut down.");
+        log.debug("All BesGroup's have been shut down.");
 
     }
 
@@ -219,11 +266,12 @@ public class BESManager implements DispatchHandler {
         doc.setRootElement(new Element("OPeNDAP-Version"));
         Element besVer;
         Document tmp;
-        for (BES bes : _besCollection) {
-            tmp = bes.getVersionDocument();
-            besVer = tmp.getRootElement();
-            besVer.detach();
-            doc.getRootElement().addContent(besVer);
+
+        for(BesGroup besGroup : _besCollection){
+
+            Document besGroupVerDoc = besGroup.getGroupVersion();
+            doc.getRootElement().addContent(besGroupVerDoc.detachRootElement());
+
         }
 
         // Add a version element for this, the OLFS server
@@ -238,9 +286,21 @@ public class BESManager implements DispatchHandler {
 
 
 
-    public static Document getVersionDocument(String path) throws Exception {
+    public static Document getGroupVersionDocument(String path) throws Exception {
 
-        return getBES(path).getVersionDocument();
+        return getBesGroup(path).getGroupVersion();
+
+
+    }
+
+    public static Document getVersionDocument(String path, String besName) throws Exception {
+
+        BesGroup besGroup = getBesGroup(path);
+        BES bes =  besGroup.get(besName);
+
+        return bes.getVersionDocument();
+
+
     }
 
 

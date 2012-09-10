@@ -241,7 +241,7 @@ public class ChunkedInputStream  {
                         (isError?errStream:dStream).write(buffer,0,bytesReceived);
                         (isError?errStream:dStream).flush();
 
-                        // update the read pointer.show veriosn
+                        // update the read pointer.
                         chunkReadPosition += bytesReceived;
                         break;
 

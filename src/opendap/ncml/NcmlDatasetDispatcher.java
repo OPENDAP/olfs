@@ -64,8 +64,26 @@ public class NcmlDatasetDispatcher extends DapDispatcher {
 
         NcmlDatasetBesApi besApi = new NcmlDatasetBesApi();
 
+
+        ingestConfig(config);
+
         init(servlet, config ,besApi);
 
+    }
+
+
+    private void ingestConfig(Element config){
+
+        _config = config;
+        Element PreloadNcmlIntoBes = _config.getChild("PreloadNcmlIntoBes");
+        if(PreloadNcmlIntoBes!=null){
+            String value = PreloadNcmlIntoBes.getTextNormalize();
+            if(value.equalsIgnoreCase("true"))
+                NcmlManager.setPreloadBes(true);
+
+            log.debug("Pre-Load Catalog NcML into BES: ",NcmlManager.preloadBes());
+
+        }
     }
 
 

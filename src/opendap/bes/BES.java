@@ -25,20 +25,16 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.OPeNDAPException;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.io.IOException;
 
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
@@ -178,6 +174,14 @@ public class BES {
     public String getPrefix() {
         return _config.getPrefix();
     }
+
+    public String getNickName() {
+        return _config.getBesName();
+    }
+    public void setNickName(String name) {
+        _config.setBesName(name);
+    }
+
 
     public int getMaxClients() {
         return _config.getMaxClients();
@@ -641,6 +645,214 @@ public class BES {
 
 
     /**
+     * The name of the BES Exception Element.
+     */
+    private static String BES_ERROR = "BESError";
+
+
+    /**
+     * Executes a command/response transaction with the BES
+     *
+     * @param request   The BES request document.
+     * @param response  The document into which the BES response will be placed. If the passed Document object contains
+     * conent, then the content will be discarded.
+     * @return true if the request is successful, false if there is a problem fulfilling the request.
+     * @throws IOException
+     * @throws PPTException
+     * @throws BadConfigurationException
+     * @throws JDOMException
+     */
+    public boolean besTransaction(Document request, Document response )
+            throws IOException, PPTException, BadConfigurationException, JDOMException {
+
+
+        boolean trouble = false;
+        Document doc;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+        SAXBuilder sb = new SAXBuilder();
+
+        OPeNDAPClient oc = getClient();
+
+        try {
+
+            if(oc.sendRequest(request,baos,erros)){
+
+                log.debug("BES returned this document:\n" +
+                        "-----------\n" + baos + "-----------");
+
+                if(baos.size() != 0){
+
+                    doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
+
+                    // Get the root element.
+                    Element root = doc.getRootElement();
+
+                    // Detach it from the document
+                    root.detach();
+
+                    // Pitch the root element that came with the passed catalog.
+                    // (There may not be one but whatever...)
+                    response.detachRootElement();
+
+                    // Set the root element to be the one sent from the BES.
+                    response.setRootElement(root);
+                }
+
+                return true;
+
+            }
+            else {
+
+                log.debug("BES returned this ERROR document:\n" +
+                        "-----------\n" + erros + "-----------");
+
+
+                if(erros.size()!=0){
+                    doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
+
+                    Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
+
+                    Element err;
+                    if(i.hasNext()){
+                        err = (Element)i.next();
+                    }
+                    else {
+                        err = doc.getRootElement();
+                    }
+
+                    err.detach();
+                    response.detachRootElement();
+                    response.setRootElement(err);
+
+                }
+                else {
+                    // Build and return an error object for the BES that isn't sending back stuff
+                    String reqId = request.getRootElement().getAttributeValue("reqID");
+                    Element errResponseElement = getMissingBesResponseError(reqId);
+                    response.setRootElement(errResponseElement);
+                }
+
+                return false;
+
+            }
+
+
+        }
+        catch (PPTException e) {
+
+            trouble = true;
+
+            log.debug("OLFS Encountered a PPT Problem!",e);
+            //e.printStackTrace();
+
+            String msg = "besTransaction() Problem with OPeNDAPClient. " +
+                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
+
+            log.error(msg);
+            throw new PPTException(msg);
+        }
+        finally {
+            returnClient(oc, trouble);
+            log.debug("besTransaction complete.");
+        }
+
+
+    }
+
+    String showRequest(Document request) throws IOException{
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(request);
+
+    }
+
+    private Element getMissingBesResponseError(String reqId){
+
+
+        Element errorResponse = new Element("response",BES_NS);
+        Element bes       = new Element("BES",BES_NS);
+        Element besError  = new Element("BESError",BES_NS);
+        Element type      = new Element("Type",BES_NS);
+        Element message   = new Element("Message",BES_NS);
+        Element admin     = new Element("Administrator",BES_NS);
+
+        errorResponse.addNamespaceDeclaration(BES_NS);
+        errorResponse.setAttribute("reqID", reqId);
+
+        type.setText("1");
+        message.setText("BES returned an empty error document! That's a bad thing!");
+        admin.setText("UNKNOWN Administrator - BES Error response was empty!");
+
+        besError.addContent(type);
+        besError.addContent(message);
+        besError.addContent(admin);
+        bes.addContent(besError);
+
+        errorResponse.addContent(bes);
+
+        return errorResponse;
+
+
+    }
+
+
+    /**
+     * Executes a command/response transaction with the BES
+     *
+     * @param request   The BES request document.
+     * @param os   The outputstream to write the BES response to.
+     * @param err  The output stream to which BES errors should be written
+     * @return true if the request is successful, false if there is a problem fulfilling the request. If false, then
+     * any error information will be written to the OutputStream err.
+     * @throws BadConfigurationException
+     * @throws IOException
+     * @throws PPTException
+     */
+    public boolean besTransaction(Document request,
+                                             OutputStream os,
+                                             OutputStream err)
+            throws BadConfigurationException, IOException, PPTException {
+
+
+
+        log.debug("besTransaction() started.");
+        log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
+
+
+        boolean besTrouble = false;
+
+
+        OPeNDAPClient oc = getClient();
+
+
+        try {
+            return oc.sendRequest(request,os,err);
+
+        }
+        catch (PPTException e) {
+
+            // e.printStackTrace();
+            besTrouble = true;
+
+            String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
+                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
+            log.error(msg);
+
+            throw new PPTException(msg,e);
+        }
+        finally {
+            returnClient(oc, besTrouble);
+            log.debug("besGetTransaction complete.");
+
+        }
+
+    }
+
+
+
+    /**
      * @throws IOException
      * @throws PPTException
      * @throws BadConfigurationException
@@ -657,6 +869,17 @@ public class BES {
 
         Document version = new Document();
 
+
+        OPeNDAPClient oc = getClient();
+
+
+
+
+
+
+
+
+
         BesApi besApi = new BesApi();
 
         if (besApi.getVersion(getPrefix(), version)) {
@@ -670,6 +893,8 @@ public class BES {
 
             ver.setName("BES");
             ver.setAttribute("prefix", getPrefix());
+            if(getNickName()!=null)
+                ver.setAttribute("name",getNickName());
 
             version.detachRootElement();
             version.setRootElement(ver);
@@ -772,7 +997,11 @@ public class BES {
                 // Add it to the client pool
                 try {
                     _clientsMapLock.lock();
-                    clientId = "besC-" + totalClients;
+                    if(getNickName()==null)
+                        clientId = "besC-" + totalClients;
+                    else
+                        clientId = getNickName()+":" + totalClients;
+
                     besClient.setID(clientId);
                     _clients.put(clientId, besClient);
                     totalClients++;

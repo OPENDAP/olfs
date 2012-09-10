@@ -120,8 +120,8 @@ public class BesApi {
     }
 
 
-    public Document getVersionDocument(String path) throws Exception {
-        return BESManager.getVersionDocument(path);
+    public Document getGroupVersionDocument(String path) throws Exception {
+        return BESManager.getGroupVersionDocument(path);
     }
 
     public Document getCombinedVersionDocument() throws Exception {
@@ -532,7 +532,7 @@ public class BesApi {
 
 
     /**
-     * Returns the BES verion document for the BES serving the passed
+     * Returns the BES version document for the BES serving the passed
      * dataSource.
      *
      * @param dataSource The data source whose information is to be retrieved
@@ -581,7 +581,7 @@ public class BesApi {
 
         boolean ret;
 
-        String responseCacheKey = this.getClass().getName()+".showCatalog(\""+dataSource+"\")";
+        String responseCacheKey = this.getClass().getName()+".getCatalog(\""+dataSource+"\")";
 
         log.info("getCatalog(): Looking for cached copy of BES showCatalog response for responseCacheKey=\""+responseCacheKey+"\"");
 
@@ -818,107 +818,6 @@ public class BesApi {
     }
 
 
-    /**
-     * Executes a command/response transaction with the BES
-     *
-     * @param bes  The BES to which the request must be sent.
-     * @param request   The BES request document.
-     * @param response  The document into which the BES response will be placed. If the passed Document object contains
-     * conent, then the content will be discarded.
-     * @return true if the request is successful, false if there is a problem fulfilling the request.
-     * @throws IOException
-     * @throws PPTException
-     * @throws BadConfigurationException
-     * @throws JDOMException
-     */
-    public boolean besTransaction( BES bes,
-                                           Document request,
-                                           Document response
-                                            )
-            throws IOException, PPTException, BadConfigurationException, JDOMException {
-
-
-        boolean trouble = false;
-        Document doc;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-        SAXBuilder sb = new SAXBuilder();
-
-        OPeNDAPClient oc = bes.getClient();
-
-        try {
-
-            if(oc.sendRequest(request,baos,erros)){
-
-                log.debug("BES returned this document:\n" +
-                        "-----------\n" + baos + "-----------");
-
-                doc = sb.build(new ByteArrayInputStream(baos.toByteArray()));
-
-                // Get the root element.
-                Element root = doc.getRootElement();
-
-                // Detach it from the document
-                root.detach();
-
-                // Pitch the root element that came with the passed catalog.
-                // (There may not be one but whatever...)
-                response.detachRootElement();
-
-                // Set the root element to be the one sent from the BES.
-                response.setRootElement(root);
-
-                return true;
-
-            }
-            else {
-
-                log.debug("BES returned this ERROR document:\n" +
-                        "-----------\n" + erros + "-----------");
-
-                doc = sb.build(new ByteArrayInputStream(erros.toByteArray()));
-
-                Iterator i  = doc.getDescendants(new ElementFilter(BES_ERROR));
-
-                Element err;
-                if(i.hasNext()){
-                    err = (Element)i.next();
-                }
-                else {
-                    err = doc.getRootElement();
-                }
-
-                err.detach();
-                response.detachRootElement();
-                response.setRootElement(err);
-                return false;
-
-            }
-
-
-        }
-        catch (PPTException e) {
-
-            trouble = true;
-
-            log.debug("OLFS Encountered a PPT Problem!",e);
-            //e.printStackTrace();
-
-            String msg = "besTransaction() Problem with OPeNDAPClient. " +
-                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
-
-            log.error(msg);
-            throw new PPTException(msg);
-        }
-        finally {
-            bes.returnClient(oc, trouble);
-            log.debug("besTransaction complete.");
-        }
-
-
-    }
-
 
 
     /**
@@ -945,12 +844,6 @@ public class BesApi {
         log.debug("besTransaction started.");
         log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
 
-        boolean trouble = false;
-        Document doc;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-        SAXBuilder sb = new SAXBuilder();
 
         BES bes = BESManager.getBES(dataSource);
 
@@ -960,7 +853,7 @@ public class BesApi {
             throw new BadConfigurationException(msg);
         }
 
-        return besTransaction(bes,request,response);
+        return bes.besTransaction(request,response);
 
 
     }
@@ -993,34 +886,14 @@ public class BesApi {
         log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
 
 
-        boolean besTrouble = false;
         BES bes = BESManager.getBES(dataSource);
         if (bes == null)
             throw new BadConfigurationException("There is no BES to handle the requested data source: " + dataSource);
 
-        OPeNDAPClient oc = bes.getClient();
 
 
-        try {
-            return oc.sendRequest(request,os,err);
+        return bes.besTransaction(request, os, err);
 
-        }
-        catch (PPTException e) {
-
-            // e.printStackTrace();
-            besTrouble = true;
-
-            String msg = "besGetTransaction()  Problem encountered with OPeNDAPCLient. " +
-                    "OPeNDAPClient executed " + oc.getCommandCount() + " commands";
-            log.error(msg);
-
-            throw new PPTException(msg,e);
-        }
-        finally {
-            bes.returnClient(oc, besTrouble);
-            log.debug("besGetTransaction complete.");
-
-        }
 
     }
 

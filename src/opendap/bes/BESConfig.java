@@ -47,13 +47,17 @@ public class BESConfig  {
 
     private  Logger log;
 
-    private  String    _BESHost;
-    private  int       _BESPort;
-    private  int       _BESAdminPort;
-    private  int       _BESMaxClients;
-    private  int       _BESMaxCommands;
-    private  int       _BESMaxResponseSize;
-    private  String    _BESPrefix;
+    private  String  _BesHost;
+    private  int     _BesPort;
+    private  int     _BesAdminPort;
+    private  int     _BesMaxClients;
+    private  int     _BesMaxCommands;
+    private  int     _BesMaxResponseSize;
+    private  String  _BesPrefix;
+
+    private  String  _BesNickName;
+
+
     //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
 
@@ -61,13 +65,14 @@ public class BESConfig  {
     private BESConfig() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        _BESHost = "HostNameIsNotSet!";
-        _BESPort = -1;
-        _BESAdminPort = -1;
-        _BESMaxClients = 10;
-        _BESMaxCommands = 2000;
-        _BESPrefix = "/";
-        _BESMaxResponseSize = 0;
+        _BesHost = "HostNameIsNotSet!";
+        _BesPort = -1;
+        _BesAdminPort = -1;
+        _BesMaxClients = 10;
+        _BesMaxCommands = 2000;
+        _BesPrefix = "/";
+        _BesMaxResponseSize = 0;
+        _BesNickName = null;
     }
 
     public BESConfig(Document besConfiguration) throws Exception{
@@ -89,13 +94,14 @@ public class BESConfig  {
 
         BESConfig copy = new BESConfig();
 
-        copy._BESHost        = _BESHost;
-        copy._BESPort        = _BESPort;
-        copy._BESAdminPort   = _BESAdminPort;
-        copy._BESMaxResponseSize   = _BESMaxResponseSize;
-        copy._BESMaxClients  = _BESMaxClients;
-        copy._BESMaxCommands = _BESMaxCommands;
-        copy._BESPrefix      = _BESPrefix;
+        copy._BesHost            = _BesHost;
+        copy._BesPort            = _BesPort;
+        copy._BesAdminPort       = _BesAdminPort;
+        copy._BesMaxResponseSize = _BesMaxResponseSize;
+        copy._BesMaxClients      = _BesMaxClients;
+        copy._BesMaxCommands     = _BesMaxCommands;
+        copy._BesPrefix          = _BesPrefix;
+        copy._BesNickName        = _BesNickName;
 
         return copy;
     }
@@ -262,17 +268,32 @@ public class BESConfig  {
 
 
 
+        String besName = besConfig.getAttributeValue("name");
+        if( besName!=null ){
+            setBesName(besName);
+        }
+
+        log.info("BES nickName set to {}", getBesName());
+
 
     }
 
+
+    public void setBesName(String nickName){
+        _BesNickName = nickName;
+    }
+
+    public String getBesName(){
+        return _BesNickName;
+    }
 
 
     public void setMaxCommands(int max){
-        _BESMaxCommands = max;
+        _BesMaxCommands = max;
     }
 
     public int getMaxCommands(){
-        return _BESMaxCommands;
+        return _BesMaxCommands;
     }
 
 
@@ -327,8 +348,8 @@ public class BESConfig  {
 
 
         Element clientPool = new Element("ClientPool");
-        clientPool.setAttribute("maximum",Integer.toString(_BESMaxClients));
-        clientPool.setAttribute("maxCmds",Integer.toString(_BESMaxCommands));
+        clientPool.setAttribute("maximum",Integer.toString(_BesMaxClients));
+        clientPool.setAttribute("maxCmds",Integer.toString(_BesMaxCommands));
 
         bes.addContent(prefix);
         bes.addContent(host);
@@ -344,31 +365,31 @@ public class BESConfig  {
 
 
 
-    public void setHost(String host){ _BESHost = host; }
-    public String getHost(){ return _BESHost; }
+    public void setHost(String host){ _BesHost = host; }
+    public String getHost(){ return _BesHost; }
 
 
-    public void setPort(String port){ _BESPort = Integer.parseInt(port); }
-    public void setPort(int port){ _BESPort = port; }
-    public int getPort() { return _BESPort; }
+    public void setPort(String port){ _BesPort = Integer.parseInt(port); }
+    public void setPort(int port){ _BesPort = port; }
+    public int getPort() { return _BesPort; }
 
-    public void setAdminPort(String port){ _BESAdminPort = Integer.parseInt(port); }
-    public void setAdminPort(int port){ _BESAdminPort = port; }
-    public int getAdminPort() { return _BESAdminPort; }
+    public void setAdminPort(String port){ _BesAdminPort = Integer.parseInt(port); }
+    public void setAdminPort(int port){ _BesAdminPort = port; }
+    public int getAdminPort() { return _BesAdminPort; }
 
-    public void setMaxResponseSize(String maxResponseSize){ _BESMaxResponseSize = Integer.parseInt(maxResponseSize); }
-    public void setMaxResponseSize(int maxResponseSize){ _BESMaxResponseSize = maxResponseSize; }
-    public int getMaxResponseSize() { return _BESMaxResponseSize; }
-
-
-    public void setPrefix(String prefix){ _BESPrefix = prefix; }
-    public String getPrefix() { return _BESPrefix; }
+    public void setMaxResponseSize(String maxResponseSize){ _BesMaxResponseSize = Integer.parseInt(maxResponseSize); }
+    public void setMaxResponseSize(int maxResponseSize){ _BesMaxResponseSize = maxResponseSize; }
+    public int getMaxResponseSize() { return _BesMaxResponseSize; }
 
 
+    public void setPrefix(String prefix){ _BesPrefix = prefix; }
+    public String getPrefix() { return _BesPrefix; }
 
-    public void setMaxClients(String i){ _BESMaxClients = Integer.parseInt(i);   }
-    public void setMaxClients(int i){ _BESMaxClients = i;   }
-    public int getMaxClients(){ return _BESMaxClients;  }
+
+
+    public void setMaxClients(String i){ _BesMaxClients = Integer.parseInt(i);   }
+    public void setMaxClients(int i){ _BesMaxClients = i;   }
+    public int getMaxClients(){ return _BesMaxClients;  }
 
 
 
