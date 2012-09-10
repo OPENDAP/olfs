@@ -67,9 +67,10 @@ public class XmlData extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/xml-data#");
-        setServiceTitle("XML Data Response");
-        setServiceDescription("An XML document containing both the dataset's structural metadata along with data values.");
+        setServiceRoleId("http://services.opendap.org/dap2/xml-data");
+        setServiceMediaType("text/xml");
+        setServiceTitle("DAP2 XML Data Response");
+        setServiceDescription("An XML document containing both the DAP2 dataset's structural metadata along with data values.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_XML_Data_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
 
@@ -103,7 +104,7 @@ public class XmlData extends BesDapResponder {
                     "    CE: '" + constraintExpression + "'");
 
 
-        response.setContentType("text/xml");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...

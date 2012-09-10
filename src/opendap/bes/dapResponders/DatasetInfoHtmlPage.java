@@ -64,9 +64,10 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap2/info#");
-        setServiceTitle("INFO");
-        setServiceDescription("OPeNDAP Dataset Information Page.");
+        setServiceRoleId("http://services.opendap.org/dap2/info");
+        setServiceMediaType("text/html");
+        setServiceTitle("DAP2 INFO");
+        setServiceDescription("DAP2 Dataset Information HTML Page.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Info_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
@@ -91,7 +92,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
 
         log.debug("sendINFO() for dataset: " + dataSource);
 
-        response.setContentType("text/html");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...

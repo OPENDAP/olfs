@@ -1,6 +1,7 @@
 package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
+import opendap.namespaces.DAP;
 import opendap.namespaces.XLINK;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public abstract class DapResponder extends HttpResponder  {
     private String _serviceDescription = null;
     private String _serviceDescriptionLink = null;
     private String _preferredServiceSuffix = null;
+    private String _serviceMediaType = null;
 
 
     public DapResponder(String sysPath, String requestSuffix) {
@@ -106,21 +108,19 @@ public abstract class DapResponder extends HttpResponder  {
         String suffix = getPreferredServiceSuffix();
         role_id = getServiceRoleId();
         String title = getServiceTitle();
-        service = new org.jdom.Element("Service");
+        service = new org.jdom.Element("Service", DAP.DAPv40_DatasetServices_NS);
         service.setAttribute("title",title);
-        //service.setAttribute("suffix",suffix);
-        service.setAttribute("href",datasetUrl+suffix, XLINK.NS);
-        service.setAttribute("role",role_id, XLINK.NS);
+        service.setAttribute("role",role_id);
 
         String descriptionText = getServiceDescription();
         String descriptionLink = getServiceDescriptionLink();
 
         if(descriptionText!=null  ||  descriptionLink!=null){
 
-            Element description = new org.jdom.Element("Description");
+            Element description = new org.jdom.Element("Description",DAP.DAPv40_DatasetServices_NS);
 
             if(descriptionLink!=null)
-                description.setAttribute("href",descriptionLink,XLINK.NS);
+                description.setAttribute("href",descriptionLink);
 
             if(descriptionText!=null)
                 description.setText(descriptionText);
@@ -128,11 +128,22 @@ public abstract class DapResponder extends HttpResponder  {
             service.addContent(description);
         }
 
+        Element link = new Element("link",DAP.DAPv40_DatasetServices_NS);
+        link.setAttribute("href",datasetUrl+suffix);
+        if(getServiceMediaType()!=null)
+            link.setAttribute("type",getServiceMediaType());
+
+        service.addContent(link);
+
+
         return service;
 
     }
 
 
+    public String getServiceMediaType(){
+        return _serviceMediaType;
+    }
     public String getServiceRoleId(){
         return _serviceRoleId;
     }
@@ -163,6 +174,10 @@ public abstract class DapResponder extends HttpResponder  {
     }
     protected void setPreferredServiceSuffix(String preferredServiceSuffix){
         _preferredServiceSuffix = preferredServiceSuffix;
+    }
+
+    protected void setServiceMediaType(String mediaType){
+        _serviceMediaType = mediaType;
     }
 
 

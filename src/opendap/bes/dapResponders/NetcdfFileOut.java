@@ -66,9 +66,10 @@ public class NetcdfFileOut extends BesDapResponder {
     public NetcdfFileOut(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        setServiceRoleId("http://services.opendap.org/dap4/netcdf-3#");
-        setServiceTitle("NetCDF-File");
-        setServiceDescription("NetCDF file-out response.");
+        setServiceRoleId("http://services.opendap.org/dap2/netcdf-3");
+        setServiceMediaType("application/x-netcdf");
+        setServiceTitle("DAP2 NetCDF-3 File");
+        setServiceDescription("DAP2 data returned in a NetCDF-3 file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_NetCDF_File-out_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
@@ -105,7 +106,7 @@ public class NetcdfFileOut extends BesDapResponder {
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
 
-        response.setContentType("application/x-netcdf");
+        response.setContentType(getServiceMediaType());
         response.setHeader("Content-Disposition", contentDisposition);
 
         Version.setOpendapMimeHeaders(request, response, besApi);

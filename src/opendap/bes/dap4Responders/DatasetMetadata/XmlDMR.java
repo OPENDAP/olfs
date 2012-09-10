@@ -21,10 +21,12 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.bes.dapResponders;
+package opendap.bes.dap4Responders.DatasetMetadata;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -37,81 +39,72 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
-
-
-
-
-public class DDX extends BesDapResponder {
+public class XmlDMR extends Dap4Responder {
 
 
 
     private Logger log;
-    private static String _preferredRequestSuffix = ".ddx";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String defaultRequestSuffix = ".xml";
 
-    public DDX(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+
+
+    public XmlDMR(String sysPath, BesApi besApi) {
+        this(sysPath,null, defaultRequestSuffix,besApi);
     }
 
-    public DDX(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+    public XmlDMR(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-
-    public DDX(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public XmlDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap2/ddx");
-        setServiceMediaType("text/xml");
-        setServiceTitle("DAP2 DDX");
-        setServiceDescription("OPeNDAP Data Description and Attribute XML Document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDX_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
-    }
+        setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
+        setServiceTitle("XML representation of the DMR.");
+        setServiceDescription("Normative representation of the Dataset Metadata Response document with a generic content type.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
+        setNormativeMediaType(new ServiceMediaType("text","xml", defaultRequestSuffix));
 
-    public boolean needsBesToMatch(){
-        return true;
-    }
+        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
 
-    public boolean needsBesToRespond(){
-        return true;
     }
 
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+
+
+
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
+        String resourceID = getResourceId(requestedResourceId, false);
 
         BesApi besApi = getBesApi();
 
-        log.debug("Sending DDX for dataset: " + dataSource);
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_ddx");
+        response.setHeader("Content-Description", "dap4:Dataset");
         // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
+        // response.setHeader("Content-Encoding", "plain");
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        String xdap_accept = "3.2";
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         0,
@@ -125,7 +118,7 @@ public class DDX extends BesDapResponder {
 
         log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
@@ -135,9 +128,12 @@ public class DDX extends BesDapResponder {
 
 
         os.flush();
-        log.info("Sent DAP DDX.");
+        log.info("Sent {}",getServiceTitle());
 
 
     }
+
+
+
 
 }

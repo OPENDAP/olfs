@@ -1,0 +1,93 @@
+package opendap.bes.dap4Responders;
+
+import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.ReqInfo;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: 9/6/12
+ * Time: 12:33 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class Version extends Dap4Responder {
+
+
+    private Logger log;
+    private static String defaultRequestSuffix = ".ver";
+
+
+
+    public Version(String sysPath, BesApi besApi) {
+        this(sysPath,null, defaultRequestSuffix,besApi);
+    }
+
+    public Version(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
+    }
+
+    public Version(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+        log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/server-version");
+        setServiceTitle("Server Software Version.");
+        setServiceDescription("An XML document containing detailed software version information for this server.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+
+        setNormativeMediaType(new ServiceMediaType("text","xml", defaultRequestSuffix));
+
+        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+
+    }
+
+
+
+
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        BesApi besApi = getBesApi();
+
+        log.debug("respondToHttpGetRequest() - Sending Version response...");
+
+        response.setContentType(getServiceMediaType());
+        response.setHeader("Content-Description", "dods_version");
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        PrintStream ps = new PrintStream(response.getOutputStream());
+
+        Document vdoc = besApi.getCombinedVersionDocument();
+
+        if (vdoc == null) {
+            throw new ServletException("Internal Error: Version Document not initialized.");
+        }
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        //XMLOutputter xout = new XMLOutputter();
+        xout.output(vdoc, ps);
+        ps.flush();
+
+
+        log.debug("respondToHttpGetRequest() - Sent Version response.");
+
+
+
+
+        ps.flush();
+        log.info("Sent {}",getServiceTitle());
+
+
+    }
+
+}

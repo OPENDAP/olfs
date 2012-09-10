@@ -38,10 +38,6 @@
 
     <xsl:variable name="docsService">/opendap/docs</xsl:variable>
 
-
-
-
-
     <xsl:template match="ds:DatasetServices">
         <html>
             <head>
@@ -65,12 +61,21 @@
                 </h1>
                 <hr size="1" noshade="noshade"/>
 
+                <table border="0" width="100%">
+                    <tr>
+                        <td >
+                            <div class="small" >Supported DAP Versions: <xsl:apply-templates select="ds:DapVersion"/></div>
+                        </td>
+                        <td align="right">
+                            <div class="small" >Server Version: <xsl:apply-templates select="ds:ServerSoftwareVersion"/></div>
+                        </td>
+                    </tr>
+                </table>
                 <!-- ****************************************************** -->
                 <!--                       PAGE BODY                        -->
                 <!--                                                        -->
                 <!--                                                        -->
-                <pre>
-                    <table border="0">
+                <pre><table border="0">
                         <tr>
                             <th align="left">Service Name
                                 <div class="small" style="margin-left: 10px;">Available Representations</div>
@@ -87,10 +92,35 @@
                 </pre>
 
                 <hr size="1" noshade="noshade"/>
-                <div class="medium_bold">Server Side Functions Available For This Dataset</div>
-
+                <div class="medium_bold">Server Extensions Available For This Dataset</div>
                 <pre>
-                    <xsl:apply-templates select="ServerSideFunctions"/>
+                    <table border="0">
+                        <xsl:if test="ds:function">
+                            <tr>
+                                <th align="left">Function</th>
+                                <th align="center"></th>
+                                <th align="left">Description</th>
+                            </tr>
+                            <xsl:apply-templates select="ds:function"/>
+
+                        </xsl:if>
+                        <xsl:if test="ds:functionGroup">
+                            <tr>
+                                <th align="left">FuncGrp</th>
+                                <th align="center"></th>
+                                <th align="left">Description</th>
+                            </tr>
+                            <xsl:apply-templates select="ds:functionGroup"/>
+                        </xsl:if>
+                        <xsl:if test="ds:extension">
+                            <tr>
+                                <th align="left">Extension</th>
+                                <th align="center"></th>
+                                <th align="left">Description</th>
+                            </tr>
+                            <xsl:apply-templates select="ds:extension"/>
+                        </xsl:if>
+                    </table>
                 </pre>
 
                 <!-- ****************************************************** -->
@@ -160,29 +190,43 @@
 
 
 
-    <xsl:template match="ServerSideFunctions">
 
-        <table border="0">
-            <tr>
-                <th align="left">Function Name</th>
-                <th align="center"></th>
-                <th align="left">Description</th>
-            </tr>
-            <xsl:apply-templates select="Function"/>
-        </table>
-
-    </xsl:template>
-
-
-
-    <xsl:template match="Function">
+    <xsl:template match="ds:function">
 
         <tr>
             <td><xsl:value-of select="@name"/></td>
             <td> </td>
-          <td><xsl:value-of select="Description"/> (<a href="{@xlink:href}">more</a>)</td>
+          <td><xsl:value-of select="ds:Description"/> (<a href="{@href}">more</a>)</td>
         </tr>
 
+    </xsl:template>
+
+    <xsl:template match="ds:functionGroup">
+
+        <tr>
+            <td><xsl:value-of select="@name"/></td>
+            <td> </td>
+          <td><xsl:value-of select="ds:Description"/> (<a href="{@href}">more</a>)</td>
+        </tr>
+
+    </xsl:template>
+
+    <xsl:template match="ds:extension">
+
+        <tr>
+            <td><xsl:value-of select="@name"/></td>
+            <td> </td>
+          <td><xsl:value-of select="ds:Description"/> (<a href="{@href}">more</a>)</td>
+        </tr>
+
+    </xsl:template>
+
+
+    <xsl:template match="ds:DapVersion">
+        [<span style="font-weight: bold"><xsl:value-of select="."/></span>]
+    </xsl:template>
+    <xsl:template match="ds:ServerSoftwareVersion">
+        <span style="font-weight: bold"><xsl:value-of select="."/></span>
     </xsl:template>
 
 

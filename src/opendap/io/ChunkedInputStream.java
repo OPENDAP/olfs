@@ -64,17 +64,9 @@ public class ChunkedInputStream  {
      */
     public ChunkedInputStream(InputStream stream, ChunkProtocol chunkProtocol){
 
-        super();
-
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-
+        this(stream);
 
         this.chunkProtocol = chunkProtocol;
-        is = stream;
-        currentChunkHeader = new byte[Chunk.HEADER_SIZE];
-        //transferBuffer     = new byte[Chunk.MAX_SIZE];
-        currentChunkType   = Chunk.DATA;
-        isClosed           = false;
     }
 
 
@@ -218,6 +210,7 @@ public class ChunkedInputStream  {
                     moreData = false;
                 }
                 else {
+                    // todo Stop allocating inside this loop!!!!
                     buffer = new byte[currentChunkDataSize];
                 }
 
@@ -239,7 +232,7 @@ public class ChunkedInputStream  {
                         (isError?errStream:dStream).write(buffer,0,bytesReceived);
                         (isError?errStream:dStream).flush();
 
-                        // update the read pointer.show veriosn
+                        // update the read pointer.
                         chunkReadPosition += bytesReceived;
                         break;
 
@@ -310,6 +303,7 @@ public class ChunkedInputStream  {
                 if(status.equalsIgnoreCase(Chunk.ERROR_STATUS)){
                     //log.error("status: error");
                     isError =  true;
+                    // todo - Why is this nested?? Shouldn't it be if - else if - else if ??? FIX ME!
                     if(status.equalsIgnoreCase(Chunk.EMERGENCY_EXIT_STATUS)){
                         log.error("Stream source requested an emergency exit! Closing connection immediately.");
                         isClosed = true;

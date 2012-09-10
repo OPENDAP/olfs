@@ -78,18 +78,7 @@ public class Version  {
 
         Element olfs = new Element("OLFS");
 
-        Element lib = new Element("lib");
-        Element name = new Element("name");
-        Element ver = new Element("version");
-
-        name.addContent(new Text("olfs"));
-        lib.addContent(name);
-
-        ver.addContent(new Text(olfsVersion));
-        lib.addContent(ver);
-
-
-        olfs.addContent(lib);
+        olfs.setAttribute("version",olfsVersion);
 
         return (olfs);
 
@@ -101,22 +90,11 @@ public class Version  {
      */
     public static Element getHyraxVersionElement() {
 
-        Element olfs = new Element("Hyrax");
+        Element hyrax = new Element("Hyrax");
 
-        Element lib = new Element("lib");
-        Element name = new Element("name");
-        Element ver = new Element("version");
+        hyrax.setAttribute("version",hyraxVersion);
 
-        name.addContent(new Text("Hyrax"));
-        lib.addContent(name);
-
-        ver.addContent(new Text(hyraxVersion));
-        lib.addContent(ver);
-
-
-        olfs.addContent(lib);
-
-        return (olfs);
+        return (hyrax);
 
     }
 

@@ -64,7 +64,8 @@ public class Dap2Data extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap2/dods#");
+        setServiceRoleId("http://services.opendap.org/dap2/data");
+        setServiceMediaType("application/octet-stream");
         setServiceTitle("DAP2 Data");
         setServiceDescription("DAP2 Data Object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service");
@@ -96,7 +97,7 @@ public class Dap2Data extends BesDapResponder {
         log.debug("sendDAP2Data() For: " + dataSource+
                 "    CE: '" + constraintExpression + "'");
 
-        response.setContentType("application/octet-stream");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_data");
 

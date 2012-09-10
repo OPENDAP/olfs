@@ -59,9 +59,10 @@ public class Ascii extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/ascii#");
-        setServiceTitle("ASCII Data");
-        setServiceDescription("The DAP4 Data response in ASCII form.");
+        setServiceRoleId("http://services.opendap.org/dap2/ascii");
+        setServiceMediaType("text/plain");
+        setServiceTitle("DAP2 ASCII Data");
+        setServiceDescription("The DAP2 Data response in ASCII form.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ASCII_Data_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
@@ -88,7 +89,7 @@ public class Ascii extends BesDapResponder {
 
         log.debug("sendASCII() for dataset: " + dataSource);
 
-        response.setContentType("text/plain");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ascii");
         // Commented because of a bug in the OPeNDAP C++ stuff...

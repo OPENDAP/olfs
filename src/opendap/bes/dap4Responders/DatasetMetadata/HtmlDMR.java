@@ -21,12 +21,16 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
-package opendap.bes.dapResponders;
+package opendap.bes.dap4Responders.DatasetMetadata;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,90 +38,87 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 1/29/11
- * Time: 2:51 PM
- * To change this template use File | Settings | File Templates.
- */
-public class DAS extends BesDapResponder {
+
+public class HtmlDMR extends Dap4Responder {
+
 
 
     private Logger log;
+    private static String defaultRequestSuffix = ".html";
 
 
 
-    private static String _preferredRequestSuffix = ".das";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
-
-
-    public DAS(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+    public HtmlDMR(String sysPath, BesApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public DAS(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+    public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-
-    public DAS(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap2/das");
-        setServiceMediaType("text/plain");
-        setServiceTitle("DAP2 DAS");
-        setServiceDescription("DAP2 Dataset Attribute Structure (DAS).");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DAS_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+        setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
+        setServiceTitle("HTML representation of the DMR.");
+        setServiceDescription("HTML representation of the Dataset Metadata Response document.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+
+        setNormativeMediaType(new ServiceMediaType("text","html", defaultRequestSuffix));
+
+        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+
     }
 
-    public boolean needsBesToMatch(){
-        return true;
-    }
 
-    public boolean needsBesToRespond(){
-        return true;
-    }
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+
+
+
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String xmlBase = getXmlBase(request);
+
+        String resourceID = getResourceId(requestedResourceId, false);
+
 
         BesApi besApi = getBesApi();
 
-        log.debug("sendDAS() for dataset: " + dataSource);
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_das");
+        response.setHeader("Content-Description", "dap4:Dataset");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        String xdap_accept = "3.2";
         Document reqDoc = besApi.getRequestDocument(
-                                                        BesApi.DAS,
-                                                        dataSource,
-                                                        constraintExpression,
+                                                        BesApi.HTML_FORM,
+                                                        resourceID,
+                                                        null,
                                                         xdap_accept,
                                                         0,
                                                         null,
+                                                        xmlBase,
                                                         null,
-                                                        null,
-                                                        BesApi.DAP2_ERRORS);
+                                                        BesApi.XML_ERRORS);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
+
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
@@ -125,10 +126,13 @@ public class DAS extends BesDapResponder {
         }
 
 
+
         os.flush();
-        log.debug("Sent DAP DAS.");
+        log.info("Sent {}",getServiceTitle());
 
 
     }
+
+
 
 }

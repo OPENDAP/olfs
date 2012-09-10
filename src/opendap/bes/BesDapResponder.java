@@ -38,7 +38,7 @@ public abstract class BesDapResponder extends DapResponder {
 
 
 
-    /**
+/**
      *
      * @param relativeUrl
      * @return
@@ -46,16 +46,33 @@ public abstract class BesDapResponder extends DapResponder {
     @Override
     public boolean matches(String relativeUrl) {
 
+        return matches(relativeUrl,true);
+
+    }
+
+
+    /**
+     *
+     * @param relativeUrl
+     * @return
+     */
+    public boolean matches(String relativeUrl, boolean checkWithBes) {
+
         if (super.matches(relativeUrl)) {
 
-            String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
-            try {
-                DataSourceInfo dsi = new BESDataSource(besDataSourceId, _besApi);
-                if (dsi.isDataset()) {
-                    return true;
+            if(checkWithBes){
+                String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
+                try {
+                    DataSourceInfo dsi = new BESDataSource(besDataSourceId, _besApi);
+                    if (dsi.isDataset()) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
                 }
-            } catch (Exception e) {
-                log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
+            }
+            else {
+                return true;
             }
 
 

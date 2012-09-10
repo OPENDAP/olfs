@@ -1,31 +1,10 @@
-/////////////////////////////////////////////////////////////////////////////
-// This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
-//
-//
-// Copyright (c) 2011 OPeNDAP, Inc.
-// Author: Nathan David Potter  <ndp@opendap.org>
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-//
-// You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
-/////////////////////////////////////////////////////////////////////////////
-package opendap.bes.dapResponders;
+package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.bes.BESError;
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -38,70 +17,81 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
+/**
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: 9/5/12
+ * Time: 7:34 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class RdfDMR extends Dap4Responder {
 
-public class RDF extends BesDapResponder {
 
     private Logger log;
+    private static String defaultRequestSuffix = ".rdf";
 
 
-    private static String _preferredRequestSuffix = ".rdf";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
-    public RDF(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+    public RdfDMR(String sysPath, BesApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public RDF(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+    public RdfDMR(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-
-    public RDF(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public RdfDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        setServiceRoleId("http://services.opendap.org/dap4/rdf");
-        setServiceMediaType("application/rdf+xml");
-        setServiceTitle("DAP2 RDF");
-        setServiceDescription("An RDF representation of the DAP2 Dataset response (DDX) document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_RDF_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
+        setServiceTitle("RDF representation of the DMR");
+        setServiceDescription("RDF representation of the Dataset Metadata Response document.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
+
+        setNormativeMediaType(new ServiceMediaType("application","rdf+xml", defaultRequestSuffix));
+
+        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+
     }
 
 
 
-    public boolean needsBesToMatch(){
-        return true;
-    }
-
-    public boolean needsBesToRespond(){
-        return true;
-    }
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = getXmlBase(request);
+
+
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
         String context = request.getContextPath();
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String xmlBase = getXmlBase(request);
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-        log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + dataSource);
-
+        String resourceID = getResourceId(requestedResourceId, false);
 
 
         BesApi besApi = getBesApi();
 
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
+
+        response.setContentType(getNormativeMediaType().getMimeType());
+        Version.setOpendapMimeHeaders(request, response, besApi);
+        response.setHeader("Content-Description", "dap4:Dataset");
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
+
+
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String xdap_accept = "3.2";
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
-                        dataSource,
-                        constraintExpression,
+                        resourceID,
+                        null,
                         xdap_accept,
                         0,
                         xmlBase,
@@ -114,14 +104,14 @@ public class RDF extends BesDapResponder {
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         Document ddx = new Document();
-        if(!besApi.besTransaction(dataSource,reqDoc,ddx)){
+        if(!besApi.besTransaction(resourceID,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
             besError.sendErrorResponse(_systemPath, context, response);
             log.error("respondToHttpGetRequest() encountered a BESError:\n" + xmlo.outputString(ddx));
             return;
         }
 
-        ddx.getRootElement().setAttribute("dataset_id",dataSource);
+        ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
         log.debug(xmlo.outputString(ddx));
 
@@ -156,7 +146,7 @@ public class RDF extends BesDapResponder {
         String accepts = request.getHeader("Accepts");
 
         if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
-            response.setContentType(getServiceMediaType());
+            response.setContentType("application/rdf+xml");
         else
             response.setContentType("text/xml");
 
@@ -171,19 +161,14 @@ public class RDF extends BesDapResponder {
         try {
             addRdfId2DdxTransform.transform(ddxStreamSource);
         } catch (Exception e) {
-            sendRdfErrorResponse(e, dataSource, context, response);
+            sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
         }
 
 
-        log.info("Sent RDF version of DDX.");
-
-
+        log.info("Sent {}.",getServiceTitle());
 
     }
-
-
-
 
 
     public void sendRdfErrorResponse(Exception e, String dataSource, String docsService, HttpServletResponse response) throws Exception {

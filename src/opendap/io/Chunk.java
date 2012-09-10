@@ -173,7 +173,9 @@ public class Chunk {
         if(     buf!=null &&         // Make sure the buffer is not null
                 len>=0 &&            // Make sure they want a positive number of bytes
                 off>=0 &&            // Make sure the offset is positive
-                buf.length<=(off+len) // Guard against buffer overflow
+
+                // Guard against buffer overflow
+                buf.length<=(off+len)    // todo Make sure this inequality is correct - maybe it should be >= !!!
             ){
 
             boolean done = false;

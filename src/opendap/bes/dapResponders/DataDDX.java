@@ -62,7 +62,8 @@ public class DataDDX extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/data#");
+        setServiceRoleId("http://services.opendap.org/dap4/data");
+        setServiceMediaType("Multipart/Related");
         setServiceTitle("DAP4 Data");
         setServiceDescription("DAP4 Data object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");

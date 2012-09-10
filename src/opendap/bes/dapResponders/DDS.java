@@ -73,9 +73,10 @@ public class DDS extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap2/dds#");
-        setServiceTitle("DDS");
-        setServiceDescription("OPeNDAP Data Description Structure.");
+        setServiceRoleId("http://services.opendap.org/dap2/dds");
+        setServiceMediaType("text/plain");
+        setServiceTitle("DAP2 DDS");
+        setServiceDescription("DAP2 Data Description Structure (DDS).");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDS_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
@@ -95,7 +96,7 @@ public class DDS extends BesDapResponder {
 
         log.debug("Sending DDS for dataset: " + dataSource);
 
-        response.setContentType("text/plain");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...

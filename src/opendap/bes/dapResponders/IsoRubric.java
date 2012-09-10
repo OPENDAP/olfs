@@ -39,7 +39,8 @@ public class IsoRubric extends BesDapResponder {
     public IsoRubric(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        setServiceRoleId("http://services.opendap.org/dap4/iso-19115-score#");
+        setServiceRoleId("http://services.opendap.org/dap2/iso-19115-score");
+        setServiceMediaType("text/html");
         setServiceTitle("ISO-19115-Score");
         setServiceDescription("ISO 19115 Metadata Representation conformance score for this dataset.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ISO_Conformance_Score_Service");
@@ -75,10 +76,7 @@ public class IsoRubric extends BesDapResponder {
         // Set up up the response header
         String accepts = request.getHeader("Accepts");
 
-        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
-            response.setContentType("application/rdf+xml");
-        else
-            response.setContentType("text/html");
+        response.setContentType(getServiceMediaType());
 
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", "text/html");

@@ -66,8 +66,9 @@ public class HtmlDataRequestForm extends BesDapResponder {
     public HtmlDataRequestForm(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        setServiceRoleId("http://services.opendap.org/dap4/data-request-form#");
-        setServiceTitle("Data Request Form");
+        setServiceRoleId("http://services.opendap.org/dap2/data-request-form");
+        setServiceMediaType("text/html");
+        setServiceTitle("DAP2 Data Request Form");
         setServiceDescription("OPeNDAP HTML Data Request Form for data sub-setting and access.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_HTML_DATA_Request_Form_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
@@ -98,7 +99,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
         log.debug("respondToHttpGetRequest() - Sending HTML Data Request Form for dataset: " + dataSource+
                 "    CE: '" + request.getQueryString() + "'");
 
-        response.setContentType("text/html");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_form");
 

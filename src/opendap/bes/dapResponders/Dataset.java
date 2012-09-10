@@ -62,9 +62,10 @@ public class Dataset extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/dataset#");
-        setServiceTitle("Dataset");
-        setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
+        setServiceRoleId("http://services.opendap.org/dap2/dataset");
+        setServiceMediaType("text/xml");
+        setServiceTitle("DAP2 DDX");
+        setServiceDescription("DAP2 Dataset Description and Attribute XML Document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
@@ -92,7 +93,7 @@ public class Dataset extends BesDapResponder {
 
         log.debug("Sending DDX for dataset: " + dataSource);
 
-        response.setContentType("text/xml");
+        response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dap4:Dataset");
         // Commented because of a bug in the OPeNDAP C++ stuff...
@@ -131,7 +132,7 @@ public class Dataset extends BesDapResponder {
 
 
         os.flush();
-        log.info("Sent DAP DDX.");
+        log.info("Sent DAP2 DDX.");
 
 
     }

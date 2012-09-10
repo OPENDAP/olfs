@@ -254,12 +254,14 @@ public class AsyncDispatcher extends DapDispatcher {
         String serviceContext = ReqInfo.getFullServiceContext(request);
         String relativeURL = ReqInfo.getLocalUrl(request);
 
+        log.debug("The client requested this resource: " + relativeURL);
 
         log.debug("serviceContext: "+serviceContext);
         log.debug("relativeURL:    "+relativeURL);
 
         if(!relativeURL.startsWith("/"))
             relativeURL = "/" + relativeURL;
+
 
 
         boolean isMyRequest = relativeURL.startsWith(_prefix);

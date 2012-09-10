@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Date;
 
 
 /**
@@ -159,6 +160,7 @@ public class NcmlDatasetBesApi extends BesApi {
 
 
         if(NcmlManager.isNcmlDataset(dataSource)){
+            Element responseElement = new Element("response",BES.BES_NS);
             Element showInfo = new Element("showInfo",BES.BES_NS);
             Element dataset = new Element("dataset",BES.BES_NS);
             Element srvcRef = new Element("serviceRef",BES.BES_NS);
@@ -175,9 +177,40 @@ public class NcmlDatasetBesApi extends BesApi {
 
             srvcRef.setText("dap");
 
+            responseElement.addContent(showInfo);
+            responseElement.setAttribute("reqID",(new Date())+dataSource);
+
+            responseElement.addContent(showInfo);
+            response.setRootElement(responseElement);
+
             return true;
 
         }
+
+        Element responseElement = new Element("response",BES.BES_NS);
+        Element besElement = new Element("BES",BES.BES_NS);
+        Element besErrorElement = new Element("BESError",BES.BES_NS);
+        Element typeElement = new Element("type",BES.BES_NS);
+        Element messageElement = new Element("Message",BES.BES_NS);
+        Element adminElement = new Element("Administrator",BES.BES_NS);
+
+        messageElement.setText("Unable to access node"+dataSource+": No such file or directory");
+        typeElement.setText("5");
+        adminElement.setText("support@opendap.org");
+
+        besErrorElement.addContent(typeElement);
+        besErrorElement.addContent(messageElement);
+        besErrorElement.addContent(adminElement);
+
+        besElement.addContent(besErrorElement);
+
+        responseElement.addContent(besElement);
+
+        responseElement.setAttribute("reqID",(new Date())+dataSource);
+
+
+        response.setRootElement(responseElement);
+
 
         return false;
 

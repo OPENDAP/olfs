@@ -25,6 +25,7 @@
 package opendap.bes;
 
 import opendap.coreServlet.DispatchHandler;
+import opendap.namespaces.DAP;
 import org.apache.catalina.connector.Request;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -223,7 +224,15 @@ public class BESManager implements DispatchHandler {
 
 
         Document doc = new Document();
-        doc.setRootElement(new Element("OPeNDAP-Version"));
+        doc.setRootElement(new Element("HyraxCombinedVersion"));
+
+        // Add a version element for Hyrax (which is a combination of many things)
+        doc.getRootElement().addContent(opendap.bes.Version.getHyraxVersionElement());
+        // Add a version element for this, the OLFS server
+        doc.getRootElement().addContent(opendap.bes.Version.getOLFSVersionElement());
+
+
+        //doc.getRootElement().addNamespaceDeclaration();  // Maybe someday?
         Element besVer;
         Document tmp;
         for (BES bes : _besCollection) {
@@ -233,11 +242,7 @@ public class BESManager implements DispatchHandler {
             doc.getRootElement().addContent(besVer);
         }
 
-        // Add a version element for this, the OLFS server
-        doc.getRootElement().addContent(opendap.bes.Version.getOLFSVersionElement());
 
-        // Add a version element for this, the OLFS server
-        doc.getRootElement().addContent(opendap.bes.Version.getHyraxVersionElement());
 
         return doc;
     }

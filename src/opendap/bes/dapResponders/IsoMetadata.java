@@ -39,9 +39,10 @@ public class IsoMetadata extends BesDapResponder {
     public IsoMetadata(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-        setServiceRoleId("http://services.opendap.org/dap4/iso-19115-metadata#");
+        setServiceRoleId("http://services.opendap.org/dap2/iso-19115-metadata");
+        setServiceMediaType("text/xml");
         setServiceTitle("ISO-19115");
-        setServiceDescription("ISO 19115 Metadata Representation of the Dataset (DDX) response.");
+        setServiceDescription("ISO 19115 Metadata Representation of the DAP2 Dataset (DDX) response.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ISO_19115_Service");
         setPreferredServiceSuffix(_preferredRequestSuffix);
     }
@@ -73,10 +74,7 @@ public class IsoMetadata extends BesDapResponder {
         // Set up up the response header
         String accepts = request.getHeader("Accepts");
 
-        if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
-            response.setContentType("application/rdf+xml");
-        else
-            response.setContentType("text/xml");
+        response.setContentType(getServiceMediaType());
 
         Version.setOpendapMimeHeaders(request, response, besApi);
         response.setHeader("Content-Description", "text/xml");
@@ -132,7 +130,6 @@ public class IsoMetadata extends BesDapResponder {
 
 
             os.flush();
-            os.close();
             log.info("Sent RDF version of DDX.");
             log.debug("Restoring working directory to "+ currentDir);
             System.setProperty("user.dir",currentDir);

@@ -45,7 +45,8 @@ public class VersionResponse extends BesDapResponder {
 
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        setServiceRoleId("http://services.opendap.org/dap4/version#");
+        setServiceRoleId("http://services.opendap.org/dap2/version");
+        setServiceMediaType("text/xml");
         setServiceTitle("Server Version");
         setServiceDescription("An XML document containing information about the software version of the server..");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Server_Version_Service");
@@ -76,7 +77,7 @@ public class VersionResponse extends BesDapResponder {
 
         log.debug("respondToHttpGetRequest() - Sending Version response...");
 
-        response.setContentType("text/xml");
+        response.setContentType(getServiceMediaType());
         response.setHeader("Content-Description", "dods_version");
 
         response.setStatus(HttpServletResponse.SC_OK);

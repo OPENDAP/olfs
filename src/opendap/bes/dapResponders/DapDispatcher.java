@@ -28,6 +28,12 @@ package opendap.bes.dapResponders;
 
 import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
+import opendap.bes.dap4Responders.DataResponse.NormativeDR;
+import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
+import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
+import opendap.bes.dap4Responders.FileAccess;
+import opendap.bes.dap4Responders.Iso19115.IsoDMR;
+import opendap.bes.dap4Responders.Version;
 import opendap.coreServlet.*;
 import opendap.dap.DapResponder;
 import org.jdom.Element;
@@ -146,9 +152,37 @@ public class DapDispatcher implements DispatchHandler {
 
         BesDapResponder hr;
 
-        responders.add(new HtmlDataRequestForm(systemPath, besApi));
-        responders.add(new Dataset(systemPath, besApi));
-        responders.add(new DataDDX(systemPath, besApi));
+
+
+        responders.add(new NormativeDR(systemPath, besApi));
+        responders.add(new NormativeDMR(systemPath, besApi));
+        responders.add(new IsoDMR(systemPath, besApi));
+        if (!_useDAP2ResourceUrlResponse) {
+            responders.add(new NormativeDSR(systemPath, besApi, responders));
+
+            FileAccess dfa = new FileAccess(systemPath, besApi);
+            dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
+            responders.add(dfa);
+        }
+
+
+        /*     OLD way
+        if (!_useDAP2ResourceUrlResponse) {
+            DatasetServices sd = new DatasetServices(systemPath, besApi);
+            responders.add(sd);
+            sd.setServiceResponders(responders);
+
+            DatasetFileAccess dfa = new DatasetFileAccess(systemPath, besApi);
+            dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
+            responders.add(dfa);
+        }
+        */
+
+
+        //responders.add(new HtmlDataRequestForm(systemPath, besApi));
+        //responders.add(new Dataset(systemPath, besApi));
+        //responders.add(new DataDDX(systemPath, besApi));
+
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
         responders.add(new NetcdfFileOut(systemPath, besApi));
@@ -163,12 +197,14 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new DAS(systemPath, besApi));
         responders.add(new RDF(systemPath, besApi));
 
-        responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
+        // responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
 
 
-        responders.add(new VersionResponse(systemPath, besApi));
-        responders.add(new IsoMetadata(systemPath, besApi));
-        responders.add(new IsoRubric(systemPath, besApi));
+        responders.add(new Version(systemPath, besApi));
+        // responders.add(new VersionResponse(systemPath, besApi));
+        //responders.add(new IsoMetadata(systemPath, besApi));
+        //responders.add(new IsoRubric(systemPath, besApi));
+
 
 
         if (_useDAP2ResourceUrlResponse) {
@@ -177,17 +213,6 @@ public class DapDispatcher implements DispatchHandler {
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             dfa.setDap2Response(true);
             responders.add(dfa);
-        } else {
-
-            DatasetFileAccess dfa = new DatasetFileAccess(systemPath, besApi);
-            dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
-            responders.add(dfa);
-
-            DatasetServices sd = new DatasetServices(systemPath, besApi);
-            responders.add(sd);
-
-            sd.setDapResponders(responders);
-
         }
 
 
@@ -203,11 +228,13 @@ public class DapDispatcher implements DispatchHandler {
     public boolean requestCanBeHandled(HttpServletRequest request)
             throws Exception {
 
+        log.debug("************************************************************");
         if (requestDispatch(request, null, false)) {
             log.debug("Request can be handled.");
             return true;
         }
         log.debug("Request can not be handled.");
+        log.debug("************************************************************");
         return false;
     }
 
@@ -231,12 +258,10 @@ public class DapDispatcher implements DispatchHandler {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
-        String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
-
-        log.debug("The client requested this BES DataSource: " + besDataSourceId);
+        log.debug("The client requested this resource: {}",relativeUrl);
 
         for (HttpResponder r : responders) {
-            //log.debug(r.getClass().getSimpleName()+ ".getPathPrefix(): "+r.getPathPrefix());
+            log.debug("Checking responder: "+ r.getClass().getSimpleName()+ " (pathPrefix: "+r.getPathPrefix()+")");
             if (r.matches(relativeUrl)) {
 
                 log.info("The relative URL: " + relativeUrl + " matches " +

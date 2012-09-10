@@ -42,4 +42,9 @@ public class DAP {
     public static final String    DAPv40_SCHEMA_LOCATION= "http://xml.opendap.org/dap/dap4.0.xsd";
 
 
+    public static final String    DAPv40_DatasetServices_NAMESPACE_STRING = "http://xml.opendap.org/ns/DAP/4.0/dataset-services#";
+    public static final Namespace DAPv40_DatasetServices_NS = Namespace.getNamespace("ds",DAPv40_DatasetServices_NAMESPACE_STRING);
+    public static final String    DAPv40_DatasetServices_SCHEMA_LOCATION= "http://xml.opendap.org/dap4/datasetServices.xsd";
+
+
 }
