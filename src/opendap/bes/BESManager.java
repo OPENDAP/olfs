@@ -30,6 +30,12 @@ import org.apache.catalina.connector.Request;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.List;
+
+import opendap.coreServlet.DispatchHandler;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,7 +52,7 @@ import java.util.Vector;
 public class BESManager implements DispatchHandler {
 
 
-    private static Vector<BES> _besCollection;
+    private static Vector<BesGroup> _besCollection;
 
     private static boolean _isConfigured = false;
 
@@ -72,18 +78,12 @@ public class BESManager implements DispatchHandler {
         if(initialized) return;
 
         _config = (Element) config.clone();
-
-        configure();
+        configure(config);
 
         log.info("Initialized.");
 
         initialized = true;
 
-    }
-
-
-    public static Element getConfig(){
-        return (Element) _config.clone();
     }
 
 
@@ -116,14 +116,18 @@ public class BESManager implements DispatchHandler {
     }
 
 
+    public static Element getConfig(){
+        return (Element) _config.clone();
+    }
 
-    public static void configure() throws Exception {
+
+    public void configure(Element besConfiguration) throws Exception {
 
         if(_isConfigured) return;
 
-        _besCollection  = new Vector<BES>();
+        _besCollection  = new Vector<BesGroup>();
 
-        List besList = _config.getChildren("BES");
+        List besList = besConfiguration.getChildren("BES");
 
         if(besList.isEmpty())
             throw new BadConfigurationException("OLFS Configuration must " +
@@ -140,9 +144,17 @@ public class BESManager implements DispatchHandler {
             besConfig   = new BESConfig(besConfigElement);
             bes = new BES(besConfig);
 
-            _besCollection.add(bes);
+            BesGroup groupForThisPrefix = getBesGroup(bes.getPrefix());
 
-            if(bes.getPrefix().equals("/"))
+            if(groupForThisPrefix == null){
+                groupForThisPrefix = new BesGroup(bes.getPrefix());
+                _besCollection.add(groupForThisPrefix);
+            }
+
+            groupForThisPrefix.add(bes);
+
+
+            if(groupForThisPrefix.getGroupPrefix().equals("/"))
                 foundRootBES = true;
         }
 
@@ -159,8 +171,23 @@ public class BESManager implements DispatchHandler {
 
     public static void addBes(BES bes) throws Exception {
 
-        _besCollection.add(bes);
+        Iterator<BesGroup> i = BESManager.getBesGroups();
 
+        BesGroup bg, myGroup = null;
+        while(i.hasNext()){
+            bg = i.next();
+            if(bg.getGroupPrefix().equals(bes.getPrefix())){
+                myGroup = bg;
+            }
+        }
+        if(myGroup != null){
+            myGroup.add(bes.getNickName(),bes);
+        }
+        else {
+            myGroup = new BesGroup(bes.getPrefix());
+            myGroup.add(bes);
+            _besCollection.add(myGroup);
+        }
     }
 
 
@@ -171,7 +198,9 @@ public class BESManager implements DispatchHandler {
 
 
 
-    public static BES getBES(String path){
+
+
+    public static BES getBES(String path) {
 
         if(path==null)
             path = "/";
@@ -181,28 +210,66 @@ public class BESManager implements DispatchHandler {
             path = "/"+path;
         }
 
-        BES result = null;
+        BesGroup besGroupToServicePath = null;
         String prefix;
-        for(BES bes : _besCollection){
-            prefix = bes.getPrefix();
+        for(BesGroup besGroup : _besCollection){
+            prefix = besGroup.getGroupPrefix();
+
+            if(path.indexOf(prefix) == 0){
+                if(besGroupToServicePath == null){
+                    besGroupToServicePath = besGroup;
+                }
+                else {
+                    if(prefix.length() > besGroupToServicePath.getGroupPrefix().length())
+                        besGroupToServicePath = besGroup;
+                }
+
+            }
+        }
+
+        if(besGroupToServicePath==null)
+            return null;
+        else
+            return besGroupToServicePath.getNext();
+
+    }
+
+
+
+
+
+    public static BesGroup getBesGroup(String path){
+
+        if(path==null)
+            path = "/";
+
+        if(path.indexOf("/")!=0){
+            log.debug("Pre-pending / to path: "+ path);
+            path = "/"+path;
+        }
+
+        BesGroup result = null;
+        String prefix;
+        for(BesGroup besGroup : _besCollection){
+            prefix = besGroup.getGroupPrefix();
 
             if(path.indexOf(prefix) == 0){
                 if(result == null){
-                    result = bes;
+                    result = besGroup;
                 }
                 else {
-                    if(prefix.length() > result.getPrefix().length())
-                        result = bes;
+                    if(prefix.length() > result.getGroupPrefix().length())
+                        result = besGroup;
                 }
 
             }
         }
 
         return result;
-
     }
 
-    public static Iterator<BES> getBES(){
+
+    public static Iterator<BesGroup> getBesGroups(){
 
         return _besCollection.listIterator();
 
@@ -210,11 +277,11 @@ public class BESManager implements DispatchHandler {
 
 
     public static void shutdown(){
-        for(BES bes : _besCollection){
-            log.debug("Shutting down BesPool " + bes);
-            bes.destroy();
+        for(BesGroup besGroup : _besCollection){
+            log.debug("Shutting down BesGroup for prefix '" + besGroup.getGroupPrefix()+"'");
+            besGroup.destroy();
         }
-        log.debug("All BesPools have been shut down.");
+        log.debug("All BesGroup's have been shut down.");
 
     }
 
@@ -235,11 +302,12 @@ public class BESManager implements DispatchHandler {
         //doc.getRootElement().addNamespaceDeclaration();  // Maybe someday?
         Element besVer;
         Document tmp;
-        for (BES bes : _besCollection) {
-            tmp = bes.getVersionDocument();
-            besVer = tmp.getRootElement();
-            besVer.detach();
-            doc.getRootElement().addContent(besVer);
+
+        for(BesGroup besGroup : _besCollection){
+
+            Document besGroupVerDoc = besGroup.getGroupVersion();
+            doc.getRootElement().addContent(besGroupVerDoc.detachRootElement());
+
         }
 
 
@@ -250,9 +318,21 @@ public class BESManager implements DispatchHandler {
 
 
 
-    public static Document getVersionDocument(String path) throws Exception {
+    public static Document getGroupVersionDocument(String path) throws Exception {
 
-        return getBES(path).getVersionDocument();
+        return getBesGroup(path).getGroupVersion();
+
+
+    }
+
+    public static Document getVersionDocument(String path, String besName) throws Exception {
+
+        BesGroup besGroup = getBesGroup(path);
+        BES bes =  besGroup.get(besName);
+
+        return bes.getVersionDocument();
+
+
     }
 
 

@@ -176,12 +176,13 @@ public class DapDispatcher implements DispatchHandler {
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             responders.add(dfa);
         }
+
+
+        responders.add(new HtmlDataRequestForm(systemPath, besApi));
+        responders.add(new Dataset(systemPath, besApi));
+        responders.add(new DataDDX(systemPath, besApi));
+
         */
-
-
-        //responders.add(new HtmlDataRequestForm(systemPath, besApi));
-        //responders.add(new Dataset(systemPath, besApi));
-        //responders.add(new DataDDX(systemPath, besApi));
 
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
@@ -197,13 +198,13 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new DAS(systemPath, besApi));
         responders.add(new RDF(systemPath, besApi));
 
-        // responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
+        responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
 
 
         responders.add(new Version(systemPath, besApi));
         // responders.add(new VersionResponse(systemPath, besApi));
-        //responders.add(new IsoMetadata(systemPath, besApi));
-        //responders.add(new IsoRubric(systemPath, besApi));
+        // responders.add(new IsoMetadata(systemPath, besApi));
+        // responders.add(new IsoRubric(systemPath, besApi));
 
 
 

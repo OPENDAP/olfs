@@ -105,10 +105,14 @@ public class DispatchServlet extends HttpServlet {
         initDebug();
         initLogging();
 
+        RequestCache.openThreadCache();
 
         reqNumber = new AtomicInteger(0);
 
         log.debug("init() start");
+
+
+
 
         /*
         String xslTransformerFactoryImpl = "com.icl.saxon.TransformerFactoryImpl";
@@ -152,6 +156,7 @@ public class DispatchServlet extends HttpServlet {
 
         log.info("init() complete.");
 
+        RequestCache.closeThreadCache();
 
     }
 
@@ -401,7 +406,14 @@ public class DispatchServlet extends HttpServlet {
 
         try {
             try {
-                RequestCache.startRequestIfNeeded();
+
+                if(LicenseManager.isExpired(request)){
+                    LicenseManager.sendLicenseExpiredPage(request,response);
+                    return;
+                }
+
+
+                RequestCache.openThreadCache();
 
                 int reqno = reqNumber.incrementAndGet();
                 LogUtil.logServerAccessStart(request, "HyraxAccess", "HTTP-GET", Long.toString(reqno));
@@ -437,7 +449,7 @@ public class DispatchServlet extends HttpServlet {
                 }
             }
             finally {
-                RequestCache.endRequest();
+                RequestCache.closeThreadCache();
                 log.info("doGet(): Response completed.\n");
             }
 
@@ -557,7 +569,7 @@ public class DispatchServlet extends HttpServlet {
         try {
             try {
 
-                RequestCache.startRequestIfNeeded();
+                RequestCache.openThreadCache();
 
                 int reqno = reqNumber.incrementAndGet();
 
@@ -590,7 +602,7 @@ public class DispatchServlet extends HttpServlet {
 
             }
             finally {
-                RequestCache.endRequest();
+                RequestCache.closeThreadCache();
                 log.info("doPost(): Response completed.\n");
             }
 
@@ -645,7 +657,13 @@ public class DispatchServlet extends HttpServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
-        RequestCache.startRequest();
+
+        if(LicenseManager.isExpired(req)){
+            return -1;
+        }
+
+
+        RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));

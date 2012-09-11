@@ -1,3 +1,5 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
 /////////////////////////////////////////////////////////////////////////////
 // This file is part of the "Hyrax" project, a Java implementation
@@ -21,18 +23,13 @@
 //
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 -->
-<%@ page import="opendap.bes.BES" %>
-<%@ page import="opendap.bes.BESManager" %>
-<%@ page import="opendap.bes.BesConfigurationModule" %>
 <%@ page import="opendap.hai.Util" %>
 <%@ page import="opendap.ppt.OPeNDAPClient" %>
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Vector" %>
-<%@ page import="opendap.bes.BesAdminFail" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%@ page import="opendap.bes.*" %>
 <html>
 <%
 
@@ -55,9 +52,21 @@
 
     String currentModuleId = kvp.get("module");
 
-    BES bes = BESManager.getBES(currentPrefix);
+    String currentBesName  = kvp.get("besName");
 
-    currentPrefix = bes.getPrefix();
+
+    BesGroup currentPrefixBesGroup = BESManager.getBesGroup(currentPrefix);
+
+
+    BES bes = null;
+
+    if(currentBesName==null){
+        currentBesName = currentPrefixBesGroup.get(0).getNickName();
+    }
+
+    bes = currentPrefixBesGroup.get(currentBesName);
+
+
 
     String besCtlApi = contextPath + "/hai/besctl";
 
@@ -99,21 +108,21 @@
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
         <td>
-            <div style='v-align:center;font-size:large;'><a href="<%= contextPath%>/admin/index.html">Hyrax Admin Interface</a></div>
+            <div style='font-size:large;'><a href="<%= contextPath%>/admin/index.html">Hyrax Admin Interface</a></div>
         </td>
     </tr>
 </table>
 <h1>BES Management</h1>
 <hr size="1" noshade="noshade"/>
-<ol id="toc">
+<ol id="toc_bes_groups">
 
     <%
 
-        Iterator<BES> i = BESManager.getBES();
+        Iterator<BesGroup> bgi = BESManager.getBesGroups();
 
-        while (i.hasNext()) {
-            BES b = i.next();
-            String prefix = b.getPrefix();
+        while (bgi.hasNext()) {
+            BesGroup b = bgi.next();
+            String prefix = b.getGroupPrefix();
 
             out.append("    <li ");
             if (prefix.equals(currentPrefix))
@@ -130,10 +139,78 @@
 
     %>
 </ol>
+
+<div id="prefixDetail" class="content">
+
+<ol id="toc_bes_instances">
+
+    <%
+        BesGroup besGroup = BESManager.getBesGroup(currentPrefix);
+        for (BES b : besGroup.toArray()) {
+            String besName = b.getNickName();
+
+            out.append("    <li ");
+            if (besName.equals(currentBesName))
+                out.append("class=\"current\"");
+            out.append(">");
+
+            out.append("<a href=\"?prefix=")
+                    .append(currentPrefix)
+                    .append("&besName=")
+                    .append(besName)
+                    .append("\">")
+                    .append(besName)
+                    .append("</a></li>\n");
+
+        }
+
+    %>
+</ol>
+
+
+
 <div id="besDetail" class="content">
 
 <%
-    if (!bes.isAdminPortConfigured()) {
+    if(bes==null){
+        /** #############################################################################
+         *  #############################################################################
+         *
+         *  Show No Such BES Error
+         *
+         */
+        status.replace(0,status.length(),"");
+        status.append(" FAIL ");
+
+%>
+
+<div class="medium_bold"><%=status%></div>
+<br/>
+<div class="medium">
+    There is no BES named '<%= currentBesName%>' associated with prefix '<%= currentPrefix%>'.
+    <br/>
+    <br/>
+    Please:
+    <ul>
+        <li><a href="<%= contextPath%>/admin/index.html">Follow this link to the Hyrax Admin Interface</a></li>
+        <li>Drill back down to this page.</li>
+        <li>
+            Don't edit it the command line parameters by hand. <br />
+            It's annoying and it makes me sad when you do that.
+        </li>
+        <li>Stop it.</li>
+    </ul>
+</div>
+
+<%
+    }
+    else if (!bes.isAdminPortConfigured()) {
+        /** #############################################################################
+         *  #############################################################################
+         *
+         *  Show OLFS configuration error.
+         *
+         */
 
         status = new StringBuffer();
         status.append("OLFS CONFIGURATION ERROR!");
@@ -156,7 +233,16 @@
 </div>
 
 <%
-    } else if (!bes.checkBesAdminConnection()) {
+    }
+    else if (!bes.checkBesAdminConnection()) {
+
+        /** #############################################################################
+         *  #############################################################################
+         *
+         * Show missing BES error.
+         *
+         */
+
         status = new StringBuffer();
         status.append("There was an error communicating with the BES!");
 %>
@@ -180,6 +266,13 @@
 
     }
     else {
+        /** #############################################################################
+         *  #############################################################################
+         *
+         * Show BES controls.
+         *
+         */
+
 %>
 
 
@@ -187,19 +280,19 @@
 
 
     <button style="border: 0; background-color: transparent;"
-            onclick="startBes('<%=currentPrefix%>','<%=besCtlApi%>');">
+            onclick="startBes('<%=currentPrefix%>','<%=currentBesName%>','<%=besCtlApi%>');">
         <img alt="Start" src="<%=contextPath%>/docs/images/startButton.png" border='0' height='40px'>
     </button>
 
 
     <button style="border: 0; background-color: transparent;"
-            onclick="stopBesNicely('<%=currentPrefix%>','<%=besCtlApi%>');">
+            onclick="stopBesNicely('<%=currentPrefix%>','<%=currentBesName%>','<%=besCtlApi%>');">
         <img alt="StopNice" src="<%=contextPath%>/docs/images/stopNiceButton.png" border='0' height='40px'>
     </button>
 
 
     <button style="border: 0; background-color: transparent;"
-            onclick="stopBesNow('<%=currentPrefix%>','<%=besCtlApi%>');"
+            onclick="stopBesNow('<%=currentPrefix%>','<%=currentBesName%>','<%=besCtlApi%>');"
             >
         <img alt="StopNow" src="<%=contextPath%>/docs/images/stopNowButton.png" border='0' height='40px'>
     </button>
@@ -218,14 +311,11 @@
             width: 300px;">
 
     <div class="small_bold" style="padding-bottom: 4px;">OLFS Configuration</div>
-    bes prefix: <strong><%=bes.getPrefix()%>
-</strong><br/>
-    hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%>
-</strong><br/>
-    max client connections: <strong><%=bes.getMaxClients()%>
-</strong><br/>
-    current client connections: <strong><%=bes.getBesClientCount()%>
-</strong><br/>
+    bes nick name: <strong><%=bes.getNickName()%></strong><br/>
+    bes prefix: <strong><%=bes.getPrefix()%></strong><br/>
+    hostname: <strong><%=bes.getHost()%>:<%=bes.getPort()%></strong><br/>
+    max client connections: <strong><%=bes.getMaxClients()%></strong><br/>
+    current client connections: <strong><%=bes.getBesClientCount()%></strong><br/>
 </div>
 
 
@@ -244,6 +334,8 @@
 
             out.append("<a href=\"?prefix=")
                     .append(currentPrefix)
+                    .append("&besName=")
+                    .append(currentBesName)
                     .append("&task=config")
                     .append("\">")
                     .append("Configuration")
@@ -257,6 +349,8 @@
 
             out.append("<a href=\"?prefix=")
                     .append(currentPrefix)
+                    .append("&besName=")
+                    .append(currentBesName)
                     .append("&task=logging")
                     .append("\">")
                     .append("Logging")
@@ -270,6 +364,8 @@
 
             out.append("<a href=\"?prefix=")
                     .append(currentPrefix)
+                    .append("&besName=")
+                    .append(currentBesName)
                     .append("&task=olfsConnections")
                     .append("\">")
                     .append("OLFS Connections")
@@ -298,7 +394,7 @@
 %>
 
 <div class='small'>
-    <ol id="toc2">
+    <ol id="toc_olfs_cons">
         <%
 
             Enumeration<OPeNDAPClient> clients;
@@ -317,6 +413,8 @@
 
                 out.append("<a href=\"?prefix=")
                         .append(currentPrefix)
+                        .append("&besName=")
+                        .append(currentBesName)
                         .append("&clientId=")
                         .append(client.getID())
                         .append("&task=")
@@ -401,6 +499,8 @@
 
                     out.append("<a href=\"?prefix=")
                             .append(currentPrefix)
+                            .append("&besName=")
+                            .append(currentBesName)
                             .append("&module=")
                             .append(module.getName())
                             .append("&task=")
@@ -426,7 +526,7 @@
                         .append("</strong><br />\n");
 
         %>
-        <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&module=<%=currentModule.getName()%>&cmd=setConfig"
+        <form action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&besName=<%=currentBesName%>&module=<%=currentModule.getName()%>&cmd=setConfig"
               method="post">
             <p>
                 <textarea
@@ -448,7 +548,7 @@
             <input type="reset"/>
         </form>
 
-        <button onclick="setBesConfig('<%=currentModule.getName()%>','<%=currentPrefix%>','<%=besCtlApi%>');">
+        <button onclick="setBesConfig('<%=currentPrefix%>','<%=currentBesName%>','<%=currentModule.getName()%>','<%=besCtlApi%>');">
             Save <%=currentModule.getShortName()%> module configuration
         </button>
 
@@ -485,7 +585,7 @@
 
     <div style="float: left;">
 
-        <button onclick="startBesLogTailing('<%=besCtlApi%>','<%=currentPrefix%>');">Start</button>
+        <button onclick="startBesLogTailing('<%=besCtlApi%>','<%=currentPrefix%>','<%=currentBesName%>');">Start</button>
         <button onclick="stopBesLogTailing();">Stop</button>
         <button onclick="clearBesLogWindow();">Clear</button>
         &nbsp;&nbsp;Lines To Show:
@@ -503,7 +603,7 @@
     <div style="float: right;">
 
         <%
-            String logConfigUrl = "besLogConfig.jsp?prefix=" + currentPrefix;
+            String logConfigUrl = "besLogConfig.jsp?prefix="+currentPrefix+"&besName="+currentBesName;
         %>
 
         <button onclick='launchBesLoggingConfigurationWindow("<%=logConfigUrl%>" ,"BES Logging Configuration","width=200,height=525")'>
@@ -556,7 +656,7 @@
             <%
             /*
                 try {
-                    out.append(StringEscapeUtils.escapeHtml(xmlo.outputString(bes.getVersionDocument())));
+                    out.append(StringEscapeUtils.escapeHtml(xmlo.outputString(bes.getGroupVersionDocument())));
                 } catch (Exception e) {
                     out.append("<p><strong>Unable to produce BES Version document.</strong></p>")
                             .append("<p>Error Message:<p>")
@@ -571,6 +671,9 @@
     -->
 
 </div>
+
+</div>
+
 
 <table width="100%" border="0">
     <tr>

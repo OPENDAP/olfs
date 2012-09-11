@@ -43,7 +43,7 @@
 
             <!-- Bot Blocker
                -
-               - This handler can beused to block access from specific IP addresses
+               - This handler can be used to block access from specific IP addresses
                - and by a range of IP addresses using a regular expression.
                -
               -->

@@ -68,24 +68,37 @@ public class BESChunkedOutputStream  extends ChunkedOutputStream {
 
 
         if(!isOpen) throw new IOException(closedMsg);
-        log.debug("closing chunked stream and underlying stream.");
+        log.debug("close() - Closing BES Connection.");
 
         // Send pending data
         flushCache();
+        log.debug("close() - Flushed Cache.");
+
+
+        log.debug("close() - Sending extension chunk with BES/PPT exit command.");
 
         // send extension chunk with BES/PPT exit command
         setChunkTypeToEXTENSION();
         write(exitMsg.getBytes());
+        log.debug("close() - SENT extension chunk with BES/PPT exit command.");
+        log.debug("close() - Flushing Cache.");
         flushCache();
+        log.debug("close() - Flushed Cache.");
 
         // Send closing chunk. (The chunk type is always "DATA")
+        log.debug("close() - Sending closing chunk. (The chunk type is always \"DATA\")");
         Chunk.writeClosingChunkHeader(_rawOS);
+        log.debug("close() - SENT closing chunk.");
 
         // Close underlying stream
+        log.debug("close() - closing underlying stream.");
         _rawOS.close();
+        log.debug("close() - closed underlying stream.");
 
         // Flag this Chunked stream as closed.
         isOpen = false;
+
+        log.debug("close() - Stream is Closed.");
 
     }
 

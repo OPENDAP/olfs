@@ -1,11 +1,11 @@
 package opendap.ncml;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import opendap.bes.BESManager;
-import opendap.bes.BadConfigurationException;
+import opendap.bes.*;
 import opendap.bes.dapResponders.BesApi;
 import opendap.namespaces.NCML;
 import opendap.namespaces.THREDDS;
+import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.threddsHandler.Catalog;
 import opendap.threddsHandler.ThreddsCatalogUtil;
@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -37,6 +38,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class NcmlManager {
 
     private static Logger log = org.slf4j.LoggerFactory.getLogger(NcmlManager.class);
+
+    private static AtomicBoolean _preLoadBes;
+
+    static {
+        _preLoadBes = new AtomicBoolean(false);
+    }
+
+
+    public static void setPreloadBes(boolean state){
+          _preLoadBes.set(state);
+    }
+
+    public static boolean preloadBes(){
+          return  _preLoadBes.get();
+    }
 
 
 
@@ -100,11 +116,12 @@ public class NcmlManager {
 
                     log.debug("DAP ACCESS ID: {}",dapAccessID);
 
-                     _ncmlDatasets.put(dapAccessID, (Element)netcdf.clone());
+                    _ncmlDatasets.put(dapAccessID, (Element)netcdf.clone());
                     _ncmlDatasetsLastModifiedTimes.put(dapAccessID, catalog.getLastModified());
-                     ncmlDatasetIds.add(dapAccessID);
+                    ncmlDatasetIds.add(dapAccessID);
 
-                    sendNcmlToBes(dapAccessID, netcdf);
+                    if(preloadBes())
+                        sendNcmlToBes(dapAccessID, netcdf);
 
                 }
 
@@ -180,47 +197,49 @@ public class NcmlManager {
 
 
     public static void sendNcmlToBes(String dapAccessID, Element netcdf){
+
+
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat() );
-        opendap.bes.BES bes = BESManager.getBES(dapAccessID);
 
-        String besDatasetID = bes.trimPrefix(dapAccessID);
+        BesGroup besGroup = BESManager.getBesGroup(dapAccessID);
 
-        log.debug("BES Dataset ID: {}",besDatasetID);
+        for(opendap.bes.BES bes: besGroup.toArray()){
 
-        Element request = new Element("request", opendap.namespaces.BES.BES_NS);
+            String besDatasetID = bes.trimPrefix(dapAccessID);
+            log.debug("BES Dataset ID: {}",besDatasetID);
 
+            Element request = new Element("request", opendap.namespaces.BES.BES_NS);
+            Element setContainer = getSetContainerElement(besDatasetID, "ncml", (Element) netcdf.clone());
+            //log.debug("bes:setContainer: \n{}",xmlo.outputString(setContainer));
 
-        Element setContainer = getSetContainerElement(besDatasetID, "ncml", (Element) netcdf.clone());;
+            request.addContent(setContainer);
 
+            String reqID = "["+Thread.currentThread().getName()+":"+
+                    Thread.currentThread().getId()+":bes_request]";
 
-        log.debug("bes:setContainer: \n{}",xmlo.outputString(setContainer));
+            request.setAttribute("reqID",reqID);
 
-        request.addContent(setContainer);
+            Document besCmd = new Document(request);
 
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":bes_request]";
+            Document response  = new Document();
+            log.debug("Sending NcML to BES '{}'. BES command: \n{}",bes.getNickName(),xmlo.outputString(besCmd));
 
-        request.setAttribute("reqID",reqID);
-
-
-        Document besCmd = new Document(request);
-
-        Document response  = new Document();
-
-
-        try {
-            if(!_besApi.besTransaction(bes,besCmd,response)){
-                log.error("Failed to ingest NcML dataset '{}' BES Error Object: {}",dapAccessID,xmlo.outputString(response));
+            try {
+                if(!bes.besTransaction(besCmd,response)){
+                    log.error("BES '"+bes.getNickName()+"' failed to ingest NcML dataset '"+dapAccessID+"' BES Error Object: \n"+xmlo.outputString(response));
+                }
+            } catch (BadConfigurationException e) {
+                log.error("Failed to ingest NcML dataset '{}' Msg: {}",dapAccessID,e.getMessage());
+            } catch (PPTException e) {
+                log.error("Failed to ingest NcML dataset '{}' Msg: {}",dapAccessID,e.getMessage());
+            } catch (JDOMException e) {
+                log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
+            } catch (IOException e) {
+                log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
             }
-        } catch (BadConfigurationException e) {
-            log.error("Failed to ingest NcML dataset '{}' Msg: {}",dapAccessID,e.getMessage());
-        } catch (PPTException e) {
-            log.error("Failed to ingest NcML dataset '{}' Msg: {}",dapAccessID,e.getMessage());
-        } catch (JDOMException e) {
-            log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
-        } catch (IOException e) {
-            log.error("Failed to ingest NcML dataset '{}' Msg: {}", dapAccessID, e.getMessage());
+
         }
+
 
     }
 

@@ -97,8 +97,8 @@ public class BesXmlAPI {
     }
 
 
-    public static Document getVersionDocument(String path) throws Exception {
-        return BESManager.getVersionDocument(path);
+    public static Document getGroupVersionDocument(String path) throws Exception {
+        return BESManager.getGroupVersionDocument(path);
     }
 
     public static Document getCombinedVersionDocument() throws Exception {

@@ -175,7 +175,7 @@ public class Chunk {
                 off>=0 &&            // Make sure the offset is positive
 
                 // Guard against buffer overflow
-                buf.length<=(off+len)    // todo Make sure this inequality is correct - maybe it should be >= !!!
+                buf.length>=(off+len)
             ){
 
             boolean done = false;
@@ -213,6 +213,7 @@ public class Chunk {
             else
                 msg += " into a buffer of length "+buf.length+"  ";
             msg += "I'm afraid I can't allow that...";
+            log.error(msg);
             throw new IOException(msg);
         }
 

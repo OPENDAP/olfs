@@ -219,7 +219,7 @@ public class DispatchServlet extends HttpServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
-        RequestCache.startRequest();
+        RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "GATEWAY_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
@@ -304,7 +304,7 @@ public class DispatchServlet extends HttpServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            RequestCache.endRequest();
+            RequestCache.closeThreadCache();
             LogUtil.logServerAccessEnd(0, -1, "GATEWAY_SERVICE_ACCESS");
         }
     }

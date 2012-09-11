@@ -188,7 +188,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
-        RequestCache.startRequest();
+        RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "ADMIN_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
@@ -274,7 +274,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            RequestCache.endRequest();
+            RequestCache.closeThreadCache();
             LogUtil.logServerAccessEnd(0, -1, "ADMIN_SERVICE_ACCESS");
         }
     }
@@ -325,7 +325,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 log.error("BAD THINGS HAPPENED!", t2);
             }
         } finally {
-            RequestCache.endRequest();
+            RequestCache.closeThreadCache();
             LogUtil.logServerAccessEnd(0, -1, "ADMIN_SERVICE_ACCESS");
         }
     }

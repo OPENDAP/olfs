@@ -27,10 +27,17 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page import="opendap.bes.BesAdminFail" %>
+<%@ page import="opendap.bes.BesGroup" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <%
+
+    Logger log = LoggerFactory.getLogger("opendap.hai.jsp.besLogConfig");
+
+
 
     String contextPath = request.getContextPath();
 
@@ -42,15 +49,23 @@
         currentPrefix = "/";
 
 
+    log.debug("BES prefix: "+currentPrefix);
 
     String currentBesTask = kvp.get("task");
     if (currentBesTask == null)
         currentBesTask = "";
 
+    String currentBesName  = kvp.get("besName");
 
-    BES bes = BESManager.getBES(currentPrefix);
 
-    currentPrefix = bes.getPrefix();
+    BesGroup currentPrefixBesGroup = BESManager.getBesGroup(currentPrefix);
+
+    if(currentBesName==null){
+        currentBesName = currentPrefixBesGroup.get(0).getNickName();
+    }
+
+    BES bes = currentPrefixBesGroup.get(currentBesName);
+
 
     String besCtlApi = contextPath + "/hai/besctl";
 
@@ -75,47 +90,94 @@
 <body>
 <div style='float: right;vertical-align:middle;font-size:small;'><a style="color: green;" href="logout.jsp">logout</a></div>
 <div style="clear: both;"> </div>
-<h1>Bes Logging Configuration</h1>
+<h1 style="text-align: center;">BES Logging Configuration</h1>
+<div style="text-align: center;"> <%= currentBesName%> </div>
 
 <div id="besLoggingConfig" class="content">
 
 
-            <div class="small">
 
-                <div style=" margin-left: 40px; margin-right: 5px;">
-                    <form name="loggerSelect" action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&cmd=setLoggers"
-                          method="get">
+<%
+    if(bes==null){
+        /** #############################################################################
+         *  #############################################################################
+         *
+         *  Show No Such BES Error
+         *
+         */
+        status.replace(0,status.length(),"");
+        status.append(" FAIL ");
 
-                    <%
-                        TreeMap<String, BES.BesLogger> besLoggers = null;
-                        try {
-                            besLoggers = bes.getBesLoggers();
-                            for (BES.BesLogger logger : besLoggers.values()) {
-                                out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
+%>
 
-                                if (logger.getIsEnabled()) {
-                                    out.append(" checked='checked' ");
-                                }
-                                out.append(" />").append(logger.getName()).append("<br/>\n");
+<div class="medium_bold"><%=status%></div>
+<br/>
+<div class="medium">
+    There is no BES named '<%= currentBesName%>' associated with prefix '<%= currentPrefix%>'.
+    <br/>
+    <br/>
+    Please:
+    <ul>
+        <li><a href="<%= contextPath%>/admin/index.html">Follow this link to the Hyrax Admin Interface</a></li>
+        <li>Drill back down to this page.</li>
+        <li>
+            Don't edit it the command line parameters by hand. <br />
+            It's annoying and it makes me sad when you do that.
+        </li>
+        <li>Stop it.</li>
+    </ul>
+</div>
 
-                            }
-                        } catch (BesAdminFail besAdminFail) {
+<%
+    }
+    else {
 
-                            out.append("<strong>").append(besAdminFail.getMessage()).append("</strong>");
-                            status = new StringBuffer();
-                            status.append(besAdminFail.getMessage());
-                            //besAdminFail.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+%>
+    <div class="small">
+
+        <div style=" margin-left: 40px; margin-right: 5px;">
+            <form name="loggerSelect" action="<%=besCtlApi%>?prefix=<%=currentPrefix%>&cmd=setLoggers"
+                  method="get">
+
+            <%
+                TreeMap<String, BES.BesLogger> besLoggers = null;
+                try {
+                    besLoggers = bes.getBesLoggers();
+                    for (BES.BesLogger logger : besLoggers.values()) {
+                        out.append("<input type='checkbox' name='lSelection' value='").append(logger.getName()).append("'");
+
+                        if (logger.getIsEnabled()) {
+                            out.append(" checked='checked' ");
                         }
+                        out.append(" />").append(logger.getName()).append("<br/>\n");
 
-                    %>
+                    }
+                } catch (BesAdminFail besAdminFail) {
 
-                    </form>
-                </div>
-            </div>
+                    out.append("<strong>").append(besAdminFail.getMessage()).append("</strong>");
+                    status = new StringBuffer();
+                    status.append(besAdminFail.getMessage());
+                    //besAdminFail.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
-        <button onclick="commitBesLoggingChanges('<%=besCtlApi%>','<%=bes.getPrefix()%>',document.loggerSelect.lSelection);">Commit</button>
+            %>
 
-        <button onclick="self.close()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+<button onclick="commitBesLoggingChanges('<%=besCtlApi%>','<%=currentPrefix%>','<%=currentBesName%>',document.loggerSelect.lSelection);">Commit</button>
+
+<button onclick="self.close()">Cancel</button>
+
+ <%
+
+
+    }
+
+%>
+
+
 
 
 </div>

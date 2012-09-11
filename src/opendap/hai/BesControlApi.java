@@ -24,6 +24,7 @@ package opendap.hai;
 import opendap.bes.BES;
 import opendap.bes.BESManager;
 import opendap.bes.BesAdminFail;
+import opendap.bes.BesGroup;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.Scrub;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -275,11 +276,13 @@ public class BesControlApi extends HttpResponder {
 
         String besCmd = kvp.get("cmd");
         String currentPrefix = kvp.get("prefix");
+        String currentBesName = kvp.get("besName");
 
 
-        if (currentPrefix!=null &&  besCmd != null) {
+        if (currentPrefix!=null && currentBesName!=null &&  besCmd != null) {
 
-            BES bes = BESManager.getBES(currentPrefix);
+            BesGroup besGroup = BESManager.getBesGroup(currentPrefix);
+            BES bes = besGroup.get(currentBesName);
 
             if(bes!=null){
 
@@ -418,11 +421,12 @@ public class BesControlApi extends HttpResponder {
             }
             else {
                 String cleanPrefix = Scrub.fileName(currentPrefix);
-                sb.append("There is no BES available for prefix '").append(cleanPrefix).append("'");
-                log.error("OUCH!! The BESManager failed to return a BES for the prefix '{}'. " +
-                        "This should never happen! " +
-                        "The BES with prefix '/' should always be available and it handle all unmapped prefix " +
-                        "values.",cleanPrefix);
+                String cleanBesName= Scrub.fileName(currentBesName);
+                sb.append("The BES group associated with the prefix '").append(cleanPrefix).append("' ");
+                sb.append("does not contain a BES associated with the name '").append(cleanBesName).append("' ");
+
+                log.error("OUCH!! The BESManager failed to locate a BES named '{}' in the BesGroup  associated " +
+                        "with the prefix '{}'",cleanBesName,cleanPrefix);
             }
 
         }

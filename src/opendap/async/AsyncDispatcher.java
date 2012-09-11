@@ -2,7 +2,7 @@
 // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
 //
 //
-// Copyright (c) 2011 OPeNDAP, Inc.
+// Copyright (c) 2012 OPeNDAP, Inc.
 // Author: Nathan David Potter  <ndp@opendap.org>
 //
 // This library is free software; you can redistribute it and/or
@@ -69,6 +69,19 @@ public class AsyncDispatcher extends DapDispatcher {
     private int responseDelay; // In milliseconds
 
 
+    //private String dapMetadataRegex = ".*\\.xml|.*\\.iso|.*\\.rubric|.*\\.ver|.*\\.ddx|.*\\.dds|.*\\.das|.*\\.info|.*\\.html?";
+    //private Pattern dapMetadataPattern = Pattern.compile(dapMetadataRegex, Pattern.CASE_INSENSITIVE);
+
+    private String dap4DataRegex;
+    private Pattern dap4DataPattern;
+
+    private String dap2DataRegex;
+    private Pattern dap2DataPattern;
+
+
+
+
+
     public AsyncDispatcher(){
         log = LoggerFactory.getLogger(getClass());
 
@@ -79,6 +92,12 @@ public class AsyncDispatcher extends DapDispatcher {
         responseDelay    = 60000;   // In milliseconds
 
         usePendingAndGoneResponses = true;
+
+        dap4DataRegex = "(.*\\.dap((\\.xml)|(\\.csv)|(\\.nc))?$)";
+        dap4DataPattern = Pattern.compile(dap4DataRegex, Pattern.CASE_INSENSITIVE);
+
+        dap2DataRegex = ".*\\.dods|.*\\.asc(ii)?";
+        dap2DataPattern = Pattern.compile(dap2DataRegex, Pattern.CASE_INSENSITIVE);
 
         initialized = false;
     }
@@ -94,10 +113,10 @@ public class AsyncDispatcher extends DapDispatcher {
 
         init(servlet, config ,besApi);
 
-        ingestPrefix();
-        ingestCachePersistTime();
-        ingestResponseDelay();
-        ingestUsePendingGone();
+        ingestPrefix(config);
+        ingestCachePersistTime(config);
+        ingestResponseDelay(config);
+        ingestUsePendingGone(config);
 
 
         // What follows is a hack to get a particular BES, the BES with prefix, to service these requests.
@@ -141,12 +160,9 @@ public class AsyncDispatcher extends DapDispatcher {
 
     }
 
-    private void ingestPrefix() throws Exception{
+    private void ingestPrefix(Element config) throws Exception{
 
         String msg;
-
-        Element config = getConfig();
-
         Element e = config.getChild("prefix");
         if(e!=null)
             _prefix = e.getTextTrim();
@@ -172,12 +188,9 @@ public class AsyncDispatcher extends DapDispatcher {
 
     }
 
-    private void ingestCachePersistTime() throws Exception{
+    private void ingestCachePersistTime(Element config) throws Exception{
 
         String msg;
-
-        Element config = getConfig();
-
         Element e = config.getChild("cachePersistTime");
 
 
@@ -198,11 +211,9 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
-    private void ingestUsePendingGone() throws Exception{
+    private void ingestUsePendingGone(Element config) throws Exception{
 
         String msg;
-
-        Element config = getConfig();
 
         Element e = config.getChild("usePendingAndGoneResponses");
 
@@ -216,11 +227,9 @@ public class AsyncDispatcher extends DapDispatcher {
 
 
 
-    private void ingestResponseDelay() throws Exception{
+    private void ingestResponseDelay(Element config) throws Exception{
 
         String msg;
-
-        Element config = getConfig();
 
         Element e = config.getChild("responseDelay");
 
@@ -280,17 +289,6 @@ public class AsyncDispatcher extends DapDispatcher {
         return isMyRequest;
 
     }
-
-
-
-    //private String dapMetadataRegex = ".*\\.xml|.*\\.iso|.*\\.rubric|.*\\.ver|.*\\.ddx|.*\\.dds|.*\\.das|.*\\.info|.*\\.html?";
-    //private Pattern dapMetadataPattern = Pattern.compile(dapMetadataRegex, Pattern.CASE_INSENSITIVE);
-
-    private String dap4DataRegex = ".*\\.dap|.*\\.xdods";
-    private Pattern dap4DataPattern = Pattern.compile(dap4DataRegex, Pattern.CASE_INSENSITIVE);
-
-    private String dap2DataRegex = ".*\\.dods|.*\\.asc(ii)?";
-    private Pattern dap2DataPattern = Pattern.compile(dap2DataRegex, Pattern.CASE_INSENSITIVE);
 
 
 

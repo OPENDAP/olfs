@@ -38,11 +38,17 @@ public class ChunkedInputStream  {
 
     private Logger log;
 
+    private static int defaultBufferSize = 256;
+    private static int MaxBufferSize = 16777216;
+
     protected InputStream is;
     protected boolean isClosed;
 
 
     private byte[] currentChunkHeader;
+
+    private byte[] chunkBuffer;
+    private int largestChunkDataSize;
 
     private int currentChunkDataSize;
     private int chunkReadPosition;
@@ -81,9 +87,10 @@ public class ChunkedInputStream  {
 
             is = stream;
             currentChunkHeader = new byte[Chunk.HEADER_SIZE];
-            //transferBuffer     = new byte[Chunk.MAX_SIZE];
             currentChunkType   = Chunk.DATA;
             isClosed           = false;
+            largestChunkDataSize = 0;
+            chunkBuffer = new byte[defaultBufferSize];
         }
 
 
@@ -119,6 +126,10 @@ public class ChunkedInputStream  {
                            "    Chunk Type: "+(char)currentChunkType);
 
         chunkReadPosition = 0;
+
+        if(largestChunkDataSize< currentChunkDataSize)
+            largestChunkDataSize = currentChunkDataSize;
+
 
         return currentChunkDataSize;
 
@@ -238,6 +249,97 @@ public class ChunkedInputStream  {
 
                     case Chunk.EXTENSION:
 
+                        isError = processExtensionContent() || isError;
+
+                        break;
+
+                    default:
+                        throw new IOException("Unknown Chunk Type.");
+
+                }
+
+            }
+
+        }
+
+        return !isError;
+    }
+
+    /**
+     *
+     * @param dStream The stream into which to transfer the message data.
+     * @param errStream The stream into which to transfer error content if the
+     * message contains it.
+     * @return False is the message contained an extension with staus equal to
+     * error (Which is another way of saying that the source passed an error
+     * message in the stream)
+     * @throws IOException When there are problems reading from or interpreting
+     * the message stream.
+     */
+    public boolean readChunkedMessageNEW(OutputStream dStream, OutputStream errStream) throws IOException {
+
+        int ret;
+        int bytesReceived;
+        boolean isError = false;
+        boolean moreData = true;
+
+        while(moreData && !isClosed){
+
+            if(availableInChunk()<=0){
+
+                ret = readChunkHeader();
+
+                if(ret == -1 || isLastChunk()){
+                    moreData = false;
+                }
+                else {
+
+                    // Check to see if the chunk size is bigger than the buffer
+                    if(chunkBuffer.length < currentChunkDataSize){
+
+                        // Make sure the new chunk size isn't too big.
+                        if(currentChunkDataSize > MaxBufferSize){
+                            String msg = "Found a chunk size larger than I support. My max size " +
+                                         MaxBufferSize + " bytes, currentChunkDataSize: "+currentChunkDataSize;
+                            log.error(msg);
+                            throw new IOException(msg);
+                        }
+                        else {
+
+                            // Since it's safe to do so, upgrade the chunk buffer.
+                            log.debug("Increasing chunkBuffer size to: {} bytes.",currentChunkDataSize);
+                            chunkBuffer = new byte[currentChunkDataSize];
+                        }
+
+                    }
+
+                }
+
+            }
+            else {
+                switch (getCurrentChunkType()){
+
+                    case Chunk.DATA:
+
+                        if(chunkBuffer==null)
+                            throw new IOException("Illegal state in readChunkedMessage. The receive buffer is null.");
+
+
+                        // read the chunk body
+                        bytesReceived = Chunk.readFully(is,chunkBuffer,0, availableInChunk());
+
+                        // write the data out to the appropriate stream,
+                        // depending on the error status.
+                        (isError?errStream:dStream).write(chunkBuffer,0,bytesReceived);
+                        (isError?errStream:dStream).flush();
+
+                        // update the read pointer.
+                        chunkReadPosition += bytesReceived;
+                        break;
+
+                    case Chunk.EXTENSION:
+
+                        // Process the extension, but preserve the error state of the transmission.
                         isError = processExtensionContent() || isError;
 
                         break;

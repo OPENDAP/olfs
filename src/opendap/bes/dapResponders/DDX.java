@@ -94,6 +94,7 @@ public class DDX extends BesDapResponder {
         log.debug("Sending DDX for dataset: " + dataSource);
 
         response.setContentType(getServiceMediaType());
+        //response.setContentType("application/vnd.opendap.org.dap4.description+xml");
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ddx");
         // Commented because of a bug in the OPeNDAP C++ stuff...

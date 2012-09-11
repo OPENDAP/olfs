@@ -1,11 +1,37 @@
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * //
+ * //
+ * // Copyright (c) 2012 OPeNDAP, Inc.
+ * // Author: Nathan David Potter  <ndp@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
 package opendap.bes.dap4Responders.DatasetServices;
 
+import opendap.bes.BESManager;
+import opendap.bes.BesGroup;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.dap.DapResponder;
 import opendap.namespaces.DAP;
-import opendap.namespaces.XLINK;
 import opendap.namespaces.XML;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -14,13 +40,9 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -117,7 +139,7 @@ public class NormativeDSR extends Dap4Responder {
         datasetServices.setAttribute("base",datasetUrl, XML.NS);
         datasetServices.addNamespaceDeclaration(DAP.DAPv40_DatasetServices_NS);
 
-        datasetServices.addContent(getDapVersionsElements(datasetUrl));
+        datasetServices.addContent(getDapVersionElements(datasetUrl));
         //datasetServices.addContent(getSimpleHyraxVersion());
         datasetServices.addContent(getSimpleServerSoftwareVersionElement());
 
@@ -165,46 +187,23 @@ public class NormativeDSR extends Dap4Responder {
     }
 
 
-    private Vector<Element> getDapVersionsElements(String resourceId) {
-
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-        BesApi besApi = getBesApi();
+    private Vector<Element> getDapVersionElements(String resourceId) {
 
         Vector<Element> dapVersions = new Vector<Element>();
+
+        BesGroup besGroup = BESManager.getBesGroup(resourceId);
+
+        TreeSet<String> besDapVersions = besGroup.getCommonDapVersions();
+
         Element versionElement;
 
-        Document versionDoc = null;
-        try {
-            versionDoc = besApi.getVersionDocument(resourceId);
-        } catch (Exception e) {
-            String msg = "Unable to acquire server version document from BESManager. Msg: " + e.getMessage();
-            log.error(msg);
-            versionElement = new Element("Error");
-            versionElement.setText(msg);
-            return null;
-        }
+        Iterator<String> i = besDapVersions.descendingIterator();
+        while(i.hasNext()){
+            String version = i.next();
+            versionElement = new Element("DapVersion",DAP.DAPv40_DatasetServices_NS);
+            versionElement.setText(version);
+            dapVersions.add(versionElement);
 
-        log.debug("version doc: \n{}",xmlo.outputString(versionDoc));
-
-        if (versionDoc != null) {
-
-            Element besVersion = versionDoc.getRootElement();
-
-
-            List serviceVersionList = besVersion.getChildren("serviceVersion",opendap.namespaces.BES.BES_NS);
-
-            if(serviceVersionList.isEmpty())
-                log.error("The BES with prefix='"+besVersion.getAttributeValue("prefix")+"' has no defined services! " +
-                        "(bes:serviceRef elements are missing");
-
-            for(String version:getDapVersions(serviceVersionList)){
-                versionElement = new Element("DapVersion",DAP.DAPv40_DatasetServices_NS);
-                versionElement.setText(version);
-                dapVersions.add(versionElement);
-            }
         }
 
         return dapVersions;

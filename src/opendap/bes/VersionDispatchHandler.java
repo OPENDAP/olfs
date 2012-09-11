@@ -170,7 +170,7 @@ public class VersionDispatchHandler implements DispatchHandler {
 
 /*
         if (Debug.isSet("showResponse")) {
-            xout.output(getVersionDocument(), System.out);
+            xout.output(getGroupVersionDocument(), System.out);
             System.out.println("Document Sent.");
             System.out.println("\nMIME Headers:");
             System.out.println("    XDODS-Server: " + getXDODSServerVersion());
