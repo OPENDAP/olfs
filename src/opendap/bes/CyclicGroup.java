@@ -196,10 +196,32 @@ public class CyclicGroup<E> {
 
     }
 
+    public E[] drain(E[] e){
+        lock.lock();
+        try {
+            E[] o = members.toArray(e);
+            clear();
+            return o;         // Return it to the requester.
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
     public Object[] toArray(){
         lock.lock();
         try {
             return members.toArray();         // Return it to the requester.
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+    public E[] toArray(E[] e){
+        lock.lock();
+        try {
+            return members.toArray(e);         // Return it to the requester.
         } finally {
             lock.unlock();
         }

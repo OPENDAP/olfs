@@ -103,9 +103,10 @@ public class BesGroup extends CyclicGroup<BES> {
 
     public void destroy(){
 
-        BES[] members = (BES[]) drain();
+        Object[] members = drain();
         
-        for(BES bes : members){
+        for(Object o : members){
+            BES bes = (BES)o;
             bes.destroy();
         }
 
@@ -286,17 +287,10 @@ public class BesGroup extends CyclicGroup<BES> {
     }
 
 
-
+    @Override
     public BES[] toArray(){
-
-        Object[] oa =  super.toArray();
-
-        BES[] members = new BES[oa.length];
-        int i = 0;
-        for(Object o: oa){
-            members[i++] = (BES) o;
-        }
-        return members;         // Return it to the requester.
+        BES[] myBesSet = new BES[size()];
+        return super.toArray(myBesSet);        // Return it to the requester.
     }
 
 
