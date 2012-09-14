@@ -38,7 +38,7 @@ public class ChunkedInputStream  {
 
     private Logger log;
 
-    private static int defaultBufferSize = 256;
+    private static int defaultBufferSize = 10240;
     private static int MaxBufferSize = 16777216;
 
     protected InputStream is;
@@ -56,9 +56,6 @@ public class ChunkedInputStream  {
     private int currentChunkType;
 
     private ChunkProtocol chunkProtocol;
-
-
-    //private byte[] transferBuffer;
 
 
 
@@ -191,97 +188,26 @@ public class ChunkedInputStream  {
 
 
     /**
+     * Reads a chunked message from the underlying InputStream and transmits to the passed OutputStream,
+     * <code>dstream</code>. If an error condition is encountered in the chunked message then the error content
+     * will be written to the OutputStream <code>errStream</code>.
      *
      * @param dStream The stream into which to transfer the message data.
      * @param errStream The stream into which to transfer error content if the
      * message contains it.
-     * @return False is the message contained an extension with staus equal to
+     * @return False if the chunked message contained an extension with status equal to
      * error (Which is another way of saying that the source passed an error
-     * message in the stream)
+     * message in the stream). True otherwise.
      * @throws IOException When there are problems reading from or interpreting
-     * the message stream.
+     * the chunked message stream.
      */
-    public boolean readChunkedMessage(OutputStream dStream,
-                                      OutputStream errStream)
-            throws IOException {
+    public boolean readChunkedMessage(OutputStream dStream, OutputStream errStream) throws IOException {
 
         int ret;
         int bytesReceived;
         boolean isError = false;
         boolean moreData = true;
-        byte[] buffer=null;
-
-        while(moreData && !isClosed){
-
-            if(availableInChunk()<=0){
-
-                ret = readChunkHeader();
-
-                if(ret == -1 || isLastChunk()){
-                    moreData = false;
-                }
-                else {
-                    // todo Stop allocating inside this loop!!!!
-                    buffer = new byte[currentChunkDataSize];
-                }
-
-            }
-            else {
-                switch (getCurrentChunkType()){
-
-                    case Chunk.DATA:
-
-                        if(buffer==null)
-                            throw new IOException("Illegal state in readChunkedMessage. The receive buffer is null.");
-
-
-                        // read the chunk body
-                        bytesReceived = Chunk.readFully(is,buffer,0, availableInChunk());
-
-                        // write the data out to the appropriate stream,
-                        // depending on the error status.
-                        (isError?errStream:dStream).write(buffer,0,bytesReceived);
-                        (isError?errStream:dStream).flush();
-
-                        // update the read pointer.
-                        chunkReadPosition += bytesReceived;
-                        break;
-
-                    case Chunk.EXTENSION:
-
-                        isError = processExtensionContent() || isError;
-
-                        break;
-
-                    default:
-                        throw new IOException("Unknown Chunk Type.");
-
-                }
-
-            }
-
-        }
-
-        return !isError;
-    }
-
-    /**
-     *
-     * @param dStream The stream into which to transfer the message data.
-     * @param errStream The stream into which to transfer error content if the
-     * message contains it.
-     * @return False is the message contained an extension with staus equal to
-     * error (Which is another way of saying that the source passed an error
-     * message in the stream)
-     * @throws IOException When there are problems reading from or interpreting
-     * the message stream.
-     */
-    public boolean readChunkedMessageNEW(OutputStream dStream, OutputStream errStream) throws IOException {
-
-        int ret;
-        int bytesReceived;
-        boolean isError = false;
-        boolean moreData = true;
+        String extensionContent;
 
         while(moreData && !isClosed){
 
@@ -297,7 +223,7 @@ public class ChunkedInputStream  {
                     // Check to see if the chunk size is bigger than the buffer
                     if(chunkBuffer.length < currentChunkDataSize){
 
-                        // Make sure the new chunk size isn't too big.
+                        // If the new chunk size is too big, bail.
                         if(currentChunkDataSize > MaxBufferSize){
                             String msg = "Found a chunk size larger than I support. My max size " +
                                          MaxBufferSize + " bytes, currentChunkDataSize: "+currentChunkDataSize;
@@ -317,31 +243,29 @@ public class ChunkedInputStream  {
 
             }
             else {
+
+                // read the chunk body
+                bytesReceived = Chunk.readFully(is,chunkBuffer,0, availableInChunk());
+
+                // update the read pointer.
+                chunkReadPosition += bytesReceived;
+
                 switch (getCurrentChunkType()){
 
                     case Chunk.DATA:
-
-                        if(chunkBuffer==null)
-                            throw new IOException("Illegal state in readChunkedMessage. The receive buffer is null.");
-
-
-                        // read the chunk body
-                        bytesReceived = Chunk.readFully(is,chunkBuffer,0, availableInChunk());
-
                         // write the data out to the appropriate stream,
                         // depending on the error status.
                         (isError?errStream:dStream).write(chunkBuffer,0,bytesReceived);
                         (isError?errStream:dStream).flush();
-
-                        // update the read pointer.
-                        chunkReadPosition += bytesReceived;
                         break;
 
                     case Chunk.EXTENSION:
 
-                        // Process the extension, but preserve the error state of the transmission.
-                        isError = processExtensionContent() || isError;
+                        // Build a String from the content of the chunk extension.
+                        extensionContent =  new String(chunkBuffer,0,bytesReceived);
 
+                        // Process the extension content & preserve any previously encountered errors found in the message.
+                        isError = processExtensionContent(extensionContent) || isError;
                         break;
 
                     default:
@@ -366,33 +290,20 @@ public class ChunkedInputStream  {
     /**
      *
      *
-     * @return Ture if the extension contains the "status=error;"
+     * @param e  The content of the chunk extension held in a String.
+     * @return True if the extension contains the "status=error;"
      * extension name value pair, false otherwise.
      *
      * @throws IOException When there are problems reading from or interpreting
      * the message stream.
      */
-    private boolean processExtensionContent() throws IOException {
+    private boolean processExtensionContent(String e) throws IOException {
 
         boolean isError = false;
-
-
-        // Get the extension content from the stream
-        byte[] ext = new byte[currentChunkDataSize];
-        int bytesReceived = Chunk.readFully(is,ext,0, availableInChunk());
-        chunkReadPosition += bytesReceived;
-
-
-
-
-        // Make a string out of it
-        String e =  new String(ext,0,bytesReceived);
 
         String[] extensions = e.split(";");
 
         // Evaluate the extension information
-
-
         for(String extension : extensions){
 
             // Is it a "status" extension?
@@ -405,13 +316,12 @@ public class ChunkedInputStream  {
                 if(status.equalsIgnoreCase(Chunk.ERROR_STATUS)){
                     //log.error("status: error");
                     isError =  true;
-                    // todo - Why is this nested?? Shouldn't it be if - else if - else if ??? FIX ME!
-                    if(status.equalsIgnoreCase(Chunk.EMERGENCY_EXIT_STATUS)){
-                        log.error("Stream source requested an emergency exit! Closing connection immediately.");
-                        isClosed = true;
-                        is.close();
-                    }
-
+                }
+                // Is the status an emergency exit?
+                else if(status.equalsIgnoreCase(Chunk.EMERGENCY_EXIT_STATUS)){
+                    log.error("Stream source requested an emergency exit! Closing connection immediately.");
+                    isClosed = true;
+                    is.close();
                 }
                 // Is the status a mandatory exit?
                 else if(status.equalsIgnoreCase(Chunk.EXIT_STATUS)){
@@ -420,7 +330,6 @@ public class ChunkedInputStream  {
                         isClosed = true;
                     }
                     log.debug("Stream closed by Source.");
-
                 }
                 else {
                     log.debug("Received status extension: "+extension);
@@ -433,110 +342,6 @@ public class ChunkedInputStream  {
         return isError;
 
     }
-
-
-    /*
-
-    public boolean markSupported() {
-        return false;
-    }
-
-    public void mark(int readLimit) {
-    }
-
-    public void reset() throws IOException {
-        throw new IOException("This stream has not been marked, and dude, marking is not supported.");
-    }
-
-
-    public long skip(long n)
-            throws IOException {
-
-        throw new IOException("Skip not currently suported on ChunkedInputStream.");
-    }
-
-    public int read()
-            throws IOException {
-
-        int val;
-        if(available()>0){
-            val = is.read();
-            if(val>=0)
-                chunkReadPosition += val;
-            return val;
-        }
-        else {
-            return -1;
-        }
-    }
-
-
-
-    public int read(byte[] b)
-            throws IOException {
-
-
-        return read(b,0,b.length);
-    }
-
-
-
-    public int read(byte[] buffer, int offset, int length) throws IOException {
-
-        if (buffer == null)
-            throw new IOException("Illegal state in readChunkedMessage. " +
-                    "The read buffer is null.");
-
-        int ret;
-        int bytesReceived = 0;
-        boolean moreData = true;
-
-        while (moreData && !isClosed) {
-
-            if (availableInChunk() <= 0) {
-                ret = readChunkHeader();
-                if (ret == -1 || isLastChunk()) {
-                    moreData = false;
-                }
-            } else {
-
-                if (availableInChunk() >= length) {
-                    ret = Chunk.readFully(is, buffer, offset, length);
-                    if (ret < 0 && bytesReceived == 0) {
-                        bytesReceived = ret;
-                    } else {
-                        bytesReceived += ret;
-                        chunkReadPosition += bytesReceived;
-
-                    }
-                    moreData = false;
-
-                } else {
-                    ret = Chunk.readFully(is, buffer, offset, availableInChunk());
-                    if (ret < 0) {
-                        moreData = false;
-                        if (bytesReceived == 0)
-                            bytesReceived = ret;
-                    } else {
-                        bytesReceived += ret;
-                        chunkReadPosition += bytesReceived;
-                        offset += bytesReceived;
-                        length -= bytesReceived;
-                    }
-
-                }
-
-            }
-
-        }
-
-        return bytesReceived;
-
-
-    }
-
-
-    */
 
 
 

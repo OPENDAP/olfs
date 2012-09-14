@@ -246,7 +246,7 @@ public class NewPPTClient {
                 throw new PPTException("Cannot write response to a \"null\" " +
                         "OutputStream. ");
 
-            return _in.readChunkedMessageNEW(strm,errorStream);
+            return _in.readChunkedMessage(strm, errorStream);
 
         }
         catch (IOException e) {
