@@ -443,6 +443,9 @@
                         .append("</strong><br />\n")
                         .append("is running: <strong>")
                         .append(currentClient.isRunning() ? "true" : "false")
+                        .append("</strong><br />\n")
+                        .append("BES ReadBuffer: <strong>")
+                        .append(String.valueOf(currentClient.getChunkedReadBufferSize()))
                         .append("</strong><br />\n");
 
             } else if (bes.getBesClientCount() == 0) {

@@ -345,4 +345,9 @@ public class ChunkedInputStream  {
 
 
 
+    public int getChunkedReadBufferSize(){
+        return chunkBuffer.length;
+    }
+
+
 }

@@ -148,6 +148,10 @@ public class OPeNDAPClient {
     }
 
 
+    public int getChunkedReadBufferSize(){
+        return _client.getChunkReadBufferSize();
+    }
+
 
     public void killClient() {
         _client.dieNow();

@@ -113,6 +113,13 @@ public class NewPPTClient {
     }
 
 
+    public int getChunkReadBufferSize(){
+
+        return _in.getChunkedReadBufferSize();
+
+    }
+
+
 
     public void dieNow(){
         try{
