@@ -1,4 +1,4 @@
-package opendap.wcs.v1_1_2.http;
+package opendap.wcs.v2_0.http;
 
 import opendap.coreServlet.ReqInfo;
 

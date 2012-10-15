@@ -1,4 +1,4 @@
-package opendap.wcs.v1_1_2;
+package opendap.wcs.v2_0;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
