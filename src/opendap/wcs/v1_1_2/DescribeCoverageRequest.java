@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: ndp
@@ -101,7 +102,7 @@ public class DescribeCoverageRequest {
 
 
 
-    public DescribeCoverageRequest(HashMap<String,String> kvp)
+    public DescribeCoverageRequest(Map<String,String> kvp)
             throws WcsException {
 
 

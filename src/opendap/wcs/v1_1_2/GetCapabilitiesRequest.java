@@ -31,10 +31,7 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: ndp
@@ -209,7 +206,7 @@ public class GetCapabilitiesRequest {
 
 
 
-    public GetCapabilitiesRequest(HashMap<String,String> kvp)
+    public GetCapabilitiesRequest(Map<String,String> kvp)
             throws WcsException {
 
         String tmp[], s;
