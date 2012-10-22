@@ -26,6 +26,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -86,9 +87,12 @@ public class Dap2Data extends BesDapResponder {
         response.setHeader("Content-Description", "dods_data");
 
 
+        String downloadFileName = Scrub.fileName(relativeUrl.substring(relativeUrl.lastIndexOf("/") + 1, relativeUrl.length()));
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+        response.setHeader("Content-Disposition", contentDisposition);
+
+
         String xdap_accept = request.getHeader("XDAP-Accept");
-
-
 
 
         OutputStream os = response.getOutputStream();

@@ -26,12 +26,15 @@
 package opendap.coreServlet;
 
 
+import opendap.bes.BESDataSource;
 import opendap.dap.Request;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -69,15 +72,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ReqInfo {
 
-
-
-    private static ConcurrentHashMap<String,String> serviceContexts;
-
     private static Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
 
     }
+
+    private static String pathFunctionSyntaxRegEx = "_expr_\\{.*\\}\\{.*\\}(\\{.*\\})?";
+    private static Pattern pathFunctionSyntaxPattern;
+    static {
+         pathFunctionSyntaxPattern = Pattern.compile(pathFunctionSyntaxRegEx, Pattern.CASE_INSENSITIVE);
+    }
+
+
+
+    private static ConcurrentHashMap<String,String> serviceContexts;
+
 
     public static boolean addService(String serviceName, String serviceLocalID){
         serviceContexts.put(serviceName,serviceLocalID);
@@ -118,7 +128,7 @@ public class ReqInfo {
 
     public static String getFullServiceContext(HttpServletRequest request){
 
-        String requestUri = request.getRequestURI().toString();
+        String requestUri = request.getRequestURI();
 
         String pathInfo = request.getPathInfo();
 
@@ -132,16 +142,44 @@ public class ReqInfo {
 
     }
 
+
+    /**
+     * This finds the name of the requested local resource. It has been hacked to remove any usages of path based
+     * functions as used by the GDS, TDS, Ferret, or LAS.
+     *
+     * @todo Change the name of this method to getResourceId().
+     * @param req
+     * @return
+     */
     public static String getLocalUrl(HttpServletRequest req){
 
-        String name=req.getPathInfo();
+        String requestPath=req.getPathInfo();
 
-        if(name == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
-            name = "/";
+        if(requestPath == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
+            requestPath = "/";
 
         }
-        return name;
 
+        Pattern pathFunctionSyntaxPattern = Pattern.compile(pathFunctionSyntaxRegEx, Pattern.CASE_INSENSITIVE);
+        Matcher pathFunctionMatcher = pathFunctionSyntaxPattern.matcher(requestPath);
+
+        boolean foundFunctionSyntax = false;
+
+
+        while(!pathFunctionMatcher.hitEnd()){
+            foundFunctionSyntax = pathFunctionMatcher.find();
+            log.debug("{}", opendap.coreServlet.Util.checkRegex(pathFunctionMatcher, foundFunctionSyntax));
+        }
+
+        String resourceId = requestPath;
+
+        if(foundFunctionSyntax){
+            int start =  pathFunctionMatcher.start();
+            resourceId = requestPath.substring(0,start);
+
+        }
+
+        return resourceId;
     }
 
 
@@ -149,18 +187,81 @@ public class ReqInfo {
 
 
 
+
+
+
     /**
+     * THis has been hacked to collect path side functional expressions (server side functions expressed in the path of
+     * the URL and place them on the begining of the CE returned.
+     *
      * Returns the OPeNDAP constraint expression.
      * @param req The client request.
      * @return The OPeNDAP constraint expression.
      */
     public static  String getConstraintExpression(HttpServletRequest req) {
 
-        String CE = req.getQueryString();
+        String queryString = req.getQueryString();
 
-        if (CE == null) {
-            CE = "";
+
+        String requestPath=req.getPathInfo();
+
+        if(requestPath == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
+            requestPath = "/";
+
         }
+
+        Pattern pathFunctionSyntaxPattern = Pattern.compile(pathFunctionSyntaxRegEx, Pattern.CASE_INSENSITIVE);
+        Matcher pathFunctionMatcher = pathFunctionSyntaxPattern.matcher(requestPath);
+
+        boolean foundFunctionSyntax = false;
+
+
+        while(!pathFunctionMatcher.hitEnd()){
+            foundFunctionSyntax = pathFunctionMatcher.find();
+            log.debug("{}", opendap.coreServlet.Util.checkRegex(pathFunctionMatcher, foundFunctionSyntax));
+        }
+
+        String pathFunction = null;
+
+        if(foundFunctionSyntax){
+            int start =  pathFunctionMatcher.start();
+            pathFunction = requestPath.substring(start,requestPath.length());
+
+        }
+
+        String serverSideFunctionCalls = null;
+
+        if(pathFunction!=null){
+
+            int firstCurlyBrace = pathFunction.indexOf("{");
+
+            if(firstCurlyBrace>=0){
+                int secondCurlyBrace = pathFunction.indexOf("{",firstCurlyBrace+1);
+
+                if(secondCurlyBrace>=0){
+                    int endSecondCurlyBrace = pathFunction.indexOf("}",secondCurlyBrace+1);
+                    serverSideFunctionCalls = pathFunction.substring(secondCurlyBrace+1,endSecondCurlyBrace);
+                }
+            }
+        }
+
+        String CE = "";
+
+
+        if(queryString != null){
+
+            if(serverSideFunctionCalls!=null){
+                CE = serverSideFunctionCalls + "," + queryString;
+            }
+            else {
+                CE = queryString;
+            }
+
+        }
+        else if(serverSideFunctionCalls!=null){
+            CE = serverSideFunctionCalls;
+        }
+
 
         return CE;
     }
@@ -386,6 +487,11 @@ public class ReqInfo {
             }
         }
         log.debug("  dataSourceName: " + dataSourceName);
+
+
+
+
+
 
         return dataSourceName;
 

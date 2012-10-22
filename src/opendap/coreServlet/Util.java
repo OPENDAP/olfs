@@ -39,6 +39,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
 
 /**
  * Some handy servlet sniffing utility methods.
@@ -456,5 +457,26 @@ public class Util {
         }
 
         return msg;
+    }
+
+
+    public static String checkRegex(Matcher m, boolean isMatched){
+        StringBuilder s = new StringBuilder();
+
+
+        s.append("\n---------------------------------------------------\n");
+        s.append("Matcher.find():        ").append(isMatched).append("\n");
+        s.append("Matcher.hitEnd():      ").append(m.hitEnd()).append("\n");
+        s.append("Matcher.requireEnd():  ").append(m.requireEnd()).append("\n");
+        s.append("Matcher.regionStart(): ").append(m.regionStart()).append("\n");
+        s.append("Matcher.regionEnd():   ").append(m.regionEnd()).append("\n");
+        if(isMatched){
+            s.append("Matcher.group():       ").append(m.group()).append("\n");
+            s.append("Matcher.start():       ").append(m.start()).append("\n");
+            s.append("Matcher.end():         ").append(m.end()).append("\n");
+        }
+
+        s.append("\n");
+        return s.toString();
     }
 }

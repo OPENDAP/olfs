@@ -115,8 +115,6 @@ public class DapDispatcher implements DispatchHandler {
 
         dispatchServlet = servlet;
 
-        dispatchServlet = servlet;
-
         systemPath = ServletUtil.getSystemPath(dispatchServlet,"");
 
 
