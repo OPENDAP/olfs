@@ -26,7 +26,6 @@
 package opendap.coreServlet;
 
 
-import opendap.bes.BESDataSource;
 import opendap.dap.Request;
 import org.slf4j.Logger;
 
@@ -175,8 +174,8 @@ public class ReqInfo {
 
         if(foundFunctionSyntax){
             int start =  pathFunctionMatcher.start();
-            resourceId = requestPath.substring(0,start);
-
+            int end = pathFunctionMatcher.end();
+            resourceId = requestPath.substring(0,start) + requestPath.substring(end,requestPath.length());
         }
 
         return resourceId;
@@ -225,7 +224,8 @@ public class ReqInfo {
 
         if(foundFunctionSyntax){
             int start =  pathFunctionMatcher.start();
-            pathFunction = requestPath.substring(start,requestPath.length());
+            int end = pathFunctionMatcher.end();
+            pathFunction = requestPath.substring(start,end);
 
         }
 
