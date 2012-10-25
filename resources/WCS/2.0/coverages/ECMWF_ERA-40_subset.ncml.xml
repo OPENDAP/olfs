@@ -32,74 +32,92 @@
     xmlns:ows="http://www.opengis.net/ows/2.0"
     xmlns:gml="http://www.opengis.net/gml/3.2"
     xmlns:crs="http://www.opengis.net/wcs/service-extension/crs/1.0">
-    <wcs:CoverageDescription gml:id="ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc" xmlns="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" xmlns:swe="http://www.opengis.net/swe/2.0">
+    <wcs:CoverageDescription gml:id="ioos/ECMWF_ERA-40_subset.ncml"
+                             xmlns="http://www.opengis.net/gml/3.2"
+                             xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+                             xmlns:swe="http://www.opengis.net/swe/2.0">
         <boundedBy>
-            <Envelope srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="latitude longitude" uomLabels="deg deg" srsDimension="2">
-                <lowerCorner>82.1161499 21.73596</lowerCorner>
-                <upperCorner>122.768791 46.4944191</upperCorner>
+            <Envelope srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="time latitude longitude" uomLabels="h deg deg" srsDimension="3">
+                <lowerCorner>898476 -90.000 0.000</lowerCorner>
+                <upperCorner>899202 90.000 360.000</upperCorner>
             </Envelope>
         </boundedBy>
-        <wcs:CoverageId>ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</wcs:CoverageId>
+        <wcs:CoverageId>ioos/ECMWF_ERA-40_subset.ncml</wcs:CoverageId>
         <domainSet>
-            <RectifiedGrid dimension="2" gml:id="ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-grid">
+            <Grid dimension="3" gml:id="ioos/ECMWF_ERA-40_subset.ncml-grid">
                 <limits>
                     <GridEnvelope>
-                        <low>0 0</low>
-                        <high>459 700</high>
+                        <low>0 0 0</low>
+                        <high>62 73 144</high>
                     </GridEnvelope>
                 </limits>
-                <axisLabels>latitude longitude</axisLabels>
-                <gml:origin>
-                    <gml:Point gml:id="ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-origin" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-                        <gml:pos>82.1161499 21.73596</gml:pos>
-                    </gml:Point>
-                </gml:origin>
-                <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.08837530673913 0</gml:offsetVector>
-                <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0 0.03531877189729</gml:offsetVector>
-            </RectifiedGrid>
+                <axisLabels>time latitude longitude</axisLabels>
+            </Grid>
         </domainSet>
         <gmlcov:rangeType>
             <swe:DataRecord>
-                <swe:field name="u">
+                <swe:field name="tcw">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
-                        <swe:uom code="m/s"/>
+                        <swe:uom code="kg/m^2"/>
                         <swe:constraint>
                             <swe:AllowedValues>
-                                <swe:interval>-113 186</swe:interval>
+                                <swe:interval>-32767 32767</swe:interval>
                             </swe:AllowedValues>
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="v">
+                <swe:field name="tcwv">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
-                        <swe:uom code="m/s"/>
+                        <swe:uom code="kg/m^2"/>
                         <swe:constraint>
                             <swe:AllowedValues>
-                                <swe:interval>-110 231</swe:interval>
+                                <swe:interval>-32767 32767</swe:interval>
                             </swe:AllowedValues>
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="DOPx">
+                <swe:field name="lsp">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
-                        <swe:uom code="unknown"/>
+                        <swe:uom code="m"/>
                         <swe:constraint>
                             <swe:AllowedValues>
-                                <swe:interval>7 831</swe:interval>
+                                <swe:interval>-32767 32767</swe:interval>
                             </swe:AllowedValues>
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="DOPy">
+                <swe:field name="cp">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
-                        <swe:uom code="unknown"/>
+                        <swe:uom code="m"/>
                         <swe:constraint>
                             <swe:AllowedValues>
-                                <swe:interval>6 831</swe:interval>
+                                <swe:interval>-32767 32767</swe:interval>
+                            </swe:AllowedValues>
+                        </swe:constraint>
+                    </swe:Quantity>
+                </swe:field>
+                <swe:field name="msl">
+                    <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                        <swe:description/>
+                        <swe:uom code="Pa"/>
+                        <swe:constraint>
+                            <swe:AllowedValues>
+                                <swe:interval>-32767 32767</swe:interval>
+                            </swe:AllowedValues>
+                        </swe:constraint>
+                    </swe:Quantity>
+                </swe:field>
+                <swe:field name="blh">
+                    <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                        <swe:description/>
+                        <swe:uom code="m"/>
+                        <swe:constraint>
+                            <swe:AllowedValues>
+                                <swe:interval>-32767 32767</swe:interval>
                             </swe:AllowedValues>
                         </swe:constraint>
                     </swe:Quantity>
