@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: ndp
@@ -47,13 +48,13 @@ public class RangeSubset {
      * @param kvp Key Value Pairs from WCS URL
      * @throws WcsException  When things don't go well.
      */
-    public RangeSubset(HashMap<String,String> kvp) throws WcsException{
+    public RangeSubset(Map<String,String[]> kvp) throws WcsException{
 
 
-        String s = kvp.get("RangeSubset");
+        String[] s = kvp.get("RangeSubset");
 
         if(s!=null){
-        String[] fieldSubsetStrings = s.split(";",0);
+        String[] fieldSubsetStrings = s[0].split(";",0);
 
         if(fieldSubsetStrings.length < 1)
             throw new WcsException("The RangeSubset is required to have one or more FieldSubsets.",

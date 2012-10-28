@@ -29,8 +29,8 @@
         ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:wcs="http://www.opengis.net/wcs/1.1"
-                xmlns:ows="http://www.opengis.net/ows/1.1"
+                xmlns:wcs="http://www.opengis.net/wcs/2.0"
+                xmlns:ows="http://www.opengis.net/ows/2.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:param name="ServicePrefix" />
@@ -146,7 +146,7 @@
                 <ul>
                     <li>
                         <xsl:element name="a">
-                            <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>?service=WCS&amp;version=1.1.2&amp;request=GetCapabilities</xsl:attribute >
+                            <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>?service=WCS&amp;request=GetCapabilities</xsl:attribute >
                             Capabilities
                         </xsl:element>
                         - The GetCapabilities response.
@@ -199,7 +199,9 @@
     <!--                                                        -->
     <xsl:template match="ows:ServiceIdentification">
         <div class="small">
-            <xsl:apply-templates/>
+            <xsl:apply-templates />
+            <hr size="1" noshade="noshade"/>
+            <xsl:apply-templates mode="profiles"/>
         </div>
     </xsl:template>
 
@@ -245,7 +247,7 @@
                 <tr>
                     <th align="left">Identifier</th>
                     <!-- <th align="center">Description</th> -->
-                    <th align="center">Lat/Lon Envelope<br/>[&#160;lwrLon,&#160;&#160;lwrLat]&#160;[&#160;uprLon,&#160;&#160;uprLat]</th>
+                    <th align="center">Lat/Lon Envelope<br/>[&#160;lwrLat,&#160;&#160;lwrLon]&#160;[&#160;uprLat,&#160;&#160;uprLon]</th>
                 </tr>
                 <xsl:choose>
                     <xsl:when test="wcs:CoverageSummary">
@@ -308,14 +310,14 @@
             <td align="left">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcs:Identifier"/>
+                        <xsl:value-of select="$ServicePrefix"/>/describeCoverage?<xsl:value-of select="wcs:CoverageId"/>
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="ows:Title">
                             <xsl:value-of select="ows:Title"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <b><xsl:value-of select="wcs:Identifier"/></b>
+                            <b><xsl:value-of select="wcs:CoverageId"/></b>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:element>
@@ -323,7 +325,7 @@
 
             </td>
             <td align="center">
-                <xsl:apply-templates select="ows:WGS84BoundingBox"/>
+                <xsl:apply-templates select="ows:BoundingBox"/>
             </td>
         </tr>
 
@@ -331,7 +333,7 @@
 
 
 
-    <xsl:template match="ows:WGS84BoundingBox">
+    <xsl:template match="ows:BoundingBox">
 
         <xsl:variable name="numberFormat">+000.00;-000.00</xsl:variable>
         <xsl:variable name="lowerLon">
@@ -350,7 +352,8 @@
             <xsl:value-of select="format-number(number(substring-after(ows:UpperCorner,' ')),$numberFormat,'CoordinateFormatter')"/>
         </xsl:variable>
 
-        [<xsl:value-of select="concat($lowerLon,', ',$lowerLat)"/>] [<xsl:value-of select="concat($upperLon,', ',$upperLat)"/>]
+        <div class="small">crs=<xsl:value-of select="@crs"/></div>
+        [<xsl:value-of select="concat($lowerLat,', ',$lowerLon)"/>] [<xsl:value-of select="concat($upperLat,', ',$upperLon)"/>]
 
     </xsl:template>
 
@@ -371,7 +374,7 @@
 
 
     <xsl:template match="ows:Keywords">
-        <em>Keywords:</em>
+        <em>Keywords: </em>
         <xsl:apply-templates/>
         <br/>
     </xsl:template>
@@ -381,21 +384,28 @@
     </xsl:template>
 
     <xsl:template match="ows:ServiceType">
-        <em>Service:</em>
+        <em>Service: </em>
         <xsl:value-of select="."/>
         version
         <xsl:value-of select="../ows:ServiceTypeVersion"/>
         <br/>
     </xsl:template>
 
+    <xsl:template match="*" mode="profiles"/>
+    <xsl:template match="ows:Profile" mode="profiles">
+        <em>Profile: </em> <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+
     <xsl:template match="ows:Fees">
-        <em>Fees:</em>
+        <em>Fees: </em>
         <xsl:value-of select="."/>
         <br/>
     </xsl:template>
 
     <xsl:template match="ows:AccessConstraints">
-        <em>Access Constraints:</em>
+        <em>Access Constraints: </em>
         <xsl:value-of select="."/>
         <br/>
     </xsl:template>

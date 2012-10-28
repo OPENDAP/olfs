@@ -28,6 +28,7 @@ import org.jdom.Element;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -116,24 +117,24 @@ public class GridCRS {
     }
 
 
-    public static boolean hasGridCRS(HashMap<String,String> kvp){
-        String s = kvp.get("GridBaseCRS");
+    public static boolean hasGridCRS(Map<String,String[]> kvp){
+        String[] s = kvp.get("GridBaseCRS");
         return s != null;
     }
 
 
 
-    public GridCRS(HashMap<String,String> kvp) throws WcsException {
+    public GridCRS(Map<String,String[]> kvp) throws WcsException {
 
         init();
         boolean hasUserGridCRS = false;
-        String s;
+        String s[];
 
 
         // Get the optional GridBaseCRS
         s = kvp.get("GridBaseCRS");
         if(s!=null){
-            setGridBaseCRS(s);
+            setGridBaseCRS(s[0]);
             hasUserGridCRS = true;
         }
 
@@ -148,26 +149,26 @@ public class GridCRS {
                         "GridOffsets");
 
             }
-            setGridOffsets(s);
+            setGridOffsets(s[0]);
 
             // Get the optional GridType
             s = kvp.get("GridType");
             if(s!=null){
-                setGridType(s);
+                setGridType(s[0]);
             }
 
 
             // Get the optional GridCS
             s = kvp.get("GridCS");
             if(s!=null){
-                setGridCS(s);
+                setGridCS(s[0]);
             }
 
 
             // Get the optional GridOrigin
             s = kvp.get("GridOrigin");
             if(s!=null){
-                setGridOrigin(s);
+                setGridOrigin(s[0]);
             }
 
 

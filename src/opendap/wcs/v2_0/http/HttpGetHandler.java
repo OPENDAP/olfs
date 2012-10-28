@@ -7,7 +7,7 @@ import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.semantics.IRISail.ProcessController;
-import opendap.wcs.v1_1_2.*;
+import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -23,6 +23,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -150,6 +151,15 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         String serviceURL = Util.getServiceUrl(request);
         String query      = request.getQueryString();
 
+        Map<String,String[]> requestParameters = new HashMap<String, String[]>();
+        Map pmap =  request.getParameterMap();
+
+        for(Object o: pmap.keySet()){
+            String key = (String) o;
+            String[] value = (String[]) pmap.get(key);
+            requestParameters.put(key,value);
+        }
+
         boolean isWcsEndPoint = false;
 
         if (relativeURL != null) {
@@ -165,7 +175,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
                         log.debug("Sent redirect from / to "+_contextPath+"/");
                     }
                     else if(relativeURL.equals("") && q!=null){
-                        KvpHandler.processKvpWcsRequest(serviceURL, dataAccessBase,query,response);
+                        KvpHandler.processKvpWcsRequest(serviceURL, dataAccessBase,requestParameters,response);
                         log.info("Sent WCS Response");
                     }
                     else if(relativeURL.startsWith(_testPath)){
@@ -250,10 +260,20 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         log.debug("sendDescribeCoveragePage()  serviceUrl: "+serviceUrl);
 
         String id = request.getQueryString();
-        Element cde = CatalogWrapper.getCoverageDescriptionElement(id);
-        if(cde==null)
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        Document coverageDescription = new Document(cde);
+
+
+        Document coverageDescription = null;
+        Element cde;
+        try {
+            cde = CatalogWrapper.getCoverageDescriptionElement(id);
+            coverageDescription = new Document(cde);
+        }
+        catch(WcsException e){
+            WcsExceptionReport wcsER = new WcsExceptionReport(e);
+            coverageDescription = wcsER.getReport();
+        }
+
+
 
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:DescribeCoverage");
@@ -330,7 +350,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void echoWcsRequest(HttpServletRequest request,
                                   HttpServletResponse response) throws IOException {
 
-        HashMap<String,String> keyValuePairs = new HashMap<String,String>();
+        HashMap<String,String[]> keyValuePairs = new HashMap<String,String[]>();
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         Document reqDoc;
         String query = request.getQueryString();
@@ -339,7 +359,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         try {
 
-            switch(KvpHandler.getRequestType(query,keyValuePairs)){
+            switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
                     GetCapabilitiesRequest gcr = new GetCapabilitiesRequest(keyValuePairs);
@@ -384,7 +404,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     public void testWcsRequest(HttpServletRequest request,
                                   HttpServletResponse response) throws InterruptedException, IOException {
 
-        HashMap<String,String> keyValuePairs = new HashMap<String,String>();
+        HashMap<String,String[]> keyValuePairs = new HashMap<String,String[]>();
         String serviceUrl = Util.getServiceUrl(request);
 
         String url = Scrub.completeURL(request.getRequestURL().toString());
@@ -406,7 +426,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         try {
 
-            switch(KvpHandler.getRequestType(query,keyValuePairs)){
+            switch(KvpHandler.getRequestType(keyValuePairs)){
 
                 case  GET_CAPABILITIES:
                     page += getCapabilitiesTestPage(serviceUrl, keyValuePairs);
@@ -454,7 +474,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
-    public String getCapabilitiesTestPage(String serviceUrl, HashMap<String,String> keyValuePairs) throws InterruptedException, WcsException {
+    public String getCapabilitiesTestPage(String serviceUrl, HashMap<String,String[]> keyValuePairs) throws InterruptedException, WcsException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
@@ -479,7 +499,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
     }
 
 
-    public String describeCoverageTestPage(HashMap<String,String> keyValuePairs) throws InterruptedException, WcsException {
+    public String describeCoverageTestPage(HashMap<String,String[]> keyValuePairs) throws InterruptedException, WcsException {
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
@@ -507,7 +527,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
 
-    public String getCoverageTestPage(HttpServletRequest req, HashMap<String,String> keyValuePairs) throws InterruptedException, WcsException {
+    public String getCoverageTestPage(HttpServletRequest req, HashMap<String,String[]> keyValuePairs) throws InterruptedException, WcsException {
 
         GetCoverageRequest getCoverageRequest = new GetCoverageRequest(keyValuePairs);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

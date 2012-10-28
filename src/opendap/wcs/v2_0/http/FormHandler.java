@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0.http;
 
-import opendap.wcs.v1_1_2.WCS;
-import opendap.wcs.v1_1_2.WcsException;
+import opendap.wcs.v2_0.WCS;
+import opendap.wcs.v2_0.WcsException;
 import org.jdom.Element;
 
 import javax.servlet.http.HttpServlet;

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  */
@@ -85,9 +86,9 @@ public class TemporalSubset {
 
 
 
-    public TemporalSubset(HashMap<String,String> kvp) throws WcsException {
+    public TemporalSubset(Map<String,String[]> kvp) throws WcsException {
 
-        String s = kvp.get("TimeSequence");
+        String[] s = kvp.get("TimeSequence");
 
         if (s == null)
             throw new WcsException("Missing required " +
@@ -101,7 +102,7 @@ public class TemporalSubset {
 
         // Time Sequences can be a comma separated list of time instances
         // and time ranges.
-        tmp = s.split(",");
+        tmp = s[0].split(",");
 
         _timeTequenceItems = new TimeSequenceItem[tmp.length];
 

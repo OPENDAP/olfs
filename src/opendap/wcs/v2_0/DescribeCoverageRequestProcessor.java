@@ -40,6 +40,21 @@ public class DescribeCoverageRequestProcessor {
 
 
         Element coverageDescriptions = new Element("CoverageDescriptions",WCS.WCS_NS);
+
+        coverageDescriptions.addNamespaceDeclaration(WCS.GML_NS);
+        coverageDescriptions.addNamespaceDeclaration(WCS.SWE_NS);
+        coverageDescriptions.addNamespaceDeclaration(WCS.GMLCOV_NS);
+        coverageDescriptions.addNamespaceDeclaration(WCS.XSI_NS);
+
+        StringBuilder schemaLocationValue = new StringBuilder();
+
+        schemaLocationValue.append(WCS.WCS_NAMESPACE_STRING).append(" ").append(WCS.WCS_SCHEMA_LOCATION_BASE+"wcsAll.xsd ");
+        schemaLocationValue.append(WCS.GML_NAMESPACE_STRING).append(" ").append(WCS.GML_SCHEMA_LOCATION_BASE+"gml.xsd ");
+        schemaLocationValue.append(WCS.SWE_NAMESPACE_STRING).append(" ").append(WCS.SWE_SCHEMA_LOCATION_BASE+"swe.xsd ");
+        schemaLocationValue.append(WCS.GMLCOV_NAMESPACE_STRING).append(" ").append(WCS.GMLCOV_SCHEMA_LOCATION_BASE+"gmlcovAll.xsd ");
+
+        coverageDescriptions.setAttribute("schemaLocation",schemaLocationValue.toString(),WCS.XSI_NS);
+
         CoverageDescription cd;
 
         for(String id: req.getIds()){
@@ -49,6 +64,7 @@ public class DescribeCoverageRequestProcessor {
                         WcsException.INVALID_PARAMETER_VALUE,"wcs:Identifier");
 
             coverageDescriptions.addContent(cd.getElement());
+
         }
 
         return new Document(coverageDescriptions);

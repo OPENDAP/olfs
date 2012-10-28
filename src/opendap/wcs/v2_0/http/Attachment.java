@@ -44,7 +44,7 @@ import java.net.URISyntaxException;
  * Holds The type information and a referene to an input stream for the content of a Mutipart
  * MIME attachment.
  *
- * @see opendap.coreServlet.MultipartResponse
+ * @see MultipartResponse
  *      User: ndp
  *      Date: Apr 28, 2006
  *      Time: 12:13:19 PM

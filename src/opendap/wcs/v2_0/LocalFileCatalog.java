@@ -23,16 +23,16 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0;
 
+
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -49,9 +49,18 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class LocalFileCatalog implements WcsCatalog {
 
 
+    public static final String NamespaceName = "http://xml.opendap.org/ns/WCS/2.0/LocalFileCatalog#";
+    public static final String NamespacePrefix = "lfc";
+    public static final Namespace NS = Namespace.getNamespace(NamespacePrefix,NamespaceName);
+
+
+
     private  Logger log;
 
+    private boolean validateContent = false;
+
     private  String _catalogDir;
+    private  String _catalogConfigFile;
     private  String _capabilitiesMetadataDir;
 
     //private static boolean _useMemoryCache;
@@ -80,44 +89,63 @@ public class LocalFileCatalog implements WcsCatalog {
 
     /**
      *
-               <WcsCatalog className="opendap.wcs.v1_1_2.LocalFileCatalog">
+               <WcsCatalog className="opendap.wcs.v2_0.LocalFileCatalog">
                     <ServiceIdentification>true</ServiceIdentification>
                     <ServiceProvider>true</ServiceProvider>
                     <OperationsMetadata>true</OperationsMetadata>
                     <CoveragesDirectory>true</CoveragesDirectory>
                 </WcsCatalog>
 
-     * @param configFile
+     * @param config
      * @throws Exception
      */
 
-    public void init(URL configFile, String persistentContentPath, String contextPath) throws Exception{
+    public void init(Element config, String persistentContentPath, String contextPath) throws Exception{
 
         if(intitialized)
             return;
 
 
-        Element e1, e2;
+        Element e1;
         String msg;
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-        SAXBuilder sb = new SAXBuilder();
-        Element configFileRoot = sb.build(configFile).getRootElement();
-
-        Element catalogConfig = configFileRoot.getChild("WcsCatalog");
-
-        e1 = catalogConfig.getChild("CoveragesDirectory");
+        e1 = config.getChild("CatalogDirectory");
         if(e1==null){
-            msg = "Cannot find CoveragesDirectory element in " +
-                    "configuration element: "+ xmlo.outputString(catalogConfig);
-            log.error(msg);
-            throw new IOException(msg);
+
+            String defaultCatalogDirectory = persistentContentPath + "/"+ this.getClass().getSimpleName();
+
+            File defaultCatDir = new File(defaultCatalogDirectory);
+
+            if(!defaultCatDir.exists()){
+                if(!defaultCatDir.mkdirs()){
+                    msg = "Default Coverages Directory ("+defaultCatalogDirectory+")does not exist and cannot be " +
+                            "created. Could not find CoveragesDirectory element in " +
+                            "configuration element: "+ xmlo.outputString(config);
+                    log.error(msg);
+                    throw new IOException(msg);
+                }
+            }
+            _catalogDir = defaultCatalogDirectory;
         }
-        _catalogDir =  e1.getTextTrim();
+        else {
+            _catalogDir =  e1.getTextTrim();
+        }
+        log.debug("WCS-2.0 Coverages Directory: " + _catalogDir);
 
 
-        log.debug("WCS Coverages Directory: " + _catalogDir);
+
+        e1 = config.getChild("CatalogFile");
+        if(e1==null){
+            _catalogConfigFile = _catalogDir + "/LFC.xml";
+        }
+        else {
+            _catalogConfigFile =  e1.getTextTrim();
+        }
+        log.debug("CatalogFile: " + _catalogConfigFile);
+
+
 
         ingestCatalog();
 
@@ -130,91 +158,119 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     <WcsCoverage
+             fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.xml"
+             coverageID="ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc">
 
-    public void init(String capabilitiesMetadataDir,String catalogDir) throws Exception{
+         <field name="u">
+             <DapIdOfLatitudeCoordinate>u.longitude</DapIdOfLatitudeCoordinate>
+             <DapIdOfLongitudeCoordinate>u.latitude</DapIdOfLongitudeCoordinate>
+             <DapIdOfTimeCoordinate>u.time</DapIdOfTimeCoordinate>
+         </field>
 
-        if(intitialized)
-            return;
-
-        //Catalog._useMemoryCache =  useMemoryCache;
-        _catalogDir =  catalogDir;
-        log.debug("WCS Coverages Directory: " + _catalogDir);
-
-        ingestCatalog();
-
-
-
-        _cacheTime = new Date();
-
-        intitialized = true;
-    }
-
-
-
+         <field name="v">
+             <DapIdOfLatitudeCoordinate>v.longitude</DapIdOfLatitudeCoordinate>
+             <DapIdOfLongitudeCoordinate>v.latitude</DapIdOfLongitudeCoordinate>
+             <DapIdOfTimeCoordinate>v.time</DapIdOfTimeCoordinate>
+         </field>
+         <field name="DOPx">
+             <DapIdOfLatitudeCoordinate>DOPx.longitude</DapIdOfLatitudeCoordinate>
+             <DapIdOfLongitudeCoordinate>DOPx.latitude</DapIdOfLongitudeCoordinate>
+             <DapIdOfTimeCoordinate>DOPx.time</DapIdOfTimeCoordinate>
+         </field>
+         <field name="DOPy">
+             <DapIdOfLatitudeCoordinate>DOPy.longitude</DapIdOfLatitudeCoordinate>
+             <DapIdOfLongitudeCoordinate>DOPy.latitude</DapIdOfLongitudeCoordinate>
+             <DapIdOfTimeCoordinate>DOPy.time</DapIdOfTimeCoordinate>
+         </field>
+     </WcsCoverage>
 
 
-
-    private void ingestCatalog() throws Exception  {
+     * @throws java.io.IOException
+     * @throws org.jdom.JDOMException
+     */
+    private void ingestCatalog() throws IOException, JDOMException {
 
         String msg;
 
+        // QC the Catalog directory.
         File catalogDir = new File(_catalogDir);
-
-        if(!catalogDir.exists()){
-            msg = "Cannot find directory: "+ catalogDir;
+        if(!opendap.wcs.v2_0.Util.isReadableDir(catalogDir)){
+            msg = "ingestCatalog(): Catalog directory "+ catalogDir +" is not accessible.";
             log.error(msg);
             throw new IOException(msg);
         }
 
-        if(!catalogDir.canRead()){
-            msg = "Cannot read from directory: "+ catalogDir;
+        // QC the Catalog file.
+        File catalogFile = new File(_catalogConfigFile);
+        if(!opendap.wcs.v2_0.Util.isReadableFile(catalogFile)) {
+            msg = "ingestCatalog(): Catalog File "+ _catalogConfigFile +" is not accessible.";
             log.error(msg);
             throw new IOException(msg);
         }
-        if(!catalogDir.isDirectory()){
-            msg = "WCS Coverages directory "+ catalogDir +" is not actually a directory.";
-            log.error(msg);
-            throw new IOException(msg);
+
+        Element lfcConfig = opendap.xml.Util.getDocumentRoot(catalogFile);
+
+
+        boolean validate = false;
+        String validateAttr = lfcConfig.getAttributeValue("validateCatalog");
+        if(validateAttr!=null){
+            validate = validateAttr.equalsIgnoreCase("true") || validateAttr.equalsIgnoreCase("on");
         }
 
+        validateContent = validate;
 
 
-        class DotFileFilter implements FilenameFilter{
-           public boolean accept(File dir, String name) {
-               if(name.startsWith(".") ) return false;
-               return true;
-           }
-       }
 
-        for(File cd:catalogDir.listFiles( new DotFileFilter())){
-            ingestCoverageDescription(cd);
+
+        for (Object o : lfcConfig.getChildren("WcsCoverage", NS)) {
+            Element wcsCoverageConfig = (Element) o;
+            ingestCoverageDescription(wcsCoverageConfig,  validateContent);
         }
 
-        _lastModified = catalogDir.lastModified();
+        _lastModified = catalogFile.lastModified();
 
         log.info("Ingested WCS Coverages directory: "+_catalogDir);
 
 
     }
-    private void ingestCoverageDescription(File file) throws Exception  {
 
-        CoverageDescription cd;
+
+
+    private void ingestCoverageDescription(Element wcsCoverageConfig, boolean validateContent)  {
+
         String msg;
-        cd = new CoverageDescription(file);
-        coverages.put(cd.getIdentifier(),cd);
-        log.info("Ingested CoverageDescription: "+cd.getIdentifier());
+        CoverageDescription coverageDescription = null;
+        try {
+            coverageDescription = new CoverageDescription(wcsCoverageConfig, _catalogDir, validateContent);
+        } catch (JDOMException e) {
+            msg = "ingestCoverageDescription(): CoverageDescription file either did not parse or did not validate. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (IOException e) {
+            msg = "ingestCoverageDescription(): Attempting to access CoverageDescription file  generated an IOException. Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (ConfigurationException e) {
+            msg = "ingestCoverageDescription(): Encountered a configuration error in the configuration file "+ _catalogConfigFile +" Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        }
+
+        if(coverageDescription!=null){
+            String coverageId = coverageDescription.getCoverageId();
+            coverages.put(coverageId,coverageDescription);
+        }
+
     }
-
-    private void ingestCoverageDescription(Element cde, long lastModified) throws Exception  {
-
-        CoverageDescription cd;
-        String msg;
-        cd = new CoverageDescription(cde,lastModified);
-        coverages.put(cd.getIdentifier(),cd);
-        log.info("Ingested CoverageDescription: "+cd.getIdentifier());
-    }
-
-
 
 
 
@@ -227,7 +283,15 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
-    public  Element getCoverageDescriptionElement(String id)  {
+    public  Element getCoverageDescriptionElement(String id) throws WcsException{
+
+        CoverageDescription coverage = coverages.get(id);
+
+        if(coverage==null){
+            throw new WcsException("No such coverage.",
+                    WcsException.INVALID_PARAMETER_VALUE,"wcs:CoverageId");
+
+        }
 
         return coverages.get(id).getElement();
     }
@@ -265,68 +329,6 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
-    public  List<Element> getSupportedFormatElements()  {
-
-
-        ArrayList<Element> supportedFormats = new ArrayList<Element>();
-        HashMap<String,Element> uniqueFormats = new HashMap<String,Element>();
-
-        Enumeration enm = coverages.elements();
-        Element e;
-        Iterator i ;
-        CoverageDescription cd;
-
-        // Get all of the unique formats.
-        while(enm.hasMoreElements()){
-            cd = (CoverageDescription)enm.nextElement();
-
-            i = cd.getSupportedFormatElements().iterator();
-
-            while(i.hasNext()){
-                e = (Element) i.next();
-                uniqueFormats.put(e.getTextTrim(),e);
-            }
-        }
-
-        i =  uniqueFormats.values().iterator();
-        while(i.hasNext()){
-            supportedFormats.add((Element)i.next());
-        }
-
-
-        return supportedFormats;
-    }
-    public  List<Element> getSupportedCrsElements()  {
-
-
-        ArrayList<Element> supportedCRSs = new ArrayList<Element>();
-        HashMap<String,Element> uniqueCRSs = new HashMap<String,Element>();
-
-        Enumeration enm = coverages.elements();
-        Element e;
-        Iterator i ;
-        CoverageDescription cd;
-
-        // Get all of the unique formats.
-        while(enm.hasMoreElements()){
-            cd = (CoverageDescription)enm.nextElement();
-
-            i = cd.getSupportedCrsElements().iterator();
-
-            while(i.hasNext()){
-                e = (Element) i.next();
-                uniqueCRSs.put(e.getTextTrim(),e);
-            }
-        }
-
-        i =  uniqueCRSs.values().iterator();
-        while(i.hasNext()){
-            supportedCRSs.add((Element)i.next());
-        }
-
-
-        return supportedCRSs;
-    }
 
     public String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
         return null;

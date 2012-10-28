@@ -60,7 +60,7 @@ public interface WcsCatalog {
      * @param resourcePath The path to the resource bundle delivered with the software.
      * @throws Exception When the bad things happen.
      */
-    public void init(URL config, String cacheDir, String resourcePath) throws Exception;
+    public void init(Element config, String cacheDir, String resourcePath) throws Exception;
 
 
 
@@ -102,6 +102,7 @@ public interface WcsCatalog {
      * value wcs:Identifer is equal to the passed string. Returns null if the
      * catalog does not contain a matching Coverage.
      * @throws WcsException When the bad things happen.
+     * @throws InterruptedException
      */
     public Element getCoverageDescriptionElement(String coverageId) throws InterruptedException,  WcsException;
 
@@ -119,6 +120,7 @@ public interface WcsCatalog {
      * @return A List containing all of the wcs:CoverageDescription Elements found in
      * the catalog. The list may be empty.
      * @throws WcsException When the bad things happen.
+     * @throws InterruptedException
      */
     public List<Element> getCoverageDescriptionElements() throws InterruptedException, WcsException;
 
@@ -142,6 +144,7 @@ public interface WcsCatalog {
      * value wcs:Identifer is equal to the passed string. Returns null if the
      * catalog does not contain a matching Coverage.
      * @throws WcsException When the bad things happen.
+     * @throws InterruptedException
      */
     public Element getCoverageSummaryElement(String coverageId) throws InterruptedException, WcsException;
 
@@ -161,79 +164,12 @@ public interface WcsCatalog {
      * @return A List containing all of the wcs:CoverageOfferingBrief Elements
      * found in the catalog. The list may be empty.
      * @throws WcsException When the bad things happen.
+     * @throws InterruptedException
      */
     public List<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
 
 
 
-
-    /**
-     * The queries the catalog to return a list of all of the unique
-     * wcs:SupportedFormat Elements found (across all of the
-     * wcs:CoverageDescriptions) in the catalog.
-     *
-     * <p><b>
-     * This may be a server level configuration item. Given that we are working
-     * with an OPeNDAP server (probablly Hyrax) it may be limited the list of
-     * possible output formts provided by the server software (+ the native file
-     * formats of the data?) In the OGC document
-     * "OGC 07-067r5" Table 5 in section 8.3.3.1  says:
-     * <br>
-     * "This list of SupportedFormats shall be the union of all of the
-     * supported formats in all of the nested CoverageSummaries."
-     * <br>
-     * So, if we thought that we could return each coverage in it's native
-     * storage format then we would wannt a list of those. In reality if we
-     * intend to subset the data, then the list of returned formats is probably
-     * limited to what the server software can excrete and would not also
-     * include fomarts which it can consume.
-     *
-     * </b></p>
-     *
-     *
-     *
-     * @return The list of unique wcs:SupportedFormat Elements in the catalog.
-     */
-    public List<Element> getSupportedFormatElements() throws InterruptedException;
-
-
-
-
-    /**
-     *
-     * The queries the catalog to return a list of all of the unique
-     * wcs:SupportedCRS Elements found (across all of the
-     * wcs:CoverageDescriptions) in the catalog.
-     *
-     * <p><b>
-     * Is this a server level configuration item?
-     * <br>
-     * If the server does not support coordinate transformations, different
-     * coverages MAY have different coordinate systems. In the OGC document
-     * "OGC 07-067r5" Table 5 in section 8.3.3.1  says:
-     * <br>
-     * "This list of SupportedCRSs shall be the union of all of the
-     * SupportedCRSs in all of the nested CoverageSummaries."
-     * <br>
-     * Given that each coverage has a native CRS, and given that the server
-     * may not support CRS transformations it seems that the minimum list of
-     * SupportedCRSs would be union of all of the native CRSs found in the
-     * Coverage catalog.
-     *
-     * However, if coordinate transformation are supported then the
-     * activity would become more complex, as the server would have to look at
-     * each Coverage's native CRS and determine/compute a list of additional
-     * CRSs that data in the native CRS can be transformed into using the
-     * transformation software available to the server at runtime.
-     *
-     * With that in mind we may wish to rename this function to something like
-     * getNativeCrsElements() ... or not.
-     *
-     * </b></p>
-     *
-     * @return The list of unique wcs:SupportedFormat Elements in the catalog.
-     */
-    public List<Element> getSupportedCrsElements() throws InterruptedException;
 
 
 
@@ -298,6 +234,7 @@ public interface WcsCatalog {
      * Returns the base data access URL for this coverage. Null otherwise.
      * @param coverageID
      * @return  The base data access URL for this coverage. Null otherwise.
+     * @throws InterruptedException
      */
     public String getDataAccessUrl(String coverageID) throws InterruptedException;
 

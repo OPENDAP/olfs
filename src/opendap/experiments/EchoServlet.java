@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.experiments;
 
+import javax.print.DocFlavor;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Map;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 
 public class EchoServlet extends HttpServlet {
@@ -42,24 +46,98 @@ public class EchoServlet extends HttpServlet {
 
 
         out.println("<html>");
-        out.println("<head><title>Simple jsp page</title></head>");
+        out.println("<head><title>Echo page</title></head>");
         out.println("<body>");
+
+        out.println("<hr />");
+        out.println("<h3>HTTP Request Headers</h3>");
 
 
         out.println("<table>");
-        out.println("<th colspan=\"2\">HTTP Request Headers</th>");
-        Enumeration headers = request.getHeaderNames();
+        out.println("<th>Header Name</th><th>Value</th>");
+        Enumeration<String> headers = request.getHeaderNames();
         while(headers.hasMoreElements()){
-            String headerName = (String) headers.nextElement();
+            String headerName = headers.nextElement();
             String headerValue = request.getHeader(headerName);
             out.println("<tr>");
-                out.println("<td style=\"text-align: right;\"><code><strong>"+headerName+"</strong></code></td>");
+                out.println("<td style=\"text-align: right;\"><code><strong>"+headerName+"</strong></code>&nbsp;&nbsp;</td>");
                 out.println("<td><code> "+headerValue+"</code></td>");
             out.println("</tr>");
         }
         out.println("</table>");
 
+        out.println("<hr />");
 
+        out.println("<h3>Query String and KVP Evaluation</h3>");
+
+        out.println("<table>");
+
+        out.println("<tr>");
+            out.println("<td style=\"text-align: left;\"><code><strong>Raw &nbsp;</strong></code></td>");
+            out.println("<td><pre>"+StringEscapeUtils.escapeHtml(request.getQueryString())+"</pre></td>");
+        out.println("</tr>");
+
+        out.println("<tr>");
+            out.println("<td style=\"text-align: left;\"><code><strong>Decoded &nbsp;</strong></code></td>");
+            out.println("<td><pre>"+StringEscapeUtils.escapeHtml(java.net.URLDecoder.decode(request.getQueryString()+"","UTF-8"))+"</pre></td>");
+        out.println("</tr>");
+
+        out.println("</table>");
+
+
+        out.println("<br />");
+        out.println("<hr style=\"border:dashed #00CCFF; border-width:1px 0 0 0; height:0;line-height:0px;font-size:0;margin:0;padding:0;\">");
+        out.println("<br />");
+
+        out.println("<table>");
+        out.println("<th style=\"text-align: left;\">keyName</th><th style=\"text-align: left;\">value</th>");
+        Enumeration<String> paramNames = request.getParameterNames();
+
+        while(paramNames.hasMoreElements()){
+            String paramName = paramNames.nextElement();
+            String paramValue = request.getParameter(paramName);
+            out.println("<tr>");
+                out.println("<td style=\"text-align: left;\"><code><strong>"+paramName+"</strong></code>&nbsp;&nbsp;</td>");
+                out.println("<td><pre>"+StringEscapeUtils.escapeHtml(paramValue)+"</pre></td>");
+            out.println("</tr>");
+        }
+        out.println("</table>");
+
+
+        out.println("<hr />");
+
+
+        Map paramMap = request.getParameterMap();
+
+        out.println("<p>ParameterMap is an instance of: "+paramMap.getClass().getName()+"</p>");
+        out.println("<p>ParameterMap contains "+paramMap.size()+" elements.</p>");
+        out.println("<table>");
+        out.println("<th style=\"text-align: left;\">keyName</th><th style=\"text-align: left;\">value</th>");
+
+
+        for(Object o:paramMap.keySet()){
+            String key = (String) o;
+
+            Object oo =   paramMap.get(key);
+
+            String[] values = (String[]) oo;
+            out.println("<tr>");
+            out.println("<td style=\"text-align: left;\"><code><strong>"+key+"</strong></code>&nbsp;&nbsp;</td>");
+            out.println("<td><pre>");
+            boolean first=true;
+            for(String value:values){
+                if(!first)
+                    out.print(", ");
+                out.print(StringEscapeUtils.escapeHtml(value));
+                first = false;
+            }
+            out.println("\n</pre></td>");
+
+            out.println("</tr>");
+        }
+        out.println("</table>");
+
+        out.println("<hr />");
 
         out.println("</body>");
         out.println("</html>");

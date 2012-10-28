@@ -26,7 +26,7 @@ package opendap.wcs.v2_0.http;
 import opendap.coreServlet.DispatchServlet;
 import opendap.namespaces.NS;
 import opendap.namespaces.SOAP;
-import opendap.wcs.v1_1_2.*;
+import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
 

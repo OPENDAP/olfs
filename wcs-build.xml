@@ -157,9 +157,9 @@
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
     <property name="WCS.dir" location="${resources.dir}/WCS"/>
-    <property name="initialContent.dir" location="${WCS.dir}/initialContent"/>
-    <property name="WebInfResources.dir" location="${WCS.dir}/WEB-INF"/>
-    <property name="distributionResources.dir"  location="${WCS.dir}/distribution"/>
+    <property name="initialContent.dir" location="/1.1.2/initialContent"/>
+    <property name="WebInfResources.dir" location="/1.1.2/WEB-INF"/>
+    <property name="distributionResources.dir"  location="/1.1.2/distribution"/>
 
 
 
@@ -458,7 +458,7 @@
 
 
         <war destfile="${build.dist}/WCS.war"
-             webxml="${resources.dir}/WCS/WEB-INF/web.xml"
+             webxml="/1.1.2/WEB-INF/web.xml"
                 >
 
             <lib dir="${lib.dir}">

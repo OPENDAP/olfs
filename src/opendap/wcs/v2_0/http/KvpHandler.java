@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0.http;
 
-import opendap.wcs.v1_1_2.*;
+import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,10 +47,9 @@ public class KvpHandler {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(KvpHandler.class);
 
 
-    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, String query, HttpServletResponse response) throws InterruptedException, IOException {
+    public static void processKvpWcsRequest(String serviceURL, String dataAccessBase, Map<String,String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, IOException {
 
 
-        HashMap<String,String> keyValuePairs = new HashMap<String,String>();
 
         Document wcsResponse;
         XMLOutputter xmlo;
@@ -60,7 +59,7 @@ public class KvpHandler {
 
         try {
 
-            int wcsRequestType = getRequestType(query,keyValuePairs);
+            int wcsRequestType = getRequestType(keyValuePairs);
 
 
 
@@ -95,8 +94,8 @@ public class KvpHandler {
 
                 case WCS.GET_COVERAGE:
 
-                    String store = keyValuePairs.get("store");
-                    if(store!=null && store.equals("true")){
+                    String[] store = keyValuePairs.get("store");
+                    if(store!=null && store[0].equals("true")){
                         wcsResponse = getStoredCoverage(keyValuePairs);
                         xmlo = new XMLOutputter(Format.getPrettyFormat());
                         try {
@@ -145,7 +144,7 @@ public class KvpHandler {
      * @param keyValuePairs   Key Value Pairs from WCS URL
      * @throws WcsException When bad things happen.
      */
-    public static Document getCapabilities(HashMap<String,String> keyValuePairs, String serviceUrl)  throws InterruptedException, WcsException {
+    public static Document getCapabilities(Map<String,String[]> keyValuePairs, String serviceUrl)  throws InterruptedException, WcsException {
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
 
             return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
@@ -157,7 +156,7 @@ public class KvpHandler {
      * @param keyValuePairs     Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document describeCoverage(HashMap<String,String> keyValuePairs )  throws InterruptedException, WcsException {
+    public static Document describeCoverage(Map<String,String[]> keyValuePairs )  throws InterruptedException, WcsException {
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
 
             return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
@@ -170,7 +169,7 @@ public class KvpHandler {
      * @param keyValuePairs    Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static Document getStoredCoverage(HashMap<String, String> keyValuePairs)  throws InterruptedException, WcsException {
+    public static Document getStoredCoverage(Map<String, String[]> keyValuePairs)  throws InterruptedException, WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
 
@@ -184,7 +183,7 @@ public class KvpHandler {
      * @param keyValuePairs    Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
      */
-    public static void getCoverage(HashMap<String, String> keyValuePairs, HttpServletResponse response)  throws InterruptedException, WcsException {
+    public static void getCoverage(Map<String, String[]> keyValuePairs, HttpServletResponse response)  throws InterruptedException, WcsException {
 
         GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
 
@@ -210,32 +209,19 @@ public class KvpHandler {
 
 
 
-    public static int getRequestType(String query, HashMap<String,String> keyValuePairs) throws WcsException{
+    public static int getRequestType(Map<String,String[]> keyValuePairs) throws WcsException{
 
-        if(query==null)
+
+        if(keyValuePairs.isEmpty())
             throw new WcsException("Missing WxS query string.",
                     WcsException.MISSING_PARAMETER_VALUE,"service");
 
-        String[] pairs = query.split("&");
-
-        String[] tmp;
-
-        for(String pair: pairs){
-            tmp = pair.split("=");
-            if(tmp.length != 2)
-                throw new WcsException("Poorly formatted request URL.",
-                        WcsException.MISSING_PARAMETER_VALUE,
-                        tmp[0]);
-
-            keyValuePairs.put(tmp[0],tmp[1]);
-        }
-
         // Make sure the client is looking for a WCS service....
-        String s = keyValuePairs.get("service");
-        if(s==null || !s.equals(WCS.SERVICE))
+        String[] s = keyValuePairs.get("service");
+        if(s==null || !s[0].equals(WCS.SERVICE))
             throw new WcsException("Only the WCS service (version "+
                     WCS.CURRENT_VERSION+") is supported.",
-                    WcsException.OPERATION_NOT_SUPPORTED,s);
+                    WcsException.OPERATION_NOT_SUPPORTED,"service");
 
 
         s = keyValuePairs.get("request");
@@ -244,13 +230,13 @@ public class KvpHandler {
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(s.equals("GetCapabilities")){
+        else if(s[0].equals("GetCapabilities")){
             return WCS.GET_CAPABILITIES;
         }
-        else if(s.equals("DescribeCoverage")){
+        else if(s[0].equals("DescribeCoverage")){
             return WCS.DESCRIBE_COVERAGE;
         }
-        else if(s.equals("GetCoverage")){
+        else if(s[0].equals("GetCoverage")){
             return WCS.GET_COVERAGE;
         }
         else {

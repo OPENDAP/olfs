@@ -44,34 +44,40 @@ public class WCS {
     public static final int       MAX_REQUEST_LENGTH = 65536;
     
 
-    public static final String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1";
-    public static final Namespace WCS_NS = Namespace.getNamespace(WCS_NAMESPACE_STRING);
-    public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1/";
+    public static final String    WCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/2.0";
+    public static final Namespace WCS_NS = Namespace.getNamespace("wcs",WCS_NAMESPACE_STRING);
+    public static final String    WCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/2.0/";
 
-    public static final String    CURRENT_VERSION = "1.1.2";
+    public static final String    CURRENT_VERSION = "2.0.1";
     public static final String    SERVICE = "WCS";
 
 
 
 
-    public static final String    XSI_NAMESPACE_STRING = "http://www.w3.org/2001/XMLSchema-instance/";
+    public static final String    XSI_NAMESPACE_STRING = "http://www.w3.org/2001/XMLSchema-instance";
     public static final Namespace XSI_NS = Namespace.getNamespace("xsi",XSI_NAMESPACE_STRING);
 
 
 
-    public static final String    OWS_NAMESPACE_STRING = "http://www.opengis.net/ows/1.1";
+    public static final String    OWS_NAMESPACE_STRING = "http://www.opengis.net/ows/2.0";
     public static final Namespace OWS_NS = Namespace.getNamespace("ows",OWS_NAMESPACE_STRING);
-    public static final String    OWS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/ows/1.1.0/";
-
-    public static final String    OWCS_NAMESPACE_STRING = "http://www.opengis.net/wcs/1.1/ows";
-    public static final Namespace OWCS_NS = Namespace.getNamespace("owcs",OWCS_NAMESPACE_STRING);
-    public static final String    OWCS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/wcs/1.1.0/";
+    public static final String    OWS_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/ows/2.0/";
 
 
-    //public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml/3.2";
-    public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml"; //haibo
+    public static final String    GMLCOV_NAMESPACE_STRING = "http://www.opengis.net/gmlcov/1.0";
+    public static final Namespace GMLCOV_NS = Namespace.getNamespace("owcs",GMLCOV_NAMESPACE_STRING);
+    public static final String    GMLCOV_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/gmlcov/1.0/";
+
+    public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml/3.2";
     public static final Namespace GML_NS = Namespace.getNamespace("gml",GML_NAMESPACE_STRING);
-    public static final String    GML_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/gml/3.1.1/";
+    public static final String    GML_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/gml/3.2.1/";
+
+    public static final String    SWE_NAMESPACE_STRING = "http://www.opengis.net/swe/2.0";
+    public static final Namespace SWE_NS = Namespace.getNamespace("swe",SWE_NAMESPACE_STRING);
+    public static final String    SWE_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/sweCommon/2.0/";
+
+
+
 
     public static final String    XLINK_NAMESPACE_STRING = "http://www.w3.org/1999/xlink";
     public static final Namespace XLINK_NS = Namespace.getNamespace("xlink",XLINK_NAMESPACE_STRING);
@@ -157,36 +163,56 @@ public class WCS {
 
     public static void checkCoverageDescription(Element cd) throws WcsException{
 
-        checkNamespace(cd,"CoverageDescription",WCS.WCS_NS);
+        checkNamespace(cd,"CoverageDescription",WCS_NS);
 
-        checkIdentifier(cd.getChild("Identifier",WCS.WCS_NS));
-        checkDomain(cd.getChild("Domain",WCS.WCS_NS));
-        checkRange(cd.getChild("Range",WCS.WCS_NS));
 
-        Iterator i = cd.getChildren("SupportedFormat",WCS.WCS_NS).iterator();
+        checkBoundedBy(cd.getChild("boundedBy", GML_NS));
 
-        if(!i.hasNext())
-            throw new WcsException("wcs:CoverageDescription MUST have one or more wcs:SupportFormat elements",
-                    WcsException.MISSING_PARAMETER_VALUE,"wcs:Identifier");
+        checkCoverageId(cd.getChild("CoverageId", WCS_NS));
+
+        checkDomainSet(cd.getChild("domainSet", WCS_NS));
+        checkRangeType(cd.getChild("rangeType", GMLCOV_NS));
+
+        checkServiceParameters(cd.getChild("ServiceParameters", WCS_NS));
+
+
+    }
+
+
+    public static void checkBoundedBy(Element e) throws WcsException{
+        checkNamespace(e,"boundedBy",GML_NS);
+
 
 
 
     }
 
-    public static void checkIdentifier(Element e) throws WcsException{
-        checkNamespace(e,"Identifier",WCS.WCS_NS);
+
+    public static void checkCoverageId(Element e) throws WcsException{
+        checkNamespace(e,"CoverageId",WCS_NS);
 
         if(e.getTextTrim().equals(""))
-            throw new WcsException("wcs:Identifier MUST have a non empty value.",
-                    WcsException.MISSING_PARAMETER_VALUE,"wcs:Identifier");
+            throw new WcsException("wcs:CoverageId MUST have a non empty value.",
+                    WcsException.MISSING_PARAMETER_VALUE,"wcs:CoverageId");
 
     }
 
 
 
-    public static void checkDomain(Element e) throws WcsException{
+    public static void checkServiceParameters(Element e) throws WcsException{
+        checkNamespace(e,"ServiceParameters",WCS_NS);
 
-        checkNamespace(e,"Domain",WCS.WCS_NS);
+
+
+
+    }
+
+
+
+
+    public static void checkDomainSet(Element e) throws WcsException{
+
+        checkNamespace(e,"domainSet",WCS.WCS_NS);
         checkSpatialDomain(e.getChild("SpatialDomain",WCS.WCS_NS));
         checkTemporalDomain(e.getChild("TemporalDomain",WCS.WCS_NS));
 
@@ -253,7 +279,14 @@ public class WCS {
         //@todo Check the content of wcs:BeginPosition and wcs:EndPosition
     }
 
-    public static void checkRange(Element e) throws WcsException{
+
+
+
+
+
+
+
+    public static void checkRangeType(Element e) throws WcsException{
         checkNamespace(e,"Range",WCS.WCS_NS);
 
         Iterator fields = e.getChildren("Field",WCS.WCS_NS).iterator();
@@ -276,7 +309,7 @@ public class WCS {
     public static void checkField(Element e) throws WcsException{
         checkNamespace(e,"Field",WCS.WCS_NS);
 
-        checkIdentifier(e.getChild("Identifier",WCS.WCS_NS));
+        checkCoverageId(e.getChild("Identifier", WCS.WCS_NS));
         checkDefinition(e.getChild("Definition",WCS.WCS_NS));
         checkInterpolationMethods(e.getChild("InterpolationMethods",WCS.WCS_NS));
 

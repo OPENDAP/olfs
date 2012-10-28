@@ -25,8 +25,8 @@ package opendap.wcs.v2_0;
 
 
 import opendap.coreServlet.Scrub;
-import opendap.wcs.v1_1_2.http.MultipartResponse;
-import opendap.wcs.v1_1_2.http.SoapHandler;
+import opendap.wcs.v2_0.http.MultipartResponse;
+import opendap.wcs.v2_0.http.SoapHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -223,113 +223,10 @@ public class CoverageRequestProcessor {
 
         String proj = null;
 
-        RangeSubset rs = req.getRangeSubset();
-        TemporalSubset ts = req.getTemporalSubset();
         String coverageID = req.getCoverageID();
-        String fieldID;
-        BoundingBox subsetBB = req.getBbox();
-        GridCRS reqCRS = req.getGridCRS();
-
         CoverageDescription coverage = CatalogWrapper.getCoverageDescription(coverageID);
-        BoundingBox coverageBB = coverage.getBoundingBox();
-        //GridCRS coverageCRS = coverage.getGridCRS();
 
 
-        if (!subsetBB.intersects(coverageBB))
-            throw new WcsException("Requested BoundingBox does not intersect Coverage data.",
-                    WcsException.INVALID_PARAMETER_VALUE, "ows:BoundingBox");
-
-
-        //@todo work out how to deal with GridCRS objects.
-        //@todo compare request GridCRS (if there is one) to target coverage GridCRS.
-        // @todo Do transformation if required
-
-        if (reqCRS != null) {
-            throw new WcsException("Request contains a GridCRS. Since this " +
-                    "server does not currently support coordinate transforms the" +
-                    "request is denied. You may request the coverage data in " +
-                    "its native CRS by simply omitting a GridCRS component from" +
-                    "the request. See 'OGC 07-067r5' Table 24 footnote d.",
-                    WcsException.INVALID_PARAMETER_VALUE, "wcs:GridCRS");
-        }
-
-        FieldSubset[] fields = null;
-        if (rs != null)
-            fields = req.getRangeSubset().getFieldSubsets();
-
-        if (fields==null || fields.length == 0) {
-            Element fieldSubset;
-            Element identifier;
-            Vector<FieldSubset> allFieldSubsets = new Vector<FieldSubset>();
-            for (String id : coverage.getFieldIDs()) {
-                fieldSubset = new Element("FieldSubset", WCS.WCS_NS);
-                identifier = new Element("Identifier", WCS.OWS_NS);
-                fieldSubset.addContent(identifier);
-                identifier.setText(id);
-                allFieldSubsets.add(new FieldSubset(fieldSubset));
-
-            }
-            fields = new FieldSubset[allFieldSubsets.size()];
-            fields = allFieldSubsets.toArray(fields);
-        }
-
-
-        for (FieldSubset fs : fields) {
-
-            fieldID = fs.getID();
-            if (!CatalogWrapper.getCoverageDescription(coverageID).hasField(fieldID))
-                throw new WcsException("No such wcs:Field: " + Scrub.fileName(fieldID),
-                        WcsException.INVALID_PARAMETER_VALUE, "ows:Identifier");
-
-
-            String dapGridId = coverage.getDapGridArrayId(fieldID);
-            String dapLatitude = coverage.getLatitudeCoordinateDapId(fieldID);
-            String dapLongitude = coverage.getLongitudeCoordinateDapId(fieldID);
-            String latLonBoundingBox = subsetBB.getDapGeogridFunctionBoundingBox();
-
-
-            String dapElevation = coverage.getElevationCoordinateDapId(fieldID);
-            String geogridElevationSubset = null;
-            if (subsetBB.hasElevation())
-                geogridElevationSubset = subsetBB.getDapGeogridFunctionElevationSubset(dapElevation);
-
-
-            String dapTime = coverage.getTimeCoordinateDapId(fieldID);
-            String dapTimeUnits = coverage.getTimeUnits(fieldID);
-            String geogridTimeSubset = null;
-            if (ts != null)
-                geogridTimeSubset = ts.getDapGeogridFunctionTimeSubset(dapTime, dapTimeUnits);
-
-
-            if (proj != null)
-                proj += ",";
-            if (proj == null)
-                proj = "";
-
-
-            // Full query.
-            proj += "geogrid(" +
-                    dapGridId + "," +
-                    dapLatitude + "," +
-                    dapLongitude + "," +
-                    latLonBoundingBox +
-                    (geogridElevationSubset != null ? "," + geogridElevationSubset : "") +
-                    (geogridTimeSubset != null ? "," + geogridTimeSubset : "") +
-                    ")";
-
-
-            // Does not subset by time or elevation.
-            // proj += "geogrid("+fieldID+","+dapLatitude+","+dapLongitude+","+latLonBoundingBox +",\")";
-
-
-            //proj += "geogrid("+fieldID+","+subsetBB.getDapGeogridFunctionBoundingBox() +")";
-
-            //String gridConstraint = geoIndex(dataAccessUrl,fieldID, subsetBB.getDapGeogridFunctionBoundingBox());
-
-            //proj += fieldID + gridConstraint;
-
-
-        }
         return proj == null ? "" : proj;
     }
 

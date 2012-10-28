@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: ndp
@@ -81,11 +82,11 @@ public class DescribeCoverageRequest {
         WCS.checkVersion(descrCovElem.getAttributeValue("version"));
 
         // Get the Identifiers that client wants CoverageDescriptions for.
-        List vlist = descrCovElem.getChildren("Identifier",WCS.WCS_NS);
+        List vlist = descrCovElem.getChildren("CoverageId",WCS.WCS_NS);
         if(vlist.size()==0){
             throw new WcsException("The wcs:DescribeCoverage element is required to have one or more wcs:Identifier child elements.",
                     WcsException.MISSING_PARAMETER_VALUE,
-                    "wcs:Identifier");
+                    "wcs:CoverageId");
         }
 
         ids =  new String[vlist.size()];
@@ -101,29 +102,31 @@ public class DescribeCoverageRequest {
 
 
 
-    public DescribeCoverageRequest(HashMap<String,String> kvp)
+    public DescribeCoverageRequest(Map<String,String[]> kvp)
             throws WcsException {
 
 
-        String tmp[], s;
+        String tmp[], s[];
 
 
         // Make sure the client is looking for a WCS service....
-        WCS.checkService(kvp.get("service"));
+        s = kvp.get("service");
+        WCS.checkService(s==null? null : s[0]);
 
         // Make sure the client can accept a supported WCS version...
-        WCS.checkVersion(kvp.get("version"));
+        s = kvp.get("version");
+        WCS.checkVersion(s==null? null : s[0]);
 
 
 
-        // Make sure the client is acutally asking for this operation
+        // Make sure the client is actually asking for this operation
         s = kvp.get("request");
         if(s == null){
             throw new WcsException("Poorly formatted request URL. Missing " +
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(!s.equals(_request)){
+        else if(!s[0].equals(_request)){
             throw new WcsException("The servers internal dispatch operations " +
                     "have failed. The WCS request for the operation '"+s+"' " +
                     "has been incorrectly routed to the '"+_request+"' " +
@@ -133,16 +136,16 @@ public class DescribeCoverageRequest {
 
 
         // Get the list of identifiers for the coverage to describe.
-        s = kvp.get("identifiers");
+        s = kvp.get("coverageId");
         if(s!=null){
-            tmp = s.split(",");
+            tmp = s[0].split(",");
             ids = tmp;
         }
         else {
             throw new WcsException("Request is missing required list of " +
                     "Coverage identifiers.",
                     WcsException.MISSING_PARAMETER_VALUE,
-                    "identifiers");
+                    "coverageId");
 
         }
 
@@ -199,7 +202,7 @@ public class DescribeCoverageRequest {
 
         Element e;
         for(String id: ids){
-            e = new Element("Identifier",WCS.WCS_NS);
+            e = new Element("CoverageId",WCS.WCS_NS);
             e.setText(id);
             requestElement.addContent(e);
         }

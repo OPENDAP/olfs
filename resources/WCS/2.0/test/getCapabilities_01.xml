@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GetCapabilities xmlns="http://www.opengis.net/wcs/1.1"  service="WCS"/>
+<GetCapabilities xmlns="http://www.opengis.net/wcs/2.0"  service="WCS"/>

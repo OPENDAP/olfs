@@ -874,7 +874,7 @@ public class StaticRdfCatalog implements WcsCatalog, Runnable {
         try {
             cd = new CoverageDescription(cde, lastModified);
             coverages.put(cd.getIdentifier(), cd);
-            //log.info("Ingested CoverageDescription: " + cd.getIdentifier());
+            //log.info("Ingested CoverageDescription: " + cd.getCoverageId());
         } catch (WcsException e) {
             XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
             String wcseElem = xmlo.outputString(e.getExceptionElement());

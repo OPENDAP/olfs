@@ -29,9 +29,11 @@
         ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:wcs="http://www.opengis.net/wcs/1.1"
-                xmlns:ows="http://www.opengis.net/ows/1.1"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:wcs="http://www.opengis.net/wcs/2.0"
+                xmlns:ows="http://www.opengis.net/ows/2.0"
+                xmlns:gml="http://www.opengis.net/gml/3.2"
+                xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+                xmlns:swe="http://www.opengis.net/swe/2.0"
         >
     <xsl:param name="ServicePrefix" />
     <xsl:param name="UpdateIsRunning"/>
@@ -40,8 +42,9 @@
     <xsl:strip-space elements="*"/>
 
     <xsl:variable name="WcsSoftwareVersion">@WCS_SOFTWARE_VERSION@</xsl:variable>
-    <xsl:variable name="WcsServiceVersion">1.1</xsl:variable>
+    <xsl:variable name="WcsServiceVersion">2.0</xsl:variable>
 
+    <xsl:variable name="gmlMetadata" select="gml:metaDataProperty" />
 
 
     <xsl:template match="/wcs:CoverageDescription">
@@ -52,16 +55,7 @@
                     <xsl:attribute name="type">text/css</xsl:attribute>
                     <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
                 </xsl:element>
-                <xsl:choose>
-                    <xsl:when test="ows:Title">
-                        <title>
-                            <xsl:value-of select="ows:Title"/>
-                        </title>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <title>OPeNDAP: Web Coverage Service</title>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <title>OPeNDAP: Web Coverage Service</title>
             </head>
             <body>
 
@@ -92,29 +86,15 @@
                     </table>
 
                 </xsl:if>
-                <xsl:choose>
-                    <xsl:when test="ows:Title">
-                        <h2>
-                            WCS Coverage: <br/><xsl:value-of select="ows:Title"/>
-                            <span class="small"><a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}">XML</a></span>
-                        </h2>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <h2>
-                            <span align="left" class="small">wcs:</span>Coverage Description
-                            <a href="{$ServicePrefix}?service=WCS&amp;version=1.1.2&amp;request=DescribeCoverage&amp;identifiers={wcs:Identifier}"><span class="small">XML</span></a>
-                        </h2>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <h2>
+                    <span align="left" class="small">wcs:</span>Coverage Description
+                    <a href="{$ServicePrefix}?service=WCS&amp;version=2.0.1&amp;request=DescribeCoverage&amp;coverageId={wcs:CoverageId}"><span class="small">XML</span></a>
+                </h2>
 
-                <div class="small">
-                    <xsl:apply-templates select="ows:Abstract"/>
-                    <xsl:apply-templates select="ows:Keywords"/>
-                </div>
 
                 <dl>
-                    <dt><span class="medium">wcs:Identifier</span><br/></dt>
-                    <dd><span class="medium_bold"><xsl:value-of select="wcs:Identifier" /></span></dd>
+                    <dt><span class="medium">wcs:CoverageId</span><br/></dt>
+                    <dd><span class="medium_bold"><xsl:value-of select="wcs:CoverageId" /></span></dd>
                 </dl>
 
 
@@ -127,18 +107,8 @@
                 <!--                                                        -->
 
 
-                <xsl:apply-templates select="wcs:Domain"/>
-                <xsl:apply-templates select="wcs:Range"/>
-                <div class="medium">
-                <h3>Supported Coordinate Reference Systems</h3>
-                <ul>
-                <xsl:apply-templates select="wcs:SupportedCRS"/>
-                </ul>
-                 <h3>Supported Formats</h3>
-                <ul>
-                <xsl:apply-templates select="wcs:SupportedFormat"/>
-                </ul>
-                </div>
+
+                <xsl:apply-templates />
 
 
                 <!-- ****************************************************** -->
@@ -169,8 +139,84 @@
     <!-- ****************************************************** -->
     <!--         ows:Domain                                     -->
     <!--                                                        -->
-    <xsl:template match="wcs:Domain">
-        <h3>Domain</h3>
+
+
+
+    <xsl:template match="gml:metaDataProperty">
+        <em>gml:metaDataProperty - </em>
+        <xsl:apply-templates/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:description">
+        <em>gml:description - </em>
+        <xsl:value-of select="."/>
+    </xsl:template>
+
+    <xsl:template match="gml:descriptionReference">
+        <em>gml:descriptionReference - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:identifier">
+        <em>gml:identifier - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:name">
+        <em>gml:name - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:name">
+        <em>gml:name - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:boundedBy">
+        <h3>gml:boundedBy - </h3>
+        <xsl:apply-templates/>
+        <br/>
+    </xsl:template>
+
+
+    <xsl:template match="gml:location">
+        <em>gml:location - </em>
+        <xsl:apply-templates/>
+        <br/>
+    </xsl:template>
+
+
+    <xsl:template match="wcs:CoverageId">
+        <em>gml:CoverageId - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:coverageFunction">
+        <em>gml:coverageFunction - </em>
+        <xsl:apply-templates/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gmlcov:metadata">
+        <em>gml:coverageMetadata - </em>
+        <xsl:apply-templates/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gmlcov:metadata">
+        <em>gml:coverageMetadata - </em>
+        <xsl:apply-templates/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="gml:domainSet">
+        <h3>gml:domainSet</h3>
 
         <div class="medium">
             <xsl:apply-templates/>
@@ -178,80 +224,133 @@
 
     </xsl:template>
 
-
-    <xsl:template match="wcs:TemporalDomain">
-        Temporal Domain:
-        <ul>
-                <xsl:apply-templates mode="simple"/>
-        </ul>
-    </xsl:template>
-
-
-    <xsl:template match="wcs:SpatialDomain">
-        Spatial Domain:
-        <ul>
-                <xsl:apply-templates/>
-        </ul>
-    </xsl:template>
-
-
-    <xsl:template match="ows:BoundingBox">
-        <li>Bounding Box <span class="small">(crs='<xsl:value-of select="@crs"/>')</span>
-        <ul>
-        <li><span class="small" align="left">lowerCorner: </span>[<xsl:value-of select="ows:LowerCorner"/>]</li>
-        <li><span class="small" align="left">upperCorner: </span>[<xsl:value-of select="ows:UpperCorner"/>]</li>
-        </ul>
-        </li>
-    </xsl:template>
-
-
-    <xsl:template match="wcs:SupportedCRS">
-        <li>
-            <xsl:value-of select="."/>
-        </li>
-    </xsl:template>
-
-
-    <xsl:template match="wcs:SupportedFormat">
-        <li>
-            <xsl:value-of select="."/>
-        </li>
-    </xsl:template>
-
-
-    <xsl:template match="ows:Keywords">
-        <em>Keywords:</em>
+    <xsl:template match="gmlcov:rangeType">
+        <h3>gmlcov:rangeType</h3>
         <xsl:apply-templates/>
-        <br/>
-    </xsl:template>
-
-    <xsl:template match="ows:Keyword">
-        [<xsl:value-of select="."/>]
     </xsl:template>
 
 
-    <xsl:template match="ows:Abstract">
-        <xsl:value-of select="."/>
-        <br/>
-    </xsl:template>
 
-    <xsl:template match="wcs:Range">
-        <h3>Range</h3>
+    <xsl:template match="wcs:ServiceParameters">
+        <h3>wcs:ServiceParameters</h3>
         <ul>
             <xsl:apply-templates/>
         </ul>
     </xsl:template>
 
+    <xsl:template match="wcs:CoverageSubtype">
+        <em>wcs:CoverageSubtype - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
 
-    <xsl:template match="wcs:Field">
-        <li>field: <span class="medium_bold"> <xsl:value-of select="wcs:Identifier"/></span>
+    <xsl:template match="wcs:CoverageSubtypeParent">
+        <em>wcs:CoverageSubtypeParent - </em>
         <ul>
-            <xsl:apply-templates mode="simple"/>
+            <xsl:apply-templates/>
         </ul>
-        </li>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="wcs:nativeFormat">
+        <em>wcs:nativeFormat - </em>
+        <xsl:value-of select="."/>
+        <br/>
+    </xsl:template>
+
+    <xsl:template match="wcs:Extension">
+        <em>wcs:Extension - </em>
+        <xsl:value-of select="."/>
+        <br/>
     </xsl:template>
 
 
+
+
+
+
+
+
+
+
+    <xsl:template match="/ows:WcsExceptionReport">
+        <html>
+            <head>
+                <xsl:element name="link">
+                    <xsl:attribute name="rel">stylesheet</xsl:attribute>
+                    <xsl:attribute name="type">text/css</xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="$ServicePrefix"/>/docs/css/contents.css</xsl:attribute>
+                </xsl:element>
+                <title>OPeNDAP: Web Coverage Service Exception</title>
+            </head>
+            <body>
+
+                <!-- ****************************************************** -->
+                <!--                      PAGE BANNER                       -->
+                <!--                                                        -->
+                <!--                                                        -->
+
+                <table border="0" width="90%">
+                    <tr>
+                        <td><img alt="Institution Logo" src="{concat($ServicePrefix,'/docs/images/logo.gif')}" /></td>
+                        <td align="center">
+                            <div  class="xlarge">Web Coverage Service Exception</div>
+                        </td>
+                    </tr>
+                </table>
+
+
+
+
+                <!-- ****************************************************** -->
+                <!--                       PAGE BODY                        -->
+                <!--                                                        -->
+                <!--                                                        -->
+
+
+                <xsl:apply-templates />
+
+                <!-- ****************************************************** -->
+                <!--                              FOOTER                    -->
+                <!--                                                        -->
+                <!--                                                        -->
+                <hr size="1" noshade="noshade"/>
+                <div class="small" align="right">
+                    OPeNDAP WCS Service development sponsored by <a href='http://www.ioos.gov/'>IOOS</a>
+                </div>
+                <!-- ****************************************************** -->
+                <!--         HERE IS THE HYRAX VERSION NUMBER               -->
+                <!--                                                        -->
+                <h3>WCS-<xsl:value-of select="$WcsServiceVersion"/>
+                    <span class="small"> (OPeNDAP WCS service implementation version
+                        <xsl:value-of select="$WcsSoftwareVersion"/>)</span>
+                    <br />
+                    <span class="uuid">
+                        ServerUUID=e93c3d09-a5d9-49a0-a912-a0ca16430b91-WCS
+                    </span>
+                </h3>
+
+            </body>
+        </html>
+    </xsl:template>
+
+
+    <xsl:template match="ows:Exception">
+        <em>@exceptionCode - </em>
+        <xsl:value-of select="@exceptionCode"/>
+        <br/>
+        <em>@locator - </em>
+        <xsl:value-of select="@locator"/>
+        <br/>
+        <div class="medium"><xsl:value-of select="ows:ExceptionText"/></div>
+    </xsl:template>
+
+
+
+
+    <xsl:template match="*">
+        <xsl:apply-templates mode="simple"/>
+    </xsl:template>
 
     <xsl:template match="*" mode="simple">
         <xsl:choose>
@@ -276,6 +375,12 @@
 
 
     <xsl:template match="@*|text()"/>
+
+
+
+
+
+
 
 
 </xsl:stylesheet>

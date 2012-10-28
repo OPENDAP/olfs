@@ -80,11 +80,29 @@ public class CapabilitiesRequestProcessor {
      */
     public static Document processGetCapabilitiesRequest(GetCapabilitiesRequest req, String serviceUrl)  throws InterruptedException, WcsException {
 
+
         Element capabilities = new Element("Capabilities",WCS.WCS_NS);
+
+        capabilities.addNamespaceDeclaration(WCS.WCS_NS);
+        capabilities.addNamespaceDeclaration(WCS.OWS_NS);
+        capabilities.addNamespaceDeclaration(WCS.XSI_NS);
+
+        StringBuilder schemaLocation = new StringBuilder();
+
+        schemaLocation
+                .append(WCS.OWS_NAMESPACE_STRING).append("  ")
+                .append(WCS.OWS_SCHEMA_LOCATION_BASE).append("owsAll.xsd").append(" ")
+                .append(WCS.WCS_NAMESPACE_STRING).append("  ")
+                .append(WCS.WCS_SCHEMA_LOCATION_BASE).append("wcsAll.xsd")
+
+        ;
+        capabilities.setAttribute("schemaLocation",schemaLocation.toString(),WCS.XSI_NS);
 
         String updateSequence = getUpdateSequence();
 
         capabilities.setAttribute("updateSequence",updateSequence);
+
+        capabilities.setAttribute("version",WCS.CURRENT_VERSION);
 
         Element section;
 
@@ -122,6 +140,9 @@ public class CapabilitiesRequestProcessor {
                 capabilities.addContent(getContents());
             }
 
+
+
+
             return new Document(capabilities);
 
 
@@ -156,17 +177,6 @@ public class CapabilitiesRequestProcessor {
 
         if(i.hasNext()){
 
-            while(i.hasNext()){
-                cs = (Element) i.next();
-                contents.addContent(cs);
-            }
-
-            i = CatalogWrapper.getSupportedCrsElements().iterator();
-            while(i.hasNext()){
-                cs = (Element) i.next();
-                contents.addContent(cs);
-            }
-            i = CatalogWrapper.getSupportedFormatElements().iterator();
             while(i.hasNext()){
                 cs = (Element) i.next();
                 contents.addContent(cs);

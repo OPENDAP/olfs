@@ -102,7 +102,7 @@ public class Keywords {
 
     public Element getElement(){
         Element e;
-        Element keywordsElement = new Element("Keyword",WCS.OWCS_NS);
+        Element keywordsElement = new Element("Keyword",WCS.WCS_NS);
 
         for(LanguageString keyword: keywords){
             e = new Element("Keyword",WCS.OWS_NS);

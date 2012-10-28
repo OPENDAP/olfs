@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2012 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<wcs:CoverageDescription
+    gml:id="ioos-200803061600_HFRadar_USEGC_6km_rtv_SIO.nc"
+    xmlns="http://www.opengis.net/gml/3.2"
+    xmlns:wcs="http://www.opengis.net/wcs/2.0"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:swe="http://www.opengis.net/swe/2.0"
+    xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
+    >
+    <boundedBy>
+        <Envelope srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude"
+            uomLabels="deg deg" srsDimension="2">
+            <lowerCorner>82.1161499 21.73596</lowerCorner>
+            <upperCorner>122.768791 46.4944191</upperCorner>
+        </Envelope>
+    </boundedBy>
+    <wcs:CoverageId>ioos-200803061600_HFRadar_USEGC_6km_rtv_SIO.nc</wcs:CoverageId>
+    <domainSet>
+        <RectifiedGrid dimension="2" gml:id="ioos-200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-grid">
+            <limits>
+                <GridEnvelope>
+                    <low>0 0</low>
+                    <high>459 700</high>
+                </GridEnvelope>
+            </limits>
+            <axisLabels>latitude longitude</axisLabels>
+            <gml:origin>
+                <gml:Point gml:id="ioos-200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-origin"
+                    srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+                    <gml:pos>82.1161499 21.73596</gml:pos>
+                </gml:Point>
+            </gml:origin>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.08837530673913 0.0
+            </gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 0.03531877189729
+            </gml:offsetVector>
+        </RectifiedGrid>
+    </domainSet>
+    <gmlcov:rangeType>
+        <swe:DataRecord>
+            <swe:field name="u">
+                <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                    <swe:description/>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>-113 186</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+            <swe:field name="v">
+                <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                    <swe:description/>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>-110 231</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+            <swe:field name="DOPx">
+                <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                    <swe:description/>
+                    <swe:uom code="unknown"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>7 831</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+            <swe:field name="DOPy">
+                <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                    <swe:description/>
+                    <swe:uom code="unknown"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>6 831</swe:interval>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+        </swe:DataRecord>
+    </gmlcov:rangeType>
+    <wcs:ServiceParameters>
+        <wcs:CoverageSubtype>RectifiedGridCoverage</wcs:CoverageSubtype>
+        <wcs:nativeFormat>application/x-netcdf</wcs:nativeFormat>
+    </wcs:ServiceParameters>
+</wcs:CoverageDescription>
+
+
+

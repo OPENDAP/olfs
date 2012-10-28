@@ -24,7 +24,7 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.coreServlet.ReqInfo;
-import opendap.wcs.v1_1_2.*;
+import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -186,15 +186,17 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
 
             case WCS.GET_COVERAGE:
 
-                GetCoverageRequest wcsGCR = new GetCoverageRequest(wcsRequest);
+                GetCoverageRequest getCoverageRequest = new GetCoverageRequest(wcsRequest);
 
-                if (wcsGCR.isStore()) {
-                    wcsResponse = getStoredCoverage(wcsGCR);
+                /*
+                if (getCoverageRequest.isStore()) {
+                    wcsResponse = getStoredCoverage(getCoverageRequest);
                     sendWcsResponse(wcsResponse,response);
                 }
                 else {
-                    sendCoverageResponse(wcsGCR, response);
+                    sendCoverageResponse(getCoverageRequest, response);
                 }
+                */
 
 
                 break;
@@ -267,7 +269,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
         try {
             reqDoc = URLDecoder.decode(reqDoc, encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new WcsException("Failed to URLDecode Wcs REquest Document. Attempted with encodeing '" + encoding + "'  Message: " + e.getMessage(),
+            throw new WcsException("Failed to URLDecode Wcs Request Document. Attempted with encoding '" + encoding + "'  Message: " + e.getMessage(),
                     WcsException.INVALID_PARAMETER_VALUE,
                     "WCS Request Document.");
         }

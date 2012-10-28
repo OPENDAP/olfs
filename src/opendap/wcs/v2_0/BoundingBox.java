@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -43,7 +43,7 @@ public class BoundingBox {
     Logger log;
     private double[] lowerCorner;
     private double[] upperCorner;
-    private URI crs;
+    private URI srsName;
 
     /**
      * Builds a BoundingBox from the passed corner positions.
@@ -57,7 +57,7 @@ public class BoundingBox {
         this.lowerCorner = lowerCorner;
         this.upperCorner = upperCorner;
 
-        this.crs = crs;
+        this.srsName = crs;
     }
 
 
@@ -67,11 +67,11 @@ public class BoundingBox {
      * @param kvp A HashMap containing the KVP.
      * @throws WcsException When the KVP has issues.
      */
-    public BoundingBox(HashMap<String, String> kvp) throws WcsException {
+    public BoundingBox(Map<String, String[]> kvp) throws WcsException {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
 
-        String s = kvp.get("BoundingBox");
+        String[] s = kvp.get("BoundingBox");
 
         if (s == null)
             throw new WcsException("Request is missing required " +
@@ -85,7 +85,7 @@ public class BoundingBox {
         double[] upperCorner;
 
 
-        String tmp[] = s.split(",");
+        String tmp[] = s[0].split(",");
         int valCount = tmp.length;
 
         if (valCount < 2)
@@ -138,14 +138,25 @@ public class BoundingBox {
 
         this.lowerCorner = lowerCorner;
         this.upperCorner = upperCorner;
-        this.crs = crs;
+        this.srsName = crs;
 
 
     }
 
     /**
-     * Builds a BoundingBox from an ows:BoundingBox Element.
-     * @param bbElement The ows:BoundingBox element from which to initialize this
+     *
+     *
+     *
+     <boundedBy>
+         <Envelope srsName="http://www.opengis.net/def/srsName/EPSG/0/4326" axisLabels="time latitude longitude"
+                   uomLabels="h deg deg" srsDimension="3">
+             <lowerCorner>898476 -90.000 0.000</lowerCorner>
+             <upperCorner>899202 90.000 360.000</upperCorner>
+         </Envelope>
+     </boundedBy>
+
+     * Builds a BoundingBox from an gml:boundedBy Element.
+     * @param bbElement The gml:boundedBy element from which to initialize this
      * BoundingBox object.
      * @throws WcsException When the ows:BoundingBox has issues.
      */
@@ -154,40 +165,49 @@ public class BoundingBox {
 
 
         if (bbElement == null)
-            throw new WcsException("Missing required " +
-                    "ows:BoundingBox element. This is used to identify " +
+            throw new WcsException("Missing " +
+                    "gml:boundedBy element. This is used to identify " +
                     "a physical world bounding space for which data will be returned.",
                     WcsException.MISSING_PARAMETER_VALUE,
-                    "wcs:BoundingBox");
+                    "gml:boundedBy");
 
-        URI crs = null;
+        URI srsName = null;
         double[] lowerCorner;
         double[] upperCorner;
 
         Element e;
         String s;
 
-        WCS.checkNamespace(bbElement,"BoundingBox",WCS.OWS_NS);
+        WCS.checkNamespace(bbElement, "boundedBy", WCS.GML_NS);
 
         try {
 
+            Element envelope = bbElement.getChild("Envelope", WCS.GML_NS);
+
+            if (envelope == null)
+                throw new WcsException("Missing required" +
+                        "gml:Envelope element. This is used to identify " +
+                        "a physical world bounding space for which data will be returned.",
+                        WcsException.MISSING_PARAMETER_VALUE,
+                        "gml:Envelope");
+
 
             // Process Lower Corner.
-            e = bbElement.getChild("LowerCorner", WCS.OWS_NS);
+            e = envelope.getChild("lowerCorner", WCS.GML_NS);
             if (e == null) {
-                throw new WcsException("The BoundingBox used is incomplete. " +
-                        "It is missing the required ows:LowerCorner.",
+                throw new WcsException("The gml:boundedBy element is incomplete. " +
+                        "It is missing the required gml:lowerCorner.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "wcs:BoundingBox");
+                        "gml:boundedBy");
             }
 
             String tmp[] = e.getTextNormalize().split(" ");
             int valCount = tmp.length;
 
             if (valCount < 2)
-                throw new WcsException("The LowerCorner must contain at least two values.",
+                throw new WcsException("The gml:lowerCorner must contain at least two values.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "ows:LowerCorner");
+                        "gml:lowerCorner");
 
             lowerCorner = new double[valCount];
             int index;
@@ -196,25 +216,23 @@ public class BoundingBox {
             }
 
 
-
-
             // Process Upper Corner.
-            e = bbElement.getChild("UpperCorner", WCS.OWS_NS);
+            e = envelope.getChild("upperCorner", WCS.GML_NS);
             if (e == null) {
-                throw new WcsException("The wcs:BoundingBox used is incomplete. " +
-                        "It is missing the required ows:UpperCorner " +
+                throw new WcsException("The gml:boundedBy is incomplete. " +
+                        "It is missing the required gml:upperCorner element " +
                         "This means at LEAST two numeric values.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "wcs:BoundingBox");
+                        "gml:boundedBy");
             }
 
             tmp = e.getTextNormalize().split(" ");
             valCount = tmp.length;
 
             if (valCount < 2)
-                throw new WcsException("The ows:UpperCorner must contain at least two values.",
+                throw new WcsException("The gml:upperCorner must contain at least two values.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "ows:UpperCorner");
+                        "gml:upperCorner");
 
             upperCorner = new double[valCount];
             for (int i = 0; i < valCount; i++) {
@@ -224,35 +242,32 @@ public class BoundingBox {
 
             //Make sure they have the same number of values!
             if (upperCorner.length != lowerCorner.length)
-                throw new WcsException("The ows:UpperCorner must contain the same number of values as the ows:LowerCorner.",
+                throw new WcsException("The gml:upperCorner must contain the same number of values as the gml:lowerCorner.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "ows:UpperCorner");
+                        "gml:boundedBy");
 
-        }
-        catch (NumberFormatException nfe) {
+
+            s = envelope.getAttributeValue("srsName");
+            if (s != null) {
+                try {
+                    srsName = new URI(s);
+                } catch (URISyntaxException use) {
+                    throw new WcsException(use.getMessage(),
+                            WcsException.INVALID_PARAMETER_VALUE,
+                            "gml:Envelope/@srsName");
+                }
+
+            }
+        } catch (NumberFormatException nfe) {
             throw new WcsException(nfe.getMessage(),
                     WcsException.INVALID_PARAMETER_VALUE,
-                    "wcs:BoundingBox");
-        }
-
-
-        s = bbElement.getAttributeValue("crs");
-        if (s != null) {
-            try {
-                crs = new URI(s);
-            }
-            catch (URISyntaxException use) {
-                throw new WcsException(use.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "wcs:BoundingBox@crs");
-            }
-
+                    "gml:boundedBy");
         }
 
 
         this.lowerCorner = lowerCorner;
         this.upperCorner = upperCorner;
-        this.crs = crs;
+        this.srsName = srsName;
 
 
     }
@@ -278,7 +293,7 @@ public class BoundingBox {
      * @return The URI in which the BoundingBox coordinates are expressed.
      */
     public URI getCRSURI() {
-        return crs;
+        return srsName;
     }
 
 
@@ -328,11 +343,11 @@ public class BoundingBox {
      *
      * @return A ows:BoundingBox element representing this BoundingBox.
      */
-    public Element getBoundingBoxElement() {
+    public Element getOwsBoundingBoxElement() {
         Element bbox = new Element("BoundingBox", WCS.OWS_NS);
 
-        if (crs != null)
-            bbox.setAttribute("crs", crs.toString());
+        if (srsName != null)
+            bbox.setAttribute("crs", srsName.toString());
 
 
         String txt = "";
@@ -362,8 +377,8 @@ public class BoundingBox {
     public Element getWgs84BoundingBoxElement() {
         Element bbox = new Element("WGS84BoundingBox", WCS.OWS_NS);
 
-        if (crs != null)
-            bbox.setAttribute("crs", crs.toString());
+        if (srsName != null)
+            bbox.setAttribute("crs", srsName.toString());
 
         //@todo transform coordinates!!
 
@@ -401,13 +416,13 @@ public class BoundingBox {
 
         // @todo transform coordinates of passed BB to those of this one before check intersection
 
-        if(crs!=null &&
+        if(srsName !=null &&
                 bb.getCRSURI()!=null &&
-                !crs.equals(bb.getCRSURI())){
+                !srsName.equals(bb.getCRSURI())){
 
             String msg = "Cannot check for BoundingBox intersections since the " +
                     "passed BoundingBox is expressed in a different CRS. " +
-                    "My CRS: "+crs.toASCIIString()+" " +
+                    "My CRS: "+ srsName.toASCIIString()+" " +
                     "Passed CRS: "+bb.getCRSURI().toASCIIString();
 
             log.error(msg);

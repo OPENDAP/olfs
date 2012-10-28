@@ -118,13 +118,6 @@ public class CatalogWrapper {
         return _catalogImpl.getCoverageSummaryElements();
     }
 
-    public static List<Element> getSupportedFormatElements() throws InterruptedException {
-        return _catalogImpl.getSupportedFormatElements();
-    }
-
-    public static List<Element> getSupportedCrsElements() throws InterruptedException {
-        return _catalogImpl.getSupportedCrsElements();
-    }
 
 
     private static void ingestCapabilitiesMetadata(Element config) throws Exception  {

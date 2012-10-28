@@ -4,9 +4,15 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
-import opendap.semantics.wcs.StaticRdfCatalog;
-import opendap.wcs.v1_1_2.CatalogWrapper;
+import opendap.wcs.v2_0.CatalogWrapper;
+import opendap.wcs.v2_0.LocalFileCatalog;
+import opendap.wcs.v2_0.WcsCatalog;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
@@ -61,8 +67,6 @@ public class Servlet extends HttpServlet {
         enableUpdateUrl = s!=null && s.equalsIgnoreCase("true");
         log.debug("enableUpdateUrl: "+enableUpdateUrl);
 
-
-
         String serviceContentPath = contentPath;
         if(!serviceContentPath.endsWith("/"))
             serviceContentPath += "/";
@@ -70,8 +74,7 @@ public class Servlet extends HttpServlet {
 
         installInitialContent(resourcePath, serviceContentPath);
 
-        initializeSemanticCatalog(resourcePath, serviceContentPath, configFilename, semanticPreload);
-
+        initializeCatalog(contextPath, serviceContentPath, configFilename);
 
 
         // Build Handler Objects
@@ -113,7 +116,114 @@ public class Servlet extends HttpServlet {
 
 
 
+    public void initializeCatalog(String serviceContextPath, String serviceContentPath,  String configFileName) throws ServletException {
 
+        if (_initialized) return;
+
+
+
+        Element e1, e2;
+        String msg;
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        URL serviceConfigFile = getServiceConfigurationUrl(serviceContentPath,configFileName);
+
+
+        SAXBuilder sb = new SAXBuilder();
+        Document configDoc = null;
+
+        try {
+            configDoc = sb.build(serviceConfigFile);
+            if(configDoc==null) {
+                msg = "The WCS 2.0 servlet is unable to locate the configuration document '"+serviceConfigFile+"'";
+                log.error(msg);
+                throw new ServletException(msg);
+            }
+
+        } catch (JDOMException e) {
+            throw new ServletException(e);
+        } catch (IOException e) {
+            throw new ServletException(e);
+        }
+
+        Element configFileRoot = configDoc.getRootElement();
+        if(configFileRoot==null) {
+            msg = "The WCS 2.0 servlet is unable to locate the root element of the configuration document '"+serviceConfigFile+"'";
+            log.error(msg);
+            throw new ServletException(msg);
+        }
+
+
+        Element catalogConfig = configFileRoot.getChild("WcsCatalog");
+        if(catalogConfig==null) {
+            msg = "The WCS 2.0 servlet is unable to locate the configuration Directory <WcsCatalog> element " +
+                    "in the configuration file: " + serviceConfigFile + "'";
+            log.error(msg);
+            throw new ServletException(msg);
+        }
+
+
+        String className =  catalogConfig.getAttributeValue("className");
+        if(className==null) {
+            msg = "The WCS 2.0 servlet is unable to locate the 'className' attribute of the <WcsCatalog> element"+
+                    "in the configuration file: " + serviceConfigFile + "'";
+            log.error(msg);
+            throw new ServletException(msg);
+        }
+
+
+        WcsCatalog wcsCatalog = null;
+        try {
+
+            log.debug("Building Handler: " + className);
+            Class classDefinition = Class.forName(className);
+            wcsCatalog = (WcsCatalog) classDefinition.newInstance();
+
+
+        } catch (ClassNotFoundException e) {
+            msg = "Cannot find class: " + className;
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (InstantiationException e) {
+            msg = "Cannot instantiate class: " + className;
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (IllegalAccessException e) {
+            msg = "Cannot access class: " + className;
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (ClassCastException e) {
+            msg = "Cannot cast class: " + className + " to opendap.coreServlet.IsoDispatchHandler";
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (Exception e) {
+            msg = "Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
+            log.error(msg);
+            throw new ServletException(msg, e);
+
+        }
+
+        try {
+            wcsCatalog.init(catalogConfig, serviceContentPath, serviceContextPath);
+        } catch (Exception e) {
+            log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+            throw new ServletException(e);
+        }
+
+
+        try {
+            CatalogWrapper.init(serviceContentPath, wcsCatalog);
+        } catch (Exception e) {
+            log.error("Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+            throw new ServletException(e);
+        }
+
+        _initialized = true;
+        log.info("Initialized. ");
+
+    }
+
+
+    /*
 
 
     public void initializeSemanticCatalog(String resourcePath, String serviceContentPath,  String configFileName, String semanticPreload) throws ServletException {
@@ -154,7 +264,7 @@ public class Servlet extends HttpServlet {
 
     }
 
-
+            */
 
 
     private URL getServiceConfigurationUrl(String _serviceContentPath, String configFileName) throws ServletException{

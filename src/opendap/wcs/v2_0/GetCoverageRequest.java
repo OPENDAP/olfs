@@ -30,7 +30,9 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * User: ndp
@@ -43,31 +45,33 @@ public class GetCoverageRequest {
 
     private static final String _request = "GetCoverage";
 
+    private String coverageID = null;
+    private String format = null;
+    private String mediaType = null;
+    private Vector<DimensionSubset> subsets = null;
 
 
-    private String          coverageID = null;
-    private BoundingBox     bbox = null;
-    private String          format = null;
-    private GridCRS         gridCRS = null;
-    private TemporalSubset  tseq = null;
-    private RangeSubset     rangeSubset = null;
-    private boolean         store = false;
+
+
+
+
+    public void setMediaType(String mType) {
+        mediaType = mType;
+    }
+
+    public String getMediaType(){
+        return mediaType;
+    }
 
     public String getCoverageID() {
         return coverageID;
     }
 
+
     public void setCoverageID(String coverageID) {
         this.coverageID = coverageID;
     }
 
-    public BoundingBox getBbox() {
-        return bbox;
-    }
-
-    public void setBbox(BoundingBox bbox) {
-        this.bbox = bbox;
-    }
 
     public String getFormat() {
         return format;
@@ -77,51 +81,23 @@ public class GetCoverageRequest {
         this.format = format;
     }
 
-    public GridCRS getGridCRS() {
-        return gridCRS;
-    }
-
-    public void setGridCRS(GridCRS gridCRS) {
-        this.gridCRS = gridCRS;
-    }
-
-    public TemporalSubset getTemporalSubset() {
-        return tseq;
-    }
-
-    public void setTseq(TemporalSubset tseq) {
-        this.tseq = tseq;
-    }
-
-    public RangeSubset getRangeSubset() {
-        return rangeSubset;
-    }
-
-    public void setRangeSubset(RangeSubset rangeSubset) {
-        this.rangeSubset = rangeSubset;
-    }
-
-    public boolean isStore() {
-        return store;
-    }
-
-    public void setStore(boolean store) {
-        this.store = store;
-    }
 
 
 
 
-    public GetCoverageRequest(HashMap<String,String> kvp)
+    public GetCoverageRequest(Map<String,String[]> kvp)
             throws WcsException {
 
-        String s;
+        subsets = new Vector<DimensionSubset>();
+        String s[];
 
         // Make sure the client is looking for a WCS service....
-        WCS.checkService(kvp.get("service"));
+        s = kvp.get("service");
+        WCS.checkService(s==null? null : s[0]);
 
         // Make sure the client can accept a supported WCS version...
-        WCS.checkVersion(kvp.get("version"));
+        s = kvp.get("version");
+        WCS.checkVersion(s==null? null : s[0]);
 
 
         // Make sure the client is acutally asking for this operation
@@ -131,7 +107,7 @@ public class GetCoverageRequest {
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(!s.equals(_request)){
+        else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
                     "have failed. The WCS request for the operation '"+s+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
@@ -142,49 +118,51 @@ public class GetCoverageRequest {
 
 
         // Get the identifier for the coverage.
-        s = kvp.get("identifier");
+        s = kvp.get("coverageId");
         if(s==null){
             throw new WcsException("Request is missing required " +
-                    "Coverage 'identifier'.",
+                    "Coverage 'coverageId'.",
                     WcsException.MISSING_PARAMETER_VALUE,
                     "identifier");
         }
-        coverageID = s;
+        coverageID = s[0];
 
 
-        // Get the BoundingBox for the coverage.
-        bbox = new BoundingBox(kvp);
 
         // Get the format.
         s = kvp.get("format");
-        if(s==null){
-            throw new WcsException("Request is missing required " +
-                    "format key. This is used to specify what the " +
-                    "retuned format of the data response should be.",
-                    WcsException.MISSING_PARAMETER_VALUE,
-                    "format");
-        }
-        format = s;
+        format = s==null? null : s[0];
 
 
-        // Get the optional TemporalSubset selection
-        if(kvp.containsKey("TimeSequence"))
-            tseq = new TemporalSubset(kvp);
 
 
-        // Get the optional RangeSubset subset
-        rangeSubset = new RangeSubset(kvp);
-
-
-        // Get the optional store imperative
-        s = kvp.get("store");
+        // Get the mediaType.
+        s = kvp.get("mediaType");
         if(s!=null){
-            store = Boolean.parseBoolean(s);
+            if(!s[0].equalsIgnoreCase("multipart/related")){
+                throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
+                    "No other value is allowed. OGC [09-110r4] section 8.4.1",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "mediaType");
+            }
+            mediaType = s[0];
         }
 
 
-        if(GridCRS.hasGridCRS(kvp))
-            gridCRS = new GridCRS(kvp);
+
+        s = kvp.get("subset");
+        if(s!=null){
+            for(String subsetStr:s){
+                DimensionSubset subset = new DimensionSubset(subsetStr);
+                subsets.add(subset);
+            }
+        }
+
+
+
+
+
+
 
 
     }
@@ -193,6 +171,7 @@ public class GetCoverageRequest {
     public GetCoverageRequest(Element getCoverageRequestElem)
             throws WcsException {
 
+        subsets = new Vector<DimensionSubset>();
 
         Element e;
         String s;
@@ -210,102 +189,61 @@ public class GetCoverageRequest {
 
 
         // Get the identifier for the coverage.
-        e = getCoverageRequestElem.getChild("Identifier",WCS.OWS_NS);
+        e = getCoverageRequestElem.getChild("CoverageId",WCS.WCS_NS);
         if(e==null ){
-            throw new WcsException("Missing required ows:Identifier element. ",
+            throw new WcsException("Missing required wcs:CoverageId element. ",
                     WcsException.MISSING_PARAMETER_VALUE,
-                    "ows:Identifier");
+                    "wcs:CoverageId");
         }
         coverageID =e.getText();
 
-        ingestDomainSubset(getCoverageRequestElem.getChild("DomainSubset",WCS.WCS_NS));
 
-        
-        e = getCoverageRequestElem.getChild("RangeSubset",WCS.WCS_NS);
-        if(e!=null)
-            rangeSubset = new RangeSubset(e);
+        ingestDimensionSubset(getCoverageRequestElem);
 
 
-
-        // Get the Output for the coverage.
-        Element output  = getCoverageRequestElem.getChild("Output",WCS.WCS_NS);
-        if(output==null ){
-            throw new WcsException("Missing required ows:Output element. ",
-                    WcsException.MISSING_PARAMETER_VALUE,
-                    "wcs:Output");
-        }
-        s=output.getAttributeValue("format");
-        if(s==null){
-            throw new WcsException("The wcs:Output element is missing the required " +
-                    "format attribute. This is used to specify what the " +
-                    "returned format of the data response should be.",
-                    WcsException.MISSING_PARAMETER_VALUE,
-                    "wcs:Ouput@format");
-        }
-        format = s;
-
-
-        e = output.getChild("GridCRS",WCS.WCS_NS);
-        if(e!=null ){
-            gridCRS = new GridCRS(e);
-
+        // Get the format for the coverage output.
+        Element formatElement  = getCoverageRequestElem.getChild("format",WCS.WCS_NS);
+        if(formatElement!=null){
+            format = formatElement.getTextTrim();
         }
 
 
-        s=output.getAttributeValue("store");
-        store = false;
-        if(s!=null){
+        // Get the mediaType for the coverage output. (Srsly? WTF is this about?)
+        Element mediaTypeElement = getCoverageRequestElem.getChild("mediaType",WCS.WCS_NS);
+        if(mediaTypeElement!=null){
 
-            if(s.equalsIgnoreCase("true")){
-                store =true;
+            s = mediaTypeElement.getTextTrim();
+
+            if(!s.equalsIgnoreCase("multipart/related")){
+                throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
+                    "No other value is allowed. OGC [09-110r4] section 8.4.1",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "wcs:mediaType");
             }
-            else if(s.equalsIgnoreCase("false")){
-                store = false;
-            }
-            else {
-                throw new WcsException("The wcs:Output@store attribute has an incorrect value. " +
-                        "It may be 'true' or 'false'. " ,
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "wcs:Ouput@store");
-            }
-
+            mediaType = s;
         }
-
-
-
-
-
-
-
     }
 
 
 
 
-    public void ingestDomainSubset(Element domainSubset) throws WcsException {
+    public void ingestDimensionSubset(Element getCoverageRequestElem) throws WcsException {
 
 
-        WCS.checkNamespace(domainSubset,"DomainSubset", WCS.WCS_NS);
+        WCS.checkNamespace(getCoverageRequestElem,"GetCoverage", WCS.WCS_NS);
 
-        // Get the BoundingBox for the coverage.
-        Element e = domainSubset.getChild("BoundingBox",WCS.OWS_NS);
-        bbox = new BoundingBox(e);
+        MultiElementFilter dimensionTypeFilter = new MultiElementFilter("DimensionTrim",WCS.WCS_NS);
+        dimensionTypeFilter.addTargetElement("DimensionSlice", WCS.WCS_NS);
 
+        Iterator dtei = getCoverageRequestElem.getDescendants(dimensionTypeFilter);
 
-        // Get the optional TemporalSubset selection
-        // Get the BoundingBox for the coverage.
-        e = domainSubset.getChild("TemporalSubset",WCS.OWS_NS);
-        if(e!=null)
-            tseq = new TemporalSubset(e);
-                  
+        while(dtei.hasNext()){
+            Element dimensionType = (Element) dtei.next();
+            DimensionSubset ds = new DimensionSubset(dimensionType);
+            subsets.add(ds);
+        }
 
     }
-
-
-
-
-
-
 
 
     public Document getRequestDoc()throws WcsException{
@@ -342,80 +280,47 @@ public class GetCoverageRequest {
         requestElement = new Element(_request, WCS.WCS_NS);
         schemaLocation = WCS.WCS_NAMESPACE_STRING + "  "+ WCS.WCS_SCHEMA_LOCATION_BASE+"wcsGetCoverage.xsd  ";
 
-        requestElement.addNamespaceDeclaration(WCS.OWS_NS);
-        schemaLocation += WCS.OWS_NAMESPACE_STRING + "  "+ WCS.OWS_SCHEMA_LOCATION_BASE+"owsCommon.xsd  ";
+        //requestElement.addNamespaceDeclaration(WCS.OWS_NS);
+        //schemaLocation += WCS.OWS_NAMESPACE_STRING + "  "+ WCS.OWS_SCHEMA_LOCATION_BASE+"owsAll.xsd  ";
 
-        requestElement.addNamespaceDeclaration(WCS.GML_NS);
-        schemaLocation += WCS.GML_NAMESPACE_STRING + "  "+ WCS.GML_SCHEMA_LOCATION_BASE+"gml.xsd  ";
-
-
-        requestElement.addNamespaceDeclaration(WCS.OWCS_NS);
-        schemaLocation += WCS.OWCS_NAMESPACE_STRING + "  "+ WCS.OWCS_SCHEMA_LOCATION_BASE+"owcsAll.xsd  ";
-
-        requestElement.addNamespaceDeclaration(WCS.XSI_NS);
+        //requestElement.addNamespaceDeclaration(WCS.GML_NS);
+        //schemaLocation += WCS.GML_NAMESPACE_STRING + "  "+ WCS.GML_SCHEMA_LOCATION_BASE+"gml.xsd  ";
 
 
+        //requestElement.addNamespaceDeclaration(WCS.XSI_NS);
 
-
-        requestElement.setAttribute("schemaLocation", schemaLocation,WCS.XSI_NS);
+        //requestElement.setAttribute("schemaLocation", schemaLocation,WCS.XSI_NS);
 
 
         requestElement.setAttribute("service",WCS.SERVICE);
         requestElement.setAttribute("version",WCS.CURRENT_VERSION);
 
-        Element e = new Element("Identifier",WCS.OWS_NS);
+        Element e = new Element("CoverageId",WCS.WCS_NS);
         e.setText(coverageID);
         requestElement.addContent(e);
 
-        requestElement.addContent(getDomainSubsetElement());
-
-        if(rangeSubset !=null){
-            Element rs = rangeSubset.getElement();
-            if(rs!=null)
-                requestElement.addContent(rs    );
+        for(DimensionSubset ds: subsets){
+            requestElement.addContent(ds.getDimensionSubsetElement());
         }
 
-        requestElement.addContent(getOutputElement());
+        if(format !=null){
+            Element formatElement = new Element("format",WCS.WCS_NS);
+            formatElement.setText(format);
+            requestElement.addContent(formatElement);
+        }
+
+        if(mediaType!=null){
+            Element mediaTypeElement = new Element("mediaType",WCS.WCS_NS);
+            mediaTypeElement.setText(mediaType);
+            requestElement.addContent(mediaTypeElement);
+        }
+
 
         return requestElement;
 
     }
 
 
-
-    public Element getDomainSubsetElement() throws WcsException {
-
-
-        Element domainSubset = new Element("DomainSubset",WCS.WCS_NS);
-
-        Element e = bbox.getBoundingBoxElement();
-
-        domainSubset.addContent(e);
-
-        if(tseq !=null){
-            e = tseq.getTemporalSubsetElement();
-            domainSubset.addContent(e);
-        }
-
-
-        return domainSubset;
-    }
-
-
-
-    public Element getOutputElement(){
-        Element ot = new Element("Output",WCS.WCS_NS);
-        ot.setAttribute("format", format);
-
-        if(store)
-            ot.setAttribute("store", store +"");
-
-        if(gridCRS != null)
-            ot.addContent(gridCRS.getElement());
-
-
-        return ot;
-    }
 
 
 }

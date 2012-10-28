@@ -21,17 +21,7 @@
     <servlet>
         <servlet-name>wcs</servlet-name>
 
-        <servlet-class>opendap.wcs.v1_1_2.http.Servlet</servlet-class>
-        
-        <init-param>
-            <param-name>SemanticPreload</param-name>
-            <param-value>http://xml.opendap.org/semantics/Dap_To_Wcs-1.1.owl</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>EnableUpdateUrl</param-name>
-            <param-value>false</param-value>
-        </init-param>
+        <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
 
         <load-on-startup>1</load-on-startup> 
 

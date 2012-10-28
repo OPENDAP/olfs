@@ -31,10 +31,7 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: ndp
@@ -53,6 +50,7 @@ public class GetCapabilitiesRequest {
     private boolean hasSectionsElement;
 
     private String[]        AcceptFormats = null;
+    private String[]        AcceptLanguages = null;
 
 
     public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
@@ -136,33 +134,45 @@ public class GetCapabilitiesRequest {
             updateSequence =s;
 
         // Get the clients accepted versions.
-        e = getCRElem.getChild("AcceptVersions",WCS.OWS_NS);
+        e = getCRElem.getChild("AcceptVersions",WCS.WCS_NS);
         if(e!=null ){
-            List vlist = e.getChildren("Version",WCS.OWS_NS);
+            List vlist = e.getChildren("Version",WCS.WCS_NS);
             if(vlist.size()==0){
                 throw new WcsException("The ows:AcceptVersions element is required " +
                         "to have one or more ows:Version child elements.",
                         WcsException.MISSING_PARAMETER_VALUE,
                         "ows:Version");
             }
+            s = "";
             AcceptVersions =  new String[vlist.size()];
             i = vlist.iterator();
             index = 0;
             while(i.hasNext()){
                 e = (Element) i.next();
                 AcceptVersions[index++] = e.getTextNormalize();
-
+                s += s.equals("")?s:", "+ e.getTextNormalize();
             }
+
+            boolean compatible = false;
+            for(String version:AcceptVersions){
+                if(WCS.CURRENT_VERSION.equals(version)){
+                    compatible=true;
+                }
+            }
+            if(!compatible)
+                throw new WcsException("Client requested unsupported WCS " +
+                        "version(s): ["+s+"]\nThis WCS supports version(s) "+WCS.CURRENT_VERSION,
+                        WcsException.VERSION_NEGOTIATION_FAILED,null);
 
         }
 
         // Get the sections the client wants.
-        e = getCRElem.getChild("Sections",WCS.OWS_NS);
+        e = getCRElem.getChild("Sections",WCS.WCS_NS);
         if(e!=null ){
 
             hasSectionsElement = true;
 
-            List vlist = e.getChildren("Section",WCS.OWS_NS);
+            List vlist = e.getChildren("Section",WCS.WCS_NS);
 
             i = vlist.iterator();
             index = 0;
@@ -181,9 +191,9 @@ public class GetCapabilitiesRequest {
 
 
         // Get the formats the client wants.
-        e = getCRElem.getChild("AcceptFormats",WCS.OWS_NS);
+        e = getCRElem.getChild("AcceptFormats",WCS.WCS_NS);
         if(e!=null ){
-            List vlist = e.getChildren("OutputFormat",WCS.OWS_NS);
+            List vlist = e.getChildren("OutputFormat",WCS.WCS_NS);
             if(vlist.size()==0){
                 throw new WcsException("The ows:AcceptFormats element is required to have " +
                         "one or more ows:OutputFormat child elements.",
@@ -201,6 +211,28 @@ public class GetCapabilitiesRequest {
             }
 
         }
+
+        // Get the formats the client wants.
+        e = getCRElem.getChild("AcceptLanguages",WCS.WCS_NS);
+        if(e!=null ){
+            List vlist = e.getChildren("Language",WCS.WCS_NS);
+            if(vlist.size()==0){
+                throw new WcsException("The ows:AcceptFormats element is required to have " +
+                        "one or more ows:OutputFormat child elements.",
+                        WcsException.MISSING_PARAMETER_VALUE,
+                        "ows:OutputFormat");
+            }
+
+            AcceptLanguages =  new String[vlist.size()];
+            i = vlist.iterator();
+            index = 0;
+            while(i.hasNext()){
+                e = (Element) i.next();
+                AcceptLanguages[index++] = e.getTextNormalize();
+
+            }
+
+        }
     }
 
 
@@ -209,23 +241,23 @@ public class GetCapabilitiesRequest {
 
 
 
-    public GetCapabilitiesRequest(HashMap<String,String> kvp)
+    public GetCapabilitiesRequest(Map<String,String[]> kvp)
             throws WcsException {
 
-        String tmp[], s;
-
+        String tmp[], s[];
 
         // Make sure the client is looking for a WCS service....
-        WCS.checkService(kvp.get("service"));
+        s = kvp.get("service");
+        WCS.checkService(s==null? null : s[0]);
 
-        // Make sure the client is acutally asking for this operation
+        // Make sure the client is actually asking for this operation
         s = kvp.get("request");
         if(s == null){
             throw new WcsException("Poorly formatted request URL. Missing " +
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(!s.equals(_request)){
+        else if(!s[0].equals(_request)){
             throw new WcsException("The servers internal dispatch operations " +
                     "have failed. The WCS request for the operation '"+s+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
@@ -234,11 +266,12 @@ public class GetCapabilitiesRequest {
         }
 
 
+
         // Make sure the client can accept the correct WCS version...
         boolean compatible = false;
         s = kvp.get("AcceptVersions");
         if(s!=null){
-            tmp = s.split(",");
+            tmp = s[0].split(",");
             for(String ver:tmp){
                 if(WCS.CURRENT_VERSION.equals(ver)){
                     compatible=true;
@@ -246,7 +279,7 @@ public class GetCapabilitiesRequest {
             }
             if(!compatible)
                 throw new WcsException("Client requested unsupported WCS " +
-                        "version(s): ["+s+"]\nThis WCS supports version(s) "+WCS.CURRENT_VERSION,
+                        "version(s) ["+s[0]+"]\nThis WCS supports version(s) "+WCS.CURRENT_VERSION,
                         WcsException.VERSION_NEGOTIATION_FAILED,null);
 
             AcceptVersions = tmp;
@@ -263,7 +296,7 @@ public class GetCapabilitiesRequest {
         if(s!=null){
             hasSectionsElement = true;
 
-            tmp = s.split(",");
+            tmp = s[0].split(",");
             for(String section:tmp){
                 if(!sectionNames.contains(section)){
                     throw new WcsException("Client requested unsupported " +
@@ -277,15 +310,27 @@ public class GetCapabilitiesRequest {
 
         // Store the updatSequence information in the event that the server
         // supports it at some point...
-        updateSequence = kvp.get("updateSequence");
+        s = kvp.get("updateSequence");
+        updateSequence = s==null? null : s[0];
 
 
         // Store the AccptedFormats offered by the client in the event that the
         // the server eventually supports more than text/html
         s = kvp.get("AcceptFormats");
         if(s!=null){
-            tmp = s.split(",");
+            tmp = s[0].split(",");
             AcceptFormats = tmp;
+
+        }
+
+
+
+        // Store the AccptedFormats offered by the client in the event that the
+        // the server eventually supports more than text/html
+        s = kvp.get("AcceptLanguages");
+        if(s!=null){
+            tmp = s[0].split(",");
+            AcceptLanguages = tmp;
 
         }
 
@@ -302,8 +347,8 @@ public class GetCapabilitiesRequest {
 
         requestElement.addNamespaceDeclaration(WCS.XSI_NS);
 
-        requestElement.addNamespaceDeclaration(WCS.OWCS_NS);
-        _schemaLocation += WCS.OWCS_NAMESPACE_STRING + "  " +WCS.OWCS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd  ";
+        requestElement.addNamespaceDeclaration(WCS.OWS_NS);
+        _schemaLocation += WCS.OWS_NAMESPACE_STRING + "  " +WCS.OWS_SCHEMA_LOCATION_BASE+"owsGetCapabilities.xsd  ";
 
         requestElement.setAttribute("schemaLocation", _schemaLocation,WCS.XSI_NS);
 
@@ -316,10 +361,10 @@ public class GetCapabilitiesRequest {
 
 
         if(AcceptVersions != null){
-            Element av = new Element("AcceptVersions",WCS.OWCS_NS);
+            Element av = new Element("AcceptVersions",WCS.WCS_NS);
             Element ver;
             for(String v: AcceptVersions){
-                ver = new Element("Version",WCS.OWCS_NS);
+                ver = new Element("Version",WCS.WCS_NS);
                 ver.setText(v);
                 av.addContent(ver);
             }
@@ -327,10 +372,10 @@ public class GetCapabilitiesRequest {
         }
 
         if(!Sections.isEmpty()){
-            Element sections = new Element("Sections",WCS.OWCS_NS);
+            Element sections = new Element("Sections",WCS.WCS_NS);
             Element sec;
             for(String sv : Sections){
-                sec = new Element("Section",WCS.OWCS_NS);
+                sec = new Element("Section",WCS.WCS_NS);
                 sec.setText(sv);
                 sections.addContent(sec);
             }
@@ -338,16 +383,29 @@ public class GetCapabilitiesRequest {
         }
 
         if(AcceptFormats != null){
-            Element af = new Element("AcceptFormats",WCS.OWCS_NS);
+            Element af = new Element("AcceptFormats",WCS.WCS_NS);
             Element fe;
             for(String f : AcceptFormats){
-                fe = new Element("OutputFormat",WCS.OWCS_NS);
+                fe = new Element("OutputFormat",WCS.WCS_NS);
                 fe.setText(f);
                 af.addContent(fe);
             }
             requestElement.addContent(af);
 
         }
+
+        if(AcceptLanguages != null){
+            Element af = new Element("AcceptLanguages",WCS.WCS_NS);
+            Element fe;
+            for(String f : AcceptFormats){
+                fe = new Element("Language",WCS.WCS_NS);
+                fe.setText(f);
+                af.addContent(fe);
+            }
+            requestElement.addContent(af);
+
+        }
+
         return requestElement;
 
     }
