@@ -24,27 +24,25 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<wcs:CoverageDescriptions
-    xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd"
-    xmlns:wcs="http://www.opengis.net/wcs/2.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:ows="http://www.opengis.net/ows/2.0"
-    xmlns:gml="http://www.opengis.net/gml/3.2"
-    xmlns:crs="http://www.opengis.net/wcs/service-extension/crs/1.0">
-    <wcs:CoverageDescription gml:id="ioos/ECMWF_ERA-40_subset.ncml"
-                             xmlns="http://www.opengis.net/gml/3.2"
-                             xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
-                             xmlns:swe="http://www.opengis.net/swe/2.0">
+    <wcs:CoverageDescription
+            gml:id="ioos_002fECMWF__ERA-40__subset.ncml"
+            xmlns="http://www.opengis.net/gml/3.2"
+            xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd"
+            xmlns:wcs="http://www.opengis.net/wcs/2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:gml="http://www.opengis.net/gml/3.2"
+            xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+            xmlns:swe="http://www.opengis.net/swe/2.0">
         <boundedBy>
-            <Envelope srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="time latitude longitude" uomLabels="h deg deg" srsDimension="3">
+            <Envelope srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="time latitude longitude"
+                      uomLabels="h deg deg" srsDimension="3">
                 <lowerCorner>898476 -90.000 0.000</lowerCorner>
                 <upperCorner>899202 90.000 360.000</upperCorner>
             </Envelope>
         </boundedBy>
-        <wcs:CoverageId>ioos/ECMWF_ERA-40_subset.ncml</wcs:CoverageId>
+        <wcs:CoverageId>ioos_002fECMWF__ERA-40__subset.ncml</wcs:CoverageId>
         <domainSet>
-            <Grid dimension="3" gml:id="ioos_002fECMWF_ERA-40_subset.ncml-grid">
+            <Grid dimension="3" gml:id="ioos_002fECMWF__ERA-40__subset.ncml-grid">
                 <limits>
                     <GridEnvelope>
                         <low>0 0 0</low>
@@ -56,7 +54,7 @@
         </domainSet>
         <gmlcov:rangeType>
             <swe:DataRecord>
-                <swe:field name="tcw.tcw">
+                <swe:field name="tcw">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="kg/m^2"/>
@@ -67,7 +65,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="tcwv.tcwv">
+                <swe:field name="tcwv">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="kg/m^2"/>
@@ -78,7 +76,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="lsp.lsp">
+                <swe:field name="lsp">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="m"/>
@@ -89,7 +87,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="cp.cp">
+                <swe:field name="cp">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="m"/>
@@ -100,7 +98,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="msl.msl">
+                <swe:field name="msl">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="Pa"/>
@@ -111,7 +109,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="blh.blh">
+                <swe:field name="blh">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="m"/>
@@ -125,9 +123,11 @@
             </swe:DataRecord>
         </gmlcov:rangeType>
         <wcs:ServiceParameters>
-            <wcs:CoverageSubtype>RectifiedGridCoverage</wcs:CoverageSubtype>
-            <wcs:nativeFormat>application/x-netcdf</wcs:nativeFormat>
-        </wcs:ServiceParameters>        
+            <wcs:CoverageSubtype>GridCoverage</wcs:CoverageSubtype>
+            <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
+        </wcs:ServiceParameters>
     </wcs:CoverageDescription>
-</wcs:CoverageDescriptions>
+
+
+
 
