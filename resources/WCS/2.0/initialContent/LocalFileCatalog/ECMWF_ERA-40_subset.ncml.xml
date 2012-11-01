@@ -34,10 +34,10 @@
             xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
             xmlns:swe="http://www.opengis.net/swe/2.0">
         <boundedBy>
-            <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude"
+            <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="longitude latitude "
                 uomLabels="deg deg" srsDimension="2" >
-                <lowerCorner>-90.000 0.000</lowerCorner>
-                <upperCorner>90.000 360.000</upperCorner>
+                <lowerCorner>0.000 -90.000</lowerCorner>
+                <upperCorner>360.00 90.000</upperCorner>
                 <beginPosition>2002-07-17T09:00:00.000Z</beginPosition>
                  <endPosition>2002-07-31T15:00:00.000Z</endPosition>
             </EnvelopeWithTimePeriod>
@@ -48,10 +48,10 @@
                 <limits>
                     <GridEnvelope>
                         <low>0 0</low>
-                        <high>73 144</high>
+                        <high>144 73</high>
                     </GridEnvelope>
                 </limits>
-                <axisLabels>latitude longitude</axisLabels>
+                <axisLabels>longitude latitude</axisLabels>
             </Grid>
         </domainSet>
         <gmlcov:rangeType>

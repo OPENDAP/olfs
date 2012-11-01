@@ -92,44 +92,12 @@ public class CoverageRequestProcessor {
 
         log.debug("Sending binary data response...");
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
-        String dataAccessURL;
-
-
-
-        // We set the Content-Disposition here because typically DAP2 servers don't set it and
-        // clients like browsers will choose nonsensical a file name if they dump the response to a file.
-        // the forwardUrlContent() method will transfer all of the (other) headers that come from the data source
-        // and if the source provides a Content-Disposition that this will be overridden by the source version.
-        String contentDisposition;
-
-        String format = req.getFormat();
-        if(format==null) {
-            format = coverageDescription.getNativeFormat();
-        }
-
-
-        if(format.contains("netcdf")){
-            dataAccessURL = getNetcdfDataAccessURL(req);
-            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".nc\"";
-        }
-        else if (format.equals("application/octet-stream")){
-            dataAccessURL = getDapDataAccessURL(req);
-            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".dods\"";
-        }
-        else {
-            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
-        }
-
-
-
-        response.setHeader("Content-Disposition",contentDisposition);
+        response.setHeader("Content-Disposition",getContentDisposition(req));
 
         try {
-            opendap.wcs.v2_0.http.Util.forwardUrlContent(dataAccessURL,response,true);
+            opendap.wcs.v2_0.http.Util.forwardUrlContent(getDataAccessUrl(req),response,true);
         } catch (URISyntaxException e) {
-            throw new WcsException("Internal server error. Server failed to generate a valid server access URI: "+ Scrub.fileName(dataAccessURL),
+            throw new WcsException("Internal server error. Server failed to generate a valid server access URI: "+ Scrub.fileName(getDataAccessUrl(req)),
                     WcsException.NO_APPLICABLE_CODE,"DataAccessUrl");
         }
 
@@ -142,41 +110,11 @@ public class CoverageRequestProcessor {
 
         log.debug("Building multi-part Response...");
 
-        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
-        String dataAccessURL;
-        String mime_type;
-        String contentDisposition;
-
-        String format = req.getFormat();
-        if(format==null) {
-            format = coverageDescription.getNativeFormat();
-        }
-
-
-
-        if(format.contains("netcdf")){
-            dataAccessURL = getNetcdfDataAccessURL(req);
-            mime_type = "application/x-netcdf";
-            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".nc\"";
-        }
-        else if (format.equals("application/octet-stream")){
-            dataAccessURL = getDapDataAccessURL(req);
-            mime_type = "application/octet-stream";
-            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".dods\"";
-        }
-        else {
-            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
-        }
-
-
-
-
         String rangePartId =  "cid:"+ req.getCoverageID();
 
         Coverage cvg = new Coverage(req.getCoverageID());
 
-        Element coverage = cvg.getCoverageElement(rangePartId,mime_type);
+        Element coverage = cvg.getCoverageElement(rangePartId,getReturnMimeType(req));
 
         Document doc = new Document(coverage);
 
@@ -190,8 +128,8 @@ public class CoverageRequestProcessor {
         Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8","gml-part",doc);
         mpr.addAttachment(gmlPart);
 
-        Attachment rangePart = new Attachment(mime_type, rangePartId, dataAccessURL);
-        rangePart.setHeader("Content-Disposition",contentDisposition);
+        Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDataAccessUrl(req));
+        rangePart.setHeader("Content-Disposition",getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
 
@@ -206,9 +144,71 @@ public class CoverageRequestProcessor {
     }
 
 
+    public static String getReturnFormat(GetCoverageRequest req) throws WcsException, InterruptedException {
+        CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
+        String format = req.getFormat();
+        if(format==null) {
+            format = coverageDescription.getNativeFormat();
+        }
+        return format;
+     }
 
 
+    public static String getDataAccessUrl(GetCoverageRequest req) throws WcsException, InterruptedException {
+        String dataAccessURL;
 
+        String format = getReturnFormat(req);
+        if(format.contains("netcdf")){
+            dataAccessURL = getNetcdfDataAccessURL(req);
+        }
+        else if (format.equals("application/octet-stream")){
+            dataAccessURL = getDapDataAccessURL(req);
+        }
+        else {
+            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        }
+
+        return dataAccessURL;
+     }
+
+
+    public static String getContentDisposition(GetCoverageRequest req) throws WcsException, InterruptedException {
+        String contentDisposition;
+
+        String format = getReturnFormat(req);
+        if(format.contains("netcdf")){
+            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".nc\"";
+        }
+        else if (format.equals("application/octet-stream")){
+            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".dods\"";
+        }
+        else {
+            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        }
+
+        return contentDisposition;
+     }
+
+
+    public static String getReturnMimeType(GetCoverageRequest req) throws WcsException, InterruptedException {
+        String mime_type;
+
+        String format = getReturnFormat(req);
+        if(format.contains("netcdf")){
+            mime_type = "application/x-netcdf";
+        }
+        else if (format.equals("application/octet-stream")){
+            mime_type = "application/octet-stream";
+        }
+        else {
+            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        }
+
+        return mime_type;
+     }
 
 
 
@@ -229,7 +229,7 @@ public class CoverageRequestProcessor {
     public static String getNetcdfDataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
-        
+
         requestURL +=  ".nc"+"?"+ getDapCE(req);
 
         return requestURL;

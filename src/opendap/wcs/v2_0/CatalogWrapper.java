@@ -100,6 +100,11 @@ public class CatalogWrapper {
 
     }
 
+    public static Coverage getCoverage(String id) throws InterruptedException, WcsException{
+        return new Coverage(id);
+
+    }
+
     public static CoverageDescription getCoverageDescription(String id) throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageDescription(id);
 

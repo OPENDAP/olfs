@@ -269,34 +269,44 @@
             
 
             <table border="0" width="100%">
-                <tr>
-                    <th align="left">
-                        Supported Coordinate Reference Systems:
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <ul>
-                            <xsl:apply-templates select="wcs:SupportedCRS"/>
 
-                        </ul>
-                    </td>
-                </tr>
+
+                <xsl:if test="wcs:SupportedCRS">
+                    <tr>
+                        <th align="left">
+                            Supported Coordinate Reference Systems:
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ul>
+                                <xsl:apply-templates select="wcs:SupportedCRS"/>
+
+                            </ul>
+                        </td>
+                    </tr>
+
+                </xsl:if>
+
                 <hr size="1" noshade="noshade"/>
-                
-                <tr>
-                    <th align="left">
-                        Supported Data Formats:
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <ul>
-                            <xsl:apply-templates select="wcs:SupportedFormat"/>
 
-                        </ul>
-                    </td>
-                </tr>
+
+
+                <xsl:if test="wcs:SupportedFormat">
+                    <tr>
+                        <th align="left">
+                            Supported Data Formats:
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <ul>
+                                <xsl:apply-templates select="wcs:SupportedFormat"/>
+
+                            </ul>
+                        </td>
+                    </tr>
+                </xsl:if>
             </table>
 
         </pre>

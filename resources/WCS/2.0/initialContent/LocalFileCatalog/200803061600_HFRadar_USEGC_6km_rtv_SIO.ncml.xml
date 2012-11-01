@@ -35,7 +35,7 @@
     xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
     >
     <boundedBy>
-        <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude"
+        <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="longitude latitude"
             uomLabels="deg deg" srsDimension="2" >
             <lowerCorner>82.1161499 21.73596</lowerCorner>
             <upperCorner>122.768791 46.4944191</upperCorner>
@@ -49,10 +49,10 @@
             <limits>
                 <GridEnvelope>
                     <low>0 0</low>
-                    <high>459 700</high>
+                    <high>700 459</high>
                 </GridEnvelope>
             </limits>
-            <axisLabels>latitude longitude</axisLabels>
+            <axisLabels>longitude latitude</axisLabels>
             <gml:origin>
                 <gml:Point gml:id="GridOrigin-ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc"
                     srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
