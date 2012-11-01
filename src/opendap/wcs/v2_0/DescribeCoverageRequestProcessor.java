@@ -59,12 +59,7 @@ public class DescribeCoverageRequestProcessor {
 
         for(String id: req.getIds()){
             cd = CatalogWrapper.getCoverageDescription(id);
-            if(cd==null)
-                throw new WcsException("No such wcs:Coverage: "+ Scrub.fileName(id),
-                        WcsException.INVALID_PARAMETER_VALUE,"wcs:Identifier");
-
             coverageDescriptions.addContent(cd.getElement());
-
         }
 
         return new Document(coverageDescriptions);

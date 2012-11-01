@@ -23,10 +23,14 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0;
 
+import opendap.coreServlet.Scrub;
 import org.jdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Vector;
 
 /**
  * Represents a wcs:Coverage object. A wcs:Coverage object is part of a response to a wcs:GetCoverageRequest
@@ -40,133 +44,177 @@ import java.net.URISyntaxException;
 public class Coverage {
 
 
-    private URI _coverageRole;
-    private URI _metadataRole;
+    private Logger log;
 
-
-    private String _title;
-    public void setTitle(String s){ _title = s; }
-    public String getTitle(){ return _title; }
-
-    private String _abstract;
-    public void setAbstract(String s){ _abstract = s; }
-    public String getAbstract(){ return _abstract; }
-
-    private String _id;
-    public void setID(String s){ _id = s; }
-    public String getID(){ return _id; }
-
-    private String _dataAccessURL;
-    public void setDataAccessURL(String s){ _dataAccessURL = s; }
-    public String getDataAccessURL(){ return _dataAccessURL; }
-
-    private String _metadataURL;
-    public void setMetadataAccessURL(String s){ _metadataURL = s; }
-    public String getMetadataAccessURL(){ return _metadataURL; }
+    private CoverageDescription _myCD;
 
 
 
 
 
     void init() throws WcsException {
-
-        _id=null;
-        _title= null;
-        _abstract = null;
-        _dataAccessURL = null;
-        _metadataURL   = null;
-
-        try {
-            _coverageRole = new URI("urn:ogc:def:role:WCS:1.1:coverage");
-            _metadataRole = new URI("urn:ogc:def:role:WCS:1.1:metadata");
-        } catch (URISyntaxException e) {
-            throw new WcsException(e.getMessage(),WcsException.NO_APPLICABLE_CODE);
-
-        }
+        log = LoggerFactory.getLogger(getClass());
 
     }
 
 
 
 
-    public Coverage(String id, String title, String abstrct, String dataAccessURL, String metadataURL)throws WcsException {
+    public Coverage(CoverageDescription cd)throws WcsException {
+        _myCD = cd;
 
-
-        init();
-        _id=id;
-        _title= title;
-        _abstract = abstrct;
-        _dataAccessURL = dataAccessURL;
-        _metadataURL   = metadataURL;
-
-    }
-
-    public Coverage(String id, String dataAccessURL, String metadataURL)throws WcsException {
-        this(id,null,null,dataAccessURL,metadataURL);
-    }
-
-    public Coverage()throws WcsException {
         init();
     }
 
-    public  Element getCoverageElement() throws WcsException {
+
+    public Coverage(String coverageId) throws WcsException, InterruptedException {
+
+        _myCD = CatalogWrapper.getCoverageDescription(coverageId);
+
+        init();
+    }
+
+
+    /**
+     *
+     * @param rangeValuesPartID  The ID of the multipart document part that carries the range values.
+     * @param mimeType  The mimeType of the range values encoding
+     * @return An instance of an gmlcov:AbstractCoverage element (Like gmlcov:GridCoverage or gmlcov:RectifiedGridCOverage)
+     * @throws WcsException When the bad things happen.
+     */
+    public  Element getCoverageElement(String rangeValuesPartID, String mimeType) throws WcsException {
 
         Element e;
-        Element cvg = new Element("Coverage",WCS.WCS_NS);
-
-        cvg.addNamespaceDeclaration(WCS.OWS_NS);
-        cvg.addNamespaceDeclaration(WCS.XLINK_NS);
+        Element coverage;
 
 
 
-        if(_title!=null){
-            e = new Element("Title",WCS.OWS_NS);
-            e.setText(_title);
-            cvg.addContent(e);
+
+
+        String coverageSubtype = _myCD.getCoverageSubtype();
+        if(coverageSubtype.equals("RectifiedGridCoverage")){
+            coverage = new Element("RectifiedGridCoverage",WCS.GMLCOV_NS);
+                    }
+        else if(coverageSubtype.equals("GridCoverage")){
+            coverage = new Element("GridCoverage",WCS.GMLCOV_NS);
         }
-
-        if(_abstract!=null){
-            e = new Element("Abstract",WCS.OWS_NS);
-            e.setText(_abstract);
-            cvg.addContent(e);
-        }
-
-        if(_id!=null){
-            e = new Element("Identifier",WCS.OWS_NS);
-            e.setText(_id);
-            cvg.addContent(e);
-        }
-
-
-        if(_dataAccessURL==null)
-            throw new WcsException("This wcs:Coverage element (ows:Identifier = "+_id+") is missing a data " +
-                    "access URL.",WcsException.MISSING_PARAMETER_VALUE,"ows:Reference");
-
-
-        e = new Element("Reference",WCS.OWS_NS);
-        e.setAttribute("href",_dataAccessURL,WCS.XLINK_NS);
-        e.setAttribute("type","simpleLink",WCS.XLINK_NS);
-        e.setAttribute("role",_coverageRole.toASCIIString(),WCS.XLINK_NS);
-        cvg.addContent(e);
-
-        if(_metadataURL==null)
-            throw new WcsException("This wcs:Coverage element (ows:Identifier = "+_id+") is missing a metadata " +
-                    "access URL.",WcsException.MISSING_PARAMETER_VALUE,"ows:Reference");
-
-        e = new Element("Reference",WCS.OWS_NS);
-        e.setAttribute("href",_metadataURL,WCS.XLINK_NS);
-        e.setAttribute("type","simpleLink",WCS.XLINK_NS);
-        e.setAttribute("role",_metadataRole.toASCIIString(),WCS.XLINK_NS);
-        cvg.addContent(e);
+        else
+            throw new WcsException("This server does not support gml:CoverageSubtype: "+ Scrub.fileName(coverageSubtype),
+                    WcsException.INVALID_PARAMETER_VALUE,"gml:CoverageSubtype");
 
 
 
-        return cvg;
+        coverage.addNamespaceDeclaration(WCS.WCS_NS);
+        coverage.addNamespaceDeclaration(WCS.OWS_NS);
+        coverage.addNamespaceDeclaration(WCS.XSI_NS);
+
+        StringBuilder schemaLocation = new StringBuilder();
+
+        schemaLocation
+                .append(WCS.WCS_NAMESPACE_STRING).append(" ")
+                .append(WCS.WCS_SCHEMA_LOCATION_BASE).append("wcsAll.xsd").append("   ")
+                .append(WCS.GML_NAMESPACE_STRING).append(" ")
+                .append(WCS.GML_SCHEMA_LOCATION_BASE).append("gml.xsd").append("   ")
+                .append(WCS.GMLCOV_NAMESPACE_STRING).append(" ")
+                .append(WCS.GMLCOV_SCHEMA_LOCATION_BASE).append("gmlcovAll.xsd").append("   ")
+                .append(WCS.SWE_NAMESPACE_STRING).append(" ")
+                .append(WCS.SWE_SCHEMA_LOCATION_BASE).append("swe.xsd")
+
+        ;
+        coverage.setAttribute("schemaLocation",schemaLocation.toString(),WCS.XSI_NS);
+
+
+
+        String gmlId = _myCD.getGmlId();
+        if(gmlId!=null)
+            coverage.setAttribute("id",gmlId,WCS.GML_NS);
+
+        Vector<Element> abstractFeatureTypeContent = _myCD.getAbstractFeatureTypeContent();
+        coverage.addContent(abstractFeatureTypeContent);
+
+        coverage.addContent(_myCD.getDomainSet());
+        coverage.addContent(getRangeSet(rangeValuesPartID, mimeType));
+        coverage.addContent(_myCD.getRangeType());
+
+
+        return coverage;
 
 
 
         
     }
+
+
+
+
+    /**
+     *
+     *
+     *
+     *
+     <gml:rangeSet>
+         <gml:File>
+             <gml:rangeParameters
+                     xlink:href="cid:200803061600__HFRadar__USEGC__6km__rtv__SIO.nc"
+                     xlink:role="http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/req/CF-netCDF"
+                     xlink:arcrole="fileReference"/>
+             <gml:fileReference>cid:200803061600__HFRadar__USEGC__6km__rtv__SIO.nc</gml:fileReference>
+             <gml:fileStructure/>
+             <gml:mimeType>application/x-netcdf</gml:mimeType>
+         </gml:File>
+     </gml:rangeSet>
+     *
+     *
+     * @param rangeValuesPartID  The ID of the multipart document part that carries the range values.
+     * @param mimeType  The mimeType of the range values encoding
+\     * @return Returns the appropriate gml:rangeSet element.
+     */
+    private Element getRangeSet(String rangeValuesPartID, String mimeType) throws WcsException {
+
+
+        Element rangeSet = new Element("rangeSet",WCS.GML_NS);
+        Element file = new Element("File",WCS.GML_NS);
+
+        String ogcDatasetEncodingUri = OgcDataEncoding.getEncodingUri(mimeType);
+
+        if(ogcDatasetEncodingUri==null){
+            String msg = "Internal Service Error: No known OGC data encoding standard for MIME-TYPE: "+mimeType;
+            log.error(msg);
+            throw new WcsException(msg,WcsException.NO_APPLICABLE_CODE);
+        }
+
+
+        Element rangeParameters = new Element("rangeParameters",WCS.GML_NS);
+        rangeParameters.setAttribute("href",rangeValuesPartID,WCS.XLINK_NS);
+        rangeParameters.setAttribute("role",ogcDatasetEncodingUri,WCS.XLINK_NS);
+        rangeParameters.setAttribute("arcrole","fileReference",WCS.XLINK_NS);
+        file.addContent(rangeParameters);
+
+        Element fileReference =  new Element("fileReference",WCS.GML_NS);
+        fileReference.setText(rangeValuesPartID);
+        file.addContent(fileReference);
+
+        Element fileStructure =  new Element("fileStructure",WCS.GML_NS);
+        file.addContent(fileStructure);
+
+        Element mimeTypeElement =  new Element("mimeType",WCS.GML_NS);
+        mimeTypeElement.setText(mimeType);
+
+
+        rangeSet.addContent(file);
+
+        return rangeSet;
+
+
+    }
+
+
+
+
+
+
+
+
 
 
 

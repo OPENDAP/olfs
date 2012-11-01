@@ -79,7 +79,7 @@
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.xml">
 
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.xml</DapDatasetUrl>
+        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
 
         <field name="u">
             <DapGridId>u.u</DapGridId>

@@ -136,7 +136,7 @@
     <!-- ************************************************************ -->
     <ServiceMetadata>
         <formatSupported>application/x-netcdf-cf1.0</formatSupported>
-        <formatSupported>application/vnd.org.opendap.dap2.data</formatSupported>
+        <formatSupported>application/octet-stream</formatSupported>
     </ServiceMetadata>
     <!-- *********************************************************** -->
     <!-- * CONTENTS SECTION                                         * -->

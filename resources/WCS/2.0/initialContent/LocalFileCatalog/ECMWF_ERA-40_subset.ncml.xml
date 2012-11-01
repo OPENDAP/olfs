@@ -25,7 +25,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
     <wcs:CoverageDescription
-            gml:id="ioos-ECMWF_ERA-40_subset.ncml"
+            gml:id="ioos_002fECMWF__ERA-40__subset.ncml"
             xmlns="http://www.opengis.net/gml/3.2"
             xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd"
             xmlns:wcs="http://www.opengis.net/wcs/2.0"
@@ -40,9 +40,9 @@
                 <upperCorner>899202 90.000 360.000</upperCorner>
             </Envelope>
         </boundedBy>
-        <wcs:CoverageId>ioos-ECMWF_ERA-40_subset.ncml</wcs:CoverageId>
+        <wcs:CoverageId>ioos_002fECMWF__ERA-40__subset.ncml</wcs:CoverageId>
         <domainSet>
-            <Grid dimension="3" gml:id="ioos-ECMWF_ERA-40_subset.ncml-grid">
+            <Grid dimension="3" gml:id="ioos_002fECMWF__ERA-40__subset.ncml-grid">
                 <limits>
                     <GridEnvelope>
                         <low>0 0 0</low>
@@ -124,7 +124,7 @@
         </gmlcov:rangeType>
         <wcs:ServiceParameters>
             <wcs:CoverageSubtype>GridCoverage</wcs:CoverageSubtype>
-            <wcs:nativeFormat>application/x-netcdf</wcs:nativeFormat>
+            <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
         </wcs:ServiceParameters>
     </wcs:CoverageDescription>
 

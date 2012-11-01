@@ -65,7 +65,7 @@ public class WCS {
 
 
     public static final String    GMLCOV_NAMESPACE_STRING = "http://www.opengis.net/gmlcov/1.0";
-    public static final Namespace GMLCOV_NS = Namespace.getNamespace("owcs",GMLCOV_NAMESPACE_STRING);
+    public static final Namespace GMLCOV_NS = Namespace.getNamespace("gmlcov",GMLCOV_NAMESPACE_STRING);
     public static final String    GMLCOV_SCHEMA_LOCATION_BASE= "http://schemas.opengis.net/gmlcov/1.0/";
 
     public static final String    GML_NAMESPACE_STRING = "http://www.opengis.net/gml/3.2";

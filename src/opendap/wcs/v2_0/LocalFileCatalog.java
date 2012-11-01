@@ -24,6 +24,7 @@
 package opendap.wcs.v2_0;
 
 
+import opendap.coreServlet.Scrub;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -31,8 +32,10 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
+import javax.print.DocFlavor;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -76,8 +79,16 @@ public class LocalFileCatalog implements WcsCatalog {
     private  ReentrantReadWriteLock _catalogLock;
 
 
-    public String getDataAccessUrl(String coverageID){
-        return coverageID;
+    public String getDataAccessUrl(String coverageID) {
+
+        CoverageDescription cd = coverages.get(coverageID);
+
+        if(cd==null)
+            return null;
+
+        URL dataAccessUrl = cd.getDapDatasetUrl();
+
+        return dataAccessUrl.toExternalForm();
     }
 
     public LocalFileCatalog(){
@@ -238,7 +249,7 @@ public class LocalFileCatalog implements WcsCatalog {
 
         _lastModified = catalogFile.lastModified();
 
-        log.info("Ingested WCS Coverages directory: "+_catalogDir);
+        log.info("Ingested WCS Catalog Configuration: {}",catalogFile);
 
 
     }
@@ -261,6 +272,10 @@ public class LocalFileCatalog implements WcsCatalog {
             log.error(msg);
         } catch (ConfigurationException e) {
             msg = "ingestCoverageDescription(): Encountered a configuration error in the configuration file "+ _catalogConfigFile +" Msg: " +
+                    e.getMessage()+"  SKIPPING";
+            log.error(msg);
+        } catch (WcsException e) {
+            msg = "ingestCoverageDescription(): When ingesting the CoverageDescription it failed a validation test. Msg: " +
                     e.getMessage()+"  SKIPPING";
             log.error(msg);
         }
@@ -301,8 +316,14 @@ public class LocalFileCatalog implements WcsCatalog {
     }
 
 
-    public  CoverageDescription getCoverageDescription(String id)  {
-        return coverages.get(id);
+    public  CoverageDescription getCoverageDescription(String id) throws WcsException {
+
+        CoverageDescription cd = coverages.get(id);
+        if(cd==null)
+            throw new WcsException("No such wcs:Coverage: "+ Scrub.fileName(id),
+                    WcsException.INVALID_PARAMETER_VALUE,"wcs:CoverageId");
+
+        return cd;
     }
 
 
@@ -330,49 +351,9 @@ public class LocalFileCatalog implements WcsCatalog {
 
 
 
-    public String getLatitudeCoordinateDapId(String coverageId, String fieldId) {
-        return null;
-    }
-
-    public String getLongitudeCoordinateDapId(String coverageId, String fieldId) {
-        return null;
-    }
-
-    public String getElevationCoordinateDapId(String coverageId, String fieldId) {
-        return null;
-    }
-
-    public String getTimeCoordinateDapId(String coverageId, String fieldId) {
-        return null;
-    }
 
 
     public long getLastModified(){
-
-        /*
-        long mostRecent;
-
-
-        Enumeration enm = coverages.elements();
-        CoverageDescription cd;
-
-        try {
-            updateCapabilitiesMetadata();
-        }
-        catch(Exception e){
-            log.error("Failed to update Capabilities Metadata!");
-        }
-        mostRecent = _cacheTime.getTime();
-
-        while(enm.hasMoreElements()){
-            cd = (CoverageDescription)enm.nextElement();
-
-            if(mostRecent < cd.lastModified()){
-                mostRecent = cd.lastModified();
-            }
-        }
-        return mostRecent;
-        */
         return _lastModified;
     }
 

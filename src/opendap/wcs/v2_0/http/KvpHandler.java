@@ -94,24 +94,8 @@ public class KvpHandler {
 
                 case WCS.GET_COVERAGE:
 
-                    String[] store = keyValuePairs.get("store");
-                    if(store!=null && store[0].equals("true")){
-                        wcsResponse = getStoredCoverage(keyValuePairs);
-                        xmlo = new XMLOutputter(Format.getPrettyFormat());
-                        try {
-                            response.setContentType("text/xml");
-                            os = response.getOutputStream();
-                            xmlo.output(wcsResponse,os);
-                        } catch (IOException e) {
-                            throw new WcsException(e.getMessage(), WcsException.NO_APPLICABLE_CODE);
-                        }
+                    getCoverage(keyValuePairs,response);
 
-                    }
-                    else {
-
-                        getCoverage(keyValuePairs,response);
-
-                    }
                     break;
 
                 default:
@@ -168,22 +152,10 @@ public class KvpHandler {
      *
      * @param keyValuePairs    Key Value Pairs from WCS URL
      * @throws WcsException  When bad things happen.
+     * @throws InterruptedException
+     * @throws IOException
      */
-    public static Document getStoredCoverage(Map<String, String[]> keyValuePairs)  throws InterruptedException, WcsException {
-
-        GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
-
-            return CoverageRequestProcessor.getStoredCoverageResponse(req);
-    }
-
-
-
-    /**
-     *
-     * @param keyValuePairs    Key Value Pairs from WCS URL
-     * @throws WcsException  When bad things happen.
-     */
-    public static void getCoverage(Map<String, String[]> keyValuePairs, HttpServletResponse response)  throws InterruptedException, WcsException {
+    public static void getCoverage(Map<String, String[]> keyValuePairs, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
         GetCoverageRequest req = new GetCoverageRequest(keyValuePairs);
 
@@ -197,7 +169,7 @@ public class KvpHandler {
      * @param req    A GetCoverageREquest object.
      * @throws WcsException  When bad things happen.
      */
-    public static void getCoverage(GetCoverageRequest req, HttpServletResponse response)  throws InterruptedException, WcsException {
+    public static void getCoverage(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
 
         CoverageRequestProcessor.sendCoverageResponse(req, response, false );

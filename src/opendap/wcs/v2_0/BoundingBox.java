@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -43,105 +44,11 @@ public class BoundingBox {
     Logger log;
     private double[] lowerCorner;
     private double[] upperCorner;
+    private boolean hasTimePeriod;
+    private Date startTime;
+    private Date endTime;
     private URI srsName;
 
-    /**
-     * Builds a BoundingBox from the passed corner positions.
-     * 
-     * @param lowerCorner   Lower corner array [Minumum Longitude, Minimum Latitude, ...]
-     * @param upperCorner   Upper corner array [Maximum Longitude, Maximum Latitude, ...]
-     * @param crs A URI for the cooridinate reference system.
-     */
-    public BoundingBox(double[] lowerCorner, double[] upperCorner, URI crs) {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-        this.lowerCorner = lowerCorner;
-        this.upperCorner = upperCorner;
-
-        this.srsName = crs;
-    }
-
-
-    /**
-     * Builds a BoundingBox from one specified in a KVP encoded WCS request.
-     *
-     * @param kvp A HashMap containing the KVP.
-     * @throws WcsException When the KVP has issues.
-     */
-    public BoundingBox(Map<String, String[]> kvp) throws WcsException {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-
-
-        String[] s = kvp.get("BoundingBox");
-
-        if (s == null)
-            throw new WcsException("Request is missing required " +
-                    "BoundingBox key value pairs. This is used to identify " +
-                    "what data will be returned.",
-                    WcsException.MISSING_PARAMETER_VALUE,
-                    "BoundingBox");
-
-        URI crs = null;
-        double[] lowerCorner;
-        double[] upperCorner;
-
-
-        String tmp[] = s[0].split(",");
-        int valCount = tmp.length;
-
-        if (valCount < 2)
-            throw new WcsException("The BoundingBox used in the request is " +
-                    "incorrect. It must specify both a lower corner and an " +
-                    "upper corner. This means at LEAST two numeric values.",
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "BoundingBox");
-
-        // Check to see if they included a CRS URI. If they did, then the number
-        // of elements in tmp must be odd. This is because the BB string must
-        // contain a lower and upper corner. Every coordinate in the lower
-        // corner has a mate in the upper corner, so there must be an even
-        // number of coordinate values. This means that is the number of comma
-        // delimited items is odd then the user either bungled the URL, OR
-        // they included a CRS URI at the end. We'll assume the latter...
-        if ((valCount % 2) != 0) {
-            String st = tmp[tmp.length - 1];
-            valCount--;
-            try {
-                crs = new URI(st);
-            }
-            catch (URISyntaxException e) {
-                throw new WcsException(e.getMessage(),
-                        WcsException.INVALID_PARAMETER_VALUE,
-                        "BoundingBox");
-            }
-
-        }
-
-
-        try {
-            lowerCorner = new double[valCount / 2];
-            int index;
-            for (index = 0; index < valCount / 2; index++) {
-                lowerCorner[index] = Double.parseDouble(tmp[index]);
-            }
-
-
-            upperCorner = new double[valCount / 2];
-            for (int i = 0; index < valCount; i++, index++) {
-                upperCorner[i] = Double.parseDouble(tmp[index]);
-            }
-        }
-        catch (NumberFormatException e) {
-            throw new WcsException(e.getMessage(),
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "BoundingBox");
-        }
-
-        this.lowerCorner = lowerCorner;
-        this.upperCorner = upperCorner;
-        this.srsName = crs;
-
-
-    }
 
     /**
      *
@@ -177,31 +84,45 @@ public class BoundingBox {
 
         Element e;
         String s;
+        String tmp[];
 
         WCS.checkNamespace(bbElement, "boundedBy", WCS.GML_NS);
 
+        hasTimePeriod = false;
         try {
 
             Element envelope = bbElement.getChild("Envelope", WCS.GML_NS);
 
-            if (envelope == null)
-                throw new WcsException("Missing required" +
-                        "gml:Envelope element. This is used to identify " +
-                        "a physical world bounding space for which data will be returned.",
-                        WcsException.MISSING_PARAMETER_VALUE,
-                        "gml:Envelope");
+            if (envelope == null){
+
+                envelope = bbElement.getChild("EnvelopeWithTimePeriod", WCS.GML_NS);
+
+                if (envelope == null){
+                    throw new WcsException("The gml:boundedBy element is missing the required" +
+                            "gml:Envelope element or gml:EnvelopeWithTimePeriod element. This is used to identify " +
+                            "a physical world bounding space for which data will be returned.",
+                            WcsException.MISSING_PARAMETER_VALUE,
+                            "gml:boundedBy");
+
+                }
+
+                hasTimePeriod = true;
+
+
+
+            }
 
 
             // Process Lower Corner.
             e = envelope.getChild("lowerCorner", WCS.GML_NS);
             if (e == null) {
-                throw new WcsException("The gml:boundedBy element is incomplete. " +
+                throw new WcsException("The gml:Envelope[WithTimePeriod] element is incomplete. " +
                         "It is missing the required gml:lowerCorner.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "gml:boundedBy");
+                        "gml:Envelope[WithTimePeriod]");
             }
 
-            String tmp[] = e.getTextNormalize().split(" ");
+            tmp = e.getTextNormalize().split(" ");
             int valCount = tmp.length;
 
             if (valCount < 2)
@@ -219,11 +140,11 @@ public class BoundingBox {
             // Process Upper Corner.
             e = envelope.getChild("upperCorner", WCS.GML_NS);
             if (e == null) {
-                throw new WcsException("The gml:boundedBy is incomplete. " +
+                throw new WcsException("The gml:Envelope[WithTimePeriod] is incomplete. " +
                         "It is missing the required gml:upperCorner element " +
                         "This means at LEAST two numeric values.",
                         WcsException.INVALID_PARAMETER_VALUE,
-                        "gml:boundedBy");
+                        "gml:Envelope[WithTimePeriod]");
             }
 
             tmp = e.getTextNormalize().split(" ");
@@ -257,6 +178,38 @@ public class BoundingBox {
                             "gml:Envelope/@srsName");
                 }
 
+
+
+            if(hasTimePeriod){
+                // Process beginPosition.
+                e = envelope.getChild("beginPosition", WCS.GML_NS);
+                if (e == null) {
+                    throw new WcsException("The gml:EnvelopeWithTimePeriod element is incomplete. " +
+                            "It is missing the required gml:beginPosition.",
+                            WcsException.INVALID_PARAMETER_VALUE,
+                            "gml:EnvelopeWithTimePeriod");
+                }
+
+                s = e.getTextNormalize();
+                startTime = TimeSequenceItem.parseWCSTimePosition(s);
+
+
+                // Process endPosition.
+                e = envelope.getChild("endPosition", WCS.GML_NS);
+                if (e == null) {
+                    throw new WcsException("The gml:EnvelopeWithTimePeriod element is incomplete. " +
+                            "It is missing the required gml:endPosition.",
+                            WcsException.INVALID_PARAMETER_VALUE,
+                            "gml:EnvelopeWithTimePeriod");
+                }
+
+                s = e.getTextNormalize();
+                endTime = TimeSequenceItem.parseWCSTimePosition(s);
+            }
+
+
+
+
             }
         } catch (NumberFormatException nfe) {
             throw new WcsException(nfe.getMessage(),
@@ -271,6 +224,27 @@ public class BoundingBox {
 
 
     }
+
+
+    public boolean hasTimePeriod(){
+        return hasTimePeriod;
+    }
+
+    public Date getStartTime(){
+        if(startTime==null)
+            return null;
+
+        return (Date) startTime.clone();
+    }
+
+
+    public Date getEndTime(){
+        if(endTime==null)
+            return null;
+
+        return (Date) endTime.clone();
+    }
+
 
     /**
      *

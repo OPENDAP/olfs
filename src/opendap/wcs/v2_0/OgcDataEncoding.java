@@ -26,83 +26,27 @@
 
 package opendap.wcs.v2_0;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
- * Date: 10/27/12
- * Time: 2:20 PM
+ * Date: 11/1/12
+ * Time: 12:55 PM
  * To change this template use File | Settings | File Templates.
  */
-public class Util {
+public class OgcDataEncoding {
 
-    private static Logger log;
-
+    private static ConcurrentHashMap<String, String> ogcDataEncodings;
     static {
-        log = LoggerFactory.getLogger(Util.class);
+        ogcDataEncodings = new ConcurrentHashMap<String, String>();
+        ogcDataEncodings.put("application/x-netcdf","http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/req/CF-netCDF");
+        ogcDataEncodings.put("application/octet-stream","http://www.opengis.net/spec/WCS_coverage-encoding_opendap/req/dap2");
     }
 
+    public static String getEncodingUri(String mimeType){
 
-    public static boolean isReadableFile(File f) {
-        String msg;
-
-
-        if (!f.exists()) {
-            msg = "Cannot find file: " + f;
-            log.warn(msg);
-            return false;
-        }
-
-        if (!f.canRead()) {
-            msg = "Cannot read from file: " + f;
-            log.warn(msg);
-            return false;
-        }
-
-        if (f.isDirectory()) {
-            msg = "File " + f + " is actually a directory.";
-            log.warn(msg);
-            return false;
-        }
-
-        return true;
+        return ogcDataEncodings.get(mimeType);
 
     }
-
-    public static boolean isReadableDir(File f) {
-        String msg;
-
-
-        if (!f.exists()) {
-            msg = "Cannot find directory: " + f;
-            log.warn(msg);
-            return false;
-        }
-
-        if (!f.canRead()) {
-            msg = "Cannot read from directory: " + f;
-            log.warn(msg);
-            return false;
-        }
-
-        if (!f.isDirectory()) {
-            msg = "Directory " + f + " is not actually a directory.";
-            log.warn(msg);
-            return false;
-        }
-
-        return true;
-
-    }
-
-
-
-
 }

@@ -36,8 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-
-
+import java.util.HashMap;
 
 
 /**
@@ -58,15 +57,34 @@ public class Attachment {
 
     private Logger log;
     private String contentTransferEncoding = "binary";
-    private String contentId;
-    private String contentType;
+    private final String contentId = "Content-Id";
+    private final String contentType = "Content-Type";
     private InputStream _istream;
     private String _sourceUrl;
     private Document _doc;
-    private int defaultBufferSize = 10240; // 10k read buffer
     private ContentModel _myContentModel;
 
+    private HashMap<String, String> mimeHeaders;
 
+
+
+
+    public void setHeader(String name, String value){
+        mimeHeaders.put(name,value);
+    }
+
+    public String getHeader(String name){
+        return mimeHeaders.get(name);
+    }
+
+    public Attachment(String ctype, String cid){
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        mimeHeaders = new HashMap<String, String>();
+
+        setHeader(contentType,ctype);
+        setHeader(contentId,"<"+cid+">");
+
+    }
 
 
 
@@ -76,9 +94,8 @@ public class Attachment {
      * @param is    A stream containing the content for this attachment.
      */
     public Attachment(String ctype, String cid, InputStream is) {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-        contentType = ctype;
-        contentId = cid;
+        this(ctype,cid);
+
         _istream = is;
         _doc = null;
         _myContentModel = ContentModel.stream;
@@ -92,9 +109,8 @@ public class Attachment {
      * @param url   A URL that when dereferenced will provide the content for this attachment.
      */
     public Attachment(String ctype, String cid, String url) {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-        contentType = ctype;
-        contentId = cid;
+        this(ctype,cid);
+
         _istream = null;
         _sourceUrl = url;
         _doc = null;
@@ -107,9 +123,8 @@ public class Attachment {
      * @param doc A JDOM XML document to provide the content for this attachment.
      */
     public Attachment(String ctype, String cid, Document doc) {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-        contentType = ctype;
-        contentId = cid;
+        this(ctype,cid);
+
         _istream = null;
         _sourceUrl = null;
         _doc = doc;
@@ -118,11 +133,7 @@ public class Attachment {
 
 
     public String getContentType(){
-        return contentType;
-    }
-
-    public void setContentType(String cntTyp){
-        contentType=cntTyp;
+        return getHeader(contentType);
     }
 
 
@@ -137,121 +148,51 @@ public class Attachment {
     public void write(String mimeBoundary, ServletOutputStream sos) throws IOException, URISyntaxException {
 
 
-            sos.println("--" + mimeBoundary);
-            sos.println("Content-Type: " + contentType);
-            sos.println("Content-Transfer-Encoding: " + contentTransferEncoding);
-            sos.println("Content-Id: <" + contentId + ">");
-            sos.println();
+        sos.println("--" + mimeBoundary);
+        for(String headerName:mimeHeaders.keySet()){
+            sos.print(headerName);
+            sos.print(": ");
+            sos.println(mimeHeaders.get(headerName));
+        }
+        sos.println();
 
 
-            switch (_myContentModel) {
-                case stream:
-                    try {
-                        drainInputStream(_istream, sos);
-                    } finally {
-                        if (_istream != null) {
-                            try {
-                                _istream.close();
-                            } catch (IOException e) {
-                                log.error("Failed to close content source InputStream. " +
-                                        "Error Message: " + e.getMessage());
+        switch (_myContentModel) {
+            case stream:
+                try {
+                    Util.drainInputStream(_istream, sos);
+                } finally {
+                    if (_istream != null) {
+                        try {
+                            _istream.close();
+                        } catch (IOException e) {
+                            log.error("Failed to close content source InputStream. " +
+                                    "Error Message: " + e.getMessage());
 
-                            }
                         }
                     }
-                    break;
+                }
+                break;
 
-                case url:
-                    forwardUrlContent(_sourceUrl, sos);
-                    break;
+            case url:
+                Util.forwardUrlContent(_sourceUrl, sos);
+                break;
 
-                case document:
-                    sendDocument(sos);
-                    break;
+            case document:
+                Util.sendDocument(_doc, sos);
+                break;
 
-                default:
-                    break;
-
-            }
-
-            //MIME Attachments need to end with a newline!
-            sos.println();
-
-
-    }
-
-
-    private void sendDocument(OutputStream os) throws IOException {
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        xmlo.output(_doc, os);
-    }
-
-    private void forwardUrlContent(String url, OutputStream os) throws URISyntaxException, IOException {
-
-        log.debug("Retrieving URL: "+url);
-
-        GetMethod request = new GetMethod(url);
-        InputStream is = null;
-        try {
-
-            HttpClient httpClient = new HttpClient();
-
-            // Execute the method.
-            int statusCode = httpClient.executeMethod(request);
-
-            if (statusCode != HttpStatus.SC_OK) {
-                String msg = "HttpClient failed to executeMethod(). Status: " + request.getStatusLine();
-                log.error(msg);
-                throw new IOException(msg);
-            }
-            else {
-                is = request.getResponseBodyAsStream();
-                drainInputStream(is,os);
-
-            }
+            default:
+                break;
 
         }
-        finally {
-            if(is!=null)
-                is.close();
-            log.debug("Releasing Http connection.");
-            request.releaseConnection();
-        }
+
+        //MIME Attachments need to end with a newline!
+        sos.println();
+
 
     }
 
-
-
-
-    private int drainInputStream(InputStream is, OutputStream os) throws IOException {
-
-        byte[] buf = new byte[defaultBufferSize];
-
-        boolean done = false;
-        int totalBytesRead = 0;
-        int totalBytesWritten = 0;
-        int bytesRead;
-
-        while (!done) {
-            bytesRead = is.read(buf);
-            if (bytesRead == -1) {
-                if (totalBytesRead == 0)
-                    totalBytesRead = -1;
-                done = true;
-            } else {
-                totalBytesRead += bytesRead;
-                os.write(buf, 0, bytesRead);
-                totalBytesWritten += bytesRead;
-            }
-        }
-
-        if (totalBytesRead != totalBytesWritten)
-            throw new IOException("Failed to write as many bytes as I read! " +
-                    "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
-
-        return totalBytesRead;
-
-    }
 
 
 }

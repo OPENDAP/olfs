@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2012 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+<gmlcov:GridCoverage
+        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns:gml='http://www.opengis.net/gml/3.2'
+        xmlns='http://www.opengis.net/gml/3.2'
+        xmlns:swe='http://www.opengis.net/swe/2.0'
+        xmlns:gmlcov='http://www.opengis.net/gmlcov/1.0'
+        xmlns:gmlwcs='http://www.opengis.net/gmlcov/1.0'
+        xsi:schemaLocation='http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd
+                        http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd'
+        gml:id="ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc">
+    <gml:boundedBy>
+        <gml:Envelope srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="latitude longitude"
+                      uomLabels="deg deg" srsDimension="2">
+            <gml:lowerCorner>82.1161499 21.73596</gml:lowerCorner>
+            <gml:upperCorner>122.768791 46.4944191</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <gml:domainSet>
+        <gml:Grid gml:id="Grid-ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc" dimension="2">
+            <gml:limits>
+                <gml:GridEnvelope>
+                    <gml:low>0 0</gml:low>
+                    <gml:high>459 700</gml:high>
+                </gml:GridEnvelope>
+            </gml:limits>
+            <gml:axisLabels>latitude longitude</gml:axisLabels>
+        </gml:Grid>
+    </gml:domainSet>
+    <gml:rangeSet>
+        <gml:File>
+            <gml:rangeParameters
+                    xlink:href="cid:200803061600__HFRadar__USEGC__6km__rtv__SIO.nc"
+                    xlink:role="http://www.opengis.net/spec/WCS_coverage-encoding_netcdf/req/CF-netCDF"
+                    xlink:arcrole="fileReference"/>
+            <gml:fileReference>cid:200803061600__HFRadar__USEGC__6km__rtv__SIO.nc</gml:fileReference>
+            <gml:fileStructure/>
+            <gml:mimeType>application/x-netcdf</gml:mimeType>
+        </gml:File>
+    </gml:rangeSet>
+    <gmlcov:rangeType>
+        <swe:DataRecord>
+            <swe:field name="u.u">
+                <swe:Quantity
+                        definition="http://www.unidata.edu/def/property/CF-1.1/0/surface_eastward_sea_water_velocity">
+                    <swe:description>Eastern component of sea surface current vector.</swe:description>
+                    <swe:uom code="m/s"/>
+                    <swe:constraint>
+                        <swe:AllowedValues>
+                            <swe:interval>-327868 32768</swe:interval>
+                            <swe:significantFigures>3</swe:significantFigures>
+                        </swe:AllowedValues>
+                    </swe:constraint>
+                </swe:Quantity>
+            </swe:field>
+        </swe:DataRecord>
+    </gmlcov:rangeType>
+</gmlcov:GridCoverage>
+
+
+

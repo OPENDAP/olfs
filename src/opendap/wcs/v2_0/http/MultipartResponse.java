@@ -115,7 +115,7 @@ public class MultipartResponse {
 
 
     /**
-     * Send the Multipart MIME docuemtn response to the client.
+     * Send the Multipart MIME document response to the client.
      *
      * @throws java.io.IOException When things go wrong
      */
@@ -127,12 +127,12 @@ public class MultipartResponse {
         Attachment firstPart = attachments.firstElement();
 
 
-        servResponse.setContentType("Multipart/related;  " +
+        servResponse.setContentType("multipart/related;  " +
                 "type=\""+ firstPart.getContentType() +"\";  " +
                 "start=\"" + startID + "\";  " +
                 "boundary=\"" + mimeBoundary + "\"");
 
-        servResponse.setHeader("Content-Description", "OPeNDAP WebServices");
+        servResponse.setHeader("Content-Description", "WCS 2.0 Response");
 
         ServletOutputStream os = servResponse.getOutputStream();
 
@@ -160,20 +160,32 @@ public class MultipartResponse {
     }
 
 
-    public void addAttachment(String contentType, String contentId, InputStream is) {
+    public void addAttachment(Attachment attachment) {
 
-        attachments.add(new Attachment(contentType, contentId, is));
+        attachments.add(attachment);
+
+    }
+    public Attachment addAttachment(String contentType, String contentId, InputStream is) {
+
+        Attachment attachment = new Attachment(contentType, contentId, is);
+        attachments.add(attachment);
+
+        return attachment;
     }
 
-    public void addAttachment(String contentType, String contentId, String url) {
+    public Attachment addAttachment(String contentType, String contentId, String url) {
 
-        attachments.add(new Attachment(contentType, contentId, url));
+        Attachment attachment = new Attachment(contentType, contentId, url);
+        attachments.add(attachment);
+        return attachment;
     }
 
 
-    public void addAttachment(String contentType, String contentId, Document doc) {
+    public Attachment addAttachment(String contentType, String contentId, Document doc) {
 
-        attachments.add(new Attachment(contentType, contentId, doc));
+        Attachment attachment = new Attachment(contentType, contentId, doc);
+        attachments.add(attachment);
+        return attachment;
     }
 
 

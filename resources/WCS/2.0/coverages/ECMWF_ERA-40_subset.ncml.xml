@@ -44,7 +44,7 @@
         </boundedBy>
         <wcs:CoverageId>ioos/ECMWF_ERA-40_subset.ncml</wcs:CoverageId>
         <domainSet>
-            <Grid dimension="3" gml:id="ioos/ECMWF_ERA-40_subset.ncml-grid">
+            <Grid dimension="3" gml:id="ioos_002fECMWF_ERA-40_subset.ncml-grid">
                 <limits>
                     <GridEnvelope>
                         <low>0 0 0</low>
@@ -56,7 +56,7 @@
         </domainSet>
         <gmlcov:rangeType>
             <swe:DataRecord>
-                <swe:field name="tcw">
+                <swe:field name="tcw.tcw">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="kg/m^2"/>
@@ -67,7 +67,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="tcwv">
+                <swe:field name="tcwv.tcwv">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="kg/m^2"/>
@@ -78,7 +78,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="lsp">
+                <swe:field name="lsp.lsp">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="m"/>
@@ -89,7 +89,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="cp">
+                <swe:field name="cp.cp">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="m"/>
@@ -100,7 +100,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="msl">
+                <swe:field name="msl.msl">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="Pa"/>
@@ -111,7 +111,7 @@
                         </swe:constraint>
                     </swe:Quantity>
                 </swe:field>
-                <swe:field name="blh">
+                <swe:field name="blh.blh">
                     <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                         <swe:description/>
                         <swe:uom code="m"/>

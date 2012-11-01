@@ -306,11 +306,6 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
     }
 
 
-    public Document getStoredCoverage(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-
-        return CoverageRequestProcessor.getStoredCoverageResponse(req);
-    }
 
     /**
      *
@@ -319,7 +314,7 @@ public class XmlRequestHandler implements opendap.coreServlet.DispatchHandler, W
      * @throws WcsException  When bad things happen.
      * @throws InterruptedException When it gets interrupted.
      */
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response)  throws InterruptedException, WcsException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
         CoverageRequestProcessor.sendCoverageResponse(req, response, false );
 

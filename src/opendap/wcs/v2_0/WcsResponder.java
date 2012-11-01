@@ -36,5 +36,5 @@ import org.jdom.Document;
 public interface WcsResponder {
         Document getCapabilities(GetCapabilitiesRequest gcr, String serviceUrl) throws WcsException, InterruptedException;
         Document describeCoverage(DescribeCoverageRequest dcr) throws WcsException, InterruptedException;
-        Document getStoredCoverage(GetCoverageRequest gcr) throws WcsException, InterruptedException;
+
 }

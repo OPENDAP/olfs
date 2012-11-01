@@ -541,10 +541,11 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         page += "    <h3>The WCS response: </h3>";
         page += "    <pre>";
+        page += "WCS 2.0 Coverage response should go here!";
 
-        Document wcsResponse = KvpHandler.getStoredCoverage(keyValuePairs);
+        //Document wcsResponse = KvpHandler.getCoverageDocument(keyValuePairs);
 
-        page += xmlo.outputString(wcsResponse).replaceAll("<","&lt;").replaceAll(">","&gt;");
+        //page += xmlo.outputString(wcsResponse).replaceAll("<","&lt;").replaceAll(">","&gt;");
         page += "    </pre>";
 
 

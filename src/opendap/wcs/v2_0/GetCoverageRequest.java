@@ -55,13 +55,22 @@ public class GetCoverageRequest {
 
 
 
-    public void setMediaType(String mType) {
+    public void setMediaType(String mType) throws WcsException {
+
+        if(mType!=null && !mType.equalsIgnoreCase("multipart/related")){
+            throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
+                "No other value is allowed. OGC [09-110r4] section 8.4.1",
+                WcsException.INVALID_PARAMETER_VALUE,
+                "mediaType");
+        }
+
         mediaType = mType;
     }
 
     public String getMediaType(){
         return mediaType;
     }
+
 
     public String getCoverageID() {
         return coverageID;
@@ -129,23 +138,21 @@ public class GetCoverageRequest {
 
 
 
-        // Get the format.
+        // Get the format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
+        // it was not specified.
         s = kvp.get("format");
         format = s==null? null : s[0];
 
 
 
 
-        // Get the mediaType.
+        // Get the mediaType. It's not required and a null is used to indicate that
+        // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
+        // the response MUST be a multipart MIME document with the gml:Coverage document in the first
+        // part and the second part must contain whatever response format the user specified in the format parameter.
         s = kvp.get("mediaType");
         if(s!=null){
-            if(!s[0].equalsIgnoreCase("multipart/related")){
-                throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
-                    "No other value is allowed. OGC [09-110r4] section 8.4.1",
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "mediaType");
-            }
-            mediaType = s[0];
+            setMediaType(s[0]);
         }
 
 
@@ -157,13 +164,6 @@ public class GetCoverageRequest {
                 subsets.add(subset);
             }
         }
-
-
-
-
-
-
-
 
     }
 
@@ -208,19 +208,14 @@ public class GetCoverageRequest {
         }
 
 
-        // Get the mediaType for the coverage output. (Srsly? WTF is this about?)
+        // Get the mediaType. It's not required and a null is used to indicate that
+        // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
+        // the response MUST be a multipart MIME document with the gml:Coverage document in the first
+        // part and the second part must contain whatever response format the user specified in the format parameter.
         Element mediaTypeElement = getCoverageRequestElem.getChild("mediaType",WCS.WCS_NS);
         if(mediaTypeElement!=null){
-
             s = mediaTypeElement.getTextTrim();
-
-            if(!s.equalsIgnoreCase("multipart/related")){
-                throw new WcsException("Optional mediaType MUST be set to'multipart/related' " +
-                    "No other value is allowed. OGC [09-110r4] section 8.4.1",
-                    WcsException.INVALID_PARAMETER_VALUE,
-                    "wcs:mediaType");
-            }
-            mediaType = s;
+            setMediaType(s);
         }
     }
 

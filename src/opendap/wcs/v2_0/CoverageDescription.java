@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0;
 
+import opendap.coreServlet.Scrub;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -130,7 +131,7 @@ public class CoverageDescription {
      * @throws IOException When the file cannot be read.
      * @throws JDOMException When the file cannot be parsed.
      */
-    public CoverageDescription(Element wcsCoverageConfig, String catalogDir, boolean validateContent) throws IOException, JDOMException, ConfigurationException {
+    public CoverageDescription(Element wcsCoverageConfig, String catalogDir, boolean validateContent) throws IOException, JDOMException, ConfigurationException, WcsException {
         init();
 
 
@@ -154,7 +155,10 @@ public class CoverageDescription {
 
         myCD = ingestCoverageDescription(coverageDescriptionFile);
         myFile = coverageDescriptionFile;
-        this.lastModified = coverageDescriptionFile.lastModified();
+
+        qcCoverageDescriptionContent();
+
+        lastModified = coverageDescriptionFile.lastModified();
 
 
         /**
@@ -360,7 +364,7 @@ public class CoverageDescription {
      * @throws IOException When the file cannot be read.
      * @throws JDOMException When the file cannot be parsed.
      */
-    public CoverageDescription(File cdFile, boolean validateContent) throws IOException, JDOMException {
+    public CoverageDescription(File cdFile, boolean validateContent) throws IOException, JDOMException, WcsException {
         init();
 
         this.validateContent = validateContent;
@@ -406,7 +410,7 @@ public class CoverageDescription {
     }
 
 
-    private Element ingestCoverageDescription(File cdFile) throws IOException, JDOMException {
+    private Element ingestCoverageDescription(File cdFile) throws IOException, JDOMException, WcsException {
         String msg;
 
         if(!Util.isReadableFile(cdFile)){
@@ -420,11 +424,27 @@ public class CoverageDescription {
         Element cd = parseXmlDoc(new FileInputStream(cdFile),validateContent);
 
         myFile = cdFile;
+
         lastModified = cdFile.lastModified();
 
         return cd;
 
     }
+
+    private void qcCoverageDescriptionContent() throws WcsException {
+
+        StringBuilder msg = new StringBuilder();
+
+        if (getNativeFormat() == null) {
+            msg.append("wcs:CoverageDescription is missing required component. " +
+                    "wcs:CoverageDescription/wcs:ServiceParameters/wcs:nativeFormat");
+            throw new WcsException(msg.toString(),WcsException.MISSING_PARAMETER_VALUE,"wcs:nativeFormat");
+
+        }
+
+
+    }
+
 
     /**
      * Returns the last modified time of the Coverage.
@@ -553,6 +573,8 @@ public class CoverageDescription {
         return  cloneElementList(myCD.getChildren("SupportedCRS",WCS.WCS_NS));
     }
 
+
+
     /**
      *
      * @return Returns the wcs:nativeFormat element associated with this CoverageDescription.
@@ -568,6 +590,16 @@ public class CoverageDescription {
             return null;
 
         return  (Element) nativeFormat.clone();
+    }
+
+
+    public String getNativeFormat(){
+
+        Element nativeFormatElement = getNativeFormatElement();
+        if(nativeFormatElement==null)
+            return null;
+
+        return nativeFormatElement.getTextTrim();
     }
 
 
@@ -858,6 +890,89 @@ public class CoverageDescription {
 
         return dapDatasetUrl;
     }
+
+
+    public String getGmlId(){
+
+        return myCD.getAttributeValue("id",WCS.GML_NS);
+
+    }
+
+    public Vector<Element> getAbstractGmlTypeContent(){
+
+        Element e;
+        Vector<Element> abstractGmlTypeContent = new Vector<Element>();
+
+        for (Object o : myCD.getChildren("metaDataProperty", WCS.GML_NS)) {
+            e = (Element) o;
+            abstractGmlTypeContent.add((Element) e.clone());
+        }
+
+        e = myCD.getChild("description",WCS.GML_NS);
+        if(e!=null)
+            abstractGmlTypeContent.add((Element) e.clone());
+
+        e = myCD.getChild("descriptionReference",WCS.GML_NS);
+        if(e!=null)
+            abstractGmlTypeContent.add((Element) e.clone());
+
+
+        e = myCD.getChild("identifier",WCS.GML_NS);
+        if(e!=null)
+            abstractGmlTypeContent.add((Element) e.clone());
+
+
+        for (Object o : myCD.getChildren("name", WCS.GML_NS)) {
+            e = (Element) o;
+            abstractGmlTypeContent.add((Element) e.clone());
+        }
+
+        return abstractGmlTypeContent;
+
+
+    }
+
+    public Vector<Element> getAbstractFeatureTypeContent(){
+
+        Element e;
+        Vector<Element> abstractFeatureTypeContent = getAbstractGmlTypeContent();
+
+        e = myCD.getChild("boundedBy",WCS.GML_NS);
+        if(e!=null)
+            abstractFeatureTypeContent.add((Element) e.clone());
+
+        e = myCD.getChild("location",WCS.GML_NS);
+        if(e!=null)
+            abstractFeatureTypeContent.add((Element) e.clone());
+
+        return abstractFeatureTypeContent;
+
+    }
+
+    public Element getDomainSet() throws WcsException {
+
+        Element domainSet;
+
+        domainSet = myCD.getChild("domainSet",WCS.GML_NS);
+        if(domainSet!=null)
+            return (Element) domainSet.clone();
+
+        throw new WcsException("wcs:CoverageDescription is missing a gml:domainSet: ",
+                WcsException.MISSING_PARAMETER_VALUE,"gml:domainSet");
+    }
+
+    public Element getRangeType() throws WcsException {
+
+        Element rangeType;
+
+        rangeType = myCD.getChild("rangeType",WCS.GMLCOV_NS);
+        if(rangeType!=null)
+            return (Element) rangeType.clone();
+
+        throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
+                WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
+    }
+
 
 
 }

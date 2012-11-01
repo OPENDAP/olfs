@@ -32,6 +32,7 @@ import org.jdom.Element;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -115,15 +116,9 @@ public class SoapHandler extends XmlRequestHandler {
     }
 
 
-    @Override
-    public Document getStoredCoverage(GetCoverageRequest req) throws InterruptedException, WcsException {
-
-        return wrapDocumentInSoapEnvelope(super.getStoredCoverage(req));
-
-    }
 
     @Override
-    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException {
+    public void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response) throws InterruptedException, WcsException, IOException {
 
         CoverageRequestProcessor.sendCoverageResponse(req, response, true );
 

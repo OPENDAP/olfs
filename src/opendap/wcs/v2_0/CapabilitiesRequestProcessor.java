@@ -58,6 +58,8 @@ public class CapabilitiesRequestProcessor {
         capabilities.addContent(CatalogWrapper.getServiceIdentificationElement());
         capabilities.addContent(CatalogWrapper.getServiceProviderElement());
         capabilities.addContent(CatalogWrapper.getOperationsMetadataElement(serviceUrl));
+        capabilities.addContent(getServiceMetadata());
+
         capabilities.addContent(getContents());
 
         return new Document(capabilities);
@@ -189,6 +191,33 @@ public class CapabilitiesRequestProcessor {
         }
 
         return contents;
+
+
+    }
+
+
+
+    /**
+     * Returns the wcs:Contents section of the wcs:Capabilities response.
+     *
+     * @return Returns the wcs:Contents section of the wcs:Capabilities response.
+     * @throws WcsException   When bad things happen.
+     */
+    public static Element getServiceMetadata()  throws InterruptedException, WcsException {
+
+        Element serviceMetadata = new Element("ServiceMetadata",WCS.WCS_NS);
+
+        Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
+        formatSupported.setText("application/x-netcdf-cf1.0");
+        serviceMetadata.addContent(formatSupported);
+
+        formatSupported = new Element("formatSupported",WCS.WCS_NS);
+        formatSupported.setText("application/octet-stream");
+        serviceMetadata.addContent(formatSupported);
+
+
+
+        return serviceMetadata;
 
 
     }

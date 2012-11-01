@@ -1,8 +1,24 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.coreServlet.ReqInfo;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.jvm.hotspot.memory.HeapBlock;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,6 +28,14 @@ import javax.servlet.http.HttpServletRequest;
  * To change this template use File | Settings | File Templates.
  */
 public class Util {
+
+    private static Logger log;
+
+    static {
+        log = LoggerFactory.getLogger(Util.class);
+    }
+
+
     /***************************************************************************/
 
 
@@ -42,6 +66,155 @@ public class Util {
     public static String getServiceUrl(HttpServletRequest request){
         return ReqInfo.getServiceUrl(request);
     }
+
+
+
+
+
+
+    public static final int DEFAULT_BUFFER_SIZE = 10240; // 10k read buffer
+
+    public static int drainInputStream(InputStream is, OutputStream os) throws IOException {
+        return drainInputStream(is,os,DEFAULT_BUFFER_SIZE);
+    }
+
+    public static int drainInputStream(InputStream is, OutputStream os, int bufferSize) throws IOException {
+
+        byte[] buf = new byte[bufferSize];
+
+        boolean done = false;
+        int totalBytesRead = 0;
+        int totalBytesWritten = 0;
+        int bytesRead;
+
+        while (!done) {
+            bytesRead = is.read(buf);
+            if (bytesRead == -1) {
+                if (totalBytesRead == 0)
+                    totalBytesRead = -1;
+                done = true;
+            } else {
+                totalBytesRead += bytesRead;
+                os.write(buf, 0, bytesRead);
+                totalBytesWritten += bytesRead;
+            }
+        }
+
+        if (totalBytesRead != totalBytesWritten)
+            throw new IOException("Failed to write as many bytes as I read! " +
+                    "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
+
+        return totalBytesRead;
+
+    }
+
+
+    public static void forwardUrlContent(String url, HttpServletResponse response,boolean transferHttpHeaders) throws URISyntaxException, IOException {
+        forwardUrlContent(url,response, DEFAULT_BUFFER_SIZE, transferHttpHeaders);
+    }
+
+
+
+    public static void forwardUrlContent(String url, HttpServletResponse response, int bufferSize, boolean transferHttpHeaders) throws URISyntaxException, IOException {
+
+        log.debug("Retrieving URL: "+url);
+
+
+        GetMethod contentRequest = new GetMethod(url);
+        InputStream is = null;
+        try {
+
+            HttpClient httpClient = new HttpClient();
+
+            // Execute the method.
+            int statusCode = httpClient.executeMethod(contentRequest);
+
+            if (statusCode != HttpStatus.SC_OK) {
+                String msg = "HttpClient failed to executeMethod(). Status: " + contentRequest.getStatusLine();
+                log.error(msg);
+                Header[] headers = contentRequest.getResponseHeaders();
+
+                for(Header h:headers){
+                    response.setHeader(h.getName(),h.getValue());
+                }
+                response.sendError(statusCode);
+            }
+            else {
+
+
+                if(transferHttpHeaders){
+                    Header[] headers = contentRequest.getResponseHeaders();
+                    String name, value;
+
+                    for(Header h:headers){
+                        name = h.getName();
+                        value = h.getValue();
+                        response.setHeader(name,value);
+                    }
+                }
+
+                ServletOutputStream os = response.getOutputStream();
+
+                is = contentRequest.getResponseBodyAsStream();
+                drainInputStream(is, os, bufferSize);
+
+            }
+
+        }
+        finally {
+            if(is!=null)
+                is.close();
+            log.debug("Releasing Http connection.");
+            contentRequest.releaseConnection();
+        }
+
+    }
+
+
+    public static void forwardUrlContent(String url, ServletOutputStream os) throws URISyntaxException, IOException {
+        forwardUrlContent(url,os, DEFAULT_BUFFER_SIZE);
+    }
+    public static void forwardUrlContent(String url, ServletOutputStream os, int bufferSize) throws URISyntaxException, IOException {
+
+        log.debug("Retrieving URL: "+url);
+
+        GetMethod request = new GetMethod(url);
+        InputStream is = null;
+        try {
+
+            HttpClient httpClient = new HttpClient();
+
+            // Execute the method.
+            int statusCode = httpClient.executeMethod(request);
+
+            if (statusCode != HttpStatus.SC_OK) {
+                String msg = "HttpClient failed to executeMethod(). Status: " + request.getStatusLine();
+                log.error(msg);
+                throw new IOException(msg);
+            }
+            else {
+                is = request.getResponseBodyAsStream();
+                drainInputStream(is, os, bufferSize);
+
+            }
+
+        }
+        finally {
+            if(is!=null)
+                is.close();
+            log.debug("Releasing Http connection.");
+            request.releaseConnection();
+        }
+
+    }
+
+
+
+    public static  void sendDocument(Document doc,OutputStream os) throws IOException {
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+        xmlo.output(doc, os);
+    }
+
 
 
 }

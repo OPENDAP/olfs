@@ -171,11 +171,6 @@
         <br/>
     </xsl:template>
 
-    <xsl:template match="gml:name">
-        <em>gml:name - </em>
-        <xsl:value-of select="."/>
-        <br/>
-    </xsl:template>
 
     <xsl:template match="gml:boundedBy">
         <h3>gml:boundedBy - </h3>
@@ -263,6 +258,20 @@
         <xsl:value-of select="."/>
         <br/>
     </xsl:template>
+
+
+    <xsl:template match="swe:DataRecord">
+        <xsl:apply-templates/>
+    </xsl:template>
+
+    <xsl:template match="swe:field">
+        <em>swe:field - name='<xsl:value-of select="@name"/>'</em>
+        <ul>
+            <xsl:apply-templates/>
+        </ul>
+        <br/>
+    </xsl:template>
+
 
 
 
