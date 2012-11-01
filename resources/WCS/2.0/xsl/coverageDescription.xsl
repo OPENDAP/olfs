@@ -93,7 +93,12 @@
 
 
                 <dl>
-                    <dt><span class="medium">wcs:CoverageId</span><br/></dt>
+                    <dt><span class="medium"><span class="small">gml:</span>id</span></dt>
+                    <dd><span class="medium_bold"><xsl:value-of select="@gml:id" /></span></dd>
+                </dl>
+
+                <dl>
+                    <dt><span class="medium"><span class="small">wcs:</span>CoverageId</span></dt>
                     <dd><span class="medium_bold"><xsl:value-of select="wcs:CoverageId" /></span></dd>
                 </dl>
 
@@ -187,9 +192,7 @@
 
 
     <xsl:template match="wcs:CoverageId">
-        <em>gml:CoverageId - </em>
-        <xsl:value-of select="."/>
-        <br/>
+        <xsl:apply-templates/>
     </xsl:template>
 
     <xsl:template match="gml:coverageFunction">
@@ -265,7 +268,7 @@
     </xsl:template>
 
     <xsl:template match="swe:field">
-        <em>swe:field - name='<xsl:value-of select="@name"/>'</em>
+        <span class="small">swe:field</span> <strong><xsl:value-of select="@name"/></strong>
         <ul>
             <xsl:apply-templates/>
         </ul>
@@ -274,9 +277,26 @@
 
 
 
+    <xsl:template match="swe:uom">
+        <em>Units of Measure: </em> <xsl:value-of select="@code"/>
+        <br/>
+    </xsl:template>
 
 
 
+
+    <xsl:template match="swe:AllowedValues">
+        <em>Allowed Values: </em> <xsl:value-of select="swe:interval"/>
+        <br/>
+    </xsl:template>
+
+
+
+
+
+    <xsl:template match="swe:Quantity | swe:constraint | swe:description">
+        <xsl:apply-templates />
+    </xsl:template>
 
 
 
@@ -357,11 +377,8 @@
 
 
 
-    <xsl:template match="*">
-        <xsl:apply-templates mode="simple"/>
-    </xsl:template>
 
-    <xsl:template match="*" mode="simple">
+    <xsl:template match="*">
         <xsl:choose>
             <xsl:when test="*">
                 <li>
@@ -369,7 +386,7 @@
                     </em>
                 </li>
                 <ul>
-                    <xsl:apply-templates mode="simple"/>
+                    <xsl:apply-templates />
                 </ul>
             </xsl:when>
             <xsl:otherwise>

@@ -34,22 +34,24 @@
             xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
             xmlns:swe="http://www.opengis.net/swe/2.0">
         <boundedBy>
-            <Envelope srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="time latitude longitude"
-                      uomLabels="h deg deg" srsDimension="3">
-                <lowerCorner>898476 -90.000 0.000</lowerCorner>
-                <upperCorner>899202 90.000 360.000</upperCorner>
-            </Envelope>
+            <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="latitude longitude"
+                uomLabels="deg deg" srsDimension="2" >
+                <lowerCorner>-90.000 0.000</lowerCorner>
+                <upperCorner>90.000 360.000</upperCorner>
+                <beginPosition>2002-07-17T09:00:00.000Z</beginPosition>
+                 <endPosition>2002-07-31T15:00:00.000Z</endPosition>
+            </EnvelopeWithTimePeriod>
         </boundedBy>
         <wcs:CoverageId>ioos_002fECMWF__ERA-40__subset.ncml</wcs:CoverageId>
         <domainSet>
             <Grid dimension="3" gml:id="ioos_002fECMWF__ERA-40__subset.ncml-grid">
                 <limits>
                     <GridEnvelope>
-                        <low>0 0 0</low>
-                        <high>62 73 144</high>
+                        <low>0 0</low>
+                        <high>73 144</high>
                     </GridEnvelope>
                 </limits>
-                <axisLabels>time latitude longitude</axisLabels>
+                <axisLabels>latitude longitude</axisLabels>
             </Grid>
         </domainSet>
         <gmlcov:rangeType>
