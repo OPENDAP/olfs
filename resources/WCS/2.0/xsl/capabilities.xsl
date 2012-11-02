@@ -136,7 +136,7 @@
                     </li>
                     <br/>
                     <li>
-                        <a href="{$ServicePrefix}/echoXML">Return KVP as XML</a>
+                        <a href="{$ServicePrefix}/echoXML?service=WCS&amp;request=GetCapabilities">Return KVP as XML</a>
                         - Translates a KVP encoded request into
                         an XML encoded version of the request.
                     </li>
