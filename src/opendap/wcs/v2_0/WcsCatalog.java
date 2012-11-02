@@ -25,7 +25,6 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
-import java.net.URL;
 import java.util.List;
 
 /**

@@ -6,7 +6,6 @@ import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
-import opendap.semantics.IRISail.ProcessController;
 import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -14,7 +13,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.print.DocFlavor;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -221,6 +219,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
     public void update(HttpServletRequest request, HttpServletResponse response) throws Exception{
         ServletOutputStream sos = response.getOutputStream();
+
 
         if(ProcessController.isCurrentlyProcessing()){
             sos.println("<html><body><hr/><hr/>");
@@ -562,7 +561,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         return page.toString();
     }
-
 
 
 

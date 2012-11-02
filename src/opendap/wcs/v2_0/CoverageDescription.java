@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0;
 
-import opendap.coreServlet.Scrub;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -31,7 +30,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
-import sun.jvm.hotspot.debugger.posix.elf.ELFSectionHeader;
 
 import java.io.*;
 import java.net.MalformedURLException;

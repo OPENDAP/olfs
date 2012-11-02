@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0;
 
-import opendap.coreServlet.Scrub;
 import org.jdom.Document;
 import org.jdom.Element;
 

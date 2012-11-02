@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Map;
 
 /**
  *

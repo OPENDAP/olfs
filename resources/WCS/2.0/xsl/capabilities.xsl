@@ -130,7 +130,7 @@
                 <div class= "medium">
                 <ul>
                     <li>
-                        <a href="{$ServicePrefix}/test">KVP Test Page</a>
+                        <a href="{$ServicePrefix}/test?service=WCS&amp;request=GetCapabilities">KVP Test Page</a>
                         - Parses a KVP request and returns a page
                         reporting any problems.
                     </li>

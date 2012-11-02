@@ -10,7 +10,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.jvm.hotspot.memory.HeapBlock;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;

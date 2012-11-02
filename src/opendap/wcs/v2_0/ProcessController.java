@@ -29,31 +29,18 @@ package opendap.wcs.v2_0;
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
- * Date: 10/27/12
- * Time: 2:30 PM
+ * Date: 11/1/12
+ * Time: 8:01 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ConfigurationException extends Exception {
-
-    public ConfigurationException(){
-        super();
+public class ProcessController {
+    public static boolean isCurrentlyProcessing(){
+        return false;
     }
 
 
-    public ConfigurationException(String msg){
-        super(msg);
-
+    public static long getLastProcessingElapsedTime(){
+        return 0;
     }
-
-
-    public ConfigurationException(String msg,Throwable cause){
-        super(msg,cause);
-    }
-
-    public ConfigurationException(Throwable cause){
-        super(cause);
-    }
-
-
-
 }
+

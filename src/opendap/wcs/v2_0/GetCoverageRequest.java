@@ -23,13 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.wcs.v2_0;
 
-import opendap.coreServlet.Scrub;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;

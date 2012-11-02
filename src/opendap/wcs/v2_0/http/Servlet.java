@@ -5,7 +5,6 @@ import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import opendap.wcs.v2_0.CatalogWrapper;
-import opendap.wcs.v2_0.LocalFileCatalog;
 import opendap.wcs.v2_0.WcsCatalog;
 import org.jdom.Document;
 import org.jdom.Element;
