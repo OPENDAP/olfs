@@ -42,6 +42,105 @@ public class EchoServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
+
+
+
+
+
+
+
+
+        getPlainText(request,response);
+
+    }
+
+    public void getPlainText(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+        response.setContentType("text/plain");
+        ServletOutputStream out = response.getOutputStream();
+
+
+        out.println("---------------------------------------------------------------------");
+        out.println("---------------------------------------------------------------------");
+
+        out.println("");
+        out.println("HTTP Request Headers");
+
+
+        out.println("");
+        out.println("    Header Name            Value");
+        Enumeration<String> headers = request.getHeaderNames();
+        while(headers.hasMoreElements()){
+            String headerName = headers.nextElement();
+            String headerValue = request.getHeader(headerName);
+                out.println("    "+headerName +"            "+headerValue);
+        }
+        out.println();
+        out.println();
+
+        String queryString = request.getQueryString();
+        out.println("---------------------------------------------------------------------");
+        out.println("Query String and KVP Evaluation");
+        out.println();
+        out.println("  HttpServletRequest.getQueryString():     "+ queryString);
+        out.println();
+        out.println("  Decoded:                                 "+java.net.URLDecoder.decode(queryString==null?"null":queryString,"UTF-8"));
+        out.println();
+
+
+        out.println("---------------------------------------------------------------------");
+        out.println("HttpServletRequest.getParameter()");
+        out.println("    keyName            value ");
+        Enumeration<String> paramNames = request.getParameterNames();
+
+        while(paramNames.hasMoreElements()){
+            String paramName = paramNames.nextElement();
+            String paramValue = request.getParameter(paramName);
+                out.println("    "+paramName+"            "+paramValue);
+        }
+        out.println();
+        out.println("---------------------------------------------------------------------");
+        out.println("HttpServletRequest.getParameterMap()");
+        out.println();
+
+
+        Map paramMap = request.getParameterMap();
+
+        out.println("ParameterMap is an instance of: "+paramMap.getClass().getName());
+        out.println("ParameterMap contains "+paramMap.size()+" element(s).");
+        out.println();
+        out.println("    keyName            value(s) ");
+
+
+        for(Object o:paramMap.keySet()){
+            String key = (String) o;
+
+            Object oo =   paramMap.get(key);
+
+            String[] values = (String[]) oo;
+            out.print("    "+key+"            ");
+            boolean first=true;
+            for(String value:values){
+                if(!first)
+                    out.print(", ");
+                out.print("'"+value+"'");
+                first = false;
+            }
+            out.println();
+
+        }
+        out.println();
+
+    }
+
+
+
+
+    public void getHtml(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+        response.setContentType("text/html");
         ServletOutputStream out = response.getOutputStream();
 
 
@@ -142,5 +241,12 @@ public class EchoServlet extends HttpServlet {
         out.println("</body>");
         out.println("</html>");
     }
+
+
+
+
+
+
+
 
 }

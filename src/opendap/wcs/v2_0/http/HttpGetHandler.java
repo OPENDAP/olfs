@@ -21,8 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.Key;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -141,14 +144,14 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         Map pmap =  request.getParameterMap();
 
         for(Object o: pmap.keySet()){
-            String key = (String) o;
-            String[] value = (String[]) pmap.get(key);
+            String key = (String) o;   // Get the key String
+            String[] value = (String[]) pmap.get(key);  // Get the value before we change the key
+            key = key.toLowerCase(); // Make the key set case insensitive;
             requestParameters.put(key,value);
         }
         return requestParameters;
 
     }
-
 
 
     private boolean wcsRequestDispatch(HttpServletRequest request,

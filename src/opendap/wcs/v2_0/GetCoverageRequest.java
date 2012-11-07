@@ -127,12 +127,12 @@ public class GetCoverageRequest {
 
 
         // Get the identifier for the coverage.
-        s = kvp.get("coverageId");
+        s = kvp.get("coverageId".toLowerCase());
         if(s==null){
             throw new WcsException("Request is missing required " +
                     "Coverage 'coverageId'.",
                     WcsException.MISSING_PARAMETER_VALUE,
-                    "identifier");
+                    "coverageId");
         }
         coverageID = s[0];
 
@@ -150,7 +150,7 @@ public class GetCoverageRequest {
         // it was not specified. If it is specified it's value MUST BE "multipart/related" and the
         // the response MUST be a multipart MIME document with the gml:Coverage document in the first
         // part and the second part must contain whatever response format the user specified in the format parameter.
-        s = kvp.get("mediaType");
+        s = kvp.get("mediaType".toLowerCase());
         if(s!=null){
             setMediaType(s[0]);
         }

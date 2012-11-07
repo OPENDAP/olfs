@@ -178,9 +178,10 @@
 
 
     <xsl:template match="gml:boundedBy">
-        <h3>gml:boundedBy - </h3>
-        <xsl:apply-templates/>
-        <br/>
+        <h2>Bounding Box <span class="small">(gml:boundedBy)</span></h2>
+        <div class="medium">
+            <xsl:apply-templates/>
+        </div>
     </xsl:template>
 
 
@@ -214,7 +215,7 @@
     </xsl:template>
 
     <xsl:template match="gml:domainSet">
-        <h3>gml:domainSet</h3>
+        <h2>Domain Set <span class="small">(gml:domainSet)</span></h2>
 
         <div class="medium">
             <xsl:apply-templates/>
@@ -223,27 +224,28 @@
     </xsl:template>
 
     <xsl:template match="gmlcov:rangeType">
-        <h3>gmlcov:rangeType</h3>
+        <h2>Range Set <span class="small">(gmlcov:rangeType)</span></h2>
         <xsl:apply-templates/>
     </xsl:template>
 
 
 
     <xsl:template match="wcs:ServiceParameters">
-        <h3>wcs:ServiceParameters</h3>
-        <ul>
+        <h2>ServiceParameters</h2>
+        <table>
             <xsl:apply-templates/>
-        </ul>
+        </table>
     </xsl:template>
 
     <xsl:template match="wcs:CoverageSubtype">
-        <em>wcs:CoverageSubtype - </em>
-        <xsl:value-of select="."/>
-        <br/>
+        <tr>
+            <td><span class="small">Coverage Subtype: </span></td>
+            <td><span style="font-size: 14px;"><code><xsl:value-of select="."/></code></span><br/></td>
+        </tr>
     </xsl:template>
 
     <xsl:template match="wcs:CoverageSubtypeParent">
-        <em>wcs:CoverageSubtypeParent - </em>
+        <em>wcs:Coverage Subtype Parent: </em>
         <ul>
             <xsl:apply-templates/>
         </ul>
@@ -251,9 +253,10 @@
     </xsl:template>
 
     <xsl:template match="wcs:nativeFormat">
-        <em>wcs:nativeFormat - </em>
-        <xsl:value-of select="."/>
-        <br/>
+        <tr>
+            <td><span class="small">Native Format: </span></td>
+            <td><span style="font-size: 14px;"><code><xsl:value-of select="."/></code></span><br/></td>
+        </tr>
     </xsl:template>
 
     <xsl:template match="wcs:Extension">
@@ -268,7 +271,7 @@
     </xsl:template>
 
     <xsl:template match="swe:field">
-        <span class="small">swe:field</span> <strong><xsl:value-of select="@name"/></strong>
+        <strong><span class="large"><xsl:value-of select="@name"/> </span></strong><span class="small">(swe:field)</span>
         <ul>
             <xsl:apply-templates/>
         </ul>

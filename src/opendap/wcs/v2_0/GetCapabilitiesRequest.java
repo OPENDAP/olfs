@@ -260,7 +260,7 @@ public class GetCapabilitiesRequest {
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(!s[0].equals(_request)){
+        else if(!s[0].equalsIgnoreCase(_request)){
             throw new WcsException("The servers internal dispatch operations " +
                     "have failed. The WCS request for the operation '"+s+"' " +
                     "has been incorrectly routed to the 'GetCapabilities' " +
@@ -272,7 +272,7 @@ public class GetCapabilitiesRequest {
 
         // Make sure the client can accept the correct WCS version...
         boolean compatible = false;
-        s = kvp.get("AcceptVersions");
+        s = kvp.get("AcceptVersions".toLowerCase());
         if(s!=null){
             tmp = s[0].split(",");
             for(String ver:tmp){
@@ -295,7 +295,7 @@ public class GetCapabilitiesRequest {
         // Get the list of section the client has requested. Returning
         // individual sections may not be supported, but we'll keep track of
         // that partof the request regardless.
-        s = kvp.get("Sections");
+        s = kvp.get("Sections".toLowerCase());
         if(s!=null){
             hasSectionsElement = true;
 
@@ -313,13 +313,13 @@ public class GetCapabilitiesRequest {
 
         // Store the updatSequence information in the event that the server
         // supports it at some point...
-        s = kvp.get("updateSequence");
+        s = kvp.get("updateSequence".toLowerCase());
         updateSequence = s==null? null : s[0];
 
 
         // Store the AccptedFormats offered by the client in the event that the
         // the server eventually supports more than text/html
-        s = kvp.get("AcceptFormats");
+        s = kvp.get("AcceptFormats".toLowerCase());
         if(s!=null){
             tmp = s[0].split(",");
             AcceptFormats = tmp;
@@ -330,7 +330,7 @@ public class GetCapabilitiesRequest {
 
         // Store the AccptedFormats offered by the client in the event that the
         // the server eventually supports more than text/html
-        s = kvp.get("AcceptLanguages");
+        s = kvp.get("AcceptLanguages".toLowerCase());
         if(s!=null){
             tmp = s[0].split(",");
             AcceptLanguages = tmp;
