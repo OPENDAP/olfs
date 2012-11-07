@@ -151,7 +151,7 @@ public class WCS {
             throw new WcsException("Missing service type!",
                     WcsException.MISSING_PARAMETER_VALUE,"service");
         }
-        if(!SERVICE.equals(srvc)){
+        if(!SERVICE.equalsIgnoreCase(srvc)){
             throw new WcsException("Unsupported service: " + srvc,
                     WcsException.VERSION_NEGOTIATION_FAILED,"service");
         }
