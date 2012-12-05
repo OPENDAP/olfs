@@ -26,6 +26,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.Version;
 import opendap.bes.BesDapResponder;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -86,9 +87,15 @@ public class GeoTiff extends BesDapResponder {
                     "    CE: '" + constraintExpression + "'");
 
 
-        response.setContentType("text/xml");
+        String downloadFileName = Scrub.fileName(relativeUrl.substring(relativeUrl.lastIndexOf("/") + 1, relativeUrl.length()));
+
+        String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+
+        response.setContentType("image/geotiff");
+        response.setHeader("Content-Disposition", contentDisposition);
+
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dap_xml");
+        response.setHeader("Content-Description", "geotiff image of DSP data");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
