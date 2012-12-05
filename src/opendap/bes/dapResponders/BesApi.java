@@ -63,6 +63,8 @@ public class BesApi {
     public static String HTML_FORM  = "html_form";
     public static String INFO_PAGE  = "info_page";
     public static String XML_DATA   = "xml_data";
+    public static String NETCDF     = "netcdf";
+    public static String GEOTIFF    = "geotiff";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
@@ -371,6 +373,7 @@ public class BesApi {
      * @param constraintExpression The constraintElement expression to be applied to
      *                             the request..
      * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize
      * @param os         The Stream to which to write the response.
      * @param err        The Stream to which to write errors returned
      *                   by the BES.
@@ -417,19 +420,51 @@ public class BesApi {
                                              String constraintExpression,
                                             String xdap_accept,
                                             int maxResponseSize,
+                                            String xmlBase,
                                             OutputStream os,
                                             OutputStream err)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besTransaction(
                 dataSource,
-                getXmlDataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize),
+                getXmlDataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize,xmlBase),
                 os,
                 err);
     }
 
 
 
+    /**
+     * Writes the NetCDF file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writeGeoTiffDataResponse(String dataSource,
+                                            String constraintExpression,
+                                            String xdap_accept,
+                                            int maxResponseSize,
+                                            OutputStream os,
+                                            OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getGeoTiffDataRequest(dataSource,constraintExpression,xdap_accept,maxResponseSize),
+                os,
+                err);
+    }
 
 
     /**
@@ -1122,16 +1157,24 @@ public class BesApi {
             throws BadConfigurationException {
 
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize, null,null,"netcdf",DAP2_ERRORS);
+        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize, null,null,NETCDF,DAP2_ERRORS);
 
 
     }
+
+    public Document getGeoTiffOutRequest(String dataSource, String ce, String xdap_accept, int maxResponseSize)
+            throws BadConfigurationException {
+        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize, null,null,GEOTIFF,DAP2_ERRORS);
+    }
+
+
     /**
      *  Returns the XML data response for the passed dataSource
      *  using the passed constraint expression.
      * @param dataSource The data set whose DDS is being requested
      * @param ce The constraint expression to apply.
      * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize Maximum allowable response size.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
@@ -1139,15 +1182,51 @@ public class BesApi {
     public Document getXmlDataRequest(String dataSource,
                                          String ce,
                                          String xdap_accept,
-                                         int maxResponseSize)
+                                         int maxResponseSize,
+                                         String xmlBase)
             throws BadConfigurationException {
 
-        return getRequestDocument(XML_DATA,dataSource,ce,xdap_accept,maxResponseSize,null,null,null,XML_ERRORS);
+        return getRequestDocument(XML_DATA,dataSource,ce,xdap_accept,maxResponseSize,xmlBase,null,null,XML_ERRORS);
 
     }
 
 
+    /**
+     *  Returns the XML data response for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize Maximum allowable response size.
+     * @return The DDS request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
+    public Document getGeoTiffDataRequest(String dataSource,
+                                         String ce,
+                                         String xdap_accept,
+                                         int maxResponseSize)
+            throws BadConfigurationException {
 
+        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize,null,null,GEOTIFF,XML_ERRORS);
+
+    }
+
+
+    /**
+     * Returns a BES Request document.
+     * @param type
+     * @param dataSource The data set whose DDS is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize Maximum allowable response size.
+     * @param xmlBase
+     * @param formURL
+     * @param returnAs
+     * @param errorContext
+     * @return
+     * @throws BadConfigurationException
+     */
     public  Document getRequestDocument(String type,
                                                 String dataSource,
                                                 String ce,

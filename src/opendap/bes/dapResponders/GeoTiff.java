@@ -43,25 +43,25 @@ import java.io.*;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class XmlData extends BesDapResponder {
+public class GeoTiff extends BesDapResponder {
     private Logger log;
 
 
 
 
-    private static String defaultRequestSuffixRegex = "\\.xdods";
+    private static String defaultRequestSuffixRegex = "\\.geotiff";
 
-    public XmlData(String sysPath, BesApi besApi) {
+    public GeoTiff(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
-    public XmlData(String sysPath, String pathPrefix, BesApi besApi) {
+    public GeoTiff(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
 
-    public XmlData(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public GeoTiff(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
@@ -103,12 +103,11 @@ public class XmlData extends BesDapResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeXmlDataResponse(
+        boolean result = besApi.writeGeoTiffDataResponse(
                         dataSource,
                         constraintExpression,
                         xdap_accept,
                         user.getMaxResponseSize(),
-                        xmlBase,
                         os,
                         erros);
 
