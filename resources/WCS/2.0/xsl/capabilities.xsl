@@ -241,27 +241,25 @@
     <!--                                                        -->
     <xsl:template match="wcs:Contents">
         <h3>Available Coverages</h3>
-        <div style="font-family: courier;font-size: 10px">
-            <table border="0" width="100%">
-                <tr>
-                    <th align="left">Identifier</th>
-                    <!-- <th align="center">Description</th> -->
-                    <th align="center">Lat/Lon Envelope<br/>[&#160;lwrLat,&#160;&#160;lwrLon]&#160;[&#160;uprLat,&#160;&#160;uprLon]</th>
-                </tr>
-                <xsl:choose>
-                    <xsl:when test="wcs:CoverageSummary">
-                        <xsl:apply-templates select="wcs:CoverageSummary"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <tr>
-                            <td align="left"><span class="bold_italic">No Coverages Found</span></td>
-                            <!-- <th align="center">Description</th> -->
-                            <td align="center">[----.--, ----.--] [----.--, ----.--]</td>
-                        </tr>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </table>
-        </div>
+        <table border="0" width="100%" style="font-size: 14px; font-family: courier;" >
+            <tr>
+                <th align="left">Identifier</th>
+                <!-- <th align="center">Description</th> -->
+                <th align="center">Lat/Lon Envelope<br/>[&#160;lwrLat,&#160;&#160;lwrLon]&#160;[&#160;uprLat,&#160;&#160;uprLon]</th>
+            </tr>
+            <xsl:choose>
+                <xsl:when test="wcs:CoverageSummary">
+                    <xsl:apply-templates select="wcs:CoverageSummary"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <tr>
+                        <td align="left"><span class="bold_italic">No Coverages Found</span></td>
+                        <!-- <th align="center">Description</th> -->
+                        <td align="center">[----.--, ----.--] [----.--, ----.--]</td>
+                    </tr>
+                </xsl:otherwise>
+            </xsl:choose>
+        </table>
         <hr size="1" noshade="noshade"/>
         <!-- xsl:call-template name="ServerIDs"/ -->
         <xsl:if test="wcs:SupportedCRS">
