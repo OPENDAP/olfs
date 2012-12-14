@@ -371,7 +371,7 @@ public class Servlet extends HttpServlet {
             catch(Throwable t2) {
             	try {
             		log.error("\n########################################################\n" +
-                                "Request proccessing failed.\n" +
+                                "Request processing failed.\n" +
                                 "Normal Exception handling failed.\n" +
                                 "This is the last error log attempt for this request.\n" +
                                 "########################################################\n", t2);
@@ -408,7 +408,7 @@ public class Servlet extends HttpServlet {
             catch(Throwable t2) {
             	try {
             		log.error("\n########################################################\n" +
-                                "Request proccessing failed.\n" +
+                                "Request processing failed.\n" +
                                 "Normal Exception handling failed.\n" +
                                 "This is the last error log attempt for this request.\n" +
                                 "########################################################\n", t2);

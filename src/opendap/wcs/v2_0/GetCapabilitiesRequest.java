@@ -59,6 +59,7 @@ public class GetCapabilitiesRequest {
     public static String SERVICE_IDENTIFICATION = "ServiceIdentification";
     public static String SERVICE_PROVIDER = "ServiceProvider";
     public static String OPERATIONS_METADATA = "OperationsMetadata";
+    public static String SERVICE_METADATA = "ServiceMetadata";
     public static String CONTENTS = "Contents";
     public static String ALL = "All";
 

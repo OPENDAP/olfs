@@ -129,9 +129,10 @@ public class KvpHandler {
      * @throws WcsException When bad things happen.
      */
     public static Document getCapabilities(Map<String,String[]> keyValuePairs, String serviceUrl)  throws InterruptedException, WcsException {
+
         GetCapabilitiesRequest wcsRequest = new GetCapabilitiesRequest(keyValuePairs);
 
-            return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
+        return CapabilitiesRequestProcessor.processGetCapabilitiesRequest(wcsRequest, serviceUrl);
     }
 
 
@@ -141,9 +142,10 @@ public class KvpHandler {
      * @throws WcsException  When bad things happen.
      */
     public static Document describeCoverage(Map<String,String[]> keyValuePairs )  throws InterruptedException, WcsException {
+
         DescribeCoverageRequest wcsRequest = new DescribeCoverageRequest(keyValuePairs);
 
-            return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
+        return DescribeCoverageRequestProcessor.processDescribeCoveragesRequest(wcsRequest);
     }
 
 

@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Vector;
 
 /**
  * Process GetCoverage requests. Static methods are used to construct a wcs:Coverages
  * response.
- *
  */
 public class CoverageRequestProcessor {
 
@@ -51,53 +51,51 @@ public class CoverageRequestProcessor {
     public static String coveragesContentID = "urn:ogc:wcs:1.1:coverages";
 
 
-
     /**
-     *
-     * @param req The GetCoverageRequest object built fromt the client request.
-     * @param response  HttpServletResponse object that will receive the response content.
-     * @param useSoapEnvelope  Instructs the server to make the response a SOAP document.
-     * @throws WcsException When a wcs:Coverage response document cannot be
-     * constructed for the passed request.
+     * @param req             The GetCoverageRequest object built fromt the client request.
+     * @param response        HttpServletResponse object that will receive the response content.
+     * @param useSoapEnvelope Instructs the server to make the response a SOAP document.
+     * @throws WcsException         When a wcs:Coverage response document cannot be
+     *                              constructed for the passed request.
      * @throws InterruptedException When the server may need to stop a (possibly length) request
-     * @throws IOException Wen in the disk or the internets are broken.
+     * @throws IOException          Wen in the disk or the internets are broken.
      */
     public static void sendCoverageResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
 
         String id = req.getCoverageID();
         boolean b = CatalogWrapper.hasCoverage(id);
 
-        if(!b)
-            throw new WcsException("No such wcs:Coverage: "+ Scrub.fileName(id),
-                    WcsException.INVALID_PARAMETER_VALUE,"wcs:CoverageId");
+        if (!b)
+            throw new WcsException("No such wcs:Coverage: " + Scrub.fileName(id),
+                    WcsException.INVALID_PARAMETER_VALUE, "wcs:CoverageId");
 
         // If the mediaType is specified then we know it must be multipart/related because the spec says that's
         // the only acceptable value (orly?) and the GetCoverageRequest class enforces that rule. And since it
         // only has a single value we know it means we have to send the multipart response with the gml:Coverage
         // in the first part and then the binary stuff as specified in the format parameter in the next part.
-        if(req.getMediaType()!= null){
+        if (req.getMediaType() != null) {
 
             sendMultipartGmlResponse(req, response, useSoapEnvelope);
 
 
-        }
-        else {
+        } else {
             sendFormatResponse(req, response, useSoapEnvelope);
         }
 
 
     }
+
     public static void sendFormatResponse(GetCoverageRequest req, HttpServletResponse response, boolean useSoapEnvelope) throws WcsException, InterruptedException, IOException {
 
         log.debug("Sending binary data response...");
 
-        response.setHeader("Content-Disposition",getContentDisposition(req));
+        response.setHeader("Content-Disposition", getContentDisposition(req));
 
         try {
-            opendap.wcs.v2_0.http.Util.forwardUrlContent(getDataAccessUrl(req),response,true);
+            opendap.wcs.v2_0.http.Util.forwardUrlContent(getDataAccessUrl(req), response, true);
         } catch (URISyntaxException e) {
-            throw new WcsException("Internal server error. Server failed to generate a valid server access URI: "+ Scrub.fileName(getDataAccessUrl(req)),
-                    WcsException.NO_APPLICABLE_CODE,"DataAccessUrl");
+            throw new WcsException("Internal server error. Server failed to generate a valid server access URI: " + Scrub.fileName(getDataAccessUrl(req)),
+                    WcsException.NO_APPLICABLE_CODE, "DataAccessUrl");
         }
 
 
@@ -109,29 +107,27 @@ public class CoverageRequestProcessor {
 
         log.debug("Building multi-part Response...");
 
-        String rangePartId =  "cid:"+ req.getCoverageID();
+        String rangePartId = "cid:" + req.getCoverageID();
 
         Coverage cvg = new Coverage(req.getCoverageID());
 
-        Element coverage = cvg.getCoverageElement(rangePartId,getReturnMimeType(req));
+        Element coverage = cvg.getCoverageElement(rangePartId, getReturnMimeType(req));
 
         Document doc = new Document(coverage);
 
-        if(useSoapEnvelope)
+        if (useSoapEnvelope)
             doc = SoapHandler.wrapDocumentInSoapEnvelope(doc);
-
 
 
         MultipartResponse mpr = new MultipartResponse();
 
-        Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8","gml-part",doc);
+        Attachment gmlPart = new Attachment("application/gml+xml; charset=UTF-8", "gml-part", doc);
         mpr.addAttachment(gmlPart);
 
         Attachment rangePart = new Attachment(getReturnMimeType(req), rangePartId, getDataAccessUrl(req));
-        rangePart.setHeader("Content-Disposition",getContentDisposition(req));
+        rangePart.setHeader("Content-Disposition", getContentDisposition(req));
 
         mpr.addAttachment(rangePart);
-
 
 
         try {
@@ -146,101 +142,100 @@ public class CoverageRequestProcessor {
     public static String getReturnFormat(GetCoverageRequest req) throws WcsException, InterruptedException {
         CoverageDescription coverageDescription = CatalogWrapper.getCoverageDescription(req.getCoverageID());
         String format = req.getFormat();
-        if(format==null) {
+        if (format == null) {
             format = coverageDescription.getNativeFormat();
         }
         return format;
-     }
+    }
 
 
     public static String getDataAccessUrl(GetCoverageRequest req) throws WcsException, InterruptedException {
         String dataAccessURL;
 
         String format = getReturnFormat(req);
-        if(format.contains("netcdf")){
+        if (format.contains("netcdf")) {
             dataAccessURL = getNetcdfDataAccessURL(req);
-        }
-        else if (format.equals("application/octet-stream")){
+        } else if (format.equals("image/geotiff")) {
+            dataAccessURL = getGeoTiffDataAccessURL(req);
+        } else if (format.equals("application/octet-stream")) {
             dataAccessURL = getDapDataAccessURL(req);
-        }
-        else {
-            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        } else {
+            throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE, "wcs:Ouput/@format");
         }
 
         return dataAccessURL;
-     }
+    }
 
 
     public static String getContentDisposition(GetCoverageRequest req) throws WcsException, InterruptedException {
         String contentDisposition;
 
         String format = getReturnFormat(req);
-        if(format.contains("netcdf")){
-            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".nc\"";
-        }
-        else if (format.equals("application/octet-stream")){
-            contentDisposition = " attachment; filename=\"" +req.getCoverageID()+".dods\"";
-        }
-        else {
-            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        if (format.contains("netcdf")) {
+            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".nc\"";
+        } else if (format.equals("application/octet-stream")) {
+            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".dods\"";
+        } else {
+            throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE, "wcs:Ouput/@format");
         }
 
         return contentDisposition;
-     }
+    }
 
 
     public static String getReturnMimeType(GetCoverageRequest req) throws WcsException, InterruptedException {
         String mime_type;
 
         String format = getReturnFormat(req);
-        if(format.contains("netcdf")){
+        if (format.contains("netcdf")) {
             mime_type = "application/x-netcdf";
-        }
-        else if (format.equals("application/octet-stream")){
+        } else if (format.equals("application/octet-stream")) {
             mime_type = "application/octet-stream";
-        }
-        else {
-            throw new WcsException("Unrecognized response format: "+ Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE,"wcs:Ouput/@format");
+        } else {
+            throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
+                    WcsException.INVALID_PARAMETER_VALUE, "wcs:Ouput/@format");
         }
 
         return mime_type;
-     }
+    }
 
 
-
-
-
-
-    public static String getDapDataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
+    public static String getGeoTiffDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        requestURL +=  ".dods"+"?"+ getDapCE(req);
+        requestURL += ".geotiff" + "?" + getDapCE(req);
+
+        return requestURL;
+    }
+
+    public static String getDapDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
+
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
+
+        requestURL += ".dods" + "?" + getDapCE(req);
 
         return requestURL;
     }
 
 
+    public static String getNetcdfDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
 
-    public static String getNetcdfDataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());;
-
-        requestURL +=  ".nc"+"?"+ getDapCE(req);
+        requestURL += ".nc" + "?" + getDapCE(req);
 
         return requestURL;
     }
 
 
-
-    public static String getMetadataAccessURL(GetCoverageRequest req)  throws InterruptedException, WcsException {
+    public static String getMetadataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        requestURL +=   ".ddx";
+        requestURL += ".ddx";
         //requestURL +=  "/" + req.getCoverageID() + ".ddx"+"?"+getDapCE(req);
 
         return requestURL;
@@ -249,20 +244,68 @@ public class CoverageRequestProcessor {
 
     private static String getDapCE(GetCoverageRequest req) throws InterruptedException, WcsException {
 
-        String proj = null;
+        StringBuilder dapCE = new StringBuilder();
 
         String coverageID = req.getCoverageID();
+
+
         CoverageDescription coverage = CatalogWrapper.getCoverageDescription(coverageID);
 
 
+        Vector<Field> fields = coverage.getFields();
+        DimensionSubset[] dimensionSubsets = req.getDimensionSubsets();
+
+        for (Field field : fields) {
 
 
+            if(dapCE.length()>0)
+                dapCE.append(",");
+
+            dapCE.append("grid(").append(field.getName()).append(",");
+
+            for (DimensionSubset dimSub : dimensionSubsets) {
+
+                StringBuilder subsetClause = new StringBuilder();
+
+                switch (dimSub.getType()) {
+
+                    case TRIM:
+                        subsetClause
+                                .append(dimSub.getTrimLow())
+                                .append("<=")
+                                .append(dimSub.getDimensionId())
+                                .append("<=")
+                                .append(dimSub.getTrimHigh());
+
+                        break;
+
+                    case SLICEPOINT:
+                        subsetClause
+                                .append(dimSub.getDimensionId())
+                                .append("=")
+                                .append(dimSub.getSlicePoint());
 
 
+                        break;
+
+                    default:
+                        throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
+
+                }
+
+                if (dapCE.length() > 0 && subsetClause.length() > 0)
+                    dapCE.append(",");
+
+                dapCE.append(subsetClause.toString());
+            }
+
+            dapCE.append(")");
 
 
+        }
 
-        return proj == null ? "" : proj;
+
+        return dapCE.toString();
     }
 
 

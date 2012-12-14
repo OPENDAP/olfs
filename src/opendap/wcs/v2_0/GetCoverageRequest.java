@@ -28,6 +28,7 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -89,6 +90,14 @@ public class GetCoverageRequest {
     public void setFormat(String format) {
         this.format = format;
     }
+
+
+    public DimensionSubset[] getDimensionSubsets(){
+        DimensionSubset[] ds = new DimensionSubset[subsets.size()];
+
+        return subsets.toArray(ds);
+    }
+
 
 
 

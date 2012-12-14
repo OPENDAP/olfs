@@ -181,10 +181,6 @@ public class WCS {
 
     public static void checkBoundedBy(Element e) throws WcsException{
         checkNamespace(e,"boundedBy",GML_NS);
-
-
-
-
     }
 
 

@@ -118,6 +118,7 @@
                 <!--                                                        -->
 
                 <xsl:apply-templates select="wcs:Contents"/>
+                <xsl:apply-templates select="wcs:ServiceMetadata"/>
                 <xsl:apply-templates select="ows:OperationsMetadata"/>
                 <xsl:apply-templates select="ows:ServiceProvider"/>
 
@@ -241,8 +242,6 @@
     <xsl:template match="wcs:Contents">
         <h3>Available Coverages</h3>
         <pre>
-
-
             <table border="0" width="100%">
                 <tr>
                     <th align="left">Identifier</th>
@@ -259,58 +258,42 @@
                             <!-- <th align="center">Description</th> -->
                             <td align="center">[----.--, ----.--] [----.--, ----.--]</td>
                         </tr>
-
                     </xsl:otherwise>
                 </xsl:choose>
             </table>
-
-
-            <xsl:call-template name="ServerIDs"/>
-            
-
-            <table border="0" width="100%">
-
-
-                <xsl:if test="wcs:SupportedCRS">
-                    <tr>
-                        <th align="left">
-                            Supported Coordinate Reference Systems:
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <ul>
-                                <xsl:apply-templates select="wcs:SupportedCRS"/>
-
-                            </ul>
-                        </td>
-                    </tr>
-
-                </xsl:if>
-
-                <hr size="1" noshade="noshade"/>
-
-
-
-                <xsl:if test="wcs:SupportedFormat">
-                    <tr>
-                        <th align="left">
-                            Supported Data Formats:
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <ul>
-                                <xsl:apply-templates select="wcs:SupportedFormat"/>
-
-                            </ul>
-                        </td>
-                    </tr>
-                </xsl:if>
-            </table>
-
         </pre>
+        <hr size="1" noshade="noshade"/>
+        <!-- xsl:call-template name="ServerIDs"/ -->
+        <xsl:if test="wcs:SupportedCRS">
+            <table border="0" width="100%">
+                <tr>
+                    <th align="left">
+                        Supported Coordinate Reference Systems:
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <ul>
+                            <xsl:apply-templates select="wcs:SupportedCRS"/>
 
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </xsl:if>
+        <xsl:if test="wcs:SupportedFormat">
+            <table border="0" width="100%">
+                <tr> <th align="left">Supported Data Formats:</th></tr>
+                <tr>
+                    <td>
+                        <ul>
+                            <xsl:apply-templates select="wcs:SupportedFormat"/>
+
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </xsl:if>
     </xsl:template>
 
 
@@ -375,10 +358,15 @@
     </xsl:template>
 
 
-    <xsl:template match="wcs:SupportedFormat">
-        <li>
-            <xsl:value-of select="."/>
-        </li>
+    <xsl:template match="wcs:formatSupported">
+        <dd><span class="small"><xsl:value-of select="."/></span></dd>
+    </xsl:template>
+
+    <xsl:template match="wcs:ServiceMetadata">
+        <dl>
+            <dt><span class="small_bold">Supported Formats</span></dt>
+            <xsl:apply-templates select="wcs:formatSupported" />
+        </dl>
     </xsl:template>
 
 

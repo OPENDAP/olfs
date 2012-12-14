@@ -25,6 +25,10 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
@@ -35,6 +39,8 @@ import java.util.Iterator;
  *
  */
 public class CapabilitiesRequestProcessor {
+
+    static Logger log = LoggerFactory.getLogger(CapabilitiesRequestProcessor.class);
 
 
     /**
@@ -59,6 +65,10 @@ public class CapabilitiesRequestProcessor {
         capabilities.addContent(CatalogWrapper.getServiceProviderElement());
         capabilities.addContent(CatalogWrapper.getOperationsMetadataElement(serviceUrl));
         capabilities.addContent(getServiceMetadata());
+
+        //XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        //log.debug(xmlo.outputString(capabilities));
 
         capabilities.addContent(getContents());
 
@@ -138,6 +148,10 @@ public class CapabilitiesRequestProcessor {
                 capabilities.addContent(CatalogWrapper.getOperationsMetadataElement(serviceUrl));
             }
 
+            if(all  ||  req.hasSection(GetCapabilitiesRequest.SERVICE_METADATA)){
+                capabilities.addContent(getServiceMetadata());
+            }
+
             if(all  ||  req.hasSection(GetCapabilitiesRequest.CONTENTS)){
                 capabilities.addContent(getContents());
             }
@@ -202,6 +216,7 @@ public class CapabilitiesRequestProcessor {
      *
      * @return Returns the wcs:Contents section of the wcs:Capabilities response.
      * @throws WcsException   When bad things happen.
+     * @throws InterruptedException
      */
     public static Element getServiceMetadata()  throws InterruptedException, WcsException {
 
@@ -209,6 +224,10 @@ public class CapabilitiesRequestProcessor {
 
         Element formatSupported = new Element("formatSupported",WCS.WCS_NS);
         formatSupported.setText("application/x-netcdf-cf1.0");
+        serviceMetadata.addContent(formatSupported);
+
+        formatSupported = new Element("formatSupported",WCS.WCS_NS);
+        formatSupported.setText("image/geotiff");
         serviceMetadata.addContent(formatSupported);
 
         formatSupported = new Element("formatSupported",WCS.WCS_NS);

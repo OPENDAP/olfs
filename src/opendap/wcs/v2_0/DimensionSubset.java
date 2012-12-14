@@ -36,10 +36,18 @@ import org.jdom.Element;
 * To change this template use File | Settings | File Templates.
 */
 public class DimensionSubset {
+
+
+    public enum Type {TRIM, SLICEPOINT}
+
+
+
     private String dimensionId;
     private String trimLow;
     private String trimHigh;
     private String slicePoint;
+
+    Type myDimensionType;
 
 
     /**
@@ -65,19 +73,27 @@ public class DimensionSubset {
         if(intervalOrPoint.contains(",")){
             int commaIndex = intervalOrPoint.indexOf(",");
             // It's an interval!
-
+            myDimensionType = Type.TRIM;
             trimLow = intervalOrPoint.substring(0,commaIndex);
             trimHigh = intervalOrPoint.substring(commaIndex,intervalOrPoint.length());
+
 
             slicePoint = null;
         }
         else {
             // It's a slicePoint;
+            myDimensionType = Type.SLICEPOINT;
             slicePoint = intervalOrPoint;
             trimHigh = null;
             trimLow = null;
         }
     }
+
+
+    public Type getType(){
+        return myDimensionType;
+    }
+
 
     /**
      * Accepts the an instance of the DomainSubset abstract element in WCS 2.0. Currently this may be either

@@ -32,12 +32,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-* Created by IntelliJ IDEA.
-* User: ndp
-* Date: 11/7/12
-* Time: 9:20 AM
-* To change this template use File | Settings | File Templates.
-*/
+ * A Map implementation that makes String keys case insensitive.
+ *
+ * User: ndp
+ * Date: 11/7/12
+ * Time: 9:20 AM
+ */
 public class KeyCaseInsensitiveMap<K,V> implements Map<K, V> {
 
     HashMap<K, V> map;

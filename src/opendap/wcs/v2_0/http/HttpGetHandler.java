@@ -314,6 +314,9 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         Document capabilitiesDoc = CapabilitiesRequestProcessor.getFullCapabilitiesDocument(serviceUrl);
 
+
+        log.debug(xmlo.outputString(capabilitiesDoc));
+
         response.setContentType("text/html");
         response.setHeader("Content-Description", "HTML wcs:Capabilities");
 

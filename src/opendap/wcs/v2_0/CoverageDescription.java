@@ -26,6 +26,7 @@ package opendap.wcs.v2_0;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -969,6 +970,31 @@ public class CoverageDescription {
 
         throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
                 WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
+    }
+
+
+    public Vector<Field> getFields() throws WcsException {
+
+        Element rangeType;
+
+        rangeType = myCD.getChild("rangeType",WCS.GMLCOV_NS);
+        if(rangeType==null)
+            throw new WcsException("wcs:CoverageDescription is missing a gmlcov:rangeType: ",
+                WcsException.MISSING_PARAMETER_VALUE,"gmlcov:rangeType");
+
+        Vector<Field> fields = new Vector<Field>();
+
+        ElementFilter filter = new ElementFilter("field",WCS.SWE_NS);
+        Iterator i = rangeType.getDescendants(filter);
+        while(i.hasNext()){
+            Element fieldElement = (Element) i.next();
+
+            Field field = new Field(fieldElement);
+            fields.add(field);
+
+        }
+
+        return fields;
     }
 
 
