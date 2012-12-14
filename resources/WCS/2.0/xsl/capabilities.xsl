@@ -241,7 +241,7 @@
     <!--                                                        -->
     <xsl:template match="wcs:Contents">
         <h3>Available Coverages</h3>
-        <pre>
+        <div style="font-family: courier;font-size: 10px">
             <table border="0" width="100%">
                 <tr>
                     <th align="left">Identifier</th>
@@ -261,7 +261,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </table>
-        </pre>
+        </div>
         <hr size="1" noshade="noshade"/>
         <!-- xsl:call-template name="ServerIDs"/ -->
         <xsl:if test="wcs:SupportedCRS">
