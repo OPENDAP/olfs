@@ -65,7 +65,7 @@
     </domainSet>
     <gmlcov:rangeType>
         <swe:DataRecord>
-            <swe:field name="u.u">
+            <swe:field name="u">
                 <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                     <swe:description>surface_eastward_sea_water_velocity</swe:description>
                     <swe:uom code="m/s"/>
@@ -76,7 +76,7 @@
                     </swe:constraint>
                 </swe:Quantity>
             </swe:field>
-            <swe:field name="v.v">
+            <swe:field name="v">
                 <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                     <swe:description>surface_northward_sea_water_velocity</swe:description>
                     <swe:uom code="m/s"/>
@@ -87,7 +87,7 @@
                     </swe:constraint>
                 </swe:Quantity>
             </swe:field>
-            <swe:field name="DOPx.DOPx">
+            <swe:field name="DOPx">
                 <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                     <swe:description>longitudinal dilution of precision</swe:description>
                     <swe:uom code="unknown"/>
@@ -98,7 +98,7 @@
                     </swe:constraint>
                 </swe:Quantity>
             </swe:field>
-            <swe:field name="DOPy.DOPy">
+            <swe:field name="DOPy">
                 <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
                     <swe:description>latitudinal dilution of precision</swe:description>
                     <swe:uom code="unknown"/>

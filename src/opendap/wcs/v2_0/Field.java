@@ -58,9 +58,10 @@ public class Field {
         if(swe.getName().equals("field") && swe.getNamespace().equals(WCS.SWE_NS)){
             mySweElement = swe;
         }
-
+        else {
         throw new WcsException("Cannot instantiate a Field class with a non-conformant " +
                 "intializer element.",WcsException.INVALID_PARAMETER_VALUE);
+        }
     }
 
 

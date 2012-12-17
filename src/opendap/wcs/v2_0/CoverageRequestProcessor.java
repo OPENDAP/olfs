@@ -160,8 +160,8 @@ public class CoverageRequestProcessor {
         } else if (format.equals("application/octet-stream")) {
             dataAccessURL = getDapDataAccessURL(req);
         } else {
-            throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE, "wcs:Ouput/@format");
+            throw new WcsException("Unrecognized response format: '" + Scrub.fileName(format)+"'",
+                    WcsException.INVALID_PARAMETER_VALUE, "format");
         }
 
         return dataAccessURL;
@@ -174,11 +174,13 @@ public class CoverageRequestProcessor {
         String format = getReturnFormat(req);
         if (format.contains("netcdf")) {
             contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".nc\"";
+        } else if (format.equals("image/geotiff")) {
+            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".geotiff\"";
         } else if (format.equals("application/octet-stream")) {
             contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".dods\"";
         } else {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE, "wcs:Ouput/@format");
+                    WcsException.INVALID_PARAMETER_VALUE, "format");
         }
 
         return contentDisposition;
@@ -191,11 +193,13 @@ public class CoverageRequestProcessor {
         String format = getReturnFormat(req);
         if (format.contains("netcdf")) {
             mime_type = "application/x-netcdf";
+        } else if (format.equals("image/geotiff")) {
+            mime_type = "image/geotiff";
         } else if (format.equals("application/octet-stream")) {
             mime_type = "application/octet-stream";
         } else {
             throw new WcsException("Unrecognized response format: " + Scrub.fileName(format),
-                    WcsException.INVALID_PARAMETER_VALUE, "wcs:Ouput/@format");
+                    WcsException.INVALID_PARAMETER_VALUE, "format");
         }
 
         return mime_type;
@@ -261,45 +265,43 @@ public class CoverageRequestProcessor {
             if(dapCE.length()>0)
                 dapCE.append(",");
 
-            dapCE.append("grid(").append(field.getName()).append(",");
 
-            for (DimensionSubset dimSub : dimensionSubsets) {
+            if(dimensionSubsets.length==0){
+                dapCE.append(field.getName());
+            }
+            else {
+                dapCE.append("grid(").append(field.getName()).append(",");
 
-                StringBuilder subsetClause = new StringBuilder();
+                for (DimensionSubset dimSub : dimensionSubsets) {
+                    StringBuilder subsetClause = new StringBuilder();
+                    switch (dimSub.getType()) {
+                        case TRIM:
+                            subsetClause
+                                    .append(dimSub.getTrimLow())
+                                    .append("<=")
+                                    .append(dimSub.getDimensionId())
+                                    .append("<=")
+                                    .append(dimSub.getTrimHigh());
 
-                switch (dimSub.getType()) {
-
-                    case TRIM:
-                        subsetClause
-                                .append(dimSub.getTrimLow())
-                                .append("<=")
-                                .append(dimSub.getDimensionId())
-                                .append("<=")
-                                .append(dimSub.getTrimHigh());
-
-                        break;
-
-                    case SLICEPOINT:
-                        subsetClause
-                                .append(dimSub.getDimensionId())
-                                .append("=")
-                                .append(dimSub.getSlicePoint());
+                            break;
+                        case SLICEPOINT:
+                            subsetClause
+                                    .append(dimSub.getDimensionId())
+                                    .append("=")
+                                    .append(dimSub.getSlicePoint());
 
 
-                        break;
-
-                    default:
-                        throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
-
+                            break;
+                        default:
+                            throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
+                    }
+                    if (dapCE.length() > 0 && subsetClause.length() > 0)
+                        dapCE.append(",");
+                    dapCE.append(subsetClause.toString());
                 }
-
-                if (dapCE.length() > 0 && subsetClause.length() > 0)
-                    dapCE.append(",");
-
-                dapCE.append(subsetClause.toString());
+                dapCE.append(")");
             }
 
-            dapCE.append(")");
 
 
         }

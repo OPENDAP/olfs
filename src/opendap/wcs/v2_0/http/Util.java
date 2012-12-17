@@ -1,6 +1,8 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Scrub;
+import opendap.wcs.v2_0.WcsException;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -108,13 +110,22 @@ public class Util {
     }
 
 
-    public static void forwardUrlContent(String url, HttpServletResponse response,boolean transferHttpHeaders) throws URISyntaxException, IOException {
+    public static void forwardUrlContent(
+            String url,
+            HttpServletResponse response,
+            boolean transferHttpHeaders)
+            throws URISyntaxException, IOException, WcsException {
         forwardUrlContent(url,response, DEFAULT_BUFFER_SIZE, transferHttpHeaders);
     }
 
 
 
-    public static void forwardUrlContent(String url, HttpServletResponse response, int bufferSize, boolean transferHttpHeaders) throws URISyntaxException, IOException {
+    public static void forwardUrlContent(
+            String url,
+            HttpServletResponse response,
+            int bufferSize,
+            boolean transferHttpHeaders)
+            throws URISyntaxException, IOException, WcsException {
 
         log.debug("Retrieving URL: "+url);
 
@@ -129,14 +140,27 @@ public class Util {
             int statusCode = httpClient.executeMethod(contentRequest);
 
             if (statusCode != HttpStatus.SC_OK) {
-                String msg = "HttpClient failed to executeMethod(). Status: " + contentRequest.getStatusLine();
+
+
+                String msg = "Unable to read data from primary data source. Data URL: '"+url+
+                        "' Data server returned the HTTP status line: '"+contentRequest.getStatusLine()+"'";
+
                 log.error(msg);
+
+                /*
                 Header[] headers = contentRequest.getResponseHeaders();
 
                 for(Header h:headers){
                     response.setHeader(h.getName(),h.getValue());
                 }
                 response.sendError(statusCode);
+
+                 */
+
+
+
+                throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE, "DataAccessUrl");
+
             }
             else {
 

@@ -272,9 +272,22 @@
 
     <xsl:template match="swe:field">
         <strong><span class="large"><xsl:value-of select="@name"/> </span></strong><span class="small">(swe:field)</span>
+        <xsl:apply-templates mode="fieldDescription"/>
         <ul>
-            <xsl:apply-templates/>
+            <xsl:apply-templates />
         </ul>
+        <br/>
+    </xsl:template>
+
+
+    <xsl:template match="@*|text()" mode="fieldDescription"/>
+
+    <xsl:template match="*" mode="fieldDescription">
+        <xsl:apply-templates mode="fieldDescription"/>
+    </xsl:template>
+
+    <xsl:template match="swe:description" mode="fieldDescription">
+        <span class="xlarge"><xsl:value-of select="."/></span>
         <br/>
     </xsl:template>
 
@@ -292,6 +305,10 @@
         <em>Allowed Values: </em> <xsl:value-of select="swe:interval"/>
         <br/>
     </xsl:template>
+
+
+
+
 
 
 
