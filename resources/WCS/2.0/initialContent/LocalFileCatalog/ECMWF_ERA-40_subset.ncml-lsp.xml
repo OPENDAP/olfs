@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2012 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+    <wcs:CoverageDescription
+            gml:id="ioos_002fECMWF__ERA-40__subset.ncml-lsp"
+            xmlns="http://www.opengis.net/gml/3.2"
+            xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd"
+            xmlns:wcs="http://www.opengis.net/wcs/2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:gml="http://www.opengis.net/gml/3.2"
+            xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+            xmlns:swe="http://www.opengis.net/swe/2.0">
+        <boundedBy>
+            <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="longitude latitude "
+                uomLabels="deg deg" srsDimension="2" >
+                <lowerCorner>0.000 -90.000</lowerCorner>
+                <upperCorner>360.00 90.000</upperCorner>
+                <beginPosition>2002-07-17T09:00:00.000Z</beginPosition>
+                 <endPosition>2002-07-31T15:00:00.000Z</endPosition>
+            </EnvelopeWithTimePeriod>
+        </boundedBy>
+        <wcs:CoverageId>ioos_002fECMWF__ERA-40__subset.ncml-lsp</wcs:CoverageId>
+        <domainSet>
+            <Grid dimension="3" gml:id="ioos_002fECMWF__ERA-40__subset.ncml-grid-lsp">
+                <limits>
+                    <GridEnvelope>
+                        <low>0 0</low>
+                        <high>144 73</high>
+                    </GridEnvelope>
+                </limits>
+                <axisLabels>longitude latitude</axisLabels>
+            </Grid>
+        </domainSet>
+        <gmlcov:rangeType>
+            <swe:DataRecord>
+                <swe:field name="lsp">
+                    <swe:Quantity definition="urn:ogc:def:dataType:OGC:1.1:integer">
+                        <swe:description>Stratiform precipitation (Large-scale precipitation)</swe:description>
+                        <swe:uom code="m"/>
+                        <swe:constraint>
+                            <swe:AllowedValues>
+                                <swe:interval>-32767 32767</swe:interval>
+                            </swe:AllowedValues>
+                        </swe:constraint>
+                    </swe:Quantity>
+                </swe:field>
+            </swe:DataRecord>
+        </gmlcov:rangeType>
+        <wcs:ServiceParameters>
+            <wcs:CoverageSubtype>GridCoverage</wcs:CoverageSubtype>
+            <wcs:nativeFormat>application/octet-stream</wcs:nativeFormat>
+        </wcs:ServiceParameters>
+    </wcs:CoverageDescription>
+
+
+
+
