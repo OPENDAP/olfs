@@ -56,56 +56,77 @@ public class TemporalDimensionSubset extends DimensionSubset {
     public String getDapValueConstraint() throws WcsException {
         StringBuilder subsetClause = new StringBuilder();
 
-        if(isValueSubset()){
+        if (isValueSubset()) {
 
-          switch (getType()) {
-              case TRIM:
+            switch (getType()) {
 
-                  Date beginTime   = TimeConversion.parseWCSTimePosition(getTrimLow());
-                  Date endTime     = TimeConversion.parseWCSTimePosition(getTrimHigh());
+                case TRIM:
 
-                  String beginPosition = TimeConversion.convertDateToTimeUnits(beginTime, getUnits());
-                  String endPosition   = TimeConversion.convertDateToTimeUnits(endTime, getUnits());
+                    String beginPosition = getTrimLow();
+                    if (!smellsLikeFloat(beginPosition)) {
+                        Date beginTime = TimeConversion.parseWCSTimePosition(beginPosition);
+                        beginPosition = TimeConversion.convertDateToTimeUnits(beginTime, getUnits());
+                    }
 
-                  subsetClause
-                          .append("\"")
-                          .append(beginPosition)
-                          .append("<=")
-                          .append(getDimensionId())
-                          .append("<=")
-                          .append(endPosition)
-                          .append("\"");
+                    String endPosition = getTrimHigh();
+                    if (!smellsLikeFloat(endPosition)) {
+                        Date endTime = TimeConversion.parseWCSTimePosition(getTrimHigh());
+                        endPosition = TimeConversion.convertDateToTimeUnits(endTime, getUnits());
+                    }
 
-                  break;
-              case SLICE_POINT:
+                    subsetClause
+                            .append("\"")
+                            .append(beginPosition)
+                            .append("<=")
+                            .append(getDimensionId())
+                            .append("<=")
+                            .append(endPosition)
+                            .append("\"");
 
-                  String timeString = getSlicePoint();
-                  Date timePoint =  TimeConversion.parseWCSTimePosition(timeString);
-                  String timePosition = TimeConversion.convertDateToTimeUnits(timePoint, getUnits());
-
-                  subsetClause
-                          .append("\"")
-                          .append(getDimensionId())
-                          .append("=")
-                          .append(timePosition)
-                          .append("\"");
+                    break;
 
 
+                case SLICE_POINT:
 
-                  break;
-              default:
-                  throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
-          }
+                    String timePosition = getSlicePoint();
+                    if (!smellsLikeFloat(timePosition)) {
+                        Date timePoint = TimeConversion.parseWCSTimePosition(timePosition);
+                        timePosition = TimeConversion.convertDateToTimeUnits(timePoint, getUnits());
+                    }
+
+
+                    subsetClause
+                            .append("\"")
+                            .append(getDimensionId())
+                            .append("=")
+                            .append(timePosition)
+                            .append("\"");
+
+
+                    break;
+                default:
+                    throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
+            }
 
         }
 
         return subsetClause.toString();
 
-      }
+    }
 
 
+    private boolean smellsLikeFloat(String s){
+        try {
+            Double.parseDouble(s);
+        }
+        catch(NumberFormatException e){
 
+            return false;
+        }
 
+        return true;
+
+    }
 
 
 

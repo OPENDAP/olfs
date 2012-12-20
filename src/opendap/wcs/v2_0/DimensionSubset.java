@@ -133,7 +133,23 @@ public class DimensionSubset {
             setTrimLow(intervalOrPoint.substring(0,commaIndex));
             setTrimHigh(intervalOrPoint.substring(commaIndex+1,intervalOrPoint.length()));
 
-            setIsArraySubset(isArraySubsetString(getTrimLow()) && isArraySubsetString(getTrimHigh()));
+            if(isArraySubsetString(getTrimLow())){
+                if(isArraySubsetString(getTrimHigh())){
+                    setIsArraySubset(true);
+                }
+                else {
+                    throw new WcsException("Subset syntax error! You cannot mix array index (integer valued) subsetting" +
+                            "with value based (either float or time string valued) subsetting in the same " +
+                            "subset clause.", WcsException.INVALID_PARAMETER_VALUE,"subset");
+                }
+
+
+            }
+            else if(isArraySubsetString(getTrimHigh())){
+                throw new WcsException("Subset syntax error! You cannot mix array index (integer valued) subsetting" +
+                        "with value based (either float or time string valued) subsetting in the same " +
+                        "subset clause.", WcsException.INVALID_PARAMETER_VALUE,"subset");
+            }
 
             setSlicePoint(null);
         }
@@ -156,7 +172,7 @@ public class DimensionSubset {
             return true;
 
         try {
-            int index = Integer.parseInt(subsetStr);
+            Integer.parseInt(subsetStr);
         }
         catch(NumberFormatException e){
 
@@ -248,7 +264,23 @@ public class DimensionSubset {
             else
                 setTrimHigh(trimHighElement.getTextTrim());
 
-            setIsArraySubset(isArraySubsetString(getTrimLow()) && isArraySubsetString(getTrimHigh()));
+            if(isArraySubsetString(getTrimLow())){
+                if(isArraySubsetString(getTrimHigh())){
+                    setIsArraySubset(true);
+                }
+                else {
+                    throw new WcsException("Subset syntax error! You cannot mix array index (integer valued) subsetting" +
+                            "with value based (either float or time string valued) subsetting in the same " +
+                            "subset clause.", WcsException.INVALID_PARAMETER_VALUE,"subset");
+                }
+
+
+            }
+            else if(isArraySubsetString(getTrimHigh())){
+                throw new WcsException("Subset syntax error! You cannot mix array index (integer valued) subsetting" +
+                        "with value based (either float or time string valued) subsetting in the same " +
+                        "subset clause.", WcsException.INVALID_PARAMETER_VALUE,"subset");
+            }
 
             setSlicePoint(null);
         }
