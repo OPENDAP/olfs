@@ -241,11 +241,12 @@ public class TimeConversion {
 
     /**
      * Converts the supplied date into what ever units/epoch is supplied in the timUnits string.
-     * Typically the time units reads something like  "hours since 1901-01-01 00:00:00Z" . See
-     * getEpoch() for more details on supported time units string representations.
-     * @param time
-     * @param timeUnits
-     * @return
+     * Time units are typically expressed as a string that says "timeInterval since epochDate" where time interval is
+     * one of days/hours/minutes/seconds/milliseconds and the epochDate may have one of
+     * several forms. See getEpoch() for more details on supported epoch date representations.
+     * @param time The time instance to convert.
+     * @param timeUnits  The time units to convert it to.
+     * @return  A string representation of the submitted time after conversion to the supplied time units.
      * @see TimeConversion
      */
     public static String convertDateToTimeUnits(Date time, String timeUnits){
@@ -288,13 +289,19 @@ public class TimeConversion {
     }
 
     /**
-     * timeUnits = "hours since yyyy-MM-d hh:mm:ss";
-     * timeUnits = "hour since  yyyy-MM-d'T'hh:mm:ss";
-     * timeUnits = "seconds since yyyy-MM-d";
-     * timeUnits = "seconds since 1970-01-01T00:00:00Z";
-     * timeUnits = "seconds since yyyy-MM-d'T'hh:mm:ssZ";
-     * @param timeUnits
-     * @return
+     * Time units are typically expressed as a string that says "timeInterval since epochDate" where time interval is
+     * one of years/months/weeks/days/hours/minutes/seconds/milliseconds/microseconds and the epochDate may have one of
+     * several forms.
+     *
+     * This method can parse the following epoch date expressions:
+     * <ul>
+     *     <li>yyyy-MM-d hh:mm:ssTZ</li>
+     *     <li>yyyy-MM-d'T'hh:mm:ssTZ</li>
+     *     <li>yyyy-MM-dTZ</li>
+     * </ul>
+     * Where TZ is an optional Time Zone designation.
+     * @param timeUnits a string containing the time units as described above
+     * @return Returns the epoch date as defined in the passed time units string.
      */
     static Date getEpoch(String timeUnits) {
 
@@ -468,7 +475,7 @@ public class TimeConversion {
      * "yyyy-MM-dd'T'HH:mm:ss:SSSZ"
      * @param t The time string to parse.
      * @return The Date object that represents the passed time.
-     * @throws opendap.wcs.v1_1_2.WcsException When the time string cannot be correctly interpreted.
+     * @throws WcsException When the time string cannot be correctly interpreted.
      */
     public static Date parseWCSTimePosition(String t) throws WcsException {
 

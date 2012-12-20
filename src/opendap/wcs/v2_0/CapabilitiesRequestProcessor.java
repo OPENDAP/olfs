@@ -184,6 +184,7 @@ public class CapabilitiesRequestProcessor {
      *
      * @return Returns the wcs:Contents section of the wcs:Capabilities response.
      * @throws WcsException   When bad things happen.
+     * @throws InterruptedException
      */
     public static Element getContents()  throws InterruptedException, WcsException {
 

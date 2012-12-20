@@ -100,11 +100,6 @@ public class CatalogWrapper {
 
     }
 
-    public static Coverage getCoverage(String id) throws InterruptedException, WcsException{
-        return new Coverage(id);
-
-    }
-
     public static CoverageDescription getCoverageDescription(String id) throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageDescription(id);
 
@@ -115,9 +110,6 @@ public class CatalogWrapper {
     }
 
 
-    public static Element getCoverageSummaryElement(String id)  throws InterruptedException, WcsException{
-        return _catalogImpl.getCoverageSummaryElement(id);
-    }
 
     public static List<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElements();

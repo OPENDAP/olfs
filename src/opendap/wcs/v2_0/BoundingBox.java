@@ -190,7 +190,7 @@ public class BoundingBox {
                 }
 
                 s = e.getTextNormalize();
-                startTime = TimeSequenceItem.parseWCSTimePosition(s);
+                startTime = TimeConversion.parseWCSTimePosition(s);
 
 
                 // Process endPosition.
@@ -203,7 +203,7 @@ public class BoundingBox {
                 }
 
                 s = e.getTextNormalize();
-                endTime = TimeSequenceItem.parseWCSTimePosition(s);
+                endTime = TimeConversion.parseWCSTimePosition(s);
             }
 
 
