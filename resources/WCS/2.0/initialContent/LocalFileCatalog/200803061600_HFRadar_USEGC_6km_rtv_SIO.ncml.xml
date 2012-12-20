@@ -37,8 +37,8 @@
     <boundedBy>
         <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="time latitude longitude"
             uomLabels="time deg deg" srsDimension="2" >
-            <lowerCorner>82.1161499 21.73596</lowerCorner>
-            <upperCorner>122.768791 46.4944191</upperCorner>
+            <lowerCorner>21.73596 82.1161499</lowerCorner>
+            <upperCorner>46.4944191 122.768791</upperCorner>
             <beginPosition>2008-03-27T16:00:00.000Z</beginPosition>
             <endPosition>2008-03-27T16:00:00.000Z</endPosition>
         </EnvelopeWithTimePeriod>
@@ -49,7 +49,7 @@
             <limits>
                 <GridEnvelope>
                     <low>0 0 0</low>
-                    <high>0 700 459</high>
+                    <high>0 459 700</high>
                 </GridEnvelope>
             </limits>
             <axisLabels>time latitude longitude</axisLabels>
