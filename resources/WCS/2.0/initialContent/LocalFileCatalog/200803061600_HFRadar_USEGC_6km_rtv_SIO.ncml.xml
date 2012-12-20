@@ -35,8 +35,8 @@
     xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
     >
     <boundedBy>
-        <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="longitude latitude"
-            uomLabels="deg deg" srsDimension="2" >
+        <EnvelopeWithTimePeriod srsName="urn:ogc:def:crs:EPSG::4326" axisLabels="time latitude longitude"
+            uomLabels="time deg deg" srsDimension="2" >
             <lowerCorner>82.1161499 21.73596</lowerCorner>
             <upperCorner>122.768791 46.4944191</upperCorner>
             <beginPosition>2008-03-27T16:00:00.000Z</beginPosition>
@@ -48,19 +48,19 @@
         <RectifiedGrid dimension="2" gml:id="Grid-ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc">
             <limits>
                 <GridEnvelope>
-                    <low>0 0</low>
-                    <high>700 459</high>
+                    <low>0 0 0</low>
+                    <high>0 700 459</high>
                 </GridEnvelope>
             </limits>
-            <axisLabels>longitude latitude</axisLabels>
+            <axisLabels>time latitude longitude</axisLabels>
             <gml:origin>
                 <gml:Point gml:id="GridOrigin-ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc"
                     srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-                    <gml:pos>82.1161499 21.73596</gml:pos>
+                    <gml:pos>1204819200 82.1161499 21.73596</gml:pos>
                 </gml:Point>
             </gml:origin>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.08837530673913 0.0</gml:offsetVector>
-            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.03531877189729</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.08837530673913 0.0</gml:offsetVector>
+            <gml:offsetVector srsName="http://www.opengis.net/def/crs/EPSG/0/4326">0.0 0.0 0.03531877189729</gml:offsetVector>
         </RectifiedGrid>
     </domainSet>
     <gmlcov:rangeType>

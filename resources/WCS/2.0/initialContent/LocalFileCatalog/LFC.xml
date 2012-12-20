@@ -29,348 +29,86 @@
     
 
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="tcw">
-            <DapGridId>tcw.tcw</DapGridId>
-            <DapIdOfLatitudeCoordinate>tcw.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tcw.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours" >tcw.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="tcwv">
-            <DapGridId>tcwv.tcwv</DapGridId>
-            <DapIdOfLatitudeCoordinate>tcwv.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tcwv.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tcwv.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="lsp">
-            <DapGridId>lsp.lsp</DapGridId>
-            <DapIdOfLatitudeCoordinate>lsp.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>lsp.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">lsp.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="cp">
-            <DapGridId>cp.cp</DapGridId>
-            <DapIdOfLatitudeCoordinate>cp.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>cp.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">cp.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="msl">
-            <DapGridId>msl.msl</DapGridId>
-            <DapIdOfLatitudeCoordinate>msl.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>msl.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">msl.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="blh">
-            <DapGridId>blh.blh</DapGridId>
-            <DapIdOfLatitudeCoordinate>blh.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>blh.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">blh.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="tcc">
-            <DapGridId>tcc.tcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>tcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tcc.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="p10u">
-            <DapGridId>p10u.p10u</DapGridId>
-            <DapIdOfLatitudeCoordinate>p10u.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p10u.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p10u.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="p10v">
-            <DapGridId>p10v.p10v</DapGridId>
-            <DapIdOfLatitudeCoordinate>p10v.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p10v.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p10v.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="p2t">
-            <DapGridId>p2t.p2t</DapGridId>
-            <DapIdOfLatitudeCoordinate>p2t.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p2t.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p2t.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="p2d">
-            <DapGridId>p2d.ptd</DapGridId>
-            <DapIdOfLatitudeCoordinate>p2d.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p2d.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p2d.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="e">
-            <DapGridId>e.e</DapGridId>
-            <DapIdOfLatitudeCoordinate>e.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>e.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">e.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="lcc">
-            <DapGridId>lcc.lcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>lcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>lcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">lcc.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="mcc">
-            <DapGridId>mcc.mcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>mcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>mcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">mcc.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="hcc">
-            <DapGridId>hcc.hcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>hcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>hcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">hcc.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="tco3">
-            <DapGridId>tco3.tco3</DapGridId>
-            <DapIdOfLatitudeCoordinate>tco3.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tco3.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tco3.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="tp">
-            <DapGridId>tp.tp</DapGridId>
-            <DapIdOfLatitudeCoordinate>tp.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tp.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tp.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
+        <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
+        <field name="tcw" dapID="tcw" />
+        <field name="tcwv" dapID="tcwv" />
+        <field name="cp" dapID="cp" />
+        <field name="msl" dapID="msl" />
+        <field name="blh" dapID="blh" />
+        <field name="tcc" dapID="tcc" />
+        <field name="p10u" dapID="p10u" />
+        <field name="p10v" dapID="p10v" />
+        <field name="p2t" dapID="p2t" />
+        <field name="p2d" dapID="p2d" />
+        <field name="e" dapID="e" />
+        <field name="lcc" dapID="lcc" />
+        <field name="mcc" dapID="mcc" />
+        <field name="hcc" dapID="hcc" />
+        <field name="tco3" dapID="tco3" />
+        <field name="tp" dapID="tp" />
     </WcsCoverage>
 
-
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcw.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="tcw">
-            <DapGridId>tcw.tcw</DapGridId>
-            <DapIdOfLatitudeCoordinate>tcw.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tcw.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours" >tcw.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
+        <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
+        <field name="tcw" dapID="tcw" />
     </WcsCoverage>
 
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcwv.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="tcwv">
-            <DapGridId>tcwv.tcwv</DapGridId>
-            <DapIdOfLatitudeCoordinate>tcwv.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tcwv.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tcwv.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
+        <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
+        <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
+        <field name="tcwv" dapID="tcwv" />
     </WcsCoverage>
 
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-lsp.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="lsp">
-            <DapGridId>lsp.lsp</DapGridId>
-            <DapIdOfLatitudeCoordinate>lsp.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>lsp.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">lsp.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-cp.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="cp">
-            <DapGridId>cp.cp</DapGridId>
-            <DapIdOfLatitudeCoordinate>cp.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>cp.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">cp.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-msl.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="msl">
-            <DapGridId>msl.msl</DapGridId>
-            <DapIdOfLatitudeCoordinate>msl.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>msl.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">msl.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-blh.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="blh">
-            <DapGridId>blh.blh</DapGridId>
-            <DapIdOfLatitudeCoordinate>blh.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>blh.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">blh.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcc.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="tcc">
-            <DapGridId>tcc.tcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>tcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tcc.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-p10u.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="p10u">
-            <DapGridId>p10u.p10u</DapGridId>
-            <DapIdOfLatitudeCoordinate>p10u.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p10u.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p10u.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-p10v.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="p10v">
-            <DapGridId>p10v.p10v</DapGridId>
-            <DapIdOfLatitudeCoordinate>p10v.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p10v.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p10v.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-p2t.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="p2t">
-            <DapGridId>p2t.p2t</DapGridId>
-            <DapIdOfLatitudeCoordinate>p2t.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p2t.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p2t.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-p2d.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="p2d">
-            <DapGridId>p2d.ptd</DapGridId>
-            <DapIdOfLatitudeCoordinate>p2d.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>p2d.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">p2d.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-e.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="e">
-            <DapGridId>e.e</DapGridId>
-            <DapIdOfLatitudeCoordinate>e.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>e.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">e.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-lcc.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="lcc">
-            <DapGridId>lcc.lcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>lcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>lcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">lcc.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-mcc.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="mcc">
-            <DapGridId>mcc.mcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>mcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>mcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">mcc.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-hcc.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="hcc">
-            <DapGridId>hcc.hcc</DapGridId>
-            <DapIdOfLatitudeCoordinate>hcc.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>hcc.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">hcc.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tco3.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="tco3">
-            <DapGridId>tco3.tco3</DapGridId>
-            <DapIdOfLatitudeCoordinate>tco3.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tco3.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tco3.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
-
-    <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tp.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
-        <field name="tp">
-            <DapGridId>tp.tp</DapGridId>
-            <DapIdOfLatitudeCoordinate>tp.latitude</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>tp.longitude</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">tp.time</DapIdOfTimeCoordinate>
-        </field>
-    </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
-        <field name="u">
-            <DapGridId>u.u</DapGridId>
-            <DapIdOfLatitudeCoordinate>u.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>u.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours" >u.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="v">
-            <DapGridId>v.v</DapGridId>
-            <DapIdOfLatitudeCoordinate>v.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>v.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">v.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="DOPx">
-            <DapGridId>DOPx.DOPx</DapGridId>
-            <DapIdOfLatitudeCoordinate>DOPx.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>DOPx.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">DOPx.time</DapIdOfTimeCoordinate>
-        </field>
-        <field name="DOPy">
-            <DapGridId>DOPy.DOPy</DapGridId>
-            <DapIdOfLatitudeCoordinate>DOPy.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>DOPy.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">DOPy.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="u" dapID="u" />
+        <field name="v" dapID="v" />
+        <field name="DOPx" dapID="DOPx" />
+        <field name="DOPy" dapID="DOPy" />
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-u.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
-        <field name="u">
-            <DapGridId>u.u</DapGridId>
-            <DapIdOfLatitudeCoordinate>u.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>u.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours" >u.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="u" dapID="u" />
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-v.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
-        <field name="v">
-            <DapGridId>v.v</DapGridId>
-            <DapIdOfLatitudeCoordinate>v.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>v.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">v.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="v" dapID="v" />
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-DOPx.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
-        <field name="DOPx">
-            <DapGridId>DOPx.DOPx</DapGridId>
-            <DapIdOfLatitudeCoordinate>DOPx.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>DOPx.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">DOPx.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="DOPx" dapID="DOPx" />
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-DOPy.xml">
-        <DapDatasetUrl>http://test.opendap.org:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
-        <field name="DOPy">
-            <DapGridId>DOPy.DOPy</DapGridId>
-            <DapIdOfLatitudeCoordinate>DOPy.lat</DapIdOfLatitudeCoordinate>
-            <DapIdOfLongitudeCoordinate>DOPy.lon</DapIdOfLongitudeCoordinate>
-            <DapIdOfTimeCoordinate units="hours">DOPy.time</DapIdOfTimeCoordinate>
-        </field>
+        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
+        <DomainCoordinate name="latitude" dapID="lat" units="deg" />
+        <DomainCoordinate name="longitude" dapID="lon" units="deg" />
+        <field name="DOPy" dapID="DOPy" />
     </WcsCoverage>
 
 

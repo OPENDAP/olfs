@@ -31,6 +31,7 @@ import org.jdom.output.XMLOutputter;
 import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
@@ -49,7 +50,7 @@ public class GetCoverageRequest {
     private String coverageID = null;
     private String format = null;
     private String mediaType = null;
-    private Vector<DimensionSubset> subsets = null;
+    private HashMap<String, DimensionSubset> subsets = null;
 
 
 
@@ -92,10 +93,23 @@ public class GetCoverageRequest {
     }
 
 
-    public DimensionSubset[] getDimensionSubsets(){
-        DimensionSubset[] ds = new DimensionSubset[subsets.size()];
+    public HashMap<String, DimensionSubset> getDimensionSubsets(){
 
-        return subsets.toArray(ds);
+        HashMap<String, DimensionSubset> newDS = new HashMap<String, DimensionSubset>();
+
+
+        for(DimensionSubset ds: subsets.values()){
+
+            if(ds instanceof TemporalDimensionSubset){
+                TemporalDimensionSubset ts = (TemporalDimensionSubset)ds;
+                newDS.put(ts.getDimensionId(),new TemporalDimensionSubset(ts,ts.getUnits()));
+            }
+            else {
+                newDS.put(ds.getDimensionId(),new DimensionSubset(ds));
+            }
+
+        }
+        return newDS;
     }
 
 
@@ -104,9 +118,9 @@ public class GetCoverageRequest {
 
 
     public GetCoverageRequest(Map<String,String[]> kvp)
-            throws WcsException {
+            throws WcsException, InterruptedException {
 
-        subsets = new Vector<DimensionSubset>();
+        subsets = new HashMap<String, DimensionSubset>();
         String s[];
 
         // Make sure the client is looking for a WCS service....
@@ -146,6 +160,15 @@ public class GetCoverageRequest {
         coverageID = s[0];
 
 
+        CoverageDescription cvrgDscrpt = CatalogWrapper.getCoverageDescription(coverageID);
+
+        if(cvrgDscrpt==null){
+            throw new WcsException("No such coverageID: '"+coverageID+"'",
+                    WcsException.INVALID_PARAMETER_VALUE,
+                    "coverageId");
+        }
+
+
 
         // Get the format. It's not required (defaults to coverage's nativeFormat) and a null is used to indicate that
         // it was not specified.
@@ -170,7 +193,14 @@ public class GetCoverageRequest {
         if(s!=null){
             for(String subsetStr:s){
                 DimensionSubset subset = new DimensionSubset(subsetStr);
-                subsets.add(subset);
+
+
+                if(subset.getDimensionId().toLowerCase().contains("time")){
+                    DomainCoordinate timeDomain = cvrgDscrpt.getDomainCoordinate("time");
+                    subset = new TemporalDimensionSubset(subset, timeDomain.getUnits());
+                }
+
+                subsets.put(subset.getDimensionId(), subset);
             }
         }
 
@@ -178,9 +208,9 @@ public class GetCoverageRequest {
 
 
     public GetCoverageRequest(Element getCoverageRequestElem)
-            throws WcsException {
+            throws WcsException, InterruptedException {
 
-        subsets = new Vector<DimensionSubset>();
+        subsets = new HashMap<String, DimensionSubset>();
 
         Element e;
         String s;
@@ -206,8 +236,12 @@ public class GetCoverageRequest {
         }
         coverageID =e.getText();
 
+        // This call checks that there is a coverage matching the requested ID and it will
+        // throw a WcsException if no such coverage is available.
+        CoverageDescription cvrDsc = CatalogWrapper.getCoverageDescription(coverageID);
 
-        ingestDimensionSubset(getCoverageRequestElem);
+
+        ingestDimensionSubset(getCoverageRequestElem, cvrDsc);
 
 
         // Get the format for the coverage output.
@@ -231,7 +265,7 @@ public class GetCoverageRequest {
 
 
 
-    public void ingestDimensionSubset(Element getCoverageRequestElem) throws WcsException {
+    public void ingestDimensionSubset(Element getCoverageRequestElem, CoverageDescription cvrDsc) throws WcsException {
 
 
         WCS.checkNamespace(getCoverageRequestElem,"GetCoverage", WCS.WCS_NS);
@@ -244,7 +278,13 @@ public class GetCoverageRequest {
         while(dtei.hasNext()){
             Element dimensionType = (Element) dtei.next();
             DimensionSubset ds = new DimensionSubset(dimensionType);
-            subsets.add(ds);
+
+            if(ds.getDimensionId().toLowerCase().contains("time")){
+                DomainCoordinate timeDomain = cvrDsc.getDomainCoordinate("time");
+                ds = new TemporalDimensionSubset(ds, timeDomain.getUnits());
+            }
+
+            subsets.put(ds.getDimensionId(), ds);
         }
 
     }
@@ -303,7 +343,7 @@ public class GetCoverageRequest {
         e.setText(coverageID);
         requestElement.addContent(e);
 
-        for(DimensionSubset ds: subsets){
+        for(DimensionSubset ds: subsets.values()){
             requestElement.addContent(ds.getDimensionSubsetElement());
         }
 

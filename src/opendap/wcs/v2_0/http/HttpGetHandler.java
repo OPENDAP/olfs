@@ -361,7 +361,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     public void echoWcsRequest(HttpServletRequest request,
-                                  HttpServletResponse response) throws IOException {
+                                  HttpServletResponse response) throws IOException, InterruptedException {
 
         Map<String,String[]> keyValuePairs = getKVP(request);
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());

@@ -33,9 +33,13 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 /**
@@ -210,7 +214,14 @@ public class CoverageRequestProcessor {
 
         String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
 
-        requestURL += ".geotiff" + "?" + getDapCE(req);
+        String dapCE = getDapCE(req);
+        log.debug("getGeoTiffDataAccessURL() - Dap CE: '{}'",dapCE);
+
+        try {
+            requestURL += ".geotiff" + "?" + java.net.URLEncoder.encode(dapCE, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new WcsException("Failed to construct DAP data Access URL. Primary Message: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
 
         return requestURL;
     }
@@ -254,52 +265,108 @@ public class CoverageRequestProcessor {
 
 
         CoverageDescription coverage = CatalogWrapper.getCoverageDescription(coverageID);
-
-
         Vector<Field> fields = coverage.getFields();
-        DimensionSubset[] dimensionSubsets = req.getDimensionSubsets();
+        HashMap<String, DimensionSubset> dimensionSubsets = req.getDimensionSubsets();
+
+
+        // The user provided domain subsets!
+        // Let's first just QC the request - We'll make sure that the user is asking for dimension
+        // subsets of coordinate dimensions that this field has.
+        LinkedHashMap<String, DomainCoordinate> domainCoordinates = coverage.getDomainCoordinates();
+        for(DimensionSubset ds: dimensionSubsets.values()){
+            DomainCoordinate dc = domainCoordinates.get(ds.getDimensionId());
+            if(dc==null){
+                throw new WcsException("Bad subsetting request",
+                        WcsException.INVALID_PARAMETER_VALUE,
+                        "wcs:dimension");
+            }
+        }
+
 
         for (Field field : fields) {
-
 
             if(dapCE.length()>0)
                 dapCE.append(",");
 
 
-            if(dimensionSubsets.length==0){
+            String fieldId = field.getName();
+
+            if(dimensionSubsets.isEmpty()){
                 dapCE.append(field.getName());
             }
             else {
-                dapCE.append("grid(").append(field.getName()).append(",");
-
-                for (DimensionSubset dimSub : dimensionSubsets) {
-                    StringBuilder subsetClause = new StringBuilder();
-                    switch (dimSub.getType()) {
-                        case TRIM:
-                            subsetClause
-                                    .append(dimSub.getTrimLow())
-                                    .append("<=")
-                                    .append(dimSub.getDimensionId())
-                                    .append("<=")
-                                    .append(dimSub.getTrimHigh());
-
-                            break;
-                        case SLICEPOINT:
-                            subsetClause
-                                    .append(dimSub.getDimensionId())
-                                    .append("=")
-                                    .append(dimSub.getSlicePoint());
+                String dapGridArrayName = coverage.getDapGridArrayId(fieldId);
 
 
-                            break;
-                        default:
-                            throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
+                // So we need to process the value based subsets with a call to grid
+                // and the array index subsets with an appended array index subset for that.
+
+                StringBuilder ssfGridSubsetClause = new StringBuilder();
+
+                boolean arraySubset = false;
+
+                // Process each subset term the user submitted
+                for (DimensionSubset dimSub : dimensionSubsets.values()) {
+
+
+                    if(dimSub.isValueSubset()) {
+                        // A value subset means that the user supplied values of the domain coordinates that specify
+                        // the bounds of the subset that they want
+                        if(ssfGridSubsetClause.length()==0){
+                            ssfGridSubsetClause.append("grid(").append(dapGridArrayName).append(",");
+                        }
+                        else {
+                            ssfGridSubsetClause.append(",");
+                        }
+                        ssfGridSubsetClause.append(dimSub.getDapValueConstraint());
                     }
-                    if (dapCE.length() > 0 && subsetClause.length() > 0)
-                        dapCE.append(",");
-                    dapCE.append(subsetClause.toString());
+                    else if(dimSub.isArraySubset()) {
+                        // An Array subset means that user indicated (through the use of integer values in
+                        // their subset request) that they are wanting to subset by array index.
+                        // Because order of the [] array notation in DAP URL's is important, we collect
+                        // all of the user provided array constraints here and then literally sort them out below
+                        // for inclusion in the response.
+
+                        DomainCoordinate domCoord =  domainCoordinates.get(dimSub.getDimensionId());
+                        domCoord.setArraySubset(dimSub.getDapArrayIndexConstraint());
+                        arraySubset = true;
+                    }
+                    else {
+                        throw new WcsException("Unrecognized dimension subset.",WcsException.NO_APPLICABLE_CODE);
+                    }
                 }
-                dapCE.append(")");
+
+                // So we've processed all the user requested dimension subsets, no we need to build the inditial
+                // array subsetting clause if needed.
+
+
+                StringBuilder arraySubsetClause = new StringBuilder();
+                if(arraySubset){
+                    arraySubsetClause.append(dapGridArrayName);
+
+                    // We build the subsetting string using the domain coordinates in the order they
+                    // appear in the DAP dataset, which is how they MUST occur in the configuration
+                    // or this all gets broken.
+                    for(DomainCoordinate dc : domainCoordinates.values()){
+                        String clause = dc.getArraySubset();
+                        clause = clause==null?"[*]":clause;
+                        arraySubsetClause.append(clause);
+                    }
+                }
+
+                if(ssfGridSubsetClause.length()>0){
+                    ssfGridSubsetClause.append(")");
+                    if(arraySubsetClause.length()>0){
+                        ssfGridSubsetClause.append(",");
+                    }
+                }
+
+                if(arraySubsetClause.length()>0){
+                    ssfGridSubsetClause.append(arraySubsetClause);
+                }
+
+                dapCE.append(ssfGridSubsetClause);
+
             }
 
 

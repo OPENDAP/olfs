@@ -58,11 +58,9 @@ public class CoverageDescription {
 
     private URL dapDatasetUrl;
     private HashMap<String,String> _dapGridId;
-    private HashMap<String,String> _latitudeCoordinateDapId;
-    private HashMap<String,String> _longitudeCoordinateDapId;
-    private HashMap<String,String> _elevationCoordinateDapId;
-    private HashMap<String,String> _timeCoordinateDapId;
-    private HashMap<String,String> _timeUnits;
+
+
+    private LinkedHashMap<String, DomainCoordinate> _domainCoordinates;
 
     boolean initialized = false;
 
@@ -124,11 +122,14 @@ public class CoverageDescription {
      *
      *
      * @param wcsCoverageConfig The file containing the wcs:CoverageDescription element.
+     * @param catalogDir
      * @param validateContent  Controls the XML parser document validation. A value of true will cause the parser to
      * perform document validation. A value of false will cause the parser to simply parse the document which only
      * checks for that it is well-formed.
      * @throws IOException When the file cannot be read.
      * @throws JDOMException When the file cannot be parsed.
+     * @throws ConfigurationException
+     * @throws WcsException
      */
     public CoverageDescription(Element wcsCoverageConfig, String catalogDir, boolean validateContent) throws IOException, JDOMException, ConfigurationException, WcsException {
         init();
@@ -174,6 +175,27 @@ public class CoverageDescription {
         setDapDatasetUrl(datasetUrl);
 
 
+
+        /**
+         * Load DAP ID (The Fully Qualified Name) for the variable that holds the Latitude coordinate values
+         * for this field.
+         * This is REQUIRED.
+         */
+        List coordList = wcsCoverageConfig.getChildren("DomainCoordinate",LocalFileCatalog.NS);
+        if(coordList.isEmpty()){
+            msg = "ingestCatalog(): The configuration element is missing the required " +
+                    "child element(s) 'DomainCoordinate'.";
+            log.error(msg);
+            throw new ConfigurationException(msg);
+        }
+        Iterator coordIt = coordList.iterator();
+        while(coordIt.hasNext()){
+            Element domainCoordinateElem =  (Element)coordIt.next();
+            DomainCoordinate dc = new DomainCoordinate(domainCoordinateElem);
+            _domainCoordinates.put(dc.getName(),dc);
+        }
+
+
         /**
          * Process each lfc:field element in the coverage's range set..
          */
@@ -183,11 +205,6 @@ public class CoverageDescription {
 
             String fieldName;
             String dapGridId;
-            String dapIdOfLatitudeCoordinate;
-            String dapIdOfLongitudeCoordinate;
-            String dapIdOfElevationCoordinate;
-            String dapIdOfTimeCoordinate;
-            String timeUnits;
 
 
             /**
@@ -207,106 +224,16 @@ public class CoverageDescription {
              * Load DAP ID (The Fully Qualified Name) for the Grid variable that holds the range data for this field.
              * This is REQUIRED.
              */
-            e = field.getChild("DapGridId",LocalFileCatalog.NS);
-            if(e==null){
-                msg = "ingestCatalog(): In the catalog file " +coverageDescriptionFileName + " the lfc:field element " +
+
+            String dapID = field.getAttributeValue("dapID");
+            if(dapID==null){
+                msg = "CoverageDescription(): In in the Catalog Configuration file, the field element"  +
                         "named "+fieldName+" is missing the required" +
-                        "child element 'DapGridId'.";
+                        "attribute  'dapID'.";
                 log.error(msg);
                 throw new ConfigurationException(msg);
             }
-            dapGridId = e.getTextTrim();
-            setDapGridArrayId(fieldName,dapGridId);
-
-
-            /**
-             * Load DAP ID (The Fully Qualified Name) for the variable that holds the Latitude coordinate values
-             * for this field.
-             * This is REQUIRED.
-             */
-            e = field.getChild("DapIdOfLatitudeCoordinate",LocalFileCatalog.NS);
-            if(e==null){
-                msg = "ingestCatalog(): In the catalog file " +coverageDescriptionFileName + " the lfc:field element " +
-                        "named "+fieldName+" is missing the required " +
-                        "child element 'DapIdOfLatitudeCoordinate'.";
-                log.error(msg);
-                throw new ConfigurationException(msg);
-            }
-            dapIdOfLatitudeCoordinate = e.getTextTrim();
-            setLatitudeCoordinateDapId(fieldName,dapIdOfLatitudeCoordinate);
-
-
-            /**
-             * Load DAP ID (The Fully Qualified Name) for the variable that holds the Longitude coordinate values
-             * for this field.
-             * This is REQUIRED.
-             */
-            e = field.getChild("DapIdOfLongitudeCoordinate",LocalFileCatalog.NS);
-            if(e==null){
-                msg = "ingestCatalog(): In the catalog file " +coverageDescriptionFileName + " the lfc:field element " +
-                        "named "+fieldName+" is missing the required" +
-                        "child element 'DapIdOfLongitudeCoordinate'.";
-                log.error(msg);
-                throw new ConfigurationException(msg);
-            }
-            dapIdOfLongitudeCoordinate = e.getTextTrim();
-            setLongitudeCoordinateDapId(fieldName,dapIdOfLongitudeCoordinate);
-
-
-
-            /**
-             * Load DAP ID (The Fully Qualified Name) for the variable that holds the Elevation coordinate values
-             * for this field.
-             * This is OPTIONAL.
-             */
-            e = field.getChild("DapIdOfElevationCoordinate",LocalFileCatalog.NS);
-            if(e==null){
-                msg = "ingestCatalog(): In the catalog file " +coverageDescriptionFileName + " the lfc:field element " +
-                        "named "+fieldName+" is missing the optional " +
-                        "child element 'DapIdOfElevationCoordinate'.";
-                log.debug(msg);
-            }
-            else {
-                dapIdOfElevationCoordinate = e.getTextTrim();
-                setElevationCoordinateDapId(fieldName,dapIdOfElevationCoordinate);
-            }
-
-
-
-            /**
-             * Load DAP ID (The Fully Qualified Name) for the variable that holds the Time coordinate values
-             * for this field.
-             * This is OPTIONAL.
-             */
-            e = field.getChild("DapIdOfTimeCoordinate",LocalFileCatalog.NS);
-            if(e==null){
-                msg = "ingestCatalog(): In the catalog file " +coverageDescriptionFileName + " the lfc:field element " +
-                        "named "+fieldName+" is missing the optional " +
-                        "child element 'DapIdOfTimeCoordinate'.";
-                log.debug(msg);
-            }
-            else {
-                dapIdOfTimeCoordinate = e.getTextTrim();
-                setTimeCoordinateDapId(fieldName,dapIdOfTimeCoordinate);
-
-
-                /**
-                 * Load the units in which time is expressed for this field.
-                 * This is REQUIRED.
-                 */
-                timeUnits = e.getAttributeValue("units");
-                if(timeUnits==null){
-                    msg = "ingestCatalog(): In the catalog file " +coverageDescriptionFileName + " the lfc:field element " +
-                            "named "+fieldName+" is missing the required " +
-                            "attribute 'units'.";
-                    log.error(msg);
-                    throw new ConfigurationException(msg);
-                }
-                setTimeUnits(fieldName,timeUnits);
-
-            }
-
-
+            setDapGridArrayId(fieldName,dapID);
 
 
 
@@ -316,62 +243,6 @@ public class CoverageDescription {
 
     }
 
-
-
-    /**
-     * Builds the CoverageDescription object from a wcs:CoverageDescription element.
-     * @param cd A wcs:CoverageDescription element
-     * @param validateContent  Controls the XML document validation. A value of true will cause the parser to
-     * perform document validation. A value of false will cause the parser to simply parse the document which only
-     * @param lastModified The last modified time of coverage.
-     * @throws WcsException  When bad things happen.
-     */
-    public CoverageDescription(Element cd, boolean validateContent, long lastModified) throws WcsException {
-        init();
-
-        this.validateContent = validateContent;
-
-        if(validateContent){
-            XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Document cdDoc = new Document(cd);
-
-            try {
-                xmlo.output(cdDoc,baos);
-            } catch (IOException e) {
-                String msg = "Failed to validate wcs:CoverageDescription element. Msg: '"+e.getMessage()+"'";
-                log.error(msg);
-                throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE);
-            }
-        }
-
-        myCD = cd;
-        myFile = null;
-        this.lastModified = lastModified;
-    }
-
-
-
-
-
-
-    /**
-     * Builds the CoverageDescription object from a wcs:CoverageDescription element that is stored as the root
-     * element in a local File.
-     * @param cdFile The file containing the wcs:CoverageDescription element.
-     * @param validateContent
-     * @throws IOException When the file cannot be read.
-     * @throws JDOMException When the file cannot be parsed.
-     */
-    public CoverageDescription(File cdFile, boolean validateContent) throws IOException, JDOMException, WcsException {
-        init();
-
-        this.validateContent = validateContent;
-
-        myCD = ingestCoverageDescription(cdFile);
-        myFile = cdFile;
-        lastModified = cdFile.lastModified();
-    }
 
 
 
@@ -381,14 +252,8 @@ public class CoverageDescription {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _dapGridId = new HashMap<String,String>();
-        _latitudeCoordinateDapId = new HashMap<String,String>();
-        _longitudeCoordinateDapId = new HashMap<String,String>();
-        _elevationCoordinateDapId = new HashMap<String,String>();
-        _timeCoordinateDapId = new HashMap<String,String>();
-        _timeUnits = new HashMap<String,String>();
-
+        _domainCoordinates = new LinkedHashMap<String, DomainCoordinate>();
         initialized = true;
-
     }
 
 
@@ -763,121 +628,40 @@ public class CoverageDescription {
     /**
      * Gets the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
      * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
      * @return  Returns the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
      */
-    public String getLatitudeCoordinateDapId(String fieldID) {
-        return _latitudeCoordinateDapId.get(fieldID);
+    public LinkedHashMap<String,DomainCoordinate> getDomainCoordinates() {
+
+
+        LinkedHashMap<String,DomainCoordinate> dc = new LinkedHashMap<String,DomainCoordinate>();
+        for(DomainCoordinate mydc: _domainCoordinates.values()){
+            dc.put(mydc.getName(), new DomainCoordinate(mydc));
+        }
+        return dc;
+
 
     }
 
 
     /**
-     * Sets the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
+     * Gets the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
      * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @param  dapVariableID The DAP Variable ID of the Latitude coordinate map that is associated with the wcs:Field's
-     * wcs:Identifier represented by filedID.
+     * @return  Returns the DAP local ID for the Latitude coordinate map array that is associated by the wcs:Identifier
      */
-    public void setLatitudeCoordinateDapId(String fieldID, String dapVariableID) {
-        _latitudeCoordinateDapId.put(fieldID,dapVariableID);
+    public DomainCoordinate getDomainCoordinate(String coordinateName) {
 
-    }
 
-    /**
-     * Gets the DAP local ID for the Longitude coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @return  Returns the DAP local ID for the Longitude coordinate map array that is associated by the wcs:Identifier
-     */
-    public String getLongitudeCoordinateDapId(String fieldID) {
-        return _longitudeCoordinateDapId.get(fieldID);
-    }
+        DomainCoordinate dc = _domainCoordinates.get(coordinateName);
 
-    /**
-     * Sets the DAP local ID for the Longitude coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @param  dapVariableID The DAP Variable ID of the Longitude coordinate map that is associated with the wcs:Field's
-     * wcs:Identifier represented by filedID.
-     */
-    public void setLongitudeCoordinateDapId(String fieldID, String dapVariableID) {
-        _longitudeCoordinateDapId.put(fieldID,dapVariableID);
+        if(dc==null)
+            return null;
+        return new DomainCoordinate(dc);
+
     }
 
 
 
-    /**
-     * Gets the DAP local ID for the Elevation coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @return  Returns the DAP local ID for the Elevation coordinate map array that is associated by the wcs:Identifier
-     */
-    public String getElevationCoordinateDapId(String fieldID) {
-        return _elevationCoordinateDapId.get(fieldID);
 
-    }
-
-
-    /**
-     * Sets the DAP local ID for the Elevation coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @param  dapVariableID The DAP Variable ID of the Elevation coordinate map that is associated with the wcs:Field's
-     * wcs:Identifier represented by filedID.
-     */
-    public void setElevationCoordinateDapId(String fieldID, String dapVariableID) {
-        _elevationCoordinateDapId.put(fieldID,dapVariableID);
-
-    }
-
-    /**
-     * Gets the DAP local ID for the Time coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @return  Returns the DAP local ID for the Time coordinate map array that is associated by the wcs:Identifier
-     */
-    public String getTimeCoordinateDapId(String fieldID) {
-        return _timeCoordinateDapId.get(fieldID);
-    }
-
-
-    /**
-     * Sets the DAP local ID for the Time coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @param  dapVariableID The DAP Variable ID of the Time coordinate map that is associated with the wcs:Field's
-     * wcs:Identifier represented by filedID.
-     */
-    public void setTimeCoordinateDapId(String fieldID, String dapVariableID) {
-        _timeCoordinateDapId.put(fieldID,dapVariableID);
-    }
-
-
-
-    /**
-     * Sets the time units string for DAP local ID for the Time coordinate map array that is associated
-     * by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @param  timeUnits The time units string for the DAP Variable ID of the Time coordinate map that
-     * is associated with the wcs:Field's
-     * wcs:Identifier represented by filedID.
-     */
-    public void setTimeUnits(String fieldID, String timeUnits) {
-        _timeUnits.put(fieldID,timeUnits);
-    }
-
-    /**
-     * Gets the time units string for the Time coordinate map array that is associated by the wcs:Identifier
-     * for the wcs:Field
-     * @param fieldID The value of the wcs:Identifier associated with the wcs:Field in question.
-     * @return  Returns the time units string for DAP local ID for the Time coordinate map array that
-     * is associated by the wcs:Identifier
-     */
-    public String getTimeUnits(String fieldID) {
-        return _timeUnits.get(fieldID);
-    }
 
 
     public void setDapDatasetUrl(URL datasetUrl) throws MalformedURLException {

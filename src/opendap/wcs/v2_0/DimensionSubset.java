@@ -28,6 +28,9 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
+import javax.jnlp.IntegrationService;
+import javax.print.DocFlavor;
+
 /**
 * Created by IntelliJ IDEA.
 * User: ndp
@@ -38,8 +41,9 @@ import org.jdom.Element;
 public class DimensionSubset {
 
 
-    public enum Type {TRIM, SLICEPOINT}
+    public enum Type {TRIM, SLICE_POINT}
 
+    Type myDimensionType;
 
 
     private String dimensionId;
@@ -47,48 +51,129 @@ public class DimensionSubset {
     private String trimHigh;
     private String slicePoint;
 
-    Type myDimensionType;
+    private boolean isArrayIndexSubset;
 
+    public DimensionSubset(DimensionSubset source) {
+        setDimensionType(source.getType());
+        setDimensionId(source.getDimensionId());
+        setTrimLow(source.getTrimLow());
+        setTrimHigh(source.getTrimHigh());
+        setSlicePoint(source.getSlicePoint());
+        setIsArraySubset(source.isArraySubset());
+    }
+
+
+    protected void setDimensionId(String s){
+        dimensionId = s;
+    }
+
+    protected void setDimensionType(Type t){
+        myDimensionType = t;
+    }
+
+    protected void setTrimLow(String s){
+
+        trimLow = trimQuotesAndWhiteSpace(s);
+    }
+
+    protected void setTrimHigh(String s){
+        trimHigh = trimQuotesAndWhiteSpace(s);
+    }
+
+    protected void setIsArraySubset(boolean s){
+        isArrayIndexSubset = s;
+    }
+
+    protected void setSlicePoint(String s){
+        slicePoint = trimQuotesAndWhiteSpace(s);
+    }
+
+    private String trimQuotesAndWhiteSpace(String s){
+
+        if(s==null)
+            return null;
+
+        // Trim them from the front.
+        while(s.startsWith(" ") || s.startsWith("\t") || s.startsWith("\"") || s.startsWith("'"))
+            s = s.substring(1,s.length());
+
+
+        // Trim them from the back.
+        while(s.endsWith(" ") || s.endsWith("\t") || s.endsWith("\"") || s.endsWith("'"))
+            s = s.substring(0,s.length()-1);
+
+        return s;
+    }
 
     /**
      * Accepts the KVP encoding of a subset parameter for WCS 2.0
-     * @param kspSubsetStr  the KVP encoding of a subset parameter value.
+     * @param kvpSubsetString  the KVP encoding of a subset parameter value.
      * @throws WcsException When it's funky like an old sock.
      */
-    public DimensionSubset(String kspSubsetStr) throws WcsException {
-        int leftParen = kspSubsetStr.indexOf("(");
-        int rghtParen = kspSubsetStr.indexOf(")");
+    public DimensionSubset(String kvpSubsetString) throws WcsException {
+        int leftParen = kvpSubsetString.indexOf("(");
+        int rghtParen = kvpSubsetString.indexOf(")");
 
+        setIsArraySubset(false);
 
-        String s = kspSubsetStr.substring(0,leftParen);
+        String s = kvpSubsetString.substring(0,leftParen);
         if(s==null){
-            throw new WcsException("The subset parameter must begin with a valid NCNAME.",
+            throw new WcsException("The subset parameter must begin with a dimension name.",
                 WcsException.INVALID_PARAMETER_VALUE,
                 "subset");
         }
-        dimensionId = s;
+        setDimensionId(s);
 
-        String intervalOrPoint = kspSubsetStr.substring(leftParen,rghtParen);
+        String intervalOrPoint = kvpSubsetString.substring(leftParen+1,rghtParen);
 
         if(intervalOrPoint.contains(",")){
             int commaIndex = intervalOrPoint.indexOf(",");
             // It's an interval!
-            myDimensionType = Type.TRIM;
-            trimLow = intervalOrPoint.substring(0,commaIndex);
-            trimHigh = intervalOrPoint.substring(commaIndex,intervalOrPoint.length());
+            setDimensionType(Type.TRIM);
+            setTrimLow(intervalOrPoint.substring(0,commaIndex));
+            setTrimHigh(intervalOrPoint.substring(commaIndex+1,intervalOrPoint.length()));
 
+            setIsArraySubset(isArraySubsetString(getTrimLow()) && isArraySubsetString(getTrimHigh()));
 
-            slicePoint = null;
+            setSlicePoint(null);
         }
         else {
             // It's a slicePoint;
-            myDimensionType = Type.SLICEPOINT;
-            slicePoint = intervalOrPoint;
-            trimHigh = null;
-            trimLow = null;
+            setDimensionType(Type.SLICE_POINT);
+            setSlicePoint(intervalOrPoint);
+            setTrimHigh(null);
+            setTrimLow(null);
+
+            setIsArraySubset(isArraySubsetString(getSlicePoint()));
         }
     }
 
+
+
+    public boolean isArraySubsetString(String subsetStr){
+
+        if(subsetStr.equals("*"))
+            return true;
+
+        try {
+            int index = Integer.parseInt(subsetStr);
+        }
+        catch(NumberFormatException e){
+
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public boolean isValueSubset(){
+        return !isArrayIndexSubset;
+    }
+
+    public boolean isArraySubset(){
+        return isArrayIndexSubset;
+    }
 
     public Type getType(){
         return myDimensionType;
@@ -107,6 +192,7 @@ public class DimensionSubset {
 
         String type = dimensionSubsetType.getName();
 
+
         Element dimensionElement = dimensionSubsetType.getChild("Dimension",WCS.WCS_NS);
         if(dimensionElement==null)
             throw new WcsException("Missing wcs:Dimension element in wcs:DimensionSubsetType.",
@@ -119,7 +205,11 @@ public class DimensionSubset {
                 WcsException.MISSING_PARAMETER_VALUE,
                 "wcs:Dimension");
 
-        dimensionId = id;
+        setDimensionId(id);
+
+
+
+        setIsArraySubset(false);
 
 
         if(type.equals("DimensionSlice")){
@@ -136,26 +226,31 @@ public class DimensionSubset {
                     WcsException.MISSING_PARAMETER_VALUE,
                     "wcs:SlicePoint");
 
-            slicePoint = s;
-            trimLow = null;
-            trimHigh = null;
+            setSlicePoint(s);
+            setTrimHigh(null);
+            setTrimLow(null);
+
+            setIsArraySubset(isArraySubsetString(getSlicePoint()));
+
 
         }
         else if(type.equals("DimensionTrim")){
 
             Element trimLowElement = dimensionSubsetType.getChild("TrimLow",WCS.WCS_NS);
             if(trimLowElement==null)
-                trimLow = "*";
+                setTrimLow("*");
             else
-                trimLow = trimLowElement.getTextTrim();
+                setTrimLow(trimLowElement.getTextTrim());
 
             Element trimHighElement = dimensionSubsetType.getChild("TrimHigh",WCS.WCS_NS);
             if(trimHighElement==null)
-                trimHigh = "*";
+                setTrimHigh("*");
             else
-                trimHigh = trimHighElement.getTextTrim();
+                setTrimHigh(trimHighElement.getTextTrim());
 
-            slicePoint = null;
+            setIsArraySubset(isArraySubsetString(getTrimLow()) && isArraySubsetString(getTrimHigh()));
+
+            setSlicePoint(null);
         }
         else {
             throw new WcsException("Unrecognized wcs:DimensionSubsetType.",
@@ -181,8 +276,6 @@ public class DimensionSubset {
             e.setText(slicePoint);
             ds.addContent(e);
 
-
-
         }
 
         if(isTrimSubset()){
@@ -206,6 +299,97 @@ public class DimensionSubset {
         return ds;
     }
 
+
+
+
+    public String getDapValueConstraint() throws WcsException {
+        StringBuilder subsetClause = new StringBuilder();
+
+        if(isValueSubset()){
+
+          switch (getType()) {
+              case TRIM:
+                  subsetClause
+                          .append("\"")
+                          .append(getTrimLow())
+                          .append("<=")
+                          .append(getDimensionId())
+                          .append("<=")
+                          .append(getTrimHigh())
+                          .append("\"");
+
+                  break;
+              case SLICE_POINT:
+                  subsetClause
+                          .append("\"")
+                          .append(getDimensionId())
+                          .append("=")
+                          .append(getSlicePoint())
+                          .append("\"");
+
+
+
+                  break;
+              default:
+                  throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
+          }
+
+        }
+
+        return subsetClause.toString();
+
+      }
+
+
+    public String getDapArrayIndexConstraint() throws WcsException {
+        StringBuilder subsetClause = new StringBuilder();
+
+        if (isArraySubset()) {
+
+            switch (getType()) {
+                case TRIM:
+                    String lowIndex = getTrimLow();
+
+                    if(lowIndex.equals("*"))
+                        lowIndex = "0";
+
+                    String highIndex = getTrimHigh();
+                    if(highIndex.equals("*"))
+                        highIndex = "*";
+
+                    if(highIndex.equals("*") && lowIndex.equals("*")) {
+                        subsetClause.append("[*]");
+                    }
+                    else {
+
+                        subsetClause
+                                .append("[")
+                                .append(lowIndex)
+                                .append(":1:")
+                                .append(highIndex)
+                                .append("]");
+                    }
+
+
+
+                    break;
+                case SLICE_POINT:
+                    subsetClause
+                            .append("[")
+                            .append(getSlicePoint())
+                            .append("]");
+
+
+                    break;
+                default:
+                    throw new WcsException("Unknown Subset Type!", WcsException.INVALID_PARAMETER_VALUE, "subset");
+            }
+
+
+        }
+        return subsetClause.toString();
+
+    }
 
 
     public boolean isSliceSubset(){

@@ -16,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URISyntaxException;
 
 /**
@@ -88,6 +86,8 @@ public class Util {
         int totalBytesWritten = 0;
         int bytesRead;
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
         while (!done) {
             bytesRead = is.read(buf);
             if (bytesRead == -1) {
@@ -97,6 +97,7 @@ public class Util {
             } else {
                 totalBytesRead += bytesRead;
                 os.write(buf, 0, bytesRead);
+                baos.write(buf,0,bytesRead);
                 totalBytesWritten += bytesRead;
             }
         }
@@ -104,6 +105,12 @@ public class Util {
         if (totalBytesRead != totalBytesWritten)
             throw new IOException("Failed to write as many bytes as I read! " +
                     "Read: " + totalBytesRead + " Wrote: " + totalBytesWritten);
+
+
+        System.out.println("################################################################");
+        System.out.write(baos.toByteArray());
+        System.out.println("################################################################");
+
 
         return totalBytesRead;
 
@@ -147,17 +154,6 @@ public class Util {
 
                 log.error(msg);
 
-                /*
-                Header[] headers = contentRequest.getResponseHeaders();
-
-                for(Header h:headers){
-                    response.setHeader(h.getName(),h.getValue());
-                }
-                response.sendError(statusCode);
-
-                 */
-
-
 
                 throw new WcsException(msg, WcsException.NO_APPLICABLE_CODE, "DataAccessUrl");
 
@@ -169,10 +165,15 @@ public class Util {
                     Header[] headers = contentRequest.getResponseHeaders();
                     String name, value;
 
+
                     for(Header h:headers){
                         name = h.getName();
                         value = h.getValue();
-                        response.setHeader(name,value);
+
+                        // DO NOT Transfer the Transfer-Encoding header cause if you do you'll bone what ever Tomcat
+                        // is doing.
+                        if(!name.equalsIgnoreCase("Transfer-Encoding"))
+                            response.setHeader(name,value);
                     }
                 }
 
