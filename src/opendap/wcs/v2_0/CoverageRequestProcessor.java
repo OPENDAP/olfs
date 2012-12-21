@@ -33,7 +33,6 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.print.DocFlavor;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -318,7 +317,7 @@ public class CoverageRequestProcessor {
                         else {
                             ssfGridSubsetClause.append(",");
                         }
-                        ssfGridSubsetClause.append(dimSub.getDapValueConstraint());
+                        ssfGridSubsetClause.append(dimSub.getDapGridValueConstraint());
                     }
                     else if(dimSub.isArraySubset()) {
                         // An Array subset means that user indicated (through the use of integer values in

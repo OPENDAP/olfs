@@ -30,12 +30,9 @@ package opendap.wcs.v2_0;
 import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 12/19/12
- * Time: 4:35 PM
- * To change this template use File | Settings | File Templates.
- */
+ * This class extends DimensionSubset concept to correctly handle time strings.
+ *
+*/
 public class TemporalDimensionSubset extends DimensionSubset {
 
 
@@ -52,8 +49,21 @@ public class TemporalDimensionSubset extends DimensionSubset {
     public String getUnits(){ return _units; }
 
 
+    /**
+     * The is method produces the correct DAP value based constraint for inclusion in a DAP constraint expression
+     * call to the DAP server side function "grid"
+     *
+     * If the time point/slice values are numeric (if they parse as a Double correctly) then they are assumed to be in
+     * the target dataset time units and they are added to the constraint unchanged. If the time point/slice values are
+     * not numeric then they are passed to the TimeConversion.parseWCSTimePosition() utility where they are turned into
+     * java Date objects. Each Date is passed into the TimeConversion.convertDateToTimeUnits() method along with the
+     * time units of the coverage/dataset. The returned string is placed in the DAP value based constraint for inclusion
+     * into a call to the server side function "grid".
+     * @return
+     * @throws WcsException
+     */
     @Override
-    public String getDapValueConstraint() throws WcsException {
+    public String getDapGridValueConstraint() throws WcsException {
         StringBuilder subsetClause = new StringBuilder();
 
         if (isValueSubset()) {

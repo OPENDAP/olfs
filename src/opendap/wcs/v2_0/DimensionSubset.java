@@ -32,11 +32,22 @@ import javax.jnlp.IntegrationService;
 import javax.print.DocFlavor;
 
 /**
-* Created by IntelliJ IDEA.
-* User: ndp
-* Date: 10/16/12
-* Time: 6:42 PM
-* To change this template use File | Settings | File Templates.
+ * This class embodies a WCS Dimension Subset concept and is able to produce a DAP constraint expression
+ * that requests the correct subset of the data.
+ *
+ * Essentially this class acts as a map from WCS 2.0 dimension sub-setting syntax to DAP constraint expression syntax.
+ * The class handles both the "trim" (interval) and "slice" (point) requests, both by value and by array index.
+ *
+ * WCS 2.0 allows domain coordinate dimensions to be subset by array index or by coordinate value. It distinguishes
+ * instances of this by evaluating the string representation of the subsets constraint values. If a value parses as an
+ * Integer, then it's interpreted as an array index. If doesn't parse as an Integer, then it assumed to by a value in
+ * the associated CoordinateDomain and will be used in a by-value sub-setting expression.
+ *
+ * Subsets can also be either a "trim" (interval) or a "slicepoint", which is orthogonal to the arrayIndex/byValue facet.
+ * Trim subsets are specified as an interval (with mono steps assumed). The interval is defined with two values
+ * and it is required (by this software, not WCS per say) that both values be either array indices (integers) or,
+ * values (non integer). In other words: Both values must be in the arrayIndex facet, or both in the byValue facet.
+ *
 */
 public class DimensionSubset {
 
@@ -333,8 +344,18 @@ public class DimensionSubset {
 
 
 
-
-    public String getDapValueConstraint() throws WcsException {
+    /**
+     * The is method produces the correct DAP value based constraint for inclusion in a DAP constraint expression
+     * call to the DAP server side function "grid"
+     *
+     * If the time point/slice values are not integers (if they fail to parse as an Integer correctly) then they are
+     * assumed to be in the target dataset DomainCoordinate units and they are used to construct a value based
+     * constraint/filter expression for the DAP server side function "grid".
+     * @return A value constraint for the DAP server side function "grid". if the instance of the DimensionSubset
+     * is not a value based subset (i.e. as an array index subset) the empty string is returned.
+     * @throws WcsException
+     */
+    public String getDapGridValueConstraint() throws WcsException {
         StringBuilder subsetClause = new StringBuilder();
 
         if(isValueSubset()){
@@ -373,6 +394,18 @@ public class DimensionSubset {
       }
 
 
+    /**
+     * The is method produces the DAP array index constraint that represents the subset.
+     *
+     *
+     * If the time point/slice values are integers (if they  parse as an Integer correctly) then they are
+     * interpreted to be array indices in the target dataset DomainCoordinate referenced by this DimensionSubset.
+     * The time point/slice values are used to construct an array index based constraint/filter expression for
+     * a DAP Grid or Array type.
+     * @return An array index constraint for a DAP Array or Grid object. If the instance of the DomainSubset is not
+     * an array index constraint, the empty string is returned.
+     * @throws WcsException
+     */
     public String getDapArrayIndexConstraint() throws WcsException {
         StringBuilder subsetClause = new StringBuilder();
 
@@ -386,8 +419,6 @@ public class DimensionSubset {
                         lowIndex = "0";
 
                     String highIndex = getTrimHigh();
-                    if(highIndex.equals("*"))
-                        highIndex = "*";
 
                     if(highIndex.equals("*") && lowIndex.equals("*")) {
                         subsetClause.append("[*]");

@@ -1,5 +1,7 @@
 package opendap.wcs.v2_0;
 
+import org.omg.CORBA.INTERNAL;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -116,6 +118,7 @@ public class TimeConversion {
         Date now = new Date();
 
         String dateFormat = "yyyy-MM-d hh:mm:ss";
+
 
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         String epochDateStr = "1900-01-01 00:00:0.0";
