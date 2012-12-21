@@ -322,7 +322,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
         opendap.xml.Transformer t = new   opendap.xml.Transformer(xsltDoc);
         t.setParameter("ServicePrefix",serviceUrl);
-        t.setParameter("ServerIDs",getServerIDs(t.getDocumentBuilder()));
         t.setParameter("UpdateIsRunning",ProcessController.isCurrentlyProcessing()+"");
 
         XdmNode capDoc = t.build(new StreamSource(new ByteArrayInputStream(xmlo.outputString(capabilitiesDoc).getBytes())));
@@ -332,27 +331,6 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
 
 
     }
-
-
-    private XdmNode getServerIDs(DocumentBuilder build) throws SaxonApiException {
-
-
-        String nodeString = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n";
-        nodeString += "<ServerIDs>";
-
-        String serverID;
-        for(String serverURL: CoverageIdGenerator.getServerURLs()){
-            serverID  = CoverageIdGenerator.getServerID(serverURL);
-            nodeString += "<server id='"+serverID+"' url='"+serverURL+"' />";
-        }
-
-        nodeString += "</ServerIDs>";
-
-        ByteArrayInputStream reader = new ByteArrayInputStream(nodeString.getBytes());
-
-        return build.build(new StreamSource(reader));
-    }
-
 
 
 

@@ -34,7 +34,6 @@
                 xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:param name="ServicePrefix" />
-    <xsl:param name="ServerIDs" />
     <xsl:param name="UpdateIsRunning"/>
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
@@ -503,34 +502,6 @@
 
 
 
-    <xsl:template name="ServerIDs">
-
-            <table border="0" >
-                <tr>
-                    <th class="small" align="center">Server ID</th>
-                    <!-- <th align="center">Description</th> -->
-                    <th class="small" align="center">Server URL</th>
-                </tr>
-
-                <xsl:choose>
-                    <xsl:when test="$ServerIDs/ServerIDs/server">
-                        <xsl:for-each select="$ServerIDs/ServerIDs/server">
-                            <tr>
-                                <td class="small" align="center"><xsl:value-of select="@id"/></td>
-                                <td class="small" align="left"><xsl:value-of select="@url"/></td>
-                            </tr>
-                        </xsl:for-each>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <tr>
-                            <td class="small" align="center">-</td>
-                            <td class="small" align="center">-</td>
-                        </tr>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </table>
-
-    </xsl:template>
 
 
 

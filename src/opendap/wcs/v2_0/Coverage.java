@@ -165,7 +165,9 @@ public class Coverage {
      *
      * @param rangeValuesPartID  The ID of the multipart document part that carries the range values.
      * @param mimeType  The mimeType of the range values encoding
-\     * @return Returns the appropriate gml:rangeSet element.
+     * @return Returns the appropriate gml:rangeSet element.
+     * @return
+     * @throws WcsException
      */
     private Element getRangeSet(String rangeValuesPartID, String mimeType) throws WcsException {
 
