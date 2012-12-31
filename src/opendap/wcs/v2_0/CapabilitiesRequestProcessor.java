@@ -25,8 +25,6 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,7 +226,11 @@ public class CapabilitiesRequestProcessor {
         serviceMetadata.addContent(formatSupported);
 
         formatSupported = new Element("formatSupported",WCS.WCS_NS);
-        formatSupported.setText("image/geotiff");
+        formatSupported.setText("image/tiff");
+        serviceMetadata.addContent(formatSupported);
+
+        formatSupported = new Element("formatSupported",WCS.WCS_NS);
+        formatSupported.setText("image/jp2");
         serviceMetadata.addContent(formatSupported);
 
         formatSupported = new Element("formatSupported",WCS.WCS_NS);

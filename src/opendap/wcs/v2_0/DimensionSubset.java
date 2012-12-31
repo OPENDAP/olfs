@@ -28,8 +28,6 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
-import javax.jnlp.IntegrationService;
-import javax.print.DocFlavor;
 
 /**
  * This class embodies a WCS Dimension Subset concept and is able to produce a DAP constraint expression

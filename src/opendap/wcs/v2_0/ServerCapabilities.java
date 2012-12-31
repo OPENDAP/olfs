@@ -34,7 +34,7 @@ import java.net.URL;
  */
 public class ServerCapabilities {
 
-    private static String[] sf = {"netcdf-cf","dap-2.0"};
+    private static String[] sf = {"netcdf-cf","dap-2.0","geotiff","gmljp2"};
 
 
 

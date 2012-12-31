@@ -1,6 +1,5 @@
 package opendap.wcs.v2_0;
 
-import org.omg.CORBA.INTERNAL;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -538,7 +537,7 @@ public class TimeConversion {
                             "TemporalSubset. There appear to be more than 3 " +
                             "fields separated by '-' signs. That's just not " +
                             "going to work. Sorry.",
-                            opendap.wcs.v1_1_2.WcsException.INVALID_PARAMETER_VALUE,
+                            WcsException.INVALID_PARAMETER_VALUE,
                             "TemporalSubset");
                 }
 
@@ -573,7 +572,7 @@ public class TimeConversion {
                             "TemporalSubset. There appear to be more than 3 " +
                             "fields separated by ':' signs. That's just not " +
                             "going to work. Sorry.",
-                            opendap.wcs.v1_1_2.WcsException.INVALID_PARAMETER_VALUE,
+                             WcsException.INVALID_PARAMETER_VALUE,
                             "TemporalSubset");
                 }
 
@@ -588,7 +587,7 @@ public class TimeConversion {
         }
         catch (ParseException e) {
             throw new WcsException(e.getMessage(),
-                    opendap.wcs.v1_1_2.WcsException.INVALID_PARAMETER_VALUE,
+                    WcsException.INVALID_PARAMETER_VALUE,
                     "TemporalSubset");
         }
 

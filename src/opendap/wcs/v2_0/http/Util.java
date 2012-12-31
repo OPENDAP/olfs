@@ -1,7 +1,6 @@
 package opendap.wcs.v2_0.http;
 
 import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.Scrub;
 import opendap.wcs.v2_0.WcsException;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -16,7 +15,10 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 
 /**

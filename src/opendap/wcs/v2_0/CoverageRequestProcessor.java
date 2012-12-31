@@ -158,8 +158,10 @@ public class CoverageRequestProcessor {
         String format = getReturnFormat(req);
         if (format.contains("netcdf")) {
             dataAccessURL = getNetcdfDataAccessURL(req);
-        } else if (format.equals("image/geotiff")) {
+        } else if (format.equals("image/tiff")) {
             dataAccessURL = getGeoTiffDataAccessURL(req);
+        } else if (format.equals("image/jp2")) {
+            dataAccessURL = getGmlJpeg2000DataAccessURL(req);
         } else if (format.equals("application/octet-stream")) {
             dataAccessURL = getDapDataAccessURL(req);
         } else {
@@ -177,8 +179,10 @@ public class CoverageRequestProcessor {
         String format = getReturnFormat(req);
         if (format.contains("netcdf")) {
             contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".nc\"";
-        } else if (format.equals("image/geotiff")) {
-            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".geotiff\"";
+        } else if (format.equals("image/tiff")) {
+            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".tiff\"";
+        } else if (format.equals("image/jp2")) {
+            contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".jp2\"";
         } else if (format.equals("application/octet-stream")) {
             contentDisposition = " attachment; filename=\"" + req.getCoverageID() + ".dods\"";
         } else {
@@ -196,6 +200,8 @@ public class CoverageRequestProcessor {
         String format = getReturnFormat(req);
         if (format.contains("netcdf")) {
             mime_type = "application/x-netcdf";
+        } else if (format.equals("image/tiff")) {
+            mime_type = "image/tiff";
         } else if (format.equals("image/geotiff")) {
             mime_type = "image/geotiff";
         } else if (format.equals("application/octet-stream")) {
@@ -208,6 +214,22 @@ public class CoverageRequestProcessor {
         return mime_type;
     }
 
+
+    public static String getGmlJpeg2000DataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
+
+        String requestURL = CatalogWrapper.getDataAccessUrl(req.getCoverageID());
+
+        String dapCE = getDapCE(req);
+        log.debug("getGmlJpeg2000DataAccessURL() - Dap CE: '{}'",dapCE);
+
+        try {
+            requestURL += ".gmljp2" + "?" + java.net.URLEncoder.encode(dapCE, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new WcsException("Failed to construct DAP data Access URL. Primary Message: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+        }
+
+        return requestURL;
+    }
 
     public static String getGeoTiffDataAccessURL(GetCoverageRequest req) throws InterruptedException, WcsException {
 

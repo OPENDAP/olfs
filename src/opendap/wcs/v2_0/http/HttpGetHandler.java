@@ -1,7 +1,5 @@
 package opendap.wcs.v2_0.http;
 
-import net.sf.saxon.s9api.DocumentBuilder;
-import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
@@ -21,11 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.Key;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
