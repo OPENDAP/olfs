@@ -44,25 +44,25 @@ import java.io.*;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GeoTiff extends BesDapResponder {
+public class GmlJp2 extends BesDapResponder {
     private Logger log;
 
 
 
 
-    private static String defaultRequestSuffixRegex = "\\.geotiff";
+    private static String defaultRequestSuffixRegex = "\\.gmljp2";
 
-    public GeoTiff(String sysPath, BesApi besApi) {
+    public GmlJp2(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
-    public GeoTiff(String sysPath, String pathPrefix, BesApi besApi) {
+    public GmlJp2(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
 
-    public GeoTiff(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public GmlJp2(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
     }
@@ -93,11 +93,11 @@ public class GeoTiff extends BesDapResponder {
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
 
-        response.setContentType("image/tiff;application=geotiff");
+        response.setContentType("image/jp2;application=gmljp2");
         response.setHeader("Content-Disposition", contentDisposition);
 
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "geotiff image");
+        response.setHeader("Content-Description", "GML_JPEG2000 Image");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 
@@ -112,7 +112,7 @@ public class GeoTiff extends BesDapResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeGeoTiffDataResponse(
+        boolean result = besApi.writeGmlJpeg2000DataResponse(
                         dataSource,
                         constraintExpression,
                         xdap_accept,
@@ -130,7 +130,7 @@ public class GeoTiff extends BesDapResponder {
 
 
         os.flush();
-        log.info("Sent GEOTIFF Data response.");
+        log.info("Sent GML_JPEG2000 Data response.");
 
 
     }

@@ -140,6 +140,7 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new NetcdfFileOut(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
         responders.add(new GeoTiff(systemPath, besApi));
+        responders.add(new GmlJp2(systemPath, besApi));
 
         //DatasetFileAccess  dfa = new DatasetFileAccess(systemPath, besApi);
         //dfa.setAllowDirectDataSourceAccess(allowDirectDataSourceAccess);

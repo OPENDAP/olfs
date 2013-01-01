@@ -9,7 +9,7 @@
     </rule>
 
     <rule>
-        <from>^/(admin|hai|error|docs|jsp|webstart|hyrax)(/.*)?$</from>
+        <from>^/(admin|hai|error|docs|jsp|webstart|hyrax|echo)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
