@@ -27,7 +27,7 @@
 <WcsService>
     <WcsCatalog className="opendap.wcs.v2_0.LocalFileCatalog" >
         <!-- CatalogDirectory>/Users/ndp/hyrax/trunk/tomcat/content/WCS-2.0/LocalFileCatalog</CatalogDirectory -->
-        <CatalogFile>/Users/ndp/hyrax/trunk/tomcat/content/WCS-2.0/LocalFileCatalog/LFC.xml</CatalogFile>
+        <!-- CatalogFile>/Users/ndp/hyrax/trunk/tomcat/content/WCS-2.0/LocalFileCatalog/LFC.xml</CatalogFile -->
     </WcsCatalog>
 </WcsService>
 <!--
