@@ -32,10 +32,7 @@ import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -111,7 +108,7 @@ public class CatalogWrapper {
 
 
 
-    public static List<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
+    public static Collection<Element> getCoverageSummaryElements()  throws InterruptedException, WcsException{
         return _catalogImpl.getCoverageSummaryElements();
     }
 
