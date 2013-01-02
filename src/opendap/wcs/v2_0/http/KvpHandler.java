@@ -204,13 +204,13 @@ public class KvpHandler {
                     "key value pair for 'request'",
                     WcsException.MISSING_PARAMETER_VALUE,"request");
         }
-        else if(s[0].equals("GetCapabilities")){
+        else if(s[0].equalsIgnoreCase("GetCapabilities")){
             return WCS.GET_CAPABILITIES;
         }
-        else if(s[0].equals("DescribeCoverage")){
+        else if(s[0].equalsIgnoreCase("DescribeCoverage")){
             return WCS.DESCRIBE_COVERAGE;
         }
-        else if(s[0].equals("GetCoverage")){
+        else if(s[0].equalsIgnoreCase("GetCoverage")){
             return WCS.GET_COVERAGE;
         }
         else {

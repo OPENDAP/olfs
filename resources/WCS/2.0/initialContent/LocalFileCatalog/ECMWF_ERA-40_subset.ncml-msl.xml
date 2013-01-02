@@ -25,7 +25,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
     <wcs:CoverageDescription
-            gml:id="ioos_002fECMWF__ERA-40__subset.ncml-msl"
+            gml:id="ECMWF_ERA-40_subset.ncml-msl"
             xmlns="http://www.opengis.net/gml/3.2"
             xsi:schemaLocation="http://www.opengis.net/wcs/2.0 http://schemas.opengis.net/wcs/2.0/wcsAll.xsd http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd"
             xmlns:wcs="http://www.opengis.net/wcs/2.0"
@@ -42,9 +42,9 @@
                  <endPosition>2002-07-31T15:00:00.000Z</endPosition>
             </EnvelopeWithTimePeriod>
         </boundedBy>
-        <wcs:CoverageId>ioos_002fECMWF__ERA-40__subset.ncml-msl</wcs:CoverageId>
+        <wcs:CoverageId>ECMWF_ERA-40_subset.ncml-msl</wcs:CoverageId>
         <domainSet>
-            <Grid dimension="3" gml:id="ioos_002fECMWF__ERA-40__subset.ncml-msl-grid">
+            <Grid dimension="3" gml:id="Grid-ECMWF_ERA-40_subset.ncml-msl">
                 <limits>
                     <GridEnvelope>
                         <low>0 0 0</low>

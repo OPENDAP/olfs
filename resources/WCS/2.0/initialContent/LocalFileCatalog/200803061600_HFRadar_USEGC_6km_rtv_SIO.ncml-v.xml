@@ -25,7 +25,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 <wcs:CoverageDescription
-    gml:id="ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc-v"
+    gml:id="200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-v"
     xmlns="http://www.opengis.net/gml/3.2"
     xmlns:wcs="http://www.opengis.net/wcs/2.0"
     xmlns:gml="http://www.opengis.net/gml/3.2"
@@ -43,9 +43,9 @@
             <endPosition>2008-03-27T16:00:00.000Z</endPosition>
         </EnvelopeWithTimePeriod>
     </boundedBy>
-    <wcs:CoverageId>ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc</wcs:CoverageId>
+    <wcs:CoverageId>200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-v</wcs:CoverageId>
     <domainSet>
-        <RectifiedGrid dimension="2" gml:id="Grid-ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc">
+        <RectifiedGrid dimension="2" gml:id="Grid-200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-v">
             <limits>
                 <GridEnvelope>
                     <low>0 0 0</low>
@@ -54,7 +54,7 @@
             </limits>
             <axisLabels>time latitude longitude</axisLabels>
             <gml:origin>
-                <gml:Point gml:id="GridOrigin-ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc"
+                <gml:Point gml:id="GridOrigin-200803061600_HFRadar_USEGC_6km_rtv_SIO.nc-v"
                     srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
                     <gml:pos>1204819200 82.1161499 21.73596</gml:pos>
                 </gml:Point>

@@ -25,6 +25,11 @@
                 </ows:Post>
             </ows:HTTP>
         </ows:DCP>
+        <ows:Parameter name="Format">
+            <ows:AllowedValues>
+                <ows:Value>text/xml</ows:Value>
+            </ows:AllowedValues>
+        </ows:Parameter>
     </ows:Operation>
     <ows:Operation name="GetCoverage">
         <ows:DCP>
