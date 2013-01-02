@@ -35,10 +35,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -333,10 +330,10 @@ public class LocalFileCatalog implements WcsCatalog {
         return coverages.get(id).getCoverageSummary();
     }
 
-    public  List<Element> getCoverageSummaryElements() throws WcsException {
+    public  Collection<Element> getCoverageSummaryElements() throws WcsException {
 
 
-        ArrayList<Element> coverageSummaries = new ArrayList<Element>();
+        TreeMap<String, Element> coverageSummaries = new TreeMap<String,Element>();
 
         Enumeration e = coverages.elements();
 
@@ -344,11 +341,12 @@ public class LocalFileCatalog implements WcsCatalog {
 
         while(e.hasMoreElements()){
             cd = (CoverageDescription)e.nextElement();
-            coverageSummaries.add(cd.getCoverageSummary());
+
+            coverageSummaries.put(cd.getCoverageId(),cd.getCoverageSummary());
 
         }
 
-        return coverageSummaries;
+        return coverageSummaries.values();
     }
 
 

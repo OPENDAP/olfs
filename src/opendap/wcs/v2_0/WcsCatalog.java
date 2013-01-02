@@ -25,6 +25,7 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -165,7 +166,7 @@ public interface WcsCatalog {
      * @throws WcsException When the bad things happen.
      * @throws InterruptedException
      */
-    public List<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
+    public Collection<Element> getCoverageSummaryElements() throws InterruptedException, WcsException;
 
 
 
