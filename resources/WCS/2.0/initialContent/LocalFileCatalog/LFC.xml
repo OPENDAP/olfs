@@ -29,7 +29,7 @@
     
 
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
         <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
         <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
@@ -52,7 +52,7 @@
     </WcsCoverage>
 
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcw.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
         <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
         <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
@@ -60,7 +60,7 @@
     </WcsCoverage>
 
     <WcsCoverage fileName="ECMWF_ERA-40_subset.ncml-tcwv.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/ECMWF_ERA-40_subset.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="hours since 1900-01-01 00:00:0.0" />
         <DomainCoordinate name="latitude" dapID="latitude" units="deg" />
         <DomainCoordinate name="longitude" dapID="longitude" units="deg" />
@@ -69,7 +69,7 @@
 
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="lat" units="deg" />
         <DomainCoordinate name="longitude" dapID="lon" units="deg" />
@@ -80,7 +80,7 @@
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-u.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="lat" units="deg" />
         <DomainCoordinate name="longitude" dapID="lon" units="deg" />
@@ -88,7 +88,7 @@
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-v.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="lat" units="deg" />
         <DomainCoordinate name="longitude" dapID="lon" units="deg" />
@@ -96,7 +96,7 @@
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-DOPx.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="lat" units="deg" />
         <DomainCoordinate name="longitude" dapID="lon" units="deg" />
@@ -104,7 +104,7 @@
     </WcsCoverage>
 
     <WcsCoverage fileName="200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml-DOPy.xml">
-        <DapDatasetUrl>http://localhost:8080/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
+        <DapDatasetUrl>http://localhost:8090/opendap/ioos/200803061600_HFRadar_USEGC_6km_rtv_SIO.ncml</DapDatasetUrl>
         <DomainCoordinate name="time" dapID="time" units="seconds since 1970-01-01" />
         <DomainCoordinate name="latitude" dapID="lat" units="deg" />
         <DomainCoordinate name="longitude" dapID="lon" units="deg" />
