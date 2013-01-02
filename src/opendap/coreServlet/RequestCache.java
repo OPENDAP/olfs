@@ -140,8 +140,8 @@ public class RequestCache {
 
         HashMap<String, CachedObj> hm = cache.get(Thread.currentThread());
 
-        //if(hm==null)
-        //    return null;
+        if(hm==null || key==null)
+            return null;
 
         CachedObj co = hm.get(key);
 
