@@ -326,10 +326,10 @@ public class WebStartServlet extends HttpServlet {
         String query = req.getQueryString();
         HashMap<String, String> params = new HashMap<String, String>();
 
+        RequestCache.openThreadCache();
         try {
 
 
-            RequestCache.openThreadCache();
 
             if (disabled) {
                 log.error("Java WebStart is disabled!");
@@ -426,12 +426,7 @@ public class WebStartServlet extends HttpServlet {
             }
 
         }
-
-        catch (
-                Throwable t
-                )
-
-        {
+        catch (Throwable t){
             try {
                 OPeNDAPException.anyExceptionHandler(t, resp);
             }
@@ -448,11 +443,9 @@ public class WebStartServlet extends HttpServlet {
                 }
             }
         }
-
-        finally
-
-        {
-            this.destroy();
+        finally {
+            RequestCache.closeThreadCache();
+             this.destroy();
         }
 
     }
