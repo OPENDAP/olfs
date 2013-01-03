@@ -329,6 +329,8 @@ public class WebStartServlet extends HttpServlet {
         try {
 
 
+            RequestCache.openThreadCache();
+
             if (disabled) {
                 log.error("Java WebStart is disabled!");
                 resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
