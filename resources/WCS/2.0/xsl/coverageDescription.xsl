@@ -271,11 +271,11 @@
     </xsl:template>
 
     <xsl:template match="swe:field">
-        <strong><span class="large"><xsl:value-of select="@name"/> </span></strong><span class="small">(swe:field)</span>
+        <strong><span class="xlarge"><xsl:value-of select="@name"/></span></strong> :
         <xsl:apply-templates mode="fieldDescription"/>
-        <ul>
+        <span class="small">
             <xsl:apply-templates />
-        </ul>
+        </span>
         <br/>
     </xsl:template>
 
@@ -287,23 +287,21 @@
     </xsl:template>
 
     <xsl:template match="swe:description" mode="fieldDescription">
-        <span class="xlarge"><xsl:value-of select="."/></span>
+        <xsl:value-of select="."/>
         <br/>
     </xsl:template>
 
 
 
     <xsl:template match="swe:uom">
-        <em>Units of Measure: </em> <xsl:value-of select="@code"/>
-        <br/>
+       <dd> <em>Units of Measure: </em> <xsl:value-of select="@code"/></dd>
     </xsl:template>
 
 
 
 
     <xsl:template match="swe:AllowedValues">
-        <em>Allowed Values: </em> <xsl:value-of select="swe:interval"/>
-        <br/>
+        <dd> <em>Allowed Values: </em> <xsl:value-of select="swe:interval"/> </dd>
     </xsl:template>
 
 
