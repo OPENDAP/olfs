@@ -23,125 +23,115 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.BesDapResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
 import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 
-
-
-
-
-
-public class Dap2Data extends BesDapResponder {
-
-
-
+/**
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: 1/31/11
+ * Time: 4:42 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class GmlJp2 extends BesDapResponder {
     private Logger log;
 
 
-    private static String _preferredRequestSuffix = ".dods";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
 
-    public Dap2Data(String sysPath, BesApi besApi) {
+    private static String defaultRequestSuffixRegex = "\\.gmljp2";
+
+    public GmlJp2(String sysPath, BesApi besApi) {
         this(sysPath,null, defaultRequestSuffixRegex,besApi);
     }
 
-    public Dap2Data(String sysPath, String pathPrefix, BesApi besApi) {
+    public GmlJp2(String sysPath, String pathPrefix, BesApi besApi) {
         this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
     }
 
 
-    public Dap2Data(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+
+    public GmlJp2(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
-        setServiceRoleId("http://services.opendap.org/dap2/data");
-        setServiceMediaType("application/octet-stream");
-        setServiceTitle("DAP2 Data");
-        setServiceDescription("DAP2 Data Object.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
     }
 
 
-    public boolean needsBesToMatch(){
-        return true;
-    }
-
-
-    public boolean needsBesToRespond(){
-        return true;
-    }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
-
-        User user = new User(request);
-        int maxRS = user.getMaxResponseSize();
+        String xmlBase = getXmlBase(request);
 
         BesApi besApi = getBesApi();
 
-        log.debug("sendDAP2Data() For: " + dataSource+
-                "    CE: '" + constraintExpression + "'");
 
-        response.setContentType(getServiceMediaType());
-        Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dods_data");
+
+        log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + dataSource +
+                    "    CE: '" + constraintExpression + "'");
 
 
         String downloadFileName = Scrub.fileName(relativeUrl.substring(relativeUrl.lastIndexOf("/") + 1, relativeUrl.length()));
+
+
+
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
+
+        response.setContentType("image/jp2;application=gmljp2");
         response.setHeader("Content-Disposition", contentDisposition);
 
+        Version.setOpendapMimeHeaders(request,response,besApi);
+        response.setHeader("Content-Description", "GML_JPEG2000 Image");
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
 
+        response.setStatus(HttpServletResponse.SC_OK);
         String xdap_accept = request.getHeader("XDAP-Accept");
+
+
+        User user = new User(request);
 
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DAP2,
+        boolean result = besApi.writeGmlJpeg2000DataResponse(
                         dataSource,
                         constraintExpression,
                         xdap_accept,
-                        maxRS,
-                        null,
-                        null,
-                        null,
-                        BesApi.DAP2_ERRORS);
+                        user.getMaxResponseSize(),
+                        os,
+                        erros);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+
+        if(!result){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
-
         }
 
 
+
         os.flush();
-        log.info("Sent DAP2 data response.");
-
-
+        log.info("Sent GML_JPEG2000 Data response.");
 
 
     }
-
 }

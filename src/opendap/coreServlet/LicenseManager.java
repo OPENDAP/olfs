@@ -20,7 +20,7 @@ public class LicenseManager {
 
     static {
         log = LoggerFactory.getLogger(LicenseManager.class.getName());
-        GregorianCalendar expires = new GregorianCalendar(2012,8,1);   // 2012,8,1 is September 1, 2012
+        GregorianCalendar expires = new GregorianCalendar(2222,8,1);   // 2222,8,1 is September 1, 2222
         expirationDate = expires.getTime();
 
     }

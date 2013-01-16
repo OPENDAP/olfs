@@ -121,29 +121,20 @@ public class XmlData extends BesDapResponder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.XML_DATA,
+        boolean result = besApi.writeXmlDataResponse(
                         dataSource,
                         constraintExpression,
                         xdap_accept,
                         user.getMaxResponseSize(),
                         xmlBase,
-                        null,
-                        null,
-                        BesApi.XML_ERRORS);
+                        os,
+                        erros);
 
 
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        log.debug("respondToHttpGetRequest() - _besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!result){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
-
         }
 
 

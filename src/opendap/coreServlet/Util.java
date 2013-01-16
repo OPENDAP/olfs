@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
+import java.util.regex.Matcher;
 
 /**
  * Some handy servlet sniffing utility methods.

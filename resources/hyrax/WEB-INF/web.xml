@@ -202,6 +202,14 @@
     </servlet>
 
 
+    <servlet>
+        <servlet-name>echo</servlet-name>
+        <servlet-class>opendap.experiments.EchoServlet </servlet-class>
+        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
 
 
 
@@ -228,6 +236,11 @@
     </filter-mapping>
 
 
+
+    <servlet-mapping>
+        <servlet-name>echo</servlet-name>
+        <url-pattern>/echo/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>hyrax</servlet-name>
