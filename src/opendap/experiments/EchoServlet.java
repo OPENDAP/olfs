@@ -34,184 +34,126 @@ import java.util.Enumeration;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class EchoServlet extends HttpServlet {
 
+    private Logger log;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+    @Override
+    public void init() throws ServletException {
+        super.init();
 
-
-
-
-
-
-
-
-
-        getPlainText(request,response);
-
+        log = LoggerFactory.getLogger(this.getClass());
     }
 
-    public void getPlainText(HttpServletRequest request, HttpServletResponse response)
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
         response.setContentType("text/plain");
         ServletOutputStream out = response.getOutputStream();
+        String echoText = getPlainText(request);
 
-
-        out.println("---------------------------------------------------------------------");
-        out.println("---------------------------------------------------------------------");
-
-        out.println("");
-        out.println("HTTP Request Headers");
-
-
-        out.println("");
-        out.println("    Header Name            Value");
-        Enumeration<String> headers = request.getHeaderNames();
-        while(headers.hasMoreElements()){
-            String headerName = headers.nextElement();
-            String headerValue = request.getHeader(headerName);
-                out.println("    "+headerName +"            "+headerValue);
-        }
-        out.println();
-        out.println();
-
-        String queryString = request.getQueryString();
-        out.println("---------------------------------------------------------------------");
-        out.println("Query String and KVP Evaluation");
-        out.println();
-        out.println("  HttpServletRequest.getQueryString():     "+ queryString);
-        out.println();
-        out.println("  Decoded:                                 "+java.net.URLDecoder.decode(queryString==null?"null":queryString,"UTF-8"));
-        out.println();
-
-
-        out.println("---------------------------------------------------------------------");
-        out.println("HttpServletRequest.getParameter()");
-        out.println("    keyName            value ");
-        Enumeration<String> paramNames = request.getParameterNames();
-
-        while(paramNames.hasMoreElements()){
-            String paramName = paramNames.nextElement();
-            String paramValue = request.getParameter(paramName);
-                out.println("    "+paramName+"            "+paramValue);
-        }
-        out.println();
-        out.println("---------------------------------------------------------------------");
-        out.println("HttpServletRequest.getParameterMap()");
-        out.println();
-
-
-        Map paramMap = request.getParameterMap();
-
-        out.println("ParameterMap is an instance of: "+paramMap.getClass().getName());
-        out.println("ParameterMap contains "+paramMap.size()+" element(s).");
-        out.println();
-        out.println("    keyName            value(s) ");
-
-
-        for(Object o:paramMap.keySet()){
-            String key = (String) o;
-
-            Object oo =   paramMap.get(key);
-
-            String[] values = (String[]) oo;
-            out.print("    "+key+"            ");
-            boolean first=true;
-            for(String value:values){
-                if(!first)
-                    out.print(", ");
-                out.print("'"+value+"'");
-                first = false;
-            }
-            out.println();
-
-        }
-        out.println();
+        log.info(echoText);
+        out.print(echoText);
 
     }
 
-
-
-
-    public void getHtml(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    public void doHead(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
-        response.setContentType("text/html");
+        response.setContentType("text/plain");
+        String echoText = getPlainText(request);
+        log.info(echoText);
+
+        //System.out.print(echoText);
+
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+        response.setContentType("text/plain");
         ServletOutputStream out = response.getOutputStream();
+        String echoText = getPlainText(request);
+
+        log.info(echoText);
+        out.print(echoText);
+
+    }
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+
+        response.setContentType("text/plain");
+        ServletOutputStream out = response.getOutputStream();
+        String echoText = getPlainText(request);
+
+        log.info(echoText);
+        out.print(echoText);
+
+    }
+
+    public String  getPlainText(HttpServletRequest request)
+            throws IOException, ServletException {
 
 
-        out.println("<html>");
-        out.println("<head><title>Echo page</title></head>");
-        out.println("<body>");
+        StringBuilder out = new StringBuilder();
 
-        out.println("<hr />");
-        out.println("<h3>HTTP Request Headers</h3>");
+        out.append("\n\n---------------------------------------------------------------------\n");
+        out.append("HTTP Method: ").append(request.getMethod()).append("\n");
+        out.append("\n");
+        out.append("HTTP Request Headers");
 
 
-        out.println("<table>");
-        out.println("<th>Header Name</th><th>Value</th>");
+
+        out.append("\n");
         Enumeration<String> headers = request.getHeaderNames();
         while(headers.hasMoreElements()){
             String headerName = headers.nextElement();
             String headerValue = request.getHeader(headerName);
-            out.println("<tr>");
-                out.println("<td style=\"text-align: right;\"><code><strong>"+headerName+"</strong></code>&nbsp;&nbsp;</td>");
-                out.println("<td><code> "+headerValue+"</code></td>");
-            out.println("</tr>");
+            out.append("    ").append(headerName).append("            ").append(headerValue).append("\n");
         }
-        out.println("</table>");
+        out.append("\n");
+        out.append("\n");
 
-        out.println("<hr />");
-
-        out.println("<h3>Query String and KVP Evaluation</h3>");
-
-        out.println("<table>");
-
-        out.println("<tr>");
-            out.println("<td style=\"text-align: left;\"><code><strong>Raw &nbsp;</strong></code></td>");
-            out.println("<td><pre>"+StringEscapeUtils.escapeHtml(request.getQueryString())+"</pre></td>");
-        out.println("</tr>");
-
-        out.println("<tr>");
-            out.println("<td style=\"text-align: left;\"><code><strong>Decoded &nbsp;</strong></code></td>");
-            out.println("<td><pre>"+StringEscapeUtils.escapeHtml(java.net.URLDecoder.decode(request.getQueryString()+"","UTF-8"))+"</pre></td>");
-        out.println("</tr>");
-
-        out.println("</table>");
+        String queryString = request.getQueryString();
+        out.append("\n");
+        out.append("Query String and KVP Evaluation\n");
+        out.append("\n");
+        out.append("  HttpServletRequest.getQueryString():     ").append(queryString).append("\n");
+        out.append("\n");
+        out.append("  Decoded:                                 ").append(java.net.URLDecoder.decode(queryString == null ? "null" : queryString, "UTF-8")).append("\n");
+        out.append("\n");
 
 
-        out.println("<br />");
-        out.println("<hr style=\"border:dashed #00CCFF; border-width:1px 0 0 0; height:0;line-height:0px;font-size:0;margin:0;padding:0;\">");
-        out.println("<br />");
 
-        out.println("<table>");
-        out.println("<th style=\"text-align: left;\">keyName</th><th style=\"text-align: left;\">value</th>");
+        out.append("  HttpServletRequest.getParameter()\n");
+        out.append("        keyName            value \n");
         Enumeration<String> paramNames = request.getParameterNames();
 
         while(paramNames.hasMoreElements()){
             String paramName = paramNames.nextElement();
             String paramValue = request.getParameter(paramName);
-            out.println("<tr>");
-                out.println("<td style=\"text-align: left;\"><code><strong>"+paramName+"</strong></code>&nbsp;&nbsp;</td>");
-                out.println("<td><pre>"+StringEscapeUtils.escapeHtml(paramValue)+"</pre></td>");
-            out.println("</tr>");
+            out.append("        ").append(paramName).append("            ").append(paramValue).append("\n");
         }
-        out.println("</table>");
-
-
-        out.println("<hr />");
+        out.append("\n");
+        out.append("  HttpServletRequest.getParameterMap()\n");
+        out.append("\n");
 
 
         Map paramMap = request.getParameterMap();
 
-        out.println("<p>ParameterMap is an instance of: "+paramMap.getClass().getName()+"</p>");
-        out.println("<p>ParameterMap contains "+paramMap.size()+" elements.</p>");
-        out.println("<table>");
-        out.println("<th style=\"text-align: left;\">keyName</th><th style=\"text-align: left;\">value</th>");
+        out.append("    ParameterMap is an instance of: ").append(paramMap.getClass().getName()).append("\n");
+        out.append("    ParameterMap contains ").append(paramMap.size()).append(" element(s).\n");
+        out.append("\n");
+        out.append("        keyName            value(s) \n");
 
 
         for(Object o:paramMap.keySet()){
@@ -220,29 +162,23 @@ public class EchoServlet extends HttpServlet {
             Object oo =   paramMap.get(key);
 
             String[] values = (String[]) oo;
-            out.println("<tr>");
-            out.println("<td style=\"text-align: left;\"><code><strong>"+key+"</strong></code>&nbsp;&nbsp;</td>");
-            out.println("<td><pre>");
+            out.append("        ").append(key).append("            ");
             boolean first=true;
             for(String value:values){
                 if(!first)
-                    out.print(", ");
-                out.print(StringEscapeUtils.escapeHtml(value));
+                    out.append(", ");
+                out.append("'").append(value).append("'");
                 first = false;
             }
-            out.println("\n</pre></td>");
+            out.append("\n");
 
-            out.println("</tr>");
         }
-        out.println("</table>");
+        out.append("\n");
 
-        out.println("<hr />");
 
-        out.println("</body>");
-        out.println("</html>");
+        return out.toString();
+
     }
-
-
 
 
 
