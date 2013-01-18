@@ -23,88 +23,97 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-package opendap.bes.dapResponders;
+
+package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
-import opendap.bes.BesDapResponder;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
- * Date: 1/31/11
- * Time: 4:42 PM
+ * Date: 1/16/13
+ * Time: 4:44 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GmlJp2 extends BesDapResponder {
+public class GmlJpeg2000DR extends Dap4Responder {
+
+
     private Logger log;
+    private static String defaultRequestSuffix = ".jp2";
 
 
 
-
-    private static String defaultRequestSuffixRegex = "\\.jp2";
-
-    public GmlJp2(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+    public GmlJpeg2000DR(String sysPath, BesApi besApi) {
+        this(sysPath, null, defaultRequestSuffix, besApi);
     }
 
-    public GmlJp2(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+    public GmlJpeg2000DR(String sysPath, String pathPrefix, BesApi besApi) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-
-
-    public GmlJp2(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
+    public GmlJpeg2000DR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
+        setServiceRoleId("http://services.opendap.org/dap4/data/gmljp2");
+        setServiceTitle("GML-JPEG2000 Data Response");
+        setServiceDescription("GML-JPEG2000 representation of the DAP4 Data Response object.");
+        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
+
+        setNormativeMediaType(new ServiceMediaType("image","jp2;application=gmljp2", defaultRequestSuffix));
+
+        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+
     }
 
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
 
 
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String requestedResourceId = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+        String resourceID = getResourceId(requestedResourceId, false);
+
 
         BesApi besApi = getBesApi();
 
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-
-        log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + dataSource +
-                    "    CE: '" + constraintExpression + "'");
-
-
-        String downloadFileName = Scrub.fileName(relativeUrl.substring(relativeUrl.lastIndexOf("/") + 1, relativeUrl.length()));
-
-
-
+        String downloadFileName = requestedResourceId.substring(requestedResourceId.lastIndexOf("/") + 1,
+                                  requestedResourceId.length());
+        downloadFileName = Scrub.fileName(downloadFileName);
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
-
-        response.setContentType("image/jp2;application=gmljp2");
         response.setHeader("Content-Disposition", contentDisposition);
 
-        Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "GML_JPEG2000 Image");
+        Version.setOpendapMimeHeaders(request, response, besApi);
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
+        response.setContentType(getNormativeMediaType().getMimeType());
+
+        Version.setOpendapMimeHeaders(request, response, besApi);
+
+        response.setHeader("Content-Description", "dap4:Dataset encoded as a GML-JPEG2000 image");
 
 
+
+        String xdap_accept = "3.2";
         User user = new User(request);
 
 
@@ -113,25 +122,28 @@ public class GmlJp2 extends BesDapResponder {
 
 
         boolean result = besApi.writeGmlJpeg2000DataResponse(
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         user.getMaxResponseSize(),
                         os,
                         erros);
-
-
         if(!result){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
+
         }
 
 
 
         os.flush();
-        log.info("Sent GML_JPEG2000 Data response.");
+        log.debug("Sent {}",getServiceTitle());
+
 
 
     }
+
+
+
 }

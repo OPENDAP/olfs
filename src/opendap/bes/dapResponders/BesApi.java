@@ -1160,10 +1160,6 @@ public class BesApi {
 
     }
 
-    public Document getGeoTiffOutRequest(String dataSource, String ce, String xdap_accept, int maxResponseSize)
-            throws BadConfigurationException {
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize, null,null,GEOTIFF,DAP2_ERRORS);
-    }
 
 
     /**

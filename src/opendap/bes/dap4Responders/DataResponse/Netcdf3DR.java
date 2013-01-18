@@ -101,7 +101,7 @@ public class Netcdf3DR extends Dap4Responder{
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
-        response.setHeader("Content-Description", "dap4:Dataset");
+        response.setHeader("Content-Description", "dap4:Dataset encoded as NetCDF-3");
         // Commented because of a bug in the OPeNDAP C++ stuff...
         //response.setHeader("Content-Encoding", "plain");
 

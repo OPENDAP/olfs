@@ -78,6 +78,8 @@ public class NormativeDR extends Dap4Responder {
         addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new XmlDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new Netcdf3DR(sysPath, pathPrefix, besApi));
+        addAltRepResponder(new GeoTiffDR(sysPath, pathPrefix, besApi));
+        addAltRepResponder(new GmlJpeg2000DR(sysPath, pathPrefix, besApi));
 
 
         log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
