@@ -41,6 +41,7 @@ import java.io.OutputStream;
 
 
 
+@Deprecated
 public class Dataset extends BesDapResponder {
 
 
@@ -84,7 +85,7 @@ public class Dataset extends BesDapResponder {
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 

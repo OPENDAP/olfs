@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * Time: 8:14 AM
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class IsoRubric extends BesDapResponder {
     private Logger log;
 
@@ -58,7 +59,7 @@ public class IsoRubric extends BesDapResponder {
         // This first bit just collects a bunch of information about the request
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSourceId = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(),false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 

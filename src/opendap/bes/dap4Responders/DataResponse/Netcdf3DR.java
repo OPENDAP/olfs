@@ -25,7 +25,6 @@
  */
 package opendap.bes.dap4Responders.DataResponse;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.ServiceMediaType;
@@ -39,7 +38,6 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
@@ -75,9 +73,10 @@ public class Netcdf3DR extends Dap4Responder{
         setServiceDescription("NetCDF-3 representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
-        setNormativeMediaType(new ServiceMediaType("application","x-netcdf", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("application","x-netcdf", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

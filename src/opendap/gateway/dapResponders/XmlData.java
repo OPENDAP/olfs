@@ -46,6 +46,7 @@ import java.io.OutputStream;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class XmlData extends BesDapResponder {
     private Logger log;
 
@@ -74,7 +75,7 @@ public class XmlData extends BesDapResponder {
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 

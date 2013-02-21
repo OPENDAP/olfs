@@ -25,16 +25,8 @@
 package opendap.bes;
 
 import opendap.coreServlet.DispatchHandler;
-import opendap.namespaces.DAP;
-import org.apache.catalina.connector.Request;
 import org.jdom.Document;
 import org.jdom.Element;
-
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.List;
-
-import opendap.coreServlet.DispatchHandler;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;

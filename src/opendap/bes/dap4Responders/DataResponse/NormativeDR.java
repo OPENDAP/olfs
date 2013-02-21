@@ -73,7 +73,7 @@ public class NormativeDR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
 
-        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.data", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.data", getRequestSuffix()));
 
         addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new XmlDR(sysPath, pathPrefix, besApi));
@@ -82,7 +82,8 @@ public class NormativeDR extends Dap4Responder {
         addAltRepResponder(new GmlJpeg2000DR(sysPath, pathPrefix, besApi));
 
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 
@@ -94,11 +95,11 @@ public class NormativeDR extends Dap4Responder {
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
-        String resourceID = getResourceId(requestedResourceId, false);
+        String resourceID = getResourceId(relativeUrl, false);
 
 
         BesApi besApi = getBesApi();

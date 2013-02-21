@@ -23,13 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,21 +42,20 @@ import java.io.OutputStream;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class XmlData extends BesDapResponder {
+public class XmlData extends Dap4Responder {
     private Logger log;
 
 
 
-    private static String _preferredRequestSuffix = ".xdap";
+    private static String _defaultRequestSuffix = ".xdap";
 
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
 
     public XmlData(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public XmlData(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -68,11 +65,14 @@ public class XmlData extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/xml-data");
-        setServiceMediaType("text/xml");
         setServiceTitle("DAP2 XML Data Response");
         setServiceDescription("An XML document containing both the DAP2 dataset's structural metadata along with data values.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_XML_Data_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
 
     }
 
@@ -86,13 +86,13 @@ public class XmlData extends BesDapResponder {
     }
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl, false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
@@ -100,7 +100,7 @@ public class XmlData extends BesDapResponder {
 
 
 
-        log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + dataSource +
+        log.debug("respondToHttpGetRequest(): Sending XML Data response For: " + resourceID +
                     "    CE: '" + constraintExpression + "'");
 
 
@@ -122,7 +122,7 @@ public class XmlData extends BesDapResponder {
 
 
         boolean result = besApi.writeXmlDataResponse(
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         user.getMaxResponseSize(),

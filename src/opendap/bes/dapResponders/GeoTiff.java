@@ -25,19 +25,17 @@
  */
 package opendap.bes.dapResponders;
 
-import opendap.bes.Version;
 import opendap.bes.BesDapResponder;
+import opendap.bes.Version;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,6 +44,8 @@ import java.io.*;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
+
+@Deprecated
 public class GeoTiff extends BesDapResponder {
     private Logger log;
 
@@ -77,7 +77,7 @@ public class GeoTiff extends BesDapResponder {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 

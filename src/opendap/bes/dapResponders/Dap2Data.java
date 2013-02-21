@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
@@ -41,23 +42,22 @@ import java.io.OutputStream;
 
 
 
-public class Dap2Data extends BesDapResponder {
+public class Dap2Data extends Dap4Responder {
 
 
 
     private Logger log;
 
 
-    private static String _preferredRequestSuffix = ".dods";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".dods";
 
 
     public Dap2Data(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public Dap2Data(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -66,11 +66,16 @@ public class Dap2Data extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/data");
-        setServiceMediaType("application/octet-stream");
         setServiceTitle("DAP2 Data");
         setServiceDescription("DAP2 Data Object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+
+        setNormativeMediaType(new ServiceMediaType("application","octet-stream", getRequestSuffix()));
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
     }
 
 
@@ -83,19 +88,25 @@ public class Dap2Data extends BesDapResponder {
         return true;
     }
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+    @Override
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+
+        BesApi besApi = getBesApi();
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         User user = new User(request);
         int maxRS = user.getMaxResponseSize();
 
-        BesApi besApi = getBesApi();
 
-        log.debug("sendDAP2Data() For: " + dataSource+
+        log.debug("sendDAP2Data() For: " + resourceID+
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType(getServiceMediaType());
@@ -119,7 +130,7 @@ public class Dap2Data extends BesDapResponder {
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DAP2,
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         maxRS,
@@ -128,7 +139,7 @@ public class Dap2Data extends BesDapResponder {
                         null,
                         BesApi.DAP2_ERRORS);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

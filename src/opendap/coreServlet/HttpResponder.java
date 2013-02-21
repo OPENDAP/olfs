@@ -60,20 +60,27 @@ public abstract class HttpResponder {
         this.pathPrefix = pathPrefix;
     }
 
-    public String getRequestMatchRegexString(){ return _requestMatchPattern.toString();}
-    public void setRequestMatchRegex(String regexString){ _requestMatchPattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);}
+    public String getRequestMatchRegexString(){
+        return _requestMatchPattern.toString();
+    }
+
+    public void setRequestMatchRegex(String regexString){
+        _requestMatchPattern = Pattern.compile(regexString, Pattern.CASE_INSENSITIVE);
+    }
 
 
-    protected Pattern getRequestMatchPattern(){
+    public Pattern getRequestSuffixMatchPattern(){
         return _requestMatchPattern;
     }
 
 
     public boolean matches(String s){
-       Matcher m = _requestMatchPattern.matcher(s);
+       Matcher m = getRequestSuffixMatchPattern().matcher(s);
        return m.matches();
 
     }
+
+
 
 
     public void setPathPrefix(String prefix){ pathPrefix = prefix ;}

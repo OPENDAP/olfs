@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: ndp
@@ -51,9 +53,21 @@ public class VersionDispatchHandler implements DispatchHandler {
 
     private BesApi _besApi;
 
+
+    // Matches the top level server version service name and  the dataset level version response too.
+    // For now we're not using it since he havea DAP4 data responder for that.
+    // private static String _versionMatchRegexString = "(/version(/)?$)|(\\.ver$)";
+
+
+    // Matches the top level server version service name
+    private static String _versionMatchRegexString = "/version(/)?$";
+
+    private Pattern _requestMatchPattern ;
+
     public VersionDispatchHandler() {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
+        _requestMatchPattern = Pattern.compile(_versionMatchRegexString, Pattern.CASE_INSENSITIVE);
 
         initialized = false;
 
@@ -101,26 +115,24 @@ public class VersionDispatchHandler implements DispatchHandler {
                                    HttpServletResponse response,
                                    boolean sendResponse)
             throws Exception {
+
+
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
-        String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         boolean versionRequest = false;
 
-        if (dataSource != null) {
-            if (        // Version Response?
-                    dataSource.equalsIgnoreCase("/version")  ||
-                    dataSource.equalsIgnoreCase("/version/") ||
-                    (requestSuffix!=null &&
-                    requestSuffix.equalsIgnoreCase("ver"))
-                    ) {
+        if (relativeUrl != null) {
+
+
+
+            Matcher m = _requestMatchPattern.matcher(relativeUrl);
+            if (m.matches()) {
                 versionRequest = true;
                 if (sendResponse) {
                     sendVersion(request, response);
                     log.debug("Sent Version Response");
                 }
             }
-
 
         }
         return versionRequest;

@@ -93,23 +93,59 @@ public class NewPPTClient {
     }
 
 
-    public String showConnectionProperties() throws SocketException {
+    public String showConnectionProperties() {
 
-        String msg = "\nshowConnectionProperties():\n";
-        msg += "    Socket isBound():          " + _mySock.isBound();
-        msg += "    Socket isClosed():         " + _mySock.isClosed();
-        msg += "    Socket isConnected():      " + _mySock.isConnected();
-        msg += "    Socket isInputShutdown():  " + _mySock.isInputShutdown();
-        msg += "    Socket isOutputShutdown(): " + _mySock.isOutputShutdown();
-        msg += "    Socket getKeepAlive():     " + _mySock.getKeepAlive();
-        msg += "    Socket getOOBInline():     " + _mySock.getOOBInline();
-        msg += "    Socket getReuseAddress():  " + _mySock.getReuseAddress();
-        msg += "    Socket getSoLinger():      " + _mySock.getSoLinger();
-        msg += "    Socket getSoTimeout():     " + _mySock.getSoTimeout();
+        StringBuilder msg = new StringBuilder();
+
+        msg.append("\nshowConnectionProperties():\n");
+        msg.append("    Socket isBound():          ").append(_mySock.isBound()).append("\n");
+        msg.append("    Socket isClosed():         ").append(_mySock.isClosed()).append("\n");
+        msg.append("    Socket isConnected():      ").append(_mySock.isConnected()).append("\n");
+        msg.append("    Socket isInputShutdown():  ").append(_mySock.isInputShutdown()).append("\n");
+        msg.append("    Socket isOutputShutdown(): ").append(_mySock.isOutputShutdown()).append("\n");
+
+        try {
+            msg.append("    Socket getKeepAlive():     ").append(_mySock.getKeepAlive()).append("\n");
+        } catch (SocketException e) {
+            msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
+        }
+
+        try {
+            msg.append("    Socket getOOBInline():     ").append(_mySock.getOOBInline()).append("\n");
+        } catch (SocketException e) {
+            msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
+        }
+
+        try {
+            msg.append("    Socket getReuseAddress():  ").append(_mySock.getReuseAddress()).append("\n");
+        } catch (SocketException e) {
+            msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
+        }
+
+        try {
+            msg.append("    Socket getSoLinger():      ").append(_mySock.getSoLinger()).append("\n");
+        } catch (SocketException e) {
+            msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
+        }
+
+        try {
+            msg.append("    Socket getSoTimeout():     ").append(_mySock.getSoTimeout()).append("\n");
+        } catch (SocketException e) {
+            msg.append("Caught SocketException! Msg: ").append(e.getMessage()).append("\n");
+        }
 
 
-        return msg;
 
+        return msg.toString();
+
+    }
+
+    public boolean isClosed(){
+        return _mySock.isClosed();
+    }
+
+    public boolean isConnected(){
+        return _mySock.isConnected();
     }
 
 

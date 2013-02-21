@@ -24,10 +24,9 @@
 package opendap.bes;
 
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Scrub;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
-import opendap.coreServlet.Scrub;
-import org.slf4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -46,6 +45,7 @@ import java.util.Iterator;
  * Date: Sep 5, 2008
  * Time: 1:07:46 PM
  */
+@Deprecated
 public class BesXmlAPI {
 
 

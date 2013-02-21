@@ -42,8 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -77,9 +75,10 @@ public class RdfDMR extends Dap4Responder {
         setServiceDescription("RDF representation of the Dataset Metadata Response document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("application","rdf+xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("application","rdf+xml", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

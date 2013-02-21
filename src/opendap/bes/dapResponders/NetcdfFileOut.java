@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
@@ -46,20 +47,19 @@ import java.util.regex.Pattern;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class NetcdfFileOut extends BesDapResponder {
+public class NetcdfFileOut extends Dap4Responder {
 
     private Logger log;
 
 
-    private static String _preferredRequestSuffix = ".nc";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".nc";
 
     public NetcdfFileOut(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public NetcdfFileOut(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -67,11 +67,14 @@ public class NetcdfFileOut extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         setServiceRoleId("http://services.opendap.org/dap2/netcdf-3");
-        setServiceMediaType("application/x-netcdf");
         setServiceTitle("DAP2 NetCDF-3 File");
         setServiceDescription("DAP2 data returned in a NetCDF-3 file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_NetCDF_File-out_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("application","x-netcdf", getRequestSuffix()));
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
     }
 
     public boolean needsBesToMatch(){
@@ -83,18 +86,18 @@ public class NetcdfFileOut extends BesDapResponder {
     }
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl, false);
         String fullSourceName = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         BesApi besApi = getBesApi();
 
 
-        log.debug("respondToHttpGetRequest(): Sending netCDF File Out response for dataset: " + dataSource + "?" +
+        log.debug("respondToHttpGetRequest(): Sending netCDF File Out response for dataset: " + resourceID + "?" +
                     constraintExpression);
 
         String downloadFileName = Scrub.fileName(fullSourceName.substring(fullSourceName.lastIndexOf("/")+1,fullSourceName.length()));
@@ -127,7 +130,7 @@ public class NetcdfFileOut extends BesDapResponder {
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DAP2,
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         user.getMaxResponseSize(),
@@ -141,7 +144,7 @@ public class NetcdfFileOut extends BesDapResponder {
 
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

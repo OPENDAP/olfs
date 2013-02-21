@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class BESDataSource implements DataSourceInfo {
 
-    private String BESDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String BESDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
     private boolean exists;
     private boolean accessible;
@@ -74,7 +74,7 @@ public class BESDataSource implements DataSourceInfo {
         requestedDataSource = dataSourceName;
         exists              = false;
         accessible          = false;
-        node = false;
+        node                = false;
         data                = false;
         name                = null;
         size                = -1;
@@ -97,12 +97,12 @@ public class BESDataSource implements DataSourceInfo {
 
 
 
-        if(besApi.getInfo(dataSourceName,info)){
+        if(besApi.getCatalog(dataSourceName,info)){
 
             exists      = true;
             accessible  = true;
            
-            Element dataset = info.getRootElement().getChild("showInfo",BES_NS).getChild("dataset",BES_NS);
+            Element dataset = info.getRootElement().getChild("showCatalog",BES_NS).getChild("dataset",BES_NS);
 
             name = dataset.getAttributeValue("name");
             String s = dataset.getAttributeValue("size");

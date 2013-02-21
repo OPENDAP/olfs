@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
@@ -37,23 +38,23 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 
-public class DataDDX extends BesDapResponder {
+@Deprecated
+public class DataDDX extends Dap4Responder {
 
 
 
     private Logger log;
 
 
-    private static String _preferredRequestSuffix = ".dap";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".dap";
 
 
     public DataDDX(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public DataDDX(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -63,11 +64,14 @@ public class DataDDX extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap4/data");
-        setServiceMediaType("Multipart/Related");
         setServiceTitle("DAP4 Data");
         setServiceDescription("DAP4 Data object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("Multipart","Related", _defaultRequestSuffix));
+
+        log.debug("defaultRequestSuffix: '{}'", _defaultRequestSuffix);
+
     }
 
     public boolean needsBesToMatch(){
@@ -78,13 +82,13 @@ public class DataDDX extends BesDapResponder {
         return true;
     }
 
-
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String xmlBase = getXmlBase(request);
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl, false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         BesApi besApi = getBesApi();
@@ -94,7 +98,7 @@ public class DataDDX extends BesDapResponder {
         MimeBoundary mb = new MimeBoundary();
         String startID = mb.newContentID();
 
-        log.debug("sendDataDDX() for dataset: " + dataSource+
+        log.debug("sendDataDDX() for dataset: " + resourceID+
                 "    CE: '" + constraintExpression + "'");
 
 
@@ -129,7 +133,7 @@ public class DataDDX extends BesDapResponder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = besApi.getDataDDXRequest(dataSource,
+        Document reqDoc = besApi.getDataDDXRequest(resourceID,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         user.getMaxResponseSize(),
@@ -137,7 +141,7 @@ public class DataDDX extends BesDapResponder {
                                                         startID,
                                                         mb.getBoundary());
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

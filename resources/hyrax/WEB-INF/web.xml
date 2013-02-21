@@ -259,7 +259,7 @@
 
     <servlet-mapping>
         <servlet-name>gateway</servlet-name>
-        <url-pattern>/gateway/*</url-pattern>
+        <url-pattern>/servlet_gateway/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

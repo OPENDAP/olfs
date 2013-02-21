@@ -24,8 +24,9 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import org.jdom.Document;
@@ -39,20 +40,19 @@ import java.io.OutputStream;
 
 
 
-public class Ascii extends BesDapResponder {
+public class Ascii extends Dap4Responder {
 
     private Logger log;
 
-    private static String _preferredRequestSuffix = ".asc";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix+"(ii)?";
+    private static String _defaultRequestSuffix = ".asc(ii)?";
 
 
     public Ascii(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public Ascii(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
     public Ascii(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
@@ -60,11 +60,13 @@ public class Ascii extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/ascii");
-        setServiceMediaType("text/plain");
+        setNormativeMediaType(new ServiceMediaType("text", "plain", getRequestSuffix()));
         setServiceTitle("DAP2 ASCII Data");
         setServiceDescription("The DAP2 Data response in ASCII form.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ASCII_Data_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
     }
 
 
@@ -76,18 +78,27 @@ public class Ascii extends BesDapResponder {
         return true;
     }
 
+    @Override
+    public boolean matches(String relativeUrl, boolean checkWithBes){
+        return super.matches(relativeUrl,checkWithBes);
+    }
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+
+        String resourceID = getResourceId(relativeUrl, false);
+
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String context = request.getContextPath();
 
         BesApi besApi = getBesApi();
 
 
-        log.debug("sendASCII() for dataset: " + dataSource);
+        log.debug("sendASCII() for dataset: " + resourceID);
 
         response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
@@ -112,7 +123,7 @@ public class Ascii extends BesDapResponder {
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.ASCII,
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         maxRS,
@@ -121,7 +132,7 @@ public class Ascii extends BesDapResponder {
                         null,
                         BesApi.XML_ERRORS);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);

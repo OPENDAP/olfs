@@ -28,7 +28,6 @@ package opendap.bes.dap4Responders.DatasetServices;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.bes.dapResponders.BesApi;
-import opendap.dap.DapResponder;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
@@ -39,7 +38,6 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -77,9 +75,12 @@ public class XmlDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
         setPreferredServiceSuffix(defaultRequestSuffix);
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
 
         normDSR = dsr;
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 
@@ -87,14 +88,14 @@ public class XmlDSR extends Dap4Responder {
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String requestedResource = request.getRequestURL().toString();
-        String resourceId = getResourceId(requestedResource, false);
+        String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
 
         String context = request.getContextPath()+"/";
 
         Document serviceDescription = new Document();
 
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceId);
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
 
         HashMap<String,String> piMap = new HashMap<String,String>( 2 );
         piMap.put( "type", "text/xsl" );
@@ -105,7 +106,7 @@ public class XmlDSR extends Dap4Responder {
 
         Element datasetServices;
 
-        datasetServices = normDSR.getDatasetServicesElement(resourceId);
+        datasetServices = normDSR.getDatasetServicesElement(baseUrl);
 
         serviceDescription.setRootElement(datasetServices);
 

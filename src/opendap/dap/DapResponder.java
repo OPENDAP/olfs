@@ -25,7 +25,6 @@ package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
 import opendap.namespaces.DAP;
-import opendap.namespaces.XLINK;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public abstract class DapResponder extends HttpResponder  {
 
     private static String matchAnythingRegex = ".*";
 
-    protected String requestSuffixRegex;
+    protected String requestSuffix;
 
     private Logger log;
 
@@ -57,25 +56,36 @@ public abstract class DapResponder extends HttpResponder  {
         this(sysPath,null,requestSuffix);
     }
 
-    public DapResponder(String sysPath, String pathPrefix, String reqSuffixRegex) {
+    public DapResponder(String sysPath, String pathPrefix, String requestSuffix) {
         super(sysPath, pathPrefix, matchAnythingRegex);
 
         log = LoggerFactory.getLogger(this.getClass());
 
-        setRequestSuffixRegex(reqSuffixRegex);
+        setRequestSuffix(requestSuffix);
     }
 
 
-    public void setRequestSuffixRegex(String reqSuffixRegex){
+    public void setRequestSuffix(String reqSuffix){
 
-        requestSuffixRegex = reqSuffixRegex;
+        requestSuffix = reqSuffix;
 
-        String requestMatchRegex;
+        String requestSuffixRegex = reqSuffix;
 
-        requestMatchRegex = matchAnythingRegex + requestSuffixRegex;
+        if(!reqSuffix.endsWith("?"))
+            requestSuffixRegex += "?";
+
+        if(reqSuffix.startsWith("."))
+            requestSuffixRegex = "\\"+reqSuffix;
+
+        String requestMatchRegex = matchAnythingRegex + requestSuffixRegex;
 
         setRequestMatchRegex(requestMatchRegex);
 
+    }
+
+
+    public String getRequestSuffix(){
+        return requestSuffix;
     }
 
 
@@ -104,7 +114,7 @@ public abstract class DapResponder extends HttpResponder  {
 
     public String removeRequestSuffixFromString(String requestString){
         String trimmedRequestString = requestString;
-        String regex = requestSuffixRegex;
+        String regex = requestSuffix;
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(requestString);

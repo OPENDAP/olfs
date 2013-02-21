@@ -98,6 +98,19 @@ public class OPeNDAPClient {
         return _isRunning;
     }
 
+    public boolean isClosed() {
+        return _client.isClosed();
+    }
+
+    public boolean isConnected() {
+        return _client.isConnected();
+    }
+
+    public String showConnectionProperties()  {
+        return _client.showConnectionProperties();
+    }
+
+
     /**
      * Connect the OpenDAP client to the OpenDAP server.
      * <p/>

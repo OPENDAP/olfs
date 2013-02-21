@@ -25,6 +25,7 @@ package opendap.threddsHandler;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
+import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
@@ -61,6 +62,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private Logger log;
 
     private Element config;
+    private BesApi _besApi;
     private boolean initialized;
     private HttpServlet dispatchServlet;
     private String _prefix;
@@ -607,6 +609,11 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         log.debug("Configuration file processing complete.");
 
+        /* USe the generic one for now and if later we want to reuse this code we can pass in another on through the
+        config */
+        _besApi = new BesApi();
+
+
 
         if (ingestTransformFile == null) {
             ingestTransformFile = ServletUtil.getSystemPath(servlet, "/xsl/threddsCatalogIngest.xsl");
@@ -721,7 +728,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
             throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         //String requestSuffixRegex = ReqInfo.getRequestSuffix(request);
 
         boolean threddsRequest = false;

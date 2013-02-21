@@ -1,8 +1,9 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -20,35 +21,38 @@ import javax.servlet.http.HttpServletResponse;
  * Time: 8:14 AM
  * To change this template use File | Settings | File Templates.
  */
-public class IsoMetadata extends BesDapResponder {
+@Deprecated
+public class IsoMetadata extends Dap4Responder {
 
     private Logger log;
 
-    private static String _preferredRequestSuffix = ".iso";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".iso";
 
 
     public IsoMetadata(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public IsoMetadata(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
     public IsoMetadata(String sysPath, String pathPrefix,  String requestSuffixRegex, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         setServiceRoleId("http://services.opendap.org/dap2/iso-19115-metadata");
-        setServiceMediaType("text/xml");
         setServiceTitle("ISO-19115");
         setServiceDescription("ISO 19115 Metadata Representation of the DAP2 Dataset (DDX) response.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ISO_19115_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("text","xml", _defaultRequestSuffix));
+        log.debug("defaultRequestSuffix: '{}'", _defaultRequestSuffix);
+
     }
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         BesApi besApi = getBesApi();
 
@@ -56,7 +60,8 @@ public class IsoMetadata extends BesDapResponder {
         // This first bit just collects a bunch of information about the request
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl,false);
+
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
@@ -68,7 +73,7 @@ public class IsoMetadata extends BesDapResponder {
         xmlBase = xmlBase.substring(0, suffix_start);
 
 
-        log.debug("Sending ISO Response() for dataset: " + dataSourceId);
+        log.debug("Sending ISO Response() for dataset: " + resourceID);
 
 
         // Set up up the response header
@@ -91,7 +96,7 @@ public class IsoMetadata extends BesDapResponder {
 
 
         if(!besApi.getDDXDocument(
-                dataSourceId,
+                resourceID,
                 constraintExpression,
                 xdap_accept,
                 xmlBase,
@@ -103,7 +108,7 @@ public class IsoMetadata extends BesDapResponder {
         }
         else {
 
-            ddx.getRootElement().setAttribute("dataset_id",dataSourceId);
+            ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
             String currentDir = System.getProperty("user.dir");
             log.debug("Cached working directory: "+currentDir);

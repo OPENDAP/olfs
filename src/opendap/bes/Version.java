@@ -26,19 +26,13 @@ package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.Text;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import opendap.coreServlet.ReqInfo;
-
-import java.util.*;
-import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Contains the Version and UUID information for Hyrax Server.
@@ -124,10 +118,8 @@ public class Version  {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
 
-
-        BesGroup besGroup = BESManager.getBesGroup(dataSource);
+        BesGroup besGroup = BESManager.getBesGroup(relativeUrl);
 
         TreeSet<String> commonDapVersions = besGroup.getCommonDapVersions();
 
@@ -146,11 +138,10 @@ public class Version  {
             throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String datasource = ReqInfo.getBesDataSourceID(relativeUrl);
 
 
 
-        BesGroup besGroup = BESManager.getBesGroup(datasource);
+        BesGroup besGroup = BESManager.getBesGroup(relativeUrl);
 
         TreeSet<String> componentVersions = besGroup.getGroupComponentVersions();
 
@@ -191,10 +182,9 @@ public class Version  {
             clientDapVer = request.getHeader("X-DAP");
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String datasource =  ReqInfo.getBesDataSourceID(relativeUrl);
 
 
-        BesGroup besGroup = BESManager.getBesGroup(datasource);
+        BesGroup besGroup = BESManager.getBesGroup(relativeUrl);
 
         TreeSet<String> commonDapVersions = besGroup.getCommonDapVersions();
 

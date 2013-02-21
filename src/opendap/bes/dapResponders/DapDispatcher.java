@@ -28,11 +28,13 @@ package opendap.bes.dapResponders;
 
 import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
+import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.NormativeDR;
-import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
+import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dap4Responders.Iso19115.IsoDMR;
+import opendap.bes.dap4Responders.Iso19115.IsoRubricDMR;
 import opendap.bes.dap4Responders.Version;
 import opendap.coreServlet.*;
 import opendap.dap.DapResponder;
@@ -75,6 +77,11 @@ public class DapDispatcher implements DispatchHandler {
     }
 
 
+    public String getSystemPath(){
+        return systemPath;
+
+    }
+
     public static boolean allowDirectDataSourceAccess() {
         return _allowDirectDataSourceAccess;
     }
@@ -92,8 +99,13 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(r);
     }
 
-    public Element getConfig() {
-        return _config;
+
+    public BesApi getBesApi(){
+        return _besApi;
+    }
+
+    public void setBesApi(BesApi besApi){
+        _besApi = besApi;
     }
 
     public void init(HttpServlet servlet, Element config) throws Exception {
@@ -106,44 +118,58 @@ public class DapDispatcher implements DispatchHandler {
     }
 
 
-    protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
+    private void ingestConfig(Element config) throws Exception {
 
-        if (initialized) return;
+        if(config!=null){
+            _config = config;
 
-        _besApi = besApi;
+            Element besApiImpl = _config.getChild("BesApiImpl");
+            if (besApiImpl != null) {
+                String className = besApiImpl.getTextTrim();
+                log.debug("Building BesApi: " + className);
+                Class classDefinition = Class.forName(className);
 
-        _config = config;
-        Element besApiImpl = _config.getChild("BesApiImpl");
-        if (besApiImpl != null) {
-            String className = besApiImpl.getTextTrim();
-            log.debug("Building BesApi: " + className);
-            Class classDefinition = Class.forName(className);
+                Object classInstance = classDefinition.newInstance();
 
-            Object classInstance = classDefinition.newInstance();
+                if (classInstance instanceof BesApi) {
+                    log.debug("Loading BesApi from configuration.");
+                    BesApi besApi = (BesApi) classDefinition.newInstance();
+                    setBesApi(besApi);
+                }
 
-            if (classInstance instanceof BesApi) {
-                log.debug("Loading BesApi from configuration.");
-                besApi = (BesApi) classDefinition.newInstance();
+            }
+
+
+            _allowDirectDataSourceAccess = false;
+            Element dv = _config.getChild("AllowDirectDataSourceAccess");
+            if (dv != null) {
+                _allowDirectDataSourceAccess = true;
+            }
+
+
+            _useDAP2ResourceUrlResponse = false;
+            dv = _config.getChild("UseDAP2ResourceUrlResponse");
+            if (dv != null) {
+                _useDAP2ResourceUrlResponse = true;
             }
 
         }
 
-        log.debug("Using BesApi implementation: {}", besApi.getClass().getName());
 
 
-        _allowDirectDataSourceAccess = false;
-        Element dv = config.getChild("AllowDirectDataSourceAccess");
-        if (dv != null) {
-            _allowDirectDataSourceAccess = true;
-        }
 
 
-        _useDAP2ResourceUrlResponse = false;
-        dv = config.getChild("UseDAP2ResourceUrlResponse");
-        if (dv != null) {
-            _useDAP2ResourceUrlResponse = true;
-        }
+    }
 
+    protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
+
+        if (initialized) return;
+
+        setBesApi(besApi);
+
+        ingestConfig(config);
+
+        log.debug("Using BesApi implementation: {}", getBesApi().getClass().getName());
 
         dispatchServlet = servlet;
 
@@ -202,9 +228,18 @@ public class DapDispatcher implements DispatchHandler {
 
 
         responders.add(new Version(systemPath, besApi));
-        // responders.add(new VersionResponse(systemPath, besApi));
-        // responders.add(new IsoMetadata(systemPath, besApi));
-        // responders.add(new IsoRubric(systemPath, besApi));
+
+        Dap4Responder iso = new IsoDMR(systemPath, null, ".iso", besApi);
+        iso.clearAltResponders();
+        iso.setCombinedRequestSuffixRegex(iso.buildRequestMatchingRegex());
+        responders.add(iso);
+
+        iso = new IsoRubricDMR(systemPath, null, ".rubric", besApi);
+        iso.clearAltResponders();
+        iso.setCombinedRequestSuffixRegex(iso.buildRequestMatchingRegex());
+        responders.add(iso);
+
+
 
 
 
@@ -280,45 +315,12 @@ public class DapDispatcher implements DispatchHandler {
 
     }
 
-    public boolean requestDispatch_OLD(HttpServletRequest request,
-                                       HttpServletResponse response,
-                                       boolean sendResponse)
-            throws Exception {
-
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-
-        String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
-
-        DataSourceInfo dsi;
-
-        log.debug("The client requested this BES DataSource: " + besDataSourceId);
-
-
-        for (HttpResponder r : responders) {
-            log.debug(r.getPathPrefix());
-            if (r.matches(relativeUrl)) {
-                log.debug("The relative URL: " + relativeUrl + " matches " +
-                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
-                dsi = getDataSourceInfo(besDataSourceId);
-                if (dsi.isDataset()) {
-                    if (sendResponse)
-                        r.respondToHttpGetRequest(request, response);
-                    return true;
-                }
-            }
-        }
-
-
-        return false;
-
-    }
-
 
     public long getLastModified(HttpServletRequest req) {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(req);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl,false);
 
 
         if(!initialized)
@@ -354,7 +356,7 @@ public class DapDispatcher implements DispatchHandler {
     }
 
     public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new BESDataSource(dataSourceName, _besApi);
+        return new BESDataSource(dataSourceName, getBesApi());
     }
 
 

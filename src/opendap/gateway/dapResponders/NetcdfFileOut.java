@@ -48,6 +48,7 @@ import java.util.regex.Pattern;
  * Time: 4:42 PM
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class NetcdfFileOut extends BesDapResponder {
     private Logger log;
 
@@ -78,7 +79,7 @@ public class NetcdfFileOut extends BesDapResponder {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), false);
         String fullSourceName = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 

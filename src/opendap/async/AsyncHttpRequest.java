@@ -1,7 +1,5 @@
 package opendap.async;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Created by IntelliJ IDEA.
  * User: ndp

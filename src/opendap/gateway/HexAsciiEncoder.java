@@ -81,11 +81,14 @@ public class HexAsciiEncoder implements Encoder {
             else
                 os.write(Integer.toHexString(b).getBytes());
         }
-
     }
 
 
-    public static String hexToString(String s){
+    public static String hexToString(String s) throws NumberFormatException {
+
+        if(s==null)
+            return null;
+
         String ds = "";
         String achar="";
         byte b=0;

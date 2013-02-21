@@ -244,7 +244,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendDDS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDDS() for dataset: " + dataSource);
@@ -294,7 +294,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendDAS(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         log.debug("sendDAS() for dataset: " + dataSource);
@@ -342,7 +342,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendDDX(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String requestUrl = request.getRequestURL().toString();
@@ -393,7 +393,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendDAP2Data(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         User user = new User(request);
@@ -442,7 +442,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendASCII(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String context = request.getContextPath();
@@ -493,7 +493,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendINFO(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String context = request.getContextPath();
@@ -542,7 +542,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
     private void sendHTMLRequestForm(HttpServletRequest request, HttpServletResponse response, String wcsRequestURL) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = _besApi.getBesDataSourceID(relativeUrl,false);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         String context = request.getContextPath();

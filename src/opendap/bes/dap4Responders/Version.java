@@ -26,7 +26,6 @@
 package opendap.bes.dap4Responders;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -35,8 +34,6 @@ import org.slf4j.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
@@ -71,9 +68,12 @@ public class Version extends Dap4Responder {
         setServiceDescription("An XML document containing detailed software version information for this server.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
 
         log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 
@@ -114,5 +114,28 @@ public class Version extends Dap4Responder {
 
 
     }
+
+
+
+
+    /**
+     * If we want to only check the relative URL and not ask the BES if it's a valid dataset then we
+     * uncomment the folowing method. THis will override the one in the the parent class(es) so that the BES is
+     * not queried for this response.
+     *
+     * @param relativeUrl
+     * @return
+     */
+    /*
+    @Override
+    public boolean matches(String relativeUrl) {
+
+        return matches(relativeUrl,false);
+
+    }
+
+    */
+
+
 
 }

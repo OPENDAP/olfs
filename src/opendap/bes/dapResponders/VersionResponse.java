@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
  * Time: 3:30 PM
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class VersionResponse extends BesDapResponder {
 
     private Logger log;
@@ -62,7 +63,7 @@ public class VersionResponse extends BesDapResponder {
      */
     @Override
     public boolean matches(String relativeUrl){
-       Pattern p = getRequestMatchPattern();
+       Pattern p = getRequestSuffixMatchPattern();
        Matcher m = p.matcher(relativeUrl);
        return m.matches();
 

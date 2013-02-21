@@ -37,7 +37,10 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -942,7 +945,6 @@ public class BES {
             throws PPTException {
 
         OPeNDAPClient besClient = null;
-        String clientId;
 
         if (_checkOutFlag == null)
             return null;
@@ -950,7 +952,7 @@ public class BES {
         try {
             _clientCheckoutLock.lock();
 
-            // Aquiring this semaphore is what limits the number
+            // Acquiring this semaphore is what limits the number
             // of clients that will be in the pool. The number of
             // semaphores available is set to MaxClients.
             _checkOutFlag.acquire();
@@ -959,60 +961,26 @@ public class BES {
 
             if (_clientQueue.size() == 0) {
 
-
-                // Make a new OPeNDAClient to connect to the BES
-                besClient = new OPeNDAPClient();
-                log.debug("getClient() - Made new BES Client. Starting...");
-
-
-
-                // Start the client by opening the PPT connection to the BES.
-                try {
-                    besClient.startClient(getHost(), getPort());
-                    log.debug("getClient() - BES Client started.");
-
-                }
-                catch (PPTException ppte){
-
-                    _checkOutFlag.release(); // Release the client permit because this client is hosed...
-
-                    StringBuilder msg = new StringBuilder().append("BES Client Failed To Start.");
-                    msg.append(" msg: '").append(ppte.getMessage()).append("'");
-                    besClient.setID(new Date().toString() + msg);
-                    msg.insert(0, "getClient() - ");
-                    log.error(msg.toString());
-                    throw new PPTException(msg.toString(),ppte);
-                }
-
-
-                // Add it to the client pool
-                try {
-                    _clientsMapLock.lock();
-                    if(getNickName()==null)
-                        clientId = "besC-" + totalClients;
-                    else
-                        clientId = getNickName()+":" + totalClients;
-
-                    besClient.setID(clientId);
-                    _clients.put(clientId, besClient);
-                    totalClients++;
-
-                    log.debug("getClient() - BES Client assigned ID : " + besClient.getID());
-
-                } finally {
-                    _clientsMapLock.unlock();
-                }
-
-
-
-
+                besClient = getNewClient();
 
             } else {
 
                 // Get a client from the client pool.
                 besClient = _clientQueue.take();
-                log.debug("getClient() - Retrieved " +
-                        "BES Client (id: " + besClient.getID() + ") from Pool.");
+                log.debug("getClient() - Retrieved BES Client (id: " + besClient.getID() + ") from Pool.");
+
+                //log.debug("{}",besClient.showConnectionProperties());
+
+                // If the bes connection is closed, or the client just is not connected, pitch the client
+                // and make a new one, if you can...
+                if(besClient.isClosed() || !besClient.isConnected()){
+                    log.warn("getClient() - BES Client (id: " + besClient.getID() + ") appears to be dead, discarding...");
+                    discardClient(besClient);
+                    besClient = getNewClient();
+                }
+
+
+
             }
 
 
@@ -1030,6 +998,55 @@ public class BES {
             _clientCheckoutLock.unlock();
         }
 
+
+    }
+
+    private OPeNDAPClient getNewClient() throws PPTException, InterruptedException  {
+
+        // Make a new OPeNDAClient to connect to the BES
+        OPeNDAPClient besClient = new OPeNDAPClient();
+
+        log.debug("getNewClient() - Made new BES Client. Starting...");
+
+        // Start the client by opening the PPT connection to the BES.
+        try {
+            besClient.startClient(getHost(), getPort());
+            log.debug("getNewClient() - BES Client started.");
+
+        }
+        catch (PPTException ppte){
+
+            _checkOutFlag.release(); // Release the client permit because this client is hosed...
+
+            StringBuilder msg = new StringBuilder().append("BES Client Failed To Start.");
+            msg.append(" msg: '").append(ppte.getMessage()).append("'");
+            besClient.setID(new Date().toString() + msg);
+            msg.insert(0, "getClient() - ");
+            log.error(msg.toString());
+            throw new PPTException(msg.toString(),ppte);
+        }
+
+
+        // Add it to the client pool
+        try {
+            _clientsMapLock.lock();
+            String clientId;
+            if(getNickName()==null)
+                clientId = "besC-" + totalClients;
+            else
+                clientId = getNickName()+":" + totalClients;
+
+            besClient.setID(clientId);
+            _clients.put(clientId, besClient);
+            totalClients++;
+
+            log.debug("getNewClient() - BES Client assigned ID : " + besClient.getID());
+
+        } finally {
+            _clientsMapLock.unlock();
+        }
+
+        return besClient;
 
     }
 

@@ -25,15 +25,12 @@
  */
 package opendap.bes.dap4Responders;
 
-import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.DataSourceInfo;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.Util;
 import opendap.namespaces.DAP;
-import opendap.namespaces.XLINK;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +41,6 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 import java.util.Vector;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -64,8 +60,8 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
 
-    public Dap4Responder(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+    public Dap4Responder(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
         log = LoggerFactory.getLogger(getClass().getName());
         altResponders =  new Vector<Dap4Responder>();
     }
@@ -74,9 +70,9 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
     public void setNormativeMediaType(MediaType mt){
         normativeMediaType = mt;
-        combinedRequestSuffixRegex = buildRequestMatchingRegex(this);
+        combinedRequestSuffixRegex = buildRequestMatchingRegex();
         log.debug("combinedRequestSuffixRegex: {}",combinedRequestSuffixRegex);
-        setRequestSuffixRegex(combinedRequestSuffixRegex);
+        setRequestMatchRegex(combinedRequestSuffixRegex);
     }
 
 
@@ -92,14 +88,18 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
     public void addAltRepResponder(Dap4Responder altRepResponder){
         altResponders.add(altRepResponder);
-        combinedRequestSuffixRegex = buildRequestMatchingRegex(this);
+        combinedRequestSuffixRegex = buildRequestMatchingRegex();
         log.debug("combinedRequestSuffixRegex: {}",combinedRequestSuffixRegex);
-        setRequestSuffixRegex(combinedRequestSuffixRegex);
+        setRequestMatchRegex(combinedRequestSuffixRegex);
         for(Dap4Responder responder:altResponders){
             responder.combinedRequestSuffixRegex = combinedRequestSuffixRegex;
         }
     }
 
+
+    public void clearAltResponders(){
+        altResponders.clear();
+    }
 
 
 
@@ -111,20 +111,21 @@ public abstract class Dap4Responder extends BesDapResponder  {
         combinedRequestSuffixRegex = regex;
     }
 
-    public  String buildRequestMatchingRegex(Dap4Responder responder){
+    public String buildRequestMatchingRegex() {
 
         StringBuilder s = new StringBuilder();
-        s.append(buildRequestMatchingRegexWorker(responder));
+        s.append(buildRequestMatchingRegexWorker(this));
         s.append("$");
+        log.debug("Request Match Regex: {}", s.toString());
         return s.toString();
 
     }
 
-    private  String buildRequestMatchingRegexWorker(Dap4Responder responder){
+    private String buildRequestMatchingRegexWorker(Dap4Responder responder) {
 
         StringBuilder s = new StringBuilder();
 
-        if(responder.getNormativeMediaType().getMediaSuffix().startsWith("."))
+        if (responder.getNormativeMediaType().getMediaSuffix().startsWith("."))
             s.append("\\");
         s.append(responder.getNormativeMediaType().getMediaSuffix());
 
@@ -132,15 +133,15 @@ public abstract class Dap4Responder extends BesDapResponder  {
         Dap4Responder[] altResponders = responder.getAltRepResponders();
 
 
-        boolean hasAltRepResponders = altResponders.length>0;
-        if(hasAltRepResponders)
+        boolean hasAltRepResponders = altResponders.length > 0;
+        if (hasAltRepResponders)
             s.append("(");
 
 
         boolean notFirstPass = false;
-        for(Dap4Responder altResponder: altResponders){
+        for (Dap4Responder altResponder : altResponders) {
 
-            if(notFirstPass)
+            if (notFirstPass)
                 s.append("|");
 
             s.append("(").append("(");
@@ -152,19 +153,12 @@ public abstract class Dap4Responder extends BesDapResponder  {
             notFirstPass = true;
         }
 
-        if(hasAltRepResponders)
+        if (hasAltRepResponders)
             s.append(")?");
 
         return s.toString();
 
     }
-
-
-
-
-
-
-
 
 
     /**
@@ -258,18 +252,17 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         for(Dap4Responder altResponder: getAltRepResponders()){
 
-            Pattern p = altResponder.getRequestMatchPattern();
-            Matcher m = p.matcher(requestedResourceId);
+            Pattern p = altResponder.getRequestSuffixMatchPattern();
 
-            if(m.matches()){
+            if(Util.matchesSuffixPattern(requestedResourceId, p)){
                 altResponder.respondToHttpGetRequest(request,response);
                 return;
             }
         }
 
-
-        if( requestedResourceId.endsWith(getNormativeMediaType().getMediaSuffix())){
-
+        boolean regexMatch = Util.matchesSuffixPattern(requestedResourceId,getRequestSuffixMatchPattern());
+        if(regexMatch){
+            log.debug("requestedResourceId matches RequestSuffixMatchPattern: {}",regexMatch);
             Dap4Responder targetResponder = getBestResponderForHttpRequest(request);
 
             if(targetResponder==null){
@@ -284,7 +277,12 @@ public abstract class Dap4Responder extends BesDapResponder  {
             log.debug("Target Responder: {} normative media-type: {}",targetResponder.getClass().getName(),targetResponder.getNormativeMediaType());
 
             targetResponder.sendNormativeRepresentation(request,response);
+            return;
         }
+        log.error("Something Bad Happened. Unable to respond to request for : {}'",Scrub.urlContent(requestedResourceId));
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+
 
     }
 
@@ -297,12 +295,21 @@ public abstract class Dap4Responder extends BesDapResponder  {
     @Override
     public boolean matches(String requestedResourceId, boolean checkWithBes) {
 
-        String resourceID = getResourceId(requestedResourceId, checkWithBes);
+
+
+        String resourceID = getResourceId(requestedResourceId,checkWithBes);
 
         return resourceID != null;
 
     }
+    public String getResourceId(String requestedResource, boolean checkWithBes){
 
+        Pattern suffixPattern = Pattern.compile(combinedRequestSuffixRegex, Pattern.CASE_INSENSITIVE);
+        return getBesApi().getBesDataSourceID(requestedResource, suffixPattern, checkWithBes);
+
+    }
+
+    /*
 
     public String getResourceId(String requestedResource, boolean checkWithBes){
 
@@ -337,8 +344,15 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
             }
         }
+
+
+
+
+
         return besDataSourceId;
     }
+
+    */
 
     @Override
     public String getXmlBase(HttpServletRequest req){
@@ -355,7 +369,9 @@ public abstract class Dap4Responder extends BesDapResponder  {
         }
 
 
-        String xmlBase = getResourceId(requestUrl,false);
+
+        String xmlBase = Util.dropSuffixFrom(requestUrl, Pattern.compile(getCombinedRequestSuffixRegex()));
+
 
 
         log.debug("@xml:base='{}'",xmlBase);

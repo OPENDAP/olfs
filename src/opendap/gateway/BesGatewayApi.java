@@ -1,15 +1,26 @@
 package opendap.gateway;
 
+import opendap.bes.BESDataSource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.Util;
 import opendap.namespaces.BES;
+import opendap.ppt.PPTException;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.HeadMethod;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,11 +33,16 @@ public class BesGatewayApi extends BesApi {
 
 
     private Logger log;
+    private String _servicePrefix;
 
     public BesGatewayApi(){
+        this("");
+    }
+
+    public BesGatewayApi(String servicePrefix){
         super();
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
+        _servicePrefix = servicePrefix;
     }
 
 
@@ -126,23 +142,44 @@ public class BesGatewayApi extends BesApi {
 
     }
 
-    public String getDataSourceUrl(HttpServletRequest req, String pathPrefix) throws MalformedURLException {
+    public String getDataSourceUrl(HttpServletRequest req, String pathPrefix)  {
 
 
         String relativeURL = ReqInfo.getLocalUrl(req);
-        String requestSuffix = ReqInfo.getRequestSuffix(req);
 
-        if(relativeURL.startsWith("/"))
+        return getRemoteDataSourceUrl(relativeURL, pathPrefix, Pattern.compile(_regexToMatchLastDotSuffixString));
+
+
+    }
+
+    public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern )  {
+
+
+
+        //String requestSuffix = ReqInfo.getSuffix(relativeURL);
+
+
+
+        // Strip leading slash(es)
+        while(relativeURL.startsWith("/") && !relativeURL.equals("/"))
             relativeURL = relativeURL.substring(1,relativeURL.length());
 
 
 
         String dataSourceUrl = relativeURL;
 
+
+        // Strip the path off.
         if(pathPrefix!=null && dataSourceUrl.startsWith(pathPrefix))
             dataSourceUrl = dataSourceUrl.substring(pathPrefix.length());
 
-        dataSourceUrl = dataSourceUrl.substring(0,dataSourceUrl.lastIndexOf("."+requestSuffix));
+
+        if(!dataSourceUrl.equals("")){
+            dataSourceUrl = Util.dropSuffixFrom(dataSourceUrl, suffixMatchPattern);
+        }
+
+
+
 
 
 
@@ -199,5 +236,179 @@ public class BesGatewayApi extends BesApi {
         return reqDoc;
 
     }
+
+    /*
+
+    @Override
+    public boolean getInfo(String dataSource, Document response) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
+
+
+        String besDataSourceId = getBesDataSourceID(dataSource);
+
+        return super.getInfo(besDataSourceId, response);
+
+    }
+    */
+
+
+    String stripPrefix(String dataSource){
+
+
+        while(dataSource.startsWith("/") && !dataSource.equals("/"))
+            dataSource = dataSource.substring(1,dataSource.length());
+
+
+        if(dataSource.startsWith(_servicePrefix))
+            return dataSource.substring(_servicePrefix.length(),dataSource.length());
+
+        return dataSource;
+
+    }
+
+
+    /**
+     * Because the gateway doesn't support a catalog we ignore the checkWithBes parameter
+     * @param relativeUrl The relative URL of the client request. No Constraint expression (i.e. No query section of
+     * the URL - the question mark and everything after it.)
+     * @param suffixMatchPattern This parameter provides the method with a suffix regex to use in evaluating what part,
+     * if any, of the relative URL must be removed to construct the besDataSourceId/
+     * @param checkWithBes This boolean value instructs the code to ask the appropriate BES if the resulting
+     * besDataSourceID is does in fact represent a valid data source in it's world. Because the BES gateway_module
+     * doesn't have catalog services this parameter is ignored.
+     * @return
+     */
+    @Override
+    public String getBesDataSourceID(String relativeUrl, Pattern suffixMatchPattern, boolean checkWithBes){
+
+        log.debug("getBesDataSourceID() - relativeUrl: " + relativeUrl);
+
+        StringBuilder besDataSourceId = new StringBuilder();
+
+        if(Util.matchesSuffixPattern(relativeUrl,suffixMatchPattern)){
+            try {
+
+                besDataSourceId.append(getRemoteDataSourceUrl(relativeUrl, _servicePrefix, suffixMatchPattern));
+                log.debug("getBesDataSourceID() - besDataSourceId: {}", besDataSourceId.toString());
+                return besDataSourceId.toString();
+            }
+            catch (NumberFormatException e){
+                log.debug("getBesDataSourceID() - Failed to extract target dataset URL from relative URL '{}'", relativeUrl);
+            }
+        }
+
+        return null;
+
+
+    }
+
+
+
+    @Override
+    public boolean getCatalog(String dataSourceUrl, Document response) throws
+            PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException {
+
+
+        // Go get the HEAD for the catalog:
+        HttpClient httpClient = new HttpClient();
+        HeadMethod headReq = new HeadMethod(dataSourceUrl);
+
+        try {
+            int statusCode = httpClient.executeMethod(headReq);
+
+            if (statusCode != HttpStatus.SC_OK) {
+                log.error("Unable to HEAD s3 object: " + dataSourceUrl);
+                org.opendap.dap4.Error error = new org.opendap.dap4.Error();
+                error.setMessage("OLFS: Unable to access requested resource.");
+                error.setContext(dataSourceUrl);
+                error.setHttpCode(statusCode);
+
+                return false;
+            }
+
+            Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
+            if (lastModifiedHeader == null) {
+                return false;
+            }
+            String lmtString = lastModifiedHeader.getValue();
+            SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+            Date lastModified = format.parse(lmtString);
+
+            int size = -1;
+            Header contentLengthHeader =  headReq.getResponseHeader("Content-Length");
+
+            if(contentLengthHeader!=null){
+                String sizeStr = contentLengthHeader.getValue();
+                try {
+                    size = Integer.parseInt(sizeStr);
+                }
+                catch (NumberFormatException nfe){
+                    log.warn("Received invalid content length from datasource: {}: ",dataSourceUrl);
+                }
+            }
+
+            Element catalogElement = getShowCatalogResponseDocForDatasetUrl(dataSourceUrl,size,lastModified);
+
+
+            response.detachRootElement();
+            response.setRootElement(catalogElement);
+
+            return true;
+
+        } catch (Exception e) {
+            log.error("Unable to HEAD the s3 resource: {} Error Msg: {}", dataSourceUrl, e.getMessage());
+        }
+
+
+        return false;
+
+
+    }
+
+
+
+    public Element getShowCatalogResponseDocForDatasetUrl(String dataSourceURL, int size, Date lastModified){
+
+
+
+        Element root = new Element("response",BES.BES_NS);
+        root.addNamespaceDeclaration(BES.BES_NS);
+        root.setAttribute("reqID","BesGatewayApi_Construct");
+
+
+        Element showCatalog = new Element("showCatalog",BES.BES_NS);
+        root.addContent(showCatalog);
+
+
+        Element dataset = new Element("dataset",BES.BES_NS);
+        showCatalog.addContent(dataset);
+
+        dataset.setAttribute("name",dataSourceURL);
+        dataset.setAttribute("size",""+size);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(BESDataSource.BESDateFormat);
+
+        dataset.setAttribute("lastModified",sdf.format(lastModified));
+
+
+        dataset.setAttribute("node","false");
+
+
+
+        Element serviceRef = new Element("serviceRef",BES.BES_NS);
+        serviceRef.setText("dap");
+
+        dataset.addContent(serviceRef);
+
+
+        return root;
+    }
+
 
 }

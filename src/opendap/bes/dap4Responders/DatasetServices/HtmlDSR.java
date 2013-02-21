@@ -28,7 +28,6 @@ package opendap.bes.dap4Responders.DatasetServices;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.bes.dapResponders.BesApi;
-import opendap.dap.DapResponder;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -40,7 +39,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,11 +74,15 @@ public class HtmlDSR extends Dap4Responder {
         setServiceTitle("HTML Dataset Services Response");
         setServiceDescription("The HTML representation of the DSR.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
-        setPreferredServiceSuffix(defaultRequestSuffix);
+        setPreferredServiceSuffix(getRequestSuffix());
 
-        setNormativeMediaType(new ServiceMediaType("text","html", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
 
         normDSR = dsr;
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
 
     }
 
@@ -92,7 +94,8 @@ public class HtmlDSR extends Dap4Responder {
 
 
         String requestedResource = request.getRequestURL().toString();
-        String resourceId = getResourceId(requestedResource,false);
+
+        String baseUrl = opendap.coreServlet.Util.dropSuffixFrom(requestedResource,getRequestSuffixMatchPattern());
 
         String context = request.getContextPath()+"/";
 
@@ -108,9 +111,9 @@ public class HtmlDSR extends Dap4Responder {
         Element datasetServices;
 
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceId);
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),baseUrl);
 
-        datasetServices = normDSR.getDatasetServicesElement(resourceId);
+        datasetServices = normDSR.getDatasetServicesElement(baseUrl);
 
         responseDoc.setRootElement(datasetServices);
 

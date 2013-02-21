@@ -23,7 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.experiments;
 
-import javax.print.DocFlavor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -32,10 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class EchoServlet extends HttpServlet {

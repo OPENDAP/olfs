@@ -43,6 +43,7 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class HtmlDataRequestForm extends BesDapResponder {
 
 
@@ -89,7 +90,7 @@ public class HtmlDataRequestForm extends BesDapResponder {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), false);
         String requestSuffix = ReqInfo.getRequestSuffix(request);
 
         String context = request.getContextPath();

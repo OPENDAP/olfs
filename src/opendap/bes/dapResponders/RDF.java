@@ -24,8 +24,9 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -40,20 +41,19 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 
 
-public class RDF extends BesDapResponder {
+public class RDF extends Dap4Responder {
 
     private Logger log;
 
 
-    private static String _preferredRequestSuffix = ".rdf";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".rdf";
 
     public RDF(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public RDF(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -61,11 +61,14 @@ public class RDF extends BesDapResponder {
         super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         setServiceRoleId("http://services.opendap.org/dap4/rdf");
-        setServiceMediaType("application/rdf+xml");
         setServiceTitle("DAP2 RDF");
         setServiceDescription("An RDF representation of the DAP2 Dataset response (DDX) document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_RDF_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("application","rdf+xml", getRequestSuffix()));
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
     }
 
 
@@ -79,9 +82,10 @@ public class RDF extends BesDapResponder {
     }
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl,false);
+
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
         String context = request.getContextPath();
@@ -89,7 +93,7 @@ public class RDF extends BesDapResponder {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-        log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + dataSource);
+        log.debug("respondToHttpGetRequest() Sending RDF for dataset: " + resourceID);
 
 
 
@@ -100,7 +104,7 @@ public class RDF extends BesDapResponder {
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         0,
@@ -114,14 +118,14 @@ public class RDF extends BesDapResponder {
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         Document ddx = new Document();
-        if(!besApi.besTransaction(dataSource,reqDoc,ddx)){
+        if(!besApi.besTransaction(resourceID,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
             besError.sendErrorResponse(_systemPath, context, response);
             log.error("respondToHttpGetRequest() encountered a BESError:\n" + xmlo.outputString(ddx));
             return;
         }
 
-        ddx.getRootElement().setAttribute("dataset_id",dataSource);
+        ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
         log.debug(xmlo.outputString(ddx));
 
@@ -171,7 +175,7 @@ public class RDF extends BesDapResponder {
         try {
             addRdfId2DdxTransform.transform(ddxStreamSource);
         } catch (Exception e) {
-            sendRdfErrorResponse(e, dataSource, context, response);
+            sendRdfErrorResponse(e, resourceID, context, response);
             log.error(e.getMessage());
         }
 

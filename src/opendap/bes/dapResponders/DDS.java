@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -41,15 +42,14 @@ import java.io.OutputStream;
  * Time: 2:51 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DDS extends BesDapResponder {
+public class DDS extends Dap4Responder {
 
 
     private Logger log;
 
 
 
-    private static String _preferredRequestSuffix = ".dds";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".dds";
 
 
     public boolean needsBesToMatch(){
@@ -61,11 +61,11 @@ public class DDS extends BesDapResponder {
     }
 
     public DDS(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public DDS(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -74,27 +74,31 @@ public class DDS extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/dds");
-        setServiceMediaType("text/plain");
         setServiceTitle("DAP2 DDS");
         setServiceDescription("DAP2 Data Description Structure (DDS).");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDS_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("text","plain", getRequestSuffix()));
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
     }
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+    @Override
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
+        String resourceID = getResourceId(relativeUrl, false);
 
-
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
 
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         BesApi besApi = getBesApi();
 
 
-        log.debug("Sending DDS for dataset: " + dataSource);
+        log.debug("Sending DDS for dataset: " + resourceID);
 
         response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
@@ -111,7 +115,7 @@ public class DDS extends BesDapResponder {
 
         Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.DDS,
-                                                        dataSource,
+                                                        resourceID,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         0,
@@ -120,7 +124,7 @@ public class DDS extends BesDapResponder {
                                                         null,
                                                         BesApi.DAP2_ERRORS);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
 
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);

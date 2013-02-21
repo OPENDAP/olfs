@@ -87,10 +87,14 @@ public class NormativeDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
         setPreferredServiceSuffix("");
 
-        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.dataset-services+xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.dataset-services+xml", getRequestSuffix()));
 
         addAltRepResponder(new HtmlDSR(sysPath, pathPrefix, besApi, this));
         addAltRepResponder(new XmlDSR(sysPath, pathPrefix, besApi, this));
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
 
     }
 

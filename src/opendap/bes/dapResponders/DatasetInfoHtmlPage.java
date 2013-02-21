@@ -24,8 +24,9 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.BESError;
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.slf4j.Logger;
@@ -41,22 +42,21 @@ import java.io.OutputStream;
 
 
 
-public class DatasetInfoHtmlPage extends BesDapResponder {
+public class DatasetInfoHtmlPage extends Dap4Responder {
 
 
 
     private Logger log;
 
 
-    private static String _preferredRequestSuffix = ".info";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".info";
 
 
     public DatasetInfoHtmlPage(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
     public DatasetInfoHtmlPage(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -65,13 +65,15 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/info");
-        setServiceMediaType("text/html");
         setServiceTitle("DAP2 INFO");
         setServiceDescription("DAP2 Dataset Information HTML Page.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Info_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
-    }
 
+        setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
+    }
 
     public boolean needsBesToMatch(){
         return true;
@@ -81,16 +83,16 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
         return true;
     }
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String resourceID = getResourceId(relativeUrl, false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
 
         String context = request.getContextPath();
 
         BesApi besApi = getBesApi();
 
-        log.debug("sendINFO() for dataset: " + dataSource);
+        log.debug("sendINFO() for dataset: " + resourceID);
 
         response.setContentType(getServiceMediaType());
         Version.setOpendapMimeHeaders(request,response,besApi);
@@ -108,7 +110,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
 
         Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.INFO_PAGE,
-                                                        dataSource,
+                                                        resourceID,
                                                         constraintExpression,
                                                         xdap_accept,
                                                         0,
@@ -117,7 +119,7 @@ public class DatasetInfoHtmlPage extends BesDapResponder {
                                                         null,
                                                         BesApi.XML_ERRORS);
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath, context, response);

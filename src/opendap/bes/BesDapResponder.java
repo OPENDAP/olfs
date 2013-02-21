@@ -1,8 +1,6 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.DataSourceInfo;
-import opendap.coreServlet.ReqInfo;
 import opendap.dap.DapResponder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +25,8 @@ public abstract class BesDapResponder extends DapResponder {
         this(sysPath,null,requestSuffixRegex, besApi);
     }
 
-    public BesDapResponder(String sysPath, String pathPrefix, String reqSuffixRegex, BesApi besApi) {
-        super(sysPath, pathPrefix, reqSuffixRegex);
+    public BesDapResponder(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix);
 
         log = LoggerFactory.getLogger(DapResponder.class);
 
@@ -54,29 +52,16 @@ public abstract class BesDapResponder extends DapResponder {
     /**
      *
      * @param relativeUrl
+     * @param checkWithBes
      * @return
+     *
      */
     public boolean matches(String relativeUrl, boolean checkWithBes) {
 
-        if (super.matches(relativeUrl)) {
+        String besDataSourceId = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), checkWithBes);
 
-            if(checkWithBes){
-                String besDataSourceId = ReqInfo.getBesDataSourceID(relativeUrl);
-                try {
-                    DataSourceInfo dsi = new BESDataSource(besDataSourceId, _besApi);
-                    if (dsi.isDataset()) {
-                        return true;
-                    }
-                } catch (Exception e) {
-                    log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
-                }
-            }
-            else {
-                return true;
-            }
-
-
-        }
+        if(besDataSourceId!=null)
+            return true;
 
 
         return false;

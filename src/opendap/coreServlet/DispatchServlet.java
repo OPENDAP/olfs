@@ -401,7 +401,6 @@ public class DispatchServlet extends HttpServlet {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
 
         try {
             try {
@@ -427,7 +426,7 @@ public class DispatchServlet extends HttpServlet {
                     return;
 
 
-                log.debug("Requested dataSource: '" + dataSource +
+                log.debug("Requested relative URL: '" + relativeUrl +
                         "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                         "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 
@@ -563,7 +562,6 @@ public class DispatchServlet extends HttpServlet {
                        HttpServletResponse response) {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource =  ReqInfo.getBesDataSourceID(relativeUrl);
 
         try {
             try {
@@ -577,7 +575,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.showRequest(request, reqno));
 
 
-                log.debug("Requested dataSource: '" + dataSource +
+                log.debug("Requested relative URL: '" + relativeUrl +
                        "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                        "' CE: '" + ReqInfo.getConstraintExpression(request) + "'");
 

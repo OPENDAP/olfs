@@ -23,8 +23,9 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.Version;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -41,20 +42,17 @@ import java.io.OutputStream;
 
 
 
-public class DDX extends BesDapResponder {
-
-
+public class DDX extends Dap4Responder {
 
     private Logger log;
-    private static String _preferredRequestSuffix = ".ddx";
-    private static String defaultRequestSuffixRegex = "\\"+ _preferredRequestSuffix;
+    private static String _defaultRequestSuffix = ".ddx";
 
     public DDX(String sysPath, BesApi besApi) {
-        this(sysPath,null, defaultRequestSuffixRegex,besApi);
+        this(sysPath,null, _defaultRequestSuffix,besApi);
     }
 
     public DDX(String sysPath, String pathPrefix, BesApi besApi) {
-        this(sysPath,pathPrefix, defaultRequestSuffixRegex,besApi);
+        this(sysPath,pathPrefix, _defaultRequestSuffix,besApi);
     }
 
 
@@ -63,11 +61,15 @@ public class DDX extends BesDapResponder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/ddx");
-        setServiceMediaType("text/xml");
         setServiceTitle("DAP2 DDX");
         setServiceDescription("OPeNDAP Data Description and Attribute XML Document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_DDX_Service");
-        setPreferredServiceSuffix(_preferredRequestSuffix);
+
+        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
+
+
     }
 
 
@@ -81,17 +83,20 @@ public class DDX extends BesDapResponder {
 
 
 
-    public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+
+        String resourceID = getResourceId(relativeUrl,false);
+
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String xmlBase = getXmlBase(request);
 
 
         BesApi besApi = getBesApi();
 
-        log.debug("Sending DDX for dataset: " + dataSource);
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setContentType(getServiceMediaType());
         //response.setContentType("application/vnd.opendap.org.dap4.description+xml");
@@ -112,7 +117,7 @@ public class DDX extends BesDapResponder {
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
-                        dataSource,
+                        resourceID,
                         constraintExpression,
                         xdap_accept,
                         0,
@@ -126,7 +131,7 @@ public class DDX extends BesDapResponder {
 
         log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        if(!besApi.besTransaction(dataSource,reqDoc,os,erros)){
+        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

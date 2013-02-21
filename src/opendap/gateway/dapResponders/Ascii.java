@@ -41,6 +41,7 @@ import java.io.OutputStream;
 
 
 
+@Deprecated
 public class Ascii extends BesDapResponder {
 
     private Logger log;
@@ -71,7 +72,7 @@ public class Ascii extends BesDapResponder {
     @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, getRequestSuffixMatchPattern(), false);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
         String dataSourceUrl = _besGatewayApi.getDataSourceUrl(request, getPathPrefix());
         String context = request.getContextPath();

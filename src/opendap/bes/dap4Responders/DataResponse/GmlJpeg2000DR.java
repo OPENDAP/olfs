@@ -72,9 +72,10 @@ public class GmlJpeg2000DR extends Dap4Responder {
         setServiceDescription("GML-JPEG2000 representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
-        setNormativeMediaType(new ServiceMediaType("image","jp2;application=gmljp2", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("image","jp2;application=gmljp2", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

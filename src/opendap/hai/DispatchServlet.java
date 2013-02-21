@@ -240,11 +240,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
 
                 log.debug("The client requested this: " + name);
 
-                String relativeUrl = ReqInfo.getLocalUrl(request);
-
-                String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-                DataSourceInfo dsi;
-
 
                 String requestURL = request.getRequestURL().toString();
 
@@ -291,12 +286,6 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
                 String name = getName(request);
 
                 log.debug("The client requested this: " + name);
-
-                String relativeUrl = ReqInfo.getLocalUrl(request);
-
-                String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-                DataSourceInfo dsi;
-
 
                 String requestURL = request.getRequestURL().toString();
 

@@ -56,8 +56,8 @@ public class HtmlDMR extends Dap4Responder {
         this(sysPath, pathPrefix, defaultRequestSuffix, besApi);
     }
 
-    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi) {
-        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
+    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
+        super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
@@ -65,9 +65,10 @@ public class HtmlDMR extends Dap4Responder {
         setServiceDescription("HTML representation of the Dataset Metadata Response document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","html", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 
@@ -79,15 +80,17 @@ public class HtmlDMR extends Dap4Responder {
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        String requestedResourceId = ReqInfo.getLocalUrl(request);
+
+
+        String relativeUrl = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
 
-        String resourceID = getResourceId(requestedResourceId, false);
+        String resourceID = getResourceId(relativeUrl, false);
 
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         BesApi besApi = getBesApi();
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);

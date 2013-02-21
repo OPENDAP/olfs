@@ -34,14 +34,11 @@ import opendap.coreServlet.ReqInfo;
 import opendap.dap.Request;
 import opendap.xml.Transformer;
 import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 
 /**
@@ -76,9 +73,10 @@ public class IsoRubricDMR extends Dap4Responder {
         setServiceDescription("ISO-19115 Conformance Score for the Dataset Metadata Response document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","html", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

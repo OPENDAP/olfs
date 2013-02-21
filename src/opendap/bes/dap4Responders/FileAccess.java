@@ -28,24 +28,23 @@ package opendap.bes.dap4Responders;
 import opendap.bes.BESDataSource;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
-import opendap.bes.Version;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.DataSourceInfo;
 import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
-import opendap.dap.User;
-import opendap.namespaces.DAP;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.HttpStatus;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,9 +78,12 @@ public class FileAccess extends Dap4Responder {
         setServiceDescription("Simple (download) access to the underlying data file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services");
 
-        setNormativeMediaType(new ServiceMediaType("*","*", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("*","*", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("defaultRequestSuffix:             '{}'", defaultRequestSuffix);
+
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

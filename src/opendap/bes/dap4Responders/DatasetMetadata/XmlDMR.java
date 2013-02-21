@@ -65,9 +65,10 @@ public class XmlDMR extends Dap4Responder {
         setServiceDescription("Normative representation of the Dataset Metadata Response document with a generic content type.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

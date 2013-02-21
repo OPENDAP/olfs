@@ -5,7 +5,6 @@ import opendap.bes.BesDapResponder;
 import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.DataSourceInfo;
-import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import opendap.dap.DapResponder;
 import opendap.namespaces.XLINK;
@@ -157,13 +156,9 @@ public class DatasetServices_OLD extends BesDapResponder {
 
     public void respondToHttpGetRequest(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
-        String name = ReqInfo.getLocalUrl(req);
         String datasetUrl = req.getRequestURL().toString();
 
         String context = req.getContextPath()+"/";
-
-        String dataSourceId = ReqInfo.getBesDataSourceID(name);
-        BesApi besApi = getBesApi();
 
 
         Document serviceDescription = new Document();

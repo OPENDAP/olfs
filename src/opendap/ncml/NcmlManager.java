@@ -1,11 +1,12 @@
 package opendap.ncml;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import opendap.bes.*;
+import opendap.bes.BESManager;
+import opendap.bes.BadConfigurationException;
+import opendap.bes.BesGroup;
 import opendap.bes.dapResponders.BesApi;
 import opendap.namespaces.NCML;
 import opendap.namespaces.THREDDS;
-import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import opendap.threddsHandler.Catalog;
 import opendap.threddsHandler.ThreddsCatalogUtil;
@@ -161,6 +162,9 @@ public class NcmlManager {
 
 
     public static boolean isNcmlDataset(String dapAccessID){
+
+        if(dapAccessID==null)
+            return false;
 
         return _ncmlDatasets.containsKey(dapAccessID);
 

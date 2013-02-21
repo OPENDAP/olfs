@@ -39,14 +39,13 @@ public class User {
 
 
     String userName;
-    String dataSource;
+    String relativeUrl;
 
 
     public User(HttpServletRequest request){
 
         userName = request.getRemoteUser();
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
+        relativeUrl = ReqInfo.getLocalUrl(request);
 
     }
 
@@ -55,7 +54,7 @@ public class User {
 
 
         if(userName==null) {
-            return BESManager.getBES(dataSource).getMaxResponseSize();
+            return BESManager.getBES(relativeUrl).getMaxResponseSize();
         }
 
         return 0;

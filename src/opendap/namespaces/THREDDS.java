@@ -43,4 +43,7 @@ public class THREDDS {
     public static final String CATALOG = "catalog";
     public static final String DATASET = "dataset";
     public static final String NAME = "name";
+    public static final String DATASIZE = "dataSize";
+    public static final String DATE = "date";
+    public static final String ACCESS = "access";
 }

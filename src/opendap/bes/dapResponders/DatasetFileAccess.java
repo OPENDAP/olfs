@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
  * Time: 5:16 PM
  * To change this template use File | Settings | File Templates.
  */
+
+@Deprecated
 public class DatasetFileAccess extends BesDapResponder {
 
     private Logger log;
@@ -104,7 +106,7 @@ public class DatasetFileAccess extends BesDapResponder {
 
             String besDataSourceId = relativeUrl;
 
-            Pattern requestMatchPattern = getRequestMatchPattern();
+            Pattern requestMatchPattern = getRequestSuffixMatchPattern();
             Matcher m = requestMatchPattern.matcher(besDataSourceId);
             if (m.matches()) {
                 try {
@@ -134,7 +136,7 @@ public class DatasetFileAccess extends BesDapResponder {
         String serviceUrl = ReqInfo.getFullServiceContext(req);
 
         if(!isDap2Response()){
-            dataSourceId = ReqInfo.getBesDataSourceID(dataSourceId);
+            dataSourceId  = getBesApi().getBesDataSourceID(dataSourceId, getRequestSuffixMatchPattern(),false);
         }
 
 

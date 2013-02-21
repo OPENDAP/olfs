@@ -72,15 +72,16 @@ public class IsoDMR extends Dap4Responder {
         setServiceDescription("ISO-19115 metadata extracted form the normative DMR.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
 
         IsoRubricDMR rubric =  new IsoRubricDMR(sysPath, pathPrefix, besApi);
 
         addAltRepResponder(rubric);
 
-        rubric.setRequestSuffixRegex(buildRequestMatchingRegex(rubric));
+        //rubric.setRequestSuffix(buildRequestMatchingRegex());
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 
@@ -108,36 +109,36 @@ public class IsoDMR extends Dap4Responder {
 
 
     @Override
-    public String buildRequestMatchingRegex(Dap4Responder responder){
+    public String buildRequestMatchingRegex() {
 
         StringBuilder s = new StringBuilder();
-        s.append(buildRequestMatchingRegexWorker(responder));
+        s.append(buildRequestMatchingRegexWorker(this));
         s.append("$");
-        log.debug("Request Match Regex: {}",s.toString());
+        log.debug("Request Match Regex: {}", s.toString());
         return s.toString();
 
     }
 
-    private String buildRequestMatchingRegexWorker(Dap4Responder responder){
+    private String buildRequestMatchingRegexWorker(Dap4Responder responder) {
 
         StringBuilder s = new StringBuilder();
 
         Dap4Responder[] altResponders = responder.getAltRepResponders();
-        boolean hasAltRepResponders = altResponders.length>0;
+        boolean hasAltRepResponders = altResponders.length > 0;
 
-        if(hasAltRepResponders)
+        if (hasAltRepResponders)
             s.append("((");
 
-        if(responder.getNormativeMediaType().getMediaSuffix().startsWith("."))
+        if (responder.getNormativeMediaType().getMediaSuffix().startsWith("."))
             s.append("\\");
         s.append(responder.getNormativeMediaType().getMediaSuffix());
 
-        if(hasAltRepResponders)
+        if (hasAltRepResponders)
             s.append(")");
 
-        for(Dap4Responder altResponder: altResponders){
+        for (Dap4Responder altResponder : altResponders) {
 
-             s.append("|");
+            s.append("|");
 
             s.append("(");
 
@@ -147,15 +148,12 @@ public class IsoDMR extends Dap4Responder {
 
         }
 
-        if(hasAltRepResponders)
+        if (hasAltRepResponders)
             s.append(")");
 
         return s.toString();
 
     }
-
-
-
 
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {

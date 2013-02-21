@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <rdf:Description rdf:about="">
+      <Dataset xmlns="http://xml.opendap.org/ns/DAP/3.2#">
+         <rdf:Description xmlns:rdfx="http://www.w3.org/1999/02/22-rdf-syntax-ns"
+                          xmlns:nons="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#"
+                          rdf:about=""
+                          xml:base="http://localhost:8080/opendap/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65">
+            <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">dodsU1wlRS</name>
+            <schemaLocation xmlns="http://www.w3.org/2001/XMLSchema-instance#">http://xml.opendap.org/ns/DAP/3.2# http://xml.opendap.org/dap/dap3.2.xsd</schemaLocation>
+            <transformation xmlns="http://www.w3.org/2003/g/data-view#">http://xml.opendap.org/transforms/ddxToRdfTriples.xsl</transformation>
+            <dapVersion xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">3.2</dapVersion>
+            <dataset_id xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">http://localhost:8080/opendap/data/nc/fnoc1.nc.file</dataset_id>
+            <Attribute>
+               <rdf:Description>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">NC_GLOBAL</name>
+                  <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">Container</type>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">base_time</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>88- 10-00:00:00</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">title</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>FNOC UV wind components from 1988- 10 to 1988- 13.</value>
+                     </rdf:Description>
+                  </Attribute>
+               </rdf:Description>
+            </Attribute>
+            <Attribute>
+               <rdf:Description>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">DODS_EXTRA</name>
+                  <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">Container</type>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">Unlimited_Dimension</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>time_a</value>
+                     </rdf:Description>
+                  </Attribute>
+               </rdf:Description>
+            </Attribute>
+            <Array>
+               <rdf:Description rdf:ID="u">
+                  <localId xmlns="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#">u</localId>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">u</name>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">units</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>meter per second</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">long_name</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>Vector wind eastward component</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">missing_value</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>-32767</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">scale_factor</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>0.005</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Int16 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">time_a</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">16</size>
+                     </rdf:Description>
+                  </dimension>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lat</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">17</size>
+                     </rdf:Description>
+                  </dimension>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lon</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">21</size>
+                     </rdf:Description>
+                  </dimension>
+               </rdf:Description>
+            </Array>
+            <Array>
+               <rdf:Description rdf:ID="v">
+                  <localId xmlns="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#">v</localId>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">v</name>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">units</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>meter per second</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">long_name</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>Vector wind northward component</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">missing_value</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>-32767</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">scale_factor</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>0.005</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Int16 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">time_a</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">16</size>
+                     </rdf:Description>
+                  </dimension>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lat</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">17</size>
+                     </rdf:Description>
+                  </dimension>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lon</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">21</size>
+                     </rdf:Description>
+                  </dimension>
+               </rdf:Description>
+            </Array>
+            <Array>
+               <rdf:Description rdf:ID="lat">
+                  <localId xmlns="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#">lat</localId>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lat</name>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">units</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>degree North</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Float32 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lat</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">17</size>
+                     </rdf:Description>
+                  </dimension>
+               </rdf:Description>
+            </Array>
+            <Array>
+               <rdf:Description rdf:ID="lon">
+                  <localId xmlns="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#">lon</localId>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lon</name>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">units</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>degree East</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Float32 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">lon</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">21</size>
+                     </rdf:Description>
+                  </dimension>
+               </rdf:Description>
+            </Array>
+            <Array>
+               <rdf:Description rdf:ID="time">
+                  <localId xmlns="http://xml.opendap.org/ontologies/opendap-dap-3.2.owl#">time</localId>
+                  <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">time</name>
+                  <Attribute>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">units</name>
+                        <type xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">String</type>
+                        <value>hours from base_time</value>
+                     </rdf:Description>
+                  </Attribute>
+                  <Float32 rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
+                  <dimension>
+                     <rdf:Description>
+                        <name xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">time</name>
+                        <size xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">16</size>
+                     </rdf:Description>
+                  </dimension>
+               </rdf:Description>
+            </Array>
+            <blob>
+               <rdf:Description>
+                  <href xmlns="http://iridl.ldeo.columbia.edu/ontologies/xsd2owl/nonamespace#">cid:</href>
+               </rdf:Description>
+            </blob>
+         </rdf:Description>
+      </Dataset>
+   </rdf:Description>
+</rdf:RDF>

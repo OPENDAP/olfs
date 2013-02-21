@@ -64,13 +64,14 @@ public class NormativeDMR extends Dap4Responder {
         setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.dataset-metadata+xml", defaultRequestSuffix));
+        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.dataset-metadata+xml", getRequestSuffix()));
 
         addAltRepResponder(new XmlDMR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new HtmlDMR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new RdfDMR(sysPath, pathPrefix, besApi));
 
-        log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
+        log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
+        log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
     }
 

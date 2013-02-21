@@ -23,8 +23,8 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.threddsHandler;
 
-import opendap.namespaces.THREDDS;
 import opendap.coreServlet.Scrub;
+import opendap.namespaces.THREDDS;
 import opendap.ncml.NcmlManager;
 import org.jdom.Document;
 import org.jdom.Element;

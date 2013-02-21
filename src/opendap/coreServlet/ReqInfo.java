@@ -333,6 +333,14 @@ public class ReqInfo {
      */
     public static String getSuffix(String s){
 
+
+
+        String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
+
+        Matcher m = Pattern.compile(_regexToMatchLastDotSuffixString).matcher(s);
+
+
+
         String suffix="";
 
         if (s!=null && !s.endsWith("/")) {
@@ -482,6 +490,7 @@ public class ReqInfo {
      * the URL - the question mark and everything after it.)
      * @return The DataSourceName
      */
+    @Deprecated
     public static String getBesDataSourceID(String relativeUrl){
 
         String requestPath = relativeUrl;

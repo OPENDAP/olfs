@@ -210,36 +210,36 @@ public class DispatchHandler implements opendap.coreServlet.DispatchHandler{
 
 
 
-    private void ingestPrefix() throws Exception{
+    private void ingestPrefix() throws Exception {
 
         String msg;
 
-        Element e = _config.getChild("prefix");
-        if(e!=null)
-            _prefix = e.getTextTrim();
+        if (_config != null) {
 
-        if(_prefix.equals("/")){
-            msg = "Bad Configuration. The <Handler> " +
-                    "element that declares " + this.getClass().getName() +
-                    " MUST provide 1 <prefix>  " +
-                    "child element whose value may not be equal to \"/\"";
-            log.error(msg);
-            throw new Exception(msg);
+            Element e = _config.getChild("prefix");
+            if (e != null)
+                _prefix = e.getTextTrim();
+
+            if (_prefix.equals("/")) {
+                msg = "Bad Configuration. The <Handler> " +
+                        "element that declares " + this.getClass().getName() +
+                        " MUST provide 1 <prefix>  " +
+                        "child element whose value may not be equal to \"/\"";
+                log.error(msg);
+                throw new Exception(msg);
+            }
+
+
+            if (!_prefix.endsWith("/"))
+                _prefix += "/";
+
+            if (_prefix.startsWith("/"))
+                _prefix = _prefix.substring(1);
         }
 
-
-
-        if(!_prefix.endsWith("/"))
-            _prefix += "/";
-
-        if(_prefix.startsWith("/"))
-            _prefix = _prefix.substring(1);
-
-        log.info("Initialized. prefix="+ _prefix);
+        log.info("Using prefix=" + _prefix);
 
     }
-
-
 
 
     public boolean requestCanBeHandled(HttpServletRequest request) throws Exception {

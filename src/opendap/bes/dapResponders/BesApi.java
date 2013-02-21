@@ -27,22 +27,21 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.*;
+import opendap.coreServlet.DataSourceInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
-import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import java.io.*;
-import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -82,6 +81,8 @@ public class BesApi {
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
 
+
+    public static final String _regexToMatchLastDotSuffixString = "\\.(?=[^.]*$).*$" ;
 
 
     private Logger log;
@@ -791,13 +792,13 @@ public class BesApi {
 
     }
 
-    private class NoSuchDatasource {
+    public class NoSuchDatasource {
         Document err;
-        NoSuchDatasource(Document besError){
+        public NoSuchDatasource(Document besError){
             err = besError;
         }
 
-        Document getErrDoc(){
+        public Document getErrDoc(){
             return (Document)err.clone();
         }
 
@@ -1389,8 +1390,124 @@ public class BesApi {
     }
 
 
+    /**
+     * The besDataSourceId is the relative (local) URL path of the request, minus any requestSuffixRegex detected. So,
+     * if the request is for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset
+     * minus the DAP
+     * requestSuffixRegex (such as .dds, .das, .dap, etc.). If the request is for a collection, then the dataSourceName
+     * is the complete local path.
+     * of that collection.
+     * <p><b>Examples:</b>
+     * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = fnoc1.nc </li>
+     * <li> besDataSourceId = /opendap/nc/fnoc1.nc </li>
+     * <li> requestSuffixRegex = dds </li>
+     * </ul>
+     *
+     * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = null </li>
+     * <li> besDataSourceId = /opendap/nc/ </li>
+     * <li> requestSuffixRegex = "" </li>
+     * </ul>
+     * </ul>
+     *
+     * @param relativeUrl The relative URL of the client request. No Constraint expression (i.e. No query section of
+     * the URL - the question mark and everything after it.)
+     * @param checkWithBes This boolean value instructs the code to ask the appropriate BES if the resulting
+     * besDataSourceID is does in fact represent a valid data source in it's world.
+     * @return The DataSourceName
+     */
+    public String getBesDataSourceID(String relativeUrl, boolean checkWithBes){
+
+        Pattern lastDotSuffixPattern= Pattern.compile(_regexToMatchLastDotSuffixString);
+
+        return getBesDataSourceID(relativeUrl,lastDotSuffixPattern,checkWithBes);
+
+    }
 
 
+
+
+
+
+
+    /**
+     * The besDataSourceId is the relative (local) URL path of the request, minus any requestSuffixRegex detected. So,
+     * if the request is for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset
+     * minus the DAP
+     * requestSuffixRegex (such as .dds, .das, .dap, etc.). If the request is for a collection, then the dataSourceName
+     * is the complete local path.
+     * of that collection.
+     * <p><b>Examples:</b>
+     * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = fnoc1.nc </li>
+     * <li> besDataSourceId = /opendap/nc/fnoc1.nc </li>
+     * <li> requestSuffixRegex = dds </li>
+     * </ul>
+     *
+     * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
+     * Then the:</li>
+     * <ul>
+     * <li> dataSetName = null </li>
+     * <li> besDataSourceId = /opendap/nc/ </li>
+     * <li> requestSuffixRegex = "" </li>
+     * </ul>
+     * </ul>
+     *
+     * @param relativeUrl The relative URL of the client request. No Constraint expression (i.e. No query section of
+     * the URL - the question mark and everything after it.)
+     * @param matchPattern This parameter provides the method with a regex to us in evaluating what part, if any, of
+     * the relative URL must be removed to construct the besDataSourceId/
+     * @param checkWithBes This boolean value instructs the code to ask the appropriate BES if the resulting
+     * besDataSourceID is does in fact represent a valid data source in it's world.
+     * @return The besDataSourceId
+     */
+    public String getBesDataSourceID(String relativeUrl, Pattern matchPattern, boolean checkWithBes){
+
+        log.debug("getBesDataSourceID() - relativeUrl: " + relativeUrl);
+
+        Matcher suffixMatcher = matchPattern.matcher(relativeUrl);
+
+        boolean suffixMatched = false;
+
+
+        while(!suffixMatcher.hitEnd()){
+            suffixMatched = suffixMatcher.find();
+            //log.debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
+        }
+
+        String besDataSourceId = null;
+
+        if(suffixMatched){
+            int start =  suffixMatcher.start();
+            besDataSourceId = relativeUrl.substring(0,start);
+
+            if(checkWithBes){
+                log.debug("Asking BES about resource: {}", besDataSourceId);
+
+                try {
+                    DataSourceInfo dsi = new BESDataSource(besDataSourceId, this);
+                    if (!dsi.isDataset()) {
+                        besDataSourceId = null;
+                    }
+                } catch (Exception e) {
+                    log.debug("matches() failed with an Exception. Msg: '{}'", e.getMessage());
+                }
+
+            }
+        }
+
+        log.debug("getBesDataSourceID() - besDataSourceId: " + besDataSourceId);
+
+        return besDataSourceId;
+
+    }
 
 
 

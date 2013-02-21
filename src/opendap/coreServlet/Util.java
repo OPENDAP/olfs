@@ -24,6 +24,8 @@
 
 package opendap.coreServlet;
 
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -40,7 +42,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.regex.Matcher;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Some handy servlet sniffing utility methods.
@@ -61,8 +63,7 @@ public class Util {
         msg += "  Client:  " + req.getRemoteHost() + "\n";
         msg += "  Request Info:\n";
         msg += "    baseURI:                   '" + ReqInfo.getServiceUrl(req) + "'\n";
-        msg += "    fullSourceName:            '" + ReqInfo.getLocalUrl(req) + "'\n";
-        msg += "    dataSource:                '" + ReqInfo.getBesDataSourceID(ReqInfo.getLocalUrl(req)) + "'\n";
+        msg += "    localUrl:                  '" + ReqInfo.getLocalUrl(req) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
         msg += "    requestSuffixRegex:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
         msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
@@ -480,4 +481,56 @@ public class Util {
         s.append("\n");
         return s.toString();
     }
+
+
+
+
+    public static String dropSuffixFrom(String s, Pattern suffixPattern){
+        Matcher suffixMatcher = suffixPattern.matcher(s);
+
+        boolean suffixMatched = false;
+
+
+        while(!suffixMatcher.hitEnd()){
+            suffixMatched = suffixMatcher.find();
+            LoggerFactory.getLogger(Util.class).debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
+        }
+        if(suffixMatched){
+            int start =  suffixMatcher.start();
+            return s.substring(0, start);
+        }
+
+
+        return s;
+    }
+
+
+    public static boolean matchesSuffixPattern(String s, Pattern suffixPattern){
+
+        Matcher suffixMatcher = suffixPattern.matcher(s);
+
+        boolean suffixMatched = false;
+
+
+        while(!suffixMatcher.hitEnd()){
+            suffixMatched = suffixMatcher.find();
+            LoggerFactory.getLogger(Util.class).debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
+        }
+        if(suffixMatched){
+            return true;
+        }
+
+
+        return false;
+
+
+
+    }
+
+
+
 }
+
+
+
+

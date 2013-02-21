@@ -215,14 +215,7 @@ public class NcmlDatasetBesApi extends BesApi {
         return false;
 
 
-
-
-
-
-
-
     }
-
 
 
 

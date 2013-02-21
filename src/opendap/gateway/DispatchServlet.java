@@ -24,9 +24,9 @@
 package opendap.gateway;
 
 import opendap.coreServlet.*;
-import opendap.gateway.dapResponders.*;
 import opendap.logging.LogUtil;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
@@ -39,9 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 /**
  * User: ndp
@@ -54,8 +52,7 @@ public class DispatchServlet extends HttpServlet {
     private Logger log;
 
 
-    private Document _config;
-
+    private Element _config;
 
     private AtomicInteger reqNumber;
 
@@ -63,11 +60,7 @@ public class DispatchServlet extends HttpServlet {
 
     private boolean isInitialized;
 
-
-    private Vector<HttpResponder> responders;
-
-
-
+    private NewDispatchHandler _gatewayDispatchHandler;
 
     public void init() {
 
@@ -83,43 +76,18 @@ public class DispatchServlet extends HttpServlet {
         reqNumber = new AtomicInteger(0);
         systemPath = ServletUtil.getSystemPath(this, "");
 
-        responders = new Vector<HttpResponder>();
+        _gatewayDispatchHandler = new NewDispatchHandler();
 
 
-
-        /*
         try {
             _config = loadConfig();
+            _gatewayDispatchHandler.init(this,_config);
 
         } catch (Exception e) {
             log.error("init() Failed to load it's configuration! Caught " + e.getClass().getName() + " Message: " + e.getMessage());
         }
-        */
 
 
-        BesGatewayApi besApi = new BesGatewayApi();
-
-
-        responders.add(new DDX(systemPath, besApi));
-        responders.add(new DDS(systemPath, besApi));
-        responders.add(new DAS(systemPath, besApi));
-        responders.add(new RDF(systemPath, besApi));
-
-        responders.add(new HtmlDataRequestForm(systemPath, besApi));
-        responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
-
-        responders.add(new Dap2Data(systemPath, besApi));
-        responders.add(new Ascii(systemPath, besApi));
-
-
-        responders.add(new DataDDX(systemPath, besApi));
-        responders.add(new NetcdfFileOut(systemPath, besApi));
-        responders.add(new XmlData(systemPath, besApi));
-
-        responders.add(new GatewayForm(systemPath));
-
-
-        log.info("masterDispatchRegex=\"" + getDispatchRegex() + "\"");
         log.info("Initialized.");
 
 
@@ -134,15 +102,19 @@ public class DispatchServlet extends HttpServlet {
      * @throws javax.servlet.ServletException When the file is missing, unreadable, or fails
      *                                        to parse (as an XML document).
      */
-    private Document loadConfig() throws ServletException {
+    private Element loadConfig() throws ServletException {
 
         String filename = getInitParameter("GatewayConfigFileName");
         if (filename == null) {
-            String msg = "Servlet configuration must include a file name for " +
-                    "the Gateway configuration!\n";
-            System.err.println(msg);
-            throw new ServletException(msg);
+            StringBuilder msg = new StringBuilder();
+
+            msg.append(this.getClass().getName())
+                    .append(" - Servlet configuration is missing init parameter 'GatewayConfigFileName'.")
+                    .append(" Proceeding with out configuration.");
+            log.warn(msg.toString());
+            return null;
         }
+
 
         filename = Scrub.fileName(ServletUtil.getContentPath(this) + filename);
 
@@ -157,7 +129,10 @@ public class DispatchServlet extends HttpServlet {
             try {
                 // Parse the XML doc into a Document object.
                 SAXBuilder sb = new SAXBuilder();
-                return sb.build(fis);
+                Document configDoc =  sb.build(fis);
+                Element root = configDoc.getRootElement();
+                root.detach();
+                return root;
             } finally {
                 fis.close();
             }
@@ -182,32 +157,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    public Pattern getDispatchRegex() {
-        String masterRegex = null;
-
-        for (HttpResponder p : responders) {
-            if (masterRegex != null)
-                masterRegex += "|";
-            else
-                masterRegex = "";
-
-            masterRegex += p.getRequestMatchRegexString();
-        }
-        return Pattern.compile(masterRegex);
-    }
-
-
-    /*
-    public long getLastModified(HttpServletRequest req) {
-
-        long lmt;
-        lmt = -1;
-        return lmt;
-
-
-    }
-    */
-
 
     /**
      * Gets the last modified date of the requested resource. Because the data handler is really
@@ -223,17 +172,15 @@ public class DispatchServlet extends HttpServlet {
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "GATEWAY_SERVICE_ACCESS", "LastModified", Long.toString(reqno));
-
-        if (ReqInfo.isServiceOnlyRequest(req))
-            return -1;
-
-
         try {
-            return -1;
 
-        } catch (Exception e) {
-            return -1;
-        } finally {
+            if (ReqInfo.isServiceOnlyRequest(req))
+                return -1;
+            return _gatewayDispatchHandler.getLastModified(req);
+
+
+        }
+        finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "GATEWAY_SERVICE_ACCESS");
 
         }
@@ -253,10 +200,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    private String getName(HttpServletRequest req) {
-        return req.getPathInfo();
-    }
-
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
@@ -267,34 +210,14 @@ public class DispatchServlet extends HttpServlet {
 
             if (!redirect(request, response)) {
 
-                String name = getName(request);
-
-                log.debug("The client requested this: " + name);
-
-                String relativeUrl = ReqInfo.getLocalUrl(request);
-
-                String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-                DataSourceInfo dsi;
-
-
-                String requestURL = request.getRequestURL().toString();
-
-                for (HttpResponder r : responders) {
-                    if (r.matches(requestURL)) {
-                        log.debug("The request URL: " + requestURL + " matches " +
-                                "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
-
-                        //dsi = new BESDataSource(dataSource);
-                        //if(dsi.isDataset()){
-                        r.respondToHttpGetRequest(request, response);
-                        return;
-                        //}
-
+                if(!_gatewayDispatchHandler.requestDispatch(request,response,true)){
+                    if(!response.isCommitted()){
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                        log.info("Sent BAD URL - not an OPeNDAP request suffix.");
                     }
+
                 }
 
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                log.info("Sent BAD URL - not an OPeNDAP request suffix.");
             }
 
         } catch (Throwable t) {
@@ -315,13 +238,7 @@ public class DispatchServlet extends HttpServlet {
 
         LogUtil.logServerShutdown("destroy()");
 
-        if(responders != null){
-            for (HttpResponder r : responders) {
-                log.debug("Shutting down HttpResponder: " + r.getClass().getName());
-                r.destroy();
-            }
-        }
-
+        _gatewayDispatchHandler.destroy();
 
         super.destroy();
 
