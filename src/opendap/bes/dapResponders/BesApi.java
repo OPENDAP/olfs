@@ -52,27 +52,27 @@ import java.util.regex.Pattern;
  */
 public class BesApi {
 
-    public static String DDS        = "dds";
-    public static String DAS        = "das";
-    public static String DDX        = "ddx";
-    public static String DataDDX    = "dataddx";
-    public static String DAP2       = "dods";
-    public static String STREAM     = "stream";
-    public static String ASCII      = "ascii";
-    public static String HTML_FORM  = "html_form";
-    public static String INFO_PAGE  = "info_page";
-    public static String XML_DATA   = "xml_data";
-    public static String NETCDF     = "netcdf";
-    public static String GEOTIFF    = "geotiff";
-    public static String GMLJP2     = "jpeg2000";
+    public static final String DDS        = "dds";
+    public static final String DAS        = "das";
+    public static final String DDX        = "ddx";
+    public static final String DataDDX    = "dataddx";
+    public static final String DAP2       = "dods";
+    public static final String STREAM     = "stream";
+    public static final String ASCII      = "ascii";
+    public static final String HTML_FORM  = "html_form";
+    public static final String INFO_PAGE  = "info_page";
+    public static final String XML_DATA   = "xml_data";
+    public static final String NETCDF     = "netcdf";
+    public static final String GEOTIFF    = "geotiff";
+    public static final String GMLJP2     = "jpeg2000";
 
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
-    public static String ERRORS_CONTEXT  = "errors";
-    public static String XML_ERRORS      = "xml";
-    public static String DAP2_ERRORS     = "dap2";
-    public static String XMLBASE_CONTEXT = "xml:base";
+    public static final String ERRORS_CONTEXT  = "errors";
+    public static final String XML_ERRORS      = "xml";
+    public static final String DAP2_ERRORS     = "dap2";
+    public static final String XMLBASE_CONTEXT = "xml:base";
 
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
     public static final String DEFAULT_XDAP_ACCEPT = "2.0";
