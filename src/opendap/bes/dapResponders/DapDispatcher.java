@@ -29,6 +29,8 @@ package opendap.bes.dapResponders;
 import opendap.bes.BESDataSource;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.DataResponse.GeoTiffDR;
+import opendap.bes.dap4Responders.DataResponse.GmlJpeg2000DR;
 import opendap.bes.dap4Responders.DataResponse.NormativeDR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
 import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
@@ -226,20 +228,31 @@ public class DapDispatcher implements DispatchHandler {
 
         responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
 
-
         responders.add(new Version(systemPath, besApi));
+
+
 
         Dap4Responder iso = new IsoDMR(systemPath, null, ".iso", besApi);
         iso.clearAltResponders();
         iso.setCombinedRequestSuffixRegex(iso.buildRequestMatchingRegex());
         responders.add(iso);
 
-        iso = new IsoRubricDMR(systemPath, null, ".rubric", besApi);
-        iso.clearAltResponders();
-        iso.setCombinedRequestSuffixRegex(iso.buildRequestMatchingRegex());
-        responders.add(iso);
+        Dap4Responder rubric = new IsoRubricDMR(systemPath, null, ".rubric", besApi);
+        rubric.clearAltResponders();
+        rubric.setCombinedRequestSuffixRegex(rubric.buildRequestMatchingRegex());
+        responders.add(rubric);
 
 
+        Dap4Responder geoTiff = new GeoTiffDR(systemPath, null, ".tiff", besApi);
+        geoTiff.clearAltResponders();
+        geoTiff.setCombinedRequestSuffixRegex(geoTiff.buildRequestMatchingRegex());
+        responders.add(geoTiff);
+
+
+        Dap4Responder jp2 = new GmlJpeg2000DR(systemPath, null, ".jp2", besApi);
+        jp2.clearAltResponders();
+        jp2.setCombinedRequestSuffixRegex(jp2.buildRequestMatchingRegex());
+        responders.add(jp2);
 
 
 
