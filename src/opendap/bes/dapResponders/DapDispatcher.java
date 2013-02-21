@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.GeoTiffDR;
 import opendap.bes.dap4Responders.DataResponse.GmlJpeg2000DR;
 import opendap.bes.dap4Responders.DataResponse.NormativeDR;
+import opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
 import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.FileAccess;
@@ -192,7 +193,18 @@ public class DapDispatcher implements DispatchHandler {
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             responders.add(dfa);
         }
+        else {
+            // Add the HTML form conditionally because the ".html" suffix is used
+            // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
+            // We should make sure that the old HTML ".html" response is available.
+            Dap4Responder htmlForm = new HtmlDMR(systemPath, null, ".html", besApi);
+            htmlForm.clearAltResponders();
+            htmlForm.setCombinedRequestSuffixRegex(htmlForm.buildRequestMatchingRegex());
+            responders.add(htmlForm);
 
+        }
+
+        responders.add(new Version(systemPath, besApi));
 
         /*     OLD way
         if (!_useDAP2ResourceUrlResponse) {
@@ -228,7 +240,6 @@ public class DapDispatcher implements DispatchHandler {
 
         responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
 
-        responders.add(new Version(systemPath, besApi));
 
 
 
@@ -257,11 +268,13 @@ public class DapDispatcher implements DispatchHandler {
 
 
         if (_useDAP2ResourceUrlResponse) {
-            DatasetFileAccess dfa = new DatasetFileAccess(systemPath, besApi);
-            dfa.setRequestMatchRegex(".*");// The match anything regex.
-            dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
-            dfa.setDap2Response(true);
-            responders.add(dfa);
+
+            Dap4Responder d4fa = new FileAccess(systemPath, null, "", besApi);
+
+            d4fa.clearAltResponders();
+            d4fa.setCombinedRequestSuffixRegex(d4fa.buildRequestMatchingRegex());
+
+            responders.add(d4fa);
         }
 
 
