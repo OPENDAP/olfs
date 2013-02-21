@@ -326,7 +326,7 @@ public class Util {
         }
 
         probeMsg.append("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -").append("\n");
-        probeMsg.append(" . . . . . . . . . Servlet Infomation API  . . . . . . . . . . . . . .").append("\n");
+        probeMsg.append(" . . . . . . . . . Servlet Information API  . . . . . . . . . . . . . .").append("\n");
         probeMsg.append("\n");
 
 

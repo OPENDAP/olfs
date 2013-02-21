@@ -419,7 +419,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.getMemoryReport());
 
                 log.debug(Util.showRequest(request, reqno));
-                log.debug(Util.probeRequest(this, request));
+                //log.debug(Util.probeRequest(this, request));
 
 
                 if(redirectForServiceOnlyRequest(request,response))

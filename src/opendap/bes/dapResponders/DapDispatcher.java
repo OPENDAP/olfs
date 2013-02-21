@@ -183,6 +183,8 @@ public class DapDispatcher implements DispatchHandler {
 
 
 
+
+        // DAP4 Responses
         responders.add(new NormativeDR(systemPath, besApi));
         responders.add(new NormativeDMR(systemPath, besApi));
         responders.add(new IsoDMR(systemPath, besApi));
@@ -206,42 +208,33 @@ public class DapDispatcher implements DispatchHandler {
 
         responders.add(new Version(systemPath, besApi));
 
-        /*     OLD way
-        if (!_useDAP2ResourceUrlResponse) {
-            DatasetServices sd = new DatasetServices(systemPath, besApi);
-            responders.add(sd);
-            sd.setServiceResponders(responders);
-
-            DatasetFileAccess dfa = new DatasetFileAccess(systemPath, besApi);
-            dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
-            responders.add(dfa);
-        }
 
 
-        responders.add(new HtmlDataRequestForm(systemPath, besApi));
-        responders.add(new Dataset(systemPath, besApi));
-        responders.add(new DataDDX(systemPath, besApi));
-
-        */
-
+        // DAP2 Data Responses
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
         responders.add(new NetcdfFileOut(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
 
+        Dap4Responder geoTiff = new GeoTiffDR(systemPath, null, ".tiff", besApi);
+        geoTiff.clearAltResponders();
+        geoTiff.setCombinedRequestSuffixRegex(geoTiff.buildRequestMatchingRegex());
+        responders.add(geoTiff);
 
+
+        Dap4Responder jp2 = new GmlJpeg2000DR(systemPath, null, ".jp2", besApi);
+        jp2.clearAltResponders();
+        jp2.setCombinedRequestSuffixRegex(jp2.buildRequestMatchingRegex());
+        responders.add(jp2);
+
+
+        // DAP2 Metadata responses
         hr = new DDX(systemPath, besApi);
         responders.add(hr);
-
-
         responders.add(new DDS(systemPath, besApi));
         responders.add(new DAS(systemPath, besApi));
         responders.add(new RDF(systemPath, besApi));
-
         responders.add(new DatasetInfoHtmlPage(systemPath, besApi));
-
-
-
 
         Dap4Responder iso = new IsoDMR(systemPath, null, ".iso", besApi);
         iso.clearAltResponders();
@@ -254,16 +247,6 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(rubric);
 
 
-        Dap4Responder geoTiff = new GeoTiffDR(systemPath, null, ".tiff", besApi);
-        geoTiff.clearAltResponders();
-        geoTiff.setCombinedRequestSuffixRegex(geoTiff.buildRequestMatchingRegex());
-        responders.add(geoTiff);
-
-
-        Dap4Responder jp2 = new GmlJpeg2000DR(systemPath, null, ".jp2", besApi);
-        jp2.clearAltResponders();
-        jp2.setCombinedRequestSuffixRegex(jp2.buildRequestMatchingRegex());
-        responders.add(jp2);
 
 
 
