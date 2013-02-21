@@ -60,7 +60,7 @@ public class DispatchServlet extends HttpServlet {
 
     private boolean isInitialized;
 
-    private NewDispatchHandler _gatewayDispatchHandler;
+    private DispatchHandler _gatewayDispatchHandler;
 
     public void init() {
 
@@ -76,7 +76,7 @@ public class DispatchServlet extends HttpServlet {
         reqNumber = new AtomicInteger(0);
         systemPath = ServletUtil.getSystemPath(this, "");
 
-        _gatewayDispatchHandler = new NewDispatchHandler();
+        _gatewayDispatchHandler = new DispatchHandler();
 
 
         try {

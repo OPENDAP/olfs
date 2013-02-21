@@ -49,7 +49,7 @@ import java.util.Vector;
  * Time: 10:35 AM
  * To change this template use File | Settings | File Templates.
  */
-public class NewDispatchHandler extends DapDispatcher {
+public class DispatchHandler extends DapDispatcher {
 
 
     private Logger log;
@@ -67,7 +67,7 @@ public class NewDispatchHandler extends DapDispatcher {
     private GatewayForm _gatewayForm;
 
 
-    public NewDispatchHandler() {
+    public DispatchHandler() {
 
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
