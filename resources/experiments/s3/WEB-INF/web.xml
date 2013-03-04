@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+           version="2.5">
+
+
+    <display-name>S3</display-name>
+    <description>S3 Index Service</description>
+
+
+    <servlet>
+        <servlet-name>s3</servlet-name>
+        <servlet-class>opendap.noaa_s3.S3CatalogServlet</servlet-class>
+
+        <init-param>
+            <param-name>OLFSConfigFileName</param-name>
+            <param-value>olfs.xml</param-value>
+        </init-param>
+
+        <load-on-startup>1</load-on-startup>
+
+    </servlet>
+
+
+
+    <servlet-mapping>
+        <servlet-name>s3</servlet-name>
+        <url-pattern>/index/*</url-pattern>
+    </servlet-mapping>
+
+
+
+    <!-- ==================== Default Session Configuration ================= -->
+    <!-- You can set the default session timeout (in minutes) for all newly   -->
+    <!-- created sessions by modifying the value below.                       -->
+
+      <session-config>
+          <session-timeout>30</session-timeout>
+      </session-config>
+
+
+
+
+      <!-- Default Error Page Definitions -->
+      <error-page>
+          <error-code>400</error-code>
+          <location>/error/error400.jsp</location>
+      </error-page>
+      <error-page>
+          <error-code>403</error-code>
+          <location>/error/error403.jsp</location>
+      </error-page>
+      <error-page>
+          <error-code>404</error-code>
+          <location>/error/error404.jsp</location>
+      </error-page>
+      <error-page>
+          <error-code>500</error-code>
+          <location>/error/error500.jsp</location>
+      </error-page>
+      <error-page>
+          <error-code>501</error-code>
+          <location>/error/error501.jsp</location>
+      </error-page>
+      <error-page>
+          <error-code>502</error-code>
+          <location>/error/error502.jsp</location>
+      </error-page>
+      <error-page>
+          <exception-type>java.lang.Throwable</exception-type>
+          <location>/error/error500.jsp</location>
+      </error-page>
+
+
+
+    <!-- ===================== Default MIME Type Mappings =================== -->
+    <!-- When serving static resources, Tomcat will automatically generate    -->
+    <!-- a "Content-Type" header based on the resource's filename extension,  -->
+    <!-- based on these mappings.  Additional mappings can be added here to   -->
+    <!-- apply to  your own application's web.xml deployment descriptor.      -->
+
+
+      <welcome-file-list>
+          <welcome-file>index.jsp</welcome-file>
+          <welcome-file>index.html</welcome-file>
+          <welcome-file>index.htm</welcome-file>
+      </welcome-file-list>
+
+
+      <!-- Security roles referenced by this web application -->
+      <security-role>
+          <description>
+              The role that is required to login to the Hyrax Administration Application
+          </description>
+          <role-name>manager</role-name>
+      </security-role>
+
+
+</web-app>
+
+
+
+
+
