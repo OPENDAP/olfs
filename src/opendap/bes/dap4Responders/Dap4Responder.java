@@ -248,19 +248,19 @@ public abstract class Dap4Responder extends BesDapResponder  {
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-        String requestedResourceId = ReqInfo.getLocalUrl(request);
+        String relativeUrl = ReqInfo.getLocalUrl(request);
 
         for(Dap4Responder altResponder: getAltRepResponders()){
 
             Pattern p = altResponder.getRequestSuffixMatchPattern();
 
-            if(Util.matchesSuffixPattern(requestedResourceId, p)){
+            if(Util.matchesSuffixPattern(relativeUrl, p)){
                 altResponder.respondToHttpGetRequest(request,response);
                 return;
             }
         }
 
-        boolean regexMatch = Util.matchesSuffixPattern(requestedResourceId,getRequestSuffixMatchPattern());
+        boolean regexMatch = Util.matchesSuffixPattern(relativeUrl,getRequestSuffixMatchPattern());
         if(regexMatch){
             log.debug("requestedResourceId matches RequestSuffixMatchPattern: {}",regexMatch);
             Dap4Responder targetResponder = getBestResponderForHttpRequest(request);
@@ -279,7 +279,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
             targetResponder.sendNormativeRepresentation(request,response);
             return;
         }
-        log.error("Something Bad Happened. Unable to respond to request for : {}'",Scrub.urlContent(requestedResourceId));
+        log.error("Something Bad Happened. Unable to respond to request for : {}'",Scrub.urlContent(relativeUrl));
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
 
@@ -299,7 +299,9 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         String resourceID = getResourceId(requestedResourceId,checkWithBes);
 
-        return resourceID != null;
+        boolean result =  resourceID != null;
+
+        return result;
 
     }
     public String getResourceId(String requestedResource, boolean checkWithBes){

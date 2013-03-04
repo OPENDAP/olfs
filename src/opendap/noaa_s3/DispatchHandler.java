@@ -1,0 +1,296 @@
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * //
+ * //
+ * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Author: Nathan David Potter  <ndp@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
+
+package opendap.noaa_s3;
+
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.FileAccess;
+import opendap.bes.dapResponders.DapDispatcher;
+import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ServletUtil;
+import opendap.gateway.BesGatewayApi;
+import opendap.gateway.GatewayForm;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.HeadMethod;
+import org.jdom.Element;
+import org.slf4j.Logger;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: ndp
+ * Date: 2/21/13
+ * Time: 1:01 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class DispatchHandler extends DapDispatcher {
+
+    private Logger log;
+
+    private S3BesApi _besApi;
+
+    private static final String _defaultPrefix = "s3/";
+    private String _prefix;
+
+    private boolean _initialized ;
+
+    private FileAccess fileResponder;
+
+    public DispatchHandler() {
+        this(_defaultPrefix);
+    }
+
+    public DispatchHandler(String prefix) {
+        super();
+        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        _initialized = false;
+        _besApi = null;
+        _prefix = prefix;
+
+
+    }
+
+
+    @Override
+    public void init(HttpServlet servlet, Element config) throws Exception {
+
+        if(_initialized)
+            return;
+
+        ingestPrefix(config);
+        _besApi = new S3BesApi(_prefix);
+
+
+        init(servlet, config, _besApi);
+
+        String systemPath = ServletUtil.getSystemPath(servlet, "");
+
+
+        // Non data resources need a special fileResponder.
+        fileResponder = new FileAccess(systemPath, null, "", _besApi);
+        fileResponder.clearAltResponders();
+        fileResponder.setCombinedRequestSuffixRegex(fileResponder.buildRequestMatchingRegex());
+        fileResponder.setAllowDirectDataSourceAccess(true);
+
+        _initialized = true;
+    }
+
+    @Override
+    public long getLastModified(HttpServletRequest req) {
+        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+        log.error("getLastModified() - ERROR!     THIS CODE SHOUD NEVER BE RUN AS IT'S FUNCTIONS      ERROR!");
+        log.error("getLastModified() - ERROR!            HAVE BEEN DELEGATED ELSEWHERE                ERROR!");
+        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+
+        return -1;
+    }
+
+
+    /**
+     *
+     * @return
+     * @throws java.io.IOException
+     * @throws org.jdom.JDOMException
+     */
+    public long getLastModified_OLD(HttpServletRequest req) {
+
+
+        if(!_initialized)
+            return -1;
+
+        String relativeURL = ReqInfo.getLocalUrl(req);
+
+
+
+        log.debug("getLastModified() - relativeURL: "+relativeURL);
+
+
+        String relativeUrl = ReqInfo.getLocalUrl(req);
+
+
+
+        log.debug("getLastModified(): Tomcat requesting getlastModified() " +
+                "for item: " + relativeUrl );
+
+        for (HttpResponder r : getResponders()) {
+            if (r.matches(relativeUrl)) {
+                log.info("The relative URL: " + relativeUrl + " matches " +
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
+
+                try {
+
+                    String remoteDataSourceUrl = _besApi.getRemoteDataSourceUrl(relativeURL,_prefix,r.getRequestSuffixMatchPattern());
+
+                    log.debug("remoteDataSourceUrl: " + remoteDataSourceUrl);
+
+
+                    // Go get the HEAD for the catalog:
+                    HttpClient httpClient = new HttpClient();
+                    HeadMethod headReq = new HeadMethod(remoteDataSourceUrl);
+
+                    try {
+                    int statusCode = httpClient.executeMethod(headReq);
+
+                        if (statusCode != HttpStatus.SC_OK) {
+                            log.error("Unable to HEAD s3 object: " + remoteDataSourceUrl);
+                            return -1;
+                        }
+
+
+                        log.debug("getLastModified(): Getting HTTP HEAD for "+remoteDataSourceUrl);
+
+                        Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
+
+                        if(lastModifiedHeader==null){
+                         return -1;
+                        }
+                        String lmtString = lastModifiedHeader.getValue();
+
+                        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+                        Date d = format.parse(lmtString);
+                        return d.getTime();
+
+                    } catch (Exception e) {
+                        log.error("Unable to HEAD the s3 resource: {} Error Msg: {}",remoteDataSourceUrl,e.getMessage());
+                    }
+
+                    return -1;
+
+
+
+                } catch (Exception e) {
+                    log.debug("getLastModified(): Returning: -1");
+                    return -1;
+                }
+
+            }
+
+        }
+
+        return -1;
+    }
+
+
+
+
+    @Override
+    public boolean requestDispatch(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   boolean sendResponse)
+            throws Exception  {
+
+
+        String relativeURL = ReqInfo.getLocalUrl(request);
+
+
+        log.debug("relativeURL:    "+relativeURL);
+
+
+
+        if(relativeURL.startsWith("/"))
+            relativeURL = relativeURL.substring(1,relativeURL.length());
+
+
+        //boolean itsJustThePrefixWithoutTheSlash = _prefix.substring(0,_prefix.lastIndexOf("/")).equals(relativeURL);
+        //boolean itsJustThePrefix = _prefix.equals(relativeURL);
+
+        if (relativeURL != null) {
+            if (sendResponse) {
+                log.info("Sending S3 Response");
+
+                if(!super.requestDispatch(request,response, true)  && !response.isCommitted()){
+
+
+                    try {
+                        fileResponder.sendNormativeRepresentation(request,response);
+                    } catch (Exception e) {
+                        return false;
+                    }
+
+                }
+                else
+                    log.info("Sent S3 Data Response.");
+            }
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+
+    private void ingestPrefix(Element config) throws Exception {
+
+
+        if (config != null) {
+
+            String msg;
+
+            Element e = config.getChild("prefix");
+            if (e != null)
+                _prefix = e.getTextTrim();
+
+            if (_prefix.equals("/")) {
+                msg = "Bad Configuration. The <Handler> " +
+                        "element that declares " + this.getClass().getName() +
+                        " MUST provide 1 <prefix>  " +
+                        "child element whose value may not be equal to \"/\"";
+                log.error(msg);
+                throw new Exception(msg);
+            }
+
+
+            if (!_prefix.endsWith("/"))
+                _prefix += "/";
+
+            if (_prefix.startsWith("/"))
+                _prefix = _prefix.substring(1);
+
+        }
+        log.info("Using prefix=" + _prefix);
+
+    }
+
+
+
+
+}

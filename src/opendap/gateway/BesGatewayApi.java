@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.rmi.Remote;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -286,14 +287,14 @@ public class BesGatewayApi extends BesApi {
 
         log.debug("getBesDataSourceID() - relativeUrl: " + relativeUrl);
 
-        StringBuilder besDataSourceId = new StringBuilder();
 
         if(Util.matchesSuffixPattern(relativeUrl,suffixMatchPattern)){
             try {
 
-                besDataSourceId.append(getRemoteDataSourceUrl(relativeUrl, _servicePrefix, suffixMatchPattern));
-                log.debug("getBesDataSourceID() - besDataSourceId: {}", besDataSourceId.toString());
-                return besDataSourceId.toString();
+                String remoteDatasourceUrl = getRemoteDataSourceUrl(relativeUrl, _servicePrefix, suffixMatchPattern);
+
+                log.debug("getBesDataSourceID() - besDataSourceId: {}", remoteDatasourceUrl);
+                return remoteDatasourceUrl;
             }
             catch (NumberFormatException e){
                 log.debug("getBesDataSourceID() - Failed to extract target dataset URL from relative URL '{}'", relativeUrl);

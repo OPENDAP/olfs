@@ -100,6 +100,8 @@ public class BesApi {
     private static boolean _initialized = false;
 
 
+    public boolean isInitialized(){ return _initialized; }
+
     /**
      * The name of the BES Exception Element.
      */

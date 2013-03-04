@@ -188,25 +188,16 @@ public class DapDispatcher implements DispatchHandler {
         responders.add(new NormativeDR(systemPath, besApi));
         responders.add(new NormativeDMR(systemPath, besApi));
         responders.add(new IsoDMR(systemPath, besApi));
+
+        responders.add(new Version(systemPath, besApi));
         if (!_useDAP2ResourceUrlResponse) {
-            responders.add(new NormativeDSR(systemPath, besApi, responders));
 
             FileAccess dfa = new FileAccess(systemPath, besApi);
             dfa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             responders.add(dfa);
-        }
-        else {
-            // Add the HTML form conditionally because the ".html" suffix is used
-            // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
-            // We should make sure that the old HTML ".html" response is available.
-            Dap4Responder htmlForm = new HtmlDMR(systemPath, null, ".html", besApi);
-            htmlForm.clearAltResponders();
-            htmlForm.setCombinedRequestSuffixRegex(htmlForm.buildRequestMatchingRegex());
-            responders.add(htmlForm);
 
+            responders.add(new NormativeDSR(systemPath, besApi, responders));
         }
-
-        responders.add(new Version(systemPath, besApi));
 
 
 
@@ -248,17 +239,22 @@ public class DapDispatcher implements DispatchHandler {
 
 
 
-
-
         if (_useDAP2ResourceUrlResponse) {
 
-            Dap4Responder d4fa = new FileAccess(systemPath, null, "", besApi);
+            // Add the HTML form conditionally because the ".html" suffix is used
+            // by the NormativeDSR's HTML representation. Since we aren't using the DSR response
+            // We should make sure that the old HTML ".html" response is available.
+            Dap4Responder htmlForm = new HtmlDMR(systemPath, null, ".html", besApi);
+            htmlForm.clearAltResponders();
+            htmlForm.setCombinedRequestSuffixRegex(htmlForm.buildRequestMatchingRegex());
+            responders.add(htmlForm);
 
+            Dap4Responder d4fa = new FileAccess(systemPath, null, "", besApi);
             d4fa.clearAltResponders();
             d4fa.setCombinedRequestSuffixRegex(d4fa.buildRequestMatchingRegex());
-
             responders.add(d4fa);
         }
+
 
 
         log.info("Initialized. Direct Data Source Access: " + (_allowDirectDataSourceAccess ? "Enabled" : "Disabled") + "  " +

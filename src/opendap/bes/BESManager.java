@@ -52,7 +52,7 @@ public class BESManager implements DispatchHandler {
 
     private static  org.slf4j.Logger log = null;
 
-    private static boolean initialized;
+    private static boolean initialized = false;
 
 
 
@@ -60,8 +60,6 @@ public class BESManager implements DispatchHandler {
 
     public BESManager(){
         log = org.slf4j.LoggerFactory.getLogger(getClass());
-        initialized = false;
-
     }
 
     public void init(HttpServlet servlet, Element config) throws Exception{
