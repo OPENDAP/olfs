@@ -91,11 +91,7 @@ public class S3BesApi extends BesGatewayApi {
         }
 
 
-
         // http://ocean-archive.data.nodc.noaa.gov/0087989/1.1/data/0-data/cortadv4_row00_col14.nc
-
-
-
 
 
         // @TODO Cache this! We do this twice for every response - lastModified plus doGet
