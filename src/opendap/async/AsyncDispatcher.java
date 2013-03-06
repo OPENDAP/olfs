@@ -422,13 +422,13 @@ public class AsyncDispatcher extends DapDispatcher {
 
         Date now = new Date();
 
-        Date startTime;
+        Date timeAvailable;
 
         String xmlBase = DocFactory.getXmlBase(request);
 
-        startTime = addResourceToCacheAsNeeded(xmlBase);
+        timeAvailable = addResourceToCacheAsNeeded(xmlBase);
 
-        long timeTillReady = startTime.getTime() - now.getTime();
+        long timeTillReady = timeAvailable.getTime() - now.getTime();
 
         if(timeTillReady>0){
             log.info("Delaying DAP2 data request for "+timeTillReady+"ms");
@@ -450,13 +450,16 @@ public class AsyncDispatcher extends DapDispatcher {
     private Date addResourceToCacheAsNeeded(String id){
 
         Date now = new Date();
-        Date startTime;
+        Date timeAvailable;
 
-        startTime = new Date(now.getTime()+ getResponseDelay_ms());
+        timeAvailable = new Date(now.getTime()+ getResponseDelay_ms());
 
-        startTime = asyncCache.putIfAbsent(id,startTime);
+        Date resourceAvailabilityTime = asyncCache.putIfAbsent(id,timeAvailable);
 
-        return startTime;
+        if(resourceAvailabilityTime != null)
+            return resourceAvailabilityTime;
+
+        return timeAvailable;
 
     }
 
