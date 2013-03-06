@@ -547,6 +547,7 @@
                   targetfile="${build.doc}/opendap/index.html">
             <srcfiles dir="${src.dir}">
                 <include name="opendap/**/*.java"/>
+                <include name="org/opendap/**/*.java"/>
             </srcfiles>
         </uptodate>
 
