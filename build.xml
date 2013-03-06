@@ -316,6 +316,7 @@
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
                 <include name="opendap/**"/>
+                <include name="org/opendap/**"/>
 
 
                 <!-- Exclude the old hao code  -->
