@@ -56,6 +56,7 @@ public class S3Index extends RemoteResource {
 
     Logger log;
     private String _bucketName;
+    private String _bucketContext;
     private String _index = "/index.xml";
     private String _s3ObjIdForIndex;
 
@@ -71,10 +72,13 @@ public class S3Index extends RemoteResource {
 
 
 
-    public S3Index(HttpServletRequest req, String bucketName) {
+
+
+    public S3Index(HttpServletRequest req, String bucketContext, String bucketName) {
         super();
         log = LoggerFactory.getLogger(getClass());
         _bucketName = bucketName;
+        _bucketContext = bucketContext;
         _s3ObjIdForIndex = getS3IndexObjectString(req);
         _indexElement = null;
         //_useMemoryCache = useMemCache;
@@ -170,12 +174,31 @@ public class S3Index extends RemoteResource {
 
 
 
+    private HashMap<String, Element> getThreddsCatalogServices(){
+        HashMap<String,Element> services = new HashMap<String, Element>();
+
+
+        // Define the DAP service
+        Element service = new Element(THREDDS.SERVICE, THREDDS.NS);
+        service.setAttribute("name","dap");
+        service.setAttribute("serviceType","OPeNDAP");
+        service.setAttribute("base",S3CatalogManager.theManager().getDapServiceContext());
+
+        services.put("dap",service);
+
+
+        return services;
+    }
 
 
 
-    public Element getThreddsCatalog(String catalogServiceContext, HashMap<String,Element> services) throws JDOMException, IOException {
+
+
+    public Element getThreddsCatalog() throws JDOMException, IOException {
 
         Element threddsCatalog = new Element(THREDDS.CATALOG,THREDDS.NS);
+
+        HashMap<String,Element> services = getThreddsCatalogServices();
 
         threddsCatalog.addNamespaceDeclaration(XLINK.NS);
 
@@ -188,6 +211,9 @@ public class S3Index extends RemoteResource {
         String name = getIndexPath().equals("")?getIndexDelimiter():getIndexPath();
 
         StringBuilder id = new StringBuilder();
+
+
+        String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
 
         id.append(catalogServiceContext).append(name);
 
@@ -348,7 +374,7 @@ public class S3Index extends RemoteResource {
 
             StringBuilder href = new StringBuilder();
 
-            href.append(catalogServiceContext).append(id).append("catalog.xml");
+            href.append(catalogServiceContext).append(_bucketContext).append(id).append("catalog.xml");
 
             catalogRef.setAttribute("href",href.toString(),XLINK.NS);
 
@@ -389,6 +415,9 @@ public class S3Index extends RemoteResource {
     private  String getCollectionName(HttpServletRequest request){
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
+        if(relativeUrl.startsWith(_bucketContext))
+            relativeUrl = relativeUrl.substring(_bucketContext.length());
+
         String collectionName  = Scrub.urlContent(relativeUrl);
 
         if(collectionName.endsWith("/contents.html")){

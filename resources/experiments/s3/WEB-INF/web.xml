@@ -53,7 +53,8 @@
 
     <servlet-mapping>
         <servlet-name>s3</servlet-name>
-        <url-pattern>/index/*</url-pattern>
+        <url-pattern>/catalog/*</url-pattern>
+        <url-pattern>/dap/*</url-pattern>
     </servlet-mapping>
 
 

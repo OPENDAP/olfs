@@ -28,6 +28,7 @@ package opendap.noaa_s3;
 
 import org.slf4j.LoggerFactory;
 
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -43,13 +44,21 @@ public class S3CatalogManager {
     org.slf4j.Logger log;
 
     private ConcurrentHashMap<String, S3Index> catalogNodes;
+    private ConcurrentHashMap<String, String>  s3BucketList;
 
     private static S3CatalogManager theManager = null;
+
+    private String _catalogServiceContext;
+    private String _dapServiceContext;
 
 
     private S3CatalogManager() {
         log = LoggerFactory.getLogger(this.getClass());
         catalogNodes = new ConcurrentHashMap<String, S3Index>();
+        s3BucketList = new ConcurrentHashMap<String, String>();
+        _dapServiceContext = "/dap";
+        _catalogServiceContext = "/catalog";
+
     }
 
 
@@ -62,13 +71,31 @@ public class S3CatalogManager {
     }
 
 
+    public void setCatalogServiceContext(String catalogServiceContext){
+        _catalogServiceContext = catalogServiceContext;
+    }
+
+    public void setDapServiceContext(String dapServiceContext){
+        _dapServiceContext = dapServiceContext;
+    }
+
+    public String getCatalogServiceContext(){
+        return _catalogServiceContext;
+    }
+
+    public String getDapServiceContext(){
+        return _dapServiceContext;
+    }
+
 
     public S3Index getIndex(String requestURL){
 
+        if(requestURL==null)
+            return null;
+
+
         S3Index s3i = catalogNodes.get(requestURL);
-
         log.debug("getIndex() - Request for '{}' returning s3i: {}",requestURL,s3i);
-
         return s3i;
     }
 
@@ -77,9 +104,48 @@ public class S3CatalogManager {
         log.debug("putIndex() - Putting '{}' with s3i: {}",requestURL, s3i);
 
         if(requestURL!=null  &&  s3i!=null)
-            catalogNodes.put(s3i.getS3IndexUrlString(),s3i);
+            catalogNodes.putIfAbsent(requestURL,s3i);
 
     }
+
+
+    public void addBucket(String bucketContext, String bucketName){
+
+        while(bucketContext.startsWith("/"))
+            bucketContext = bucketContext.substring(1);
+
+        bucketContext = "/" + bucketContext;
+
+        s3BucketList.putIfAbsent(bucketContext,bucketName);
+    }
+
+    public String getBucketNameForContext(String bucketContext){
+        return s3BucketList.get(bucketContext);
+    }
+
+    public String getBucketContext(String relativeUrl){
+
+        String bucketContext = "";
+        for(String context:s3BucketList.keySet()){
+            if(relativeUrl.startsWith(context)){
+                if(context.length()>bucketContext.length())
+                    bucketContext = context;
+            }
+        }
+
+        return bucketContext;
+    }
+
+    public String getBucketName(String relativeUrl){
+
+        return s3BucketList.get(getBucketContext(relativeUrl));
+    }
+
+
+    public Enumeration<String> getBucketContexts(){
+        return s3BucketList.keys();
+    }
+
 
 
 
