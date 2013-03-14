@@ -321,7 +321,7 @@ public class S3Index extends RemoteResource {
     public String getS3DatasetResourceID(String fileName) throws JDOMException, IOException {
 
         StringBuilder s3DatasetUrl =  new StringBuilder();
-        s3DatasetUrl.append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
+        s3DatasetUrl.append(_bucketContext).append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
 
         return s3DatasetUrl.toString();
     }

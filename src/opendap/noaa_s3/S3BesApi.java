@@ -26,6 +26,7 @@
 
 package opendap.noaa_s3;
 
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.gateway.BesGatewayApi;
 import org.apache.commons.httpclient.Header;
@@ -38,88 +39,74 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 2/21/13
- * Time: 1:12 PM
- * To change this template use File | Settings | File Templates.
+ * This subclass of BesGatewayApi knows how to build remote data source Urls  for resource held in an S3.
+ * The bucket name is aliased to a bucket context in the local URL by the S3CatalogManager.
  */
 public class S3BesApi extends BesGatewayApi {
 
-
-    private String s3BucketName = "ocean-archive.data.nodc.noaa.gov";
-
-
-
-
-    public S3BesApi(){
-        this("");
-    }
-
+    org.slf4j.Logger log;
 
     public S3BesApi(String servicePrefix){
         super(servicePrefix);
+        log = LoggerFactory.getLogger(S3BesApi.class);
     }
 
 
     @Override
     public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern )  {
 
-
-
-        //String requestSuffix = ReqInfo.getSuffix(relativeURL);
-
-
-
-        // Strip leading slash(es)
-        while(relativeURL.startsWith("/") && !relativeURL.equals("/"))
-            relativeURL = relativeURL.substring(1,relativeURL.length());
-
-
-
-        String dataSourceUrl = relativeURL;
-
-
-        // Strip the path off.
-        if(pathPrefix!=null && dataSourceUrl.startsWith(pathPrefix))
-            dataSourceUrl = dataSourceUrl.substring(pathPrefix.length());
-
-
-        if(!dataSourceUrl.equals("")){
-            dataSourceUrl = Util.dropSuffixFrom(dataSourceUrl, suffixMatchPattern);
-        }
-
-
-        // http://ocean-archive.data.nodc.noaa.gov/0087989/1.1/data/0-data/cortadv4_row00_col14.nc
-
+        String dataSourceUrl = getS3DataAccessUrlString(relativeURL, suffixMatchPattern);
 
         // @TODO Cache this! We do this twice for every response - lastModified plus doGet
         // Maybe even we should just read it from the index files (cause it's there) and then we can
         // Focus on caching/updating/refreshing just the catalog index.
-        dataSourceUrl = getS3DataAccessUrlString(dataSourceUrl);
-
         long lmt = getLastModified(dataSourceUrl);
 
 
-        // That's broken.
-
+        // NO luck? Then something is broken...
         if(lmt==-1)
-            return null;  // Can't set it to null, because null gets turned in to "null", a string. *sigh*
+            return null;  // Can't set dataSourceUrl to null, because null gets turned in to "null", a string. *sigh*
 
-//        URL url = new URL(dataSourceUrl);
-        //log.debug(urlInfo(url));
+        // URL url = new URL(dataSourceUrl);
+        // log.debug(urlInfo(url));
 
         return dataSourceUrl;
 
 
     }
 
-    public String getS3DataAccessUrlString(String s3ResourceId){
+
+    public String getS3DataAccessUrlString(String relativeURL,  Pattern suffixMatchPattern){
+
+
+
+        String s3ResourceId = relativeURL;
+
+        String bucketContext  = S3CatalogManager.theManager().getBucketContext(relativeURL);
+
+        // Strip off the bucket context - we'll use the actual bucket name when we build the remote resource URL.
+        while(s3ResourceId.startsWith(bucketContext))
+            s3ResourceId = s3ResourceId.substring(bucketContext.length());
+
+
+        // Strip leading slash(es)
+        while(s3ResourceId.startsWith("/") && !s3ResourceId.equals("/"))
+            s3ResourceId = s3ResourceId.substring(1,s3ResourceId.length());
+
+
+        // Drop the suffix for whatever dap service ore media-type this thing matches.
+        if(!s3ResourceId.equals("")){
+            s3ResourceId = Util.dropSuffixFrom(s3ResourceId, suffixMatchPattern);
+        }
+
+        // Get the s3 bucket id.
+        String bucketName    = S3CatalogManager.theManager().getBucketName(relativeURL);
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("http://").append(s3BucketName).append(".s3.amazonaws.com/").append(s3ResourceId);
+        sb.append( "http://" ).append( bucketName ).append( ".s3.amazonaws.com/" ).append( s3ResourceId );
 
         return sb.toString();
 
@@ -128,22 +115,30 @@ public class S3BesApi extends BesGatewayApi {
 
 
     /**
+     * Returns the last modified time of the remote resource identified by the passed remote resource URL.
      *
-     * @param remoteResourceUrl
-     * @return
-     * @throws java.io.IOException
-     * @throws org.jdom.JDOMException
-     */
+     * @param remoteResourceUrl The remote resource URL to check.
+     * @return The last-modified time OR -1 if the last modified was not available for any reason (including a
+     * missing  resource - 404)
+]     */
     public long getLastModified(String remoteResourceUrl) {
-
-        org.slf4j.Logger log = LoggerFactory.getLogger(S3BesApi.class);
-
 
         log.debug("getLastModified() - remoteResourceUrl: "+remoteResourceUrl);
 
-        try {
-            log.debug("remoteDataSourceUrl: " + remoteResourceUrl);
 
+        // Try to get it from the request cache.
+        String lmt_cache_key = remoteResourceUrl+"_last-modified";
+        Long lmt =  (Long) RequestCache.get(lmt_cache_key);
+        if(lmt!=null){
+            log.debug("getLastModified() - using cached lmt: {}",lmt);
+            return lmt;
+        }
+
+        // It's not in the cache so hop to it!
+
+        long lastModifiedTime;
+
+        try {
             // Go get the HEAD for the catalog:
             HttpClient httpClient = new HttpClient();
             HeadMethod headReq = new HeadMethod(remoteResourceUrl);
@@ -153,34 +148,38 @@ public class S3BesApi extends BesGatewayApi {
 
                 if (statusCode != HttpStatus.SC_OK) {
                     log.error("Unable to HEAD s3 object: " + remoteResourceUrl);
-                    return -1;
+                    lastModifiedTime = -1;
                 }
+                else {
+                    log.debug("getLastModified(): Getting HTTP HEAD for "+remoteResourceUrl);
 
-                log.debug("getLastModified(): Getting HTTP HEAD for "+remoteResourceUrl);
+                    Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
 
-                Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
-
-                if(lastModifiedHeader==null){
-                 return -1;
+                    if(lastModifiedHeader==null){
+                     lastModifiedTime =  -1;
+                    }
+                    else {
+                        String lmtString = lastModifiedHeader.getValue();
+                        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+                        Date d = format.parse(lmtString);
+                        lastModifiedTime =  d.getTime();
+                    }
                 }
-                String lmtString = lastModifiedHeader.getValue();
-
-                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-                Date d = format.parse(lmtString);
-                return d.getTime();
 
             } catch (Exception e) {
-                log.error("Unable to HEAD the s3 resource: {} Error Msg: {}",remoteResourceUrl,e.getMessage());
+                log.error("Unable to HEAD the s3 resource: {} Error Msg: {}", remoteResourceUrl, e.getMessage());
+                lastModifiedTime = -1;
             }
-
-            return -1;
-
-
 
         } catch (Exception e) {
             log.debug("getLastModified(): Returning: -1");
-            return -1;
+            lastModifiedTime =  -1;
         }
+
+        RequestCache.put(lmt_cache_key, lastModifiedTime);
+
+        return lastModifiedTime;
+
 
     }
 

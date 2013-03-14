@@ -29,7 +29,6 @@ package opendap.noaa_s3;
 import opendap.bes.BESManager;
 import opendap.coreServlet.*;
 import opendap.logging.LogUtil;
-import opendap.namespaces.THREDDS;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -64,7 +63,7 @@ public class S3CatalogServlet extends HttpServlet {
 
     private String _servletContext;
 
-    private DispatchHandler _s3DapDispatcher;
+    private S3DapDispatchHandler _s3DapDispatcher;
 
 
 
@@ -87,7 +86,12 @@ public class S3CatalogServlet extends HttpServlet {
         _servletContext = this.getServletContext().getContextPath();
 
 
-
+        /**
+         * ###########################################################################
+         *
+         * These things could be in a configuration file
+         *
+         */
         String s3BucketContext = "/nodc";
         String s3BucketName = "ocean-archive.data.nodc.noaa.gov";
         S3CatalogManager.theManager().addBucket(s3BucketContext,s3BucketName);
@@ -100,14 +104,19 @@ public class S3CatalogServlet extends HttpServlet {
         String catalogServiceContextPath = _servletContext+"/catalog";
         S3CatalogManager.theManager().setCatalogServiceContext(catalogServiceContextPath);
 
+        Element besConfiguration = getDefaultBesManagerConfig();
+
+        /**
+         * ###########################################################################
+         */
 
 
 
-        _s3DapDispatcher = new DispatchHandler(S3CatalogManager.theManager().getDapServiceContext());
+        _s3DapDispatcher = new S3DapDispatchHandler(S3CatalogManager.theManager().getDapServiceContext());
 
         try {
             BESManager besManager = new BESManager();
-            besManager.init(this,getDefaultBesManagerConfig());
+            besManager.init(this,besConfiguration);
             _s3DapDispatcher.init(this, getDefaultDapDispatchConfig() );
 
         } catch (Exception e) {
@@ -184,10 +193,9 @@ public class S3CatalogServlet extends HttpServlet {
 
     private boolean redirectToCatalog(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String relativeUrl =ReqInfo.getLocalUrl(req);
-        String bucketContext = S3CatalogManager.theManager().getBucketContext(relativeUrl);
         String redirectTo;
         if(relativeUrl.endsWith("/")){
-            redirectTo = _servletContext + bucketContext + relativeUrl + "catalog.xml";
+            redirectTo = S3CatalogManager.theManager().getCatalogServiceContext() + relativeUrl + "catalog.xml";
             res.sendRedirect(Scrub.urlContent(redirectTo));
             _log.debug("redirectToCatalog() Redirected request for node to THREDDS catalog: {}", redirectTo);
             return true;
@@ -198,24 +206,40 @@ public class S3CatalogServlet extends HttpServlet {
     }
 
 
-
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) {
 
         try {
-            LogUtil.logServerAccessStart(request, "S3CATALOG_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "S3_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
 
-            if (!redirectToCatalog(request, response)) {
+            if (!redirectToCatalog(request, response)) {  // Do we send the catalog redirect?
 
-                if (!directoryDispatch(request, response)) {
 
-                    if (!_s3DapDispatcher.requestDispatch(request, response, true)) {
+                String requestURI = request.getRequestURI();
 
+                if (requestURI.startsWith(S3CatalogManager.theManager().getCatalogServiceContext())) {
+                    if (!directoryDispatch(request, response)) {  // Is it a catalog request?
+                        // We don't know how to cope, looks like it's time to 404!
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                        _log.info("Sent 404 Response.");
+
+                    }
+                } else if (requestURI.startsWith(S3CatalogManager.theManager().getDapServiceContext())) {
+
+                    if (!_s3DapDispatcher.requestDispatch(request, response, true)) { // Is it a DAP request?
+
+                        // We don't know how to cope, looks like it's time to 404!
                         response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
                         _log.info("Sent 404 Response.");
 
                     }
                 }
+                else {   // It's not a catalog request, and it's not a dap request, so:
+                    // Looks like it's time to 404!
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
+                    _log.info("Sent 404 Response.");
+                }
+
 
             }
 
@@ -227,7 +251,7 @@ public class S3CatalogServlet extends HttpServlet {
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "S3CATALOG_ACCESS");
+            LogUtil.logServerAccessEnd(0, -1, "S3_ACCESS");
         }
 
     }
@@ -236,18 +260,49 @@ public class S3CatalogServlet extends HttpServlet {
 
 
         RequestCache.openThreadCache();
+        long reqno = _reqNumber.incrementAndGet();
+        LogUtil.logServerAccessStart(req, "S3", "LastModified", Long.toString(reqno));
 
         _log.debug("getLastModified() - BEGIN");
 
-        long reqno = _reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "S3CATALOG_ACCESS", "LastModified", Long.toString(reqno));
+        try {
+            LogUtil.logServerAccessStart(req, "S3CATALOG_ACCESS", "LastModified", Long.toString(reqno));
 
+            String requestURI = req.getRequestURI();
+
+            if(requestURI.startsWith(S3CatalogManager.theManager().getCatalogServiceContext())){
+                return getCatalogLastModified(req);
+            }
+            else if (requestURI.startsWith(S3CatalogManager.theManager().getDapServiceContext())) {
+                return _s3DapDispatcher.getLastModified(req);
+            }
+            return -1;
+
+        }
+        finally {
+            _log.debug("getLastModified() - END");
+
+        }
+
+
+
+    }
+
+
+
+    public void destroy() {
+        _log.info("Destroy complete.");
+
+    }
+
+
+
+
+
+    public long getCatalogLastModified(HttpServletRequest req){
 
         String requestUrl = req.getRequestURL().toString();
         String relativeURL = ReqInfo.getLocalUrl(req);
-
-
-
 
         S3Index s3i;
         boolean newIndex = false;
@@ -279,13 +334,9 @@ public class S3CatalogServlet extends HttpServlet {
 
         return lmt;
 
-    }
-
-
-    public void destroy() {
-        _log.info("Destroy complete.");
 
     }
+
 
     /**
      * Performs dispatching for file requests. If a request is not for a
@@ -310,8 +361,6 @@ public class S3CatalogServlet extends HttpServlet {
         String requestUrl = request.getRequestURL().toString();
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
-        String foo = ReqInfo.getServiceUrl(request);
-
         String bucketContext = S3CatalogManager.theManager().getBucketContext(relativeUrl);
         String bucketName = S3CatalogManager.theManager().getBucketName(relativeUrl);
 
@@ -331,7 +380,6 @@ public class S3CatalogServlet extends HttpServlet {
 
 
         try {
-
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 

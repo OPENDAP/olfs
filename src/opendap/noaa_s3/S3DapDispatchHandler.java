@@ -26,27 +26,17 @@
 
 package opendap.noaa_s3;
 
-import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dapResponders.DapDispatcher;
-import opendap.coreServlet.DataSourceInfo;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
-import opendap.gateway.BesGatewayApi;
-import opendap.gateway.GatewayForm;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.HeadMethod;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,7 +45,7 @@ import java.util.Date;
  * Time: 1:01 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DispatchHandler extends DapDispatcher {
+public class S3DapDispatchHandler extends DapDispatcher {
 
     private Logger log;
 
@@ -68,11 +58,11 @@ public class DispatchHandler extends DapDispatcher {
 
     private FileAccess fileResponder;
 
-    public DispatchHandler() {
+    public S3DapDispatchHandler() {
         this(_defaultPrefix);
     }
 
-    public DispatchHandler(String prefix) {
+    public S3DapDispatchHandler(String prefix) {
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
@@ -109,14 +99,24 @@ public class DispatchHandler extends DapDispatcher {
 
     @Override
     public long getLastModified(HttpServletRequest req) {
-        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
-        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
-        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
-        log.error("getLastModified() - ERROR!     THIS CODE SHOUD NEVER BE RUN AS IT'S FUNCTIONS      ERROR!");
-        log.error("getLastModified() - ERROR!            HAVE BEEN DELEGATED ELSEWHERE                ERROR!");
-        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
-        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
-        log.error("getLastModified() - ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR! ERROR!");
+        String relativeURL = ReqInfo.getLocalUrl(req);
+
+        log.debug("getLastModified() - relativeURL: {}",relativeURL);
+
+
+        for (HttpResponder r : getResponders()) {
+            log.debug("Checking responder: "+ r.getClass().getSimpleName()+ " (pathPrefix: "+r.getPathPrefix()+")");
+            if (r.matches(relativeURL)) {
+
+                log.info("The relative URL: " + relativeURL + " matches " +
+                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
+
+
+                String remoteS3ResourceUrl = _besApi.getS3DataAccessUrlString(relativeURL,r.getRequestSuffixMatchPattern());
+
+                return _besApi.getLastModified(remoteS3ResourceUrl);
+            }
+        }
 
         return -1;
     }
