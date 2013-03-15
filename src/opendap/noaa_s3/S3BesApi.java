@@ -59,11 +59,7 @@ public class S3BesApi extends BesGatewayApi {
 
         String dataSourceUrl = getS3DataAccessUrlString(relativeURL, suffixMatchPattern);
 
-        // @TODO Cache this! We do this twice for every response - lastModified plus doGet
-        // Maybe even we should just read it from the index files (cause it's there) and then we can
-        // Focus on caching/updating/refreshing just the catalog index.
         long lmt = getLastModified(dataSourceUrl);
-
 
         // NO luck? Then something is broken...
         if(lmt==-1)
@@ -122,6 +118,9 @@ public class S3BesApi extends BesGatewayApi {
      * not found - 404)
      */
     public long getLastModified(String remoteResourceUrl) {
+
+        // @TODO Cache this! We do this for every response  - we should just read it from the index files
+        // (cause it's already there) and then we can focus on caching/updating/refreshing just the catalog index.
 
         log.debug("getLastModified() - remoteResourceUrl: "+remoteResourceUrl);
 
