@@ -119,8 +119,8 @@ public class S3BesApi extends BesGatewayApi {
      *
      * @param remoteResourceUrl The remote resource URL to check.
      * @return The last-modified time OR -1 if the last modified was not available for any reason (including a
-     * missing  resource - 404)
-]     */
+     * not found - 404)
+     */
     public long getLastModified(String remoteResourceUrl) {
 
         log.debug("getLastModified() - remoteResourceUrl: "+remoteResourceUrl);
