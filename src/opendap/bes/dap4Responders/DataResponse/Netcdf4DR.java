@@ -73,7 +73,7 @@ public class Netcdf4DR extends Dap4Responder{
         setServiceDescription("NetCDF-4 representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
-        setNormativeMediaType(new ServiceMediaType("application","x-netcdf", getRequestSuffix()));
+        setNormativeMediaType(new ServiceMediaType("application","x-netcdf;ver=4", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
