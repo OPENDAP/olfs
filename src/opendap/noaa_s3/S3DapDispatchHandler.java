@@ -148,7 +148,7 @@ public class S3DapDispatchHandler extends DapDispatcher {
 
         if (relativeURL != null) {
             if (sendResponse) {
-                log.info("Sending S3 Response");
+                log.info("Sending DAP Response for S3 holding.");
 
                 if(!super.requestDispatch(request,response, true)  && !response.isCommitted()){
 
@@ -161,7 +161,7 @@ public class S3DapDispatchHandler extends DapDispatcher {
 
                 }
                 else
-                    log.info("Sent S3 Data Response.");
+                    log.info("Sent DAP Response for S3 holding.");
             }
         }
 

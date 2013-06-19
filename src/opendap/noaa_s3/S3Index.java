@@ -107,31 +107,6 @@ public class S3Index extends RemoteResource {
     }
 
 
-    /**
-     *
-     * @return
-     * @throws IOException
-     * @throws JDOMException
-     */
-    public void loadIndexObject_OLD() throws IOException, JDOMException {
-
-        String indexObjUrl = getS3IndexUrlString();
-
-        log.debug("indexObjUrl: " + indexObjUrl);
-
-
-         _indexElement = opendap.xml.Util.getDocumentRoot(indexObjUrl);
-
-        _indexElement.detach();
-
-
-
-
-
-        //List filesList = _indexElement.getChildren("file", S3_CATALOG_NAMESPACE);
-        //List foldersList = _indexElement.getChildren("folder", S3_CATALOG_NAMESPACE);
-
-    }
 
 
 
@@ -139,16 +114,14 @@ public class S3Index extends RemoteResource {
 
         String indexObjUrl = getS3IndexUrlString();
 
-        log.debug("indexObjUrl: " + indexObjUrl);
-
-
+        log.debug("loadIndexObject() - indexObjUrl: " + indexObjUrl);
 
         Document indexDoc = opendap.xml.Util.getDocument(getResourceAsStream());
 
         _indexElement = indexDoc.getRootElement();
         _indexElement.detach();
 
-        log.debug("getIndexDocumentRoot(): Retrieved S3 index document.");
+        log.debug("loadIndexObject() - loadIndexObject(): Retrieved S3 index document.");
 
 
 
@@ -320,10 +293,10 @@ public class S3Index extends RemoteResource {
 
     public String getS3DatasetResourceID(String fileName) throws JDOMException, IOException {
 
-        StringBuilder s3DatasetUrl =  new StringBuilder();
-        s3DatasetUrl.append(_bucketContext).append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
+        StringBuilder resourceId =  new StringBuilder();
+        resourceId.append(_bucketContext).append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
 
-        return s3DatasetUrl.toString();
+        return resourceId.toString();
     }
 
 
