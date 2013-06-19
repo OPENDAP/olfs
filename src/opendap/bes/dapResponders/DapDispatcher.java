@@ -156,6 +156,19 @@ public class DapDispatcher implements DispatchHandler {
                 _useDAP2ResourceUrlResponse = true;
             }
 
+            dv = _config.getChild("MaxPostBodyLength");
+            if (dv != null) {
+                try {
+                    int maxLength = Integer.parseInt(dv.getTextTrim());
+                    ReqInfo.setMaxPostBodyLength(maxLength);
+                }
+                catch(NumberFormatException e){
+                    log.warn("Unable to parse the value of MaxPostBodyLength! Value: {} ",dv.getTextTrim());
+
+                }
+                log.info("MaxPostBodyLength is set to {}", ReqInfo.getMaxPostBodyLength());
+            }
+
         }
 
 

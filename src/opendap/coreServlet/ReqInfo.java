@@ -27,11 +27,15 @@ package opendap.coreServlet;
 
 
 import opendap.dap.Request;
+import org.apache.bcel.generic.NEW;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +81,11 @@ public class ReqInfo {
 
     }
 
+    private static AtomicInteger maxPostBodyLength;
+    static {
+        maxPostBodyLength = new AtomicInteger(1000000);
+    }
+
     private static String pathFunctionSyntaxRegEx = "_expr_\\{.*\\}\\{.*\\}(\\{.*\\})?";
     private static Pattern pathFunctionSyntaxPattern;
     static {
@@ -84,6 +93,13 @@ public class ReqInfo {
     }
 
 
+    public static void setMaxPostBodyLength(int maxLength){
+        maxPostBodyLength.set(maxLength);
+    }
+
+    public static int getMaxPostBodyLength(){
+        return maxPostBodyLength.get();
+    }
 
     private static ConcurrentHashMap<String,String> serviceContexts;
 
@@ -119,7 +135,8 @@ public class ReqInfo {
     }
 
     /**
-     * Get service context portion of the URL - everything in the URL after the name of the server and before the localID (aka relativeUrl) of the dataset.
+     * Get service context portion of the URL - everything in the URL after the name of the server and before the
+     * localID (aka relativeUrl) of the dataset.
      * @param request The client request.
      * @return The URL of the request minus the last "." suffix. In other words if the requested URL ends
      * with a suffix that is preceeded by a dot (".") then the suffix will removed from this returned URL.
@@ -190,20 +207,126 @@ public class ReqInfo {
 
 
     /**
-     * THis has been hacked to collect path side functional expressions (server side functions expressed in the path of
-     * the URL and place them on the begining of the CE returned.
+     * This has been hacked to collect path side functional expressions (server side functions expressed in the path of
+     * the URL and place them on the beginning of the CE returned.
      *
      * Returns the OPeNDAP constraint expression.
      * @param req The client request.
      * @return The OPeNDAP constraint expression.
+     * @throws java.io.IOException When the body of a POST request cannot be read.
      */
-    public static  String getConstraintExpression(HttpServletRequest req) {
+    public static  String getConstraintExpression(HttpServletRequest req) throws IOException {
 
-        String queryString = req.getQueryString();
+        StringBuilder CE;
+
+        String ceCacheKey = ReqInfo.class.getName()+".getConstraintExpression()";
+        Object o  = RequestCache.get(ceCacheKey);
 
 
-        String requestPath=req.getPathInfo();
+        if(o == null){
 
+
+            CE = new StringBuilder();
+
+
+            StringBuilder pathFunctionCE = getPathFunctionCE(req.getPathInfo());
+
+            CE.append(pathFunctionCE);
+
+            String queryString = req.getQueryString();
+            if(queryString != null){
+
+                if(CE.length() != 0){
+                    CE.append(",");
+                }
+                CE.append(queryString);
+
+            }
+
+            StringBuilder bodyCE = getPostBodyCE(req);
+            if(CE.length()!=0 && bodyCE.length() != 0){
+                CE.append(",");
+            }
+            CE.append(bodyCE);
+            RequestCache.put(ceCacheKey,CE);
+
+        }
+        else {
+            CE = (StringBuilder)o;
+        }
+
+
+        return CE.toString();
+    }
+
+
+    private static StringBuilder getPostBodyCE(HttpServletRequest req) throws IOException {
+
+        StringBuilder bodyCE = new StringBuilder();
+
+        if(req.getMethod().equalsIgnoreCase("POST")){
+
+
+            if(req.getContentLength()> getMaxPostBodyLength()) {
+                throw new IOException("POST body content length is longer than maximum allowed by service.");
+            }
+
+            String contentType = req.getHeader("Content-Type");
+
+            if(contentType!=null && contentType.equalsIgnoreCase("application/x-www-form-urlencoded")){
+                Map paramMap = req.getParameterMap();
+
+                String[] bodyCEValues = (String[]) paramMap.get("ce");
+                if(bodyCEValues!=null){
+                    for(String ceValue: bodyCEValues){
+                        if(bodyCE.length()!=0){
+                            bodyCE.append(",");
+                        }
+                        bodyCE.append(ceValue);
+                    }
+                }
+
+                bodyCEValues = (String[]) paramMap.get("dap4:ce");
+                if(bodyCEValues!=null){
+                    for(String ceValue: bodyCEValues){
+                        if(bodyCE.length()!=0){
+                            bodyCE.append(",");
+                        }
+                        bodyCE.append(ceValue);
+                    }
+                }
+
+
+            }
+            else {
+                bodyCE.append(convertStreamToString(req.getInputStream()));
+            }
+
+        }
+
+        return bodyCE;
+
+
+    }
+
+
+
+    private static String convertStreamToString(java.io.InputStream is) throws IOException {
+
+        // Using the scanner with the \A delimiter basically says "from the beginning of the input"
+        // So then we get one big token from teh scanner and (see comment below)
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+
+        // Since the Scanner is going to make one token from the whole shebang, either the  InputStream
+        // is empty (in which case we return an empty string, or it's not empty and we return the single token.
+        return s.hasNext() ? s.next() : "";
+    }
+
+
+
+
+
+    private static StringBuilder getPathFunctionCE(String requestPath){
         if(requestPath == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
             requestPath = "/";
 
@@ -229,7 +352,7 @@ public class ReqInfo {
 
         }
 
-        String serverSideFunctionCalls = null;
+        StringBuilder serverSideFunctionCalls = new StringBuilder();
 
         if(pathFunction!=null){
 
@@ -240,32 +363,15 @@ public class ReqInfo {
 
                 if(secondCurlyBrace>=0){
                     int endSecondCurlyBrace = pathFunction.indexOf("}",secondCurlyBrace+1);
-                    serverSideFunctionCalls = pathFunction.substring(secondCurlyBrace+1,endSecondCurlyBrace);
+                    if(endSecondCurlyBrace> secondCurlyBrace)
+                        serverSideFunctionCalls.append(pathFunction.substring(secondCurlyBrace+1,endSecondCurlyBrace));
                 }
             }
         }
 
-        String CE = "";
+        return serverSideFunctionCalls;
 
-
-        if(queryString != null){
-
-            if(serverSideFunctionCalls!=null){
-                CE = serverSideFunctionCalls + "," + queryString;
-            }
-            else {
-                CE = queryString;
-            }
-
-        }
-        else if(serverSideFunctionCalls!=null){
-            CE = serverSideFunctionCalls;
-        }
-
-
-        return CE;
     }
-
 
 
 
@@ -580,7 +686,13 @@ public class ReqInfo {
         s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
         s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
         s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
-        s += "getConstraintExpression(): "+ ReqInfo.getConstraintExpression(request) + "\n";
+
+        s += "getConstraintExpression(): ";
+        try {
+            s += ReqInfo.getConstraintExpression(request) + "\n";
+        } catch (IOException e) {
+            s += "Encountered IOException when attempting get the constraint expression! Msg: " + e.getMessage() + "\n";
+        }
         s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
         s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
         s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";

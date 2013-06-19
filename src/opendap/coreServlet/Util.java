@@ -66,8 +66,12 @@ public class Util {
         msg += "    localUrl:                  '" + ReqInfo.getLocalUrl(req) + "'\n";
         msg += "    dataSetName:               '" + ReqInfo.getDataSetName(req) + "'\n";
         msg += "    requestSuffixRegex:             '" + ReqInfo.getRequestSuffix(req) + "'\n";
-        msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
-        msg += "    CE:                        '" + ReqInfo.getConstraintExpression(req) + "'\n";
+        msg += "    CE:                        '";
+        try {
+            msg +=  ReqInfo.getConstraintExpression(req) + "'\n";
+        } catch (IOException e) {
+            msg += "Encountered IOException when attempting get the constraint expression! Msg: " + e.getMessage() + "\n";
+        }
         msg += "\n";
         msg += "    getPathInfo():             '" + req.getPathInfo()+"'\n";
         msg +="ReqInfo:\n";
