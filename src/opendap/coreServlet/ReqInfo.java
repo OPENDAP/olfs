@@ -27,7 +27,6 @@ package opendap.coreServlet;
 
 
 import opendap.dap.Request;
-import org.apache.bcel.generic.NEW;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
