@@ -26,7 +26,9 @@
 
 package opendap.ncml;
 
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
+
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +37,7 @@ import opendap.coreServlet.DataSourceInfo;
  * Time: 10:12 AM
  * To change this template use File | Settings | File Templates.
  */
-public class NcmlDatasetInfo implements DataSourceInfo {
+public class NcmlDatasetInfo implements ResourceInfo {
 
     String datasetId;
 
@@ -43,25 +45,31 @@ public class NcmlDatasetInfo implements DataSourceInfo {
         datasetId = ncmlDatasetId;
     }
 
+    @Override
     public  boolean sourceExists(){
         return NcmlManager.isNcmlDataset(datasetId);
     }
 
+    @Override
     public  boolean sourceIsAccesible(){
 
         return NcmlManager.isNcmlDataset(datasetId);
     }
 
+    @Override
     public  boolean isNode(){
         return false;
     }
 
+    @Override
     public  boolean isDataset(){
         return NcmlManager.isNcmlDataset(datasetId);
     }
 
+    @Override
     public  long    lastModified(){
         return NcmlManager.getLastModified(datasetId);
     }
+
 
 }

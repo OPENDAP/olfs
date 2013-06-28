@@ -24,6 +24,7 @@
 package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ResourceInfo;
 import opendap.namespaces.DAP;
 import org.jdom.Element;
 import org.slf4j.Logger;

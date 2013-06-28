@@ -24,12 +24,13 @@
 
 package opendap.coreServlet;
 
+
 /**
  * User: ndp
  * Date: Nov 15, 2006
  * Time: 5:24:06 PM
  */
-public interface DataSourceInfo {
+public interface ResourceInfo {
 
     public  boolean sourceExists();
 
@@ -40,6 +41,7 @@ public interface DataSourceInfo {
     public  boolean isDataset();
 
     public  long    lastModified();
+
 
 
 }

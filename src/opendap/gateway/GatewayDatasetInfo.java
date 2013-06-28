@@ -26,7 +26,9 @@
 
 package opendap.gateway;
 
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
+
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +37,7 @@ import opendap.coreServlet.DataSourceInfo;
  * Time: 2:05 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GatewayDatasetInfo implements DataSourceInfo {
+public class GatewayDatasetInfo implements ResourceInfo {
 
     String datasetId;
 
@@ -43,25 +45,32 @@ public class GatewayDatasetInfo implements DataSourceInfo {
         datasetId = DatasetId;
     }
 
+    @Override
     public  boolean sourceExists(){
         return true;
     }
 
+    @Override
     public  boolean sourceIsAccesible(){
 
         return true;
     }
 
+    @Override
     public  boolean isNode(){
         return false;
     }
 
+    @Override
     public  boolean isDataset(){
         return true;
     }
 
+    @Override
     public  long    lastModified(){
         return -1;
     }
+
+
 
 }

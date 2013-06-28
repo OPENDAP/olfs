@@ -25,11 +25,11 @@
  */
 package opendap.bes.dap4Responders;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
@@ -104,7 +104,7 @@ public class FileAccess extends Dap4Responder {
 
         BesApi besApi = getBesApi();
 
-        DataSourceInfo dsi = new BESDataSource(resourceID, besApi);
+        ResourceInfo dsi = new BESResource(resourceID, besApi);
         if (dsi.sourceExists()) {
             if (!dsi.isNode()) {
                 if (dsi.sourceIsAccesible()) {

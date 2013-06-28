@@ -41,6 +41,7 @@ import java.util.Date;
  * User: ndp
  * Date: Apr 16, 2007
  * Time: 4:17:12 PM
+ * @deprecated
  */
 public class FileDispatchHandler implements DispatchHandler {
 
@@ -108,7 +109,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name,_besApi);
+            ResourceInfo dsi = new BESResource(name,_besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -148,7 +149,7 @@ public class FileDispatchHandler implements DispatchHandler {
                                 boolean sendResponse) throws Exception {
 
 
-        DataSourceInfo dsi = new BESDataSource(ReqInfo.getLocalUrl(request),_besApi);
+        ResourceInfo dsi = new BESResource(ReqInfo.getLocalUrl(request),_besApi);
 
         boolean isFileResponse = false;
 

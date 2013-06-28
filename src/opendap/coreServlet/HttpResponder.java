@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +48,8 @@ public abstract class HttpResponder {
     static {
         log = org.slf4j.LoggerFactory.getLogger(HttpResponder.class);
     }
+
+    public static final String HttpDatFormatString = "EEE, d MMM yyyy hh:mm:ss z";
 
 
 
@@ -81,13 +84,13 @@ public abstract class HttpResponder {
     }
 
 
-
-
     public void setPathPrefix(String prefix){ pathPrefix = prefix ;}
 
     public String getPathPrefix() { return pathPrefix; }
 
 
+    public abstract ResourceInfo getResourceInfo(String resourceName) throws Exception;
+    public abstract long getLastModified(HttpServletRequest request) throws Exception ;
     public abstract void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 
@@ -162,6 +165,9 @@ public abstract class HttpResponder {
         }
         return stringBuilder.toString();
     }
+
+
+
 
 
     public void destroy(){

@@ -23,6 +23,7 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.gateway;
 
+import opendap.coreServlet.ResourceInfo;
 import opendap.dap.DapResponder;
 import org.slf4j.Logger;
 
@@ -59,7 +60,15 @@ public class GatewayForm extends DapResponder {
     }
 
 
+    @Override
+    public ResourceInfo getResourceInfo(String resourceName) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
+    @Override
+    public long getLastModified(HttpServletRequest request) throws Exception {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 

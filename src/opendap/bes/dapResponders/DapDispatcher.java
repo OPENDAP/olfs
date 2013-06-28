@@ -26,7 +26,7 @@
 
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.GeoTiffDR;
@@ -70,7 +70,9 @@ public class DapDispatcher implements DispatchHandler {
     private static boolean _allowDirectDataSourceAccess = false;
     private static boolean _useDAP2ResourceUrlResponse = false;
 
+
     private BesApi _besApi;
+
 
 
     public DapDispatcher() {
@@ -311,6 +313,7 @@ public class DapDispatcher implements DispatchHandler {
             throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
 
         log.debug("The client requested this resource: {}",relativeUrl);
 
@@ -321,8 +324,11 @@ public class DapDispatcher implements DispatchHandler {
                 log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
-                if (sendResponse)
+                if (sendResponse){
+
                     r.respondToHttpGetRequest(request, response);
+
+                }
 
                 return true;
             }
@@ -338,14 +344,11 @@ public class DapDispatcher implements DispatchHandler {
 
 
         String relativeUrl = ReqInfo.getLocalUrl(req);
-        String dataSource = getBesApi().getBesDataSourceID(relativeUrl,false);
 
 
         if(!initialized)
             return -1;
 
-        log.debug("getLastModified(): Tomcat requesting getlastModified() " +
-                "for collection: " + dataSource );
 
         for (HttpResponder r : responders) {
             if (r.matches(relativeUrl)) {
@@ -353,11 +356,10 @@ public class DapDispatcher implements DispatchHandler {
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
                 try {
-                    log.debug("getLastModified(): Getting datasource info for "+dataSource);
-                    DataSourceInfo dsi = getDataSourceInfo(dataSource);
-                    log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
-                    return dsi.lastModified();
+                    long lmt =  r.getLastModified(req);
+                    log.debug("getLastModified(): Returning: {}", new Date(lmt));
+                    return lmt;
 
                 } catch (Exception e) {
                     log.debug("getLastModified(): Returning: -1");
@@ -373,9 +375,6 @@ public class DapDispatcher implements DispatchHandler {
 
     }
 
-    public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new BESDataSource(dataSourceName, getBesApi());
-    }
 
 
     public void destroy() {

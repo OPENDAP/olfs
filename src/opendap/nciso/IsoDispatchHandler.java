@@ -23,11 +23,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.nciso;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
 import opendap.xml.Transformer;
@@ -119,7 +119,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name, _besApi);
+            ResourceInfo dsi = new BESResource(name, _besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -163,7 +163,7 @@ public class IsoDispatchHandler implements opendap.coreServlet.DispatchHandler {
         if(isoRequestPattern.matcher(requestURL).matches())   {
             String relativeUrl = ReqInfo.getLocalUrl(request);
             String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-            DataSourceInfo dsi = new BESDataSource(dataSource,_besApi);
+            ResourceInfo dsi = new BESResource(dataSource,_besApi);
 
             if (dsi.sourceExists() && dsi.isDataset()) {
                 isIsoResponse = true;

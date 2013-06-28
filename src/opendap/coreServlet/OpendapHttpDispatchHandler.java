@@ -38,7 +38,7 @@ public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
 
 
-    public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception;
+    public ResourceInfo getDataSourceInfo(String dataSourceName) throws Exception;
 
 
 

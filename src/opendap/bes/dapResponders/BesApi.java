@@ -27,9 +27,10 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.*;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
+import opendap.dap.Dap2HeaderInputStream;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -838,7 +839,7 @@ public class BesApi {
 
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-        HeaderInputStream his = new HeaderInputStream(is);
+        Dap2HeaderInputStream his = new Dap2HeaderInputStream(is);
 
         boolean done = false;
         int val;
@@ -1494,7 +1495,7 @@ public class BesApi {
                 log.debug("Asking BES about resource: {}", besDataSourceId);
 
                 try {
-                    DataSourceInfo dsi = new BESDataSource(besDataSourceId, this);
+                    ResourceInfo dsi = new BESResource(besDataSourceId, this);
                     if (!dsi.isDataset()) {
                         besDataSourceId = null;
                     }

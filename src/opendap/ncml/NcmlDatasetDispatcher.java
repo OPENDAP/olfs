@@ -24,7 +24,7 @@
 package opendap.ncml;
 
 import opendap.bes.dapResponders.DapDispatcher;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Element;
@@ -44,26 +44,31 @@ public class NcmlDatasetDispatcher extends DapDispatcher {
 
     private Logger log;
     private boolean initialized;
-    private HttpServlet dispatchServlet;
 
-    private String systemPath;
     private Element _config;
 
 
     public NcmlDatasetDispatcher(){
         //super();
         log = LoggerFactory.getLogger(getClass());
+        initialized = false;
     }
 
 
     @Override
     public void init(HttpServlet servlet,Element config) throws Exception {
 
+        if(initialized)
+            return;
+
         NcmlDatasetBesApi besApi = new NcmlDatasetBesApi();
+
 
         ingestConfig(config);
 
         init(servlet, config ,besApi);
+
+        initialized = true;
 
     }
 
@@ -83,10 +88,6 @@ public class NcmlDatasetDispatcher extends DapDispatcher {
     }
 
 
-    @Override
-    public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new NcmlDatasetInfo(dataSourceName);
-    }
 
     @Override
     public boolean requestDispatch(HttpServletRequest request,

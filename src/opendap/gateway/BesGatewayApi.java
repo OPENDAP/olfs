@@ -1,6 +1,6 @@
 package opendap.gateway;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.rmi.Remote;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -393,7 +392,7 @@ public class BesGatewayApi extends BesApi {
         dataset.setAttribute("name",dataSourceURL);
         dataset.setAttribute("size",""+size);
 
-        SimpleDateFormat sdf = new SimpleDateFormat(BESDataSource.BESDateFormat);
+        SimpleDateFormat sdf = new SimpleDateFormat(BESResource.BESDateFormat);
 
         dataset.setAttribute("lastModified",sdf.format(lastModified));
 

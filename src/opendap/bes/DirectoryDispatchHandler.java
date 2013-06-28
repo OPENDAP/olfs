@@ -115,7 +115,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name,_besApi);
+            ResourceInfo dsi = new BESResource(name,_besApi);
             log.debug("getLastModified():  Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -172,7 +172,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
                 isContentsRequest = true;
 
         } else {
-            DataSourceInfo dsi = new BESDataSource(dsName,_besApi);
+            ResourceInfo dsi = new BESResource(dsName,_besApi);
             if (dsi.sourceExists() &&
                     dsi.isNode() ) {
                     isDirectoryResponse = true;

@@ -28,6 +28,7 @@ package opendap.bes.dap4Responders;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.Util;
 import opendap.namespaces.DAP;
@@ -37,10 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -245,7 +244,28 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
 
+    @Override
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+        log.debug("respondToHttpGetRequest() - Checking Last-Modified header...");
+
+        if (!response.containsHeader("Last-Modified")) {
+            log.debug("respondToHttpGetRequest() - Last-Modified header has not been set. Setting...");
+
+            Date lmt = new Date(getLastModified(request));
+            SimpleDateFormat httpDateFormat = new SimpleDateFormat(HttpDatFormatString);
+
+            response.setHeader("Last-Modified",httpDateFormat.format(lmt));
+
+            log.debug("respondToHttpGetRequest() - Last-Modified: {}",httpDateFormat.format(lmt));
+
+
+        } else {
+            String lastModified =  response.toString();
+            log.debug("respondToHttpGetRequest() - Last-Modified header has already been set.");
+
+        }
 
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
@@ -336,7 +356,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
                 log.debug("Asking BES about resource: {}", besDataSourceId);
 
                 try {
-                    DataSourceInfo dsi = new BESDataSource(besDataSourceId, getBesApi());
+                    ResourceInfo dsi = new BESResource(besDataSourceId, getBesApi());
                     if (!dsi.isDataset()) {
                         besDataSourceId = null;
                     }
@@ -381,6 +401,19 @@ public abstract class Dap4Responder extends BesDapResponder  {
     }
 
 
+    @Override
+    public long getLastModified(HttpServletRequest request) throws Exception {
+
+
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String dataSource = getResourceId(relativeUrl,true);
+
+        log.debug("getLastModified(): Determining LastModified time for resource {}",dataSource );
+
+        ResourceInfo ri = getResourceInfo(dataSource);
+        return ri.lastModified();
+
+    }
 
 
 

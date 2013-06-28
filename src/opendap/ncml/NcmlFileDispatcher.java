@@ -23,12 +23,12 @@
 /////////////////////////////////////////////////////////////////////////////
 package opendap.ncml;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.ReqInfo;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -118,7 +118,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
 
         try {
-            DataSourceInfo dsi = new BESDataSource(name, _besApi);
+            ResourceInfo dsi = new BESResource(name, _besApi);
             log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
             return dsi.lastModified();
@@ -161,7 +161,7 @@ public class NcmlFileDispatcher implements opendap.coreServlet.DispatchHandler {
 
         if(ncmlRequestPattern.matcher(requestURL).matches())   {
             String relativeUrl = ReqInfo.getLocalUrl(request);
-            DataSourceInfo dsi = new BESDataSource(relativeUrl,_besApi);
+            ResourceInfo dsi = new BESResource(relativeUrl,_besApi);
 
             if (dsi.sourceExists() && dsi.isDataset() && DapDispatcher.allowDirectDataSourceAccess()) {
                 isNcmlRequest = true;

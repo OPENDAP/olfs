@@ -1,9 +1,13 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.coreServlet.ResourceInfo;
+import opendap.coreServlet.ReqInfo;
 import opendap.dap.DapResponder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +37,27 @@ public abstract class BesDapResponder extends DapResponder {
         _besApi = besApi;
 
     }
+
+
+
+    @Override
+    public long getLastModified(HttpServletRequest request) throws Exception {
+
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
+
+        ResourceInfo ri = getResourceInfo(dataSource);
+        return ri.lastModified();
+
+    }
+
+
+
+
+    public ResourceInfo getResourceInfo(String resourceName) throws Exception {
+        return new BESResource(resourceName, getBesApi());
+    }
+
 
 
 

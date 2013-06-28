@@ -22,21 +22,21 @@
 // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
 /////////////////////////////////////////////////////////////////////////////
 
-package opendap.bes;
+package opendap.dap;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The HeaderInputStream filters the input to only read lines of text until
+ * The Dap2HeaderInputStream filters the input to only read lines of text until
  * the "Data:" line.  This is required because overzealous buffering in the
  * DDSParser will read the data as well as the DDS otherwise.
  *
  * @author jehamby
  * @version $Revision: 14212 $
  */
-public class HeaderInputStream extends FilterInputStream {
+public class Dap2HeaderInputStream extends FilterInputStream {
     /**
      * Each line is buffered here.
      */
@@ -64,9 +64,9 @@ public class HeaderInputStream extends FilterInputStream {
     private boolean endFound;
 
     /**
-     * Construct a new HeaderInputStream.
+     * Construct a new Dap2HeaderInputStream.
      */
-    public HeaderInputStream(InputStream in) {
+    public Dap2HeaderInputStream(InputStream in) {
         super(in);
         lineBuf = new byte[4096];
         bytesRemaining = currentOffset = 0;

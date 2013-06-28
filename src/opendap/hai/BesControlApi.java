@@ -26,6 +26,7 @@ import opendap.bes.BESManager;
 import opendap.bes.BesAdminFail;
 import opendap.bes.BesGroup;
 import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jdom.Document;
@@ -76,6 +77,16 @@ public class BesControlApi extends HttpResponder {
     public BesControlApi(String sysPath, String pathPrefix) {
         super(sysPath, pathPrefix, defaultRegex);
         init();
+    }
+
+    @Override
+    public ResourceInfo getResourceInfo(String resourceName) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public long getLastModified(HttpServletRequest request) throws Exception {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

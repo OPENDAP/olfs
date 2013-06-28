@@ -25,7 +25,7 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -42,7 +42,7 @@ import java.util.List;
  * Date: Nov 15, 2006
  * Time: 7:10:51 PM
  */
-public class BESDataSource implements DataSourceInfo {
+public class BESResource implements ResourceInfo {
 
     public static final String BESDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
@@ -65,7 +65,7 @@ public class BESDataSource implements DataSourceInfo {
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
 
-    public BESDataSource(String dataSourceName, BesApi besApi) throws Exception {
+    public BESResource(String dataSourceName, BesApi besApi) throws Exception {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -90,7 +90,7 @@ public class BESDataSource implements DataSourceInfo {
             name          = null;
             size          = -1;
             lastModified  = null;
-            log.error("BESDataSource(): Received a null value for the BesApi instance!");
+            log.error("BESResource(): Received a null value for the BesApi instance!");
 
             return;
         }
@@ -183,12 +183,14 @@ public class BESDataSource implements DataSourceInfo {
         return size;
     }
 
-    public Date getLastModfiedDate(){
+    public Date getLastModifiedDate(){
         return lastModified;
     }
 
     public long lastModified(){
-        return lastModified.getTime();
+        if(lastModified!=null)
+            return lastModified.getTime();
+        return -1;
     }
 
     public String getRequestedDataSource(){
@@ -201,7 +203,7 @@ public class BESDataSource implements DataSourceInfo {
 
 
     public String toString(){
-        String s = "BESDataSource("+requestedDataSource+"):\n";
+        String s = "BESResource("+requestedDataSource+"):\n";
 
         s += "    exists:        "+exists+"\n";
         if(exists){
