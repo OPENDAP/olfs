@@ -183,7 +183,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
                 try {
                     log.debug("getLastModified(): Getting datasource info for "+dataSource);
-                    DataSourceInfo dsi = getDataSourceInfo(dataSource);
+                    ResourceInfo dsi = getDataSourceInfo(dataSource);
                     log.debug("getLastModified(): Returning: " + new Date(dsi.lastModified()));
 
                     return dsi.lastModified();
@@ -251,7 +251,7 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         String dataSource = ReqInfo.getBesDataSourceID(relativeUrl);
-        DataSourceInfo dsi;
+        ResourceInfo dsi;
 
         Method dispatchMethod;
 
@@ -282,8 +282,8 @@ public class DapDispatchHandler implements OpendapHttpDispatchHandler {
 
 
 
-    public DataSourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
-        return new BESDataSource(dataSourceName, new BesApi());
+    public ResourceInfo getDataSourceInfo(String dataSourceName) throws Exception {
+        return new BESResource(dataSourceName, new BesApi());
     }
 
 

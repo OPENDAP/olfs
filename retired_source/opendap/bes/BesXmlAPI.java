@@ -25,6 +25,7 @@ package opendap.bes;
 
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
+import opendap.dap.Dap2HeaderInputStream;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -773,7 +774,7 @@ public class BesXmlAPI {
 
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
-        HeaderInputStream his = new HeaderInputStream(is);
+        Dap2HeaderInputStream his = new Dap2HeaderInputStream(is);
 
         boolean done = false;
         int val;

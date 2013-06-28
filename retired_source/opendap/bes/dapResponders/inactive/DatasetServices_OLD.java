@@ -1,10 +1,10 @@
 package opendap.bes.dapResponders.inactive;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Util;
 import opendap.dap.DapResponder;
 import opendap.namespaces.XLINK;
@@ -118,7 +118,7 @@ public class DatasetServices_OLD extends BesDapResponder {
             log.debug("Asking BES about resource: {}", besDataSourceId);
 
             try {
-                DataSourceInfo dsi = new BESDataSource(besDataSourceId, getBesApi());
+                ResourceInfo dsi = new BESResource(besDataSourceId, getBesApi());
                 if (dsi.isDataset()) {
                     return true;
                 }

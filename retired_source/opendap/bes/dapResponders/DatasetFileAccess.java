@@ -1,10 +1,10 @@
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESDataSource;
+import opendap.bes.BESResource;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapResponder;
-import opendap.coreServlet.DataSourceInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.MimeTypes;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
@@ -110,7 +110,7 @@ public class DatasetFileAccess extends BesDapResponder {
             Matcher m = requestMatchPattern.matcher(besDataSourceId);
             if (m.matches()) {
                 try {
-                    DataSourceInfo dsi = new BESDataSource(besDataSourceId, getBesApi());
+                    ResourceInfo dsi = new BESResource(besDataSourceId, getBesApi());
                     if (dsi.isDataset()) {
                         return true;
                     }
@@ -143,7 +143,7 @@ public class DatasetFileAccess extends BesDapResponder {
 
         BesApi besApi = getBesApi();
 
-        DataSourceInfo dsi = new BESDataSource(dataSourceId, besApi);
+        ResourceInfo dsi = new BESResource(dataSourceId, besApi);
         if (dsi.sourceExists()) {
             if (!dsi.isNode()) {
                 if (dsi.sourceIsAccesible()) {
