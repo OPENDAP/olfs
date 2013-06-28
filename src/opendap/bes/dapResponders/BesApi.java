@@ -27,8 +27,8 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.*;
-import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.Dap2HeaderInputStream;
 import opendap.ppt.PPTException;

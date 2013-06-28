@@ -26,7 +26,6 @@
 
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESResource;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.GeoTiffDR;
@@ -39,7 +38,10 @@ import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dap4Responders.Iso19115.IsoDMR;
 import opendap.bes.dap4Responders.Iso19115.IsoRubricDMR;
 import opendap.bes.dap4Responders.Version;
-import opendap.coreServlet.*;
+import opendap.coreServlet.DispatchHandler;
+import opendap.coreServlet.HttpResponder;
+import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ServletUtil;
 import opendap.dap.DapResponder;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -179,6 +181,15 @@ public class DapDispatcher implements DispatchHandler {
 
     }
 
+    /**
+     *  This method is where the behavior of the DapDispatcher is defined. In here the various Responder classes
+     *  are instantiated and loaded in to an ordered list. The types of the responders and their order defines the
+     *  behaviour of the DAP dispatch activity.
+     * @param servlet    The Servlet instance that this dispatcher is running in.
+     * @param config  The configuration element loaded from the olfs.xml file for this dispatcher
+     * @param besApi    The BesApi instance to use when servicing requests.
+     * @throws Exception  When the bad things happen.
+     */
     protected void init(HttpServlet servlet, Element config, BesApi besApi) throws Exception {
 
         if (initialized) return;
