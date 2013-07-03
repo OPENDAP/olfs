@@ -136,10 +136,14 @@ public class BESManager implements DispatchHandler {
 
             BesGroup groupForThisPrefix = getBesGroup(bes.getPrefix());
 
-            if(groupForThisPrefix == null){
+            // Since the BES with prefix '/' will always match we have to check to make sure
+            // that if a non null group is returned that it's prefix does in fact match the one
+            // for the new BES - if it doesn't match the returned group prefix then we need to make a new group.
+            if(groupForThisPrefix == null || !groupForThisPrefix.getGroupPrefix().equals(bes.getPrefix())){
                 groupForThisPrefix = new BesGroup(bes.getPrefix());
                 _besCollection.add(groupForThisPrefix);
             }
+
 
             groupForThisPrefix.add(bes);
 
