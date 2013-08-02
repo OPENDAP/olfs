@@ -24,7 +24,7 @@
 package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
-import opendap.coreServlet.ResourceInfo;
+import opendap.coreServlet.Util;
 import opendap.namespaces.DAP;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -114,21 +114,13 @@ public abstract class DapResponder extends HttpResponder  {
 
 
     public String removeRequestSuffixFromString(String requestString){
-        String trimmedRequestString = requestString;
-        String regex = requestSuffix;
 
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(requestString);
+        Pattern pattern = getRequestSuffixMatchPattern();
 
-        while (matcher.find()) {
-            log.debug("removeRequestSuffixFromString() - matcher.find() found the text \""+matcher.group()+"\" starting at " +
-               "index "+matcher.start()+" and ending at index "+matcher.end());
+        String trimmedRequestString = Util.dropSuffixFrom(requestString,pattern);
 
-            if(matcher.end() == requestString.length()){
-                trimmedRequestString = requestString.substring(0,matcher.start());
-            }
+        log.debug("removeRequestSuffixFromString() - trimmed: {}   Util.dropSuffixFrom(): {}",trimmedRequestString);
 
-        }
          return trimmedRequestString;
     }
 
