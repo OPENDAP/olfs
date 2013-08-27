@@ -24,6 +24,7 @@
 
 package opendap.coreServlet;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
@@ -471,15 +472,16 @@ public class Util {
 
 
         s.append("\n---------------------------------------------------\n");
-        s.append("Matcher.find():        ").append(isMatched).append("\n");
-        s.append("Matcher.hitEnd():      ").append(m.hitEnd()).append("\n");
-        s.append("Matcher.requireEnd():  ").append(m.requireEnd()).append("\n");
-        s.append("Matcher.regionStart(): ").append(m.regionStart()).append("\n");
-        s.append("Matcher.regionEnd():   ").append(m.regionEnd()).append("\n");
+        s.append("checkRegex():\n");
+        s.append("  Matcher.find():        ").append(isMatched).append("\n");
+        s.append("  Matcher.hitEnd():      ").append(m.hitEnd()).append("\n");
+        s.append("  Matcher.requireEnd():  ").append(m.requireEnd()).append("\n");
+        s.append("  Matcher.regionStart(): ").append(m.regionStart()).append("\n");
+        s.append("  Matcher.regionEnd():   ").append(m.regionEnd()).append("\n");
         if(isMatched){
-            s.append("Matcher.group():       ").append(m.group()).append("\n");
-            s.append("Matcher.start():       ").append(m.start()).append("\n");
-            s.append("Matcher.end():         ").append(m.end()).append("\n");
+            s.append("  Matcher.group():       ").append(m.group()).append("\n");
+            s.append("  Matcher.start():       ").append(m.start()).append("\n");
+            s.append("  Matcher.end():         ").append(m.end()).append("\n");
         }
 
         s.append("\n");
@@ -490,22 +492,30 @@ public class Util {
 
 
     public static String dropSuffixFrom(String s, Pattern suffixPattern){
+
+        Logger log =  LoggerFactory.getLogger(Util.class);
+        log.debug("dropSuffixFrom() - regex: '{}'   inputString: '{}'",suffixPattern.pattern(),s);
+
+
         Matcher suffixMatcher = suffixPattern.matcher(s);
 
         boolean suffixMatched = false;
 
+        String result = s;
+
 
         while(!suffixMatcher.hitEnd()){
             suffixMatched = suffixMatcher.find();
-            LoggerFactory.getLogger(Util.class).debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
+            log.debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
         }
         if(suffixMatched){
             int start =  suffixMatcher.start();
-            return s.substring(0, start);
+            result =  s.substring(0, start);
         }
 
+        log.debug("dropSuffixFrom() - returning '{}'",result);
 
-        return s;
+        return result;
     }
 
 
