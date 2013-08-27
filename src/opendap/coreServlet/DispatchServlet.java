@@ -26,6 +26,7 @@ package opendap.coreServlet;
 
 
 import opendap.logging.LogUtil;
+import opendap.logging.Timer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -104,14 +105,14 @@ public class DispatchServlet extends HttpServlet {
         initDebug();
         initLogging();
 
+        Timer.enable();
+
+
         RequestCache.openThreadCache();
 
         reqNumber = new AtomicInteger(0);
 
         log.debug("init() start");
-
-
-
 
         /*
         String xslTransformerFactoryImpl = "com.icl.saxon.TransformerFactoryImpl";
@@ -400,9 +401,11 @@ public class DispatchServlet extends HttpServlet {
                       HttpServletResponse response) {
 
 
+
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
         try {
+            String tKey = Timer.start();
             try {
 
                 if(LicenseManager.isExpired(request)){
@@ -419,7 +422,7 @@ public class DispatchServlet extends HttpServlet {
                 log.debug(Util.getMemoryReport());
 
                 log.debug(Util.showRequest(request, reqno));
-                //log.debug(Util.probeRequest(this, request));
+                //log.debug(AwsUtil.probeRequest(this, request));
 
 
                 if(redirectForServiceOnlyRequest(request,response))
@@ -449,6 +452,7 @@ public class DispatchServlet extends HttpServlet {
             finally {
                 RequestCache.closeThreadCache();
                 log.info("doGet(): Response completed.\n");
+                Timer.stop(tKey);
             }
 
 
@@ -460,7 +464,7 @@ public class DispatchServlet extends HttpServlet {
             catch(Throwable t2) {
             	try {
             		log.error("\n########################################################\n" +
-                                "Request proccessing failed.\n" +
+                                "Request processing failed.\n" +
                                 "Normal Exception handling failed.\n" +
                                 "This is the last error log attempt for this request.\n" +
                                 "########################################################\n", t2);
@@ -471,7 +475,8 @@ public class DispatchServlet extends HttpServlet {
             }
         }
 
-
+        Timer.report(System.out);
+        Timer.reset();
     }
     //**************************************************************************
 
@@ -654,41 +659,42 @@ public class DispatchServlet extends HttpServlet {
      */
     protected long getLastModified(HttpServletRequest req) {
 
-
-        if(LicenseManager.isExpired(req)){
-            return -1;
-        }
-
+        String tKey = Timer.start();
 
         RequestCache.openThreadCache();
 
         long reqno = reqNumber.incrementAndGet();
         LogUtil.logServerAccessStart(req, "HyraxAccess", "LastModified", Long.toString(reqno));
 
-        if(ReqInfo.isServiceOnlyRequest(req))
+
+        long lmt = -1;
+        if (ReqInfo.isServiceOnlyRequest(req))
             return -1;
 
         try {
 
-            DispatchHandler dh = getDispatchHandler(req, httpGetDispatchHandlers);
-            if (dh != null) {
-                log.debug("getLastModified() -  Request being handled by: " + dh.getClass().getName());
-                return dh.getLastModified(req);
+            if (!LicenseManager.isExpired(req) && !ReqInfo.isServiceOnlyRequest(req)) {
 
-            } else {
-                return -1;
+                DispatchHandler dh = getDispatchHandler(req, httpGetDispatchHandlers);
+                if (dh != null) {
+                    log.debug("getLastModified() -  Request being handled by: " + dh.getClass().getName());
+                    lmt = dh.getLastModified(req);
+
+                }
             }
         } catch (Exception e) {
-            return -1;
-        }
-        finally {
+            log.error("getLastModifiedTime() - Caught " + e.getClass().getName() + " msg: " + e.getMessage());
+            lmt = -1;
+        } finally {
             LogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, -1, "HyraxAccess");
 
         }
 
+        Timer.stop(tKey);
+
+        return lmt;
 
     }
-
 
 
     public void destroy() {

@@ -25,6 +25,8 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
+import opendap.logging.*;
+import opendap.logging.Timer;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
@@ -680,6 +682,8 @@ public class BES {
 
         OPeNDAPClient oc = getClient();
 
+        String tKey = Timer.start();
+
         try {
 
             if(oc.sendRequest(request,baos,erros)){
@@ -760,6 +764,8 @@ public class BES {
         }
         finally {
             returnClient(oc, trouble);
+
+            Timer.stop(tKey);
             log.debug("besTransaction complete.");
         }
 
@@ -831,6 +837,7 @@ public class BES {
 
         OPeNDAPClient oc = getClient();
 
+        String tKey = Timer.start();
 
         try {
             return oc.sendRequest(request,os,err);
@@ -849,6 +856,9 @@ public class BES {
         }
         finally {
             returnClient(oc, besTrouble);
+
+            Timer.stop(tKey);
+
             log.debug("besGetTransaction complete.");
 
         }

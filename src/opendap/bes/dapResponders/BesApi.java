@@ -31,6 +31,7 @@ import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.Dap2HeaderInputStream;
+import opendap.logging.Timer;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -687,7 +688,9 @@ public class BesApi {
             return ret;
         }
         else {
-            log.info("getCatalog(): Using cached copy of BES showCatalog.  responseCacheKey=\""+responseCacheKey+"\"");
+            log.info("getCatalog(): Using cached copy of BES showCatalog.  responseCacheKey=\"" + responseCacheKey + "\"");
+            String tKey = opendap.logging.Timer.start();
+
 
             Document result;
 
@@ -703,6 +706,8 @@ public class BesApi {
             Element root = result.getRootElement();
             root.detach();
             response.setRootElement(root);
+
+            opendap.logging.Timer.stop(tKey);
 
             return ret;
 
@@ -772,6 +777,8 @@ public class BesApi {
         else {
             log.info("getInfo(): Using cached copy of BES showInfo.  responseCacheKey=\""+Scrub.urlContent(responseCacheKey)+"\" returned an object of type "+o.getClass().getName());
 
+            String tKey = Timer.start();
+
             Document result;
 
             if(o instanceof NoSuchDatasource){
@@ -786,6 +793,7 @@ public class BesApi {
             Element root = result.getRootElement();
             root.detach();
             response.setRootElement(root);
+            Timer.stop(tKey);
 
 
         }
