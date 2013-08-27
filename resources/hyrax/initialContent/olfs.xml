@@ -40,6 +40,7 @@
 
             </Handler>
 
+            <Handler className="opendap.bes.VersionDispatchHandler" />
 
             <!-- Bot Blocker
                -
@@ -152,9 +153,11 @@
                   - and allowing their transmission with out subsetting can put heavy loads
                   - on the network and the server.
                   -->
-                  <!-- AllowDirectDataSourceAccess / -->
 
-                  <!-- UseDAP2ResourceUrlResponse / -->
+                <!-- AllowDirectDataSourceAccess / -->
+
+                <!-- UseDAP2ResourceUrlResponse / -->
+                <!-- PostBodyMaxLength>1000000</PostBodyMaxLength -->
 
             </Handler>
 
