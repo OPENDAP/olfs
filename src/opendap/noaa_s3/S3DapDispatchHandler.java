@@ -26,17 +26,23 @@
 
 package opendap.noaa_s3;
 
+import opendap.aws.AwsUtil;
+import opendap.bes.BesDapResponder;
+import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.Util;
 import org.jdom.Element;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -97,28 +103,54 @@ public class S3DapDispatchHandler extends DapDispatcher {
         _initialized = true;
     }
 
+
+
+
     @Override
     public long getLastModified(HttpServletRequest req) {
+
         String relativeURL = ReqInfo.getLocalUrl(req);
 
         log.debug("getLastModified() - relativeURL: {}",relativeURL);
 
 
+        if(false)
+            return -1;
+
+        long lmt = -1;
+
         for (HttpResponder r : getResponders()) {
             log.debug("Checking responder: "+ r.getClass().getSimpleName()+ " (pathPrefix: "+r.getPathPrefix()+")");
-            if (r.matches(relativeURL)) {
-
-                log.info("The relative URL: " + relativeURL + " matches " +
-                        "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
 
 
-                String remoteS3ResourceUrl = _besApi.getS3DataAccessUrlString(relativeURL,r.getRequestSuffixMatchPattern());
+           if(r instanceof Dap4Responder) {
+               Dap4Responder d4r = (Dap4Responder)r;
 
-                return _besApi.getLastModified(remoteS3ResourceUrl);
-            }
+               Pattern suffixPattern = Pattern.compile(d4r.getCombinedRequestSuffixRegex(), Pattern.CASE_INSENSITIVE);
+
+
+               if(Util.matchesSuffixPattern(relativeURL, suffixPattern)) {
+
+                   log.info("The relative URL: " + relativeURL + " matches " +
+                           "the pattern: \"" + r.getRequestMatchRegexString() + "\"");
+
+                   String resourceId = d4r.removeRequestSuffixFromString(relativeURL);
+
+                   S3IndexedFile s3if = S3CatalogManager.theManager().getIndexedFile(resourceId);
+
+                   if(s3if!=null){
+                       lmt = s3if.getLastModified();
+                       log.debug("lastModified() - Returning: {}",lmt);
+                       return lmt;
+                   }
+
+               }
+
+           }
+
         }
-
-        return -1;
+        log.debug("lastModified() - Returning: {}",lmt);
+        return lmt;
     }
 
 

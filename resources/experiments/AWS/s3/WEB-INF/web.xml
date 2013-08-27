@@ -41,8 +41,8 @@
         <servlet-class>opendap.noaa_s3.S3CatalogServlet</servlet-class>
 
         <init-param>
-            <param-name>OLFSConfigFileName</param-name>
-            <param-value>olfs.xml</param-value>
+            <param-name>S3ConfigFileName</param-name>
+            <param-value>s3.xml</param-value>
         </init-param>
 
         <load-on-startup>1</load-on-startup>

@@ -26,9 +26,9 @@
 
 package opendap.noaa_s3;
 
+import opendap.aws.s3.S3Object;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
-import opendap.gateway.HexAsciiEncoder;
 import opendap.namespaces.THREDDS;
 import opendap.namespaces.XLINK;
 import org.jdom.Document;
@@ -40,10 +40,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,22 +54,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 4:35 PM
  * To change this template use File | Settings | File Templates.
  */
-public class S3Index extends RemoteResource {
+public class S3Index extends S3Object {
 
     Logger log;
-    private String _bucketName;
     private String _bucketContext;
-    private String _index = "/index.xml";
-    private String _s3ObjIdForIndex;
+    private static String _index = "/index.xml";
 
     private Element _indexElement;
 
     public static final String S3_CATALOG_NAMESPACE_STRING = "http://nodc.noaa.gov/s3/catalog/1.0";
     public static final Namespace S3_CATALOG_NAMESPACE =  Namespace.getNamespace("s3c",S3_CATALOG_NAMESPACE_STRING);
 
-
-    private ConcurrentHashMap<String, S3Index> parents;
-    private ConcurrentHashMap<String, S3Index> children;
 
 
 
@@ -77,31 +74,53 @@ public class S3Index extends RemoteResource {
     public S3Index(HttpServletRequest req, String bucketContext, String bucketName) {
         super();
         log = LoggerFactory.getLogger(getClass());
-        _bucketName = bucketName;
         _bucketContext = bucketContext;
-        _s3ObjIdForIndex = getS3IndexObjectString(req);
+        setBucketName(bucketName);
+        String key = getS3IndexId(req);
+        setKey(key);
+        setResourceUrl(getS3Url(getBucketName(), getKey()));
+    }
+
+    public S3Index(String bucketName, String key) {
+        super(bucketName,key);
+        log = LoggerFactory.getLogger(getClass());
+        _bucketContext = "";
         _indexElement = null;
-        //_useMemoryCache = useMemCache;
-        String resourceUrl = getS3IndexUrlString();
-        setResourceUrl(resourceUrl);
+        setResourceUrl(getS3Url(getBucketName(), getKey()));
+
+    }
+
+    /**
+     * Creates the default root index for bucketName.
+     * @param bucketName Amazon S3 bucket to create root index for.
+     */
+    public S3Index(String bucketName) {
+        super();
+        log = LoggerFactory.getLogger(getClass());
+        _bucketContext = "";
+        setBucketName(bucketName);
+        String key = "/"+_index;
+        setKey(key);
+        setResourceUrl(getS3Url(getBucketName(), getKey()));
+        _indexElement = null;
     }
 
 
-
-
-
-    public String getBucketName(){
-        return _bucketName;
+    public S3Index(String bucketName, String key, String s3CacheRoot) {
+        super(bucketName, key, s3CacheRoot);
+        log = LoggerFactory.getLogger(getClass());
+        _bucketContext = "";
+        setResourceUrl(getS3Url(getBucketName(), getKey()));
+        _indexElement = null;
     }
 
-    public String gets3IndexObjectId(){
-        return _s3ObjIdForIndex;
-    }
+
 
 
     public Element getIndexElement() throws JDOMException, IOException {
+        //@todo Check last modified time and refresh as needed.
         if(_indexElement == null) {
-            loadIndexObject();
+            loadIndex();
         }
         return _indexElement;
     }
@@ -109,24 +128,32 @@ public class S3Index extends RemoteResource {
 
 
 
+    private void loadIndex() throws IOException, JDOMException {
 
-    private void loadIndexObject() throws IOException, JDOMException {
-
-        String indexObjUrl = getS3IndexUrlString();
-
-        log.debug("loadIndexObject() - indexObjUrl: " + indexObjUrl);
+        log.debug("loadIndex() - BEGIN [bucket:{}][key:{}]",getBucketName(),getKey());
+        log.debug("loadIndex() - indexUrl: " + getResourceUrl());
 
         Document indexDoc = opendap.xml.Util.getDocument(getResourceAsStream());
 
         _indexElement = indexDoc.getRootElement();
         _indexElement.detach();
 
-        log.debug("loadIndexObject() - loadIndexObject(): Retrieved S3 index document.");
+        log.debug("loadIndex(): Retrieved S3 index document.");
+        log.debug("loadIndex() - indexUrl: " + getResourceUrl());
 
+        log.debug("loadIndex() - END");
 
 
     }
 
+
+    public String getBucketContext(){
+        return _bucketContext;
+    }
+
+    public void setBucketContext(String bucketContext){
+        _bucketContext = bucketContext;
+    }
 
 
 
@@ -214,7 +241,6 @@ public class S3Index extends RemoteResource {
     public Vector<Element> getThreddsDatasets(HashMap<String,Element> services) throws JDOMException, IOException {
 
         Vector<Element> threddsDatasets = new Vector<Element>();
-        HexAsciiEncoder encoder = new HexAsciiEncoder();
 
         String indexPath = getIndexPath();
         String delim = getIndexDelimiter();
@@ -255,7 +281,7 @@ public class S3Index extends RemoteResource {
                 // String s3DatasetUrl =  getS3DatasetUrl(fileName);
                 // String urlPath = "/" + encoder.encode(s3DatasetUrl.toString());
 
-                String urlPath =  getS3DatasetResourceID(fileName);
+                String urlPath =  getS3ResourceID(fileName);
 
 
                 for(String serviceName:services.keySet()){
@@ -282,24 +308,6 @@ public class S3Index extends RemoteResource {
     }
 
 
-    public String getS3DatasetUrl(String fileName) throws JDOMException, IOException {
-
-        StringBuilder s3DatasetUrl =  new StringBuilder();
-        s3DatasetUrl.append(getIndexBase()).append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
-
-        return s3DatasetUrl.toString();
-    }
-
-
-    public String getS3DatasetResourceID(String fileName) throws JDOMException, IOException {
-
-        StringBuilder resourceId =  new StringBuilder();
-        resourceId.append(_bucketContext).append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
-
-        return resourceId.toString();
-    }
-
-
 
 
 
@@ -310,8 +318,9 @@ public class S3Index extends RemoteResource {
      *    <thredds:catalogRef name="data" xlink:href="/context/data/catalog.xml" xlink:title="data" xlink:type="simple" ID="/context/navid/"/>
      *
      *
-     * @param catalogServiceContext
-     * @return
+     * @param catalogServiceContext The "service context" in which the catalog operates.
+     * @return A Vector of Element objects representing the XML THREDDS catalogRef elements contained in the THREDDS catalog
+     * node represented by the index file.
      * @throws java.io.IOException
      * @throws org.jdom.JDOMException
      */
@@ -319,17 +328,15 @@ public class S3Index extends RemoteResource {
 
         Vector<Element> catalogRefs = new Vector<Element>();
 
-        String indexPath = getIndexPath();
-        String delim = getIndexDelimiter();
+
+        Element indexElement = getIndexElement();
 
 
-        List filesList = _indexElement.getChildren("folder", S3_CATALOG_NAMESPACE);
+        List foldersList = indexElement.getChildren("folder", S3_CATALOG_NAMESPACE);
 
-        for(Object o: filesList){
+        for(Object o: foldersList){
             Element folder = (Element) o;
             String folderName = folder.getAttributeValue("name");
-            String folderCount = folder.getAttributeValue("count");
-            String folderSize = folder.getAttributeValue("size");
 
 
             Element catalogRef = new Element(THREDDS.CATALOG_REF,THREDDS.NS);
@@ -360,18 +367,18 @@ public class S3Index extends RemoteResource {
     }
 
 
-    public String getS3IndexUrlString(){
 
-        StringBuilder sb = new StringBuilder();
+    public String getS3ResourceID(String fileName) throws JDOMException, IOException {
 
-        sb.append("http://").append(getBucketName()).append(".s3.amazonaws.com").append(gets3IndexObjectId());
+        StringBuilder resourceId =  new StringBuilder();
+        resourceId.append(_bucketContext).append(getIndexPath()).append(getIndexDelimiter()).append(fileName);
 
-        return sb.toString();
-
+        return resourceId.toString();
     }
 
 
-    private  String getS3IndexObjectString(HttpServletRequest request){
+
+    private  String getS3IndexId(HttpServletRequest request){
 
         StringBuilder sb = new StringBuilder();
 
@@ -413,6 +420,358 @@ public class S3Index extends RemoteResource {
 
         return collectionName;
     }
+
+
+    /**
+     *
+     * <pre>
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <?xml-stylesheet type='text/xsl' href='/ocean-archive.data.nodc.noaa.gov//index.xsl'?>
+     * <index xmlns="http://nodc.noaa.gov/s3/catalog/1.0" base="http://ocean-archive.data.nodc.noaa.gov" path="" name="ocean-archive.data.nodc.noaa.gov" delimiter="/" encoding="UTF-8">
+     *   <folder name="0000841" size="12374900179" count="89099"/>
+     *   <folder name="0001467" size="134979214" count="86"/>
+     *   <folder name="0043269" size="248832168394" count="61910"/>
+     *   <folder name="0077816" size="18764208623" count="5442"/>
+     *   <folder name="0087989" size="502782436280" count="288"/>
+     *   <folder name="0095107" size="221388385700" count="8946"/>
+     *   <folder name="0097969" size="192721819112" count="1834"/>
+     *   <folder name="0099041" size="3501057505212" count="671756"/>
+     *   <folder name="0099042" size="57510702097" count="4649"/>
+     *   <folder name="ocean-archive.data.nodc.noaa.gov" size="6508" count="7"/>
+     * </index>
+     * </pre>
+     *
+     *
+     * @return
+     * @throws JDOMException
+     * @throws IOException
+     */
+    public Vector<String> getChildIndexKeys() throws JDOMException, IOException{
+        Vector<String> childIndexKeys = new Vector<String>();
+
+        Element indexElement = getIndexElement();
+
+        List foldersList = indexElement.getChildren("folder", S3_CATALOG_NAMESPACE);
+        for(Object o: foldersList){
+            Element folder = (Element) o;
+            String folderName = folder.getAttributeValue("name");
+
+            StringBuilder key = new StringBuilder();
+
+            key.append(getIndexPath())
+                    .append(getIndexDelimiter())
+                    .append(folderName)
+                    .append(getIndexDelimiter())
+                    .append(_index);
+
+
+
+            childIndexKeys.add(key.toString());
+        }
+
+        return childIndexKeys;
+
+    }
+
+
+
+
+
+    public Vector<String> getChildIndexKeys(boolean recurse, int maxLevels) throws JDOMException, IOException{
+        return  getChildIndexKeys(recurse, maxLevels, 0);
+    }
+
+    private  Vector<String> getChildIndexKeys(boolean recurse, int maxLevels, int level) throws JDOMException, IOException{
+
+        Vector<String> childIndexKeys = getChildIndexKeys();
+
+        Vector<String> grandChildIndexKeys;
+        if(recurse && ((maxLevels==0) || (level<maxLevels))) {
+            Vector<String> descendaents = new Vector<String>();
+            for(String childIndexKey: childIndexKeys){
+
+                S3Index childIndex = new S3Index(getBucketName(),childIndexKey,getS3CacheRoot());
+
+                grandChildIndexKeys = childIndex.getChildIndexKeys(recurse, maxLevels, level + 1);
+                descendaents.addAll(grandChildIndexKeys);
+            }
+            childIndexKeys.addAll(descendaents);
+        }
+
+        return   childIndexKeys;
+
+    }
+
+
+    public Vector<S3Index> getChildren() throws JDOMException, IOException {
+
+        Vector<String> childIndexKeys = getChildIndexKeys();
+
+        Vector<S3Index> children = new Vector<S3Index>();
+
+        for(String childIndexKey: childIndexKeys){
+
+            S3Index childIndex = new S3Index(getBucketName(),childIndexKey,getS3CacheRoot());
+            childIndex.setBucketContext(getBucketContext());
+
+            children.add(childIndex);
+
+        }
+        return children;
+
+    }
+
+
+    public Vector<S3Index> getChildren(boolean recurse, int maxLevels) throws JDOMException, IOException{
+        return    getChildren(recurse, maxLevels, 0);
+    }
+
+
+    public Vector<S3Index> getChildren(boolean recurse, int maxLevels, int level)throws JDOMException, IOException{
+        Vector<S3Index> children = getChildren();
+
+        Vector<S3Index> grandChildren;
+        if(recurse && ((maxLevels==0) || (level<maxLevels))) {
+            Vector<S3Index> descendaents = new Vector<S3Index>();
+            for(S3Index child: children){
+                grandChildren = child.getChildren(recurse, maxLevels, level + 1);
+                descendaents.addAll(grandChildren);
+            }
+            children.addAll(descendaents);
+        }
+
+        return children;
+
+    }
+
+
+
+
+
+
+
+
+    public void updateCachedIndexAsNeeded(boolean recurse, int maxLevels) throws JDOMException, IOException{
+        updateCachedIndexAsNeeded(recurse, maxLevels, 0);
+    }
+
+
+
+
+    private void updateCachedIndexAsNeeded(boolean recurse, int maxLevels, int level)throws JDOMException, IOException{
+
+        if(getS3CacheRoot()==null)
+            throw new IOException("updateCachedIndexAsNeeded() - s3CacheRootDirectory has not been set.");
+
+        log.debug("updateCachedIndexAsNeeded() - key:  {}    level: {}",getKey(),level);
+        updateCachedObjectAsNeeded();
+
+        if(recurse && ((maxLevels==0) || (level<maxLevels))) {
+            Vector<S3Index> children = getChildren();
+            for(S3Index child: children){
+                child.updateCachedIndexAsNeeded(recurse, maxLevels, level + 1);
+            }
+        }
+    }
+
+
+
+
+
+
+
+    /**
+     *
+     * <pre>
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <?xml-stylesheet type='text/xsl' href='/ocean-archive.data.nodc.noaa.gov//index.xsl'?>
+     * <index xmlns="http://nodc.noaa.gov/s3/catalog/1.0" base="http://ocean-archive.data.nodc.noaa.gov" path="" name="ocean-archive.data.nodc.noaa.gov" delimiter="/" encoding="UTF-8">
+     *   <folder name="0000841" size="12374900179" count="89099"/>
+     *   <folder name="0001467" size="134979214" count="86"/>
+     *   <folder name="0043269" size="248832168394" count="61910"/>
+     *   <folder name="0077816" size="18764208623" count="5442"/>
+     *   <folder name="0087989" size="502782436280" count="288"/>
+     *   <folder name="0095107" size="221388385700" count="8946"/>
+     *   <folder name="0097969" size="192721819112" count="1834"/>
+     *   <folder name="0099041" size="3501057505212" count="671756"/>
+     *   <folder name="0099042" size="57510702097" count="4649"/>
+     *   <folder name="ocean-archive.data.nodc.noaa.gov" size="6508" count="7"/>
+     * </index>
+     * </pre>
+     *
+     *
+     * @return
+     * @throws JDOMException
+     * @throws IOException
+     */
+    public Vector<String> getChildResourceKeys() throws JDOMException, IOException{
+        Vector<String> childResourceKeys = new Vector<String>();
+
+
+        Element indexElement = getIndexElement();
+
+        List fileList = indexElement.getChildren("file", S3_CATALOG_NAMESPACE);
+        for(Object o: fileList){
+            Element file = (Element) o;
+            String fileName = file.getAttributeValue("name");
+
+            StringBuilder key = new StringBuilder();
+
+            key.append(getIndexPath())
+                    .append(getIndexDelimiter())
+                    .append(fileName);
+
+            childResourceKeys.add(key.toString());
+        }
+
+
+        return childResourceKeys;
+
+    }
+
+    public Vector<String> getChildResourceKeys(boolean recurse, int maxLevels) throws JDOMException, IOException{
+        return    getChildResourceKeys(recurse, maxLevels, 0);
+    }
+
+
+    public Vector<String> getChildResourceKeys(boolean recurse, int maxLevels, int level)throws JDOMException, IOException{
+        Vector<S3Index> children = getChildren();
+
+        Vector<String> childResourceKeys = getChildResourceKeys();
+
+        Vector<String> grandChildResourceKeys;
+        Vector<String> descendants = new Vector<String>();
+        if(recurse && ((maxLevels==0) || (level<maxLevels))) {
+            for(S3Index child: children){
+                grandChildResourceKeys = child.getChildResourceKeys(recurse, maxLevels, level + 1);
+                descendants.addAll(grandChildResourceKeys);
+            }
+            childResourceKeys.addAll(descendants);
+            descendants.clear();
+        }
+
+        return childResourceKeys;
+
+    }
+
+
+    /**
+     *
+     * <pre>
+     * <?xml version="1.0" encoding="UTF-8"?>
+     * <?xml-stylesheet type='text/xsl' href='/ocean-archive.data.nodc.noaa.gov//index.xsl'?>
+     * <index xmlns="http://nodc.noaa.gov/s3/catalog/1.0" base="http://ocean-archive.data.nodc.noaa.gov" path="" name="ocean-archive.data.nodc.noaa.gov" delimiter="/" encoding="UTF-8">
+     *   <folder name="0000841" size="12374900179" count="89099"/>
+     *   <folder name="0001467" size="134979214" count="86"/>
+     *   <folder name="0043269" size="248832168394" count="61910"/>
+     *   <folder name="0077816" size="18764208623" count="5442"/>
+     *   <folder name="0087989" size="502782436280" count="288"/>
+     *   <folder name="0095107" size="221388385700" count="8946"/>
+     *   <folder name="0097969" size="192721819112" count="1834"/>
+     *   <folder name="0099041" size="3501057505212" count="671756"/>
+     *   <folder name="0099042" size="57510702097" count="4649"/>
+     *   <folder name="ocean-archive.data.nodc.noaa.gov" size="6508" count="7"/>
+     * </index>
+     * </pre>
+     *
+     *
+     * @return
+     * @throws JDOMException
+     * @throws IOException
+     */
+    public Vector<S3IndexedFile> getIndexedFiles() throws JDOMException, IOException{
+        Vector<S3IndexedFile> childIndexedFiles = new Vector<S3IndexedFile>();
+
+
+        Element indexElement = getIndexElement();
+
+        List fileList = indexElement.getChildren("file", S3_CATALOG_NAMESPACE);
+        for(Object o: fileList){
+            Element file = (Element) o;
+
+            String fileName = file.getAttributeValue("name");
+            StringBuilder key = new StringBuilder();
+            key.append(getIndexPath())
+                    .append(getIndexDelimiter())
+                    .append(fileName);
+
+
+
+            String lmtString = file.getAttributeValue("last-modified");
+            long lmt = getTimeFromLMTString(lmtString);
+
+            long size;
+            String sizeString = file.getAttributeValue("size");
+            try {
+                size = Integer.parseInt(sizeString);
+            } catch (NumberFormatException e) {
+                size = -1;
+            }
+
+            S3IndexedFile s3if = new S3IndexedFile(getBucketName(),key.toString(),lmt, size);
+            s3if.setS3CacheRoot(getS3CacheRoot());
+
+            childIndexedFiles.add(s3if);
+        }
+
+
+        return childIndexedFiles;
+
+    }
+
+
+    /**
+     *   <file name="JA2_GPN_2PdP097_015_20110219_120533_20110219_130146.nc" last-modified="2013-07-02T20:00:54.000Z" size="6386228"/>
+     */
+
+    private long getTimeFromLMTString(String lmtString){
+        long lmt;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");
+            if(lmtString.endsWith("Z"))
+                lmtString = lmtString.substring(0,lmtString.lastIndexOf('Z')) + "GMT";
+            Date d = format.parse(lmtString);
+            lmt = d.getTime();
+        } catch (Exception e) {
+            log.error("ERROR: Failed to parse last modified time string {}  MESSAGE: {}",lmtString,e.getMessage());
+            lmt = -1;
+        }
+        return lmt;
+
+
+    }
+
+
+    public Vector<S3IndexedFile> getChildIndexedFiles(boolean recurse, int maxLevels) throws JDOMException, IOException{
+        return    getChildIndexedFiles(recurse, maxLevels, 0);
+    }
+
+
+    public Vector<S3IndexedFile> getChildIndexedFiles(boolean recurse, int maxLevels, int level)throws JDOMException, IOException{
+        Vector<S3Index> children = getChildren();
+
+        Vector<S3IndexedFile> childResourceObjects = getIndexedFiles();
+
+        Vector<S3IndexedFile> grandChildObjects;
+        Vector<S3IndexedFile> descendants = new Vector<S3IndexedFile>();
+        if(recurse && ((maxLevels==0) || (level<maxLevels))) {
+            for(S3Index child: children){
+                grandChildObjects = child.getChildIndexedFiles(recurse, maxLevels, level + 1);
+                descendants.addAll(grandChildObjects);
+            }
+            childResourceObjects.addAll(descendants);
+            descendants.clear();
+        }
+
+        return childResourceObjects;
+
+    }
+
+
+    public static String getCatalogIndexString(){
+        return _index;
+    }
+
 
 
 }

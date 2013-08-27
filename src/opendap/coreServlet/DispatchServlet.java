@@ -105,7 +105,7 @@ public class DispatchServlet extends HttpServlet {
         initDebug();
         initLogging();
 
-        Timer.enable();
+        // Timer.enable();
 
 
         RequestCache.openThreadCache();

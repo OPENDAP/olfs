@@ -35,8 +35,6 @@
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
 
 
-
-
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
           <pattern>${FORMAT}</pattern>
@@ -84,7 +82,11 @@
 
 
     <!-- OPeNDAP Hyrax Logging -->
-    <logger name="opendap.noaa_s3" level="all" >
+    <logger name="opendap.noaa_s3" level="error" >
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="opendap.aws" level="error" >
         <appender-ref ref="stdout"/>
     </logger>
 

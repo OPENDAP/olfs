@@ -142,7 +142,7 @@ public class BesGatewayApi extends BesApi {
 
     }
 
-    public String getDataSourceUrl(HttpServletRequest req, String pathPrefix)  {
+    private String getDataSourceUrl(HttpServletRequest req, String pathPrefix)  {
 
 
         String relativeURL = ReqInfo.getLocalUrl(req);
@@ -177,10 +177,6 @@ public class BesGatewayApi extends BesApi {
         if(!dataSourceUrl.equals("")){
             dataSourceUrl = Util.dropSuffixFrom(dataSourceUrl, suffixMatchPattern);
         }
-
-
-
-
 
 
         dataSourceUrl = HexAsciiEncoder.hexToString(dataSourceUrl);

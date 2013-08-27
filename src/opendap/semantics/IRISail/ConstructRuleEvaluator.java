@@ -116,7 +116,7 @@ public class ConstructRuleEvaluator {
          findConstruct(repository);
 
          //log.debug("Before running the construct rules:\n " +
-         //opendap.coreServlet.Util.getMemoryReport());
+         //opendap.coreServlet.AwsUtil.getMemoryReport());
 
 
          boolean repositoryChanged = false;
@@ -138,7 +138,7 @@ public class ConstructRuleEvaluator {
                      log.info("runConstruct(): Total number of construct rule(s): " + this.constructQuery.size());
                  }
                  //log.debug("Applying Construct Rules. Beginning Pass #" + runNbr
-                 //        + " \n" + opendap.coreServlet.Util.getMemoryReport());
+                 //        + " \n" + opendap.coreServlet.AwsUtil.getMemoryReport());
                  int ruleNumber = 0;
                  for (String qstring : this.constructQuery) {
                      ruleNumber++;
@@ -164,7 +164,7 @@ public class ConstructRuleEvaluator {
 
                      try {
                          //log.debug("Prior to making new repository connection:\n "
-                         //+ opendap.coreServlet.Util.getMemoryReport());
+                         //+ opendap.coreServlet.AwsUtil.getMemoryReport());
                          log.debug("runConstruct(): Original construct rule ID: " + constructURL);
                          GraphQuery graphQuery = con.prepareGraphQuery(
                                  QueryLanguage.SERQL, processedQueryString);
@@ -186,7 +186,7 @@ public class ConstructRuleEvaluator {
                                      process_xsString(graphResult, creatValue, Added,
                                              toAdd, con, context);
                                      //log.debug("After processing xs:string:\n "
-                                     //        + opendap.coreServlet.Util
+                                     //        + opendap.coreServlet.AwsUtil
                                      //                .getMemoryReport());
                                      break;
 
@@ -194,7 +194,7 @@ public class ConstructRuleEvaluator {
                                      process_DropQuotes(graphResult, creatValue, Added,
                                              toAdd, con, context);
                                      //log.debug("After processing DropQuotes:\n "
-                                     //        + opendap.coreServlet.Util
+                                     //        + opendap.coreServlet.AwsUtil
                                      //                .getMemoryReport());
                                      break;
 
@@ -202,7 +202,7 @@ public class ConstructRuleEvaluator {
                                      process_RetypeTo(graphResult, creatValue, Added,
                                              toAdd, con, context);
                                      //log.debug("After processing RetypeTo:\n "
-                                     //        + opendap.coreServlet.Util
+                                     //        + opendap.coreServlet.AwsUtil
                                      //                .getMemoryReport());
                                      break;
 
@@ -210,7 +210,7 @@ public class ConstructRuleEvaluator {
                                      process_Increment(graphResult, creatValue, Added,
                                              toAdd, con, context);
                                      //log.debug("After processing Increment:\n "
-                                     //        + opendap.coreServlet.Util
+                                     //        + opendap.coreServlet.AwsUtil
                                      //                .getMemoryReport());
                                      break;
 
@@ -600,7 +600,7 @@ public class ConstructRuleEvaluator {
 
         }
         // log.debug("After processing dropQuotes:\n " +
-        // opendap.coreServlet.Util.getMemoryReport());
+        // opendap.coreServlet.AwsUtil.getMemoryReport());
 
     }
 
@@ -655,7 +655,7 @@ public class ConstructRuleEvaluator {
 
         }
         // log.debug("After processing xs:string:\n " +
-        // opendap.coreServlet.Util.getMemoryReport());
+        // opendap.coreServlet.AwsUtil.getMemoryReport());
     }
 
 
@@ -748,7 +748,7 @@ public class ConstructRuleEvaluator {
 
         }
         // log.debug("After processing RetypeTo:\n " +
-        // opendap.coreServlet.Util.getMemoryReport());
+        // opendap.coreServlet.AwsUtil.getMemoryReport());
 
     }
 

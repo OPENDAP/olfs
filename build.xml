@@ -158,7 +158,6 @@
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
-    <property name="initialContent.dir" location="${resources.dir}/initialContent"/>
     <property name="WebInfResources.dir" location="${resources.dir}/hyrax/WEB-INF"/>
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
@@ -253,7 +252,7 @@
 
 
 
-    <target name="all" depends="clean,clients,check,server,soap-lib"
+    <target name="all" depends="clean,clients,check,server"
             description="Builds lots of stuff."/>
 
 
@@ -319,10 +318,6 @@
                 <include name="org/opendap/**"/>
 
 
-                <!-- Exclude the old hao code  -->
-                <exclude name="hao/**"/>
-
-
                 <!-- Exclude the experimental code  -->
                 <exclude name="opendap/experiments/**"/>
 
@@ -333,6 +328,10 @@
                 <exclude name="opendap/wcsGateway/**"/>
                 <exclude name="opendap/wcs/**"/>
                 <exclude name="opendap/semantics/**"/>
+
+                <!-- Exclude prototype Amazon Web Services code from production -->
+                <exclude name="opendap/aws/**"/>
+                <exclude name="opendap/noaa_s3/**"/>
 
 
                 <!-- Exclude the Hyrax Admin Interface code  -->
@@ -408,19 +407,7 @@
     <target name="olfs-lib" depends="clean,compile">
 
         <jar destfile="${build.lib}/olfs-${OLFS_VERSION}.jar">
-            <fileset dir="${build.classes}">
-                <exclude name="hao/**/*.class"/>
-            </fileset>
-        </jar>
-
-    </target>
-
-
-    <target name="soap-lib" depends="clean,compile">
-        <jar destfile="${build.lib}/opendap-soap-${OLFS_VERSION}.jar">
-            <fileset dir="${build.classes}">
-                <include name="opendap/soap/**/*.class"/>
-            </fileset>
+            <fileset dir="${build.classes}" />
         </jar>
 
     </target>
@@ -504,6 +491,8 @@
                 <exclude name="src/opendap/wcsGateway/**"/>
                 <exclude name="src/opendap/wcs/**"/>
                 <exclude name="src/opendap/semantics/**"/>
+                <exclude name="src/opendap/aws/**"/>
+                <exclude name="src/opendap/noaa_s3/**"/>
 
             </zipfileset>
 
@@ -740,15 +729,15 @@
             <zipfileset dir="${hyraxResources.dir}/admin" prefix="admin" />
             <zipfileset dir="${hyraxResources.dir}/error" prefix="error" />
             <zipfileset dir="${hyraxResources.dir}/jsp"   prefix="jsp" />
+            <zipfileset dir="${hyraxResources.dir}/initialContent" prefix="initialContent">
+                <include name="**/*"/>
+            </zipfileset>
 
             <zipfileset dir="${WebStartResources.dir}" prefix="WebStart" />
             <zipfileset dir="${GatewayResources.dir}" prefix="gateway" />
             <zipfileset dir="${ncISO.dir}" prefix="nciso" />
 
 
-            <zipfileset dir="${initialContent.dir}" prefix="initialContent">
-                <include name="**/*"/>
-            </zipfileset>
 
             <webinf dir="${WebInfResources.dir}">
                 <include name="logback-test.xml"/>

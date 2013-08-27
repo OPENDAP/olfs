@@ -141,75 +141,25 @@
 
 
     <servlet>
-        <servlet-name>hyrax</servlet-name>
-
-        <servlet-class>opendap.coreServlet.DispatchServlet</servlet-class>
-
+        <servlet-name>catalog</servlet-name>
+        <servlet-class>opendap.aws.glacier.CatalogServlet</servlet-class>
         <init-param>
             <param-name>DebugOn</param-name>
             <param-value>false</param-value>
         </init-param>
-
-        <init-param>
-            <param-name>OLFSConfigFileName</param-name>
-            <param-value>olfs.xml</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
-
-    </servlet>
-
-    <servlet>
-        <servlet-name>adminInterface</servlet-name>
-        <servlet-class>opendap.hai.DispatchServlet</servlet-class>
-    </servlet>
-
-
-
-    <servlet>
-        <servlet-name>webstart</servlet-name>
-
-        <servlet-class>opendap.webstart.WebStartServlet</servlet-class>
-
-        <init-param>
-            <param-name>WebStartConfigFileName</param-name>
-            <param-value>webstart.xml</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
-
-    </servlet>
-
-    <servlet>
-        <servlet-name>gateway</servlet-name>
-
-        <servlet-class>opendap.gateway.DispatchServlet</servlet-class>
-
-        <init-param>
-            <param-name>GatewayConfigFileName</param-name>
-            <param-value>gateway.xml</param-value>
-        </init-param>
-
-        <load-on-startup>1</load-on-startup>
-
-    </servlet>
-
-    <servlet>
-        <servlet-name>docs_servlet</servlet-name>
-        <servlet-class>opendap.coreServlet.DocServlet </servlet-class>
-        <!--servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class -->
         <load-on-startup>1</load-on-startup>
     </servlet>
 
 
     <!-- servlet>
-        <servlet-name>echo</servlet-name>
-        <servlet-class>opendap.experiments.EchoServlet </servlet-class>
+        <servlet-name>dap</servlet-name>
+        <servlet-class>opendap.aws.glacier.DapServlet</servlet-class>
+        <init-param>
+            <param-name>DebugOn</param-name>
+            <param-value>false</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet -->
-
-
-
 
 
     <filter>
@@ -236,35 +186,16 @@
 
 
 
+    <servlet-mapping>
+        <servlet-name>catalog</servlet-name>
+        <url-pattern>/catalog/*</url-pattern>
+    </servlet-mapping>
+
     <!-- servlet-mapping>
-        <servlet-name>echo</servlet-name>
-        <url-pattern>/echo/*</url-pattern>
+        <servlet-name>dap</servlet-name>
+        <url-pattern>/dap/*</url-pattern>
     </servlet-mapping -->
 
-    <servlet-mapping>
-        <servlet-name>hyrax</servlet-name>
-        <url-pattern>/hyrax/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>adminInterface</servlet-name>
-        <url-pattern>/hai/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>webstart</servlet-name>
-        <url-pattern>/webstart/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>gateway</servlet-name>
-        <url-pattern>/servlet_gateway/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>docs_servlet</servlet-name>
-        <url-pattern>/docs/*</url-pattern>
-    </servlet-mapping>
 
 
 

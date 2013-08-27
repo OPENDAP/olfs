@@ -160,7 +160,8 @@ public class DapDispatcher implements DispatchHandler {
                 _useDAP2ResourceUrlResponse = true;
             }
 
-            dv = _config.getChild("MaxPostBodyLength");
+
+            dv = _config.getChild("PostBodyMaxLength");
             if (dv != null) {
                 try {
                     int maxLength = Integer.parseInt(dv.getTextTrim());
@@ -170,8 +171,8 @@ public class DapDispatcher implements DispatchHandler {
                     log.warn("Unable to parse the value of MaxPostBodyLength! Value: {} ",dv.getTextTrim());
 
                 }
-                log.info("MaxPostBodyLength is set to {}", ReqInfo.getMaxPostBodyLength());
             }
+            log.info("PostBodyMaxLength is set to {}", ReqInfo.getPostBodyMaxLength());
 
         }
 
@@ -324,7 +325,7 @@ public class DapDispatcher implements DispatchHandler {
             throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
+        // String dataSource = getBesApi().getBesDataSourceID(relativeUrl, false);
 
         log.debug("The client requested this resource: {}",relativeUrl);
 
@@ -352,6 +353,7 @@ public class DapDispatcher implements DispatchHandler {
 
 
     public long getLastModified(HttpServletRequest req) {
+
 
 
         String relativeUrl = ReqInfo.getLocalUrl(req);

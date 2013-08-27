@@ -29,7 +29,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <% String contextPath = request.getContextPath();
 
-    //String requestProbe = Util.probeRequest(null, request);
+    //String requestProbe = AwsUtil.probeRequest(null, request);
 
 %>
 <head>

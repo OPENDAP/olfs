@@ -254,6 +254,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
             log.debug("respondToHttpGetRequest() - Last-Modified header has not been set. Setting...");
 
             Date lmt = new Date(getLastModified(request));
+            //Date lmt = new Date((long)-1);
             SimpleDateFormat httpDateFormat = new SimpleDateFormat(HttpDatFormatString);
 
             response.setHeader("Last-Modified",httpDateFormat.format(lmt));
@@ -262,7 +263,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
         } else {
-            String lastModified =  response.toString();
             log.debug("respondToHttpGetRequest() - Last-Modified header has already been set.");
 
         }
@@ -315,8 +315,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
     @Override
     public boolean matches(String requestedResourceId, boolean checkWithBes) {
 
-
-
         String resourceID = getResourceId(requestedResourceId,checkWithBes);
 
         boolean result =  resourceID != null;
@@ -343,7 +341,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         while(!suffixMatcher.hitEnd()){
             suffixMatched = suffixMatcher.find();
-            log.debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
+            log.debug("{}", AwsUtil.checkRegex(suffixMatcher, suffixMatched));
         }
 
         String besDataSourceId = null;
@@ -502,6 +500,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
         }
         return description;
     }
+
 
 
 

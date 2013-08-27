@@ -57,54 +57,20 @@ public class S3BesApi extends BesGatewayApi {
     @Override
     public String getRemoteDataSourceUrl(String relativeURL, String pathPrefix, Pattern suffixMatchPattern )  {
 
-        String dataSourceUrl = getS3DataAccessUrlString(relativeURL, suffixMatchPattern);
-
-        long lmt = getLastModified(dataSourceUrl);
-
-        // NO luck? Then something is broken...
-        if(lmt==-1)
-            return null;  // Can't set dataSourceUrl to null, because null gets turned in to "null", a string. *sigh*
-
-        // URL url = new URL(dataSourceUrl);
-        // log.debug(urlInfo(url));
-
-        return dataSourceUrl;
-
-
-    }
-
-
-    public String getS3DataAccessUrlString(String relativeURL,  Pattern suffixMatchPattern){
-
-
-
         String s3ResourceId = relativeURL;
 
-        String bucketContext  = S3CatalogManager.theManager().getBucketContext(relativeURL);
-
-        // Strip off the bucket context - we'll use the actual bucket name when we build the remote resource URL.
-        while(s3ResourceId.startsWith(bucketContext))
-            s3ResourceId = s3ResourceId.substring(bucketContext.length());
-
-
-        // Strip leading slash(es)
-        while(s3ResourceId.startsWith("/") && !s3ResourceId.equals("/"))
-            s3ResourceId = s3ResourceId.substring(1,s3ResourceId.length());
-
-
-        // Drop the suffix for whatever dap service ore media-type this thing matches.
+        // Drop the suffix for whatever dap service or alt media-type this thing matches.
         if(!s3ResourceId.equals("")){
             s3ResourceId = Util.dropSuffixFrom(s3ResourceId, suffixMatchPattern);
         }
 
-        // Get the s3 bucket id.
-        String bucketName    = S3CatalogManager.theManager().getBucketName(relativeURL);
+        S3IndexedFile s3if = S3CatalogManager.theManager().getIndexedFile(s3ResourceId);
 
-        StringBuilder sb = new StringBuilder();
+        if(s3if==null)
+            return null;
 
-        sb.append( "http://" ).append( bucketName ).append( ".s3.amazonaws.com/" ).append( s3ResourceId );
+        return s3if.getResourceUrl();
 
-        return sb.toString();
 
     }
 
@@ -117,10 +83,14 @@ public class S3BesApi extends BesGatewayApi {
      * @return The last-modified time OR -1 if the last modified was not available for any reason (including a
      * not found - 404)
      */
-    public long getLastModified(String remoteResourceUrl) {
+    private long getLastModified(String remoteResourceUrl) {
 
         // @TODO Cache this! We do this for every response  - we should just read it from the index files
         // (cause it's already there) and then we can focus on caching/updating/refreshing just the catalog index.
+
+
+
+
 
         log.debug("getLastModified() - remoteResourceUrl: "+remoteResourceUrl);
 
@@ -146,11 +116,11 @@ public class S3BesApi extends BesGatewayApi {
             int statusCode = httpClient.executeMethod(headReq);
 
                 if (statusCode != HttpStatus.SC_OK) {
-                    log.error("Unable to HEAD s3 object: " + remoteResourceUrl);
+                    log.error("getLastModified() - Unable to HEAD s3 object: " + remoteResourceUrl);
                     lastModifiedTime = -1;
                 }
                 else {
-                    log.debug("getLastModified(): Getting HTTP HEAD for "+remoteResourceUrl);
+                    log.debug("getLastModified(): Executed HTTP HEAD for "+remoteResourceUrl);
 
                     Header lastModifiedHeader = headReq.getResponseHeader("Last-Modified");
 

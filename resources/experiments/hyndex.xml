@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type='text/xsl' href='/ocean-archive.data.nodc.noaa.gov//index.xsl'?>
+<catalog xmlns="http://nodc.noaa.gov/s3/catalog/1.0" base="http://ocean-archive.data.nodc.noaa.gov" path="/0000841/1.1/data/0-data" name="ocean-archive.data.nodc.noaa.gov" delimiter="/" encoding="UTF-8">
+  <node name="WOCE_conf_2002Nov" size="411691927" count="57"/>
+  <node name="wocedata_1" size="5395190439" count="53459"/>
+  <node name="wocedata_2" size="6510891835" count="35565"/>
+  <leaf name="fnoc1.nc" last-modified="2013-02-01T15:48:41.000Z" size="23944">
+      <service type="dap4" href="/dap4/0000841/1.1/data/0-data/fnoc1.nc" />
+      <service type="dap2" href="/dap2/0000841/1.1/data/0-data/fnoc1.nc.html" />
+      <service type="wcs" href="/wcs?DESCRIBE_COVERAGE_QUERY"/>
+  </leaf>
+</catalog>

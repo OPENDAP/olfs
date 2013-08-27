@@ -317,7 +317,7 @@ public class WebStartServlet extends HttpServlet {
 
 
         log.debug(opendap.coreServlet.Util.showRequest(req, reqNumber.get()));
-        //log.debug(opendap.coreServlet.Util.probeRequest(this, req));
+        //log.debug(opendap.coreServlet.AwsUtil.probeRequest(this, req));
 
 
         Request dapRequest = new Request(this,req);

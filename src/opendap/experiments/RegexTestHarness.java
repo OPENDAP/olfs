@@ -25,7 +25,12 @@
 
 package opendap.experiments;
 
+import opendap.coreServlet.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,12 +40,30 @@ public class RegexTestHarness {
 
 
     public static void main(String[] args) throws Exception {
-        BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
 
+
+        String regex;
+        regex = "\\.dmr(((\\.xml)?)|((\\.html)?)|((\\.rdf)?))?$";
+        //regex = "\\.dmr(((\\.xml)?)|((\\.html)?)|((\\.rdf)?))$";
+        //regex = "\\.dmr(($)?|((\\.xml$)?)|((\\.html$)?)|((\\.rdf$)?))?$";
+        String candidate = "/foo-s3cmd/gdr/cycle097/JA2_GPN_2PdP097_001_20110218_225833_20110218_235445.nc.dmr.xml";
+        regexTest(regex,candidate);
+
+
+        Pattern pattern = Pattern.compile(regex);
+        Util.dropSuffixFrom(candidate,pattern);
+
+        //console();
+    }
+
+
+
+    public static void console() throws IOException {
+
+        BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in));
         String regex = null;
         String candidate = null;
         String k;
-
         while (true) {
 
             System.out.print("-----------------------------------------------------------");
@@ -58,6 +81,7 @@ public class RegexTestHarness {
 
 
         }
+
     }
 
 
@@ -90,21 +114,23 @@ public class RegexTestHarness {
         }
 
 
-        System.out.println("String.split()");
         String[] urlParts = candidate.split(regex);
+        System.out.println("String.split(): Found "+urlParts.length+" parts");
+
         for(int i=0; i<urlParts.length; i++){
             System.out.println("    part["+i+"]: "+urlParts[i]);
         }
 
 
-        System.out.println("Pattern.split()");
         urlParts = pattern.split(candidate);
+        System.out.println("Pattern.split(): Found "+urlParts.length+" parts");
         for(int i=0; i<urlParts.length; i++){
             System.out.println("    part["+i+"]: "+urlParts[i]);
         }
 
 
 
+        System.out.println("-----------------------------------------------------------");
 
 
 
