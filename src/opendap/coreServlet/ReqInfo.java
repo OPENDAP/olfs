@@ -74,6 +74,8 @@ import java.util.regex.Pattern;
 
 public class ReqInfo {
 
+    public static final int DEFAULT_POST_BODY_MAX_LENGTH = 1000000;
+
     private static Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
@@ -82,7 +84,7 @@ public class ReqInfo {
 
     private static AtomicInteger maxPostBodyLength;
     static {
-        maxPostBodyLength = new AtomicInteger(1000000);
+        maxPostBodyLength = new AtomicInteger(DEFAULT_POST_BODY_MAX_LENGTH);
     }
 
     private static String pathFunctionSyntaxRegEx = "_expr_\\{.*\\}\\{.*\\}(\\{.*\\})?";
@@ -96,7 +98,7 @@ public class ReqInfo {
         maxPostBodyLength.set(maxLength);
     }
 
-    public static int getMaxPostBodyLength(){
+    public static int getPostBodyMaxLength(){
         return maxPostBodyLength.get();
     }
 
@@ -266,7 +268,7 @@ public class ReqInfo {
         if(req.getMethod().equalsIgnoreCase("POST")){
 
 
-            if(req.getContentLength()> getMaxPostBodyLength()) {
+            if(req.getContentLength()> getPostBodyMaxLength()) {
                 throw new IOException("POST body content length is longer than maximum allowed by service.");
             }
 
