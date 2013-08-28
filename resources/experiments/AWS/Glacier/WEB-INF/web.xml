@@ -151,7 +151,7 @@
     </servlet>
 
 
-    <!-- servlet>
+    <servlet>
         <servlet-name>dap</servlet-name>
         <servlet-class>opendap.aws.glacier.DapServlet</servlet-class>
         <init-param>
@@ -159,7 +159,7 @@
             <param-value>false</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
-    </servlet -->
+    </servlet>
 
 
     <filter>
@@ -191,10 +191,10 @@
         <url-pattern>/catalog/*</url-pattern>
     </servlet-mapping>
 
-    <!-- servlet-mapping>
+    <servlet-mapping>
         <servlet-name>dap</servlet-name>
         <url-pattern>/dap/*</url-pattern>
-    </servlet-mapping -->
+    </servlet-mapping>
 
 
 

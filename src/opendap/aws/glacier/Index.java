@@ -197,7 +197,7 @@ public class Index {
     }
 
 
-    private HashMap<String, Element> getThreddsCatalogServices(){
+    private HashMap<String, Element> getThreddsCatalogServices(String dapServiceContext){
         HashMap<String,Element> services = new HashMap<String, Element>();
 
 
@@ -205,7 +205,7 @@ public class Index {
         Element service = new Element(THREDDS.SERVICE, THREDDS.NS);
         service.setAttribute("name","dap");
         service.setAttribute("serviceType","OPeNDAP");
-        service.setAttribute("base", S3CatalogManager.theManager().getDapServiceContext());
+        service.setAttribute("base", dapServiceContext);
 
         services.put("dap",service);
 
@@ -217,11 +217,11 @@ public class Index {
 
 
 
-    public Element getThreddsCatalog(String catalogContext) throws JDOMException, IOException {
+    public Element getThreddsCatalog(String vaultName, String catalogServiceContext, String dapServiceContext) throws JDOMException, IOException {
 
         Element threddsCatalog = new Element(THREDDS.CATALOG,THREDDS.NS);
 
-        HashMap<String,Element> services = getThreddsCatalogServices();
+        HashMap<String,Element> services = getThreddsCatalogServices(dapServiceContext);
 
         threddsCatalog.addNamespaceDeclaration(XLINK.NS);
 
@@ -231,20 +231,16 @@ public class Index {
 
         Element catalogDataset = new Element(THREDDS.DATASET,THREDDS.NS);
 
-        String name = getPath().equals("")?getDelimiter():getPath();
+        String name = vaultName + (getPath().equals("")?getDelimiter():getPath());
+        catalogDataset.setAttribute("name",name);
 
         StringBuilder id = new StringBuilder();
-
-
-        String catalogServiceContext = S3CatalogManager.theManager().getCatalogServiceContext();
-
         id.append(catalogServiceContext).append(name);
-
-        catalogDataset.setAttribute("name",name);
         catalogDataset.setAttribute("ID",id.toString());
 
-        catalogDataset.addContent(getThreddsCatalogRefs(catalogServiceContext,catalogContext));
-        catalogDataset.addContent(getThreddsDatasets(services,catalogContext));
+
+        catalogDataset.addContent(getThreddsCatalogRefs(catalogServiceContext));
+        catalogDataset.addContent(getThreddsDatasets(services,dapServiceContext));
 
         threddsCatalog.addContent(catalogDataset);
 
@@ -259,7 +255,7 @@ public class Index {
      *   <file name="FGDC_meta_0077816_long_version.xml" last-modified="2013-02-01T17:43:44.000Z" size="152333"/>
      * @return
      */
-    public Vector<Element> getThreddsDatasets(HashMap<String,Element> services, String catalogContext) throws JDOMException, IOException {
+    public Vector<Element> getThreddsDatasets(HashMap<String,Element> services, String dapServiceContext) throws JDOMException, IOException {
 
         Vector<Element> threddsDatasets = new Vector<Element>();
 
@@ -302,7 +298,7 @@ public class Index {
                 // String s3DatasetUrl =  getS3DatasetUrl(fileName);
                 // String urlPath = "/" + encoder.encode(s3DatasetUrl.toString());
 
-                String urlPath = getCatalogId(fileName, catalogContext);
+                String urlPath = getCatalogId(fileName);
 
 
                 for(String serviceName:services.keySet()){
@@ -345,7 +341,7 @@ public class Index {
      * @throws java.io.IOException
      * @throws org.jdom.JDOMException
      */
-    public Vector<Element> getThreddsCatalogRefs(String catalogServiceContext, String catalogContext) throws JDOMException, IOException {
+    public Vector<Element> getThreddsCatalogRefs(String catalogServiceContext) throws JDOMException, IOException {
 
         Vector<Element> catalogRefs = new Vector<Element>();
 
@@ -375,7 +371,7 @@ public class Index {
 
             StringBuilder href = new StringBuilder();
 
-            href.append(catalogServiceContext).append(catalogContext).append(id).append("catalog.xml");
+            href.append(catalogServiceContext).append(id).append("catalog.xml");
 
             catalogRef.setAttribute("href",href.toString(),XLINK.NS);
 
@@ -389,10 +385,10 @@ public class Index {
 
 
     // @todo Move to class(es?) that hold collections of Index and know the catalogContext name.
-    public String getCatalogId(String fileName, String catalogContext) throws JDOMException, IOException {
+    public String getCatalogId(String fileName) throws JDOMException, IOException {
 
         StringBuilder resourceId =  new StringBuilder();
-        resourceId.append(catalogContext).append(getPath()).append(getDelimiter()).append(fileName);
+        resourceId.append(getPath()).append(getDelimiter()).append(fileName);
 
         return resourceId.toString();
     }

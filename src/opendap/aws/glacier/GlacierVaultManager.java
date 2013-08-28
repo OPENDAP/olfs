@@ -150,14 +150,14 @@ public class GlacierVaultManager {
     }
 
 
-    public void addArchiveRecord(GlacierArchiveRecord gar) throws IOException {
+    public void cacheArchiveRecord(GlacierArchiveRecord gar) throws IOException {
 
 
         File targetFile = new File(getArchiveRecordsDir(), AwsUtil.encodeKeyForFileSystemName(gar.getResourceId()));
-        log.debug("addArchiveRecord() - targetFile: '{}'",targetFile);
+        log.debug("cacheArchiveRecord() - targetFile: '{}'",targetFile);
 
         if(targetFile.exists()){
-            log.warn("addArchiveRecord() - OVERWRITING RESOURCE ARCHIVE RECORD: '{}'", targetFile);
+            log.warn("cacheArchiveRecord() - OVERWRITING RESOURCE ARCHIVE RECORD: '{}'", targetFile);
 
         }
         else {
@@ -209,7 +209,7 @@ public class GlacierVaultManager {
                     gar = new GlacierArchiveRecord(archiveRecord);
 
 
-                    String resourceId = getServiceContext() + gar.getResourceId();
+                    String resourceId = gar.getResourceId();
 
                     _archiveRecords.put(resourceId,gar);
                     log.debug("Loaded Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
@@ -244,7 +244,7 @@ public class GlacierVaultManager {
                     String pathDelimiter = index.getDelimiter();
 
                     resourceId
-                            .append(getServiceContext())
+                            //.append(getGlacierServiceContext())
                             .append(index.getPath())
                             .append(pathDelimiter)
                             .append(index.getIndexFileConvention());

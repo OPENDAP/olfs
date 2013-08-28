@@ -93,8 +93,17 @@ public class CatalogServlet extends HttpServlet {
          * These things could be in a configuration file
          *
          */
+        Element config = null;
+
+
+        /**
+         * ###########################################################################
+         */
+
+
+
         try {
-            GlacierArchiveManager.theManager().init(null);
+            GlacierArchiveManager.theManager().init(config);
         } catch (IOException e) {
             String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
             e.printStackTrace();
@@ -105,10 +114,6 @@ public class CatalogServlet extends HttpServlet {
             throw new ServletException(msg);
         }
 
-
-        /**
-         * ###########################################################################
-         */
 
 
 
@@ -217,18 +222,17 @@ public class CatalogServlet extends HttpServlet {
 
     public long getCatalogLastModified(HttpServletRequest req){
 
-        String requestUrl = req.getRequestURL().toString();
-        String relativeURL = ReqInfo.getLocalUrl(req);
+        String resourceId = getCatalogIndexResourceId(req);
 
         long lmt = -1;
 
-        Index index = GlacierArchiveManager.theManager().getIndex(relativeURL);
+        Index index = GlacierArchiveManager.theManager().getIndex(resourceId);
 
         if(index == null) {
-            _log.debug("getLastModified() - The requested index '{}' was not Found.",relativeURL);
+            _log.debug("getLastModified() - The requested index '{}' was not Found.",resourceId);
         }
         else {
-            _log.debug("getLastModified() - Retrieved cached Index for '{}'",relativeURL);
+            _log.debug("getLastModified() - Retrieved cached Index for '{}'",resourceId);
             lmt = index.getLastModified();
         }
 
@@ -238,6 +242,23 @@ public class CatalogServlet extends HttpServlet {
 
 
         return lmt;
+
+
+    }
+
+
+    private String _catalogSuffix = "catalog.xml";
+
+    private String getCatalogIndexResourceId(HttpServletRequest request){
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+
+        while(relativeUrl.startsWith("/") && relativeUrl.length()>1)
+            relativeUrl = relativeUrl.substring(1);
+
+        if(relativeUrl.endsWith("/catalog.xml"))
+            relativeUrl = relativeUrl.substring(0,relativeUrl.lastIndexOf(_catalogSuffix)) + "/index.xml";
+
+        return relativeUrl;
 
 
     }
@@ -260,26 +281,37 @@ public class CatalogServlet extends HttpServlet {
         boolean handled = false;
 
 
+
         String requestUrl = request.getRequestURL().toString();
-        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String indexResourceId = getCatalogIndexResourceId(request);
 
         Index index;
 
-        index = GlacierArchiveManager.theManager().getIndex(relativeUrl);
-        boolean newIndex = false;
+
+
+        String vaultName = GlacierArchiveManager.theManager().getVaultName(indexResourceId);
+
+        index = GlacierArchiveManager.theManager().getIndex(indexResourceId);
+
+
         if(index == null) {
-            _log.debug("directoryDispatch() - No index associated with resourceId '{}'",relativeUrl);
+            _log.debug("directoryDispatch() - No index associated with indexResourceId '{}'",indexResourceId);
             return false;
         }
 
-        _log.debug("directoryDispatch() - Retrieved cached S3Index for '{}'",requestUrl);
+        _log.debug("directoryDispatch() - Retrieved cached Glacier Index for '{}'",requestUrl);
 
 
         try {
 
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-            Element catalog = index.getThreddsCatalog(_servletContext);
+
+            String catalogServiceContext = GlacierArchiveManager.theManager().getCatalogServiceContext(indexResourceId);
+            String dapServiceContext = GlacierArchiveManager.theManager().getDapServiceContext(indexResourceId);
+
+
+            Element catalog = index.getThreddsCatalog(vaultName,catalogServiceContext,dapServiceContext);
 
             Document threddsDoc = new Document();
 

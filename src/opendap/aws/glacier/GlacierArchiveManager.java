@@ -62,7 +62,9 @@ public class GlacierArchiveManager {
     private String _galcierEndpoint;
 
     private String _parentContext;
-    private String _serviceContext;
+    private String _glacierServiceContext;
+    private String _dapServiceContext;
+    private String _catalogServiceContext;
 
     private String _pathDelimiter = "/";
 
@@ -105,19 +107,43 @@ public class GlacierArchiveManager {
         _galcierEndpoint = endpoint;
     }
 
-    public String getServiceContext(){
-        return _serviceContext;
+    public String getGlacierServiceContext(){
+        return _glacierServiceContext;
     }
+
+    public String getDapServiceContext(){
+        return _dapServiceContext;
+    }
+
+    public String getDapServiceContext(String resourceId){
+        String dapServiceForVault =  getDapServiceContext() +"/"+ getVaultName(resourceId);
+
+        return dapServiceForVault ;
+    }
+
+    public String getCatalogServiceContext(){
+        return _catalogServiceContext ;
+    }
+
+    public String getCatalogServiceContext(String resourceId){
+
+        String catalogServiceForVault =  getCatalogServiceContext() +"/"+ getVaultName(resourceId);
+
+        return catalogServiceForVault ;
+    }
+
 
 
     public void setParentContext(String parentContext){
         _parentContext = parentContext;
         String myContext = _parentContext + _pathDelimiter + getName();
-        setServiceContext(myContext);
+        setGlacierServiceContext(myContext);
     }
 
-    public void setServiceContext(String serviceContext){
-        _serviceContext = serviceContext;
+    public void setGlacierServiceContext(String serviceContext){
+        _glacierServiceContext = serviceContext;
+        _dapServiceContext = _glacierServiceContext + "/dap";
+        _catalogServiceContext = _glacierServiceContext + "/catalog";
     }
 
 
@@ -182,7 +208,7 @@ public class GlacierArchiveManager {
 
         String vaultName =  gar.getVaultName();
         GlacierVaultManager gvm = makeVaultManagerIfNeeded(vaultName);
-        gvm.addArchiveRecord(gar);
+        gvm.cacheArchiveRecord(gar);
     }
 
     public GlacierVaultManager makeVaultManagerIfNeeded(String vaultName) throws IOException {
@@ -210,6 +236,20 @@ public class GlacierArchiveManager {
 
     public Index getIndex(String resourceId){
 
+        String vaultName = getVaultName(resourceId);
+
+        if(vaultName!= null){
+            log.debug("getIndex() - Found vault name {} for resourceId {}. Trimming resourceId",vaultName,resourceId);
+            resourceId = resourceId.substring(vaultName.length());
+            log.debug("getIndex() - Vault adjusted resourceId: {}",resourceId);
+            return getIndex(vaultName,resourceId);
+        }
+
+        return null;
+
+    }
+
+    public String getVaultName(String resourceId){
         String vaultName = null;
         for(String vName: _vaults.keySet()){
             if(resourceId.startsWith(vName)){
@@ -222,14 +262,7 @@ public class GlacierArchiveManager {
             }
 
         }
-        if(vaultName!= null){
-            log.debug("getIndex() - Found vault name {} for resourceId {}. Trimming resourceId",vaultName,resourceId);
-            resourceId = resourceId.substring(vaultName.length());
-            log.debug("getIndex() - Vault adjusted resourceId: {}",resourceId);
-        }
-        return getIndex(vaultName,resourceId);
-
-
+        return vaultName;
     }
 
 
@@ -289,9 +322,6 @@ public class GlacierArchiveManager {
     public void loadVaults() throws IOException, JDOMException {
 
         GlacierVaultManager gvm;
-        ConcurrentHashMap<String, GlacierArchiveRecord> vaultMap;
-
-
 
         File gRootDir = getGlacierRootDir();
         log.debug("loadVaults(): getGlacierRootDir",getGlacierRootDir());
@@ -306,9 +336,10 @@ public class GlacierArchiveManager {
                 if (vault.isDirectory()) {
 
                     gvm = new GlacierVaultManager(vaultName,gRootDir);
-                    gvm.setParentContext(getServiceContext());
+                    gvm.setParentContext(getGlacierServiceContext());
                     gvm.loadArchiveRecords();
                     gvm.loadIndexObjects();
+                    _vaults.put(gvm.name(),gvm);
                 }
 
             }

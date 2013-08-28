@@ -124,7 +124,7 @@ public class GlacierArchiveRecord  {
     /**
      * <gar:GlacierArchiveRecord
      *         xmlns:gar="http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#"
-     *         setResourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
+     *         resourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
      *         vault="foo-s3cmd.nodc.noaa.gov"
      *         archiveId="DUApQbY05dAB50FCci6NFTVkp0MpswEg_YwcYyy7x9Jn1UohMOEywbj1iMuXHNu53HKTRX1kMTNJUEbxDazAciwk5CvBCHkx66khGPxKm2TcHGsLNByPgNH6jOWroN5Yg5V9tdb9Og" />
      * @return
@@ -132,7 +132,7 @@ public class GlacierArchiveRecord  {
     public Element getArchiveRecordElement(){
         Element index = new Element("GlacierArchiveRecord", glacierRecordNameSpace);
 
-        index.setAttribute("setResourceId",getResourceId());
+        index.setAttribute("resourceId",getResourceId());
         index.setAttribute("vault",getVaultName());
         index.setAttribute("archiveId",getArchiveId());
 
@@ -152,7 +152,7 @@ public class GlacierArchiveRecord  {
     /**
      * <gar:GlacierArchiveRecord
      *         xmlns:gar="http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#"
-     *         setResourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
+     *         resourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
      *         vault="foo-s3cmd.nodc.noaa.gov"
      *         archiveId="DUApQbY05dAB50FCci6NFTVkp0MpswEg_YwcYyy7x9Jn1UohMOEywbj1iMuXHNu53HKTRX1kMTNJUEbxDazAciwk5CvBCHkx66khGPxKm2TcHGsLNByPgNH6jOWroN5Yg5V9tdb9Og" />
      * @return
@@ -185,7 +185,7 @@ public class GlacierArchiveRecord  {
         if(resourceId==null)
             throw new IOException("loadArchiveRecordFromFile() - The element " +
                     archiveRecordElement.getName() +
-                    " is missing the required attribute 'setResourceId'.");
+                    " is missing the required attribute 'resourceId'.");
         setResourceId(resourceId);
 
 

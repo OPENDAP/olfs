@@ -97,23 +97,27 @@ public class DapServlet extends HttpServlet {
          * These things could be in a configuration file
          *
          */
-        String s3BucketContext = "/nodc";
-        String s3BucketName = "ocean-archive.data.nodc.noaa.gov";
-        try {
-            GlacierArchiveManager.theManager().init(null);
-        } catch (IOException e) {
-            throw new ServletException("Failed to initialize the GlacierArchive Manager!! IOException: "+e.getMessage());
-        } catch (JDOMException e) {
-            throw new ServletException("Failed to initialize the GlacierArchive Manager!! JDOMException: "+e.getMessage());
-        }
-
-
+        Element config = null;
         Element besConfiguration = getDefaultBesManagerConfig();
+
 
         /**
          * ###########################################################################
          */
 
+
+
+        try {
+            GlacierArchiveManager.theManager().init(config);
+        } catch (IOException e) {
+            String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
+            e.printStackTrace();
+            throw new ServletException(msg);
+        } catch (JDOMException e) {
+            String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
+            e.printStackTrace();
+            throw new ServletException(msg);
+        }
 
 
 
@@ -126,6 +130,14 @@ public class DapServlet extends HttpServlet {
             _log.error("Failed to initialize BESManager.");
             throw new ServletException(e);
         }
+
+
+        /**
+         * ###########################################################################
+         */
+
+
+
 
 
 
