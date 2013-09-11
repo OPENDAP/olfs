@@ -1,238 +1,3660 @@
-2009-05-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-08-28  Nathan Potter <ndp@opendap.org>
 
-	olfs: Fixed unsafe usages of HttpServletResponse.reset()
+	olfs: Checking in Glacier service resources.
 
-2009-05-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-08-27  Nathan Potter <ndp@opendap.org>
 
-2009-04-08  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: Checking in protoype code for working wth S3 and Glacier.
 
-	olfs: Creating tag for version 1.5.0
+2013-08-27  Nathan Potter <ndp@opendap.org>
 
-2009-04-08  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: Improving the implementation of suffix removal using a regex.
 
-	olfs: Check in prior to taggin for 1.5.0
+2013-08-27  Nathan Potter <ndp@opendap.org>
 
-2009-04-08  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: Adding execution timing
 
-	olfs: Check in prior to taggin for 1.5.0
+2013-08-26  Nathan Potter <ndp@opendap.org>
 
-2009-03-16  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: Added minor changes to the way CEs are accepted via POST
 
-	olfs: misc. changes
+2013-08-26  Nathan Potter <ndp@opendap.org>
 
-2009-03-09  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: Moved the initialContent directory to a more sensible location
 
-	olfs: Disabled (commented out) browsing of remote THREDDS catalogs.
+2013-08-02  Nathan Potter <ndp@opendap.org>
 
-2009-03-09  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Fixed bug in which the suffix regex was being accessed as a private variable and not via the API which was preventing child classes from providing alternate values by overriding API access methods.
 
-	Commented out RDF link for datasets
+2013-07-03  Nathan Potter <ndp@opendap.org>
 
-2009-02-23  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Fixed bug in BESManager that caused the manager to incorrectly assign ALL BES instances in the configuration to BESGroup with prefix '/' (ouch).
 
-2009-02-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-06-28  Nathan Potter <ndp@opendap.org>
 
-2009-02-23  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Optimized imports.
 
-2009-02-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-06-28  Nathan Potter <ndp@opendap.org>
 
-2009-02-20  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: Checking in spurious mods to retired source (why? let's just say because I said so...)
 
-	hyrax-1.5.: updated olfs tests to accommodate changes to fileout_netcdf and netcdf_handler
+2013-06-28  Nathan Potter <ndp@opendap.org>
 
-2009-02-20  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Renamed BesDataSource to BesResource. Fixed bug that was causing the server to omit last modified time headers from its responses.
 
-	hyrax-1.5.0: attempted bug fix for olfs production rules
+2013-06-20  Nathan Potter <ndp@opendap.org>
 
-2009-02-20  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs: removed spurious import statement
 
-	hyrax-1.5: Merged branch/xmlresponse/olfs into hyrax-1.5.0
+2013-06-18  Nathan Potter <ndp@opendap.org>
 
-2009-02-11  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Added Prototype support for POST requests that contain a CE in the request body.
 
-	olfs: Added debugging instrumentation of BES errors
+2013-06-18  Nathan Potter <ndp@opendap.org>
 
-2009-02-11  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  NOAA S3 minor changes.
 
-	olfs: Added debugging instrumentation of BES errors
+2013-06-18  Nathan Potter <ndp@opendap.org>
 
-2009-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Modified media type for netcdf-4 fileout
 
-2009-02-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-04-01  Nathan Potter <ndp@opendap.org>
 
-2009-01-31  Nathan Potter <ndp@coas.oregonstate.edu>
+	olfs:  Added netcdf-4 fileout support (suffix = .nc4)
 
-2009-01-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-03-14  Nathan Potter <ndp@opendap.org>
 
-	olfs: Branching for Hyrax 1.5 beta release.
+	olfs:  Fixed s3 catalog and dap service dispatch issues. Using request cache for last modified times of s3 data resources.
 
-2009-01-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-03-14  Nathan Potter <ndp@opendap.org>
 
-	olfs: Added missing library
+	olfs:  Fixed s3 catalog and dap service dispatch issues. Using request cache for last modified times of s3 data resources.
 
-2009-01-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2013-03-14  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Fixed s3 catalog and dap service dispatch issues. Using request cache for last modified times of s3 data resources.
+
+2013-03-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added multiple bucket support for s3 catalog. Fixed s3 catalog dispatch issues.
+
+2013-03-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Bug fix for Async Prototype
+
+2013-03-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Bug fix for Async Prototype
+
+2013-03-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Production rules...
+
+2013-03-04  Nathan Potter <ndp@opendap.org>
+
+	olfs: Prototype s3 index service
+
+2013-03-04  Nathan Potter <ndp@opendap.org>
+
+	olfs: Prototype s3 index service
+
+2013-03-04  Nathan Potter <ndp@opendap.org>
+
+	olfs: Prototype s3 index service
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Retiring unused code from active code base.
+
+2013-02-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Repaired broken DAP4, DAP2, gateway, and ncmlHandler dispatch.
+
+2013-01-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added geotiff and gmljp2 responses as dap4 alternate data representations
+
+2013-01-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merging branch/olfs/1.9.0 to trunk against the tags/olfs/1.9.6 tag. Created tags/olfs/1.9.7 tag.
+
+2013-01-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Small mods to the HTTP request diagnostic tool EchoServlet
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Reformatted presentation view of a CoverageDescription
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Loosened collection type used in by getCoverageSummaryElements()
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Protecting request cache api from null pointers
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Started Sorting Coverages by coverageId
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Fixed id's and names in wcs contnet. Made server accept WCS request parameters in a non case sensitive manner.
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Fixed id's and names in wcs contnet. Made server accept WCS request parameters in a non case sensitive manner.
+
+2013-01-02  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Fixed id's and names in wcs contnet. Made server accept WCS request parameters in a non case sensitive manner.
+
+2012-12-31  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Optimized imports. Removed more crufty references to version 1_1_2 code.
+
+2012-12-21  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Removed cruft files. Dropped ServerIDs thingy in the xsl and code (cruft from 1.1.2).
+
+2012-12-20  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Renamed CE method more accurately, comments.
+
+2012-12-20  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added checks to prevent mixed mode (value vs array index) subsetting requests and to correctly detect time value types during CE construction.
+
+2012-12-20  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Corrected errors in  coverage descriptions.
+
+2012-12-20  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Dropped cruft classes. Added comments to TimConversion methods
+
+2012-12-20  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added support for domain sub-setting by value and by array index. Added support for time domain sub-setting.
+
+2012-12-17  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-17  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-13  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-13  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-13  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-11-07  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Made WCS KVP key set case insensitive.
+
+2012-11-07  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Made WCS KVP key set case insensitive.
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  UI adjustments
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  New production rules for WCS-2.0.
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Fixing service test harness.
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  Fixing service test harness.
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  GetCoverage working. Both "format" and "GML" (aka multipart) responses.
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  GetCoverage working. Both "format" and "GML" (aka multipart) responses.
+
+2012-11-01  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  GetCoverage working. Both "format" and "GML" (aka multipart) responses.
+
+2012-10-27  Nathan Potter <ndp@opendap.org>
+
+	WCS-2.0:  GetCapabilites and DescribeCoverage working via kvp. Both response documents validate.
+
+2012-10-25  Nathan Potter <ndp@opendap.org>
+
+	WCS: Two example WCS-2.0 CoverageDescriptions
+
+2012-10-22  Nathan Potter <ndp@opendap.org>
+
+	WCS: Relaxed usage of HashMap to Map
+
+2012-10-17  Nathan Potter <ndp@opendap.org>
+
+	WCS: Relaxed usage of HashMap to Map
+
+2012-10-17  Nathan Potter <ndp@opendap.org>
+
+	WCS: Creating specific resource trees for versions 1.1.2 and 2.0
+
+	A    https://scm.opendap.org/svn/trunk/olfs/resources/WCS/2.0
+
+2012-10-17  Nathan Potter <ndp@opendap.org>
+
+	WCS: Creating resources specific for versions 1.1.2 and 2.0
+
+2012-10-15  Nathan Potter <ndp@opendap.org>
+
+	wcs: Updated package names for the classes in the newly created WCS 2.0 package.
+
+2012-10-15  Nathan Potter <ndp@opendap.org>
+
+	wcs: Creating WCS 2.0 implmentation starting point by cloning WCS 1.1.2 code because the amount of similarity between the two versions leads me to beleive that this will save time.
+
+2012-09-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added instrumentation to HAI to monitor ChunkReadBuffer size for each BesClient
+
+2012-09-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improvements to memory allocation/use in Chunked communications.
+
+2012-09-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed flaws in destroy() and drain() methods
+
+2012-09-11  Nathan Potter <ndp@opendap.org>
+
+	olfs: Comitting merge from 1.9.0 release branch (using the 1.9.5 tag). Merged code contains BES load balancing implementation.
+
+2012-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: First implementation of DAP4 Web Services
+
+2012-08-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Unwinding bad changes sprayed about the code by refactor tools run mad.
+
+2012-08-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated async responses so that the use of "pending" and "gone" can be switched off (404 response in their place).
+
+2012-08-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated async to emit and ingest time periods as seconds (formerly milliseconds).
+
+2012-08-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in getLastModifed() (again?)
+
+2012-08-01  Nathan Potter <ndp@opendap.org>
+
+2012-08-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Post merge adding new SOAPRequestDispatcher.java class - lost as a casuality of tree conflicts in the merge.
+
+2012-08-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged 1.9.0 branch to trunk using 1.9.4 tag. Created 1.9.5 tag
+
+2012-07-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in DapDispatcher.getLastModified()
+
+2012-07-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in DapDispatcher.getLastModified()
+
+2012-06-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: SVN test
+
+2012-04-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: updated test controls
+
+2012-04-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a response blocking filer to the BotBlocker so that crawl bots can be stopped from accessing data services but can still get metadata and catalog information.
+
+2012-04-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a response blocking filer to the BotBlocker so that crawl bots can be stopped from accessing data services but can still get metadata and catalog information.
+
+2012-04-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+2012-04-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+2012-04-18  Nathan Potter <ndp@opendap.org>
+
+2012-04-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+2012-04-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+2012-04-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+2012-04-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added configurable response delay and cache persist time to asynchronous response prototype
+
+2012-04-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added asynchronous response prototype
+
+2012-04-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders. (minor edits)
+
+2012-04-02  jdcorral
+
+	added use of canonical in template check-reserved.  M. Benno Blumenthal.  Check in by J. del Corral
+
+2012-03-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders.
+
+2012-03-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders.
+
+2012-03-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders.
+
+2012-03-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updating olfs.xml to reflect the retirement of the NcmlFileDistacher and comments regarding the DatasetServices response.
+
+2012-03-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updating olfs.xml to reflect the retirement of the NcmlFileDistacher and comments regarding the DatasetServices response.
+
+2012-03-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Deprecated NcmlFileDispatcher by adding it's logic to DatasetFileAccess
+
+2012-03-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Deprecated NcmlFileDispatcher by adding it's logic to DatasetFileAccess
+
+2012-03-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up unused imports.
+
+2012-03-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Commented out debugging alerts in the javascript code of the HAI. Fixed an async problem  that when committing changes. Updated default logging configs.
+
+2012-03-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: First working draft of services description response. Changed a number of things to allow this to be turned on and off via the olfs.xml configuration.
+
+2012-03-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged 1.9.0 branch to trunk using 1.9.3 tag. Created 1.9.4 tag
+
+2012-03-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged 1.9.0 branch to trunk using 1.9.3 tag. Created 1.9.4 tag
+
+2012-03-07  Nathan Potter <ndp@opendap.org>
+
+	wcs: updating inital config file
+
+2012-03-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes to WCS production rules and version tagging.
+
+2012-03-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged olfs-1.9.3 to trunk.
+
+2012-03-03  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in WCS deployment that was causing the DocServlet not to be included.
+
+2012-02-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: MErged 1.9 relase brach back to trunk using previous 1.9.1 tag. Created 1.9.2 tag
+
+2012-02-13  Nathan Potter <ndp@opendap.org>
+
+	WCS: Updated supported format and mime-type strings.
+
+2012-02-09  Nathan Potter <ndp@opendap.org>
+
+	WCS: Added multipart mime responses. Fixed many bits.
+
+2012-02-09  Nathan Potter <ndp@opendap.org>
+
+	WCS: Updating test XML request files.
+
+2012-02-08  Nathan Potter <ndp@opendap.org>
+
+	WCS: Adding tests for the XML POST and SOAP interfaces.
+
+2012-01-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged 1.9.1 back to trunk.
+
+2012-01-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged 1.9.0 branch back to trunk
+
+2012-01-19  Nathan Potter <ndp@opendap.org>
+
+	Removing eclipse detritus from code base
+
+2012-01-06  jdcorral
+
+	fixed section of code in addChildren where order is not specified. JdC
+
+2011-09-28  jdcorral
+
+	removed references to trree.jar, no longer necessary
+
+2011-09-28  jdcorral
+
+	updated sesame2  lib
+
+2011-09-28  jdcorral
+
+	updated  owlim lib
+
+2011-09-28  jdcorral
+
+	fixed coding problems in RdfImporter, RepositoryOps, and XMLfromRDF and updated Sesame2 and OWLim libs
+
+2011-09-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Commented out debugging alerts in the javascript code of the HAI. Fixed an async problem  that when committing changes. Updated default logging configs.
+
+2011-09-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in HAI that was causing it to fail silently when the BES admin port was not configured in the olfs.xml file.
+
+2011-09-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed problems in WCS service caused by other modifications to the code base.
+
+2011-09-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added links to the HAI on the default page.
+
+2011-09-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking changes in support of migration to JSP (switching to default Tomcat servlet from the docs servlet).
+
+2011-09-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking changes in support of migration to JSP (switching to default Tomcat servlet from the docs servlet).
+
+2011-08-25  jdcorral
+
+	added work around for file:/// URIs
+
+2011-08-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: More ticket 1796
+
+2011-08-22  jdcorral
+
+	removed check for http:// from query string constructor. JdC.
+
+2011-08-22  jdcorral
+
+	test of modifying IRISail
+
+2011-08-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: More ticket 1796
+
+2011-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: More ticket 1796
+
+2011-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Repaired the generation of data access links in THREDDS catalogs.(ticket 1796)
+
+2011-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs-hai: Added form based login. Added logout
+
+2011-07-14  James Gallagher <jgallagher@opendap.org>
+
+	I changed the way that stopNice_worker is called so thet the stop nice command is sent to the besdaemon synchronously. This ensures that the stop command always precedes the start command. Running the commands in the reverse order means that the beslistener is started when it's already running (which has no effect) and then stopped. That leaves the server in a stopped state. You can restart it by hand (but no one but us will every relaize that).
+
+2011-07-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added copyright headers to new code..
+
+2011-07-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaned up some libraries.
+
+2011-07-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: BES logging configuration changes.
+
+2011-07-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: BES logging configuration changes.
+
+2011-07-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: BES logging configuration changes.
+
+2011-06-30  Patrick West <pwest@ucar.edu>
+
+	Merge hyrax 1.7 branch to trunk
+
+2011-06-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Integrated BES logging and controls. Logging control prototype working.
+
+2011-06-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Integrated BES logging and controls. Logging control prototype working.
+
+2011-06-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added double quotes to Content-Disposition filename component.
+
+2011-06-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Bes Logging control prototype check in
+
+2011-06-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in Content-Disposition header for netcdf file out response.
+
+2011-06-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+2011-06-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+2011-06-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+2011-06-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+2011-05-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype olfs log viewer working with controls!
+
+2011-05-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Renamed method respondToHttpRequest in HttpResponder to respondToHttpGetRequest
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Renamed method respondToHttpRequest in HttpResponder to respondToHttpGetRequest
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Mods to admin interface
+
+2011-05-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Repaired DirectoryDispatch so that it correctly  finds nodes without trailing slashes in their URLs.
+
+2011-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking prototype besctl for the HAI
+
+2011-05-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking prototype besctl for the HAI
+
+2011-05-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking prototype besctl for the HAI
+
+2011-05-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added prototype Ncml Handler.
+
+2011-04-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added security constraints to the web.xml in order to protect the admin interface. Added first draft of OLFS log viewing to admin interface along with an ajax tool for a log "tail" function. Dropping Admin Servlet for a DispatchServlet built like the gateway.
+
+2011-04-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added security constraints to the web.xml in order to protect the admin interface. Added first draft of OLFS log viewing to admin interface along with an ajax tool for a log "tail" function. Dropping Admin Servlet for a DispatchServlet built like the gateway.
+
+2011-04-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: fixed the netcdf fileout response for the gateway - the content type was being set to application/octet-stream
+
+2011-04-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: dropped hao package
+
+2011-04-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: dropped hao package
+
+2011-04-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added call to NcMLManager
+
+2011-04-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added call to NcMLManager
+
+2011-04-08  haibo
+
+	commemts update
+
+2011-04-08  haibo
+
+	owlim3.5
+
+2011-03-17  Nathan Potter <ndp@opendap.org>
+
+2011-03-09  haibo
+
+	new owlim
+
+2011-03-08  James Gallagher <jgallagher@opendap.org>
+
+	Merge for hyrax	1.7 from the hyrax_1.6.2_release branch	of shrew to the	trunk
+
+	_M   .
+	A  + mkPackage
+	_M   src/opendap/coreServlet
+	_M   src/opendap/ppt
+	_M   src/opendap/bes
+	M    testsuite/config/unix.exp
+	M    build.xml
+	_M   doc
+	_M   doc/xsl/dap_2.0_ddxToRdfTriples.xsl
+	AM + resources/osx
+	A  + resources/osx/InstallationCheck
+	A  + resources/osx/License.txt
+	A  + resources/osx/update_mac_package_contents.pl
+	A  + resources/osx/Info.plist
+	A  + resources/osx/InstallationCheck.strings
+	A  + resources/osx/ReadMe.txt
+	A  + resources/osx/Description.plist
+	A  + resources/osx/Welcome.html
+	A  + resources/osx/background.jpg
+
+2011-02-18  haibo
+
+	New internal startingpoint, updated construct rules
+
+2011-02-18  haibo
+
+	update openrdf-sesame-2.3.2-onejar
+
+2011-02-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved error message mechanism
+
+2011-02-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved error message mechanism
+
+2011-02-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved error message content for RDF response.
+
+2011-02-10  James Gallagher <jgallagher@opendap.org>
+
+	I fixed up the name of the file(s) written by eml_writer and also added some better verbose options
+
+2011-02-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Bug fix for ncml dispatcher.
+
+2011-02-04  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated ISO metadata XSL and analysis code
+
+2011-02-03  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added ISO metadata XSL and analysis code from Dave Neufeld
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added XSL transformation (using the ddx2rdf transform code as a place holder) to the nciso .DispatchHandler. This should provide an easy framework for Dave to work with.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added XSL transformation (using the ddx2rdf transform code as a place holder) to the nciso .DispatchHandler. This should provide an easy framework for Dave to work with.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Copyright update.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Copyright update.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Copyright update.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	gateway-service: Implemented netCDF fileout responder.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	gateway-service: Implemented Xml Data response.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Implemented DAP4 DataDDX response.
+
+2011-02-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Implemented gateway as a DispatchHandler.
+
+2011-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in first draft of the gateway service.
+
+2011-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in first draft of the gateway service.
+
+2011-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in first draft of the gateway service.
+
+2011-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in first draft of the gateway service.
+
+2011-01-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a DispatchHandler to mend NcML files coming from the BES so that the location attributes are correct for the server from a clients perspective.
+
+2011-01-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Renamed the commons-cli lib to match our naming convention
+
+2011-01-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Included apache-commons-lang in ant build
+
+2011-01-26  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Added various things to WCS semantics
+
+2011-01-26  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Added ISO response Dispatch Handler.
+
+2011-01-20  James Gallagher <jgallagher@opendap.org>
+
+	Reset the logging for the default case do that it is not so verbose.
+
+2011-01-20  James Gallagher <jgallagher@opendap.org>
+
+	Fixed the iso-time template in the xsl and also an errant eml tag.
+
+2011-01-20  James Gallagher <jgallagher@opendap.org>
+
+	Added '.eml' to the end of the created eml files
+
+2010-12-22  James Gallagher <jgallagher@opendap.org>
+
+	Several minor fixes plus a big one - new patterns added for grouping that drop the count of groups on the NDOC archive from 8,000+ to 56.
+
+2010-12-21  James Gallagher <jgallagher@opendap.org>
+
+	In URLClassifier I used continue when I could/should have used break. Switching to break runs the code much faster (3:50 to process 127,000 urls with continue; 0:29 for the same 127,000 urls with break). The difference is that with break the searching stops at the first match of a URL and a group.
+	I also added a size() method to URLGroups.
+
+2010-12-21  James Gallagher <jgallagher@opendap.org>
+
+	Added the old NCMLWriter and testStackSave classes
+
+2010-12-15  haibo
+
+	close http connection after using
+
+2010-12-14  haibo
+
+2010-12-10  haibo
+
+	owl-horst-optimized
+
+2010-12-10  haibo
+
+	dropWithMemoryStoreDeleteDir
+
+2010-11-24  James Gallagher <jgallagher@opendap.org>
+
+	Changes to the crawler code so that we can do stuff like build NCML from the raw results of a crawl, better builds for the executables, fixes for some common issues in URLs, stuff like that.
+
+2010-11-22  haibo
+
+	omit duplicate xsl, update RDF Docs when xsl is updated
+
+2010-11-15  James Gallagher <jgallagher@opendap.org>
+
+	Latest version of the classifier code - quasi-rule-based
+
+2010-11-15  haibo
+
+2010-11-10  James Gallagher <jgallagher@opendap.org>
+
+	Now recognizes lat/lon bounding box info in dsp files
+
+2010-11-09  haibo
+
+	Filter udplicate statements in getUrlForTransformToRdf
+
+2010-11-05  James Gallagher <jgallagher@opendap.org>
+
+	First version that builds NCML
+
+2010-11-05  James Gallagher <jgallagher@opendap.org>
+
+	Removed main() and the stuff it imported. Use EMLWriter.java instead.
+
+2010-11-04  haibo
+
+	XMLfromRDF(RepositoryConnection con)
+
+2010-11-03  James Gallagher <jgallagher@opendap.org>
+
+	Updates for the main programs (Java classes with main() methods, ant stuff to make executable jar files and shell scripts that call the code) to crawl, classify/group and write EML automatically.
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+2010-11-03  haibo
+
+2010-11-03  haibo
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Fine tuned exception handling to satisfy fortify...
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:  Removed catch for InterruptedException from drop method
+
+2010-11-03  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs: This is a major re-working of the way in which errors are handled in the WCS. Prior to this we were absorbing all exceptions (by catching java.lang.Exception) close to where they were being thrown and simply logging the errors. This was an effective way to ensure that processing code always run to completeion but not very useful for production code that is running as a service and that needs to be stopped. I reworked the exception handling to catch individual exception types and added java.lang.InterruptedException to the throws clause on almost every method in the semantic processing. This, in conjunction with the finally blocks already in place, allows a supervisory thread to call Thread.interrupt() on the semantic processing thread and cause it to quit. Mostly. There are still (as yet to identified) places in the code that seem to be swallowing InterruptedException. In order to ameliorate this I added a ProcessManager class that carries flags that can be checked to see if processing should be stopped. I added calls to this in a number of critical places in the semantic processing. Additionally, I had to change the logic of RepositoryOps.updateSemanticRepository() to accomodate the situation where all of the required documents have been read in, but processing was stopped before or during the running of the construct rules. Without the logic change the construct rules would never have been run again, and thus the catalog would never be update correctly.
+
+2010-11-02  James Gallagher <jgallagher@opendap.org>
+
+	Updates and checkpoint - DateString is broken.
+
+2010-11-02  James Gallagher <jgallagher@opendap.org>
+
+	Moved
+
+2010-11-02  James Gallagher <jgallagher@opendap.org>
+
+	Moved/added
+
+2010-11-02  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs: Uncommented <root> logging element in order to supress noise from logback
+
+2010-11-02  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs: Fixed logback files to use "encoder" instead of "layout"
+
+2010-11-01  James Gallagher <jgallagher@opendap.org>
+
+	Some copyright changes and made some classes serializable. Testing if the latter is a workable solution to moving state between command line tools.
+
+2010-11-01  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs: Improved error handling in the DocServlet
+
+2010-11-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated builds to use slf4j version 1.6.1
+
+2010-11-01  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs:
+
+2010-11-01  Nathan Potter <ndp@opendap.org>
+
+	olfs-wcs: REpaired bug (Ticket 1662) which was preventing the catalog update thread from exiting smoothly when Tomcat was shut down.
+
+2010-10-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Adjusting some loggin levels
+
+2010-10-29  James Gallagher <jgallagher@opendap.org>
+
+	Update to README; added copyrights
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged branch/olfs/1.7.1 to trunk. Made changes to intgrate alteration of openda.dap.Request object behavior
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+2010-10-29  James Gallagher <jgallagher@opendap.org>
+
+	Some partial fixes for the ctrl-c issue - where java makes it hard to trap ctrl-c and save state so the code can restart later.
+
+2010-10-29  James Gallagher <jgallagher@opendap.org>
+
+	Spelling in comments...
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Adjusting some loggin levels
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Adjusting some loggin levels
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Sorting out production rules
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Sorting out production rules
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaned up open resources, impred exception handling.
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Removed unsed assignments and null pointer issues.
+
+2010-10-29  Nathan Potter <ndp@opendap.org>
+
+	olfs: Removed unsed assignments and null pointer issues.
+
+2010-10-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Code cleaning...
+
+2010-10-28  James Gallagher <jgallagher@opendap.org>
+
+	Fixed the way postgres caches are used. Now each site gets its own cache by default (i.e., it's own table in the crawl_cache db in postgres). Here 'site' is really the 'cacheName' parameter passed to ddx_crawler.sh but that defaults to the host name of teh catalog root URL. Reading from the cache has been fixed too. Also, I fixed a bug in the TCU class where catalogs were accessed twice (over the net); once to get the refs and once to get the data urls. Now the second access always uses the cache unless some combination of options has completely disabled it. A better solution would be to rewrite the TCU code.
+
+2010-10-28  James Gallagher <jgallagher@opendap.org>
+
+	ThreddsCatalogUtil and DDXCrawler are fixed so that the crawler does not require that the cache files be deleted on subsequent runs. But the TCU code still is making several references to the same catalog using SAXBuilder which uses lots of time.
+
+2010-10-28  haibo
+
+	log changes
+
+2010-10-27  James Gallagher <jgallagher@opendap.org>
+
+2010-10-27  James Gallagher <jgallagher@opendap.org>
+
+	Working on a consistent set of tools...
+
+2010-10-27  haibo
+
+	Modify query to elimate duplicates in query results.
+
+2010-10-27  James Gallagher <jgallagher@opendap.org>
+
+	Refactor: variable name changes
+
+2010-10-27  haibo
+
+	clean up comments
+
+2010-10-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moved dapTestPreload.owl to http://xml.opendap.org/semantics/Dap_To_Wcs-1.1.owl
+
+2010-10-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactoring WCS service
+
+2010-10-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactoring WCS service
+
+2010-10-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactoring WCS service
+
+2010-10-26  haibo
+
+	modified log output
+
+2010-10-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up cruft code.
+
+2010-10-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moved and renamed opendap.semantics.IRISail.NewStaticRDFCatalog to opendap.semanitcs.wcs.StaticRdfCatalog.
+
+2010-10-25  haibo
+
+	Correct top NS for Coverage DOC, Add cast function to replace xsString
+
+2010-10-25  Nathan Potter <ndp@opendap.org>
+
+2010-10-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactored WCS web application
+
+2010-10-21  haibo
+
+	owlim-2738 dropping bug fixed
+
+2010-10-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactored WCS web application
+
+2010-10-21  benno
+
+	corrected namespace for a number of elements
+
+2010-10-20  benno
+
+	added targetNamespace property to RDF version of Schema
+
+2010-10-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added rdf:ID handling.
+
+2010-10-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added rdf:ID handling.
+
+2010-10-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Reformat
+
+2010-10-18  benno
+
+	fixed to omit # for namespaces ending in ? or :
+
+2010-10-14  benno
+
+	different solution to no namespace problem -- now the equivalence is confined to the proper class, which is semantically correct.
+
+2010-10-14  benno
+
+	changed owl:equivalentProperty to xsd2owl:superPropertyOf so that I could limit the inferencing to be only from nonamespace to namespace
+
+2010-10-12  benno
+
+	fix $targetns to be set from $targetNamespaceDelimited
+
+2010-10-12  benno
+
+	changed namespace delimiting to add # only if it does not end in # or / or :
+
+2010-10-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Ncml Post service
+
+2010-10-05  Nathan Potter <ndp@opendap.org>
+
+	olfs/wcs: Documentation
+
+2010-10-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Documentation, mostly
+
+2010-10-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changed implmentation of the coverages map for an ordered map implementation..
+
+2010-09-24  Nathan Potter <ndp@opendap.org>
+
+2010-09-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated XSL generated HTML pages for WCS service.
+
+2010-09-22  haibo
+
+	file://
+
+2010-09-22  haibo
+
+	bug fix, the rule was evaluated twice, now only once
+
+2010-09-20  haibo
+
+	update swiftowlim-3.3.2660
+
+2010-09-17  haibo
+
+	document
+
+2010-09-17  haibo
+
+	document
+
+2010-09-17  haibo
+
+	document
+
+2010-09-17  James Gallagher <jgallagher@opendap.org>
+
+	Removed comments form xsl; fixed file/dir installs in ant xml
+
+2010-09-17  James Gallagher <jgallagher@opendap.org>
+
+	Added an output option to the classify and build eml exec
+
+2010-09-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a link to the wcs:CoverageDescription to our HTML page for the Coverage.
+
+2010-09-17  benno
+
+	fix to openning javadoc
+
+2010-09-17  benno
+
+	fix
+
+2010-09-17  benno
+
+	fix to isReplacedBy
+
+2010-09-17  benno
+
+	fix to rdfType
+
+2010-09-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Documentation
+
+2010-09-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Copyright additions, and changes to Terms
+
+2010-09-17  haibo
+
+	document change
+
+2010-09-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Copyright additions, and changes to Terms
+
+2010-09-16  haibo
+
+	document change
+
+2010-09-16  haibo
+
+	document change
+
+2010-09-16  haibo
+
+	document change
+
+2010-09-16  benno
+
+	update
+
+2010-09-16  benno
+
+	more javadoc
+
+2010-09-16  benno
+
+	added javadoc
+
+2010-09-15  benno
+
+	added javadoc
+
+2010-09-15  haibo
+
+	document change
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-09-15  haibo
+
+	add importIS = httpConnection.getInputStream() in line 331, elimating "null" value error for http://marinemetadata.org/cf
+
+2010-09-15  haibo
+
+	flushRepositoryOnDrop = true
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Utilized localResource map in RdfImporter
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Utilized localResource map in RdfImporter
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: added localResource map to Terms
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: javadocs changes
+
+2010-09-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: logging changes
+
+2010-09-15  haibo
+
+	drop bug fix from owlim
+
+2010-09-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added build target for javadocs to wcs-build.xml/ Changes in support of geogrid compatibility
+
+2010-09-14  haibo
+
+	log info for getDapGridId
+
+2010-09-14  haibo
+
+	getDapGridId
+
+2010-09-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added stubs to get the name of the DAP GRid variable associated with each field in a coverage.
+
+2010-09-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added stubs to get the name of the DAP GRid variable associated with each field in a coverage.
+
+2010-09-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: WebStart changes.
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+	document
+
+2010-09-12  haibo
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added copyright statement
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added copyright statement
+
+2010-09-10  haibo
+
+	documents
+
+2010-09-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Chnged the usages os StreamSource in transforms
+
+2010-09-10  haibo
+
+	change createCoordinateUnitsIdQuery to  createCoordinateUnitsQuery
+
+2010-09-10  haibo
+
+	fix bug in getTimeUnits
+
+2010-09-09  James Gallagher <jgallagher@opendap.org>
+
+	This check in includes new code to build EML for collections of URLs that vary by date as well as data sets that are made up of single URLs. It can also insert the EML into metacat. See the Java program ClassifyServerBuildEML
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Chnged the usages os StreamSource in transforms
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	ioos: logging changes
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	ioos: logging changes
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactored webstart servlet and webstart application wrappers.
+
+2010-09-09  haibo
+
+	delete unused method
+
+2010-09-09  haibo
+
+	getXsltTransformation -->getXsltStylesheet
+
+2010-09-09  haibo
+
+	clean up getXsltTransformation
+
+2010-09-09  haibo
+
+	clean up getXsltTransformation
+
+2010-09-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Refactored webstart servlet and webstart application wrappers.
+
+2010-09-09  haibo
+
+	getTimeUnits(RepositoryConnection con, String coverageId, String fieldId)
+
+2010-09-08  haibo
+
+	improved getXsltTransformation
+
+2010-09-08  haibo
+
+	new xslttransformation method
+
+2010-09-08  haibo
+
+	new xslttransformation method
+
+2010-09-08  Nathan Potter <ndp@opendap.org>
+
+2010-09-08  Nathan Potter <ndp@opendap.org>
+
+2010-09-08  Nathan Potter <ndp@opendap.org>
+
+2010-09-08  Nathan Potter <ndp@opendap.org>
+
+2010-09-07  James Gallagher <jgallagher@opendap.org>
+
+	Added classifier targets
+
+2010-09-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added prototype support for time and elevation subsetting.
+
+2010-09-02  James Gallagher <jgallagher@opendap.org>
+
+	javadoc update
+
+2010-09-02  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-09-02  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-09-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed build to include WebStart resources.
+
+2010-09-02  haibo
+
+	contenttype -->Content-type
+
+2010-09-01  haibo
+
+	change comments.
+
+2010-09-01  haibo
+
+	add IRIHTTPRepository.java
+
+2010-09-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Documentation
+
+2010-08-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Documentation changes
+
+2010-08-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of Ticket 1335
+
+2010-08-31  benno
+
+	changed it to dependsOn
+
+2010-08-31  benno
+
+	changed another seeAlso to owl:imports
+
+2010-08-31  benno
+
+	changed seeAlso to xsd2owl:imports so that we can infer SchemaType
+
+2010-08-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up documentation
+
+2010-08-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixing problems with THREDDS catalog IDs, urlPaths, and redirecting requests for just the service name.
+
+2010-08-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Factored the fixed strings representing servlet context and servlet name out of most (all?) of the xsl and html documents. This is a candidate fix for bug 1537 The web app can now run in a context other than 'opendap'. Woo!Hoo!
+
+2010-08-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Correcting destroy() to interrupt the processing thread and stop processing prior to attempting to acquire the write lock for the repository.
+
+2010-08-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: More refactoring changes.
+
+2010-08-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added ProcessingState class to provide a cntral place for the processing steps to check to see if the system is trying to stop things. (A thread management activity)
+
+2010-08-26  James Gallagher <jgallagher@opendap.org>
+
+	Spelling fixes + a change from LinkedList to ArrayList
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: More refactoring changes.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: More refactoring changes.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: More refactoring changes.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Switched code from using the more specific IRISailRepository and SailRepository to using the interface Repository.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Switched code from using the more specific IRISailRepository and SailRepository to using the interface Repository.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Switched code from using the more specific IRISailRepository and SailRepository to using the interface Repository.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+2010-08-26  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+2010-08-26  James Gallagher <jgallagher@opendap.org>
+
+	Added DateString which provides a way to sort dates using the Collections.sort() algorithm.
+
+2010-08-25  James Gallagher <jgallagher@opendap.org>
+
+	Changes to the printing code - now it is smart enough to print just the first and last URLs for each group, where first and last is either the discovery order or the date ordering.
+
+2010-08-25  James Gallagher <jgallagher@opendap.org>
+
+	Switched to ordered collections for the URLs
+
+2010-08-25  James Gallagher <jgallagher@opendap.org>
+
+	Now sorts dates correctly
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:  Refactoring Drop activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Created and started using a Terms class to hold various important strings throughout the repository activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Created and started using a Terms class to hold various important strings throughout the repository activities.
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-25  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-23  James Gallagher <jgallagher@opendap.org>
+
+	Changes for dates and the start of sorting code to help choose the DDXs
+
+2010-08-23  haibo
+
+	Add notImport as a Vector holding doc not supposed to import
+
+2010-08-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated Java WebStart example code.
+
+2010-08-21  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-20  haibo
+
+	remove methods no longer using
+
+2010-08-20  haibo
+
+	removing StaticRDFCatalog no longer using
+
+2010-08-20  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updates in support of WebStart for NetCDF ToolsUI
+
+2010-08-20  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Patched repository test code to read the trig frile from subversions HTTP interface
+
+2010-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Patched repository test code to read the trig frile from subversions HTTP interface
+
+2010-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added the rdf file test.trig so that the RepoTest class can work from anywhere.
+
+2010-08-19  James Gallagher <jgallagher@opendap.org>
+
+	Basic date recognition.
+
+2010-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-19  haibo
+
+	add RDFa2RDFXML.xsl
+
+2010-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-19  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  James Gallagher <jgallagher@opendap.org>
+
+	changes of various sorts
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated wcs-build.xml to use new SwiftOwl and Sesame libraries.
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: removing older swiftowl libraries
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Centralized the defintion of the cache context and lastModified context.
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Centralized the defintion of the cache context and lastModified context.
+
+2010-08-18  haibo
+
+	new owlim
+
+2010-08-18  Nathan Potter <ndp@opendap.org>
+
+	olfs: Centralized the defintions of the context names.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved comments.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Repository update logic for drop fixed.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixing drop code
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixing drop code
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up drop code.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up drop code.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up drop code.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up drop code.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Made the WCS service re-read the config with each update.
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-17  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-16  James Gallagher <jgallagher@opendap.org>
+
+	Comments - spelling
+
+2010-08-16  James Gallagher <jgallagher@opendap.org>
+
+	Fixes - k-means runs and shows the components that were grouped.
+
+2010-08-16  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-13  James Gallagher <jgallagher@opendap.org>
+
+	Metacat code now builds a histogram for each group and has more data stored internally. I added results from a set of crawls, plus the raw DDX URL cache files, to the resources/metacat directory. This hold information for about 3.5 millon URLs and 270+ groups.
+
+	Will commit in batches
+
+2010-08-13  James Gallagher <jgallagher@opendap.org>
+
+	Metacat code now builds a histogram for each group and has more data stored internally. I added results from a set of crawls, plus the raw DDX URL cache files, to the resources/metacat directory. This hold information for about 3.5 millon URLs and 270+ groups.
+
+	Will commit in batches
+
+2010-08-13  haibo
+
+	handle RDFa in an XHTML file
+
+2010-08-13  Nathan Potter <ndp@opendap.org>
+
+2010-08-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Patched problem with catalog nupdate in which memory resident catalog was not cleared.
+
+2010-08-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Enabled WCS catalog to be trigged by web access. TEST ONLY
+
+2010-08-11  Nathan Potter <ndp@opendap.org>
+
+2010-08-11  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed problem with DAP dispatch handling
+
+2010-08-11  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXCoordinateDapId functions...
+
+2010-08-11  haibo
+
+	Fixed the query for coordinates
+
+2010-08-11  haibo
+
+	Fixed the query for coordinates
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added ".xdods" response to Dap Dispatch for hyrax
+
+2010-08-10  James Gallagher <jgallagher@opendap.org>
+
+	Added the cache files from a URLs-only run of the crawler at CSIRO.
+
+	AM   resources/opendap.csiro.au_urls_onlyDDX_Visited.save
+	AM   resources/opendap.csiro.au_urls_onlyTC_Visited.save
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added ".xdods" response to Dap Dispatch for hyrax
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  haibo
+
+	new query for createCoordinateIdQuery
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  Nathan Potter <ndp@opendap.org>
+
+2010-08-10  James Gallagher <jgallagher@opendap.org>
+
+	Removed some warnings...
+
+2010-08-10  James Gallagher <jgallagher@opendap.org>
+
+	Got sick of seeing these as broken so I renamed tham .not_java
+
+	D    old_code/DapIngestOrig.java
+	A  + old_code/DapIngestOrig.not_java
+	D    old_code/ResponseCacheMetacat.java
+	A  + old_code/ResponseCacheMetacat.not_java
+	D    old_code/ResponseCache.java
+	A  + old_code/ResponseCache.not_java
+
+2010-08-10  James Gallagher <jgallagher@opendap.org>
+
+	Modified the k_means code so that it will work with the URL components and three dimensions. Untested...
+
+2010-08-09  James Gallagher <jgallagher@opendap.org>
+
+	Added start of KMeans class for URL components.
+
+2010-08-09  James Gallagher <jgallagher@opendap.org>
+
+	Moved the cluster code to a subdir/package called cluster_example.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Adding prototype WebStart JNLP files...
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of factoring the hardwired servlet context out of various XSLT and HTML docs.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of Java WebStart
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support retrieving coordinate variable ID's
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support retrieving coordinate variable ID's
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-06  James Gallagher <jgallagher@opendap.org>
+
+	Added k-means clustering code, including an ant build file.
+	Minor edits to the DDXCrawler and UrlClassifier; change to classifier run params int he reap ant build file.
+
+2010-08-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-06  benno
+
+	added support for rdf namespace without #
+	added support for rdf:resource
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  haibo
+
+	modified addNeededRDFDocuments(Vector<String> rdfDocs) to skip problem file
+
+2010-08-05  haibo
+
+	modified logs
+
+2010-08-05  haibo
+
+	modified logs
+
+2010-08-04  James Gallagher <jgallagher@opendap.org>
+
+	Added exception handling to URLClassifier and URLgroup.
+
+2010-08-04  haibo
+
+	big fix in convertWRL
+
+2010-08-04  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-04  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-04  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-08-03  haibo
+
+2010-08-03  haibo
+
+2010-08-03  haibo
+
+2010-08-03  haibo
+
+2010-08-02  haibo
+
+	add conenttype to repository
+
+2010-07-30  haibo
+
+2010-07-30  haibo
+
+	new class handling repository update: RdfPersistence.java
+
+2010-07-28  haibo
+
+	print querys to the log
+
+2010-07-28  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+	Turn off DEBUG logging in the postgres-based cache.
+	Better target in the ant build file.
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+	Fixed up some stuff in the ddx crawler and added a --fetch-ddx option so that the crawler can be used to just get teh DDX URLs and not their contents - should speed up crawls where all we need is a set of URLs and not the DDXs.
+	Fixed a bug in the ThreddsCatalogUtil: Bad logic broke the looping prevention. Use the test.opendap.org/opendap/catalog.xml to test for a loop.
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+	Added Dan's python classifier/clustering code
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+	Added shell scripts for crawler commands
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+	Removed hand-built manifest files - use ant for this job
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+	Library checkin
+
+2010-07-27  James Gallagher <jgallagher@opendap.org>
+
+2010-07-26  James Gallagher <jgallagher@opendap.org>
+
+	Updated the version number printed in error messages within ddx2eml-3.1.xsl
+
+2010-07-26  James Gallagher <jgallagher@opendap.org>
+
+	Fixes to the classifier
+
+2010-07-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added local filesystem access to WebStart test.
+
+2010-07-23  James Gallagher <jgallagher@opendap.org>
+
+	Added URL Classification code
+
+2010-07-23  James Gallagher <jgallagher@opendap.org>
+
+	Updates to the crawling code.
+
+2010-07-23  James Gallagher <jgallagher@opendap.org>
+
+	Updates to the crawling code.
+
+2010-07-23  James Gallagher <jgallagher@opendap.org>
+
+	Updates to the crawling code.
+
+2010-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Modified working draft of an XSLT that produces fully qualified data access links and catalogRefs for THREDDS catalogs.
+
+2010-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Have a working draft of an XSLT that priduces fully qualified data access links and catalogRefs for THREDDS catalogs.
+
+2010-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  haibo
+
+	startingPointExists
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo
+
+	add last_modified for external inferencing
+
+2010-07-21  haibo
+
+	add last_modified for external inferencing
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo
+
+2010-07-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo
+
+2010-07-21  haibo
+
+2010-07-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-20  haibo
+
+	CSVSplitter.java
+
+2010-07-20  haibo
+
+	add trig for dumping repository
+
+2010-07-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Prototyping xslt to extract dataset access links from thredds catalogs.
+
+2010-07-19  haibo
+
+	fn2 -->fn
+
+2010-07-19  haibo
+
+	functions getXXXCoordinate(String,String) are implemented
+
+2010-07-16  haibo
+
+	new function Value localName, improved process_fn2
+
+2010-07-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated thredds catalog handler to provide service defintions for inherited (via datasetScan) services.
+
+2010-07-13  haibo
+
+	update on NewStaticRDFCatalog and IRISailRepository
+
+2010-07-13  haibo
+
+	comment out line 516
+
+2010-07-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated WCS productio  rules to utilize new OWLIM and TTREE libraries.
+
+2010-07-12  haibo
+
+	Add new class NewStaticRDFCatalog.java
+
+2010-07-09  James Gallagher <jgallagher@opendap.org>
+
+	Changed the error thrown from the ResponseCache so that if a thing is not found it is not an error. A null document is returned instead, which the called can ignore. This fixes a problem where a single missing entry in the cache stops execution of an entire ingest.
+
+2010-07-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in Java Web Start test code.
+
+2010-07-09  James Gallagher <jgallagher@opendap.org>
+
+	Better error reporting for dap_ingest
+
+2010-07-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changed representation of empty nodes.
+
+2010-07-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changed representation of empty nodes.
+
+2010-07-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changed representation of empty nodes.
+
+2010-07-09  James Gallagher <jgallagher@opendap.org>
+
+	Minor path fix for the BuildDapIngest target's automatic Manifest generation code.
+
+2010-07-09  James Gallagher <jgallagher@opendap.org>
+
+	Added automatic manifest generation to reap_crawler_build.xml
+
+2010-07-09  haibo
+
+	add method dropStartingPoint(RepositoryConnection con, Vector <String> importURLs)
+
+2010-07-09  haibo
+
+	add method dropStartingPoint(RepositoryConnection con, Vector <String> importURLs)
+
+2010-07-09  haibo
+
+	update setStartingPoint
+
+2010-07-09  haibo
+
+	update setStartingPoint
+
+2010-07-08  haibo
+
+	update IRISailRepository
+
+2010-07-08  haibo
+
+	replace trree-3.0.beta9.jar with trree-3.0.beta12.jar and owlim-3.0.beta9.jar with owlim-3.0.beta12.jar
+
+2010-07-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moving join() methof to RepositoryFunctions class
+
+2010-07-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moving join() methof to RepositoryFunctions class
+
+2010-07-06  haibo
+
+	clean up comments and a minor change in convertSWRLQueryToSeasameQuery(String queryString)
+
+2010-07-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking changes in support of adding inherited metadata from static THREDDS catlog files containing datasetScane elements to BES THREDDS catalogs.
+
+2010-07-06  haibo
+
+	Use 1 pattern match in function process
+
+2010-07-06  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in CXSL that was causing the links to the dataset page (the detailed view of a thredds dataset) to break. Ticket 1591
+
+2010-07-06  haibo
+
+	use full URI in pred comparision and expand
+
+2010-07-05  James Gallagher <jgallagher@opendap.org>
+
+	Fixed the bug (w/o testing the fix yet) where a bad docid (accession number?) is never incremented and so remains bad for an entire run.
+
+2010-07-02  James Gallagher <jgallagher@opendap.org>
+
+	More fixes to the crawler code. DapIngest now has a more sane set of features and can insert EML into Metacat. My account is hardwired into the code, however.
+
+2010-07-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: New methods for Transformer
+
+2010-07-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: THREDDS metadat inventory.
+
+2010-07-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Formating
+
+2010-07-01  haibo
+
+	delete extra space in formating
+
+2010-07-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed String truncation in class#function prcessing.
+
+2010-06-30  James Gallagher <jgallagher@opendap.org>
+
+	DapIngest rewrite. Other fixes to related classes.
+
+2010-06-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Tweaks to processing class and function discovery and usage.
+
+2010-06-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Tweaks to class and function matching.
+
+2010-06-30  James Gallagher <jgallagher@opendap.org>
+
+	Build files now use the commons cli 1.2 library.
+
+2010-06-30  James Gallagher <jgallagher@opendap.org>
+
+	Various fixes and tweaks. Now DapIngest has the code to stuff values into metacat using the web interface (and a Java class).
+
+	I also tidied up some code... The build file 'reap_crawler_build.xml' builds on the code here and parts elsewhere that are needed, but not the 'old code.' Two of the java files in the subdir old_code now have a correct extension.
+
+2010-06-30  James Gallagher <jgallagher@opendap.org>
+
+	Added apache's Commons CLI 1.2 jar
+
+2010-06-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated JDOM to 1.1.1
+
+2010-06-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated JDOM to 1.1.1
+
+2010-06-29  haibo
+
+	update convertSWRLQueryToSesameQuery(String)
+
+2010-06-29  James Gallagher <jgallagher@opendap.org>
+
+	Move old code into the old_code subdir; fiddled with comments and minor refactorings
+
+2010-06-28  James Gallagher <jgallagher@opendap.org>
+
+	Latest version. Fixes a bug with the abstract element (had to remove the HTML tags).
+
+2010-06-28  James Gallagher <jgallagher@opendap.org>
+
+	Now has <coverage> for each entity (just references the dataset coverage at this stage.
+
+2010-06-28  James Gallagher <jgallagher@opendap.org>
+
+	This version uses a global coverage element and provides one otherEntity element for each Grid variable.
+
+2010-06-28  James Gallagher <jgallagher@opendap.org>
+
+	Makes valid EML!
+
+2010-06-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Starting to migrate the Coverage ID generation (getWcsId()) out of IRISailRepository
+
+2010-06-27  James Gallagher <jgallagher@opendap.org>
+
+	Now valid except for the trailing ' UTC' on dates and times.
+
+2010-06-27  James Gallagher <jgallagher@opendap.org>
+
+	ddx2eml 3.0.0 now is close to making valid and usable EML.
+
+2010-06-25  James Gallagher <jgallagher@opendap.org>
+
+	Updated comments and such.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updating version mechanism so that it is baked into the build process and not into the code.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updating version mechanism so that it is baked into the build process and not into the code.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updating version numbers.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+2010-06-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a first cut at using java.reflection classes in the processing function code in the IRISailRepository
+
+2010-06-23  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a first cut at using java.reflection classes in the processing function code in the IRISailRepository
+
+2010-06-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added a first cut at using java.reflection classes in the processing function code in the IRISailRepository
+
+2010-06-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: The JDOM Transformer class started returning invaild objects. Unable to determine the cause of the problem, I reworked it to use Saxon. Works now."
+
+2010-06-16  Nathan Potter <ndp@opendap.org>
+
+	olfs: Reorganized IRISailRepository to minimize conflicts while working in tandem with Haibo.
+
+2010-06-15  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed _another concurrency problem with thredds catalog caching and updates. This one caused multiple catalog updates to happen instead of a single update.
+
+2010-06-11  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed (I think) concurrency problem with thredds catalog caching and updates.
+
+2010-06-09  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-06-09  Nathan Potter <ndp@opendap.org>
+
+	olfs: Chenged method signature for coordinate variable discovery bto include both coverageID and fieldId.
+
+2010-06-04  Nathan Potter <ndp@opendap.org>
+
+	olfs: Error handling and debuggin instrumentation updates.
+
+2010-06-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes for datasetScan and such in thredds catalogs.
+
+2010-06-02  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes for datasetScan and such in thredds catalogs.
+
+2010-05-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Building THREDDS catalog ingest XSLT to process datasetScan and NcML elements.
+
+2010-05-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed perisitence of serverID and wcsID hash maps.
+
+2010-05-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed (I think) a problem with repository sartup and shutdwon activities.
+
+2010-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Made all saxon imports explicit.
+
+2010-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: More clean up and intelligence for the dataseScan template.
+
+2010-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added some debugging statements.
+
+2010-05-27  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed datasetScan template to correctly locate dataset scan locations in the BES catalogs.
+
+2010-05-26  James Gallagher <jgallagher@opendap.org>
+
+	This version of DDXCrawler and ThreddsCatalogUtil is smart enough to save the state of the crawl if an exception is thrown and to restart with the next catalog that would have been visited.
+
+2010-05-26  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed repository shutdown problem in StaticRDFCatalog
+
+2010-05-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Patched thredds:datasetScan template to correctly utilize the thredds:datsetScan@location attribute.
+
+2010-05-25  Nathan Potter <ndp@opendap.org>
+
+	olfs: Range subsetting modified to return a WcsException when multiple Fields are explicitly requested.
+
+2010-05-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changes in support of BES emergency exit request.
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bad wcs:CoverageRequest object
+
+2010-05-20  James Gallagher <jgallagher@opendap.org>
+
+	Added this because it has useful stuff for the ThreddsCatalogUtil class in terms of caching in the absence of postgres. The current code uses postgres to cache values.
+
+2010-05-20  James Gallagher <jgallagher@opendap.org>
+
+	This version of the DDX and THREDDS crawling code ws used to crawl the NODC ghrsst site (a subdir of the entre NODC site).
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved debugging output.
+
+2010-05-20  James Gallagher <jgallagher@opendap.org>
+
+	DDX Crawling works and caches the result in Postgres.
+
+2010-05-20  haibo
+
+	separate delet and add
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved debugging output.
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved debugging output.
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Improved debugging output.
+
+2010-05-20  haibo
+
+	roll back
+
+2010-05-20  Nathan Potter <ndp@opendap.org>
+
+	olfs: Debugging fixes
+
+2010-05-20  haibo
+
+	fix a bug in StaticRDFCatalog introduced yesterday
+
+2010-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added serviceIDs and wcsIDs persistence and update. Add getDataAccessUrl()
+
+2010-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on getting server prefix mappings
+
+2010-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on getting server prefix mappings
+
+2010-05-19  haibo
+
+	Separate add and delete imports, add repository status (up/down as boolean)
+
+2010-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on getting server prefix mappings
+
+2010-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Working on getting server prefix mappings
+
+2010-05-19  Nathan Potter <ndp@opendap.org>
+
+	olfs: Trying to fix persistence bug in the servlet.
+
+2010-05-18  Nathan Potter <ndp@opendap.org>
+
+2010-05-18  James Gallagher <jgallagher@opendap.org>
+
+	Interim check in - the code need to be refactored to make it easier to use. There's a fairly confusing array of caching options. Reduce to just postgres and hash maps and do that using two distict classes.
+
+2010-05-17  Nathan Potter <ndp@opendap.org>
+
+	olfs: Trying to fix persistence bug in the servlet.
+
+2010-05-15  James Gallagher <jgallagher@opendap.org>
+
+	Added comments about first successful crawl over the entire ghrsst part of the NODC site.
+
+2010-05-14  James Gallagher <jgallagher@opendap.org>
+
+	This version of ResponseCache can use Postgres (and has partial support for JCS, although it makes a weak persistent store since you cannot be certain items won't be removed from the disk cache). Other classes have been updated to use the Postgres-enabled cache.
+
+2010-05-14  James Gallagher <jgallagher@opendap.org>
+
+	Added resources for the crawler that uses the Postgres DB for a persistent store.
+
+2010-05-14  James Gallagher <jgallagher@opendap.org>
+
+	Snapshot of the transition to Postgress &/| JCS as the caching system. Both are in the class ResponseCache now.
+
+2010-05-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moved metacat related code into metacat package where it belongs.
+
+2010-05-14  James Gallagher <jgallagher@opendap.org>
+
+	Removed ResponseCache (from the metacat crawling work) from this class.
+
+2010-05-14  James Gallagher <jgallagher@opendap.org>
+
+	Added an argument to the tcc target (but commented it out so tcc doesn't recur unexpedly)
+
+2010-05-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moved metacat related code into metacat package where it belongs.
+
+2010-05-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Moved metacat related code into metacat package where it belongs.
+
+2010-05-12  James Gallagher <jgallagher@opendap.org>
+
+	Metacat no longer used for caching...
+
+2010-05-12  James Gallagher <jgallagher@opendap.org>
+
+	Added as a precaution... This version of TCU uses metacat as a cache - not complete, but see ResponseCacheMetacat.java for a look at a start. Metacat does not make a particularly good cache because of the processing it does.
+
+2010-05-12  James Gallagher <jgallagher@opendap.org>
+
+	This snapshot of the crawler has changes that implement access to metacat - I tried using metacat as a cache for thredds catalogs, but it was fairly slow (as a cache) and required a schema and validation for any xml in a namespace). I'm going to try the JCS disk cache next...
+	However, this code shows how to call metacat from Java. I will save off this version of ResponseCache to ResponseCacheMetacat so it's easy to find.
+
+2010-05-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated copyright headers
+
+2010-05-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated copyright headers
+
+2010-05-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed Hanging on exit problem.
+
+2010-05-05  haibo
+
+	updated some log statement in XMLfromRDF and StaticRDFCatalog
+
+2010-05-05  Nathan Potter <ndp@opendap.org>
+
+2010-04-30  James Gallagher <jgallagher@opendap.org>
+
+	ThreddsCatalogUtil: modest changes to debug logback issues with executable jar files (solution, put the logback.xml in the jar file at the top level).
+	Code in opendap/metacat: comments, minor method refactor, some variables moved closer to their first use.
+
+2010-04-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: WCS webapp working
+
+2010-04-28  James Gallagher <jgallagher@opendap.org>
+
+	Added stuff
+
+2010-04-28  James Gallagher <jgallagher@opendap.org>
+
+	Added
+
+2010-04-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixing relative paths in XSL files for WCS webapp
+
+2010-04-28  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-04-28  haibo
+
+	fn frame work
+
+2010-04-28  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated servlet api to version 2.5
+
+2010-04-28  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-04-27  James Gallagher <jgallagher@opendap.org>
+
+	Eh - fixes of various sorts.
+
+2010-04-27  James Gallagher <jgallagher@opendap.org>
+
+	I removed a fair amount of the logging code from the classes that are now designed to be used as 'applications' run from the command line.
+
+2010-04-27  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+
+2010-04-21  haibo
+
+	silent 2 logs
+
+2010-04-21  haibo
+
+	silent 2 logs
+
+2010-04-21  haibo
+
+	semantic function framwork
+
+2010-04-15  James Gallagher <jgallagher@opendap.org>
+
+	Removed reap-related targets
+
+2010-04-15  James Gallagher <jgallagher@opendap.org>
+
+	reap-specific build file.
+
+2010-04-14  James Gallagher <jgallagher@opendap.org>
+
+	I added a second build file to tame the growing tangle of targets.
+
+2010-04-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged ioos branch to olfs trunk.
+
+2010-04-12  Nathan Potter <ndp@opendap.org>
+
+2010-04-12  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merging with 1,6,0 branch
+
+2010-03-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Removed test servlet from web.xml
+
+2010-02-03  Nathan Potter <ndp@opendap.org>
+
+	olfs: Changed version number in the branch
+
+2010-02-03  Nathan Potter <ndp@opendap.org>
+
+2010-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Turned on RDF links on contents pages.
+
+2010-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Turned on RDF links on contents pages.
+
+2010-02-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Checking in numerous changes.
+	 - Improved error handling
+	 - OtherXML support for RDF output.
+	 - Misc changes
+
+2010-01-19  Nathan Potter <ndp@opendap.org>
+
+2009-12-07  Nathan Potter <ndp@opendap.org>
+
+	olfs: Add a 300000 ms time out to Socket connection.
+
+2009-11-04  James Gallagher <jgallagher@opendap.org>
+
+	Changed the dataddx Content-Description header value to dap4_data_ddx from dap_data_ddx - minor but I want to start switching to the new values.
+
+2009-09-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated version number for OLFS
+
+2009-09-13  Nathan Potter <ndp@opendap.org>
+
+	olfs: Pathed test targets. Added ':' to list of sccepted characters in filenames for compatiblity with MS-Windows
+
+2009-08-21  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added supoport for DataDDX response.
+
+2009-08-04  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged the 1.5.2 tag back to the trunk.
+
+2009-05-11  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged changes from 1.5.0 tag to trunk. Changes removed unsafe uses of HttpServletResponse.reset()
+
+2009-05-11  Nathan Potter <ndp@opendap.org>
+
+	olfs: merged changes from 1.5.0 tag to trunk
+
+2009-04-08  Nathan Potter <ndp@opendap.org>
+
+	olfs: Merged trunk with 1.5.0 tag
+
+2009-02-04  Nathan Potter <ndp@opendap.org>
+
+2009-02-04  Nathan Potter <ndp@opendap.org>
+
+2009-02-02  Nathan Potter <ndp@opendap.org>
+
+2009-01-31  Nathan Potter <ndp@opendap.org>
+
+2009-01-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Check in prior to branching for hyrax 1.5 release
 
-2009-01-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Added missing library
+
+2009-01-30  Nathan Potter <ndp@opendap.org>
+
+	olfs: Check in prior to branching for hyrax 1.5 release
+
+2009-01-27  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed content header problems for DAP errors.  Automated Hyrax version numbering by tying it to the ANT build process.
 
-2009-01-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-16  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added per request caching of BES <showInfo> and <showCatalog> responses for performance testing.
 
-2009-01-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-16  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added per request caching of BES <showInfo> and <showCatalog> responses for performance testing.
 
-2009-01-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-16  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added per request caching of BES <showInfo> and <showCatalog> responses for performance testing.
 
-2009-01-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-16  Nathan Potter <ndp@opendap.org>
 
 	olfs: xml -xslt-> dap -xslt->xml  style sheet development
 
-2009-01-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patch for Ticket 1227 - OLFS now returns DAP2 error objects with HTTP status 404 when the resource cannot be located.
 
-2009-01-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Adding Namespace objects
 
-2009-01-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Sync update
 
-2009-01-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-11  Nathan Potter <ndp@opendap.org>
 
 	olfs: Sync update
 
-2009-01-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-07  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added prebuilt responses for WCS use cases to resources folder
 
-2009-01-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-07  Nathan Potter <ndp@opendap.org>
 
 	olfs: Purging TDS dependant code.
 
-2009-01-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-06  Nathan Potter <ndp@opendap.org>
 
-2009-01-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-06  Nathan Potter <ndp@opendap.org>
 
 	olfs: Small Changes.
 
-2009-01-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-05  Nathan Potter <ndp@opendap.org>
 
 	olfs: Purging TDS dependant code.
 
-2009-01-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: Removed dependancy on UNIDATA THREDDS code.
 
-2009-01-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: TreddsHander Update
 
-2009-01-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Purging TDS dependant code.
 
-2009-01-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Purging TDS dependant code.
 
-2009-01-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: New threddsHandler working. Remote Catalog Browsing working.
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: clean up
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: cleanup
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: updating saxon libraries to 9.1.0.5
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: clean up.
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Adding remote catalog browsing to therddsHandler
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: threddsHandler remote catalog browsing.
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler. Adding XSLT for dataset information page.
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler. Dataset information pages implemented.
 
-2009-01-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2009-01-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler. Dataset information pages implemented.
 
-2008-12-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-12-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
 
-2008-12-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-12-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
 
-2008-12-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-12-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
 
-2008-12-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-12-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
 
-2008-11-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-26  Nathan Potter <ndp@opendap.org>
 
-2008-11-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-26  Nathan Potter <ndp@opendap.org>
 
 	olfs: Tidying up loose ends...
 
-2008-11-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Removing unused buildfiles
 
-2008-11-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Removing unused build files.
 
-2008-11-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Removing schema directory because it is unused.
 
-2008-11-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Refactored opendap.wcs.gatewayClient in order to move WCS activities out of the opendap.bes package. Added ReqCache object. Updated libraries.
 
-2008-11-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Checkpoint.
 
-2008-11-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-17  Nathan Potter <ndp@opendap.org>
 
-2008-11-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-14  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added netcdf file out! WOOO! HOOO!
 
-2008-11-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-11-14  Nathan Potter <ndp@opendap.org>
 
 	olfs: xmlrequest branch merged to trunk
 
@@ -248,102 +3670,102 @@
 
 	Merged multifile branch
 
-2008-08-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: New subversion server test checkin
 
-2008-08-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: New subversion server test checkin
 
-2008-08-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-28  Nathan Potter <ndp@opendap.org>
 
 	olfs: svn 1.5.1 check in test
 
-2008-08-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-28  Nathan Potter <ndp@opendap.org>
 
 	olfs: svn 1.5.1 check in test
 
-2008-08-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-20  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added a "Validation succeeded" message.
 
-2008-08-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-20  Nathan Potter <ndp@opendap.org>
 
 	olfs: Cleaned up source code.
 
-2008-08-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-20  Nathan Potter <ndp@opendap.org>
 
 	olfs: Improved request document validation. Validaition errors now seem to be coming from OGC schemas and not our request documents.
 
-2008-08-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-19  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 
-2008-08-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-19  Nathan Potter <ndp@opendap.org>
 
 	olfs: First cut at forming GetCapabilities, DescribeCoverage, and GetCoverage request objects from KVP (URL) input
 	.
 
-2008-08-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-15  Nathan Potter <ndp@opendap.org>
 
-2008-08-15  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	olfs: First cut at exception handling and forming GetCapabilities request objects.
-
-2008-08-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-15  Nathan Potter <ndp@opendap.org>
 
 	olfs: First cut at exception handling and forming GetCapabilities request objects.
 
-2008-08-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-15  Nathan Potter <ndp@opendap.org>
 
 	olfs: First cut at exception handling and forming GetCapabilities request objects.
 
-2008-08-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-15  Nathan Potter <ndp@opendap.org>
 
 	olfs: First cut at exception handling and forming GetCapabilities request objects.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-14  Nathan Potter <ndp@opendap.org>
+
+	olfs: First cut at exception handling and forming GetCapabilities request objects.
+
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
-2008-08-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-08-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Moved wcs_service package to wcsGateway to improve clarity.
 
-2008-07-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-07-11  Nathan Potter <ndp@opendap.org>
 
 	olfs: Removed printing to stdout.
 
-2008-07-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-07-11  Nathan Potter <ndp@opendap.org>
 
 	olfs: Removed printing to stdout.
 
@@ -352,379 +3774,379 @@
 	Chunk size is now represented by 7 characters instead of 4.
 	M    src/opendap/io/Chunk.java
 
-2008-06-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-26  Nathan Potter <ndp@opendap.org>
 
-2008-06-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added null value checking.
 
-2008-06-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Changes to accomodate changing chunk protocol to allow for larger chunks.
 
-2008-06-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed error handling in the WcsDispatchHandler
 
-2008-06-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Moved XSL based THREDDS dispatch into production.
 
-2008-06-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Moved XSL based THREDDS dispatch into production.
 
-2008-06-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-06-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: removed hashing from wcs handlers use of the coverageName
 
-2008-05-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched poorly formed tags in the HTML files.
 
-2008-05-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-05  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched poorly formed tags in the HTML files.
 
-2008-05-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-05  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched poorly formed tags in the HTML files.
 
-2008-05-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-05  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched poorly formed tags in the HTML files.
 
-2008-05-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-02  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added intelligent reloading of the THREDDS catalogs (Ticket 1105)
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added intelligent reloading of the THREDDS catalogs (Ticket 1105)
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added intelligent reloading of the THREDDS catalogs (Ticket 1105)
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added trusted hosts list to wcs_service.DispatchHandler (Ticket 1104)
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updating XML tools
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updating XML tools
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updating XML tools
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	WcsDispatchHandler - changes to more closely align debug message with code base.
 
-2008-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-05-01  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	WcsDispatchHandler - changes to more closely align debug message with code base.
 
-2008-04-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: threddsHandler.Dispatch prior to removing urlPrefix string processing.
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Thredds.xsl
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Thredds.xsl
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Thredds.xsl
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Thredds.xsl
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Experiments
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Experiments
 
-2008-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Experiments
 
-2008-04-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: First check-in of new of wcs_service and thredds catalog.
 
-2008-04-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-24  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Removed calls to "delete containers;" and "delete definitions;" from the BesAPI
 
-2008-04-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: threddsHandler
 
-2008-04-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-18  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Started threddsHandler
 
-2008-04-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-04-11  Nathan Potter <ndp@opendap.org>
 
 	olfs:  WcsHandler
 
-2008-03-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-20  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Fixes ticket 1088 in which the olfs was failing to correcty set the xdods-server HTTP header.
 
-2008-03-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-20  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Fixes ticket 1088 in which the olfs was failing to correcty set the xdods-server HTTP header.
 
-2008-03-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-18  Nathan Potter <ndp@opendap.org>
 
 	olfs:  WCS sites now get returned in wcs.xml document order.
 
-2008-03-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-17  Nathan Potter <ndp@opendap.org>
 
 	olfs:  WCS handler
 
-2008-03-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-17  Nathan Potter <ndp@opendap.org>
 
 	olfs: Checking in new WCS handler
 
-2008-03-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-17  Nathan Potter <ndp@opendap.org>
 
 	olfs: Checking in new WCS handler
 
-2008-03-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-12  Nathan Potter <ndp@opendap.org>
 
 	olfs: Creating wcs package
 
-2008-03-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-10  Nathan Potter <ndp@opendap.org>
 
 	olfs: Wcs Changes
 
-2008-03-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-05  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added new tests for ChunkedOutputStream
 
-2008-03-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-03-05  Nathan Potter <ndp@opendap.org>
 
-2008-02-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updating test targets yet again.
 
-2008-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-28  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updating test targets.
 
-2008-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-28  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated test targets
 
-2008-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-28  Nathan Potter <ndp@opendap.org>
 
-2008-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-28  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated Copyright information
 
-2008-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-28  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added JUnit tests for Scrub.java
 
-2008-02-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-22  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added space and backslash to allowed characters in a URL or path
 
-2008-02-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-08  Nathan Potter <ndp@opendap.org>
 
 	olfs: updating test targets
 
-2008-02-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-08  Nathan Potter <ndp@opendap.org>
 
 	olfs: updating test targets
 
-2008-02-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-08  Nathan Potter <ndp@opendap.org>
 
 	olfs: updating test targets
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: XLST for 403 and 500 http errors.
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: XLST for error codes...
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: XLST for error codes...
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: XLST for error codes...
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: XLST for error codes...
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: Added XSLT for generating dynamix pages for user generated errors.
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: OPeNDAP contents.html/xsl navigation repaired. Should work with multiple BES's
 
-2008-02-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-02-04  Nathan Potter <ndp@opendap.org>
 
 	olfs: OPeNDAP contents.html/xsl navigation repaired. Should work with multiple BES's
 
-2008-01-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Out of band error handling complete. OPeNDAP contents.html changed to be generated by XSLT
 
-2008-01-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-18  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-17  Nathan Potter <ndp@opendap.org>
 
 	olfs: Chunking added. Working, but needs additional testing.
 
-2008-01-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2008-01-09  Nathan Potter <ndp@opendap.org>
 
 	olfs: Made wcs and catalog containers use different container names (Patch for WCS bug that's the result of a namespace collision in the BES.)
 
-2007-12-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-12-10  Nathan Potter <ndp@opendap.org>
 
 	olfs: Made wcs and catalog containers use different container names (Patch for WCS bug that's the result of a namespace collision in the BES.)
 
-2007-12-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-12-06  Nathan Potter <ndp@opendap.org>
 
 	olfs: Made wcs and catalog containers use different container names (Patch for WCS bug that's the result of a namespace collision in the BES.)
 
-2007-11-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-11-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Made all of the constructors for BESException public.
 
-2007-11-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-11-14  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated Version to 1.3.0
 
-2007-11-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-11-14  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated docs page for release 1.3.0
 
-2007-11-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-11-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Various small repairs. Updated testsuite.
 
-2007-10-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-26  Nathan Potter <ndp@opendap.org>
 
 	olfs: Modfied static error pages.
 
-2007-10-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-26  Nathan Potter <ndp@opendap.org>
 
 	olfs: Created static error pages that can be altered by a Hyrax admin. Added error pages to web.xml
 
-2007-10-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-26  Nathan Potter <ndp@opendap.org>
 
 	olfs: Created static error pages that can be altered by a Hyrax admin. Added error pages to web.xml
 
-2007-10-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-26  Nathan Potter <ndp@opendap.org>
 
 	olfs: Created static error pages that can be altered by a Hyrax admin. Added error pages to web.xml
 
-2007-10-24  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-24  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated THREDDS library.
 
-2007-10-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-23  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated documentation.
 
-2007-10-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-23  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 
-2007-10-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-10  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated documentation.
 
-2007-10-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-10  Nathan Potter <ndp@opendap.org>
 
 	olfs: Trapped potential null pointr exception.
 
-2007-10-03  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-03  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed various issues, updated copyright statement.
 
-2007-10-03  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-03  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed various issues, updated copyright date.
 
-2007-10-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-10-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Build patch
 
-2007-08-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-08-23  Nathan Potter <ndp@opendap.org>
 
 	olfs: Security patches.
 
-2007-08-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-08-23  Nathan Potter <ndp@opendap.org>
 
 	olfs: Security patches.
 
-2007-06-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-06-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated THREDDS libraries.
 
-2007-06-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-06-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated THREDDS initialization code to use the DataRootCatalogs.initCatalogs() method.
 
-2007-06-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-06-23  Nathan Potter <ndp@opendap.org>
 
 	olfs: Protoype WCS-> OPeNDAP Service
 
-2007-06-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-06-21  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Removed hostname and port from BES version reporting
 
-2007-05-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-05-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched Version Response.
 
@@ -739,216 +4161,216 @@
 	M    ppt/MarkFinder.java
 	M    ppt/PPTClient.java
 
-2007-05-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-05-16  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed bug in PPT MarkFinder
 
-2007-04-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched Version Response.
 
-2007-04-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-30  Nathan Potter <ndp@opendap.org>
 
 	olfs: Patched Version Response to responsed to any URL ending in ".ver"
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs: Release 1.2.1, candidate 1.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-27  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-26  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-26  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Patched concurrency bug in BES client pool.
 
-2007-04-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-25  Nathan Potter <ndp@opendap.org>
 
 	olfs: Limited number of commands an OPeNDAPClient may send to the BES
 
-2007-04-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-20  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Refactored POST Dispatch. Major changes to code and configurations.
 
-2007-04-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-20  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Refactored POST Dispatch. Major changes to code and configurations.
 
-2007-04-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-20  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Refactored Dispatch. Major changes to code and configurations.
 
-2007-04-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-19  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Refactored Dispatch. Major changes to code and configurations.
 
-2007-04-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-19  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 
-2007-04-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-17  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 
-2007-04-16  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	olfs:
-	Support for multiple BES's added.
-
-2007-04-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-16  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Support for multiple BES's added.
 
-2007-04-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-16  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Support for multiple BES's added.
 
-2007-04-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-16  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Support for multiple BES's added.
 
-2007-04-07  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2007-04-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-09  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Support for multiple BES's added.
 
-2007-04-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-04-07  Nathan Potter <ndp@opendap.org>
+
+2007-04-05  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+	Support for multiple BES's added.
+
+2007-04-02  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Added prototype BESManager and BES - precursor to multiple BES implementation
 
-2007-03-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-19  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Added prototype BESManager and BES - precursor to multiple BES implementation
 
-2007-03-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-19  Nathan Potter <ndp@opendap.org>
 
 	olfs: Update THREDDS lib
 
-2007-03-19  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-19  Nathan Potter <ndp@opendap.org>
 
 	olfs: Fixed ticket 862. Added THREDDS jnlp files and configured the 'view' servlet.
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updating tests
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: UPdated Version tags
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: UPdated Version tags
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Migrated documentation to the dpcs.opendap.org site. Removed ancillary documentation files.
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Upadted THREDDS libraries to 3.14.03
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: Incorporated CSS into directory view and THREDDS dataset view
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: added folder images
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: added CSS for THREDDS and OPeNDAP directories
 
-2007-03-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-13  Nathan Potter <ndp@opendap.org>
 
 	olfs: updated test targets
 
-2007-03-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-06  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Resolved Ticket #800
 	SOAPDispatchHandler now uses full THREDDS catalog implmentation and not SimpleCataligBuilder.
 
-2007-03-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-06  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Resolved Ticket #785
 	Logging implementedadn documented.
 
-2007-03-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-05  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Rewrote the OPeNDAP directory response so that it sorts the entries correctly.
 
-2007-03-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-05  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 
-2007-03-01  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	olfs:
-	THREDDS 3.14 adoption. (Ticket 786)
-	 - Major issues fixed or work arounds established.
-	Removed the use of /root prefix from THREDDS implementation. (Ticket 821)
-
-2007-03-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-01  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	THREDDS 3.14 adoption. (Ticket 786)
 	 - Major issues fixed or work arounds established.
 	Removed the use of /root prefix from THREDDS implementation. (Ticket 821)
 
-2007-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-03-01  Nathan Potter <ndp@opendap.org>
+
+	olfs:
+	THREDDS 3.14 adoption. (Ticket 786)
+	 - Major issues fixed or work arounds established.
+	Removed the use of /root prefix from THREDDS implementation. (Ticket 821)
+
+2007-02-28  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	THREDDS 3.14 adoption.
@@ -958,17 +4380,17 @@
 	 - Checking in so Ethan can get to the code.
 	 - Check pointed code tree to tags/olfs/checkpoint-02.28.2007 prior to checking in these changes.
 
-2007-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-28  Nathan Potter <ndp@opendap.org>
 
-2007-02-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-28  Nathan Potter <ndp@opendap.org>
 
-2007-02-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-27  Nathan Potter <ndp@opendap.org>
 
-2007-02-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-20  Nathan Potter <ndp@opendap.org>
 
 	olfs: Changed package name opendap.olfs to opendap.bes
 
-2007-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-09  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Release 0.1.5 candidate 04.
 
@@ -980,7 +4402,7 @@
 
 	TestClient.java: removed timeoutVal
 
-2007-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-09  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Release 0.1.5 candidate 03.
 
@@ -989,33 +4411,33 @@
 	TestClient.java: I removed the debug and related variables
 	since they are not used.
 
-2007-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-09  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Release 0.1.5 candidate 02.
 
-2007-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-09  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated tests to accomodate expected changes in BES/OLFS output.
 
-2007-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-09  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Release 0.1.5 candidate 01.
 
-2007-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-09  Nathan Potter <ndp@opendap.org>
 
 	olfs:  Tweaked logging for more accurate reporting
 
-2007-02-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-08  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Changed references to Server4 into references to Hyrax.
 	Fixed unreported bug in DocServlet.
 
-2007-02-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-08  Nathan Potter <ndp@opendap.org>
 
 	olfs: Logging changes.
 
-2007-02-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-07  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Implmented logging in lieu of writing to stdout.
@@ -1025,7 +4447,7 @@
 
 	apache.html: Updated with information about #798; index.html: minor changes.
 
-2007-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-02-01  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Reorganized build files.
@@ -1035,507 +4457,507 @@
 
 	install.html, README: Updated with (more) correct information.
 
-2007-01-30  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-30  Nathan Potter <ndp@opendap.org>
 
 	olfs:
 	Changed getLastModified() to return a -1 for THREDDS catalog requests (indicates last modified date is unknown).
 	Resolves ticket 784.
 
-2007-01-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-29  Nathan Potter <ndp@opendap.org>
 
 	olfs: Simplified Apache integration instructions as requested by jhrg
 
-2007-01-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-29  Nathan Potter <ndp@opendap.org>
 
-2007-01-26  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	OLFS: Rearranging files
-
-2007-01-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-26  Nathan Potter <ndp@opendap.org>
 
 	OLFS: Rearranging files
 
-2007-01-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-26  Nathan Potter <ndp@opendap.org>
 
-2007-01-26  Nathan Potter <ndp@coas.oregonstate.edu>
+	OLFS: Rearranging files
 
-2007-01-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-26  Nathan Potter <ndp@opendap.org>
+
+2007-01-26  Nathan Potter <ndp@opendap.org>
+
+2007-01-26  Nathan Potter <ndp@opendap.org>
 
 	Changing name os Server4 project to olfs, because that's what is really in there.
 
-2007-01-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-12  Nathan Potter <ndp@opendap.org>
 
 	OLFS: Resolved  ticket 76 and added favicon.ico
 
-2007-01-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-02  Nathan Potter <ndp@opendap.org>
 
-2007-01-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2007-01-02  Nathan Potter <ndp@opendap.org>
 
-2006-12-27  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-27  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 14 for 0.1.4
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
 	OLFS: All new curl tests.
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-26  Nathan Potter <ndp@opendap.org>
 
-2006-12-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-22  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 13 for 0.1.4 - Cleaned up Comments
 
-2006-12-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-21  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 12 for 0.1.4 - Added NOAA sponsorship credit to OPeNDAP directory view
 
-2006-12-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-21  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 12 for 0.1.4 - Added NOAA sponsorship credit to OPeNDAP directory view
 
-2006-12-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-08  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 11 for 0.1.4 - Prepared default configuration
 
-2006-12-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-07  Nathan Potter <ndp@opendap.org>
 
-2006-12-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-07  Nathan Potter <ndp@opendap.org>
 
-2006-12-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-07  Nathan Potter <ndp@opendap.org>
 
-2006-12-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-07  Nathan Potter <ndp@opendap.org>
 
-2006-12-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-05  Nathan Potter <ndp@opendap.org>
 
-2006-12-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-05  Nathan Potter <ndp@opendap.org>
 
-2006-12-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-04  Nathan Potter <ndp@opendap.org>
 
-2006-12-04  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-04  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 10 for 0.1.4 - Added improved error handling to BesAPI
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 9 for 0.1.4
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 9 for 0.1.4
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 9 for 0.1.4
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Retired older version of dispatch servlet
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Retired older version of dispatch servlet
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Retired old DispatchServlet. Promoted NewDispatch2 to DispatchServlet
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
 	Server4: Added baseline files for netcdf tests
 
-2006-12-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-12-01  Nathan Potter <ndp@opendap.org>
 
-2006-11-29  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-29  Nathan Potter <ndp@opendap.org>
 
 	Server4: Added Testsuite
 
-2006-11-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-28  Nathan Potter <ndp@opendap.org>
 
-2006-11-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-28  Nathan Potter <ndp@opendap.org>
 
-2006-11-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-28  Nathan Potter <ndp@opendap.org>
 
-2006-11-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-28  Nathan Potter <ndp@opendap.org>
 
-2006-11-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-22  Nathan Potter <ndp@opendap.org>
 
-2006-11-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-22  Nathan Potter <ndp@opendap.org>
 
-2006-11-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-21  Nathan Potter <ndp@opendap.org>
 
 	Server4: Added documentation regarding Server4 integration with Apache
 
-2006-11-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-20  Nathan Potter <ndp@opendap.org>
 
 	Server4: Updated sponsorship links
 
-2006-11-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-20  Nathan Potter <ndp@opendap.org>
 
 	Server4: New Dispatch code
 
-2006-11-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-15  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 8 for 0.1.4 (added sponsorship links to directory view and documentation)
 
-2006-11-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-11-06  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 8 for 0.1.4 (added sponsorship links to directory view and documentation)
 
-2006-10-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-20  Nathan Potter <ndp@opendap.org>
 
 	Serve4: Removed bad character in catalog.xml
 
-2006-10-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-20  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 7 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 6 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 5 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 4 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 4 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 3 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 3 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 3 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 2 for 0.1.4
 
-2006-10-18  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-18  Nathan Potter <ndp@opendap.org>
 
 	Server4: Release candidate 1 for 0.1.4
 
-2006-10-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-16  Nathan Potter <ndp@opendap.org>
 
 	Server4: Repaired minor bug in exception handling in PPTClient. Repaired bug in BESConfig
 
-2006-10-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-16  Nathan Potter <ndp@opendap.org>
 
 	Server4: Added support for file vs data detection in the Directory (S4Dir) response. Added support for BESClient pooling.
 
-2006-10-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-14  Nathan Potter <ndp@opendap.org>
 
 	Server4: Appearance adjustment for S4Dir
 
-2006-10-12  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-12  Nathan Potter <ndp@opendap.org>
 
 	Server4: Adding File Servlet
 
-2006-10-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-11  Nathan Potter <ndp@opendap.org>
 
 	Server4: Repairing documentation issues.
 
-2006-10-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-11  Nathan Potter <ndp@opendap.org>
 
 	Server4: Repairing documentation issues.
 
-2006-10-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-11  Nathan Potter <ndp@opendap.org>
 
 	Server4: Made ReqInfo a collection static methods and integrated their use in to code base. Reworked implementation of conditional GET to utilize the existing servlet interface for it in Tomcat.
 
-2006-10-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-10  Nathan Potter <ndp@opendap.org>
 
 	.Renamed ReqState to ReqInfo
 
-2006-10-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-10  Nathan Potter <ndp@opendap.org>
 
 	.Overhauled ReqState. Made all methods static and essentially turned into a collection of stateless helper methods.
 
-2006-10-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-09  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-10-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-10-05  Nathan Potter <ndp@opendap.org>
 
 	.Added DocsServlet, persistent security configurations and a MimeTypes class to Server4
 
-2006-09-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-20  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-09-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-20  Nathan Potter <ndp@opendap.org>
 
 	.Reconfigured the nio tests to be in the package opendap.experiments. Added experiments that test peristent HTTP connections.
 
-2006-09-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-20  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-09-20  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-20  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-09-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-15  Nathan Potter <ndp@opendap.org>
 
-2006-09-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-15  Nathan Potter <ndp@opendap.org>
 
-2006-09-15  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
-
-2006-09-15  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2006-09-15  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2006-09-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-15  Nathan Potter <ndp@opendap.org>
 
 	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
 
-2006-09-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-15  Nathan Potter <ndp@opendap.org>
+
+2006-09-15  Nathan Potter <ndp@opendap.org>
+
+2006-09-14  Nathan Potter <ndp@opendap.org>
 
 	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
 
-2006-09-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-13  Nathan Potter <ndp@opendap.org>
 
 	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
 
-2006-09-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-13  Nathan Potter <ndp@opendap.org>
 
 	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
 
-2006-09-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-13  Nathan Potter <ndp@opendap.org>
 
 	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
 
-2006-09-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-13  Nathan Potter <ndp@opendap.org>
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+2006-09-06  Nathan Potter <ndp@opendap.org>
 
 	NIO Test Working.
 
-2006-09-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-06  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-09-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-06  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-09-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-05  Nathan Potter <ndp@opendap.org>
 
-2006-09-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-05  Nathan Potter <ndp@opendap.org>
 
-2006-09-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-05  Nathan Potter <ndp@opendap.org>
 
-2006-09-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-05  Nathan Potter <ndp@opendap.org>
 
-2006-09-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-05  Nathan Potter <ndp@opendap.org>
 
 	NIO test code
 
-2006-09-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-01  Nathan Potter <ndp@opendap.org>
 
 	.NIO Test code
 
-2006-09-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-01  Nathan Potter <ndp@opendap.org>
 
 	.NIO Test code
 
-2006-09-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-01  Nathan Potter <ndp@opendap.org>
 
 	.NIO Test code
 
-2006-09-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-09-01  Nathan Potter <ndp@opendap.org>
 
 	.NIO Test code
 
-2006-08-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-25  Nathan Potter <ndp@opendap.org>
 
 	.Updated SOAP code to deal with new <dataBLOB> element that replaces the <dodsBLOB> element in the DDX
 
-2006-08-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-25  Nathan Potter <ndp@opendap.org>
 
 	.Updating docs
 
-2006-08-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-25  Nathan Potter <ndp@opendap.org>
 
 	.Moving (promoting) ThreddsServlet to DispatchServlet
 
-2006-08-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-25  Nathan Potter <ndp@opendap.org>
 
 	.Preparing to move ThreddsServlet to DispatchServlet
 
-2006-08-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-23  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-08-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-23  Nathan Potter <ndp@opendap.org>
 
 	Checking in HTTP/1.1 caching mods for Server4.
 
-2006-08-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-21  Nathan Potter <ndp@opendap.org>
 
 	Updated THREDDS libs
 
-2006-08-03  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-03  Nathan Potter <ndp@opendap.org>
 
 	Updated Java-OPeNDAP library
 
-2006-08-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-08-02  Nathan Potter <ndp@opendap.org>
 
 	Checking in persistent content mods to OLFS.
 
-2006-07-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-25  Nathan Potter <ndp@opendap.org>
 
 	Checking in persistent content mods to OLFS.
 
-2006-07-25  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-25  Nathan Potter <ndp@opendap.org>
 
 	Updated version to 0.1.2
 
-2006-07-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-23  Nathan Potter <ndp@opendap.org>
 
 	Added resources directory to Server4 project
 
-2006-07-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-21  Nathan Potter <ndp@opendap.org>
 
 	Repaired bug in PPTClient where an End Of Stream was not being detected when reading from the BES.
 
-2006-07-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-16  Nathan Potter <ndp@opendap.org>
 
 	repaired ant build rules
 
-2006-07-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-15  Nathan Potter <ndp@opendap.org>
 
 	Updated version to 0.1.2
 
-2006-07-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-15  Nathan Potter <ndp@opendap.org>
 
 	Updated opendap library
 
-2006-07-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-14  Nathan Potter <ndp@opendap.org>
 
 	Corrected ug in which WWW encoded id strings were improperly handled by OLFS.
 
-2006-07-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-10  Nathan Potter <ndp@opendap.org>
 
 	Updated OPeNDAP java lib to 0.0.4. This version includes WWW escaping of variable names in the DDS.
 
-2006-07-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-06  Nathan Potter <ndp@opendap.org>
 
 	Fixed bug in AsciiResponse in which the ServerVersion was not being correctly determined from the version information sent by the BES.
 
-2006-07-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-05  Nathan Potter <ndp@opendap.org>
 
-2006-07-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-05  Nathan Potter <ndp@opendap.org>
 
 	updated opendap java lib
 
-2006-07-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-07-05  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-06-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-28  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-06-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-23  Nathan Potter <ndp@opendap.org>
 
-2006-06-23  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-23  Nathan Potter <ndp@opendap.org>
 
-2006-06-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-13  Nathan Potter <ndp@opendap.org>
 
 	docs update
 
-2006-06-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-13  Nathan Potter <ndp@opendap.org>
 
 	Updated THREDDS LIBS
 
-2006-06-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-13  Nathan Potter <ndp@opendap.org>
 
 	docs update
 
-2006-06-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-06-01  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-05-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-31  Nathan Potter <ndp@opendap.org>
 
 	.
 
-2006-05-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-22  Nathan Potter <ndp@opendap.org>
 
-2006-05-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-17  Nathan Potter <ndp@opendap.org>
 
-2006-05-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-17  Nathan Potter <ndp@opendap.org>
 
-2006-05-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-11  Nathan Potter <ndp@opendap.org>
 
-2006-05-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-10  Nathan Potter <ndp@opendap.org>
 
-2006-05-10  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	Added TestCleint Libs and build rules.
-
-2006-05-10  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2006-05-10  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2006-05-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-10  Nathan Potter <ndp@opendap.org>
 
 	Added TestCleint Libs and build rules.
 
-2006-05-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-10  Nathan Potter <ndp@opendap.org>
 
-2006-05-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-10  Nathan Potter <ndp@opendap.org>
 
-2006-05-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-10  Nathan Potter <ndp@opendap.org>
 
 	Added TestCleint Libs and build rules.
 
-2006-05-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-10  Nathan Potter <ndp@opendap.org>
 
-2006-05-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-09  Nathan Potter <ndp@opendap.org>
 
-2006-05-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-08  Nathan Potter <ndp@opendap.org>
 
-2006-05-03  Nathan Potter <ndp@coas.oregonstate.edu>
+	Added TestCleint Libs and build rules.
+
+2006-05-08  Nathan Potter <ndp@opendap.org>
+
+2006-05-08  Nathan Potter <ndp@opendap.org>
+
+2006-05-08  Nathan Potter <ndp@opendap.org>
+
+2006-05-03  Nathan Potter <ndp@opendap.org>
 
 	Made the SOAP TestClient more like getURL.
 
-2006-05-03  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-03  Nathan Potter <ndp@opendap.org>
 
-2006-05-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-02  Nathan Potter <ndp@opendap.org>
 
-2006-05-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-02  Nathan Potter <ndp@opendap.org>
 
 	Added TestCleint Libs and build rules.
 
@@ -1544,80 +4966,80 @@
 	HtmlResponse.java: Changed the online help URL to the new location
 	(on www.opendap.org).
 
-2006-05-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-05-01  Nathan Potter <ndp@opendap.org>
 
 	Added TestCleint Libs and build rules.
 
-2006-04-28  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-28  Nathan Potter <ndp@opendap.org>
 
 	Added SOAP interface to server.
 
-2006-04-26  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-26  Nathan Potter <ndp@opendap.org>
 
 	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
 	Dispath architecture seems to work.
 
-2006-04-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-21  Nathan Potter <ndp@opendap.org>
 
-2006-04-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-21  Nathan Potter <ndp@opendap.org>
 
-2006-04-21  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
-	Dispath architecture seems to work.
-
-2006-04-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-21  Nathan Potter <ndp@opendap.org>
 
 	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
 	Dispath architecture seems to work.
 
-2006-04-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-21  Nathan Potter <ndp@opendap.org>
 
 	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
 	Dispath architecture seems to work.
 
-2006-04-11  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-11  Nathan Potter <ndp@opendap.org>
 
 	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
 	Dispath architecture seems to work.
 
-2006-04-05  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-11  Nathan Potter <ndp@opendap.org>
 
 	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
 	Dispath architecture seems to work.
 
-2006-03-31  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2006-03-31  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2006-03-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-04-05  Nathan Potter <ndp@opendap.org>
 
 	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
 	Dispath architecture seems to work.
 
-2006-03-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-03-31  Nathan Potter <ndp@opendap.org>
 
-2006-03-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-03-31  Nathan Potter <ndp@opendap.org>
+
+2006-03-31  Nathan Potter <ndp@opendap.org>
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation.
+	Dispath architecture seems to work.
+
+2006-03-31  Nathan Potter <ndp@opendap.org>
+
+2006-03-31  Nathan Potter <ndp@opendap.org>
 
 	Restructured Server4 to use a Dispatch/Handler model
 
-2006-02-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-22  Nathan Potter <ndp@opendap.org>
 
-2006-02-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-22  Nathan Potter <ndp@opendap.org>
 
-2006-02-21  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-21  Nathan Potter <ndp@opendap.org>
 
-2006-02-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-17  Nathan Potter <ndp@opendap.org>
 
 	Documentation updates
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
 2006-02-16  James Gallagher <jgallagher@opendap.org>
 
@@ -1628,47 +5050,47 @@
 
 	I removed the execute property on all the files in and under 'doc.'
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
 	Documentation updates
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
 	Documentation updates
 
-2006-02-16  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-16  Nathan Potter <ndp@opendap.org>
 
-2006-02-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-15  Nathan Potter <ndp@opendap.org>
 
-2006-02-15  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-15  Nathan Potter <ndp@opendap.org>
 
 	Documentation updates
 
-2006-02-14  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-14  Nathan Potter <ndp@opendap.org>
 
 	THREDDS might work with these changes
 
-2006-02-13  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-13  Nathan Potter <ndp@opendap.org>
 
 	THREDDS might work with these changes
 
-2006-02-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-10  Nathan Potter <ndp@opendap.org>
 
-2006-02-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-10  Nathan Potter <ndp@opendap.org>
 
-2006-02-10  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	Improved exception handling. Code now attempts to close outstanding open connections when exceptions are caught.
-
-2006-02-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-10  Nathan Potter <ndp@opendap.org>
 
 	Improved exception handling. Code now attempts to close outstanding open connections when exceptions are caught.
 
-2006-02-10  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-10  Nathan Potter <ndp@opendap.org>
+
+	Improved exception handling. Code now attempts to close outstanding open connections when exceptions are caught.
+
+2006-02-10  Nathan Potter <ndp@opendap.org>
 
 	Added a new getResponse() implementation that works with bytes (as opposed to chars) and that will find the "PPT_COMPLETE_DATA_TRANSMITION" sequence even when the sequence is  read from the stream in separate calls.
 
-2006-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-09  Nathan Potter <ndp@opendap.org>
 
 	Added a new getResponse() implementation that works with bytes (as opposed to chars) and that will find the "PPT_COMPLETE_DATA_TRANSMITION" sequence even when the sequence is  read from the stream in separate calls.
 
@@ -1676,9 +5098,9 @@
 
 	change input stream and output stream. Changed the way COMPLETE_TRANSMITION being checked. Changed the way data written to output stream. Fixed problem reading too much from file.
 
-2006-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-09  Nathan Potter <ndp@opendap.org>
 
-2006-02-09  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-09  Nathan Potter <ndp@opendap.org>
 
 	Changed  input stage from:  BufferedReader(InputStreamReader)
 	to:  BufferedInputStream(DataInputStream)
@@ -1688,17 +5110,17 @@
 
 	This should repair the incorrect byte juggling caused by the Reader/Writer pair when handling binary data.
 
-2006-02-08  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-08  Nathan Potter <ndp@opendap.org>
 
-2006-02-07  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-07  Nathan Potter <ndp@opendap.org>
 
-2006-02-06  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-06  Nathan Potter <ndp@opendap.org>
 
 2006-02-03  James Gallagher <jgallagher@opendap.org>
 
 	Added a blurb about copying the opendap.war file to the Tomcat webapps directory.
 
-2006-02-03  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-03  Nathan Potter <ndp@opendap.org>
 
 	Added directory response. (Based on the test server located at: http://test.opendap.org/opendap-3.5/nph-dods/data/nc)
 
@@ -1714,65 +5136,65 @@
 
 	Initial versions of the README, NEWS and INSTALL files.
 
-2006-02-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-02  Nathan Potter <ndp@opendap.org>
 
 	Added exception handling for BES API
 
-2006-02-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-02  Nathan Potter <ndp@opendap.org>
 
 	Added first implementation of a THREDDS CrawlableDataset
 
-2006-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-01  Nathan Potter <ndp@opendap.org>
 
 	Added first implementation of a THREDDS CrawlableDataset
 
-2006-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-01  Nathan Potter <ndp@opendap.org>
 
 	Added first implementation of a THREDDS CrawlableDataset
 
-2006-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-01  Nathan Potter <ndp@opendap.org>
 
-2006-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
-
-	Added first implementation of a THREDDS CrawlableDataset
-
-2006-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-01  Nathan Potter <ndp@opendap.org>
 
 	Added first implementation of a THREDDS CrawlableDataset
 
-2006-02-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-01  Nathan Potter <ndp@opendap.org>
 
 	Added first implementation of a THREDDS CrawlableDataset
 
-2006-01-25  Nathan Potter <ndp@coas.oregonstate.edu>
-
-2005-12-22  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-02-01  Nathan Potter <ndp@opendap.org>
 
 	Added first implementation of a THREDDS CrawlableDataset
 
-2005-11-17  Nathan Potter <ndp@coas.oregonstate.edu>
+2006-01-25  Nathan Potter <ndp@opendap.org>
+
+2005-12-22  Nathan Potter <ndp@opendap.org>
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+2005-11-17  Nathan Potter <ndp@opendap.org>
 
 	Added ASCII response and INFO response.
 
-2005-11-03  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-11-03  Nathan Potter <ndp@opendap.org>
 
-2005-11-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-11-02  Nathan Potter <ndp@opendap.org>
 
 	Version 1.0.0 candidate
 
-2005-11-02  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-11-02  Nathan Potter <ndp@opendap.org>
 
-2005-10-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-10-31  Nathan Potter <ndp@opendap.org>
 
-2005-10-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-10-31  Nathan Potter <ndp@opendap.org>
 
 	Updated jdom library to version 1.0
 
-2005-08-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-31  Nathan Potter <ndp@opendap.org>
 
-2005-08-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-31  Nathan Potter <ndp@opendap.org>
 
-2005-08-31  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-31  Nathan Potter <ndp@opendap.org>
 
 	Prototype source for Server4 checked in
 
@@ -1780,18 +5202,15 @@
 
 	Auto reset of Subversion properties
 
-2005-08-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-01  Nathan Potter <ndp@opendap.org>
 
-2005-08-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-01  Nathan Potter <ndp@opendap.org>
 
-2005-08-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-01  Nathan Potter <ndp@opendap.org>
 
 	Capricious name change.
 
-2005-08-01  Nathan Potter <ndp@coas.oregonstate.edu>
+2005-08-01  Nathan Potter <ndp@opendap.org>
 
 	Creating Server 4 project
 
-;; Local Variables:
-;; coding: utf-8
-;; End:

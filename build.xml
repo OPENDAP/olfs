@@ -491,6 +491,8 @@
                 <exclude name="src/opendap/wcsGateway/**"/>
                 <exclude name="src/opendap/wcs/**"/>
                 <exclude name="src/opendap/semantics/**"/>
+                
+                <!-- Exclude the prototype AWS code  -->
                 <exclude name="src/opendap/aws/**"/>
                 <exclude name="src/opendap/noaa_s3/**"/>
 

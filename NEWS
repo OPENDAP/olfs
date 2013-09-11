@@ -1,0 +1,13 @@
+Version 1.10.0 (11 September 2013)
+
+
+Support for geotiff and jpeg2000 responses.
+Bug fixes.
+Cruft code removal from code tree.
+Support for constraint expressions as POST bodies.
+
+
+Version < 1.10 (06 January 2013)
+
+I created the NEWS file with version 1.10.0 so no
+prior versions are represented here.
