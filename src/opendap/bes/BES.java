@@ -829,7 +829,7 @@ public class BES {
 
 
         log.debug("besTransaction() started.");
-        log.debug("besTransaction() request document: \n-----------\n"+showRequest(request)+"-----------\n");
+        log.debug("besTransaction() request document: \n-----------\n{}-----------\n",showRequest(request));
 
 
         boolean besTrouble = false;
