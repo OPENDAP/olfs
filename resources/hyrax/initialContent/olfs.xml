@@ -93,7 +93,13 @@
 
                 <!-- AllowDirectDataSourceAccess / -->
 
-                <!-- UseDAP2ResourceUrlResponse / -->
+                <!--
+                  By default, at least for now, the server will provide the (undefined) DAP2 style response
+                  to requests for a dataset resource URL. Commenting out the "UseDAP2ResourceUrlResponse" element will
+                  cause the server to return the (well defined) DAP4 DSR response when a dataset resource URL is
+                  requested.
+                -->
+                <UseDAP2ResourceUrlResponse />
 
             </Handler>
 
