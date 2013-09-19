@@ -1,4 +1,10 @@
-Error {
-    code = 1001;
-    message = "libdap error transmitting DDS: Function calls can only be used with data requests. To see the structure of the underlying data source, reissue the URL without the function.";
-};
+Dataset {
+    Grid {
+      Array:
+        Float32 SST[TIME = 12][COADSY = 46][COADSX = 90];
+      Maps:
+        Float64 TIME[TIME = 12];
+        Float64 COADSY[COADSY = 46];
+        Float64 COADSX[COADSX = 90];
+    } SST;
+} function_result_coads_climatology.nc;

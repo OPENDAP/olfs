@@ -1,4 +1,4 @@
 Error {
-    code = 1001;
-    message = "libdap error transmitting DDS: Function calls can only be used with data requests. To see the structure of the underlying data source, reissue the URL without the function.";
+    code = 1005;
+    message = "libdap error transmitting DDS: Wrong number of arguments to geogrid() (expected at least 5 args). See geogrid() for more information.";
 };

@@ -13,7 +13,7 @@
         <Float32 name="Depth"/>
         <Float32 name="Sea_Temp"/>
         <Float32 name="Salinity"/>
-        <Float32 name="DO "/>
+        <Float32 name="DO_percent"/>
         <Float32 name="pH"/>
         <Float32 name="Turbidity"/>
         <Float32 name="Air_Temp"/>
