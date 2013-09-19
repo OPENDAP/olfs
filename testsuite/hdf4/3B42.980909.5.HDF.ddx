@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Dataset name="3B42.980909.5.HDF" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xml.opendap.org/ns/DAP2" xsi:schemaLocation="http://xml.opendap.org/ns/DAP2 http://xml.opendap.org/dap/dap2.xsd">
-    <Attribute name="HDF_GLOBAL" type="Container"/>
     <Attribute name="CoreMetadata" type="Container">
         <Attribute name="OrbitNumber" type="Container">
             <Attribute name="Value" type="Int32">
@@ -1327,51 +1326,53 @@
             </Attribute>
         </Attribute>
     </Attribute>
-    <Structure name="DATA_GRANULE">
-        <Structure name="PlanetaryGrid">
-            <Array name="percipitate">
-                <Attribute name="dim_0" type="Container">
-                    <Attribute name="name" type="String">
-                        <value>scan</value>
-                    </Attribute>
-                </Attribute>
-                <Attribute name="dim_1" type="Container">
-                    <Attribute name="name" type="String">
-                        <value>longitude</value>
-                    </Attribute>
-                </Attribute>
-                <Attribute name="dim_2" type="Container">
-                    <Attribute name="name" type="String">
-                        <value>latitude</value>
-                    </Attribute>
-                </Attribute>
-                <Float32/>
-                <dimension name="scan" size="1"/>
-                <dimension name="longitude" size="360"/>
-                <dimension name="latitude" size="80"/>
-            </Array>
-            <Array name="relError">
-                <Attribute name="dim_0" type="Container">
-                    <Attribute name="name" type="String">
-                        <value>scan</value>
-                    </Attribute>
-                </Attribute>
-                <Attribute name="dim_1" type="Container">
-                    <Attribute name="name" type="String">
-                        <value>longitude</value>
-                    </Attribute>
-                </Attribute>
-                <Attribute name="dim_2" type="Container">
-                    <Attribute name="name" type="String">
-                        <value>latitude</value>
-                    </Attribute>
-                </Attribute>
-                <Float32/>
-                <dimension name="scan" size="1"/>
-                <dimension name="longitude" size="360"/>
-                <dimension name="latitude" size="80"/>
-            </Array>
-        </Structure>
-    </Structure>
+    <Attribute name="DATA_GRANULE_PlanetaryGrid_percipitate_dim_0" type="Container">
+        <Attribute name="name" type="String">
+            <value>scan</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DATA_GRANULE_PlanetaryGrid_percipitate_dim_1" type="Container">
+        <Attribute name="name" type="String">
+            <value>longitude</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DATA_GRANULE_PlanetaryGrid_percipitate_dim_2" type="Container">
+        <Attribute name="name" type="String">
+            <value>latitude</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DATA_GRANULE_PlanetaryGrid_relError_dim_0" type="Container">
+        <Attribute name="name" type="String">
+            <value>scan</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DATA_GRANULE_PlanetaryGrid_relError_dim_1" type="Container">
+        <Attribute name="name" type="String">
+            <value>longitude</value>
+        </Attribute>
+    </Attribute>
+    <Attribute name="DATA_GRANULE_PlanetaryGrid_relError_dim_2" type="Container">
+        <Attribute name="name" type="String">
+            <value>latitude</value>
+        </Attribute>
+    </Attribute>
+    <Array name="DATA_GRANULE_PlanetaryGrid_percipitate">
+        <Attribute name="long_name" type="String">
+            <value>percipitate</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="scan" size="1"/>
+        <dimension name="longitude" size="360"/>
+        <dimension name="latitude" size="80"/>
+    </Array>
+    <Array name="DATA_GRANULE_PlanetaryGrid_relError">
+        <Attribute name="long_name" type="String">
+            <value>relError</value>
+        </Attribute>
+        <Float32/>
+        <dimension name="scan" size="1"/>
+        <dimension name="longitude" size="360"/>
+        <dimension name="latitude" size="80"/>
+    </Array>
     <dataBLOB href=""/>
 </Dataset>

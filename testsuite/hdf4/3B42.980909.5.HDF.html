@@ -310,7 +310,7 @@ function get_selection() {
     return s;
 }    
 
-DODS_URL = new dods_url("http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF");
+DODS_URL = new dods_url("http://localhost:8080/opendap/data/hdf4/3B42.980909.5.HDF");
 // -->
 </script>
 </head>
@@ -332,7 +332,7 @@ DODS_URL = new dods_url("http://localhost:8080/opendap/data/hdf/3B42.980909.5.HD
 <tr>
 <td align="right"><h3><a href="opendap_form_help.html#data_url" target="help">Data URL:</a>
 </h3>
-<td><input name="url" type="text" size="70" value="http://localhost:8080/opendap/data/hdf/3B42.980909.5.HDF">
+<td><input name="url" type="text" size="70" value="http://localhost:8080/opendap/data/hdf4/3B42.980909.5.HDF">
 <tr><td><td><hr>
 
 <tr>
@@ -699,6 +699,12 @@ ArchiveMetadata.LastScanLon.Mandatory: FALSE
 ArchiveMetadata.NumberOfRainScans.Value: -9999
 ArchiveMetadata.NumberOfRainScans.Data_Location: PGE
 ArchiveMetadata.NumberOfRainScans.Mandatory: FALSE
+DATA_GRANULE_PlanetaryGrid_percipitate_dim_0.name: scan
+DATA_GRANULE_PlanetaryGrid_percipitate_dim_1.name: longitude
+DATA_GRANULE_PlanetaryGrid_percipitate_dim_2.name: latitude
+DATA_GRANULE_PlanetaryGrid_relError_dim_0.name: scan
+DATA_GRANULE_PlanetaryGrid_relError_dim_1.name: longitude
+DATA_GRANULE_PlanetaryGrid_relError_dim_2.name: latitude
 </textarea><p>
 
 <tr><td><td><hr>
@@ -706,19 +712,15 @@ ArchiveMetadata.NumberOfRainScans.Mandatory: FALSE
 <tr>
 <td align="right" valign="top">
 <h3><a href="opendap_form_help.html#dataset_variables" target="help">Variables:</a></h3>
-<td><b>Structure DATA_GRANULE </b><br>
-<dl><dd>
-<b>Structure PlanetaryGrid </b><br>
-<dl><dd>
-<script type="text/javascript">
+<td><script type="text/javascript">
 <!--
-org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate = new dods_var("DATA_GRANULE.PlanetaryGrid.percipitate", "org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate", 1);
+org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate = new dods_var("DATA_GRANULE_PlanetaryGrid_percipitate", "org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate", 1);
 DODS_URL.add_dods_var(org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate"
 onclick="org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate.handle_projection_change(get_org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate) "  onfocus="describe_projection()">
-<font size="+1">percipitate</font></b>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>
+<font size="+1">DATA_GRANULE_PlanetaryGrid_percipitate</font></b>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>
 
 scan:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -740,22 +742,24 @@ org_opendap_DATA_GRANULE_PlanetaryGrid_percipitate.add_dim(80);
 </script>
 <br>
 
-<textarea name="percipitate_attr" rows="5" cols="70">
-dim_0.name: scan
-dim_1.name: longitude
-dim_2.name: latitude
+<textarea name="DATA_GRANULE_PlanetaryGrid_percipitate_attr" rows="5" cols="70">
+long_name: percipitate
 </textarea>
 
+
 <p><p>
+
+<tr><td><td>
+
 <script type="text/javascript">
 <!--
-org_opendap_DATA_GRANULE_PlanetaryGrid_relError = new dods_var("DATA_GRANULE.PlanetaryGrid.relError", "org_opendap_DATA_GRANULE_PlanetaryGrid_relError", 1);
+org_opendap_DATA_GRANULE_PlanetaryGrid_relError = new dods_var("DATA_GRANULE_PlanetaryGrid_relError", "org_opendap_DATA_GRANULE_PlanetaryGrid_relError", 1);
 DODS_URL.add_dods_var(org_opendap_DATA_GRANULE_PlanetaryGrid_relError);
 // -->
 </script>
 <b><input type="checkbox" name="get_org_opendap_DATA_GRANULE_PlanetaryGrid_relError"
 onclick="org_opendap_DATA_GRANULE_PlanetaryGrid_relError.handle_projection_change(get_org_opendap_DATA_GRANULE_PlanetaryGrid_relError) "  onfocus="describe_projection()">
-<font size="+1">relError</font></b>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>
+<font size="+1">DATA_GRANULE_PlanetaryGrid_relError</font></b>: Array of 32 bit Reals [scan = 0..0][longitude = 0..359][latitude = 0..79]<br>
 
 scan:<input type="text" name="org_opendap_DATA_GRANULE_PlanetaryGrid_relError_0" size=8 onfocus="describe_index()" onChange="DODS_URL.update_url()">
 <script type="text/javascript">
@@ -777,16 +781,10 @@ org_opendap_DATA_GRANULE_PlanetaryGrid_relError.add_dim(80);
 </script>
 <br>
 
-<textarea name="relError_attr" rows="5" cols="70">
-dim_0.name: scan
-dim_1.name: longitude
-dim_2.name: latitude
+<textarea name="DATA_GRANULE_PlanetaryGrid_relError_attr" rows="5" cols="70">
+long_name: relError
 </textarea>
 
-<p><p>
-</dd></dl>
-<p><p>
-</dd></dl>
 
 <p><p>
 

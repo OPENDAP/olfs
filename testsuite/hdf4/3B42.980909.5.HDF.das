@@ -1,6 +1,4 @@
 Attributes {
-    HDF_GLOBAL {
-    }
     CoreMetadata {
         OrbitNumber {
             Int32 Value -9999;
@@ -605,22 +603,28 @@ Attributes {
             String Mandatory "FALSE";
         }
     }
-    percipitate_dim_0 {
+    DATA_GRANULE_PlanetaryGrid_percipitate {
+        String long_name "percipitate";
+    }
+    DATA_GRANULE_PlanetaryGrid_percipitate_dim_0 {
         String name "scan";
     }
-    percipitate_dim_1 {
+    DATA_GRANULE_PlanetaryGrid_percipitate_dim_1 {
         String name "longitude";
     }
-    percipitate_dim_2 {
+    DATA_GRANULE_PlanetaryGrid_percipitate_dim_2 {
         String name "latitude";
     }
-    relError_dim_0 {
+    DATA_GRANULE_PlanetaryGrid_relError {
+        String long_name "relError";
+    }
+    DATA_GRANULE_PlanetaryGrid_relError_dim_0 {
         String name "scan";
     }
-    relError_dim_1 {
+    DATA_GRANULE_PlanetaryGrid_relError_dim_1 {
         String name "longitude";
     }
-    relError_dim_2 {
+    DATA_GRANULE_PlanetaryGrid_relError_dim_2 {
         String name "latitude";
     }
 }
