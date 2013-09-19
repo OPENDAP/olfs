@@ -78,69 +78,6 @@
                 <responseDelay>5000</responseDelay>
             </Handler>
 
-            <!--  opendap.bes.dapResponders.DapDispatcher
-
-
-            Provides all DAP responses.
-
-            This includes a DatasetServices response that is returned for every data resource URL. The
-            DatasetServices response is an XML document with a
-
-            * A root level DatasetServices element which has:
-                * A required xml:base attribute the holds as it's value the URL de-referenced to generate the
-                  document. This would be the data resource URL.
-
-                * One or more Service elements each of which has
-                    * A title attribute that has as its value the a human readable name.
-                    * A required xlink:href attribute that has as its value the service URL.
-                    * A required xlink:role that provides a namespace ID that is uniquely associated with the service
-                      behavior. For example every DAP2 data service response should always have the same value of
-                      xlink:role="http://services.opendap.org/dap2/dods#"
-                    * An optional child element Description that contains
-                        * An optional xlink:href attribute that points to a human/browser readable description of the service.
-                        * And the required content of a brief description of the service.
-
-                * An optional ServerSideFunction element that holds
-                 * One or more Function elements each of which has
-                     * A name attribute that has as its value the name of the function.
-                     * An optional xlink:href attribute that has as its value a URL that points to a
-                       human readable description of the function.
-                     * An optional child element Description that contains
-                         * And the required content of a brief description of the service.
-
-
-            Example:
-
-            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <?xml-stylesheet type="text/xsl" href="/opendap/xsl/serviceDescription.xsl"?>
-            <DatasetServices
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                xml:base="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml">
-
-
-                <Service title="DAP2 Data"
-                         xlink:href="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml.dods"
-                         xlink:role="http://services.opendap.org/dap2/dods#">
-                    <Description xlink:href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Data_Service">DAP2 Data Object.</Description>
-                </Service>
-
-                <Service title="Data Request Form"
-                         xlink:href="http://test.opendap.org:8090/opendap/hyrax/ECMWF_ERA-40_subset.ncml.html"
-                         xlink:role="http://services.opendap.org/dap4/data-request-form#">
-                    <Description xlink:href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_HTML_DATA_Request_Form_Service">OPeNDAP HTML Data Request Form for data sub-setting and access.</Description>
-                </Service>
-
-
-            </Dataset>
-            The DatasetServices response is obtained by de-referencing the data resource URL (aka the
-            dataset URL, aka the file URL).
-
-
-            Returning the Service Description in response to requests for the dataset URL eliminates a long
-            standing ambiguity and lack of REST(ful) behavior in the Hyrax DAP servers.
-
-
-            -->
             <Handler className="opendap.bes.dapResponders.DapDispatcher" >
 
                 <!-- AllowDirectDataSourceAccess
@@ -157,7 +94,6 @@
                 <!-- AllowDirectDataSourceAccess / -->
 
                 <!-- UseDAP2ResourceUrlResponse / -->
-                <!-- PostBodyMaxLength>1000000</PostBodyMaxLength -->
 
             </Handler>
 
@@ -169,6 +105,38 @@
 
 
         </HttpGetHandlers>
+
+
+        <!--
+           If you need to accept a constraint expression (ce) that is larger than will fit in a URL query string then you
+           can configure the server to accept the ce as the body of a POST request referencing the same resource.
+           If the the Content-Encoding of the request is set to "application/x-www-form-urlencoded" then the server
+           will ingest all of parameter names "ce" and "dap4:ce"  to build the DAP constraint expression. Otherwise
+           the server will treat the entire POST bidy as a DAP ce.
+
+           By default the maximum length of the POST body is limited to 2000000 characters, and may never be
+           larger than 10000000 characters (if you need more then get in touch with support@opendap.org). You can adjust
+           the limit in the configuration for the DapDispatcher.
+
+           Configuration:
+           Uncomment the HttpPostHandlers element below. Make sure that the body of the DapDispatcher Handler element is
+           IDENTICAL to it's sister in the HttpGetHandlers element above.
+
+           If you need to change the default value of the maximum POST body length do it by adding a
+           "PostBodyMaxLength" element to the DapDispatcher Handler below:
+
+           <PostBodyMaxLength>500</PostBodyMaxLength>
+
+           The text content of which must be an integer between 0 and 10000000
+        -->
+        <!--
+        <HttpPostHandlers>
+            <Handler className="opendap.bes.dapResponders.DapDispatcher" >
+                MAKE SURE THAT THE CONTENT OF THIS ELEMENT IS IDENTICAL TO IT'S SISTER IN THE  HttpGetHandlers ELEMENT!
+                (Disregarding the presence of a PostBodyMaxLength element)
+            </Handler>
+        </HttpPostHandlers>
+        -->
 
 
     </DispatchHandlers>

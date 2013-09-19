@@ -74,7 +74,8 @@ import java.util.regex.Pattern;
 
 public class ReqInfo {
 
-    public static final int DEFAULT_POST_BODY_MAX_LENGTH = 1000000;
+    public static final int DEFAULT_POST_BODY_MAX_LENGTH  =  2000000;
+    public static final int ABSOLUTE_MAX_POST_BODY_LENGTH = 10000000;
 
     private static Logger log;
     static {
@@ -95,7 +96,13 @@ public class ReqInfo {
 
 
     public static void setMaxPostBodyLength(int maxLength){
-        maxPostBodyLength.set(maxLength);
+        if(maxLength > ABSOLUTE_MAX_POST_BODY_LENGTH){
+            log.error("Submitted max POST body length ({}) is too large. Setting to max allowable POST body length of {}.",maxLength,ABSOLUTE_MAX_POST_BODY_LENGTH);
+            maxPostBodyLength.set(ABSOLUTE_MAX_POST_BODY_LENGTH);
+        }
+        else {
+            maxPostBodyLength.set(maxLength);
+        }
     }
 
     public static int getPostBodyMaxLength(){
