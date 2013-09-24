@@ -176,7 +176,7 @@ public class CatalogServlet extends HttpServlet {
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "S3_ACCESS");
+            LogUtil.logServerAccessEnd(0, -1, "GLACIER_CATALOG_ACCESS");
         }
 
     }

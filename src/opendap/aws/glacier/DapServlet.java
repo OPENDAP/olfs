@@ -28,17 +28,11 @@ package opendap.aws.glacier;
 
 import opendap.bes.BESManager;
 import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
 import opendap.noaa_s3.S3DapDispatchHandler;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.ProcessingInstruction;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
@@ -46,7 +40,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -67,7 +60,7 @@ public class DapServlet extends HttpServlet {
 
     private String _servletContext;
 
-    private S3DapDispatchHandler _s3DapDispatcher;
+    private S3DapDispatchHandler _glacierDapDispatcher;
 
 
 
@@ -124,7 +117,7 @@ public class DapServlet extends HttpServlet {
         try {
             BESManager besManager = new BESManager();
             besManager.init(this,besConfiguration);
-            _s3DapDispatcher.init(this, getDefaultDapDispatchConfig() );
+            _glacierDapDispatcher.init(this, getDefaultDapDispatchConfig());
 
         } catch (Exception e) {
             _log.error("Failed to initialize BESManager.");
@@ -206,13 +199,13 @@ public class DapServlet extends HttpServlet {
                       HttpServletResponse response) {
 
         try {
-            LogUtil.logServerAccessStart(request, "S3_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
+            LogUtil.logServerAccessStart(request, "GLACIER_DAP_ACCESS", "HTTP-GET", Integer.toString(_reqNumber.incrementAndGet()));
 
 
 
             String requestURI = request.getRequestURI();
 
-            if (!_s3DapDispatcher.requestDispatch(request, response, true)) { // Is it a DAP request?
+            if (!_glacierDapDispatcher.requestDispatch(request, response, true)) { // Is it a DAP request?
 
                 // We don't know how to cope, looks like it's time to 404!
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to locate requested resource.");
@@ -229,7 +222,7 @@ public class DapServlet extends HttpServlet {
             }
         } finally {
             RequestCache.closeThreadCache();
-            LogUtil.logServerAccessEnd(0, -1, "S3_ACCESS");
+            LogUtil.logServerAccessEnd(0, -1, "GLACIER_DAP_ACCESS");
         }
 
     }
@@ -239,13 +232,12 @@ public class DapServlet extends HttpServlet {
 
         RequestCache.openThreadCache();
         long reqno = _reqNumber.incrementAndGet();
-        LogUtil.logServerAccessStart(req, "S3", "LastModified", Long.toString(reqno));
+        LogUtil.logServerAccessStart(req, "GLACIER_DAP_ACCESS", "LastModified", Long.toString(reqno));
 
         _log.debug("getLastModified() - BEGIN");
 
         try {
-            LogUtil.logServerAccessStart(req, "S3CATALOG_ACCESS", "LastModified", Long.toString(reqno));
-            return _s3DapDispatcher.getLastModified(req);
+            return _glacierDapDispatcher.getLastModified(req);
 
         }
         finally {
