@@ -49,6 +49,10 @@
     -->
     <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <property name="OLFS_VERSION"  value="Not.A.Release"/>
+    <property name="WEBAPP_DIST"   value="olfs-${OLFS_VERSION}-webapp"/>
+    <property name="SRC_DIST"      value="olfs-${OLFS_VERSION}-src"/>
+    <property name="DOC_DIST"      value="olfs-${OLFS_VERSION}-doc"/>
+    <property name="OLFS_LIB"      value="olfs-${OLFS_VERSION}"/>
 
 
     <!-- Compiler Settings -->
@@ -116,21 +120,21 @@
 
     <target name="show" description="Show build settings.">
 
-        <echo level="info" message="Project Name:       ${ant.project.name}"/>
-        <echo level="info" message="Project File:       ${ant.file}"/>
-        <echo level="info" message="Hyrax Version:      ${HYRAX_VERSION}"/>
-        <echo level="info" message="Olfs Version:       ${OLFS_VERSION}"/>
+        <echo level="info" message="Project Name:          ${ant.project.name}"/>
+        <echo level="info" message="Project File:          ${ant.file}"/>
+        <echo level="info" message="Hyrax Version:         ${HYRAX_VERSION}"/>
+        <echo level="info" message="Olfs Version:          ${OLFS_VERSION}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="    src.dir:       ${src.dir}"/>
-        <echo level="info" message="    doc.dir:       ${doc.dir}"/>
-        <echo level="info" message="    lib.dir:       ${lib.dir}"/>
-        <echo level="info" message="    resources.dir: ${resources.dir}"/>
+        <echo level="info" message="    src.dir:           ${src.dir}"/>
+        <echo level="info" message="    doc.dir:           ${doc.dir}"/>
+        <echo level="info" message="    lib.dir:           ${lib.dir}"/>
+        <echo level="info" message="    resources.dir:     ${resources.dir}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="    build.dir:      ${build.dir}"/>
-        <echo level="info" message="    build.classes:  ${build.classes}"/>
-        <echo level="info" message="    build.doc:      ${build.doc}"/>
+        <echo level="info" message="    build.dir:         ${build.dir}"/>
+        <echo level="info" message="    build.classes:     ${build.classes}"/>
+        <echo level="info" message="    build.doc:         ${build.doc}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
         <echo level="info" message="    ant.file:          ${ant.file}"/>
@@ -142,6 +146,12 @@
         <echo level="info" message="    user.name:         ${user.name}"/>
         <echo level="info" message="    user.home:         ${user.home}"/>
         <echo level="info" message="    java.home:         ${java.home}"/>
+        <echo level="info" message=""/>
+        <echo level="info" message="Distribution Targets: "/>
+        <echo level="info" message="    WEBAPP_DIST:       ${WEBAPP_DIST}"/>
+        <echo level="info" message="    SRC_DIST:          ${SRC_DIST}"/>
+        <echo level="info" message="    DOC_DIST:          ${DOC_DIST}"/>
+        <echo level="info" message="    OLFS_LIB:          ${OLFS_LIB}"/>
         <echo level="info" message=""/>
 
     </target>
@@ -406,7 +416,7 @@
 
     <target name="olfs-lib" depends="clean,compile">
 
-        <jar destfile="${build.lib}/olfs-${OLFS_VERSION}.jar">
+        <jar destfile="${build.lib}/${OLFS_LIB}.jar">
             <fileset dir="${build.classes}" />
         </jar>
 
@@ -441,63 +451,40 @@
             description="Builds documentation distribution"
             >
 
-        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-doc.tgz"
+        <tar destfile="${build.dist}/${DOC_DIST}.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.doc}" prefix="olfs-${OLFS_VERSION}-doc"/>
+            <zipfileset dir="${build.doc}" prefix="${DOC_DIST}"/>
         </tar>
 
     </target>
+
 
     <target name="src-dist"
             depends="clean,PreProcessSourceCode"
             description="Builds source distribution"
             >
 
-        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-src.tgz"
+        <tar destfile="${build.dist}/${SRC_DIST}.tgz"
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="olfs-${OLFS_VERSION}-src">
+            <zipfileset dir="${build.src}" prefix="${SRC_DIST}/src"/>
 
-                <!-- Exclude the build directory -->
-                <exclude name="build/**"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="doc/**" />
 
-                <!-- Exclude the fortify directory -->
-                <exclude name="fortify/**"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="lib/**"/>
 
-                <!-- Exclude the javadoc directory in the ${doc.dir} dir -->
-                <exclude name="doc/javadoc/**"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/hyrax/**"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/WebStart/**"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/gateway/**"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" includes="resources/nciso/**"/>
 
-                <!-- Exclude the _notes directory in the ${doc.dir} dir -->
-                <exclude name="doc/_notes/**"/>
-
-                <!-- Exclude the IntelliJ IDEA spore -->
-                <exclude name="out/**"/>
-                <exclude name="**/*.iml"/>
-                <exclude name="**/*.ipr"/>
-                <exclude name="**/*.iws"/>
-
-                <!-- Exclude the old hao code  -->
-                <exclude name="src/hao/**"/>
-
-
-                <!-- Exclude the Metacat code -->
-                <exclude name="src/opendap/metacat/**"/>
-
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="wcs-build.xml"/>
-                <exclude name="resources/WCS/**"/>
-                <exclude name="src/opendap/wcsGateway/**"/>
-                <exclude name="src/opendap/wcs/**"/>
-                <exclude name="src/opendap/semantics/**"/>
-                
-                <!-- Exclude the prototype AWS code  -->
-                <exclude name="src/opendap/aws/**"/>
-                <exclude name="src/opendap/noaa_s3/**"/>
-
-            </zipfileset>
-
+            <zipfileset dir="." prefix="${SRC_DIST}" file="build.xml"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" file="README"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" file="NEWS"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" file="ChangeLog"/>
+            <zipfileset dir="." prefix="${SRC_DIST}" file="COPYRIGHT"/>
 
         </tar>
 
@@ -510,10 +497,10 @@
         <copy file="${distributionResources.dir}/WarFileReadMe"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/olfs-${OLFS_VERSION}-webapp.tgz"
+        <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.dist}" prefix="olfs-${OLFS_VERSION}-webapp">
+            <zipfileset dir="${build.dist}" prefix="${WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="README"/>
             </zipfileset>
