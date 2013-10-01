@@ -1,3 +1,29 @@
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * // This file is part of the "Hyrax Data Server" project.
+ * //
+ * //
+ * // Copyright (c) 2013 OPeNDAP, Inc.
+ * // Author: Nathan David Potter  <ndp@opendap.org>
+ * //
+ * // This library is free software; you can redistribute it and/or
+ * // modify it under the terms of the GNU Lesser General Public
+ * // License as published by the Free Software Foundation; either
+ * // version 2.1 of the License, or (at your option) any later version.
+ * //
+ * // This library is distributed in the hope that it will be useful,
+ * // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * // Lesser General Public License for more details.
+ * //
+ * // You should have received a copy of the GNU Lesser General Public
+ * // License along with this library; if not, write to the Free Software
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * //
+ * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+ * /////////////////////////////////////////////////////////////////////////////
+ */
+
 package opendap.experiments;
 
 import opendap.coreServlet.ServletUtil;
@@ -16,15 +42,15 @@ import javax.servlet.ServletContextListener;
 */
 public class WorkerThread implements Runnable, ServletContextListener {
 
-    private Logger log;
-    private Thread myThread;
+    private Logger _log;
+    private Thread _myThread;
 
     public WorkerThread(){
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
-        log.info("In WorkerThread constructor.");
+        _log = org.slf4j.LoggerFactory.getLogger(getClass());
+        _log.info("In WorkerThread constructor.");
 
-        myThread = new Thread(this);
-        myThread.setName("BackgroundWorker"+myThread.getName());
+        _myThread = new Thread(this);
+        _myThread.setName("BackgroundWorker" + _myThread.getName());
 
 
 
@@ -37,16 +63,16 @@ public class WorkerThread implements Runnable, ServletContextListener {
         ServletContext sc = arg0.getServletContext();
 
         String contentPath = ServletUtil.getContentPath(sc);
-        log.debug("contentPath: "+contentPath);
+        _log.debug("contentPath: " + contentPath);
 
         String serviceContentPath = contentPath;
         if(!serviceContentPath.endsWith("/"))
             serviceContentPath += "/";
-        log.debug("_serviceContentPath: "+serviceContentPath);
+        _log.debug("_serviceContentPath: " + serviceContentPath);
 
 
-        myThread.start();
-        log.info("contextInitialized(): "+myThread.getName()+" is started.");
+        _myThread.start();
+        _log.info("contextInitialized(): " + _myThread.getName() + " is started.");
 
 
 
@@ -57,13 +83,13 @@ public class WorkerThread implements Runnable, ServletContextListener {
         Thread thread = Thread.currentThread();
 
         try {
-            myThread.interrupt();
-            myThread.join();
-            log.info("contextDestroyed(): "+myThread.getName()+" is stopped.");
+            _myThread.interrupt();
+            _myThread.join();
+            _log.info("contextDestroyed(): " + _myThread.getName() + " is stopped.");
         } catch (InterruptedException e) {
-            log.debug(thread.getClass().getName()+" was interrupted.");
+            _log.debug(thread.getClass().getName() + " was interrupted.");
         }
-        log.info("contextDestroyed(): Finished..");
+        _log.info("contextDestroyed(): Finished..");
 
     }
 
@@ -71,30 +97,30 @@ public class WorkerThread implements Runnable, ServletContextListener {
 
     @Override
     public void run() {
-        log.debug("In run() method.");
+        _log.debug("In run() method.");
 
         long sleepTime= 20;
 
         Thread thread = Thread.currentThread();
         try {
             while(true && !thread.isInterrupted()){
-                log.info(thread.getName()+": Sleeping for: "+sleepTime+" seconds");
+                _log.info(thread.getName() + ": Sleeping for: " + sleepTime + " seconds");
 
                 napTime(sleepTime);
-                log.info(thread.getName()+": Resetting to: "+sleepTime/1000.0+" seconds");
+                _log.info(thread.getName() + ": Resetting to: " + sleepTime / 1000.0 + " seconds");
 
             }
         } catch (InterruptedException e) {
-            log.warn(thread.getName()+" was interrupted.");
+            _log.warn(thread.getName() + " was interrupted.");
         } catch (Exception e) {
-            log.error(thread.getName()+" Caught "+e.getClass().getName()+"  Msg: "+e.getMessage());
+            _log.error(thread.getName() + " Caught " + e.getClass().getName() + "  Msg: " + e.getMessage());
         }
     }
 
 
     public void napTime(long intervalInSeconds) throws Exception {
         Thread.sleep(intervalInSeconds * 1000);
-        log.info(Thread.currentThread().getName()+": Sleep timer expired.");
+        _log.info(Thread.currentThread().getName() + ": Sleep timer expired.");
 
     }
 

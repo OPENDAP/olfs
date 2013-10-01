@@ -1,9 +1,9 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2012 OPeNDAP, Inc.
+ * // Copyright (c) 2013 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -18,11 +18,12 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
+
 package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
@@ -82,6 +83,8 @@ public class Netcdf4DR extends Dap4Responder{
 
 
 
+    public boolean isDataResponder(){ return true; }
+    public boolean isMetadataResponder(){ return false; }
 
 
 
@@ -118,7 +121,7 @@ public class Netcdf4DR extends Dap4Responder{
 
         Document reqDoc =
                 besApi.getRequestDocument(
-                        BesApi.DAP2,
+                        BesApi.DAP2_DATA,
                         resourceID,
                         constraintExpression,
                         xdap_accept,

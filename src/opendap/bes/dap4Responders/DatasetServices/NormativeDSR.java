@@ -1,9 +1,9 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2012 OPeNDAP, Inc.
+ * // Copyright (c) 2013 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -18,14 +18,16 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
+
 package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.bes.BESManager;
+import opendap.bes.BesDapResponder;
 import opendap.bes.BesGroup;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.ServiceMediaType;
@@ -62,18 +64,18 @@ public class NormativeDSR extends Dap4Responder {
     private static String defaultRequestSuffix = "";
 
 
-    private Vector<DapResponder> allServices = null;
+    private Vector<BesDapResponder> allServices = null;
 
 
-    public NormativeDSR(String sysPath, BesApi besApi, Vector<DapResponder> services) {
+    public NormativeDSR(String sysPath, BesApi besApi, Vector<BesDapResponder> services) {
         this(sysPath,null, defaultRequestSuffix,besApi,services);
     }
 
-    public NormativeDSR(String sysPath, String pathPrefix, BesApi besApi, Vector<DapResponder> services) {
+    public NormativeDSR(String sysPath, String pathPrefix, BesApi besApi, Vector<BesDapResponder> services) {
         this(sysPath,pathPrefix, defaultRequestSuffix,besApi,services );
     }
 
-    public NormativeDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, Vector<DapResponder> services) {
+    public NormativeDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, Vector<BesDapResponder> services) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         allServices = services;
 
@@ -99,6 +101,8 @@ public class NormativeDSR extends Dap4Responder {
     }
 
 
+    public boolean isDataResponder(){ return false; }
+    public boolean isMetadataResponder(){ return true; }
 
 
 

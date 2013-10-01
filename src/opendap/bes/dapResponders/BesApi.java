@@ -58,7 +58,7 @@ public class BesApi {
     public static final String DAS        = "das";
     public static final String DDX        = "ddx";
     public static final String DataDDX    = "dataddx";
-    public static final String DAP2       = "dods";
+    public static final String DAP2_DATA  = "dods";
     public static final String STREAM     = "stream";
     public static final String ASCII      = "ascii";
     public static final String HTML_FORM  = "html_form";
@@ -1124,7 +1124,7 @@ public class BesApi {
                                               String xdap_accept, int maxResponseSize)
             throws BadConfigurationException {
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize,null,null,null,DAP2_ERRORS);
+        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize,null,null,null,DAP2_ERRORS);
 
     }
 
@@ -1167,7 +1167,7 @@ public class BesApi {
             throws BadConfigurationException {
 
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize, null,null,NETCDF,DAP2_ERRORS);
+        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize, null,null,NETCDF,DAP2_ERRORS);
 
 
     }
@@ -1214,7 +1214,7 @@ public class BesApi {
                                          int maxResponseSize)
             throws BadConfigurationException {
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize,null,null,GMLJP2,XML_ERRORS);
+        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize,null,null,GMLJP2,XML_ERRORS);
 
     }
 
@@ -1236,7 +1236,7 @@ public class BesApi {
                                          int maxResponseSize)
             throws BadConfigurationException {
 
-        return getRequestDocument(DAP2,dataSource,ce,xdap_accept,maxResponseSize,null,null,GEOTIFF,XML_ERRORS);
+        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize,null,null,GEOTIFF,XML_ERRORS);
 
     }
 

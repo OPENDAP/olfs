@@ -1,9 +1,9 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
- * // Copyright (c) 2012 OPeNDAP, Inc.
+ * // Copyright (c) 2013 OPeNDAP, Inc.
  * // Author: Nathan David Potter  <ndp@opendap.org>
  * //
  * // This library is free software; you can redistribute it and/or
@@ -18,11 +18,12 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
+
 package opendap.async;
 
 import opendap.namespaces.DAP;
@@ -84,6 +85,75 @@ public class DocFactory {
     }
 
 
+    /**
+     *
+     *
+     *
+     *
+     <grammar xmlns="http://relaxng.org/ns/structure/1.0"
+                     xmlns:doc="http://www.example.com/annotation"
+                     datatypeLibrary="http://xml.opendap.org/datatypes/dap4"
+                     ns="http://xml.opendap.org/ns/DAP/4.0#"
+                     >
+     <start>
+       <ref name="errorresponse"/>
+     </start>
+     <define name="errorresponse">
+       <element name="Error">
+         <optional>
+           <attribute name="httpcode"><data type="dap4_integer"/></attribute>
+         </optional>
+         <optional>
+           <interleave>
+             <element name = "Message"><text/></Message>
+             <element name = "Context"><text/></Message>
+             <element name = "OtherInformation"><text/></Message>
+           </interleave>
+         </optional>
+       </element>
+     </define>
+
+     *
+     *
+     *
+     *
+     *
+     *
+     * @param message
+     * @return
+     */
+    private static Element getMessageElement(String message){
+        Element e    = new Element("Message",DAP.DAPv40_NS);
+        e.setText(message);
+        return  e;
+    }
+
+    private static Element getContextElement(String context){
+        Element e    = new Element("Context",DAP.DAPv40_NS);
+        e.setText(context);
+        return  e;
+    }
+
+    private static Element getOtherInformationElement(String other){
+        Element e    = new Element("OtherInformation",DAP.DAPv40_NS);
+        e.setText(other);
+        return  e;
+    }
+
+    public static Element getDap4ErrorElement(int httpStatus, String message, String context, String other){
+        Element e    = new Element("Error",DAP.DAPv40_NS);
+
+        e.setAttribute("httpcode",httpStatus+"");
+
+        e.addContent(getMessageElement(message));
+        e.addContent(getContextElement(context));
+        e.addContent(getOtherInformationElement(other));
+
+        return  e;
+    }
+    public static Document getDap4ErrorDocument(int httpStatus, String message, String context, String other){
+        return new Document(getDap4ErrorElement(httpStatus, message, context, other));
+    }
 
 
 
@@ -214,6 +284,13 @@ public class DocFactory {
         return getAsynchronousResponseDocument(xmlBase,context,asyncStatus.GONE);
 
     }
+
+
+
+
+
+
+
 
 
 
