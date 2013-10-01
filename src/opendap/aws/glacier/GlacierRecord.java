@@ -1,6 +1,6 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
  * // Copyright (c) 2013 OPeNDAP, Inc.
@@ -18,7 +18,7 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
@@ -26,11 +26,7 @@
 
 package opendap.aws.glacier;
 
-import com.amazonaws.services.glacier.AmazonGlacierClient;
-import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
-import com.amazonaws.services.glacier.transfer.UploadResult;
-import opendap.aws.auth.Credentials;
-import opendap.aws.s3.S3Object;
+import opendap.aws.AwsUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -40,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
@@ -50,9 +47,9 @@ import java.util.Vector;
  * Time: 7:41 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GlacierArchiveRecord  {
+public class GlacierRecord implements Serializable {
 
-    private Logger log = null;
+    private Logger _log = null;
 
     //private String _glacierArchiveCacheRoot = null;
 
@@ -61,17 +58,17 @@ public class GlacierArchiveRecord  {
 
     private String _resourceId;
 
-    private Element _archiveRecordElement =  null;
-
     private Vector<Element> _metadata = null;
+
+    private File _cacheFile;
 
 
     public static final Namespace glacierRecordNameSpace = Namespace.getNamespace("gar","http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#");
 
 
-    public GlacierArchiveRecord(String vaultName, String resourceId, String archiveId) {
+    public GlacierRecord(String vaultName, String resourceId, String archiveId) {
         super();
-        log = LoggerFactory.getLogger(getClass());
+        _log = LoggerFactory.getLogger(getClass());
 
         setVaultName(vaultName);
         setResourceId(resourceId);
@@ -80,9 +77,9 @@ public class GlacierArchiveRecord  {
     }
 
 
-    public GlacierArchiveRecord(File archiveRecordFile) throws IOException, JDOMException {
+    public GlacierRecord(File archiveRecordFile) throws IOException, JDOMException {
         super();
-        log = LoggerFactory.getLogger(getClass());
+        _log = LoggerFactory.getLogger(getClass());
         _metadata = new Vector<Element>();
         loadArchiveRecordFromFile(archiveRecordFile);
     }
@@ -122,7 +119,7 @@ public class GlacierArchiveRecord  {
 
 
     /**
-     * <gar:GlacierArchiveRecord
+     * <gar:GlacierRecord
      *         xmlns:gar="http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#"
      *         resourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
      *         vault="foo-s3cmd.nodc.noaa.gov"
@@ -130,11 +127,14 @@ public class GlacierArchiveRecord  {
      * @return
      */
     public Element getArchiveRecordElement(){
-        Element index = new Element("GlacierArchiveRecord", glacierRecordNameSpace);
+        Element index = new Element("GlacierRecord", glacierRecordNameSpace);
 
         index.setAttribute("resourceId",getResourceId());
         index.setAttribute("vault",getVaultName());
         index.setAttribute("archiveId",getArchiveId());
+
+        if(_cacheFile!=null)
+            index.setAttribute("cacheFile",getCacheFile().getAbsolutePath());
 
         Element[] metadataElements = getMetaDataElements();
 
@@ -150,7 +150,7 @@ public class GlacierArchiveRecord  {
 
 
     /**
-     * <gar:GlacierArchiveRecord
+     * <gar:GlacierRecord
      *         xmlns:gar="http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#"
      *         resourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
      *         vault="foo-s3cmd.nodc.noaa.gov"
@@ -209,7 +209,55 @@ public class GlacierArchiveRecord  {
     }
 
 
+    public File getCacheFile(){
+       return  _cacheFile;
+    }
 
+
+
+    public File createCacheFile(File resourceCacheDirectory) throws IOException {
+
+        if(_cacheFile!=null)
+            return _cacheFile;
+
+        _log.debug("getCacheFile() - Cache Dir: '{}'",resourceCacheDirectory);
+
+        String cacheFileName =  getVaultName() + getResourceId();
+
+        File cacheFile = new File(resourceCacheDirectory, AwsUtil.encodeKeyForFileSystemName(cacheFileName));
+        _log.debug("getCacheFile() - cacheFile: '{}'", cacheFile);
+
+        if(cacheFile.exists() && !cacheFile.canWrite())
+            throw new IOException("createCacheFile() - Unable to write to cache file: "+cacheFile.getPath());
+
+        _cacheFile = cacheFile;
+
+        return _cacheFile;
+
+    }
+
+
+    public boolean resourceIsCached() throws IOException {
+
+        File cacheFile = getCacheFile();
+
+        return cacheFile!=null && cacheFile.exists();
+
+    }
+
+    public long getCachedResourceLastModifiedTime(){
+
+        File cacheFile = getCacheFile();
+
+        if(cacheFile== null)
+            return -1;
+
+        return cacheFile.lastModified();
+
+
+
+
+    }
 
 
 

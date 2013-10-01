@@ -1,6 +1,6 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
  * // Copyright (c) 2013 OPeNDAP, Inc.
@@ -18,7 +18,7 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
@@ -40,6 +40,7 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -291,6 +292,9 @@ public class CatalogServlet extends HttpServlet {
 
         String vaultName = GlacierArchiveManager.theManager().getVaultName(indexResourceId);
 
+        //indexResourceId = indexResourceId.substring(vaultName.length());
+
+
         index = GlacierArchiveManager.theManager().getIndex(indexResourceId);
 
 
@@ -343,8 +347,6 @@ public class CatalogServlet extends HttpServlet {
         return handled;
 
     }
-
-
 
 
 

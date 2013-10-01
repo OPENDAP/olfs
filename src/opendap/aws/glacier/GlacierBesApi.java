@@ -24,35 +24,42 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.aws;
+package opendap.aws.glacier;
 
-import java.io.File;
+import opendap.aws.AwsUtil;
+import opendap.bes.dapResponders.BesApi;
+
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
  * User: ndp
- * Date: 7/18/13
- * Time: 11:27 AM
+ * Date: 9/25/13
+ * Time: 12:13 PM
  * To change this template use File | Settings | File Templates.
  */
-public class AwsUtil {
+public class GlacierBesApi extends BesApi {
 
-    private static String keyChar              =  "#";
-    private static String escapedSeparatorChar =  keyChar + "2F";
-    private static String escapedKeyChar       =  keyChar + "23";
 
-    public static String encodeKeyForFileSystemName(String originalKey){
-        String encodedKey = originalKey.replace(keyChar, escapedKeyChar);
-        encodedKey = encodedKey.replace(File.separator, escapedSeparatorChar);
-        return encodedKey;
+
+    public String getBesDataSourceID(String relativeUrl, boolean checkWithBes){
+
+        String id = super.getBesDataSourceID(relativeUrl,checkWithBes);
+
+        return AwsUtil.encodeKeyForFileSystemName(id);
     }
 
-    public static String decodeFileSystemNameForKey(String encodedKey){
-        String decodedKey;
-        decodedKey = encodedKey.replace(escapedKeyChar,keyChar);
-        decodedKey = decodedKey.replace(escapedSeparatorChar,File.separator);
-        return decodedKey;
+    public String getBesDataSourceID(String relativeUrl, Pattern matchPattern, boolean checkWithBes){
+
+        while(relativeUrl.startsWith("/") && relativeUrl.length()>1)
+            relativeUrl = relativeUrl.substring(1);
+
+
+        String id = super.getBesDataSourceID(relativeUrl,matchPattern,checkWithBes);
+        if(id!=null)
+            id = AwsUtil.encodeKeyForFileSystemName(id);
+        return id;
+
+
     }
-
-
 }

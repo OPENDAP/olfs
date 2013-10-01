@@ -1,6 +1,6 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
  * // Copyright (c) 2013 OPeNDAP, Inc.
@@ -18,7 +18,7 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ public class DapServlet extends HttpServlet {
 
     private String _servletContext;
 
-    private S3DapDispatchHandler _glacierDapDispatcher;
+    private GlacierDapDispatcher _glacierDapDispatcher;
 
 
 
@@ -71,6 +71,9 @@ public class DapServlet extends HttpServlet {
         _initialized = false;
         _reqNumber = new AtomicInteger(0);
         _servletContext = null;
+
+        _glacierDapDispatcher = new GlacierDapDispatcher();
+
     }
 
 
@@ -111,7 +114,6 @@ public class DapServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException(msg);
         }
-
 
 
         try {
@@ -252,6 +254,8 @@ public class DapServlet extends HttpServlet {
 
 
     public void destroy() {
+
+        GlacierArchiveManager.theManager().destroy();
         _log.info("Destroy complete.");
 
     }

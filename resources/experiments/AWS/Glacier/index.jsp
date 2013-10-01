@@ -1,3 +1,4 @@
+<%@ page import="opendap.aws.glacier.GlacierArchiveManager" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -49,45 +50,35 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<%@ page import="opendap.hai.Util" %>
-<%@ page import="opendap.ppt.OPeNDAPClient" %>
-<%@ page import="java.util.Enumeration" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.Vector" %>
-<%@ page import="opendap.bes.*" %>
-<%@ page import="opendap.noaa_s3.S3CatalogManager" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% String contextPath = request.getContextPath(); %>
-<% String catalogServiceContextPath = S3CatalogManager.theManager().getCatalogServiceContext(); %>
+<% String catalogContext = GlacierArchiveManager.theManager().getCatalogServiceContext(); %>
 
 <html>
-
-
-
-
-
-
-
 <head>
     <link rel='stylesheet' href='<%= contextPath %>/docs/css/contents.css' type='text/css'/>
-    <title>NOAA S3 Index</title>
+    <title>Glacier Vaults</title>
 </head>
+<body>
+
+
+
 
 <!-- ****************************************************** -->
 <!--                      PAGE BANNER                       -->
 <!--                                                        -->
 <!--                                                        -->
 
+
 <table width='95%'>
     <tr>
         <td><img alt="OPeNDAP Logo" src='<%= contextPath%>/docs/images/logo.gif'/></td>
         <td>
-            <div style='font-size:large;'><a href="">Special Testiness</a></div>
+            <div style='font-size:large;'><a href="">Glacier Vaults</a></div>
         </td>
     </tr>
 </table>
-<h1>NOAA S3 Index Test</h1>
+<h1>Glacier Vaults</h1>
 <hr size="1" noshade="noshade"/>
 
 <!-- ****************************************************** -->
@@ -95,42 +86,14 @@
 <!--                                                        -->
 <!--                                                        -->
 
+     <dl>
 
 
-<%
+<%  for(String vault: GlacierArchiveManager.theManager().getVaultNames()){   %>
+        <dd><a href="<%=catalogContext%>/<%=vault%>/catalog.xml"><%=vault%></a></dd>
+<%  } %>
 
-    Enumeration<String> e = S3CatalogManager.theManager().getBucketContexts();
-
-    if(e.hasMoreElements()) {
-        out.append("<dl>");
-
-        while(e.hasMoreElements()){
-            String bucketContext = e.nextElement();
-            String bucketName    = S3CatalogManager.theManager().getBucketName(bucketContext);
-            out.append("<dd>");
-            out.append("<a href=\"").append(catalogServiceContextPath).append(bucketContext).append("/catalog.xml\">").append(bucketName).append("</a>");
-            out.append("</dd>");
-
-        }
-        out.append("</dl>");
-    }
-    else {
-        out.append("</dl>");
-%>
-        <strong>No Buckets Found.</strong>
-
-<%
-
-    }
-
-
-
-%>
-
-
-
-
-
+     </dl>
 
 
 
@@ -143,7 +106,7 @@
     <tr>
         <td>
             <div class="small" align="left">
-                <a href="<%= contextPath %>/docs/admin">Hyrax Admin Interface </a>
+                Glacier Vaults
             </div>
         </td>
         <td>

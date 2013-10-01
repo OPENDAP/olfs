@@ -1,6 +1,6 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
- * // This file is part of the "OPeNDAP 4 Data Server (aka Hyrax)" project.
+ * // This file is part of the "Hyrax Data Server" project.
  * //
  * //
  * // Copyright (c) 2013 OPeNDAP, Inc.
@@ -18,7 +18,7 @@
  * //
  * // You should have received a copy of the GNU Lesser General Public
  * // License along with this library; if not, write to the Free Software
- * // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * //
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GlacierVaultManager {
 
-   Logger log = LoggerFactory.getLogger(this.getClass());
+   Logger _log = LoggerFactory.getLogger(this.getClass());
 
 
     private String _name;
@@ -58,17 +58,17 @@ public class GlacierVaultManager {
     private String _serviceContext;
     private String _pathDelimiter = "/";
 
-    public static final String IndexDirectoryName = "index";
+    public  static final String DefaultIndexDirectoryName = "index";
     private File _indexDirectory;
 
-    public static final String ArchiveRecordsDirectoryName = "archive";
+    public  static final String DefaultArchiveRecordsDirectoryName = "archive";
     private File _archiveRecordsDirectory;
 
-    public static final String ResourceCacheDirectoryName = "cache";
+    public  static final String DefaultResourceCacheDirectoryName = "cache";
     private File _resourceCacheDirectory;
 
 
-    private ConcurrentHashMap<String, GlacierArchiveRecord> _archiveRecords;
+    private ConcurrentHashMap<String, GlacierRecord> _archiveRecords;
     private ConcurrentHashMap<String, Index> _indexObjects;
 
 
@@ -81,11 +81,11 @@ public class GlacierVaultManager {
         _name = vaultName;
         File vaultDir = mkDir(glacierRootDir,_name);
 
-        _indexDirectory = mkDir(vaultDir,IndexDirectoryName);
-        _archiveRecordsDirectory = mkDir(vaultDir,ArchiveRecordsDirectoryName);
-        _resourceCacheDirectory = mkDir(vaultDir,ResourceCacheDirectoryName);
+        _indexDirectory = mkDir(vaultDir,DefaultIndexDirectoryName);
+        _archiveRecordsDirectory = mkDir(vaultDir,DefaultArchiveRecordsDirectoryName);
+        _resourceCacheDirectory = mkDir(glacierRootDir,DefaultResourceCacheDirectoryName);
 
-        _archiveRecords = new ConcurrentHashMap<String, GlacierArchiveRecord>();
+        _archiveRecords = new ConcurrentHashMap<String, GlacierRecord>();
         _indexObjects   = new ConcurrentHashMap<String, Index>();
     }
 
@@ -135,7 +135,6 @@ public class GlacierVaultManager {
 
 
 
-
     public File mkDir(File parent, String dirName) throws IOException {
 
         File newDir = new File(parent,dirName);
@@ -150,14 +149,16 @@ public class GlacierVaultManager {
     }
 
 
-    public void cacheArchiveRecord(GlacierArchiveRecord gar) throws IOException {
+
+
+    public void cacheArchiveRecord(GlacierRecord gar) throws IOException {
 
 
         File targetFile = new File(getArchiveRecordsDir(), AwsUtil.encodeKeyForFileSystemName(gar.getResourceId()));
-        log.debug("cacheArchiveRecord() - targetFile: '{}'",targetFile);
+        _log.debug("cacheArchiveRecord() - targetFile: '{}'", targetFile);
 
         if(targetFile.exists()){
-            log.warn("cacheArchiveRecord() - OVERWRITING RESOURCE ARCHIVE RECORD: '{}'", targetFile);
+            _log.warn("cacheArchiveRecord() - OVERWRITING RESOURCE ARCHIVE RECORD: '{}'", targetFile);
 
         }
         else {
@@ -167,7 +168,7 @@ public class GlacierVaultManager {
                 throw new IOException("Couldn't create the parent directory: " + parent);
             }
 
-            log.debug("Attempting to create target file: '{}'",targetFile.getAbsolutePath());
+            _log.debug("Attempting to create target file: '{}'", targetFile.getAbsolutePath());
             targetFile.createNewFile();
 
 
@@ -187,7 +188,7 @@ public class GlacierVaultManager {
     }
 
 
-    public GlacierArchiveRecord getArchiveRecord(String resourceId){
+    public GlacierRecord getArchiveRecord(String resourceId){
         return _archiveRecords.get(resourceId);
     }
 
@@ -198,7 +199,7 @@ public class GlacierVaultManager {
 
     public void loadArchiveRecords() throws IOException, JDOMException {
 
-        GlacierArchiveRecord gar;
+        GlacierRecord gar;
 
         File archiveDir = getArchiveRecordsDir();
         File[] archiveRecords = archiveDir.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
@@ -206,21 +207,22 @@ public class GlacierVaultManager {
         if (archiveRecords != null) {
             for (File archiveRecord : archiveRecords) {
                 if (archiveRecord.isFile()) {
-                    gar = new GlacierArchiveRecord(archiveRecord);
+                    gar = new GlacierRecord(archiveRecord);
 
+                    gar.createCacheFile(_resourceCacheDirectory);
 
                     String resourceId = gar.getResourceId();
 
                     _archiveRecords.put(resourceId,gar);
-                    log.debug("Loaded Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
+                    _log.debug("Loaded Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
 
                 }
                 else {
-                    log.debug("Skipping directory/link {}", archiveRecord);
+                    _log.debug("Skipping directory/link {}", archiveRecord);
                 }
             }
         } else {
-            log.debug("No archive records found for vault {}", name());
+            _log.debug("No archive records found for vault {}", name());
         }
 
     }
@@ -251,18 +253,21 @@ public class GlacierVaultManager {
 
                     index.setResourceId(resourceId.toString());
                     _indexObjects.put(index.getResourceId(),index);
-                    log.debug("Loaded Index. Vault: {} resourceId: {}", name(), index.getResourceId());
+                    _log.debug("Loaded Index. Vault: {} resourceId: {}", name(), index.getResourceId());
 
                 }
                 else {
-                    log.debug("Skipping directory/link {}", indexFile);
+                    _log.debug("Skipping directory/link {}", indexFile);
                 }
             }
         } else {
-            log.debug("No index files found for vault {}", name());
+            _log.debug("No index files found for vault {}", name());
         }
 
     }
+
+
+
 
 
 
