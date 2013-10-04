@@ -37,6 +37,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -46,11 +47,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 5/11/11
- * Time: 3:15 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * Subclass BesApi to get different BES behaviors.
+ *
+ * You may find that it's usefule to:
+ *
+ *  - override one (or even all!) of the BesApi.write*() methods.
+ *
+ *  - override BesApi.getRequestDocument()
+ *
+ *  - override BesApi.besTransaction(*)
  */
 public class BesApi {
 
@@ -64,7 +70,8 @@ public class BesApi {
     public static final String HTML_FORM  = "html_form";
     public static final String INFO_PAGE  = "info_page";
     public static final String XML_DATA   = "xml_data";
-    public static final String NETCDF     = "netcdf";
+    public static final String NETCDF_3   = "netcdf";
+    public static final String NETCDF_4   = "netcdf-4";
     public static final String GEOTIFF    = "geotiff";
     public static final String GMLJP2     = "jpeg2000";
 
@@ -192,7 +199,7 @@ public class BesApi {
          * @throws java.io.IOException               .
          * @throws opendap.ppt.PPTException              .
          */
-        public boolean writeDataDDX(String dataSource,
+        public boolean writeDap4Data(String dataSource,
                                     String constraintExpression,
                                     String xdap_accept,
                                     int maxResponseSize,
@@ -205,7 +212,7 @@ public class BesApi {
 
             return besTransaction(
                     dataSource,
-                    getDataDDXRequest(dataSource,
+                    getDap4DataRequest(dataSource,
                             constraintExpression,
                             xdap_accept,
                             maxResponseSize,
@@ -225,12 +232,29 @@ public class BesApi {
             throws PPTException,
             BadConfigurationException,
             IOException,
-            JDOMException {
+            JDOMException, BESError {
 
-            return besTransaction(
-                    dataSource,
-                    getDDXRequest(dataSource,constraintExpression,xdap_accept, xmlBase),
-                    response);
+
+        ByteArrayOutputStream ddxString = new ByteArrayOutputStream();
+
+
+        boolean ret = writeDDX(dataSource,constraintExpression,xdap_accept,xmlBase,ddxString,ddxString);
+
+
+        SAXBuilder sb = new SAXBuilder();
+
+
+
+        Document ddx = sb.build(new ByteArrayInputStream(ddxString.toByteArray()));
+
+        response.detachRootElement();
+
+        response.setRootElement(ddx.detachRootElement());
+
+
+        return ret;
+
+
     }
 
     /**
@@ -372,7 +396,7 @@ public class BesApi {
     }
 
     /**
-     * Writes the NetCDF file out response for the dataSource to the passed
+     * Writes the NetCDF-3 file out response for the dataSource to the passed
      * stream.
      *
      * @param dataSource The requested DataSource
@@ -389,17 +413,51 @@ public class BesApi {
      * @throws IOException               .
      * @throws PPTException              .
      */
-    public boolean writeNetcdfFileOut(String dataSource,
-                                             String constraintExpression,
-                                            String xdap_accept,
-                                            int maxResponseSize,
-                                            OutputStream os,
-                                            OutputStream err)
+    public boolean writeNetcdf3FileOut(String dataSource,
+                                       String constraintExpression,
+                                       String xdap_accept,
+                                       int maxResponseSize,
+                                       OutputStream os,
+                                       OutputStream err)
             throws BadConfigurationException, BESError, IOException, PPTException {
 
         return besTransaction(
                 dataSource,
-                getNetcdfFileOutRequest(dataSource,constraintExpression,xdap_accept, maxResponseSize),
+                getNetcdfFile3OutRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
+                os,
+                err);
+    }
+
+
+    /**
+     * Writes the NetCDF-4 file out response for the dataSource to the passed
+     * stream.
+     *
+     * @param dataSource The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param maxResponseSize
+     * @param os         The Stream to which to write the response.
+     * @param err        The Stream to which to write errors returned
+     *                   by the BES.
+     * @return False if the BES returns an error, true otherwise.
+     * @throws BadConfigurationException .
+     * @throws BESError                  .
+     * @throws IOException               .
+     * @throws PPTException              .
+     */
+    public boolean writeNetcdf4FileOut(String dataSource,
+                                       String constraintExpression,
+                                       String xdap_accept,
+                                       int maxResponseSize,
+                                       OutputStream os,
+                                       OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getNetcdfFile4OutRequest(dataSource, constraintExpression, xdap_accept, maxResponseSize),
                 os,
                 err);
     }
@@ -1051,13 +1109,13 @@ public class BesApi {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public Document getDataDDXRequest(String dataSource,
-                                         String ce,
-                                         String xdap_accept,
-                                         int maxResponseSize,
-                                         String xmlBase,
-                                         String contentID,
-                                         String mimeBoundary)
+    public Document getDap4DataRequest(String dataSource,
+                                       String ce,
+                                       String xdap_accept,
+                                       int maxResponseSize,
+                                       String xmlBase,
+                                       String contentID,
+                                       String mimeBoundary)
             throws BadConfigurationException {
 
         Document reqDoc =
@@ -1163,11 +1221,21 @@ public class BesApi {
 
     }
 
-    public Document getNetcdfFileOutRequest(String dataSource, String ce, String xdap_accept, int maxResponseSize)
+    public Document getNetcdfFile3OutRequest(String dataSource, String ce, String xdap_accept, int maxResponseSize)
             throws BadConfigurationException {
 
 
-        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize, null,null,NETCDF,DAP2_ERRORS);
+        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize, null,null, NETCDF_3,DAP2_ERRORS);
+
+
+    }
+
+
+    public Document getNetcdfFile4OutRequest(String dataSource, String ce, String xdap_accept, int maxResponseSize)
+            throws BadConfigurationException {
+
+
+        return getRequestDocument(DAP2_DATA,dataSource,ce,xdap_accept,maxResponseSize, null,null, NETCDF_4,DAP2_ERRORS);
 
 
     }

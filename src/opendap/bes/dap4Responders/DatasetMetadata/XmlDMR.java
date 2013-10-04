@@ -104,9 +104,10 @@ public class XmlDMR extends Dap4Responder {
 
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-
         String xdap_accept = "3.2";
+
+
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
@@ -125,6 +126,15 @@ public class XmlDMR extends Dap4Responder {
         log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+        */
+
+        if(!besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

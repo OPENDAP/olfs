@@ -109,6 +109,15 @@ public class DDX extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        if(!besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+        /*
+
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
@@ -132,6 +141,7 @@ public class DDX extends Dap4Responder {
             os.write(msg.getBytes());
 
         }
+        */
 
 
 

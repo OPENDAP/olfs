@@ -230,13 +230,13 @@ public class BesGatewayApi extends BesApi {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
-    public Document getDataDDXRequest(String dataSource,
-                                         String ce,
-                                         String xdap_accept,
-                                         int maxResponseSize,
-                                         String xmlBase,
-                                         String contentID,
-                                         String mimeBoundary)
+    public Document getDap4DataRequest(String dataSource,
+                                       String ce,
+                                       String xdap_accept,
+                                       int maxResponseSize,
+                                       String xmlBase,
+                                       String contentID,
+                                       String mimeBoundary)
             throws BadConfigurationException {
 
         Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,maxResponseSize,xmlBase,null,null,XML_ERRORS);

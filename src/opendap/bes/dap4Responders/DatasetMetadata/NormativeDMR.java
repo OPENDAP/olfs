@@ -111,6 +111,8 @@ public class NormativeDMR extends Dap4Responder {
 
 
         String xdap_accept = "3.2";
+
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
@@ -134,6 +136,15 @@ public class NormativeDMR extends Dap4Responder {
             os.write(msg.getBytes());
 
         }
+        */
+
+        if(!besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
 
 
 

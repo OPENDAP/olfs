@@ -27,6 +27,7 @@ package opendap.webstart;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmNode;
+import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.*;
@@ -538,7 +539,7 @@ public class WebStartServlet extends HttpServlet {
 
 
 
-    public Document getDDX(String serverURL, String dapService, String datasetID) throws IOException, PPTException, BadConfigurationException, SaxonApiException, JDOMException {
+    public Document getDDX(String serverURL, String dapService, String datasetID) throws IOException, PPTException, BadConfigurationException, BESError, SaxonApiException, JDOMException {
 
 
 

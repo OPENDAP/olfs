@@ -118,6 +118,7 @@ public class Ascii extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.ASCII,
@@ -136,6 +137,17 @@ public class Ascii extends Dap4Responder {
             besError.sendErrorResponse(_systemPath,context, response);
             log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
         }
+        */
+
+
+        if(!besApi.writeASCII(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+
+            BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
+            besError.sendErrorResponse(_systemPath,context, response);
+            log.error("respondToHttpGetRequest() encountered a BESError: "+besError.getMessage());
+        }
+
+
 
 
         os.flush();

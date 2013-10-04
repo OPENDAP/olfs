@@ -119,6 +119,7 @@ public class Netcdf4DR extends Dap4Responder{
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DAP2_DATA,
@@ -137,6 +138,14 @@ public class Netcdf4DR extends Dap4Responder{
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
+            os.write(msg.getBytes());
+
+        }
+        */
+
+        if(!besApi.writeNetcdf4FileOut(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
             os.write(msg.getBytes());

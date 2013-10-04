@@ -119,6 +119,14 @@ public class DDS extends Dap4Responder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
+        if(!besApi.writeDDS(resourceID,constraintExpression,xdap_accept,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+        /*
         Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.DDS,
                                                         resourceID,
@@ -136,7 +144,7 @@ public class DDS extends Dap4Responder {
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
         }
-
+         */
 
         os.flush();
         log.debug("Sent DAP DDS.");

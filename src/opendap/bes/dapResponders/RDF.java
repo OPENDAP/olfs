@@ -98,6 +98,8 @@ public class RDF extends Dap4Responder {
 
 
         String xdap_accept = "3.2";
+
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
@@ -114,13 +116,10 @@ public class RDF extends Dap4Responder {
 
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
+*/
         Document ddx = new Document();
-        if(!besApi.besTransaction(resourceID,reqDoc,ddx)){
-            BESError besError = new BESError(xmlo.outputString(ddx));
-            besError.sendErrorResponse(_systemPath, context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError:\n" + xmlo.outputString(ddx));
-            return;
-        }
+
+        besApi.getDDXDocument(resourceID,constraintExpression,xdap_accept,xmlBase,ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 

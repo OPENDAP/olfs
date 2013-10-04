@@ -32,9 +32,6 @@ import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -119,6 +116,7 @@ public class Netcdf3DR extends Dap4Responder{
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
+        /*
 
         Document reqDoc =
                 besApi.getRequestDocument(
@@ -138,6 +136,16 @@ public class Netcdf3DR extends Dap4Responder{
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
         if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
+            os.write(msg.getBytes());
+
+        }
+        */
+
+
+
+        if(!besApi.writeNetcdf3FileOut(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: " + msg);
             os.write(msg.getBytes());

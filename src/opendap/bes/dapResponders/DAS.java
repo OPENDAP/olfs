@@ -109,6 +109,14 @@ public class DAS extends Dap4Responder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
+        if(!besApi.writeDAS(resourceID,constraintExpression,xdap_accept,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+        /*
 
         Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.DAS,
@@ -128,6 +136,7 @@ public class DAS extends Dap4Responder {
 
         }
 
+        */
 
         os.flush();
         log.debug("Sent DAP DAS.");

@@ -123,6 +123,14 @@ public class NetcdfFileOut extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
+        if(!besApi.writeDap2Data(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+        }
+
+
+        /*
 
         Document reqDoc =
                 besApi.getRequestDocument(
@@ -147,6 +155,7 @@ public class NetcdfFileOut extends Dap4Responder {
             os.write(msg.getBytes());
 
         }
+        */
 
 
 

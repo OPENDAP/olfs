@@ -107,8 +107,20 @@ public class HtmlDMR extends Dap4Responder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-
         String xdap_accept = "3.2";
+
+
+
+        if(!besApi.writeHTMLForm(resourceID,xdap_accept,xmlBase,os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+        /*
+
+
         Document reqDoc = besApi.getRequestDocument(
                                                         BesApi.HTML_FORM,
                                                         resourceID,
@@ -132,6 +144,8 @@ public class HtmlDMR extends Dap4Responder {
             os.write(msg.getBytes());
 
         }
+
+        */
 
 
 

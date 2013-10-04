@@ -129,16 +129,17 @@ public class NormativeDR extends Dap4Responder {
         OutputStream os = response.getOutputStream();
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
-        Document reqDoc = besApi.getDataDDXRequest(resourceID,
-                                                        constraintExpression,
-                                                        xdap_accept,
-                                                        user.getMaxResponseSize(),
-                                                        xmlBase,
-                                                        startID,
-                                                        mb.getBoundary());
+        /*
+        Document reqDoc = besApi.getDap4DataRequest(resourceID,
+                constraintExpression,
+                xdap_accept,
+                user.getMaxResponseSize(),
+                xmlBase,
+                startID,
+                mb.getBoundary());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        log.debug("BesApi.getDataDDXRequest() returned:\n "+xmlo.outputString(reqDoc));
+        log.debug("BesApi.getDap4DataRequest() returned:\n "+xmlo.outputString(reqDoc));
 
         if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
             String msg = new String(erros.toByteArray());
@@ -146,6 +147,28 @@ public class NormativeDR extends Dap4Responder {
             os.write(msg.getBytes());
 
         }
+        */
+
+
+        boolean worked = besApi.writeDap4Data(
+                resourceID,
+                constraintExpression,
+                xdap_accept,
+                user.getMaxResponseSize(),
+                xmlBase,startID,
+                mb.getBoundary(),
+                os,
+                erros);
+
+
+        if(!worked){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+
 
 
         os.flush();

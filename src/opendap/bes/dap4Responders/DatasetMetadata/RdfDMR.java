@@ -99,11 +99,12 @@ public class RdfDMR extends Dap4Responder {
         String xmlBase = getXmlBase(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
+        String constraintExpression = ReqInfo.getConstraintExpression(request);
 
 
         BesApi besApi = getBesApi();
 
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
+        log.debug("sendNormativeRepresentation() - Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request, response, besApi);
@@ -115,6 +116,10 @@ public class RdfDMR extends Dap4Responder {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
         String xdap_accept = "3.2";
+
+        Document ddx = new Document();
+
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DDX,
@@ -131,17 +136,32 @@ public class RdfDMR extends Dap4Responder {
 
         log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
 
-        Document ddx = new Document();
         if(!besApi.besTransaction(resourceID,reqDoc,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
             besError.sendErrorResponse(_systemPath, context, response);
-            log.error("respondToHttpGetRequest() encountered a BESError:\n" + xmlo.outputString(ddx));
+            log.error("sendNormativeRepresentation() encountered a BESError:\n" + xmlo.outputString(ddx));
             return;
+        }
+        ddx.getRootElement().setAttribute("dataset_id",resourceID);
+        log.debug(xmlo.outputString(ddx));
+        */
+
+
+
+
+
+        if(!besApi.getDDXDocument(resourceID,constraintExpression,xdap_accept,xmlBase,ddx)){
+            BESError besError = new BESError(xmlo.outputString(ddx));
+            besError.sendErrorResponse(_systemPath, context, response);
+            log.error("sendNormativeRepresentation() - Encountered a BESError:\n" + xmlo.outputString(ddx));
+            return;
+
         }
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 
         log.debug(xmlo.outputString(ddx));
+
 
         ServletOutputStream os = response.getOutputStream();
         StreamSource ddxStreamSource  = new StreamSource(new ByteArrayInputStream(xmlo.outputString(ddx).getBytes()));

@@ -102,7 +102,7 @@ public class Dap2Data extends Dap4Responder {
         int maxRS = user.getMaxResponseSize();
 
 
-        log.debug("sendDAP2Data() For: " + resourceID+
+        log.debug("sendNormativeRepresentation() For: " + resourceID+
                 "    CE: '" + constraintExpression + "'");
 
         response.setContentType(getServiceMediaType());
@@ -123,6 +123,7 @@ public class Dap2Data extends Dap4Responder {
 
 
 
+        /*
         Document reqDoc =
                 besApi.getRequestDocument(
                         BesApi.DAP2_DATA,
@@ -142,9 +143,18 @@ public class Dap2Data extends Dap4Responder {
 
         }
 
+*/
+
+        if(!besApi.writeDap2Data(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+            String msg = new String(erros.toByteArray());
+            log.error("sendNormativeRepresentation() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
 
         os.flush();
-        log.info("Sent DAP2 data response.");
+        log.info("sendNormativeRepresentation() Sent DAP2 data response.");
 
 
 
