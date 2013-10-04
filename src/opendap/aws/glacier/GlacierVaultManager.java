@@ -39,6 +39,7 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -68,8 +69,18 @@ public class GlacierVaultManager {
     private File _resourceCacheDirectory;
 
 
-    private ConcurrentHashMap<String, GlacierRecord> _archiveRecords;
+    public static int DEFAULT_MAX_RECORDS_IN_MEMORY = 100;
+
+    private int _max_records;
+
+
+
+    //private ConcurrentHashMap<String, GlacierRecord> _archiveRecords;
     private ConcurrentHashMap<String, Index> _indexObjects;
+
+
+    private ConcurrentHashMap<String, ResourceId> _resourceIds;
+    private ConcurrentSkipListMap<ResourceId, GlacierRecord> _glacierRecords;
 
 
     public GlacierVaultManager(String vaultName, File glacierRootDir) throws IOException {
@@ -85,8 +96,12 @@ public class GlacierVaultManager {
         _archiveRecordsDirectory = mkDir(vaultDir,DefaultArchiveRecordsDirectoryName);
         _resourceCacheDirectory = mkDir(glacierRootDir,DefaultResourceCacheDirectoryName);
 
-        _archiveRecords = new ConcurrentHashMap<String, GlacierRecord>();
+        _resourceIds = new ConcurrentHashMap<String, ResourceId>();
+        _glacierRecords = new ConcurrentSkipListMap<ResourceId, GlacierRecord>();
+
         _indexObjects   = new ConcurrentHashMap<String, Index>();
+
+        _max_records = DEFAULT_MAX_RECORDS_IN_MEMORY;
     }
 
 
@@ -188,8 +203,13 @@ public class GlacierVaultManager {
     }
 
 
-    public GlacierRecord getArchiveRecord(String resourceId){
-        return _archiveRecords.get(resourceId);
+    public GlacierRecord getArchiveRecord(String resourceId) throws IOException, JDOMException {
+        ResourceId id = _resourceIds.get(resourceId);
+        if(id==null)
+            return loadArchiveRecord(resourceId);
+
+        id.updateLastAccessed();
+        return _glacierRecords.get(id);
     }
 
     public Index getIndex(String resourceId){
@@ -197,6 +217,8 @@ public class GlacierVaultManager {
     }
 
 
+
+    /*
     public void loadArchiveRecords() throws IOException, JDOMException {
 
         GlacierRecord gar;
@@ -211,9 +233,9 @@ public class GlacierVaultManager {
 
                     gar.createCacheFile(_resourceCacheDirectory);
 
-                    String resourceId = gar.getResourceId();
-
-                    _archiveRecords.put(resourceId,gar);
+                    ResourceId resourceId = new ResourceId(gar.getResourceId());
+                    _resourceIds.put(resourceId.toString(), resourceId);
+                    _glacierRecords.put(resourceId,gar);
                     _log.debug("Loaded Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
 
                 }
@@ -225,6 +247,43 @@ public class GlacierVaultManager {
             _log.debug("No archive records found for vault {}", name());
         }
 
+    }
+
+*/
+
+    private  GlacierRecord loadArchiveRecord(String resourceId) throws IOException, JDOMException {
+
+        GlacierRecord gar;
+
+        String baseFileName = AwsUtil.encodeKeyForFileSystemName(resourceId);
+
+        File archiveRecord = new File(getArchiveRecordsDir(),baseFileName);
+
+        if (archiveRecord.isFile()) {
+            gar = new GlacierRecord(archiveRecord);
+
+            gar.createCacheFile(_resourceCacheDirectory);
+
+            ResourceId rId = new ResourceId(gar.getResourceId());
+
+            while(_resourceIds.size() >= _max_records){
+                _log.debug("loadArchiveRecord() - Max Records limit reached. Unloading Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
+                ResourceId mostStaleId = _glacierRecords.firstKey();
+                _resourceIds.remove(mostStaleId.getId());
+                _glacierRecords.remove(mostStaleId);
+            }
+
+            _resourceIds.put(rId.toString(), rId);
+            _glacierRecords.put(rId,gar);
+            _log.debug("loadArchiveRecord() - Loaded Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
+            return gar;
+
+        }
+
+        _log.warn("loadArchiveRecord() - Could not locate Glacier Archive Record. vault: {} resourceId: {}", name(), resourceId);
+
+
+        return null;
     }
 
 
