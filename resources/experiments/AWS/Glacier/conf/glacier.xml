@@ -29,33 +29,14 @@
 
     <BesConfig>
         <BES>
-            <!-- The prefix is a URL token between server address/port
-            and catalog root used to designate a particular BES instance
-            in the case that multiple Back-End-Servers are available to
-            a single OLFS.  The default is no additional tag,
-            designated by "/". So, for a single BES the prefix MUST be
-            set to "/".  -->
             <prefix>/</prefix>
 
-            <!-- The hostname (or IP address) for this BES -->
             <host>localhost</host>
 
-            <!-- The port number for this BES -->
             <port>10022</port>
 
-            <!-- The Administration port number for this BES -->
-            <!-- <adminPort>11002</adminPort> -->
-
-            <!--
-                The maximum response size, in kilobytes, for non authenticated users
-                A value of zero means there is no limit.
-            -->
             <maxResponseSize>0</maxResponseSize>
 
-
-            <!-- The ClientPool maximum number of concurrent
-              -  BES client connections allowed.
-              -->
             <ClientPool maximum="10" maxCmds="2000" />
 
         </BES>

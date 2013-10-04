@@ -105,10 +105,10 @@ public class BesMetadataExtractor {
         Element metadata;
 
 
-        metadata = new Element("DDS", GlacierRecord.GlacierRecordNameSpace);
+        metadata = new Element(GlacierRecord.DDS, GlacierRecord.GlacierRecordNameSpace);
         metadata.setAttribute("type","dds");
 
-        gar.addMetaDataElement(metadata);
+        gar.addMetaDataElement(GlacierRecord.DDS,metadata);
 
         StringBuilder sysCmd = new StringBuilder();
 
@@ -125,9 +125,9 @@ public class BesMetadataExtractor {
         metadata.setText(result);
 
 
-        metadata = new Element("DAS", GlacierRecord.GlacierRecordNameSpace);
+        metadata = new Element(GlacierRecord.DAS, GlacierRecord.GlacierRecordNameSpace);
         metadata.setAttribute("type","das");
-        gar.addMetaDataElement(metadata);
+        gar.addMetaDataElement(GlacierRecord.DAS,metadata);
 
         sysCmd = new StringBuilder();
 
@@ -141,9 +141,9 @@ public class BesMetadataExtractor {
         metadata.setText(result);
 
 
-        metadata = new Element("DDX", GlacierRecord.GlacierRecordNameSpace);
+        metadata = new Element(GlacierRecord.DDX, GlacierRecord.GlacierRecordNameSpace);
         metadata.setAttribute("type","ddx");
-        gar.addMetaDataElement(metadata);
+        gar.addMetaDataElement(GlacierRecord.DDX,metadata);
 
 
         sysCmd = new StringBuilder();
@@ -217,7 +217,7 @@ public class BesMetadataExtractor {
                 break;
 
             case DDX:
-                bescmd = besApi.getDDXRequest(resourceID, "", "3.2","http://xmlbase");
+                bescmd = besApi.getDDXRequest(resourceID, "", "3.2","#XML_BASE#");
                 break;
 
             default:

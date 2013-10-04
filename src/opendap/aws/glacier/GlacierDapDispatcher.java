@@ -141,8 +141,10 @@ public class GlacierDapDispatcher extends DapDispatcher{
 
                 if(gar!=null){
 
+                    String ce = request.getQueryString();
 
-                    if( /* @todo TURN THIS ON WHEN OU GOT IT CACHED r.isMetadataResponder() || */ gar.resourceIsCached()){
+
+                    if( (ce==null && r.isMetadataResponder()) ||  gar.resourceIsCached()){
 
                         // If the request is for a metadata object, or if the resource is cached we know we should
                         // be able process the request.

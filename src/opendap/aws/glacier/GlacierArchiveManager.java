@@ -75,6 +75,9 @@ public class GlacierArchiveManager {
 
     public  static final String DefaultResourceCacheDirectoryName = "cache";
 
+    public static final String CONFIG_ELEMENT_GLACIER_ENDPOINT = "GlacierEndpoint";
+    public static final String CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT = "GlacierArchiveRootDirectory";
+
 
     private GlacierArchiveManager() {
         log = LoggerFactory.getLogger(this.getClass());
@@ -93,14 +96,14 @@ public class GlacierArchiveManager {
         }
 
 
-        Element glacierEndpointElement = config.getChild("GlacierEndpoint");
+        Element glacierEndpointElement = config.getChild(CONFIG_ELEMENT_GLACIER_ENDPOINT);
         if(glacierEndpointElement==null || glacierEndpointElement.getTextTrim().equals(""))
             throw new ConfigurationException("Configuration must contain a Glacier Endpoint URL");
         URL glacierEndpointUrl = new URL(glacierEndpointElement.getTextTrim());
         setGlacierEndpoint(glacierEndpointUrl.toString());
 
 
-        Element glacierArciveRootDirElement = config.getChild("GlacierArchiveRootDirectory");
+        Element glacierArciveRootDirElement = config.getChild(CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
         if(glacierArciveRootDirElement==null || glacierArciveRootDirElement.getTextTrim().equals(""))
             throw new ConfigurationException("Configuration must identify a top level directory for the Glacier archive using a GlacierArchiveRootDirectory element. ");
         setGlacierArchiveRootDirectory(glacierArciveRootDirElement.getTextTrim());
@@ -220,7 +223,7 @@ public class GlacierArchiveManager {
     }
 
 
-    public GlacierRecord getArchiveRecord(String vaultName, String resourceId){
+    public GlacierRecord getArchiveRecord(String vaultName, String resourceId) throws IOException, JDOMException {
         GlacierVaultManager gvm =  getVaultManager(vaultName);
         if(gvm==null)
             return null;
@@ -228,7 +231,7 @@ public class GlacierArchiveManager {
         return gvm.getArchiveRecord(resourceId);
     }
 
-    public GlacierRecord getArchiveRecord(String combinedVaultResourceId){
+    public GlacierRecord getArchiveRecord(String combinedVaultResourceId) throws IOException, JDOMException {
         String glacierVaultName = GlacierArchiveManager.theManager().getVaultName(combinedVaultResourceId);
 
         String resourceId  = combinedVaultResourceId.substring(glacierVaultName.length());
@@ -305,81 +308,10 @@ public class GlacierArchiveManager {
 
         }
         return vaultName;
+
     }
 
-
-/*
-
-// Moved to Glacier ingestor class NoaaResourceIngestor
-
-    public GlacierRecord addS3ObjectToGlacier(Credentials glacierCreds, S3Object s3Object ) throws JDOMException, IOException {
-
-
-        log.debug("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
-        log.debug("Uploading S3Object to Glacier:  ");
-        log.debug("S3 bucket name: {}", s3Object.getBucketName());
-        log.debug("        S3 key: {}", s3Object.getKey());
-
-
-        GlacierRecord gar;
-
-
-        String vaultName  = s3Object.getBucketName();
-        String resourceId = s3Object.getKey();
-
-        GlacierVaultManager gvm = makeVaultManagerIfNeeded(vaultName);
-
-        GlacierRecord cachedGar = gvm.getArchiveRecord(resourceId);
-        if(cachedGar!=null){
-            log.debug("Found cached archive record for  [vault: {}]  resourceId: {}",vaultName,resourceId);
-            gar = cachedGar;
-            // @todo Check last modified time of s3Object and of cached file. Update as needed (delete old glacier archive etc.)
-
-        }
-        else {
-            log.debug("Retrieving S3 Object.");
-            s3Object.cacheObjectToFile();
-            File cacheFile = s3Object.getCacheFile();
-            log.debug("Cache File:  " + cacheFile);
-            log.debug("Cache file size: " + cacheFile.length() + " bytes");
-
-            File targetDir = s3Object.getCacheDir();
-            gar = new GlacierRecord(vaultName,resourceId,"NOT_UPLOADED_TO_GLACIER");
-
-            try {
-                BesMetadataExtractor.extractMetadata(gar,targetDir, cacheFile);
-                log.info("Got metadata for {}",gar.getResourceId());
-            } catch (Exception e) {
-                log.error("Failed to extract metadata from {}. Msg: ",cacheFile.getName(),e.getMessage());
-                e.printStackTrace();
-            }
-
-
-
-            AmazonGlacierClient client = new AmazonGlacierClient(glacierCreds);
-            client.setEndpoint(getGlacierEndpoint());
-
-            ArchiveTransferManager atm = new ArchiveTransferManager(client, glacierCreds);
-
-            log.debug("Transferring cache file content to Glacier. vault: {}  description: {}",vaultName,resourceId);
-            UploadResult uploadResult = atm.upload(vaultName, resourceId, cacheFile);
-            String archiveId = uploadResult.getArchiveId();
-
-            gar.setArchiveId(archiveId);
-
-            addArchiveRecord(gar);
-            s3Object.deleteCacheFile();
-
-        }
-
-        return gar;
-    }
-
-*/
-
-
-
-    public void loadVaults() throws IOException, JDOMException {
+   public void loadVaults() throws IOException, JDOMException {
 
         GlacierVaultManager gvm;
 
@@ -400,7 +332,7 @@ public class GlacierArchiveManager {
                     if (vault.isDirectory()) {
                         gvm = new GlacierVaultManager(vaultName,gRootDir);
                         gvm.setParentContext(getGlacierServiceContext());
-                        gvm.loadArchiveRecords();
+                        // gvm.loadArchiveRecords();
                         gvm.loadIndexObjects();
                         _vaults.put(gvm.name(),gvm);
                     }

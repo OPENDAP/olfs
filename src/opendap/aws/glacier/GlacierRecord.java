@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,9 +59,13 @@ public class GlacierRecord implements Serializable {
 
     private String _resourceId;
 
-    private Vector<Element> _metadata = null;
+    private ConcurrentHashMap<String, Element> _metadata = null;
 
     private File _cacheFile;
+
+    public static final String DDS = "DDS";
+    public static final String DAS = "DAS";
+    public static final String DDX = "DDX";
 
 
     public static final Namespace GlacierRecordNameSpace = Namespace.getNamespace("gar","http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#");
@@ -73,14 +78,14 @@ public class GlacierRecord implements Serializable {
         setVaultName(vaultName);
         setResourceId(resourceId);
         setArchiveId(archiveId);
-        _metadata = new Vector<Element>();
+        _metadata = new ConcurrentHashMap<String, Element>();
     }
 
 
     public GlacierRecord(File archiveRecordFile) throws IOException, JDOMException {
         super();
         _log = LoggerFactory.getLogger(getClass());
-        _metadata = new Vector<Element>();
+        _metadata = new ConcurrentHashMap<String, Element>();
         loadArchiveRecordFromFile(archiveRecordFile);
     }
 
@@ -106,13 +111,18 @@ public class GlacierRecord implements Serializable {
         _resourceId = resourceId;
     }
 
-    public void addMetaDataElement(Element metadata){
-        _metadata.add(metadata);
+    public void addMetaDataElement(String key, Element metadata){
+        _metadata.put(key,metadata);
     }
 
-    public Element[] getMetaDataElements(){
+
+    public Element getMetadataElement(String key){
+        return _metadata.get(key);
+    }
+
+    private Element[] getMetaDataElements(){
         Element[] metadata = new Element[_metadata.size()];
-        metadata = _metadata.toArray(metadata);
+        metadata = _metadata.values().toArray(metadata);
         return metadata;
     }
 
@@ -199,17 +209,28 @@ public class GlacierRecord implements Serializable {
 
 
         // Load Metadata Elements
-        Vector<Element> metadataElements = new Vector<Element>();
-        List children  = archiveRecordElement.getChildren();
-        for(Object o: children){
-            Element e = (Element)o;
-            metadataElements.add(e);
+
+        Element e;
+
+        e = archiveRecordElement.getChild(DDS,GlacierRecordNameSpace);
+        if(e!=null){
+            e.detach();
+            addMetaDataElement(DDS,e);
         }
 
-        for(Element e: metadataElements){
+        e = archiveRecordElement.getChild(DAS,GlacierRecordNameSpace);
+        if(e!=null){
             e.detach();
-            addMetaDataElement(e);
+            addMetaDataElement(DAS,e);
         }
+
+        e = archiveRecordElement.getChild(DDX,GlacierRecordNameSpace);
+        if(e!=null){
+            e.detach();
+            addMetaDataElement(DDX,e);
+        }
+
+
 
     }
 

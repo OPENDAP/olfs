@@ -36,6 +36,7 @@ import opendap.coreServlet.Util;
 import opendap.noaa_s3.S3Index;
 import opendap.noaa_s3.S3IndexedFile;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -54,6 +55,30 @@ import java.util.Vector;
 public class NoaaResourceIngester {
 
 
+
+    public static Element getSimpleGlacierArchiveConfig(String glacierEndpoint, String glacierArchiveRootDir){
+        Element  glacierConfig = new Element("config");
+
+
+        Element e;
+
+
+        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ENDPOINT);
+        e.setText(glacierEndpoint);
+        glacierConfig.addContent(e);
+
+        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
+        e.setText(glacierArchiveRootDir);
+        glacierConfig.addContent(e);
+
+
+
+
+        return glacierConfig;
+    }
+
+
+
     public static void main(String[] args)  {
 
 
@@ -61,17 +86,28 @@ public class NoaaResourceIngester {
 
         System.out.println("===========================================");
 
-        String s3CacheRoot = "/Users/ndp/scratch/s3Test";
+        String s3CacheRoot        = "/Users/ndp/scratch/s3Test";
         //String noaaS3BucketName = "ocean-archive.data.nodc.noaa.gov";
-        String noaaS3BucketName = "foo-s3cmd.nodc.noaa.gov";
+        String noaaS3BucketName   = "foo-s3cmd.nodc.noaa.gov";
 
-        String glacierEndpoint = "https://glacier.us-east-1.amazonaws.com/";
+        String glacierEndpoint    = "https://glacier.us-east-1.amazonaws.com/";
+        String glacierArchiveRoot =  "/Users/ndp/scratch/glacier";
 
-        String besPrefix = "/Users/ndp/hyrax/trunk";
+        String besInstallPrefix          = "/Users/ndp/hyrax/trunk";
 
-        BesMetadataExtractor.init(besPrefix);
+        BesMetadataExtractor.init(besInstallPrefix);
+
+
+
+        Element glacierConfig = getSimpleGlacierArchiveConfig(glacierEndpoint,glacierArchiveRoot);
+
+
+
+
+
+
         try {
-            GlacierArchiveManager.theManager().init(null);
+            GlacierArchiveManager.theManager().init(glacierConfig);
 
 
             S3Index topLevelIndex = new S3Index(noaaS3BucketName,"//index.xml",s3CacheRoot);

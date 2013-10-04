@@ -109,7 +109,6 @@ public class DapServlet extends HttpServlet {
          *
          */
         Element glacierServiceConfiguration = _configDoc.getRootElement();
-        //Element besConfiguration = getDefaultBesManagerConfig();
         Element besConfiguration = glacierServiceConfiguration.getChild("BesConfig");
 
 
