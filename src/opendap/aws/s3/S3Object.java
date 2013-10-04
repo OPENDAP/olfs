@@ -54,6 +54,7 @@ public class S3Object extends RemoteResource {
     private String _key = null;
 
     private File _cacheFile = null;
+    private File _cacheDir  = null;
 
 
     protected S3Object(){
@@ -117,6 +118,12 @@ public class S3Object extends RemoteResource {
 
     }
 
+    public File getCacheDir() throws IOException {
+
+        return _cacheDir;
+
+    }
+
     private File makeCacheFile() throws IOException {
 
         if(_cacheFile!=null)
@@ -129,10 +136,12 @@ public class S3Object extends RemoteResource {
 
         _log.debug("getCacheFile() - s3RootDir: '{}'", s3RootDir);
 
-        File bucketDir = new File(s3RootDir,getBucketName());
-        _log.debug("getCacheFile() - bucketDir: '{}'", bucketDir);
+        File cacheDir = new File(s3RootDir,getBucketName());
+        _log.debug("getCacheFile() - bucketDir: '{}'", cacheDir);
 
-        _cacheFile = new File(bucketDir, AwsUtil.encodeKeyForFileSystemName(getKey()));
+        _cacheDir = cacheDir;
+
+        _cacheFile = new File(cacheDir, AwsUtil.encodeKeyForFileSystemName(getKey()));
         _log.debug("getCacheFile() - cacheFile: '{}'", _cacheFile);
 
         return _cacheFile;

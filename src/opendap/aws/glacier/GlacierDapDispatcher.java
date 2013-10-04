@@ -213,7 +213,7 @@ public class GlacierDapDispatcher extends DapDispatcher{
                         // Probably should stop catching the exceptions below and let them propagate up...
 
 
-                        sendDap4Error(response, "Somethings borked in the Async Service", request.getContextPath()+"/", "");
+                        sendDap4Error(response, "Something's borked in the Async Service", request.getContextPath()+"/", "");
                         return true;
 
                     }

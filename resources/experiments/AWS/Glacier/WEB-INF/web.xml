@@ -140,24 +140,20 @@
   <!--   page in the Tomcat documentation.                                  -->
 
 
-    <servlet>
-        <servlet-name>catalog</servlet-name>
-        <servlet-class>opendap.aws.glacier.CatalogServlet</servlet-class>
-        <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value>false</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
 
     <servlet>
         <servlet-name>dap</servlet-name>
         <servlet-class>opendap.aws.glacier.DapServlet</servlet-class>
         <init-param>
-            <param-name>DebugOn</param-name>
-            <param-value>false</param-value>
+            <param-name>ConfigFileName</param-name>
+            <param-value>glacier.xml</param-value>
         </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>catalog</servlet-name>
+        <servlet-class>opendap.aws.glacier.CatalogServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

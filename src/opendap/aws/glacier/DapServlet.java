@@ -29,16 +29,23 @@ package opendap.aws.glacier;
 import opendap.bes.BESManager;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.Scrub;
+import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
 import opendap.noaa_s3.S3DapDispatchHandler;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -62,6 +69,7 @@ public class DapServlet extends HttpServlet {
 
     private GlacierDapDispatcher _glacierDapDispatcher;
 
+    private Document _configDoc;
 
 
 
@@ -87,14 +95,22 @@ public class DapServlet extends HttpServlet {
         _servletContext = this.getServletContext().getContextPath();
 
 
+        loadConfig();
+
+
+
+
+
+
         /**
          * ###########################################################################
          *
          * These things could be in a configuration file
          *
          */
-        Element config = null;
-        Element besConfiguration = getDefaultBesManagerConfig();
+        Element glacierServiceConfiguration = _configDoc.getRootElement();
+        //Element besConfiguration = getDefaultBesManagerConfig();
+        Element besConfiguration = glacierServiceConfiguration.getChild("BesConfig");
 
 
         /**
@@ -104,7 +120,7 @@ public class DapServlet extends HttpServlet {
 
 
         try {
-            GlacierArchiveManager.theManager().init(config);
+            GlacierArchiveManager.theManager().init(glacierServiceConfiguration);
         } catch (IOException e) {
             String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
             e.printStackTrace();
@@ -131,16 +147,82 @@ public class DapServlet extends HttpServlet {
          * ###########################################################################
          */
 
-
-
-
-
-
-
-
-
         _initialized = true;
     }
+
+
+
+
+    /**
+     * Loads the configuration file specified in the servlet parameter
+     * OLFSConfigFileName.
+     *
+     * @throws ServletException When the file is missing, unreadable, or fails
+     *                          to parse (as an XML document).
+     */
+    private void loadConfig() throws ServletException {
+
+        String basename = getInitParameter("ConfigFileName");
+        if (basename == null) {
+            String msg = "Servlet configuration must include a file name for " +
+                    "the Glacier Service configuration!\n";
+            System.err.println(msg);
+            throw new ServletException(msg);
+        }
+
+        String filename = Scrub.fileName(ServletUtil.getContentPath(this) + basename);
+
+
+        File confFile = new File(filename);
+
+        if(!confFile.exists()){
+            filename = Scrub.fileName(ServletUtil.getSystemPath(this,"conf") + "/" + basename);
+            confFile = new File(filename);
+        }
+
+
+
+        _log.debug("Loading Configuration File: " + filename);
+
+        try {
+
+
+
+            FileInputStream fis = new FileInputStream(confFile);
+
+            try {
+                // Parse the XML doc into a Document object.
+                SAXBuilder sb = new SAXBuilder();
+                _configDoc = sb.build(fis);
+            }
+            finally {
+            	fis.close();
+            }
+
+        } catch (FileNotFoundException e) {
+            String msg = "loadConfig() - The configuration file \"" + filename + "\" cannot be found.";
+            _log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (IOException e) {
+            String msg = "loadConfig() - The configuration file \"" + filename + "\" is not readable.";
+            _log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (JDOMException e) {
+            String msg = "loadConfig() - The configuration file \"" + filename + "\" cannot be parsed.";
+            _log.error(msg);
+            throw new ServletException(msg, e);
+        }
+
+        _log.debug("Configuration loaded and parsed.");
+
+    }
+
+
+
+
+
+
+
 
     Element getDefaultDapDispatchConfig() {
         Element config = new Element("config");
@@ -151,7 +233,7 @@ public class DapServlet extends HttpServlet {
     }
 
 
-    Element getDefaultBesManagerConfig() {
+    public static Element getDefaultBesManagerConfig() {
 
         Element e;
         Element handler = new Element("Handler");

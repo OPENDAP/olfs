@@ -29,18 +29,17 @@ package opendap.aws.glacier;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
 import com.amazonaws.services.glacier.transfer.UploadResult;
-import opendap.aws.AwsUtil;
 import opendap.aws.auth.Credentials;
 import opendap.aws.s3.S3Object;
+import opendap.bes.BadConfigurationException;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -93,20 +92,29 @@ public class GlacierArchiveManager {
             return;
         }
 
-        setGlacierEndpoint("https://glacier.us-east-1.amazonaws.com/");
 
-        setGlacierArchiveRootDirectory("/Users/ndp/scratch/glacier");
+        Element glacierEndpointElement = config.getChild("GlacierEndpoint");
+        if(glacierEndpointElement==null || glacierEndpointElement.getTextTrim().equals(""))
+            throw new ConfigurationException("Configuration must contain a Glacier Endpoint URL");
+        URL glacierEndpointUrl = new URL(glacierEndpointElement.getTextTrim());
+        setGlacierEndpoint(glacierEndpointUrl.toString());
+
+
+        Element glacierArciveRootDirElement = config.getChild("GlacierArchiveRootDirectory");
+        if(glacierArciveRootDirElement==null || glacierArciveRootDirElement.getTextTrim().equals(""))
+            throw new ConfigurationException("Configuration must identify a top level directory for the Glacier archive using a GlacierArchiveRootDirectory element. ");
+        setGlacierArchiveRootDirectory(glacierArciveRootDirElement.getTextTrim());
 
         setParentContext("");
 
         loadVaults();
-
-
-        DownloadManager.theManager().init(config);
+        DownloadManager.theManager().init(getResourceCacheDir());
 
 
         isInitialized = true;
     }
+
+
 
     public String getGlacierEndpoint(){
         return _galcierEndpoint;
@@ -126,7 +134,7 @@ public class GlacierArchiveManager {
     }
 
     public String getDapServiceContext(String resourceId){
-        String dapServiceForVault =  getDapServiceContext() +"/"+ getVaultName(resourceId);
+        String dapServiceForVault =  getDapServiceContext() +_pathDelimiter+ getVaultName(resourceId);
 
         return dapServiceForVault ;
     }
@@ -137,7 +145,7 @@ public class GlacierArchiveManager {
 
     public String getCatalogServiceContext(String resourceId){
 
-        String catalogServiceForVault =  getCatalogServiceContext() +"/"+ getVaultName(resourceId);
+        String catalogServiceForVault =  getCatalogServiceContext() +_pathDelimiter+ getVaultName(resourceId);
 
         return catalogServiceForVault ;
     }
@@ -300,11 +308,12 @@ public class GlacierArchiveManager {
     }
 
 
+/*
 
+// Moved to Glacier ingestor class NoaaResourceIngestor
 
     public GlacierRecord addS3ObjectToGlacier(Credentials glacierCreds, S3Object s3Object ) throws JDOMException, IOException {
 
-        Logger log = LoggerFactory.getLogger(GlacierRecord.class);
 
         log.debug("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
         log.debug("Uploading S3Object to Glacier:  ");
@@ -334,6 +343,18 @@ public class GlacierArchiveManager {
             log.debug("Cache File:  " + cacheFile);
             log.debug("Cache file size: " + cacheFile.length() + " bytes");
 
+            File targetDir = s3Object.getCacheDir();
+            gar = new GlacierRecord(vaultName,resourceId,"NOT_UPLOADED_TO_GLACIER");
+
+            try {
+                BesMetadataExtractor.extractMetadata(gar,targetDir, cacheFile);
+                log.info("Got metadata for {}",gar.getResourceId());
+            } catch (Exception e) {
+                log.error("Failed to extract metadata from {}. Msg: ",cacheFile.getName(),e.getMessage());
+                e.printStackTrace();
+            }
+
+
 
             AmazonGlacierClient client = new AmazonGlacierClient(glacierCreds);
             client.setEndpoint(getGlacierEndpoint());
@@ -343,7 +364,8 @@ public class GlacierArchiveManager {
             log.debug("Transferring cache file content to Glacier. vault: {}  description: {}",vaultName,resourceId);
             UploadResult uploadResult = atm.upload(vaultName, resourceId, cacheFile);
             String archiveId = uploadResult.getArchiveId();
-            gar = new GlacierRecord(vaultName,resourceId,archiveId);
+
+            gar.setArchiveId(archiveId);
 
             addArchiveRecord(gar);
             s3Object.deleteCacheFile();
@@ -352,6 +374,10 @@ public class GlacierArchiveManager {
 
         return gar;
     }
+
+*/
+
+
 
     public void loadVaults() throws IOException, JDOMException {
 
@@ -372,7 +398,6 @@ public class GlacierArchiveManager {
                     log.debug("loadVaults(): Loading vault: {} vaultName: {}",vault, vaultName);
 
                     if (vault.isDirectory()) {
-
                         gvm = new GlacierVaultManager(vaultName,gRootDir);
                         gvm.setParentContext(getGlacierServiceContext());
                         gvm.loadArchiveRecords();

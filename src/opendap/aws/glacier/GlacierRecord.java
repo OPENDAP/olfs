@@ -63,7 +63,7 @@ public class GlacierRecord implements Serializable {
     private File _cacheFile;
 
 
-    public static final Namespace glacierRecordNameSpace = Namespace.getNamespace("gar","http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#");
+    public static final Namespace GlacierRecordNameSpace = Namespace.getNamespace("gar","http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#");
 
 
     public GlacierRecord(String vaultName, String resourceId, String archiveId) {
@@ -127,23 +127,23 @@ public class GlacierRecord implements Serializable {
      * @return
      */
     public Element getArchiveRecordElement(){
-        Element index = new Element("GlacierRecord", glacierRecordNameSpace);
+        Element glacierRecord = new Element("GlacierRecord", GlacierRecordNameSpace);
 
-        index.setAttribute("resourceId",getResourceId());
-        index.setAttribute("vault",getVaultName());
-        index.setAttribute("archiveId",getArchiveId());
+        glacierRecord.setAttribute("resourceId", getResourceId());
+        glacierRecord.setAttribute("vault", getVaultName());
+        glacierRecord.setAttribute("archiveId", getArchiveId());
 
         if(_cacheFile!=null)
-            index.setAttribute("cacheFile",getCacheFile().getAbsolutePath());
+            glacierRecord.setAttribute("cacheFile",getCacheFile().getAbsolutePath());
 
         Element[] metadataElements = getMetaDataElements();
 
         if(metadataElements.length>0){
             for(Element mde: metadataElements)
-                index.addContent(mde);
+                glacierRecord.addContent((Element)mde.clone());
         }
 
-        return index;
+        return glacierRecord;
 
     }
 
@@ -199,11 +199,16 @@ public class GlacierRecord implements Serializable {
 
 
         // Load Metadata Elements
+        Vector<Element> metadataElements = new Vector<Element>();
         List children  = archiveRecordElement.getChildren();
         for(Object o: children){
-            Element metadataElement = (Element)o;
-            metadataElement.detach();
-            addMetaDataElement(metadataElement);
+            Element e = (Element)o;
+            metadataElements.add(e);
+        }
+
+        for(Element e: metadataElements){
+            e.detach();
+            addMetaDataElement(e);
         }
 
     }
@@ -223,8 +228,9 @@ public class GlacierRecord implements Serializable {
         _log.debug("getCacheFile() - Cache Dir: '{}'",resourceCacheDirectory);
 
         String cacheFileName =  getVaultName() + getResourceId();
+        cacheFileName = AwsUtil.encodeKeyForFileSystemName(cacheFileName);
 
-        File cacheFile = new File(resourceCacheDirectory, AwsUtil.encodeKeyForFileSystemName(cacheFileName));
+        File cacheFile = new File(resourceCacheDirectory, cacheFileName);
         _log.debug("getCacheFile() - cacheFile: '{}'", cacheFile);
 
         if(cacheFile.exists() && !cacheFile.canWrite())

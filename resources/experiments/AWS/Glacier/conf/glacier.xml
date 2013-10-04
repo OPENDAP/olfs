@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /////////////////////////////////////////////////////////////////////////////
+  ~ // This file is part of the "Hyrax Data Server" project.
+  ~ //
+  ~ //
+  ~ // Copyright (c) 2013 OPeNDAP, Inc.
+  ~ // Author: Nathan David Potter  <ndp@opendap.org>
+  ~ //
+  ~ // This library is free software; you can redistribute it and/or
+  ~ // modify it under the terms of the GNU Lesser General Public
+  ~ // License as published by the Free Software Foundation; either
+  ~ // version 2.1 of the License, or (at your option) any later version.
+  ~ //
+  ~ // This library is distributed in the hope that it will be useful,
+  ~ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ // Lesser General Public License for more details.
+  ~ //
+  ~ // You should have received a copy of the GNU Lesser General Public
+  ~ // License along with this library; if not, write to the Free Software
+  ~ // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  ~ //
+  ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
+  ~ /////////////////////////////////////////////////////////////////////////////
+  -->
+
+<GlacierService>
+
+    <BesConfig>
+        <BES>
+            <!-- The prefix is a URL token between server address/port
+            and catalog root used to designate a particular BES instance
+            in the case that multiple Back-End-Servers are available to
+            a single OLFS.  The default is no additional tag,
+            designated by "/". So, for a single BES the prefix MUST be
+            set to "/".  -->
+            <prefix>/</prefix>
+
+            <!-- The hostname (or IP address) for this BES -->
+            <host>localhost</host>
+
+            <!-- The port number for this BES -->
+            <port>10022</port>
+
+            <!-- The Administration port number for this BES -->
+            <!-- <adminPort>11002</adminPort> -->
+
+            <!--
+                The maximum response size, in kilobytes, for non authenticated users
+                A value of zero means there is no limit.
+            -->
+            <maxResponseSize>0</maxResponseSize>
+
+
+            <!-- The ClientPool maximum number of concurrent
+              -  BES client connections allowed.
+              -->
+            <ClientPool maximum="10" maxCmds="2000" />
+
+        </BES>
+
+    </BesConfig>
+
+    <GlacierEndpoint>https://glacier.us-east-1.amazonaws.com/</GlacierEndpoint>
+
+    <GlacierArchiveRootDirectory>/Users/ndp/scratch/glacier</GlacierArchiveRootDirectory>
+
+
+</GlacierService>
+

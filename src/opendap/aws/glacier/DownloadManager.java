@@ -27,7 +27,6 @@
 package opendap.aws.glacier;
 
 import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
-import com.amazonaws.services.glacier.model.*;
 import opendap.aws.auth.Credentials;
 import opendap.coreServlet.ServletUtil;
 import org.jdom.Element;
@@ -39,7 +38,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.*;
-import java.util.Date;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,7 +60,7 @@ public class DownloadManager {
     private WorkerThread worker;
     private Thread workerThread;
 
-    private File _workingDir;
+    private File _targetDir;
 
     private String  _activeDownloadBackupFileName;
 
@@ -97,7 +95,7 @@ public class DownloadManager {
     }
 
 
-    public void init(Element config) throws IOException, JDOMException {
+    public void init(File targetDir) throws IOException, JDOMException {
 
         _downloadLock.lock();
         try {
@@ -106,7 +104,7 @@ public class DownloadManager {
                 return;
             }
 
-            setWorkingDirectory("/Users/ndp/scratch/glacier");
+            _targetDir = targetDir;
 
             loadActiveDownloads();
 
@@ -209,7 +207,7 @@ public class DownloadManager {
     private void saveActiveDownloads() throws IOException {
 
 
-        File backup = new File(_workingDir,_activeDownloadBackupFileName);
+        File backup = new File(_targetDir,_activeDownloadBackupFileName);
 
         FileOutputStream fos = new FileOutputStream(backup);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -222,7 +220,7 @@ public class DownloadManager {
     private void loadActiveDownloads() throws IOException {
 
 
-        File backup = new File(_workingDir,_activeDownloadBackupFileName);
+        File backup = new File(_targetDir,_activeDownloadBackupFileName);
 
         if(backup.exists()){
             FileInputStream fis = new FileInputStream(backup);
@@ -252,19 +250,19 @@ public class DownloadManager {
     }
 
 
-    private void setWorkingDirectory(String workingDirName) throws IOException {
+    private void setTargetDirectory(String targetDirName) throws IOException {
 
-        if(workingDirName==null)
+        if(targetDirName==null)
             throw new IOException("Working directory name was null valued.");
 
 
-        File workingDir = new File(workingDirName);
-        if(!workingDir.exists() && !workingDir.mkdirs()){
-            throw new IOException("setWorkingDirectory(): Unable to create working directory: "+workingDir);
+        File targetDir = new File(targetDirName);
+        if(!targetDir.exists() && !targetDir.mkdirs()){
+            throw new IOException("setTargetDirectory(): Unable to create working directory: "+targetDir);
         }
-        _workingDir = workingDir;
+        _targetDir = targetDir;
 
-        _log.info("setWorkingDirectory() - Working directory set to {}",_workingDir.getName());
+        _log.info("setTargetDirectory() - Working directory set to {}", _targetDir.getName());
 
     }
 
