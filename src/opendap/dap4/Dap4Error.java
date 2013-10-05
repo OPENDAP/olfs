@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package org.opendap.dap4;
+package opendap.dap4;
 
 import opendap.coreServlet.HttpResponder;
 import opendap.namespaces.DAP4;
@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 
 /**
@@ -76,7 +77,7 @@ ns="http://xml.opendap.org/ns/DAP/4.0#"
  *
  *
  * */
-public class Error {
+public class Dap4Error {
 
 
 
@@ -96,7 +97,7 @@ public class Error {
 
 
 
-    public Error(){
+    public Dap4Error(){
 
         setHttpCode(-1);
         message = null;
@@ -104,7 +105,7 @@ public class Error {
         otherInfo = null;
     }
 
-    public Error(String msg) {
+    public Dap4Error(String msg) {
 
 
         setHttpCode(-1);
@@ -115,7 +116,7 @@ public class Error {
     }
 
 
-    public Error(Document error) {
+    public Dap4Error(Document error) {
 
         Iterator i = error.getDescendants(new ElementFilter(DAP4.ERROR, DAP4.NS));
 
@@ -131,7 +132,7 @@ public class Error {
 
     }
 
-    public Error(Element error) {
+    public Dap4Error(Element error) {
 
         errorDoc = new Document(error);
         ingestError(error);
@@ -139,7 +140,7 @@ public class Error {
 
     }
 
-    public Error( InputStream is) {
+    public Dap4Error( InputStream is) {
         SAXBuilder sb = new SAXBuilder();
 
         try {
@@ -243,24 +244,45 @@ public class Error {
     }
 
 
+    public Element getErrorElement(){
+        Element error = new Element("Error",DAP4.NS);
+
+        error.setAttribute("httpcode",getHttpCode()+"");
+
+        Element e = new Element("Message",DAP4.NS);
+        e.setText(getMessage());
+        error.addContent(e);
+
+        e = new Element("Context",DAP4.NS);
+        e.setText(getContext());
+        error.addContent(e);
+
+        e = new Element("OtherInformation",DAP4.NS);
+        e.setText(getOtherInformation());
+        error.addContent(e);
 
 
+
+        return error;
+    }
+
+    public Document getErrorDocument(){
+         return new Document(getErrorElement());
+    }
+
+
+    public void print(OutputStream os) throws IOException {
+        os.write(toString().getBytes());
+    }
 
 
 
     public  String toString() {
 
-        StringBuilder msg = new StringBuilder();
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-        msg.append("[dap4:Error ");
-        msg.append("[httpcode(").append(getHttpCode()).append(")]");
-        msg.append("[Message(").append(getHttpCode()).append(")]");
-        msg.append("[Context(").append(getHttpCode()).append(")]");
-        msg.append("[OtherInformation:  ").append(getHttpCode()).append(")]");
-        msg.append("]");
+        return xmlo.outputString(getErrorDocument());
 
-
-        return msg.toString();
     }
 
 

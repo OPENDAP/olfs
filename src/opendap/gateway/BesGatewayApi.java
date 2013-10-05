@@ -31,6 +31,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
+import opendap.dap4.Dap4Error;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
 import org.apache.commons.httpclient.Header;
@@ -346,7 +347,7 @@ public class BesGatewayApi extends BesApi {
 
             if (statusCode != HttpStatus.SC_OK) {
                 log.error("Unable to HEAD s3 object: " + dataSourceUrl);
-                org.opendap.dap4.Error error = new org.opendap.dap4.Error();
+                Dap4Error error = new Dap4Error();
                 error.setMessage("OLFS: Unable to access requested resource.");
                 error.setContext(dataSourceUrl);
                 error.setHttpCode(statusCode);

@@ -35,6 +35,7 @@ import opendap.aws.s3.S3Object;
 import opendap.coreServlet.Util;
 import opendap.noaa_s3.S3Index;
 import opendap.noaa_s3.S3IndexedFile;
+import org.apache.commons.cli.*;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -55,107 +56,175 @@ import java.util.Vector;
 public class NoaaResourceIngester {
 
 
+    private static String s3Root = null;
 
-    public static Element getSimpleGlacierArchiveConfig(String glacierEndpoint, String glacierArchiveRootDir){
-        Element  glacierConfig = new Element("config");
+    private static String s3BucketName = null;
 
+    private static String glacierEndpointUrl =  null;
 
-        Element e;
+    private static String glacierArchiveRoot = null;
 
+    private static String besInstallPrefix = null;
 
-        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ENDPOINT);
-        e.setText(glacierEndpoint);
-        glacierConfig.addContent(e);
-
-        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
-        e.setText(glacierArchiveRootDir);
-        glacierConfig.addContent(e);
+    private static boolean useDefaults = false;
 
 
+    private static boolean processCommandline(String[] args) throws ParseException {
+
+        CommandLineParser parser = new PosixParser();
+
+        Options options = new Options();
+
+        options.addOption("h", "help", true, "Usage information.");
+        options.addOption("s", "s3-root", true, "Top level directory for the S3 cache.");
+
+        options.addOption("n", "s3-bucket-name", true, "Name of S3 bucket whose contents will be used to build a Glacier archive.");
+
+        options.addOption("d", "use-defaults", false, "Use the baked in default values for everything (only works on my development machine). This overrides any other options set on the commandline.");
 
 
-        return glacierConfig;
+        options.addOption("e", "glacier-endpoint-url", true , "The Glacier endpoint URL.");
+
+        options.addOption("a", "glacier-archive-root", true, "Top level directory for the Glacier Archive Database");
+        // options.addOption("d", "dir", true, "Write eml files to this directory.");
+
+        options.addOption("b", "bes-install-prefix", true, "The prefix used when installing the BES and libdap.");
+
+        CommandLine line =   parser.parse(options, args);
+
+
+        StringBuilder errorMessage = new StringBuilder();
+
+        if (line.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("NoaaResourceIngester [options] --cache-name <name prefix>", options);
+            return false;
+        }
+
+        s3Root = line.getOptionValue("s3-root");
+        if(s3Root==null){
+            errorMessage.append("Missing Option - You must provide an S3 cache directory with the --s3-root option.\n");
+        }
+
+        s3BucketName = line.getOptionValue("s3-bucket-name");
+        if(s3BucketName==null){
+            errorMessage.append("Missing Option - You must provide a S3 bucket name with the --s3-bucket-name option.\n");
+        }
+
+        glacierEndpointUrl = line.getOptionValue("glacier-endpoint-url");
+        if(glacierEndpointUrl==null){
+            errorMessage.append("Missing Option - You must provide a Glacier endpoint URL with the --glacier-endpoint-url option.\n");
+        }
+
+        glacierArchiveRoot = line.getOptionValue("glacier-archive-root");
+        if(glacierArchiveRoot==null){
+            errorMessage.append("Missing Option - You must provide a root directory for the Glacier Archive with the --glacier-archive-root option.\n");
+        }
+
+        besInstallPrefix =  line.getOptionValue("bes-install-prefix");
+        if(s3BucketName==null){
+            errorMessage.append("Missing Option - You must provide the local location of the BES and libdap with the --bes-install-prefix option.\n");
+        }
+
+        useDefaults =  line.hasOption("use-defaults");
+        if(useDefaults)
+            errorMessage.delete(0,errorMessage.length());
+
+        if(errorMessage.length()!=0){
+
+            System.err.println(errorMessage);
+
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("NoaaResourceIngester -s S3Dir -n S3Bucket -e GlacierEndpointURL -a GlacierArchiveDir -b BESLocation", options);
+
+            return false;
+        }
+
+        return true;
+
     }
 
+    private static void defaults(){
+
+        s3Root        = "/Users/ndp/scratch/s3Test";
+        //String noaaS3BucketName = "ocean-archive.data.nodc.noaa.gov";
+        s3BucketName   = "foo-s3cmd.nodc.noaa.gov";
+
+        glacierEndpointUrl    = "https://glacier.us-east-1.amazonaws.com/";
+        glacierArchiveRoot =  "/Users/ndp/scratch/glacier";
+
+        besInstallPrefix          = "/Users/ndp/hyrax/trunk";
+
+    }
 
 
     public static void main(String[] args)  {
 
 
 
-
         System.out.println("===========================================");
-
-        String s3CacheRoot        = "/Users/ndp/scratch/s3Test";
-        //String noaaS3BucketName = "ocean-archive.data.nodc.noaa.gov";
-        String noaaS3BucketName   = "foo-s3cmd.nodc.noaa.gov";
-
-        String glacierEndpoint    = "https://glacier.us-east-1.amazonaws.com/";
-        String glacierArchiveRoot =  "/Users/ndp/scratch/glacier";
-
-        String besInstallPrefix          = "/Users/ndp/hyrax/trunk";
-
-        BesMetadataExtractor.init(besInstallPrefix);
-
-
-
-        Element glacierConfig = getSimpleGlacierArchiveConfig(glacierEndpoint,glacierArchiveRoot);
-
-
 
 
 
 
         try {
-            GlacierArchiveManager.theManager().init(glacierConfig);
+
+            if(processCommandline(args)){
+
+                if(useDefaults)
+                    defaults();
+
+                BesMetadataExtractor.init(besInstallPrefix);
+
+                Element glacierConfig = GlacierArchiveManager.getDefaultConfig(glacierEndpointUrl, glacierArchiveRoot);
 
 
-            S3Index topLevelIndex = new S3Index(noaaS3BucketName,"//index.xml",s3CacheRoot);
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-            System.out.println("Loaded Top Level Index: "+topLevelIndex.getResourceUrl());
-            System.out.println("Content: ");
-            xmlo.output(topLevelIndex.getIndexElement(), System.out);
-
-            System.out.println(Util.getMemoryReport());
+                GlacierArchiveManager.theManager().init(glacierConfig);
 
 
+                S3Index topLevelIndex = new S3Index(s3BucketName,"//index.xml",s3Root);
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
-            topLevelIndex.updateCachedIndexAsNeeded(true, 3);
-            Vector<S3IndexedFile> resourceObjects = topLevelIndex.getChildIndexedFiles(true, 3);
+                System.out.println("Loaded Top Level Index: "+topLevelIndex.getResourceUrl());
+                System.out.println("Content: ");
+                xmlo.output(topLevelIndex.getIndexElement(), System.out);
 
-
-
-            System.out.println("Located " +resourceObjects.size()+" resource objects.");
-            //topLevelIndex.updateCachedIndexAsNeeded(true,0);
-
-            Credentials creds =  new Credentials();
-
-            //AmazonGlacierClient client = new AmazonGlacierClient(creds);
-            //client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");
-
-            inspectVaults();
-
-            //CreateVaultRequest request = new CreateVaultRequest().withAccountId("-").withVaultName(topLevelIndex.getVaultName());
-            //CreateVaultResult result = client.createVault(request);
+                System.out.println(Util.getMemoryReport());
 
 
 
+                topLevelIndex.updateCachedIndexAsNeeded(true, 3);
+                Vector<S3IndexedFile> resourceObjects = topLevelIndex.getChildIndexedFiles(true, 3);
 
-            for(S3Object resource : resourceObjects){
-                GlacierRecord gar = addS3ObjectToGlacier(creds, glacierEndpoint, resource);
 
-                Document garDoc = gar.getArchiveRecordDocument();
-                System.out.println();
-                xmlo.output(garDoc,System.out);
-                System.out.println();
+
+                System.out.println("Located " +resourceObjects.size()+" resource objects.");
+                //topLevelIndex.updateCachedIndexAsNeeded(true,0);
+
+                Credentials creds =  new Credentials();
+
+                //AmazonGlacierClient client = new AmazonGlacierClient(creds);
+                //client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");
+
+                inspectVaults();
+
+                //CreateVaultRequest request = new CreateVaultRequest().withAccountId("-").withVaultName(topLevelIndex.getVaultName());
+                //CreateVaultResult result = client.createVault(request);
+
+
+                for(S3Object resource : resourceObjects){
+                    GlacierRecord gar = addS3ObjectToGlacier(creds, glacierEndpointUrl, resource);
+
+                    Document garDoc = gar.getArchiveRecordDocument();
+                    System.out.println();
+                    xmlo.output(garDoc,System.out);
+                    System.out.println();
+
+                }
 
             }
-
-
-
-
             System.out.println(Util.getMemoryReport());
+
 
         } catch (Exception e) {
             e.printStackTrace();

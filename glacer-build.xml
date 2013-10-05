@@ -29,7 +29,7 @@
 <!-- Build file for OPeNDAP core software -->
 
 <project
-        name="Web Coverage Service"
+        name="Glacier Access Service"
         default="all" basedir=".">
 
     <!-- Global Properties for Java-OPeNDAP software development -->
@@ -47,8 +47,8 @@
          line by the distribution build script using
          tag information from CVS.
     -->
-    <property name="WCS_SOFTWARE_VERSION" value="Not.A.Release"/>
-    <property name="CONFIG_FILE" value="ConfigFileNotSpecified"/>
+    <property name="GLACIER_SERVICE_SOFTWARE_VERSION" value="Not.A.Release"/>
+    <!-- property name="CONFIG_FILE" value="ConfigFileNotSpecified"/ -->
 
 
     <!-- Compiler Settings -->
@@ -118,7 +118,7 @@
 
         <echo level="info" message="Project Name:         ${ant.project.name}"/>
         <echo level="info" message="Project File:         ${ant.file}"/>
-        <echo level="info" message="WCS_SOFTWARE_VERSION: ${WCS_SOFTWARE_VERSION}"/>
+        <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="    src.dir:       ${src.dir}"/>
@@ -157,7 +157,7 @@
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
     <property name="resources.dir" location="resources"/>
-    <property name="WCS.dir" location="${resources.dir}/WCS"/>
+    <property name="glacier.dir" location="${resources.dir}"/>
     <property name="initialContent.dir" location="/1.1.2/initialContent"/>
     <property name="WebInfResources.dir" location="/1.1.2/WEB-INF"/>
     <property name="distributionResources.dir"  location="/1.1.2/distribution"/>
@@ -264,7 +264,7 @@
         <mkdir dir="${build.src}"/>
         <mkdir dir="${build.resources}"/>
 
-        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_SOFTWARE_VERSION}"/>
+        <filter token="GLACIER_SERVICE_SOFTWARE_VERSION" value="${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -286,9 +286,12 @@
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
-                <include name="opendap/wcs/v1_1_2/**/*.java"/>
-                <include name="opendap/semantics/**/*.java"/>
+                <include name="opendap/aws/**/*.java"/>
+                <include name="opendap/noaa_s3/**/*.java"/>
 
+                <include name="opendap/bes/DocServlet.java"/>
+
+                <!--
                 <include name="opendap/coreServlet/DocServlet.java"/>
                 <include name="opendap/coreServlet/ServletUtil.java"/>
                 <include name="opendap/coreServlet/Scrub.java"/>
@@ -305,6 +308,7 @@
                 <include name="opendap/coreServlet/MimeTypes.java"/>
 
                 <include name="opendap/dap/Request.java"/>
+                -->
 
                 <include name="opendap/namespaces/**/*.java"/>
                 <include name="opendap/logging/**/*.java"/>
@@ -330,9 +334,9 @@
     <target
             name="compile"
             depends="PreProcessSourceCode"
-            description="Compiles the OLFS."
+            description="Compiles the Glacier Service software."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling OLFS"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling Glacier Service"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
@@ -352,32 +356,6 @@
     </target>
 
 
-    <target
-            name="compile_old"
-            depends="init"
-            description="Compiles the Web Coverage Service."
-            >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Semantic Web"/>
-        <echo level="info"
-              message="Using the ${build.compiler} javac compiler"/>
-        <echo level="info" message=""/>
-        <javac compiler="${build.compiler}"
-               destdir="${build.classes}"
-               debug="${compile.debug}"
-               debuglevel="${compile.debuglevel}"
-               deprecation="${compile.deprecation}">
-
-            <compilerarg value="-Xlint:unchecked"/>
-            <classpath refid="compile.classpath"/>
-
-            <src path="${src.dir}"/>
-            <include name="opendap/wcs/v1_1_2/**/*.java"/>
-            <include name="opendap/semantics/**/*.java"/>
-            <include name="opendap/coreServlet/DocServlet.java"/>
-
-        </javac>
-
-    </target>
 
 
 
@@ -390,11 +368,11 @@
             description="Builds source distribution"
             >
 
-        <tar destfile="${build.dist}/wcs-${WCS_SOFTWARE_VERSION}-src.tgz"
+        <tar destfile="${build.dist}/glacier-${GLACIER_SERVICE_SOFTWARE_VERSION}-src.tgz"
              compression="gzip"
                 >
 
-            <zipfileset dir="." prefix="wcs-${WCS_SOFTWARE_VERSION}-src">
+            <zipfileset dir="." prefix="wcs-${GLACIER_SERVICE_SOFTWARE_VERSION}-src">
                 <exclude name="build/**"/>
                 <exclude name="doc/javadoc/**"/>
                 <exclude name="doc/admin/**"/>
@@ -418,18 +396,18 @@
         <copy file="${distributionResources.dir}/README"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/wcs-${WCS_SOFTWARE_VERSION}-webapp.tgz"
+        <tar destfile="${build.dist}/wcs-${GLACIER_SERVICE_SOFTWARE_VERSION}-webapp.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.dist}" prefix="wcs-${WCS_SOFTWARE_VERSION}-webapp">
-                <include name="WCS.war"/>
+            <zipfileset dir="${build.dist}" prefix="wcs-${GLACIER_SERVICE_SOFTWARE_VERSION}-webapp">
+                <include name="glacier.war"/>
                 <include name="README"/>
             </zipfileset>
 
         </tar>
 
         <delete file="${build.dist}/README"/>
-        <delete file="${build.dist}/WCS.war"/>
+        <delete file="${build.dist}/glacier.war"/>
 
     </target>
 
@@ -453,12 +431,12 @@
             >
 
 
-        <echo level="info" message="Building WCS server war file."/>
+        <echo level="info" message="Building glacier service war file."/>
         <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
         <echo level="info" message="build.dist: ${build.dist}"/>
 
 
-        <war destfile="${build.dist}/WCS.war"
+        <war destfile="${build.dist}/glacier.war"
              webxml="/1.1.2/WEB-INF/web.xml"
                 >
 
@@ -490,7 +468,7 @@
                 <exclude name="admin/**"/>
                 <exclude name="_notes"/>
             </zipfileset>
-            
+
             <zipfileset dir="${build.resources}" prefix="">
                 <include name="**/*"/>
                 <exclude name="WEB-INF/web.xml"/>

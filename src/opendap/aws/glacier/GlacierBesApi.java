@@ -30,10 +30,13 @@ import opendap.aws.AwsUtil;
 import opendap.bes.BESError;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
+import opendap.dap.Dap2Error;
+import opendap.dap4.Dap4Error;
 import opendap.ppt.PPTException;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
@@ -93,13 +96,14 @@ public class GlacierBesApi extends BesApi {
             }
             else {
                 String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDS metadata.";
-                err.write(errMsg.getBytes());
+                Dap2Error dap2Error = new Dap2Error(Dap2Error.UNDEFINED_ERROR,errMsg);
+                dap2Error.print(err);
+                // err.write(errMsg.getBytes());
             }
 
         }
         else {
-            String errMsg = "ERROR: No such resource: "+dataSource;
-            err.write(errMsg.getBytes());
+            noSuchResource(dataSource, err);
         }
 
         return false;
@@ -128,14 +132,15 @@ public class GlacierBesApi extends BesApi {
                 return true;
             }
             else {
-                String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDS metadata.";
-                err.write(errMsg.getBytes());
+                String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DAS metadata.";
+                Dap2Error dap2Error = new Dap2Error(Dap2Error.UNDEFINED_ERROR,errMsg);
+                dap2Error.print(err);
+                // err.write(errMsg.getBytes());
             }
 
         }
         else {
-            String errMsg = "ERROR: No such resource: "+dataSource;
-            err.write(errMsg.getBytes());
+            noSuchResource(dataSource, err);
         }
 
         return false;
@@ -173,14 +178,29 @@ public class GlacierBesApi extends BesApi {
                 return true;
             }
             else {
-                String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDS metadata.";
-                err.write(errMsg.getBytes());
+                String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDX metadata.";
+
+                Dap4Error error  = new Dap4Error();
+
+                error.setMessage(errMsg);
+                error.setContext("Glacier Service");
+                error.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                err.write(error.toString().getBytes());
+
             }
 
         }
         else {
-            String errMsg = "ERROR: No such resource: "+dataSource;
-            err.write(errMsg.getBytes());
+            String errMsg = "ERROR: No such resource:  "+dataSource;
+
+            Dap4Error error  = new Dap4Error();
+
+            error.setMessage(errMsg);
+            error.setContext("Glacier Service");
+            error.setHttpCode(HttpServletResponse.SC_NOT_FOUND);
+
+            err.write(error.toString().getBytes());
         }
 
         return false;
@@ -214,16 +234,26 @@ public class GlacierBesApi extends BesApi {
                 return true;
             }
             else {
-                String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDS metadata.";
-                err.write(errMsg.getBytes());
+                String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DDX metadata.";
+                Dap2Error dap2Error = new Dap2Error(Dap2Error.UNDEFINED_ERROR,errMsg);
+                dap2Error.print(err);
+                // err.write(errMsg.getBytes());
             }
 
         }
         else {
-            String errMsg = "ERROR: No such resource: "+dataSource;
-            err.write(errMsg.getBytes());
+            noSuchResource(dataSource,err);
         }
 
         return false;
     }
+
+    private void noSuchResource(String missingResource, OutputStream err) {
+        String errMsg = "ERROR: No such resource: "+missingResource;
+        Dap2Error dap2Error = new Dap2Error(Dap2Error.NO_SUCH_FILE,errMsg);
+        dap2Error.print(err);
+        // err.write(errMsg.getBytes());
+
+    }
+
 }

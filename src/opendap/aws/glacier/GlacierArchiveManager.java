@@ -344,6 +344,30 @@ public class GlacierArchiveManager {
 
     }
 
+    public static Element getDefaultConfig(String glacierEndpoint, String glacierArchiveRootDir){
+
+
+
+        Element  glacierConfig = new Element("GlacierService");
+
+
+        Element e;
+
+
+        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ENDPOINT);
+        e.setText(glacierEndpoint);
+        glacierConfig.addContent(e);
+
+        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
+        e.setText(glacierArchiveRootDir);
+        glacierConfig.addContent(e);
+
+
+
+
+        return glacierConfig;
+    }
+
 
 
 
