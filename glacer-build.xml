@@ -534,7 +534,7 @@
             NOAA S3 Resource Ingester -
 
             Given an S3 Bucket that contains an index/catalog as defined by Relph and Ogata along with the associated
-            the application will retrieve the S3 contents, create a local catalog, upload all of the data into a
+            data files the application will retrieve the S3 contents, create a local catalog, upload all of the data into a
             glacier vault (with the same smae as the s3 bucket) and inter the dataset metadata locally in the process.
 
     -->
@@ -546,7 +546,7 @@
     <property name="GLACIER_ENDPOINT_URL" value="https://glacier.us-east-1.amazonaws.com"/>
 
     <property name="AWS_KEY_ID"      value="anonymous" />
-    <property name="AWS_SECRET_KEY"  value="YouKnowBetterThanI" />
+    <property name="AWS_SECRET_KEY"  value="YouShouldKnowBetterThanThat" />
 
     <property name="BES_PREFIX"  value="/Users/ndp/hyrax/trunk" />
 
@@ -616,16 +616,6 @@
                 >
         </sourceanalyzer>
     </target>
-
-
-
-
-
-
-
-
-
-
 
 
 
