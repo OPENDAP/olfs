@@ -26,6 +26,7 @@
 
 package opendap.aws.glacier;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
 import com.amazonaws.services.glacier.transfer.UploadResult;
@@ -71,6 +72,8 @@ public class GlacierArchiveManager {
 
     private ConcurrentHashMap<String, GlacierVaultManager> _vaults;
 
+    private AWSCredentials _glacierCredentials;
+
     private static GlacierArchiveManager theManager = null;
 
     public  static final String DefaultResourceCacheDirectoryName = "cache";
@@ -78,11 +81,15 @@ public class GlacierArchiveManager {
     public static final String CONFIG_ELEMENT_GLACIER_ENDPOINT = "GlacierEndpoint";
     public static final String CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT = "GlacierArchiveRootDirectory";
 
+    public static final String CONFIG_ELEMENT_AWS_ACCESS_KEY_ID = "AwsAccessKeyId";
+    public static final String CONFIG_ELEMENT_AWS_SECRET_KEY = "AwsSecretKey";
+
 
     private GlacierArchiveManager() {
         log = LoggerFactory.getLogger(this.getClass());
         _glacierRootDirectoryName = null;
         _glacierRootDirectory = null;
+        _glacierCredentials = null;
         isInitialized = false;
         _vaults = new ConcurrentHashMap<String, GlacierVaultManager>();
     }
@@ -98,20 +105,38 @@ public class GlacierArchiveManager {
 
         Element glacierEndpointElement = config.getChild(CONFIG_ELEMENT_GLACIER_ENDPOINT);
         if(glacierEndpointElement==null || glacierEndpointElement.getTextTrim().equals(""))
-            throw new ConfigurationException("Configuration must contain a Glacier Endpoint URL");
+            throw new ConfigurationException("Configuration must provide a Glacier Endpoint URL " +
+                    "with  a "+CONFIG_ELEMENT_GLACIER_ENDPOINT+ " element. ");
         URL glacierEndpointUrl = new URL(glacierEndpointElement.getTextTrim());
         setGlacierEndpoint(glacierEndpointUrl.toString());
 
 
         Element glacierArciveRootDirElement = config.getChild(CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
         if(glacierArciveRootDirElement==null || glacierArciveRootDirElement.getTextTrim().equals(""))
-            throw new ConfigurationException("Configuration must identify a top level directory for the Glacier archive using a GlacierArchiveRootDirectory element. ");
+            throw new ConfigurationException("Configuration must identify a top level directory for " +
+                    "the Glacier archive using a "+CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT+ " element. ");
         setGlacierArchiveRootDirectory(glacierArciveRootDirElement.getTextTrim());
+
+
+        Element awsAccessKeyIdElement = config.getChild(CONFIG_ELEMENT_AWS_ACCESS_KEY_ID);
+        if(awsAccessKeyIdElement==null || awsAccessKeyIdElement.getTextTrim().equals(""))
+            throw new ConfigurationException("Configuration must provide AWS Access Key Id " +
+                    "(for accessing Glacier) with an "+CONFIG_ELEMENT_AWS_ACCESS_KEY_ID+ " element. ");
+        String awsAccessKeyId = awsAccessKeyIdElement.getTextTrim();
+
+        Element awsSecretKeyElement = config.getChild(CONFIG_ELEMENT_AWS_SECRET_KEY);
+        if(awsSecretKeyElement==null || awsSecretKeyElement.getTextTrim().equals(""))
+            throw new ConfigurationException("Configuration must provide AWS Secret Key " +
+                    "(for accessing Glacier) with an "+CONFIG_ELEMENT_AWS_SECRET_KEY+ " element. ");
+        String awsSecretKey = awsSecretKeyElement.getTextTrim();
+
+        _glacierCredentials = new Credentials(awsAccessKeyId,awsSecretKey);
+
 
         setParentContext("");
 
         loadVaults();
-        DownloadManager.theManager().init(getResourceCacheDir());
+        DownloadManager.theManager().init(getResourceCacheDir(),_glacierCredentials);
 
 
         isInitialized = true;
@@ -344,7 +369,7 @@ public class GlacierArchiveManager {
 
     }
 
-    public static Element getDefaultConfig(String glacierEndpoint, String glacierArchiveRootDir){
+    public static Element getDefaultConfig(String glacierEndpoint, String glacierArchiveRootDir, String awsId, String awsKey){
 
 
 
@@ -360,6 +385,14 @@ public class GlacierArchiveManager {
 
         e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
         e.setText(glacierArchiveRootDir);
+        glacierConfig.addContent(e);
+
+        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_AWS_ACCESS_KEY_ID);
+        e.setText(awsId);
+        glacierConfig.addContent(e);
+
+        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_AWS_SECRET_KEY);
+        e.setText(awsKey);
         glacierConfig.addContent(e);
 
 

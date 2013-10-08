@@ -26,6 +26,7 @@
 
 package opendap.aws.glacier;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
 import com.amazonaws.services.glacier.model.*;
 import opendap.aws.auth.Credentials;
@@ -94,7 +95,7 @@ public class ActiveDownload  implements  Serializable {
 
 
 
-    public boolean startGlacierRetrieval(Credentials glacierCreds) throws IOException {
+    public boolean startGlacierRetrieval(AWSCredentials glacierCreds) throws IOException {
 
         _log.debug("startGlacierRetrieval() - BEGIN ");
 
@@ -137,7 +138,7 @@ public class ActiveDownload  implements  Serializable {
 
     }
 
-    public boolean isReadyForDownload(Credentials glacierCreds) throws IOException {
+    public boolean isReadyForDownload(AWSCredentials glacierCreds) throws IOException {
 
         _log.debug("isReadyForDownload() - BEGIN ");
 
@@ -173,7 +174,7 @@ public class ActiveDownload  implements  Serializable {
     }
 
 
-    public boolean download(Credentials glacierCreds){
+    public boolean download(AWSCredentials glacierCreds){
 
         _log.debug("download() - BEGIN (retrieving Glacier Resource {})",getGlacierRecord().getArchiveId());
         boolean success = false;

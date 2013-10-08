@@ -26,6 +26,7 @@
 
 package opendap.aws.glacier;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.model.*;
 import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
@@ -68,6 +69,8 @@ public class NoaaResourceIngester {
 
     private static boolean useDefaults = false;
 
+    private static String awsAccessKeyId = null;
+    private static String awsSecretKey = null;
 
     private static boolean processCommandline(String[] args) throws ParseException {
 
@@ -75,7 +78,13 @@ public class NoaaResourceIngester {
 
         Options options = new Options();
 
-        options.addOption("h", "help", true, "Usage information.");
+        options.addOption("h", "help", false, "Usage information.");
+
+        options.addOption("i", "awsId", true, "AWS access key ID for working with Glacier.");
+        options.addOption("k", "awsKey", true, "AWS secret key for working with Glacier.");
+
+
+
         options.addOption("s", "s3-root", true, "Top level directory for the S3 cache.");
 
         options.addOption("n", "s3-bucket-name", true, "Name of S3 bucket whose contents will be used to build a Glacier archive.");
@@ -101,34 +110,43 @@ public class NoaaResourceIngester {
             return false;
         }
 
-        s3Root = line.getOptionValue("s3-root");
-        if(s3Root==null){
-            errorMessage.append("Missing Option - You must provide an S3 cache directory with the --s3-root option.\n");
-        }
-
-        s3BucketName = line.getOptionValue("s3-bucket-name");
-        if(s3BucketName==null){
-            errorMessage.append("Missing Option - You must provide a S3 bucket name with the --s3-bucket-name option.\n");
-        }
-
-        glacierEndpointUrl = line.getOptionValue("glacier-endpoint-url");
-        if(glacierEndpointUrl==null){
-            errorMessage.append("Missing Option - You must provide a Glacier endpoint URL with the --glacier-endpoint-url option.\n");
-        }
-
-        glacierArchiveRoot = line.getOptionValue("glacier-archive-root");
-        if(glacierArchiveRoot==null){
-            errorMessage.append("Missing Option - You must provide a root directory for the Glacier Archive with the --glacier-archive-root option.\n");
-        }
-
-        besInstallPrefix =  line.getOptionValue("bes-install-prefix");
-        if(s3BucketName==null){
-            errorMessage.append("Missing Option - You must provide the local location of the BES and libdap with the --bes-install-prefix option.\n");
-        }
-
         useDefaults =  line.hasOption("use-defaults");
-        if(useDefaults)
-            errorMessage.delete(0,errorMessage.length());
+        if(!useDefaults) {
+            s3Root = line.getOptionValue("s3-root");
+            if(s3Root==null){
+                errorMessage.append("Missing Parameter - You must provide an S3 cache directory with the --s3-root option.\n");
+            }
+
+            s3BucketName = line.getOptionValue("s3-bucket-name");
+            if(s3BucketName==null){
+                errorMessage.append("Missing Parameter - You must provide a S3 bucket name with the --s3-bucket-name option.\n");
+            }
+
+            glacierEndpointUrl = line.getOptionValue("glacier-endpoint-url");
+            if(glacierEndpointUrl==null){
+                errorMessage.append("Missing Parameter - You must provide a Glacier endpoint URL with the --glacier-endpoint-url option.\n");
+            }
+
+            glacierArchiveRoot = line.getOptionValue("glacier-archive-root");
+            if(glacierArchiveRoot==null){
+                errorMessage.append("Missing Parameter - You must provide a root directory for the Glacier Archive with the --glacier-archive-root option.\n");
+            }
+
+            besInstallPrefix =  line.getOptionValue("bes-install-prefix");
+            if(s3BucketName==null){
+                errorMessage.append("Missing Parameter - You must provide the local location of the BES and libdap with the --bes-install-prefix option.\n");
+            }
+        }
+        awsAccessKeyId =  line.getOptionValue("awsId");
+        if(awsAccessKeyId == null){
+            errorMessage.append("Missing Parameter - You must provide an AWS access key ID (to access the Glacier service) with the --awsId option.\n");
+        }
+
+        awsSecretKey = line.getOptionValue("awsKey");
+        if(awsSecretKey == null){
+            errorMessage.append("Missing Parameter - You must provide an AWS secret key (to access the Glacier service) with the --awsKey option.\n");
+        }
+
 
         if(errorMessage.length()!=0){
 
@@ -176,7 +194,7 @@ public class NoaaResourceIngester {
 
                 BesMetadataExtractor.init(besInstallPrefix);
 
-                Element glacierConfig = GlacierArchiveManager.getDefaultConfig(glacierEndpointUrl, glacierArchiveRoot);
+                Element glacierConfig = GlacierArchiveManager.getDefaultConfig(glacierEndpointUrl, glacierArchiveRoot,awsAccessKeyId,awsSecretKey);
 
 
                 GlacierArchiveManager.theManager().init(glacierConfig);
@@ -201,12 +219,12 @@ public class NoaaResourceIngester {
                 System.out.println("Located " +resourceObjects.size()+" resource objects.");
                 //topLevelIndex.updateCachedIndexAsNeeded(true,0);
 
-                Credentials creds =  new Credentials();
+                Credentials creds =  new Credentials(awsAccessKeyId,awsSecretKey);
 
                 //AmazonGlacierClient client = new AmazonGlacierClient(creds);
                 //client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");
 
-                inspectVaults();
+                inspectVaults(creds);
 
                 //CreateVaultRequest request = new CreateVaultRequest().withAccountId("-").withVaultName(topLevelIndex.getVaultName());
                 //CreateVaultResult result = client.createVault(request);
@@ -236,9 +254,8 @@ public class NoaaResourceIngester {
     }
 
 
-    public static void inspectVaults(){
+    public static void inspectVaults(AWSCredentials creds){
 
-        Credentials creds =  new Credentials();
 
         AmazonGlacierClient client = new AmazonGlacierClient(creds);
         client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");

@@ -27,19 +27,29 @@
 package opendap.aws.auth;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import opendap.aws.auth.Credentials;
 
-public class CredentialsProvider implements AWSCredentialsProvider {
+public class Credentials implements AWSCredentials {
+
+    private String accessKeyId;
+    private String secretKey;
 
 
 
-    @Override
-    public AWSCredentials getCredentials() {
-        return new Credentials(null,null);
+    public Credentials(String awsAccessKeyId, String awsSecretKey){
+        accessKeyId = awsAccessKeyId;
+        secretKey = awsSecretKey;
     }
 
     @Override
-    public void refresh() {
+    public String getAWSAccessKeyId() {
+        return  accessKeyId;
     }
+
+    @Override
+    public String getAWSSecretKey() {
+        return secretKey;
+    }
+
 }
+
+

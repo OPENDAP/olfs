@@ -47,6 +47,9 @@
 
     <GlacierArchiveRootDirectory>/Users/ndp/scratch/glacier</GlacierArchiveRootDirectory>
 
+    <AwsAccessKeyId>anonymous</AwsAccessKeyId>
+    <AwsSecretKey>ndp@opendap.org</AwsSecretKey>
+
 
 </GlacierService>
 

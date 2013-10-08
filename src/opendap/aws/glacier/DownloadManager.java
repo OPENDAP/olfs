@@ -26,6 +26,7 @@
 
 package opendap.aws.glacier;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
 import opendap.aws.auth.Credentials;
 import opendap.coreServlet.ServletUtil;
@@ -74,6 +75,7 @@ public class DownloadManager {
     public static final long DEFAULT_GLACIER_ACCESS_DELAY = 14400; // 4 hours worth of seconds.
     public static final long MINIMUM_GLACIER_ACCESS_DELAY = 60; // 4 hours worth of seconds.
 
+    private AWSCredentials _awsCredentials;
 
     private DownloadManager() {
 
@@ -82,6 +84,7 @@ public class DownloadManager {
         _downloadLock = new ReentrantLock();
         _activeDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveDownloads";
         _isInitialized = false;
+        _awsCredentials = null;
         workerThread = null;
 
     }
@@ -95,7 +98,7 @@ public class DownloadManager {
     }
 
 
-    public void init(File targetDir) throws IOException, JDOMException {
+    public void init(File targetDir, AWSCredentials credentials) throws IOException, JDOMException {
 
         _downloadLock.lock();
         try {
@@ -104,11 +107,13 @@ public class DownloadManager {
                 return;
             }
 
+            _awsCredentials = credentials;
+
             _targetDir = targetDir;
 
             loadActiveDownloads();
 
-            startDownloadWorker();
+            startDownloadWorker(_awsCredentials);
 
             _isInitialized = true;
 
@@ -132,18 +137,14 @@ public class DownloadManager {
 
     }
 
-    public long initiateGlacierDownload(GlacierRecord gRec) throws JDOMException, IOException {
+    public long initiateGlacierDownload(GlacierRecord gRec ) throws JDOMException, IOException {
 
-
-        return initiateGlacierDownload(new Credentials(),gRec);
-
-
+        return initiateGlacierDownload(_awsCredentials,gRec);
     }
 
 
 
-
-    public long initiateGlacierDownload(Credentials glacierCreds, GlacierRecord gRec ) throws JDOMException, IOException {
+    public long initiateGlacierDownload(AWSCredentials glacierCreds, GlacierRecord gRec ) throws JDOMException, IOException {
 
         _log.debug("initiateGlacierDownload() - BEGIN");
 
@@ -267,9 +268,9 @@ public class DownloadManager {
     }
 
 
-    private void startDownloadWorker(){
+    private void startDownloadWorker(AWSCredentials credentials){
 
-        worker = new WorkerThread(new Credentials());
+        worker = new WorkerThread(credentials);
 
         workerThread = new Thread(worker);
 
@@ -321,9 +322,9 @@ public class DownloadManager {
 
         private Logger _log;
         private Thread _myThread;
-        Credentials _glacierCreds;
+        AWSCredentials _glacierCreds;
 
-        public WorkerThread(Credentials glacierCreds){
+        public WorkerThread(AWSCredentials glacierCreds){
             _log = org.slf4j.LoggerFactory.getLogger(getClass());
             _log.info("In WorkerThread constructor.");
 

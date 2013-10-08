@@ -199,7 +199,7 @@
     <!-- Libraries -->
     <property name="junit.lib"       value="junit-4.4.jar"/>
     <property name="jdom.lib"        value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib"      value="urlrewrite-3.2.0.jar"/>
+    <property name="urlRewrite.lib"  value="urlrewrite-3.2.0.jar"/>
 
 
     <property name="slf4j.lib"            value="slf4j-api-1.6.1.jar"/>
@@ -210,17 +210,15 @@
     <property name="openrdf-sesame.lib"   value="openrdf-sesame-2.6.2-onejar.jar" />
 
     <property name="commons-cli.lib"        value="apache-commons-cli-1.2.jar"/>
-    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
-    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.1.jar"/>
     <property name="commons-codec.lib"      value="apache-commons-codec-1.8.jar"/>
-    <property name="commons-lang.lib"      value="apache-commons-lang-2.5.jar"/>
+    <property name="commons-httpclient.lib" value="apache-commons-httpclient-3.1.jar"/>
+    <property name="commons-lang.lib"       value="apache-commons-lang-2.5.jar"/>
+    <property name="commons-logging.lib"    value="apache-commons-logging-1.1.3.jar"/>
 
-    <property name="serializer.lib"    value="xalan-2.7.1-serializer.jar"/>
-    <property name="xalan.lib"         value="xalan-2.7.1-xalan.jar"/>
-    <property name="xercesImpl.lib"    value="xalan-2.7.1-xercesImpl.jar"/>
-    <property name="xercesXmlApis.lib" value="xalan-2.7.1-xml-apis.jar"/>
-    <property name="xsltc.lib"         value="xalan-2.7.1-xsltc.jar"/>
-    
+    <property name="xalan.lib"         value="xalan.jar"/>
+    <property name="xercesImpl.lib"    value="xercesImpl-2.8.1.jar"/>
+    <property name="xercesXmlApis.lib" value="xml-apis-2.8.1.jar"/>
+
     <property name="saxon-jdom.lib"  value="saxon-9.1.0.5-jdom.jar"/>
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib"       value="saxon-9.1.0.5.jar"/>

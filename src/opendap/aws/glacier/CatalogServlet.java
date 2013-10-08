@@ -88,36 +88,6 @@ public class CatalogServlet extends HttpServlet {
         _servletContext = this.getServletContext().getContextPath();
 
 
-        /**
-         * ###########################################################################
-         *
-         * These things could be in a configuration file
-         *
-         */
-        Element config = null;
-
-
-        /**
-         * ###########################################################################
-         */
-
-
-
-        try {
-            GlacierArchiveManager.theManager().init(config);
-        } catch (IOException e) {
-            String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
-            e.printStackTrace();
-            throw new ServletException(msg);
-        } catch (JDOMException e) {
-            String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
-            e.printStackTrace();
-            throw new ServletException(msg);
-        }
-
-
-
-
         _initialized = true;
     }
 
