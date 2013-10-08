@@ -72,6 +72,8 @@ public class NoaaResourceIngester {
     private static String awsAccessKeyId = null;
     private static String awsSecretKey = null;
 
+    private static boolean verbose = false;
+
     private static boolean processCommandline(String[] args) throws ParseException {
 
         CommandLineParser parser = new PosixParser();
@@ -83,6 +85,7 @@ public class NoaaResourceIngester {
         options.addOption("i", "awsId", true, "AWS access key ID for working with Glacier.");
         options.addOption("k", "awsKey", true, "AWS secret key for working with Glacier.");
 
+        options.addOption("v", "verbose", false, "Makes more output...");
 
 
         options.addOption("s", "s3-root", true, "Top level directory for the S3 cache.");
@@ -110,6 +113,7 @@ public class NoaaResourceIngester {
             return false;
         }
 
+        verbose = line.hasOption("verbose");
         useDefaults =  line.hasOption("use-defaults");
         if(!useDefaults) {
             s3Root = line.getOptionValue("s3-root");
@@ -146,6 +150,8 @@ public class NoaaResourceIngester {
         if(awsSecretKey == null){
             errorMessage.append("Missing Parameter - You must provide an AWS secret key (to access the Glacier service) with the --awsKey option.\n");
         }
+
+
 
 
         if(errorMessage.length()!=0){
@@ -212,7 +218,7 @@ public class NoaaResourceIngester {
 
 
                 topLevelIndex.updateCachedIndexAsNeeded(true, 3);
-                Vector<S3IndexedFile> resourceObjects = topLevelIndex.getChildIndexedFiles(true, 3);
+                Vector<S3IndexedFile> resourceObjects = topLevelIndex.getChildIndexedFiles(true,0);
 
 
 
@@ -234,8 +240,12 @@ public class NoaaResourceIngester {
                     GlacierRecord gar = addS3ObjectToGlacier(creds, glacierEndpointUrl, resource);
 
                     Document garDoc = gar.getArchiveRecordDocument();
-                    System.out.println();
-                    xmlo.output(garDoc,System.out);
+
+
+                    if(verbose){
+                        System.out.println();
+                        xmlo.output(garDoc,System.out);
+                    }
                     System.out.println();
 
                 }

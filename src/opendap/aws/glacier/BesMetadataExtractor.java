@@ -105,15 +105,15 @@ public class BesMetadataExtractor {
         Element metadata;
 
 
-        metadata = new Element(GlacierRecord.DDS, GlacierRecord.GlacierRecordNameSpace);
-        metadata.setAttribute("type","dds");
+        Element dds = new Element(GlacierRecord.DDS, GlacierRecord.GlacierRecordNameSpace);
+        dds.setAttribute("type","dds");
 
-        gar.addMetaDataElement(GlacierRecord.DDS,metadata);
 
         StringBuilder sysCmd = new StringBuilder();
 
         String result;
 
+        // ------------- Retrieve DDS ----------------
         mkCommand(bescmd,datasetFile,DAP2.DDS);
         sysCmd.append(besStandAlone)
                 .append(" -c ").append(besConfig)
@@ -121,13 +121,13 @@ public class BesMetadataExtractor {
                 ;//.append(" -f ").append(metadataResult);
 
         result = runSysCommand(sysCmd.toString());
+        dds.setText(result);
+        gar.addMetaDataElement(GlacierRecord.DDS,dds);
 
-        metadata.setText(result);
 
-
-        metadata = new Element(GlacierRecord.DAS, GlacierRecord.GlacierRecordNameSpace);
-        metadata.setAttribute("type","das");
-        gar.addMetaDataElement(GlacierRecord.DAS,metadata);
+        // ------------- Retrieve DAS ----------------
+        Element das = new Element(GlacierRecord.DAS, GlacierRecord.GlacierRecordNameSpace);
+        das.setAttribute("type","das");
 
         sysCmd = new StringBuilder();
 
@@ -138,12 +138,13 @@ public class BesMetadataExtractor {
                 ;//.append(" -f ").append(metadataResult);
 
         result = runSysCommand(sysCmd.toString());
-        metadata.setText(result);
+        das.setText(result);
+        gar.addMetaDataElement(GlacierRecord.DAS,das);
 
 
-        metadata = new Element(GlacierRecord.DDX, GlacierRecord.GlacierRecordNameSpace);
-        metadata.setAttribute("type","ddx");
-        gar.addMetaDataElement(GlacierRecord.DDX,metadata);
+        // ------------- Retrieve DDX ----------------
+        Element ddx = new Element(GlacierRecord.DDX, GlacierRecord.GlacierRecordNameSpace);
+        ddx.setAttribute("type","ddx");
 
 
         sysCmd = new StringBuilder();
@@ -156,7 +157,8 @@ public class BesMetadataExtractor {
 
         result = runSysCommand(sysCmd.toString());
 
-        metadata.setText(result);
+        ddx.setText(result);
+        gar.addMetaDataElement(GlacierRecord.DDX,ddx);
 
     }
 
