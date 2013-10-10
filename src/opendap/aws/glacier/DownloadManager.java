@@ -28,9 +28,7 @@ package opendap.aws.glacier;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
-import opendap.aws.auth.Credentials;
 import opendap.coreServlet.ServletUtil;
-import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +54,7 @@ public class DownloadManager {
 
     private boolean _isInitialized;
 
-    private ConcurrentHashMap<String, ActiveDownload> _activeDownloads;
+    private ConcurrentHashMap<String, ArchiveDownload> _activeDownloads;
 
     private WorkerThread worker;
     private Thread workerThread;
@@ -80,7 +78,7 @@ public class DownloadManager {
     private DownloadManager() {
 
         _log = LoggerFactory.getLogger(this.getClass());
-        _activeDownloads = new ConcurrentHashMap<String, ActiveDownload>();
+        _activeDownloads = new ConcurrentHashMap<String, ArchiveDownload>();
         _downloadLock = new ReentrantLock();
         _activeDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveDownloads";
         _isInitialized = false;
@@ -155,7 +153,7 @@ public class DownloadManager {
         _log.debug("initiateGlacierDownload() -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
         _log.debug("initiateGlacierDownload() - Downloading resource from Glacier:  ");
         _log.debug("initiateGlacierDownload() -     Vault Name:  {}", vaultName);
-        _log.debug("initiateGlacierDownload() -     Resource ID: {}", archiveId);
+        _log.debug("initiateGlacierDownload() -     Resource ID: {}", resourceId);
         _log.debug("initiateGlacierDownload() -     Archive ID:  {}", archiveId);
 
         long estimatedRetrievalTime = DEFAULT_GLACIER_ACCESS_DELAY;
@@ -167,20 +165,20 @@ public class DownloadManager {
 
             if(_activeDownloads.containsKey(resourceId)){
 
-                ActiveDownload activeDownload = _activeDownloads.get(resourceId);
+                ArchiveDownload activeDownload = _activeDownloads.get(resourceId);
                 estimatedRetrievalTime = activeDownload.estimatedTimeRemaining();
 
-                if(activeDownload.isReadyForDownload(glacierCreds)){
-                    activeDownload.download(glacierCreds);
+                if(activeDownload.isReadyForDownload()){
+                    activeDownload.download();
                     estimatedRetrievalTime = 0;
                 }
 
             }
             else {
 
-                ActiveDownload ad = new ActiveDownload(gRec, DEFAULT_GLACIER_ACCESS_DELAY);
+                ArchiveDownload ad = new ArchiveDownload(gRec,glacierCreds, DEFAULT_GLACIER_ACCESS_DELAY);
 
-                if(ad.startGlacierRetrieval(glacierCreds)) {
+                if(ad.startArchiveRetrieval()) {
                     _activeDownloads.put(resourceId,ad);
                     saveActiveDownloads();
                     _log.debug("initiateGlacierDownload() - Active downloads saved.");
@@ -228,7 +226,7 @@ public class DownloadManager {
             ObjectInputStream ois = new ObjectInputStream(fis);
 
             try {
-                _activeDownloads = (ConcurrentHashMap<String, ActiveDownload>) ois.readObject();
+                _activeDownloads = (ConcurrentHashMap<String, ArchiveDownload>) ois.readObject();
             } catch (Exception e) {
                 reloadingJobsError(backup,e);
 
@@ -239,7 +237,7 @@ public class DownloadManager {
 
     private void reloadingJobsError(File activeJobsArchive, Exception e) throws IOException {
 
-        String msg =  "Unable to load ActiveDownload archive: "+activeJobsArchive.getAbsoluteFile()+" Msg: "+e.getMessage();
+        String msg =  "Unable to load ArchiveDownload archive: "+activeJobsArchive.getAbsoluteFile()+" Msg: "+e.getMessage();
         _log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         _log.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         _log.error(msg);
@@ -387,15 +385,15 @@ public class DownloadManager {
 
 
 
-                    Vector<ActiveDownload> completed = new Vector<ActiveDownload>();
+                    Vector<ArchiveDownload> completed = new Vector<ArchiveDownload>();
 
                     _downloadLock.lock();
                     try {
 
-                        for(ActiveDownload activeDownload : _activeDownloads.values()){
+                        for(ArchiveDownload activeDownload : _activeDownloads.values()){
 
-                            if(activeDownload.isReadyForDownload(_glacierCreds)){
-                                if(activeDownload.download(_glacierCreds)){
+                            if(activeDownload.isReadyForDownload()){
+                                if(activeDownload.download()){
                                     completed.add(activeDownload);
                                 }
 
@@ -410,7 +408,7 @@ public class DownloadManager {
 
                         }
 
-                        for(ActiveDownload completedDownload: completed){
+                        for(ArchiveDownload completedDownload: completed){
                             _activeDownloads.remove(completedDownload.getGlacierRecord().getResourceId());
                             saveActiveDownloads();
                         }

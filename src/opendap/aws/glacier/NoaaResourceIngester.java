@@ -57,24 +57,35 @@ import java.util.Vector;
 public class NoaaResourceIngester {
 
 
-    private static String s3Root = null;
+    private  String s3Root = null;
 
-    private static String s3BucketName = null;
+    private  String s3BucketName = null;
 
-    private static String glacierEndpointUrl =  null;
+    private  String glacierEndpointUrl =  null;
 
-    private static String glacierArchiveRoot = null;
+    private  String glacierArchiveRoot = null;
 
-    private static String besInstallPrefix = null;
+    private  File besInstallPrefix = null;
 
-    private static boolean useDefaults = false;
+    private  File besConfig = null;
 
-    private static String awsAccessKeyId = null;
-    private static String awsSecretKey = null;
 
-    private static boolean verbose = false;
+    private  String awsAccessKeyId = null;
+    private  String awsSecretKey = null;
 
-    private static boolean processCommandline(String[] args) throws ParseException {
+    private  boolean verbose = false;
+
+    private  NoaaResourceIngester(){
+
+        s3Root              = null;
+        s3BucketName        = null;
+        glacierEndpointUrl  = null;
+        glacierArchiveRoot  = null;
+        besInstallPrefix    = null;
+        besConfig           = null;
+    }
+
+    private  boolean processCommandline(String[] args) throws ParseException {
 
         CommandLineParser parser = new PosixParser();
 
@@ -100,47 +111,65 @@ public class NoaaResourceIngester {
         options.addOption("a", "glacier-archive-root", true, "Top level directory for the Glacier Archive Database");
         // options.addOption("d", "dir", true, "Write eml files to this directory.");
 
-        options.addOption("b", "bes-install-prefix", true, "The prefix used when installing the BES and libdap.");
+        options.addOption("p", "bes-install-prefix", true, "The prefix used when installing the BES and libdap.");
+
+
+        options.addOption("c", "bes-config-file", true, "A BES configuration file that sets the BES.Catalog.catalog.RootDirectory parameter to the top of directory tree containing the data.");
 
         CommandLine line =   parser.parse(options, args);
 
 
+        String usage  = this.getClass().getName()+" -i AWSAccessKeyID -k AWSSecretKey -s S3Dir -n S3Bucket -e GlacierEndpointURL -a GlacierArchiveDir -b BESLocation [-c besConfigFile] [-v] ";
+
+
         StringBuilder errorMessage = new StringBuilder();
+
+
 
         if (line.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("NoaaResourceIngester [options] --cache-name <name prefix>", options);
+            formatter.printHelp(usage, options);
             return false;
         }
 
         verbose = line.hasOption("verbose");
-        useDefaults =  line.hasOption("use-defaults");
-        if(!useDefaults) {
-            s3Root = line.getOptionValue("s3-root");
-            if(s3Root==null){
-                errorMessage.append("Missing Parameter - You must provide an S3 cache directory with the --s3-root option.\n");
-            }
 
-            s3BucketName = line.getOptionValue("s3-bucket-name");
-            if(s3BucketName==null){
-                errorMessage.append("Missing Parameter - You must provide a S3 bucket name with the --s3-bucket-name option.\n");
-            }
-
-            glacierEndpointUrl = line.getOptionValue("glacier-endpoint-url");
-            if(glacierEndpointUrl==null){
-                errorMessage.append("Missing Parameter - You must provide a Glacier endpoint URL with the --glacier-endpoint-url option.\n");
-            }
-
-            glacierArchiveRoot = line.getOptionValue("glacier-archive-root");
-            if(glacierArchiveRoot==null){
-                errorMessage.append("Missing Parameter - You must provide a root directory for the Glacier Archive with the --glacier-archive-root option.\n");
-            }
-
-            besInstallPrefix =  line.getOptionValue("bes-install-prefix");
-            if(s3BucketName==null){
-                errorMessage.append("Missing Parameter - You must provide the local location of the BES and libdap with the --bes-install-prefix option.\n");
-            }
+        s3Root = line.getOptionValue("s3-root");
+        if(s3Root==null){
+            errorMessage.append("Missing Parameter - You must provide an S3 cache directory with the --s3-root option.\n");
         }
+
+        s3BucketName = line.getOptionValue("s3-bucket-name");
+        if(s3BucketName==null){
+            errorMessage.append("Missing Parameter - You must provide a S3 bucket name with the --s3-bucket-name option.\n");
+        }
+
+        glacierEndpointUrl = line.getOptionValue("glacier-endpoint-url");
+        if(glacierEndpointUrl==null){
+            errorMessage.append("Missing Parameter - You must provide a Glacier endpoint URL with the --glacier-endpoint-url option.\n");
+        }
+
+        glacierArchiveRoot = line.getOptionValue("glacier-archive-root");
+        if(glacierArchiveRoot==null){
+            errorMessage.append("Missing Parameter - You must provide a root directory for the Glacier Archive with the --glacier-archive-root option.\n");
+        }
+
+        String name =  line.getOptionValue("bes-install-prefix");
+        if(name==null){
+            errorMessage.append("Missing Parameter - You must provide the local location of the BES and libdap with the --bes-install-prefix option.\n");
+        }
+        else {
+            besInstallPrefix = new File(name);
+        }
+
+        name =  line.getOptionValue("bes-config-file");
+        if(name!=null){
+            besConfig = new File(name);
+        }
+        else {
+            besConfig = new File(besInstallPrefix,"etc/bes/bes.conf");
+        }
+
         awsAccessKeyId =  line.getOptionValue("awsId");
         if(awsAccessKeyId == null){
             errorMessage.append("Missing Parameter - You must provide an AWS access key ID (to access the Glacier service) with the --awsId option.\n");
@@ -159,7 +188,7 @@ public class NoaaResourceIngester {
             System.err.println(errorMessage);
 
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("NoaaResourceIngester -s S3Dir -n S3Bucket -e GlacierEndpointURL -a GlacierArchiveDir -b BESLocation", options);
+            formatter.printHelp(usage, options);
 
             return false;
         }
@@ -168,18 +197,6 @@ public class NoaaResourceIngester {
 
     }
 
-    private static void defaults(){
-
-        s3Root        = "/Users/ndp/scratch/s3Test";
-        //String noaaS3BucketName = "ocean-archive.data.nodc.noaa.gov";
-        s3BucketName   = "foo-s3cmd.nodc.noaa.gov";
-
-        glacierEndpointUrl    = "https://glacier.us-east-1.amazonaws.com/";
-        glacierArchiveRoot =  "/Users/ndp/scratch/glacier";
-
-        besInstallPrefix          = "/Users/ndp/hyrax/trunk";
-
-    }
 
 
     public static void main(String[] args)  {
@@ -189,24 +206,23 @@ public class NoaaResourceIngester {
         System.out.println("===========================================");
 
 
+        NoaaResourceIngester nri = new NoaaResourceIngester();
 
 
         try {
 
-            if(processCommandline(args)){
+            if(nri.processCommandline(args)){
 
-                if(useDefaults)
-                    defaults();
 
-                BesMetadataExtractor.init(besInstallPrefix);
+                BesMetadataExtractor bme = new BesMetadataExtractor(nri.besInstallPrefix,nri.besConfig);
 
-                Element glacierConfig = GlacierArchiveManager.getDefaultConfig(glacierEndpointUrl, glacierArchiveRoot,awsAccessKeyId,awsSecretKey);
+                Element glacierConfig = GlacierArchiveManager.getDefaultConfig(nri.glacierEndpointUrl, nri.glacierArchiveRoot,nri.awsAccessKeyId,nri.awsSecretKey);
 
 
                 GlacierArchiveManager.theManager().init(glacierConfig);
 
 
-                S3Index topLevelIndex = new S3Index(s3BucketName,"//index.xml",s3Root);
+                S3Index topLevelIndex = new S3Index(nri.s3BucketName,"//index.xml",nri.s3Root);
                 XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
                 System.out.println("Loaded Top Level Index: "+topLevelIndex.getResourceUrl());
@@ -225,24 +241,25 @@ public class NoaaResourceIngester {
                 System.out.println("Located " +resourceObjects.size()+" resource objects.");
                 //topLevelIndex.updateCachedIndexAsNeeded(true,0);
 
-                Credentials creds =  new Credentials(awsAccessKeyId,awsSecretKey);
+                Credentials creds =  new Credentials(nri.awsAccessKeyId,nri.awsSecretKey);
 
                 //AmazonGlacierClient client = new AmazonGlacierClient(creds);
                 //client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");
 
-                inspectVaults(creds);
+                nri.inspectVaults(creds,nri.glacierEndpointUrl);
 
                 //CreateVaultRequest request = new CreateVaultRequest().withAccountId("-").withVaultName(topLevelIndex.getVaultName());
                 //CreateVaultResult result = client.createVault(request);
 
 
                 for(S3Object resource : resourceObjects){
-                    GlacierRecord gar = addS3ObjectToGlacier(creds, glacierEndpointUrl, resource);
+
+                    GlacierRecord gar = nri.addS3ObjectToGlacier(creds, nri.glacierEndpointUrl, resource, bme);
 
                     Document garDoc = gar.getArchiveRecordDocument();
 
 
-                    if(verbose){
+                    if(nri.verbose){
                         System.out.println();
                         xmlo.output(garDoc,System.out);
                     }
@@ -257,18 +274,15 @@ public class NoaaResourceIngester {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            BesMetadataExtractor.destroy();
-        }
 
     }
 
 
-    public static void inspectVaults(AWSCredentials creds){
+    public void inspectVaults(AWSCredentials creds, String endPointUrl){
 
 
         AmazonGlacierClient client = new AmazonGlacierClient(creds);
-        client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");
+        client.setEndpoint(endPointUrl);
 
         ListVaultsResult listVaultsResult =  client.listVaults(new ListVaultsRequest());
         for(DescribeVaultOutput dvo : listVaultsResult.getVaultList() ){
@@ -282,7 +296,7 @@ public class NoaaResourceIngester {
 
 
 
-    public static String describeVault(DescribeVaultOutput dvo){
+    public String describeVault(DescribeVaultOutput dvo){
         StringBuilder sb = new StringBuilder();
         sb.append("================================================================================\n");
         sb.append("Found Vault: ").append(dvo.getVaultName()).append("\n");
@@ -299,7 +313,7 @@ public class NoaaResourceIngester {
 
 
 
-    public static GlacierRecord addS3ObjectToGlacier(Credentials glacierCreds, String glacierEndpPoint, S3Object s3Object ) throws JDOMException, IOException {
+    public GlacierRecord addS3ObjectToGlacier(Credentials glacierCreds, String glacierEndPoint, S3Object s3Object, BesMetadataExtractor bme ) throws JDOMException, IOException {
 
 
         System.out.println("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
@@ -330,31 +344,36 @@ public class NoaaResourceIngester {
             System.out.println("Cache File:  " + cacheFile);
             System.out.println("Cache file size: " + cacheFile.length() + " bytes");
 
-            File targetDir = s3Object.getCacheDir();
             gar = new GlacierRecord(vaultName,resourceId,"NOT_UPLOADED_TO_GLACIER");
+            boolean readyToUpload = false;
 
             try {
-                BesMetadataExtractor.extractMetadata(gar,targetDir, cacheFile);
+                bme.extractMetadata(gar, cacheFile);
                 System.out.println("Got metadata for " + gar.getResourceId());
+                readyToUpload = true;
             } catch (Exception e) {
-                System.out.println("ERROR: Failed to extract metadata from "+cacheFile.getName()+". Msg: " + e.getMessage());
+                System.err.println("ERROR: Failed to extract metadata from "+cacheFile.getName()+". Msg: " + e.getMessage());
                 e.printStackTrace();
+
             }
 
 
-            AmazonGlacierClient client = new AmazonGlacierClient(glacierCreds);
-            client.setEndpoint(glacierEndpPoint);
+            if(readyToUpload){
 
-            ArchiveTransferManager atm = new ArchiveTransferManager(client, glacierCreds);
+                Vault vault = new Vault(vaultName,glacierCreds,glacierEndPoint);
 
-            System.out.println("Transferring cache file content to Glacier. vault: "+vaultName+"  description: " + resourceId);
-            UploadResult uploadResult = atm.upload(vaultName, resourceId, cacheFile);
-            String archiveId = uploadResult.getArchiveId();
+                String archiveId = vault.put(resourceId,cacheFile);
 
-            gar.setArchiveId(archiveId);
+                gar.setArchiveId(archiveId);
 
-            GlacierArchiveManager.theManager().addArchiveRecord(gar);
-            s3Object.deleteCacheFile();
+                GlacierArchiveManager.theManager().addArchiveRecord(gar);
+                s3Object.deleteCacheFile();
+            }
+            else {
+                System.err.println("SKIPPING Dataset:  "+cacheFile.getName());
+                System.err.println("Dataset not uploaded to Glacier.");
+                System.err.println("Dataset file not removed from local disk. Location: "+cacheFile.getAbsolutePath());
+            }
 
         }
 

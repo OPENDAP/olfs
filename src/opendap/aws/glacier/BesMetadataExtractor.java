@@ -30,6 +30,7 @@ import opendap.bes.BESManager;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.RequestCache;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -37,7 +38,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import java.io.*;
-import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,29 +49,34 @@ import java.util.Vector;
 public class BesMetadataExtractor {
 
 
-    private static boolean inititialized = false;
 
-    private static String _besPrefix;
+    private File _besPrefix;
+    private File _besConf;
+    private File _tmpDir;
+
+    private String _dataFileNames[];
+
+    private boolean _verbose = false;
+
+
+    private File _datasetFile;
 
     public static enum DAP2 {
         DDS, DAS, DDX
     }
 
 
-    public static void  init(String besPrefix){
+    public BesMetadataExtractor(File besPrefix, File besConf ){
 
-        if(inititialized)
-            return;
-
-        while(besPrefix.endsWith("/"))
-            besPrefix = besPrefix.substring(0,besPrefix.lastIndexOf('/'));
+        this();
 
         _besPrefix = besPrefix;
+        _besConf = besConf;
+        _tmpDir = new File("/tmp");
 
-        RequestCache.openThreadCache();
+        _dataFileNames = null;
 
         Element besConfig = DapServlet.getDefaultBesManagerConfig();
-
         try {
             BESManager besManager = new BESManager();
             besManager.init(null,besConfig);
@@ -82,83 +87,282 @@ public class BesMetadataExtractor {
 
 
     }
+    private  BesMetadataExtractor() {
 
-    public static void destroy() {
-        RequestCache.closeThreadCache();
+        _besPrefix     = null;
+        _besConf       = null;
+        _tmpDir        = null;
+        _dataFileNames = null;
+
+        _verbose = false;
+
+
+    }
+
+    public BesMetadataExtractor(String [] args )throws ParseException{
+
+        this();
+
+        processCommandline(args);
+
+        Element besConfig = DapServlet.getDefaultBesManagerConfig();
+        try {
+
+
+            BESManager besManager = new BESManager();
+            besManager.init(null,besConfig);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static void main(String[] args)  {
+
+        try {
+
+            BesMetadataExtractor bme = new BesMetadataExtractor(args);
+
+            for(String dataFileName : bme._dataFileNames){
+
+                File datasetFile = new File(dataFileName);
+
+                GlacierRecord grec = new GlacierRecord("vaultName",dataFileName,"archiveId");
+
+
+                bme.extractMetadata(grec, datasetFile);
+                XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+                xmlo.output(grec.getArchiveRecordDocument(),System.out);
+            }
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private boolean processCommandline(String[] args) throws ParseException {
+
+        String s;
+        CommandLineParser parser = new PosixParser();
+
+        Options options = new Options();
+
+
+        options.addOption("h", "help", false, "Help message.");
+        options.addOption("v", "verbose", false, "Makes more output...");
+
+
+        //
+        // options.addOption("d", "dataset-file", true, "The dataset file from which to extract metadata.");
+
+        options.addOption("c", "bes-conf", true, "A BES configuration which defines the " +
+                "BES.Catalog.catalog.RootDirectory as the " +
+                "parent directory of the dataset file.");
+
+        options.addOption("p", "bes-prefix", true, "The location (aka 'prefix') of the BES installation");
+
+        options.addOption("t", "temp-dir", true, "An (existing) directory to which the program can write temporary files.");
+
+
+        String usage = this.getClass().getSimpleName() + "-d datasetFile -n datasetFile -c besConfigurationFile " +
+                "-p besPrefix [-t tempDir] FILE1 [FILE2 FILE3 ...]";
+
+
+        CommandLine line =   parser.parse(options, args);
+
+
+        StringBuilder errorMessage = new StringBuilder();
+
+        if (line.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(usage, options);
+            return false;
+        }
+
+        _verbose = line.hasOption("verbose");
+
+
+        s = line.getOptionValue("bes-prefix");
+        if(s==null){
+            errorMessage.append("Missing Parameter - You must provide the location (aka 'prefix') of the BES " +
+                    "installation with the  --bes-prefix option.\n");
+        }
+        _besPrefix = new File(s);
+
+
+        s = line.getOptionValue("bes-conf");
+        if(s!=null){
+            _besConf = new File(s);
+        }
+        else {
+            _besConf = new File(_besPrefix,"etc/bes/bes.conf");
+        }
+
+
+
+        s = line.getOptionValue("temp-dir");
+        if(s!=null){
+            setTmpDir(s);
+        }
+        else {
+            setTmpDir("/tmp");
+        }
+
+
+        _dataFileNames = line.getArgs();
+
+        if(_dataFileNames.length ==0){
+            errorMessage.append("Missing Parameter - You must provide (after all of the other command line parameters) " +
+                    "one or more datafile names that are specified" +
+                    " as their path relative to the BES.Catalog.catalog.RootDirectory \n");
+
+        }
+
+
+
+
+        if(errorMessage.length()!=0){
+
+            System.err.println(errorMessage);
+
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(usage, options);
+
+            return false;
+        }
+
+        return true;
 
     }
 
 
 
 
-    public static void extractMetadata(GlacierRecord gar, File tmpDir, File datasetFile) throws BadConfigurationException, IOException {
+
+    public void setTmpDir(String dirName){
+        _tmpDir = new File(dirName);
+    }
 
 
 
 
+    public Element getDDSGlacierRecordMetadataElement(File datasetFile) throws BadConfigurationException, IOException {
 
-        String besStandAlone = _besPrefix + "/bin/besstandalone";
-        String besConfig     = _besPrefix + "/etc/bes/s3Bes.conf";
-        File   bescmd        = new File(tmpDir,"bes.cmd");
-
-
-        Element metadata;
-
+        StringBuilder sysCmd;
+        String result;
+        File besStandAlone = new File(_besPrefix, "/bin/besstandalone");
+        File   bescmd      = new File(_tmpDir,"bes.cmd");
 
         Element dds = new Element(GlacierRecord.DDS, GlacierRecord.GlacierRecordNameSpace);
-        dds.setAttribute("type","dds");
+        sysCmd = new StringBuilder();
 
-
-        StringBuilder sysCmd = new StringBuilder();
-
-        String result;
-
-        // ------------- Retrieve DDS ----------------
         mkCommand(bescmd,datasetFile,DAP2.DDS);
         sysCmd.append(besStandAlone)
-                .append(" -c ").append(besConfig)
+                .append(" -c ").append(_besConf.getAbsolutePath())
                 .append(" -i ").append(bescmd.getAbsolutePath())
                 ;//.append(" -f ").append(metadataResult);
 
         result = runSysCommand(sysCmd.toString());
+        if(_verbose)
+            System.out.println("\n\n"+result);
         dds.setText(result);
-        gar.addMetaDataElement(GlacierRecord.DDS,dds);
+
+        return dds;
+    }
 
 
-        // ------------- Retrieve DAS ----------------
+    public Element getDASGlacierRecordMetadataElement(File datasetFile) throws BadConfigurationException, IOException {
+
+        StringBuilder sysCmd;
+        String result;
+        File besStandAlone = new File(_besPrefix, "/bin/besstandalone");
+        File   bescmd      = new File(_tmpDir,"bes.cmd");
+
+
         Element das = new Element(GlacierRecord.DAS, GlacierRecord.GlacierRecordNameSpace);
-        das.setAttribute("type","das");
-
         sysCmd = new StringBuilder();
 
         mkCommand(bescmd,datasetFile,DAP2.DAS);
         sysCmd.append(besStandAlone)
-                .append(" -c ").append(besConfig)
+                .append(" -c ").append(_besConf.getAbsolutePath())
                 .append(" -i ").append(bescmd.getAbsolutePath())
                 ;//.append(" -f ").append(metadataResult);
 
         result = runSysCommand(sysCmd.toString());
-        das.setText(result);
-        gar.addMetaDataElement(GlacierRecord.DAS,das);
+        if(_verbose)
+            System.out.println("\n\n"+result);
+//        das.setText(result);
+
+        return das;
+    }
 
 
-        // ------------- Retrieve DDX ----------------
+
+    public Element getDDXGlacierRecordMetadataElement(File datasetFile) throws BadConfigurationException, IOException {
+
+        StringBuilder sysCmd;
+        String result;
+        File besStandAlone = new File(_besPrefix, "/bin/besstandalone");
+        File   bescmd      = new File(_tmpDir,"bes.cmd");
+
+
         Element ddx = new Element(GlacierRecord.DDX, GlacierRecord.GlacierRecordNameSpace);
-        ddx.setAttribute("type","ddx");
-
 
         sysCmd = new StringBuilder();
 
         mkCommand(bescmd, datasetFile, DAP2.DDX);
         sysCmd.append(besStandAlone)
-                .append(" -c ").append(besConfig)
+                .append(" -c ").append(_besConf.getAbsolutePath())
                 .append(" -i ").append(bescmd.getAbsolutePath())
                 ;//.append(" -f ").append(metadataResult);
 
         result = runSysCommand(sysCmd.toString());
 
+        if(_verbose)
+            System.out.println("\n\n"+result);
         ddx.setText(result);
-        gar.addMetaDataElement(GlacierRecord.DDX,ddx);
+
+        return ddx;
+    }
+
+
+    public  void extractMetadata(GlacierRecord gar, File datasetFile) throws BadConfigurationException, IOException {
+
+
+        RequestCache.openThreadCache();
+        try {
+
+            // -------------------------------------------
+            // ------------- Retrieve DDX ----------------
+            Element ddx = getDDXGlacierRecordMetadataElement(datasetFile);
+            gar.addMetaDataElement(GlacierRecord.DDX,ddx);
+
+
+            // -------------------------------------------
+            // ------------- Retrieve DDS ----------------
+
+            Element dds = getDDSGlacierRecordMetadataElement(datasetFile);
+            gar.addMetaDataElement(GlacierRecord.DDS, dds);
+
+
+            // -------------------------------------------
+            // ------------- Retrieve DAS ----------------
+            Element das = getDASGlacierRecordMetadataElement(datasetFile);
+            gar.addMetaDataElement(GlacierRecord.DAS,das);
+
+
+
+            }
+        finally {
+            RequestCache.closeThreadCache();
+
+        }
 
     }
 
@@ -202,11 +406,8 @@ public class BesMetadataExtractor {
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
         BesApi besApi = new BesApi();
 
-        if(!cmdFile.exists())
-            cmdFile.createNewFile();
 
-
-        String resourceID  = datasetFile.getName();
+        String resourceID  = datasetFile.getPath();
 
         Document bescmd = null;
         switch(responseType){
@@ -236,36 +437,5 @@ public class BesMetadataExtractor {
 
 
 
-    public static void main(String[] args)  {
-
-
-        File targetDir =  new File("/Users/ndp/scratch/s3Test/foo-s3cmd.nodc.noaa.gov");
-
-        File datasetFile = new File("/Users/ndp/scratch/s3Test/foo-s3cmd.nodc.noaa.gov/#2Fgdr#2Fcycle097#2FJA2_GPN_2PdP097_093_20110222_131017_20110222_140630.nc");
-
-        String besPrefix = "/Users/ndp/hyrax/trunk";
-
-        init(besPrefix);
-
-
-        try {
-            GlacierRecord grec = new GlacierRecord("vname","resourceId","archiveId");
-
-            BesMetadataExtractor.extractMetadata(grec,targetDir, datasetFile);
-            XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-
-            xmlo.output(grec.getArchiveRecordDocument(),System.out);
-
-
-
-        } catch (BadConfigurationException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-        destroy();
-    }
 
 }

@@ -28,6 +28,7 @@ package opendap.aws.glacier;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
+import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.model.*;
 import opendap.aws.auth.Credentials;
 import org.apache.commons.io.IOUtils;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Date;
 
-public class ActiveDownload  implements  Serializable {
+public class InventoryDownload  implements  Serializable {
 
     Logger _log;
 
@@ -47,26 +48,35 @@ public class ActiveDownload  implements  Serializable {
     Date _startDate;
     private long _expectedDelay;   // In seconds
     InitiateJobResult _initiateJobResult;
-    GlacierRecord _glacierRecord;
-    public static final String GLACIER_ARCHIVE_RETRIEVAL = "archive-retrieval";
+    public static final String GLACIER_INVENTORY_RETRIEVAL = "inventory-retrieval";
 
-    ActiveDownload(
-        GlacierRecord glacierRecord,
-        long expectedDelay
-    ) {
+    private String _vaultName;
+    private String _endPointUrl;
+
+    private AWSCredentials _credentials;
+
+
+    public InventoryDownload(String vaultName, String glacierEndpointUrl, AWSCredentials awsCredentials, long expectedDelay) {
 
         _log = LoggerFactory.getLogger(this.getClass());
 
+        _vaultName = vaultName;
+        _endPointUrl = glacierEndpointUrl;
+        _credentials = awsCredentials;
+        _expectedDelay = expectedDelay;
+
         _startDate = null;
         _initiateJobResult = null;
-        _glacierRecord = glacierRecord;
-        _expectedDelay = expectedDelay;
         _started = false;
     }
 
     public Date getStartDate(){ return _startDate; }
 
     public long getExpectedDelay(){ return _expectedDelay; }
+
+    public String getVaultName() { return _vaultName;}
+    public String getEndpointUrl() { return _endPointUrl; }
+    public AWSCredentials getCredentials() { return _credentials; }
 
 
     // Returns Estimated wait time in seconds
@@ -91,75 +101,68 @@ public class ActiveDownload  implements  Serializable {
 
     public InitiateJobResult getInitiateJobResult(){ return _initiateJobResult; }
 
-    public GlacierRecord getGlacierRecord(){ return _glacierRecord; }
 
 
+    public boolean startRetrieval() throws IOException {
 
-    public boolean startGlacierRetrieval(AWSCredentials glacierCreds) throws IOException {
-
-        _log.debug("startGlacierRetrieval() - BEGIN ");
+        _log.debug("startRetrieval() - BEGIN ");
 
         if(_started)
-            throw new IOException("Glacier retrieval job for resourceID '"+_glacierRecord.getResourceId()+" has already been started!");
+            throw new IOException("Glacier inventory retrieval job has already been started!");
 
-        AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(glacierCreds);
-        client.setEndpoint(GlacierArchiveManager.theManager().getGlacierEndpoint());
+        AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(getCredentials());
+        client.setEndpoint(getEndpointUrl());
 
-        String vaultName  = _glacierRecord.getVaultName();
-        String archiveId  = _glacierRecord.getArchiveId();
-        String resourceId = _glacierRecord.getResourceId();
+
+
 
         JobParameters jobParameters = new JobParameters()
-            .withArchiveId(archiveId)
-            .withDescription("Retrieving " + resourceId)
-            .withType(GLACIER_ARCHIVE_RETRIEVAL);
+            .withDescription("Inventory Retrieval")
+            .withType(GLACIER_INVENTORY_RETRIEVAL);
 
+        InitiateJobRequest ijb = new InitiateJobRequest(getVaultName(),jobParameters);
         try {
 
             _startDate = new Date();
 
-            _initiateJobResult = client.initiateJob(new InitiateJobRequest()
-                    .withJobParameters(jobParameters)
-                    .withVaultName(vaultName));
+            _initiateJobResult = client.initiateJob(ijb);
 
 
-            _log.debug("startGlacierRetrieval() - Glacier download job started. jobId: {}",_initiateJobResult.getJobId());
+            _log.debug("startRetrieval() - Glacier download job started. jobId: {}",_initiateJobResult.getJobId());
 
             _started = true;
 
         }
         catch (Exception e) {
-            _log.error("startGlacierRetrieval() - Download failed to start! msg: {}",e.getMessage());
+            _log.error("startRetrieval() - Download failed to start! msg: {}",e.getMessage());
         }
 
-        _log.debug("startGlacierRetrieval() - END ");
+        _log.debug("startRetrieval() - END ");
 
         return _started;
 
     }
 
-    public boolean isReadyForDownload(AWSCredentials glacierCreds) throws IOException {
+
+    public boolean isReadyForDownload() throws IOException {
 
         _log.debug("isReadyForDownload() - BEGIN ");
 
         if(!_started)
-            throw new IOException("Glacier retrieval job for resourceID '"+_glacierRecord.getResourceId()+" has already NOT been started!");
+            throw new IOException("Glacier retrieval job has NOT been started!");
 
 
-        AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(glacierCreds);
+        AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(getCredentials());
         client.setEndpoint(GlacierArchiveManager.theManager().getGlacierEndpoint());
-
-        String vaultName  = _glacierRecord.getVaultName();
 
 
         InitiateJobResult initiateJobResult = getInitiateJobResult();
-
 
         long timeRemaining = estimatedTimeRemaining();
 
         _log.debug("isReadyForDownload() - Estimated Time Remaining: {} seconds  jobId: {}",timeRemaining,initiateJobResult.getJobId());
 
-        DescribeJobRequest djr = new DescribeJobRequest(vaultName,initiateJobResult.getJobId());
+        DescribeJobRequest djr = new DescribeJobRequest(getVaultName(),initiateJobResult.getJobId());
 
         DescribeJobResult describeJobResult = client.describeJob(djr);
 
@@ -174,37 +177,43 @@ public class ActiveDownload  implements  Serializable {
     }
 
 
-    public boolean download(AWSCredentials glacierCreds){
+    public boolean download(File downloadFile) throws IOException {
 
-        _log.debug("download() - BEGIN (retrieving Glacier Resource {})",getGlacierRecord().getArchiveId());
+
+        if(!isReadyForDownload()) {
+            _log.warn("Glacier retrieval job has not completed!");
+            return false;
+        }
         boolean success = false;
 
+
         String jobId = getInitiateJobResult().getJobId();
-        String vaultName = getGlacierRecord().getVaultName();
-        File cacheFile = getGlacierRecord().getCacheFile();
+
+        _log.debug("download() - BEGIN (retrieving Glacier Job Result. JobID: {}",jobId);
+
 
         try {
-            AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(glacierCreds);
+            AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(getCredentials());
             client.setEndpoint(GlacierArchiveManager.theManager().getGlacierEndpoint());
 
 
             GetJobOutputRequest jobOutputRequest = new GetJobOutputRequest()
                     .withJobId(jobId)
-                    .withVaultName(vaultName);
+                    .withVaultName(getVaultName());
             GetJobOutputResult jobOutputResult = client.getJobOutput(jobOutputRequest);
 
             InputStream in = jobOutputResult.getBody();
 
-            FileOutputStream out = new FileOutputStream(cacheFile);
+            FileOutputStream out = new FileOutputStream(downloadFile);
             IOUtils.copy(in, out);
 
-            _log.error("download() - Retrieved glacier resource. CacheFile: ",cacheFile.getAbsolutePath());
+            _log.error("download() - Retrieved Glacier job output. CacheFile: ",downloadFile.getAbsolutePath());
 
             success = true;
 
         }
         catch (Exception e) {
-            _log.error("download() - Failed to to download glacier resource. Msg: {}",e.getMessage());
+            _log.error("download() - Failed to retrieve Glacier job output. Msg: {}",e.getMessage());
         }
 
 
