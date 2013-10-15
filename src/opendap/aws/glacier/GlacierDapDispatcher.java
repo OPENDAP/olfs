@@ -31,7 +31,6 @@ import opendap.async.HttpHeaders;
 import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dapResponders.DapDispatcher;
-import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -136,7 +135,7 @@ public class GlacierDapDispatcher extends DapDispatcher{
                 String resourceId = r.removeRequestSuffixFromString(relativeUrl);
                 log.debug("Requested resourceId: {}",resourceId);
 
-                GlacierRecord gar = GlacierArchiveManager.theManager().getArchiveRecord(resourceId);
+                GlacierArchive gar = GlacierManager.theManager().getArchiveRecord(resourceId);
 
 
                 if(gar!=null){
@@ -199,7 +198,7 @@ public class GlacierDapDispatcher extends DapDispatcher{
 
                     }
 
-                    long estimatedRetrievalTime = DownloadManager.theManager().initiateGlacierDownload(gar);
+                    long estimatedRetrievalTime = DownloadManager.theManager().initiateArchiveDownload(gar);
 
                     if(estimatedRetrievalTime == -1){
 
@@ -428,7 +427,7 @@ public class GlacierDapDispatcher extends DapDispatcher{
 
 
 
-    public void conditionallySetLastModifiedTime(HttpServletResponse response, GlacierRecord gar){
+    public void conditionallySetLastModifiedTime(HttpServletResponse response, GlacierArchive gar){
 
         log.debug("conditionallySetLastModifiedTime() - Checking Last-Modified header...");
 

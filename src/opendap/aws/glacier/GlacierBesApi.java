@@ -80,15 +80,15 @@ public class GlacierBesApi extends BesApi {
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
 
-        GlacierRecord grec;
+        GlacierArchive grec;
         try {
-            grec = GlacierArchiveManager.theManager().getArchiveRecord(dataSource);
+            grec = GlacierManager.theManager().getArchiveRecord(dataSource);
         } catch (JDOMException e) {
             throw new IOException("Unable to parse Glacier Record object. msg: "+e.getMessage(), e);
         }
 
         if(grec!=null){
-            Element dds = grec.getMetadataElement(GlacierRecord.DDS);
+            Element dds = grec.getMetadataElement(GlacierArchive.DDS);
 
             if(dds!=null){
                 os.write(dds.getTextTrim().getBytes());
@@ -117,15 +117,15 @@ public class GlacierBesApi extends BesApi {
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
 
-        GlacierRecord grec;
+        GlacierArchive grec;
         try {
-            grec = GlacierArchiveManager.theManager().getArchiveRecord(dataSource);
+            grec = GlacierManager.theManager().getArchiveRecord(dataSource);
         } catch (JDOMException e) {
             throw new IOException("Unable to parse Glacier Record object. msg: "+e.getMessage(), e);
         }
 
         if(grec!=null){
-            Element das = grec.getMetadataElement(GlacierRecord.DAS);
+            Element das = grec.getMetadataElement(GlacierArchive.DAS);
 
             if(das!=null){
                 os.write(das.getTextTrim().getBytes());
@@ -157,15 +157,15 @@ public class GlacierBesApi extends BesApi {
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
 
-        GlacierRecord grec;
+        GlacierArchive grec;
         try {
-            grec = GlacierArchiveManager.theManager().getArchiveRecord(dataSource);
+            grec = GlacierManager.theManager().getArchiveRecord(dataSource);
         } catch (JDOMException e) {
             throw new IOException("Unable to parse Glacier Record object. msg: "+e.getMessage(), e);
         }
 
         if(grec!=null){
-            Element ddx = grec.getMetadataElement(GlacierRecord.DDX);
+            Element ddx = grec.getMetadataElement(GlacierArchive.DDX);
 
             if(ddx!=null){
                 String ddxDoc = ddx.getTextTrim();
@@ -216,15 +216,15 @@ public class GlacierBesApi extends BesApi {
 
         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
 
-        GlacierRecord grec;
+        GlacierArchive grec;
         try {
-            grec = GlacierArchiveManager.theManager().getArchiveRecord(dataSource);
+            grec = GlacierManager.theManager().getArchiveRecord(dataSource);
         } catch (JDOMException e) {
             throw new IOException("Unable to parse Glacier Record object. msg: "+e.getMessage(), e);
         }
 
         if(grec!=null){
-            Element ddx = grec.getMetadataElement(GlacierRecord.DDX);
+            Element ddx = grec.getMetadataElement(GlacierArchive.DDX);
 
             if(ddx!=null){
                 String ddxDoc = ddx.getTextTrim();

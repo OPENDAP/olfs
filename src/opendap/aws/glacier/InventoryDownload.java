@@ -27,203 +27,39 @@
 package opendap.aws.glacier;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.glacier.AmazonGlacierAsyncClient;
-import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.model.*;
-import opendap.aws.auth.Credentials;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Date;
 
-public class InventoryDownload  implements  Serializable {
+public class InventoryDownload  extends Download implements  Serializable {
 
     Logger _log;
-
-    private boolean _started;
-
-
-    Date _startDate;
-    private long _expectedDelay;   // In seconds
-    InitiateJobResult _initiateJobResult;
     public static final String GLACIER_INVENTORY_RETRIEVAL = "inventory-retrieval";
-
-    private String _vaultName;
-    private String _endPointUrl;
-
-    private AWSCredentials _credentials;
 
 
     public InventoryDownload(String vaultName, String glacierEndpointUrl, AWSCredentials awsCredentials, long expectedDelay) {
 
+        super(vaultName,glacierEndpointUrl,awsCredentials,expectedDelay);
         _log = LoggerFactory.getLogger(this.getClass());
 
-        _vaultName = vaultName;
-        _endPointUrl = glacierEndpointUrl;
-        _credentials = awsCredentials;
-        _expectedDelay = expectedDelay;
+        ;
 
-        _startDate = null;
-        _initiateJobResult = null;
-        _started = false;
-    }
-
-    public Date getStartDate(){ return _startDate; }
-
-    public long getExpectedDelay(){ return _expectedDelay; }
-
-    public String getVaultName() { return _vaultName;}
-    public String getEndpointUrl() { return _endPointUrl; }
-    public AWSCredentials getCredentials() { return _credentials; }
-
-
-    // Returns Estimated wait time in seconds
-    public long estimatedTimeRemaining() throws IOException{
-
-        if(_startDate == null){
-            throw new IOException("Glacier Job has not been started!");
-        }
-
-        long start = _startDate.getTime();
-        long now = new Date().getTime();
-
-        long elapsed = now - start;
-
-        long remaining  = (_expectedDelay*1000) - elapsed;
-        if(remaining<0)
-            remaining = 0;
-
-        return remaining/1000;
 
     }
 
-    public InitiateJobResult getInitiateJobResult(){ return _initiateJobResult; }
-
-
-
-    public boolean startRetrieval() throws IOException {
-
-        _log.debug("startRetrieval() - BEGIN ");
-
-        if(_started)
-            throw new IOException("Glacier inventory retrieval job has already been started!");
-
-        AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(getCredentials());
-        client.setEndpoint(getEndpointUrl());
-
-
-
+    @Override
+    public boolean startJob() throws IOException {
 
         JobParameters jobParameters = new JobParameters()
-            .withDescription("Inventory Retrieval")
-            .withType(GLACIER_INVENTORY_RETRIEVAL);
+            .withType(GLACIER_INVENTORY_RETRIEVAL)
+                .withDescription(GLACIER_INVENTORY_RETRIEVAL);
 
-        InitiateJobRequest ijb = new InitiateJobRequest(getVaultName(),jobParameters);
-        try {
-
-            _startDate = new Date();
-
-            _initiateJobResult = client.initiateJob(ijb);
-
-
-            _log.debug("startRetrieval() - Glacier download job started. jobId: {}",_initiateJobResult.getJobId());
-
-            _started = true;
-
-        }
-        catch (Exception e) {
-            _log.error("startRetrieval() - Download failed to start! msg: {}",e.getMessage());
-        }
-
-        _log.debug("startRetrieval() - END ");
-
-        return _started;
+        return startJob(jobParameters);
 
     }
 
-
-    public boolean isReadyForDownload() throws IOException {
-
-        _log.debug("isReadyForDownload() - BEGIN ");
-
-        if(!_started)
-            throw new IOException("Glacier retrieval job has NOT been started!");
-
-
-        AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(getCredentials());
-        client.setEndpoint(GlacierArchiveManager.theManager().getGlacierEndpoint());
-
-
-        InitiateJobResult initiateJobResult = getInitiateJobResult();
-
-        long timeRemaining = estimatedTimeRemaining();
-
-        _log.debug("isReadyForDownload() - Estimated Time Remaining: {} seconds  jobId: {}",timeRemaining,initiateJobResult.getJobId());
-
-        DescribeJobRequest djr = new DescribeJobRequest(getVaultName(),initiateJobResult.getJobId());
-
-        DescribeJobResult describeJobResult = client.describeJob(djr);
-
-        _log.debug("isReadyForDownload() - DescribeJobResult: {}",describeJobResult.toString());
-        _log.debug("isReadyForDownload() - DescribeJobResult.isCompleted(): {}",describeJobResult.isCompleted());
-        _log.debug("isReadyForDownload() - DescribeJobResult.status(): {}",describeJobResult.getStatusCode());
-
-        _log.debug("isReadyForDownload() - END ");
-
-        return describeJobResult.isCompleted();
-
-    }
-
-
-    public boolean download(File downloadFile) throws IOException {
-
-
-        if(!isReadyForDownload()) {
-            _log.warn("Glacier retrieval job has not completed!");
-            return false;
-        }
-        boolean success = false;
-
-
-        String jobId = getInitiateJobResult().getJobId();
-
-        _log.debug("download() - BEGIN (retrieving Glacier Job Result. JobID: {}",jobId);
-
-
-        try {
-            AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(getCredentials());
-            client.setEndpoint(GlacierArchiveManager.theManager().getGlacierEndpoint());
-
-
-            GetJobOutputRequest jobOutputRequest = new GetJobOutputRequest()
-                    .withJobId(jobId)
-                    .withVaultName(getVaultName());
-            GetJobOutputResult jobOutputResult = client.getJobOutput(jobOutputRequest);
-
-            InputStream in = jobOutputResult.getBody();
-
-            FileOutputStream out = new FileOutputStream(downloadFile);
-            IOUtils.copy(in, out);
-
-            _log.error("download() - Retrieved Glacier job output. CacheFile: ",downloadFile.getAbsolutePath());
-
-            success = true;
-
-        }
-        catch (Exception e) {
-            _log.error("download() - Failed to retrieve Glacier job output. Msg: {}",e.getMessage());
-        }
-
-
-
-        _log.debug("download() - END");
-
-
-        return success;
-
-    }
 
 
 }

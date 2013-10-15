@@ -40,7 +40,6 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -197,7 +196,7 @@ public class CatalogServlet extends HttpServlet {
 
         long lmt = -1;
 
-        Index index = GlacierArchiveManager.theManager().getIndex(resourceId);
+        Index index = GlacierManager.theManager().getIndex(resourceId);
 
         if(index == null) {
             _log.debug("getLastModified() - The requested index '{}' was not Found.",resourceId);
@@ -260,12 +259,12 @@ public class CatalogServlet extends HttpServlet {
 
 
 
-        String vaultName = GlacierArchiveManager.theManager().getVaultName(indexResourceId);
+        String vaultName = GlacierManager.theManager().getVaultName(indexResourceId);
 
         //indexResourceId = indexResourceId.substring(vaultName.length());
 
 
-        index = GlacierArchiveManager.theManager().getIndex(indexResourceId);
+        index = GlacierManager.theManager().getIndex(indexResourceId);
 
 
         if(index == null) {
@@ -281,8 +280,8 @@ public class CatalogServlet extends HttpServlet {
             XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 
 
-            String catalogServiceContext = GlacierArchiveManager.theManager().getCatalogServiceContext(indexResourceId);
-            String dapServiceContext = GlacierArchiveManager.theManager().getDapServiceContext(indexResourceId);
+            String catalogServiceContext = GlacierManager.theManager().getCatalogServiceContext(indexResourceId);
+            String dapServiceContext = GlacierManager.theManager().getDapServiceContext(indexResourceId);
 
 
             Element catalog = index.getThreddsCatalog(vaultName,catalogServiceContext,dapServiceContext);

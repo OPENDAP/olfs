@@ -27,16 +27,10 @@
 package opendap.aws.glacier;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.glacier.AmazonGlacierClient;
-import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
-import com.amazonaws.services.glacier.transfer.UploadResult;
 import opendap.aws.auth.Credentials;
-import opendap.aws.s3.S3Object;
-import opendap.bes.BadConfigurationException;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
@@ -51,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 11:02 AM
  * To change this template use File | Settings | File Templates.
  */
-public class GlacierArchiveManager {
+public class GlacierManager {
 
 
     org.slf4j.Logger log;
@@ -74,7 +68,7 @@ public class GlacierArchiveManager {
 
     private AWSCredentials _glacierCredentials;
 
-    private static GlacierArchiveManager theManager = null;
+    private static GlacierManager theManager = null;
 
     public  static final String DefaultResourceCacheDirectoryName = "cache";
 
@@ -85,7 +79,7 @@ public class GlacierArchiveManager {
     public static final String CONFIG_ELEMENT_AWS_SECRET_KEY = "AwsSecretKey";
 
 
-    private GlacierArchiveManager() {
+    private GlacierManager() {
         log = LoggerFactory.getLogger(this.getClass());
         _glacierRootDirectoryName = null;
         _glacierRootDirectory = null;
@@ -200,10 +194,10 @@ public class GlacierArchiveManager {
 
 
 
-    public static GlacierArchiveManager theManager(){
+    public static GlacierManager theManager(){
 
         if(theManager==null)
-            theManager = new GlacierArchiveManager();
+            theManager = new GlacierManager();
 
         return theManager;
     }
@@ -248,7 +242,7 @@ public class GlacierArchiveManager {
     }
 
 
-    public GlacierRecord getArchiveRecord(String vaultName, String resourceId) throws IOException, JDOMException {
+    public GlacierArchive getArchiveRecord(String vaultName, String resourceId) throws IOException, JDOMException {
         GlacierVaultManager gvm =  getVaultManager(vaultName);
         if(gvm==null)
             return null;
@@ -256,17 +250,17 @@ public class GlacierArchiveManager {
         return gvm.getArchiveRecord(resourceId);
     }
 
-    public GlacierRecord getArchiveRecord(String combinedVaultResourceId) throws IOException, JDOMException {
-        String glacierVaultName = GlacierArchiveManager.theManager().getVaultName(combinedVaultResourceId);
+    public GlacierArchive getArchiveRecord(String combinedVaultResourceId) throws IOException, JDOMException {
+        String glacierVaultName = GlacierManager.theManager().getVaultName(combinedVaultResourceId);
 
         String resourceId  = combinedVaultResourceId.substring(glacierVaultName.length());
 
-        return GlacierArchiveManager.theManager().getArchiveRecord(glacierVaultName,resourceId);
+        return GlacierManager.theManager().getArchiveRecord(glacierVaultName,resourceId);
 
     }
 
 
-    public void addArchiveRecord(GlacierRecord gar) throws IOException {
+    public void addArchiveRecord(GlacierArchive gar) throws IOException {
 
         String vaultName =  gar.getVaultName();
         GlacierVaultManager gvm = makeVaultManagerIfNeeded(vaultName);
@@ -379,19 +373,19 @@ public class GlacierArchiveManager {
         Element e;
 
 
-        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ENDPOINT);
+        e = new Element(GlacierManager.CONFIG_ELEMENT_GLACIER_ENDPOINT);
         e.setText(glacierEndpoint);
         glacierConfig.addContent(e);
 
-        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
+        e = new Element(GlacierManager.CONFIG_ELEMENT_GLACIER_ARCHIVE_ROOT);
         e.setText(glacierArchiveRootDir);
         glacierConfig.addContent(e);
 
-        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_AWS_ACCESS_KEY_ID);
+        e = new Element(GlacierManager.CONFIG_ELEMENT_AWS_ACCESS_KEY_ID);
         e.setText(awsId);
         glacierConfig.addContent(e);
 
-        e = new Element(GlacierArchiveManager.CONFIG_ELEMENT_AWS_SECRET_KEY);
+        e = new Element(GlacierManager.CONFIG_ELEMENT_AWS_SECRET_KEY);
         e.setText(awsKey);
         glacierConfig.addContent(e);
 

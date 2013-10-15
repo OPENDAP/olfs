@@ -129,7 +129,7 @@ public class BesMetadataExtractor {
 
                 File datasetFile = new File(dataFileName);
 
-                GlacierRecord grec = new GlacierRecord("vaultName",dataFileName,"archiveId");
+                GlacierArchive grec = new GlacierArchive("vaultName",dataFileName,"archiveId");
 
 
                 bme.extractMetadata(grec, datasetFile);
@@ -259,7 +259,7 @@ public class BesMetadataExtractor {
         File besStandAlone = new File(_besPrefix, "/bin/besstandalone");
         File   bescmd      = new File(_tmpDir,"bes.cmd");
 
-        Element dds = new Element(GlacierRecord.DDS, GlacierRecord.GlacierRecordNameSpace);
+        Element dds = new Element(GlacierArchive.DDS, GlacierArchive.GlacierRecordNameSpace);
         sysCmd = new StringBuilder();
 
         mkCommand(bescmd,datasetFile,DAP2.DDS);
@@ -285,7 +285,7 @@ public class BesMetadataExtractor {
         File   bescmd      = new File(_tmpDir,"bes.cmd");
 
 
-        Element das = new Element(GlacierRecord.DAS, GlacierRecord.GlacierRecordNameSpace);
+        Element das = new Element(GlacierArchive.DAS, GlacierArchive.GlacierRecordNameSpace);
         sysCmd = new StringBuilder();
 
         mkCommand(bescmd,datasetFile,DAP2.DAS);
@@ -312,7 +312,7 @@ public class BesMetadataExtractor {
         File   bescmd      = new File(_tmpDir,"bes.cmd");
 
 
-        Element ddx = new Element(GlacierRecord.DDX, GlacierRecord.GlacierRecordNameSpace);
+        Element ddx = new Element(GlacierArchive.DDX, GlacierArchive.GlacierRecordNameSpace);
 
         sysCmd = new StringBuilder();
 
@@ -332,7 +332,7 @@ public class BesMetadataExtractor {
     }
 
 
-    public  void extractMetadata(GlacierRecord gar, File datasetFile) throws BadConfigurationException, IOException {
+    public  void extractMetadata(GlacierArchive gar, File datasetFile) throws BadConfigurationException, IOException {
 
 
         RequestCache.openThreadCache();
@@ -341,20 +341,20 @@ public class BesMetadataExtractor {
             // -------------------------------------------
             // ------------- Retrieve DDX ----------------
             Element ddx = getDDXGlacierRecordMetadataElement(datasetFile);
-            gar.addMetaDataElement(GlacierRecord.DDX,ddx);
+            gar.addMetaDataElement(GlacierArchive.DDX,ddx);
 
 
             // -------------------------------------------
             // ------------- Retrieve DDS ----------------
 
             Element dds = getDDSGlacierRecordMetadataElement(datasetFile);
-            gar.addMetaDataElement(GlacierRecord.DDS, dds);
+            gar.addMetaDataElement(GlacierArchive.DDS, dds);
 
 
             // -------------------------------------------
             // ------------- Retrieve DAS ----------------
             Element das = getDASGlacierRecordMetadataElement(datasetFile);
-            gar.addMetaDataElement(GlacierRecord.DAS,das);
+            gar.addMetaDataElement(GlacierArchive.DAS,das);
 
 
 

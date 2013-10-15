@@ -54,21 +54,22 @@ public class DownloadManager {
 
     private boolean _isInitialized;
 
-    private ConcurrentHashMap<String, ArchiveDownload> _activeDownloads;
+    private ConcurrentHashMap<String, ArchiveDownload> _activeArchiveDownloads;
+
+    private InventoryDownload _inventoryDownload;
 
     private WorkerThread worker;
     private Thread workerThread;
 
     private File _targetDir;
 
-    private String  _activeDownloadBackupFileName;
+    private String _activeArchiveDownloadBackupFileName;
 
-    private ReentrantLock _downloadLock;
+    private String _activeInventoryDownloadBackupFileName;
+
+    private ReentrantLock _managerLock;
 
     private static DownloadManager _theManager = null;
-
-    public static final String GLACIER_ARCHIVE_RETRIEVAL = "archive-retrieval";
-    public static final String GLACIER_INVENTORY_RETRIEVAL = "inventory-retrieval";
 
     public static final long DEFAULT_GLACIER_ACCESS_DELAY = 14400; // 4 hours worth of seconds.
     public static final long MINIMUM_GLACIER_ACCESS_DELAY = 60; // 4 hours worth of seconds.
@@ -78,9 +79,11 @@ public class DownloadManager {
     private DownloadManager() {
 
         _log = LoggerFactory.getLogger(this.getClass());
-        _activeDownloads = new ConcurrentHashMap<String, ArchiveDownload>();
-        _downloadLock = new ReentrantLock();
-        _activeDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveDownloads";
+        _activeArchiveDownloads = new ConcurrentHashMap<String, ArchiveDownload>();
+        _inventoryDownload = null;
+        _managerLock = new ReentrantLock();
+        _activeArchiveDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveArchiveDownloads";
+        _activeInventoryDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveInventoryDownload";
         _isInitialized = false;
         _awsCredentials = null;
         workerThread = null;
@@ -98,7 +101,7 @@ public class DownloadManager {
 
     public void init(File targetDir, AWSCredentials credentials) throws IOException, JDOMException {
 
-        _downloadLock.lock();
+        _managerLock.lock();
         try {
             if(_isInitialized) {
                 _log.debug("init() - Already initialized, nothing to do.");
@@ -109,7 +112,8 @@ public class DownloadManager {
 
             _targetDir = targetDir;
 
-            loadActiveDownloads();
+            loadActiveArchiveDownloads();
+            loadActiveInventoryDownload();
 
             startDownloadWorker(_awsCredentials);
 
@@ -117,71 +121,71 @@ public class DownloadManager {
 
         }
         finally {
-            _downloadLock.unlock();
+            _managerLock.unlock();
         }
     }
 
-    public boolean alreadyRequested(GlacierRecord gRec){
+    public boolean alreadyRequested(GlacierArchive gRec){
         String resourceId = gRec.getResourceId();
 
-        _downloadLock.lock();
+        _managerLock.lock();
         try {
-            return _activeDownloads.containsKey(resourceId);
+            return _activeArchiveDownloads.containsKey(resourceId);
         }
         finally {
-            _downloadLock.unlock();
+            _managerLock.unlock();
         }
 
 
     }
 
-    public long initiateGlacierDownload(GlacierRecord gRec ) throws JDOMException, IOException {
+    public long initiateArchiveDownload(GlacierArchive gRec) throws JDOMException, IOException {
 
-        return initiateGlacierDownload(_awsCredentials,gRec);
+        return initiateArchiveDownload(_awsCredentials, gRec);
     }
 
 
 
-    public long initiateGlacierDownload(AWSCredentials glacierCreds, GlacierRecord gRec ) throws JDOMException, IOException {
+    public long initiateArchiveDownload(AWSCredentials glacierCreds, GlacierArchive gArc) throws JDOMException, IOException {
 
-        _log.debug("initiateGlacierDownload() - BEGIN");
+        _log.debug("initiateArchiveDownload() - BEGIN");
 
-        String vaultName  = gRec.getVaultName();
-        String archiveId  = gRec.getArchiveId();
-        String resourceId = gRec.getResourceId();
+        String vaultName  = gArc.getVaultName();
+        String archiveId  = gArc.getArchiveId();
+        String resourceId = gArc.getResourceId();
 
-        _log.debug("initiateGlacierDownload() -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
-        _log.debug("initiateGlacierDownload() - Downloading resource from Glacier:  ");
-        _log.debug("initiateGlacierDownload() -     Vault Name:  {}", vaultName);
-        _log.debug("initiateGlacierDownload() -     Resource ID: {}", resourceId);
-        _log.debug("initiateGlacierDownload() -     Archive ID:  {}", archiveId);
+        _log.debug("initiateArchiveDownload() -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
+        _log.debug("initiateArchiveDownload() - Downloading resource from Glacier:  ");
+        _log.debug("initiateArchiveDownload() -     Vault Name:  {}", vaultName);
+        _log.debug("initiateArchiveDownload() -     Resource ID: {}", resourceId);
+        _log.debug("initiateArchiveDownload() -     Archive ID:  {}", archiveId);
 
         long estimatedRetrievalTime = DEFAULT_GLACIER_ACCESS_DELAY;
-        _downloadLock.lock();
+        _managerLock.lock();
         try {
             AmazonGlacierAsyncClient client = new AmazonGlacierAsyncClient(glacierCreds);
-            client.setEndpoint(GlacierArchiveManager.theManager().getGlacierEndpoint());
+            client.setEndpoint(GlacierManager.theManager().getGlacierEndpoint());
 
 
-            if(_activeDownloads.containsKey(resourceId)){
+            if(_activeArchiveDownloads.containsKey(resourceId)){
 
-                ArchiveDownload activeDownload = _activeDownloads.get(resourceId);
-                estimatedRetrievalTime = activeDownload.estimatedTimeRemaining();
+                Download download = _activeArchiveDownloads.get(resourceId);
+                estimatedRetrievalTime = download.estimatedTimeRemaining();
 
-                if(activeDownload.isReadyForDownload()){
-                    activeDownload.download();
+                if(download.jobCompleted()){
+                    download.downloadJobOutput(gArc.getCacheFile());
                     estimatedRetrievalTime = 0;
                 }
 
             }
             else {
 
-                ArchiveDownload ad = new ArchiveDownload(gRec,glacierCreds, DEFAULT_GLACIER_ACCESS_DELAY);
+                ArchiveDownload ad = new ArchiveDownload(gArc,glacierCreds, DEFAULT_GLACIER_ACCESS_DELAY);
 
-                if(ad.startArchiveRetrieval()) {
-                    _activeDownloads.put(resourceId,ad);
-                    saveActiveDownloads();
-                    _log.debug("initiateGlacierDownload() - Active downloads saved.");
+                if(ad.startJob()) {
+                    _activeArchiveDownloads.put(resourceId,ad);
+                    saveActiveArchiveDownloads();
+                    _log.debug("initiateArchiveDownload() - Active downloads saved.");
                     estimatedRetrievalTime = ad.estimatedTimeRemaining();
                 }
                 else {
@@ -192,10 +196,10 @@ public class DownloadManager {
             }
         }
         finally {
-            _downloadLock.unlock();
+            _managerLock.unlock();
         }
 
-        _log.debug("initiateGlacierDownload() - END");
+        _log.debug("initiateArchiveDownload() - END");
 
 
         return estimatedRetrievalTime;
@@ -203,30 +207,169 @@ public class DownloadManager {
 
 
 
-    private void saveActiveDownloads() throws IOException {
+    public boolean download(String downloadId) throws IOException {
+
+        _managerLock.lock();
+        try {
+            if(_activeArchiveDownloads.containsKey(downloadId)){
+                Download download = _activeArchiveDownloads.get(downloadId);
+                if(download.jobCompleted()){
+                    download.downloadJobOutput();
+                    return true;
+                }
+                _log.info("Job to retrieve '{}' not yet completed.",downloadId);
+            }
+            else {
+                _log.warn("Download ID '{}' was not found in the active downloads list.",downloadId);
+            }
+        }
+        finally {
+            _managerLock.unlock();
+        }
+        return false;
+
+    }
+
+    public boolean jobCompleted(String downloadId) throws IOException {
+
+        _managerLock.lock();
+        try {
+            if(_activeArchiveDownloads.containsKey(downloadId)){
+                Download download = _activeArchiveDownloads.get(downloadId);
+                if(download.jobCompleted()){
+                    _log.info("Job '{}' is completed. woot.",downloadId);
+                    return true;
+                }
+                _log.info("Job to retrieve '{}' not yet completed.",downloadId);
+            }
+            else {
+                _log.warn("Download ID '{}' was not found in the active downloads list.",downloadId);
+            }
+        }
+        finally {
+            _managerLock.unlock();
+        }
+        return false;
+
+    }
 
 
-        File backup = new File(_targetDir,_activeDownloadBackupFileName);
+
+    public long initiateVaultInventoryDownload(String vaultName, String endpointUrl, AWSCredentials glacierCreds) throws JDOMException, IOException {
+
+        _log.debug("initiateVaultInventoryDownload() - BEGIN");
+
+        String myIdKey = InventoryDownload.GLACIER_INVENTORY_RETRIEVAL;
+        long estimatedRetrievalTime = DEFAULT_GLACIER_ACCESS_DELAY;
+
+        _managerLock.lock();
+        try {
+
+
+            if(_inventoryDownload != null){
+
+                estimatedRetrievalTime = _inventoryDownload.estimatedTimeRemaining();
+
+                if(_inventoryDownload.jobCompleted()){
+                    _inventoryDownload.setDownloadFile(new File(_targetDir,vaultName+"-INVENTORY.json"));
+                    if(_inventoryDownload.downloadJobOutput()){
+                        File activeInventoryDownload = new File(_targetDir,_activeInventoryDownloadBackupFileName);
+                        if(activeInventoryDownload.exists()){
+                            activeInventoryDownload.delete();
+                            _log.info("initiateVaultInventoryDownload() Downloaded Inventory. Removed active Inventory download.");
+                        }
+                    }
+
+                    estimatedRetrievalTime = 0;
+                }
+
+            }
+            else {
+
+                InventoryDownload inventoryDownload = new InventoryDownload(vaultName,endpointUrl,glacierCreds,DEFAULT_GLACIER_ACCESS_DELAY);
+                if(inventoryDownload.startJob()) {
+                    _inventoryDownload = inventoryDownload;
+                    saveActiveInventoryDownload();
+                    _log.debug("initiateVaultInventoryDownload() - Active downloads saved.");
+                    estimatedRetrievalTime = inventoryDownload.estimatedTimeRemaining();
+                }
+                else {
+                    estimatedRetrievalTime = -1;
+
+                }
+
+            }
+        }
+        finally {
+            _managerLock.unlock();
+        }
+
+        _log.debug("initiateVaultInventoryDownload() - END");
+
+
+        return estimatedRetrievalTime;
+    }
+
+
+
+    private void saveActiveInventoryDownload() throws IOException {
+
+
+        File backup = new File(_targetDir, _activeInventoryDownloadBackupFileName);
 
         FileOutputStream fos = new FileOutputStream(backup);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-        oos.writeObject(_activeDownloads);
+        oos.writeObject(_inventoryDownload);
 
 
     }
 
-    private void loadActiveDownloads() throws IOException {
+    private void loadActiveInventoryDownload() throws IOException {
 
 
-        File backup = new File(_targetDir,_activeDownloadBackupFileName);
+        File backup = new File(_targetDir, _activeInventoryDownloadBackupFileName);
 
         if(backup.exists()){
             FileInputStream fis = new FileInputStream(backup);
             ObjectInputStream ois = new ObjectInputStream(fis);
 
             try {
-                _activeDownloads = (ConcurrentHashMap<String, ArchiveDownload>) ois.readObject();
+                _inventoryDownload = (InventoryDownload) ois.readObject();
+            } catch (Exception e) {
+                reloadingJobsError(backup,e);
+
+            }
+        }
+
+    }
+
+
+
+    private void saveActiveArchiveDownloads() throws IOException {
+
+
+        File backup = new File(_targetDir, _activeArchiveDownloadBackupFileName);
+
+        FileOutputStream fos = new FileOutputStream(backup);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+        oos.writeObject(_activeArchiveDownloads);
+
+
+    }
+
+    private void loadActiveArchiveDownloads() throws IOException {
+
+
+        File backup = new File(_targetDir, _activeArchiveDownloadBackupFileName);
+
+        if(backup.exists()){
+            FileInputStream fis = new FileInputStream(backup);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            try {
+                _activeArchiveDownloads = (ConcurrentHashMap<String, ArchiveDownload>) ois.readObject();
             } catch (Exception e) {
                 reloadingJobsError(backup,e);
 
@@ -385,19 +528,19 @@ public class DownloadManager {
 
 
 
-                    Vector<ArchiveDownload> completed = new Vector<ArchiveDownload>();
+                    Vector<Download> completed = new Vector<Download>();
 
-                    _downloadLock.lock();
+                    _managerLock.lock();
                     try {
 
-                        for(ArchiveDownload activeDownload : _activeDownloads.values()){
+                        for(Download download : _activeArchiveDownloads.values()){
 
-                            if(activeDownload.isReadyForDownload()){
-                                if(activeDownload.download()){
-                                    completed.add(activeDownload);
+                            if(download.jobCompleted()){
+                                if(download.downloadJobOutput()){
+                                    completed.add(download);
                                 }
 
-                                long wait = activeDownload.estimatedTimeRemaining();
+                                long wait = download.estimatedTimeRemaining();
 
                                 if(sleepTime==MINIMUM_GLACIER_ACCESS_DELAY || sleepTime > wait){
                                     sleepTime = wait;
@@ -408,15 +551,15 @@ public class DownloadManager {
 
                         }
 
-                        for(ArchiveDownload completedDownload: completed){
-                            _activeDownloads.remove(completedDownload.getGlacierRecord().getResourceId());
-                            saveActiveDownloads();
+                        for(Download completedDownload: completed){
+                            _activeArchiveDownloads.remove(completedDownload.getDownloadId());
+                            saveActiveArchiveDownloads();
                         }
 
 
                     }
                     finally {
-                        _downloadLock.unlock();
+                        _managerLock.unlock();
                     }
 
                     _log.info(thread.getName() + "run() -  Sleeping for: " + sleepTime + " seconds");

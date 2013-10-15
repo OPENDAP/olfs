@@ -75,12 +75,12 @@ public class GlacierVaultManager {
 
 
 
-    //private ConcurrentHashMap<String, GlacierRecord> _archiveRecords;
+    //private ConcurrentHashMap<String, GlacierArchive> _archiveRecords;
     private ConcurrentHashMap<String, Index> _indexObjects;
 
 
     private ConcurrentHashMap<String, ResourceId> _resourceIds;
-    private ConcurrentSkipListMap<ResourceId, GlacierRecord> _glacierRecords;
+    private ConcurrentSkipListMap<ResourceId, GlacierArchive> _glacierRecords;
 
 
     public GlacierVaultManager(String vaultName, File glacierRootDir) throws IOException {
@@ -97,7 +97,7 @@ public class GlacierVaultManager {
         _resourceCacheDirectory = mkDir(glacierRootDir,DefaultResourceCacheDirectoryName);
 
         _resourceIds = new ConcurrentHashMap<String, ResourceId>();
-        _glacierRecords = new ConcurrentSkipListMap<ResourceId, GlacierRecord>();
+        _glacierRecords = new ConcurrentSkipListMap<ResourceId, GlacierArchive>();
 
         _indexObjects   = new ConcurrentHashMap<String, Index>();
 
@@ -166,7 +166,7 @@ public class GlacierVaultManager {
 
 
 
-    public void cacheArchiveRecord(GlacierRecord gar) throws IOException {
+    public void cacheArchiveRecord(GlacierArchive gar) throws IOException {
 
 
         File targetFile = new File(getArchiveRecordsDir(), AwsUtil.encodeKeyForFileSystemName(gar.getResourceId()));
@@ -203,7 +203,7 @@ public class GlacierVaultManager {
     }
 
 
-    public GlacierRecord getArchiveRecord(String resourceId) throws IOException, JDOMException {
+    public GlacierArchive getArchiveRecord(String resourceId) throws IOException, JDOMException {
         ResourceId id = _resourceIds.get(resourceId);
         if(id==null)
             return loadArchiveRecord(resourceId);
@@ -221,7 +221,7 @@ public class GlacierVaultManager {
     /*
     public void loadArchiveRecords() throws IOException, JDOMException {
 
-        GlacierRecord gar;
+        GlacierArchive gar;
 
         File archiveDir = getArchiveRecordsDir();
         File[] archiveRecords = archiveDir.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
@@ -229,7 +229,7 @@ public class GlacierVaultManager {
         if (archiveRecords != null) {
             for (File archiveRecord : archiveRecords) {
                 if (archiveRecord.isFile()) {
-                    gar = new GlacierRecord(archiveRecord);
+                    gar = new GlacierArchive(archiveRecord);
 
                     gar.createCacheFile(_resourceCacheDirectory);
 
@@ -251,16 +251,16 @@ public class GlacierVaultManager {
 
 */
 
-    private  GlacierRecord loadArchiveRecord(String resourceId) throws IOException, JDOMException {
+    private GlacierArchive loadArchiveRecord(String resourceId) throws IOException, JDOMException {
 
-        GlacierRecord gar;
+        GlacierArchive gar;
 
         String baseFileName = AwsUtil.encodeKeyForFileSystemName(resourceId);
 
         File archiveRecord = new File(getArchiveRecordsDir(),baseFileName);
 
         if (archiveRecord.isFile()) {
-            gar = new GlacierRecord(archiveRecord);
+            gar = new GlacierArchive(archiveRecord);
 
             gar.createCacheFile(_resourceCacheDirectory);
 

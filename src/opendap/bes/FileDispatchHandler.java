@@ -193,7 +193,7 @@ public class FileDispatchHandler implements DispatchHandler {
 
         log.debug("sendFile() downloadFileName: " + downloadFileName );
 
-        // I commented these two lines  out because it was incorrectly causing browsers to download
+        // I commented these two lines  out because it was incorrectly causing browsers to downloadJobOutput
         // (as opposed to display) EVERY file retrieved.
         //String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
         //response.setHeader("Content-Disposition",contentDisposition);

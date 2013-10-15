@@ -76,7 +76,7 @@ public class FileAccess extends Dap4Responder {
 
         setServiceRoleId("http://services.opendap.org/dap4/file-access");
         setServiceTitle("Data File Access");
-        setServiceDescription("Simple (download) access to the underlying data file.");
+        setServiceDescription("Simple (downloadJobOutput) access to the underlying data file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services");
 
         setNormativeMediaType(new ServiceMediaType("*","*", getRequestSuffix()));
@@ -133,7 +133,7 @@ public class FileAccess extends Dap4Responder {
 
             }
             else {
-                String errMsg = "You may not download nodes/directories, only files." + Scrub.completeURL(resourceID);
+                String errMsg = "You may not downloadJobOutput nodes/directories, only files." + Scrub.completeURL(resourceID);
                 log.info("respondToHttpGetRequest() - {}", errMsg);
                 sendHttpErrorResponse(HttpStatus.SC_FORBIDDEN, errMsg, "docs", response);
             }

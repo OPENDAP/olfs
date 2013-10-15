@@ -32,7 +32,6 @@ import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.logging.LogUtil;
-import opendap.noaa_s3.S3DapDispatchHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -119,7 +118,7 @@ public class DapServlet extends HttpServlet {
 
 
         try {
-            GlacierArchiveManager.theManager().init(glacierServiceConfiguration);
+            GlacierManager.theManager().init(glacierServiceConfiguration);
         } catch (IOException e) {
             String msg = new StringBuilder().append("Failed to initialize the GlacierArchive Manager!! IOException: ").append(e.getMessage()).toString();
             e.printStackTrace();
@@ -336,7 +335,7 @@ public class DapServlet extends HttpServlet {
 
     public void destroy() {
 
-        GlacierArchiveManager.theManager().destroy();
+        GlacierManager.theManager().destroy();
         _log.info("Destroy complete.");
 
     }

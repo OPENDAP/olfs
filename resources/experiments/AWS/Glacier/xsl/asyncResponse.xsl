@@ -230,7 +230,8 @@
 
     <xsl:template name="pending">
         <br/>
-        <div class="large_bold">The requested resource is a pending asynchronous response. Please try again later..</div>
+        <div class="large_bold">The requested resource was previously been requested and is a pending
+            asynchronous response. It will be available soon.</div>
         <br/>
     </xsl:template>
 

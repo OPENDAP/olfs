@@ -28,7 +28,9 @@ package opendap.aws.auth;
 
 import com.amazonaws.auth.AWSCredentials;
 
-public class Credentials implements AWSCredentials {
+import java.io.Serializable;
+
+public class Credentials implements AWSCredentials, Serializable {
 
     private String accessKeyId;
     private String secretKey;

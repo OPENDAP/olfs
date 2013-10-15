@@ -1,4 +1,4 @@
-<%@ page import="opendap.aws.glacier.GlacierArchiveManager" %>
+<%@ page import="opendap.aws.glacier.GlacierManager" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -27,7 +27,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% String contextPath = request.getContextPath(); %>
-<% String catalogContext = GlacierArchiveManager.theManager().getCatalogServiceContext(); %>
+<% String catalogContext = GlacierManager.theManager().getCatalogServiceContext(); %>
 
 <html>
 <head>
@@ -64,7 +64,7 @@
      <dl>
 
 
-<%  for(String vault: GlacierArchiveManager.theManager().getVaultNames()){   %>
+<%  for(String vault: GlacierManager.theManager().getVaultNames()){   %>
         <dd><a href="<%=catalogContext%>/<%=vault%>/catalog.xml"><%=vault%></a></dd>
 <%  } %>
 

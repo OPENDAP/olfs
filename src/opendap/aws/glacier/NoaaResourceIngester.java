@@ -29,8 +29,6 @@ package opendap.aws.glacier;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
 import com.amazonaws.services.glacier.model.*;
-import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
-import com.amazonaws.services.glacier.transfer.UploadResult;
 import opendap.aws.auth.Credentials;
 import opendap.aws.s3.S3Object;
 import opendap.coreServlet.Util;
@@ -216,10 +214,10 @@ public class NoaaResourceIngester {
 
                 BesMetadataExtractor bme = new BesMetadataExtractor(nri.besInstallPrefix,nri.besConfig);
 
-                Element glacierConfig = GlacierArchiveManager.getDefaultConfig(nri.glacierEndpointUrl, nri.glacierArchiveRoot,nri.awsAccessKeyId,nri.awsSecretKey);
+                Element glacierConfig = GlacierManager.getDefaultConfig(nri.glacierEndpointUrl, nri.glacierArchiveRoot, nri.awsAccessKeyId, nri.awsSecretKey);
 
 
-                GlacierArchiveManager.theManager().init(glacierConfig);
+                GlacierManager.theManager().init(glacierConfig);
 
 
                 S3Index topLevelIndex = new S3Index(nri.s3BucketName,"//index.xml",nri.s3Root);
@@ -246,7 +244,7 @@ public class NoaaResourceIngester {
                 //AmazonGlacierClient client = new AmazonGlacierClient(creds);
                 //client.setEndpoint("https://glacier.us-east-1.amazonaws.com/");
 
-                nri.inspectVaults(creds,nri.glacierEndpointUrl);
+                nri.inspectVaults(creds, nri.glacierEndpointUrl);
 
                 //CreateVaultRequest request = new CreateVaultRequest().withAccountId("-").withVaultName(topLevelIndex.getVaultName());
                 //CreateVaultResult result = client.createVault(request);
@@ -254,7 +252,7 @@ public class NoaaResourceIngester {
 
                 for(S3Object resource : resourceObjects){
 
-                    GlacierRecord gar = nri.addS3ObjectToGlacier(creds, nri.glacierEndpointUrl, resource, bme);
+                    GlacierArchive gar = nri.addS3ObjectToGlacier(creds, nri.glacierEndpointUrl, resource, bme);
 
                     Document garDoc = gar.getArchiveRecordDocument();
 
@@ -313,7 +311,7 @@ public class NoaaResourceIngester {
 
 
 
-    public GlacierRecord addS3ObjectToGlacier(Credentials glacierCreds, String glacierEndPoint, S3Object s3Object, BesMetadataExtractor bme ) throws JDOMException, IOException {
+    public GlacierArchive addS3ObjectToGlacier(Credentials glacierCreds, String glacierEndPoint, S3Object s3Object, BesMetadataExtractor bme ) throws JDOMException, IOException {
 
 
         System.out.println("-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -");
@@ -322,15 +320,15 @@ public class NoaaResourceIngester {
         System.out.println("        S3 key: " + s3Object.getKey());
 
 
-        GlacierRecord gar;
+        GlacierArchive gar;
 
 
         String vaultName  = s3Object.getBucketName();
         String resourceId = s3Object.getKey();
 
-        GlacierVaultManager gvm = GlacierArchiveManager.theManager().makeVaultManagerIfNeeded(vaultName);
+        GlacierVaultManager gvm = GlacierManager.theManager().makeVaultManagerIfNeeded(vaultName);
 
-        GlacierRecord cachedGar = gvm.getArchiveRecord(resourceId);
+        GlacierArchive cachedGar = gvm.getArchiveRecord(resourceId);
         if(cachedGar!=null){
             System.out.println("Found cached archive record for  [vault: "+vaultName+"]  resourceId: " + resourceId);
             gar = cachedGar;
@@ -344,7 +342,7 @@ public class NoaaResourceIngester {
             System.out.println("Cache File:  " + cacheFile);
             System.out.println("Cache file size: " + cacheFile.length() + " bytes");
 
-            gar = new GlacierRecord(vaultName,resourceId,"NOT_UPLOADED_TO_GLACIER");
+            gar = new GlacierArchive(vaultName,resourceId,"NOT_UPLOADED_TO_GLACIER");
             boolean readyToUpload = false;
 
             try {
@@ -366,7 +364,7 @@ public class NoaaResourceIngester {
 
                 gar.setArchiveId(archiveId);
 
-                GlacierArchiveManager.theManager().addArchiveRecord(gar);
+                GlacierManager.theManager().addArchiveRecord(gar);
                 s3Object.deleteCacheFile();
             }
             else {

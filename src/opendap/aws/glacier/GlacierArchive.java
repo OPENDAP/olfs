@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 7:41 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GlacierRecord implements Serializable {
+public class GlacierArchive implements Serializable {
 
     private Logger _log = null;
 
@@ -71,7 +71,7 @@ public class GlacierRecord implements Serializable {
     public static final Namespace GlacierRecordNameSpace = Namespace.getNamespace("gar","http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#");
 
 
-    public GlacierRecord(String vaultName, String resourceId, String archiveId) {
+    public GlacierArchive(String vaultName, String resourceId, String archiveId) {
         super();
         _log = LoggerFactory.getLogger(getClass());
 
@@ -82,7 +82,7 @@ public class GlacierRecord implements Serializable {
     }
 
 
-    public GlacierRecord(File archiveRecordFile) throws IOException, JDOMException {
+    public GlacierArchive(File archiveRecordFile) throws IOException, JDOMException {
         super();
         _log = LoggerFactory.getLogger(getClass());
         _metadata = new ConcurrentHashMap<String, Element>();
@@ -129,7 +129,7 @@ public class GlacierRecord implements Serializable {
 
 
     /**
-     * <gar:GlacierRecord
+     * <gar:GlacierArchive
      *         xmlns:gar="http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#"
      *         resourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
      *         vault="foo-s3cmd.nodc.noaa.gov"
@@ -137,7 +137,7 @@ public class GlacierRecord implements Serializable {
      * @return
      */
     public Element getArchiveRecordElement(){
-        Element glacierRecord = new Element("GlacierRecord", GlacierRecordNameSpace);
+        Element glacierRecord = new Element("GlacierArchive", GlacierRecordNameSpace);
 
         glacierRecord.setAttribute("resourceId", getResourceId());
         glacierRecord.setAttribute("vault", getVaultName());
@@ -160,7 +160,7 @@ public class GlacierRecord implements Serializable {
 
 
     /**
-     * <gar:GlacierRecord
+     * <gar:GlacierArchive
      *         xmlns:gar="http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#"
      *         resourceId="/gdr/cycle097/JA2_GPN_2PdP097_019_20110219_155025_20110219_164637.nc"
      *         vault="foo-s3cmd.nodc.noaa.gov"
