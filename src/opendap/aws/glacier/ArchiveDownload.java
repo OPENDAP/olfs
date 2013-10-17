@@ -45,6 +45,7 @@ public class ArchiveDownload extends Download implements  Serializable {
         super(glacierRecord.getVaultName(), GlacierManager.theManager().getGlacierEndpoint(),awsCredentials,expectedDelay);
         _glacierRecord = glacierRecord;
         setDownloadFile(_glacierRecord.getCacheFile());
+        setDownloadId(_glacierRecord.getResourceId());
     }
 
 

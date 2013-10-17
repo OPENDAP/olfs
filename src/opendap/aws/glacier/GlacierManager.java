@@ -131,7 +131,7 @@ public class GlacierManager {
 
         loadVaults();
         DownloadManager.theManager().init(getResourceCacheDir(),_glacierCredentials);
-
+        DownloadManager.theManager().startDownloadWorker();
 
         isInitialized = true;
     }

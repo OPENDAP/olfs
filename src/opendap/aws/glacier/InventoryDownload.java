@@ -43,10 +43,7 @@ public class InventoryDownload  extends Download implements  Serializable {
 
         super(vaultName,glacierEndpointUrl,awsCredentials,expectedDelay);
         _log = LoggerFactory.getLogger(this.getClass());
-
-        ;
-
-
+        setDownloadId(vaultName);
     }
 
     @Override

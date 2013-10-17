@@ -362,6 +362,7 @@ public class Vault {
         else {
             _workingDir = new File(dirName);
         }
+        _log.info("Working directory set to: {}",_workingDir.getAbsolutePath());
 
         _archiveId  = line.getOptionValue("archive-id");
         if(_archiveId!=null){
@@ -431,7 +432,7 @@ public class Vault {
                 showInventory();
             }
             else if(command.equalsIgnoreCase("describeVault")){
-                describeVault(getVaultName(), getCredentials());
+                System.out.println(describeVault(getVaultName(), getCredentials()));
             }
             else if(command.equalsIgnoreCase("deleteArchive")){
                 deleteArchive(getArchiveId());

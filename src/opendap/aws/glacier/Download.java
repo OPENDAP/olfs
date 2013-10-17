@@ -87,7 +87,7 @@ public abstract class Download implements Serializable {
     }
 
 
-    public Date getStartDate(){ return _startDate; }
+    public Date getStartDate(){ return new Date(_startDate.getTime()); }
 
     public long getExpectedDelay(){ return _expectedDelay; }
 
@@ -97,10 +97,6 @@ public abstract class Download implements Serializable {
 
     public InitiateJobResult getInitiateJobResult(){ return _initiateJobResult; }
 
-
-    public void setDownloadFile(String fileName){
-        _downloadFile = new File(fileName);
-    }
 
     public void setDownloadFile(File file){
         _downloadFile = new File(file.getAbsolutePath());
@@ -138,12 +134,12 @@ public abstract class Download implements Serializable {
             throw new IOException("Glacier Job has not been started!");
         }
 
-        long start = _startDate.getTime();
+        long start = getStartDate().getTime();
         long now = new Date().getTime();
 
         long elapsed = now - start;
 
-        long remaining  = (_expectedDelay*1000) - elapsed;
+        long remaining  = (getExpectedDelay()*1000) - elapsed;
         if(remaining<0)
             remaining = 0;
 
