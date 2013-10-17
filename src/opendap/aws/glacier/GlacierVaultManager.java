@@ -69,6 +69,10 @@ public class GlacierVaultManager {
     private File _resourceCacheDirectory;
 
 
+    private File _vaultInventory;
+
+
+
     public static int DEFAULT_MAX_RECORDS_IN_MEMORY = 100;
 
     private int _max_records;
@@ -101,6 +105,8 @@ public class GlacierVaultManager {
 
         _indexObjects   = new ConcurrentHashMap<String, Index>();
 
+        _vaultInventory = new File(_resourceCacheDirectory,_name+"-INVENTORY.json");
+
         _max_records = DEFAULT_MAX_RECORDS_IN_MEMORY;
     }
 
@@ -118,6 +124,10 @@ public class GlacierVaultManager {
 
     }
 
+
+    public File getInventory() {
+        return new File(_vaultInventory.getAbsolutePath());
+    }
 
 
 

@@ -53,10 +53,12 @@ public class DownloadManager {
     private Logger _log;
 
     private boolean _isInitialized;
+    public static  String INVENTORY_SUFFIX;
 
-    private ConcurrentHashMap<String, ArchiveDownload> _activeArchiveDownloads;
 
-    private InventoryDownload _inventoryDownload;
+    private ConcurrentHashMap<String, ArchiveDownload>   _activeArchiveDownloads;
+    private ConcurrentHashMap<String, InventoryDownload> _activeInventoryDownloads;
+
 
     private WorkerThread worker;
     private Thread workerThread;
@@ -66,6 +68,7 @@ public class DownloadManager {
     private String _activeArchiveDownloadBackupFileName;
 
     private String _activeInventoryDownloadBackupFileName;
+
 
     private ReentrantLock _managerLock;
 
@@ -80,10 +83,11 @@ public class DownloadManager {
 
         _log = LoggerFactory.getLogger(this.getClass());
         _activeArchiveDownloads = new ConcurrentHashMap<String, ArchiveDownload>();
-        _inventoryDownload = null;
+        _activeInventoryDownloads = null;
         _managerLock = new ReentrantLock();
         _activeArchiveDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveArchiveDownloads";
-        _activeInventoryDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveInventoryDownload";
+        _activeInventoryDownloadBackupFileName = this.getClass().getSimpleName() + "-ActiveInventoryDownloads";
+        INVENTORY_SUFFIX = "-INVENTORY.json";
         _isInitialized = false;
         _awsCredentials = null;
         workerThread = null;
@@ -205,37 +209,12 @@ public class DownloadManager {
         return estimatedRetrievalTime;
     }
 
-
-
-    public boolean download(String downloadId) throws IOException {
+    public boolean archiveRetrievalJobCompleted(String downloadId) throws IOException {
 
         _managerLock.lock();
         try {
             if(_activeArchiveDownloads.containsKey(downloadId)){
-                Download download = _activeArchiveDownloads.get(downloadId);
-                if(download.jobCompleted()){
-                    download.downloadJobOutput();
-                    return true;
-                }
-                _log.info("Job to retrieve '{}' not yet completed.",downloadId);
-            }
-            else {
-                _log.warn("Download ID '{}' was not found in the active downloads list.",downloadId);
-            }
-        }
-        finally {
-            _managerLock.unlock();
-        }
-        return false;
-
-    }
-
-    public boolean jobCompleted(String downloadId) throws IOException {
-
-        _managerLock.lock();
-        try {
-            if(_activeArchiveDownloads.containsKey(downloadId)){
-                Download download = _activeArchiveDownloads.get(downloadId);
+                ArchiveDownload download = _activeArchiveDownloads.get(downloadId);
                 if(download.jobCompleted()){
                     _log.info("Job '{}' is completed. woot.",downloadId);
                     return true;
@@ -255,40 +234,77 @@ public class DownloadManager {
 
 
 
+
+    public boolean downloadArchive(String resourceId) throws IOException {
+
+        _managerLock.lock();
+        try {
+            if(_activeArchiveDownloads.containsKey(resourceId)){
+                Download download = _activeArchiveDownloads.get(resourceId);
+                if(download.jobCompleted()){
+                    download.downloadJobOutput();
+                    return true;
+                }
+                _log.info("Job to retrieve '{}' not yet completed.",resourceId);
+            }
+            else {
+                _log.warn("Download ID '{}' was not found in the active downloads list.",resourceId);
+            }
+        }
+        finally {
+            _managerLock.unlock();
+        }
+        return false;
+
+    }
+
+
+
+
     public long initiateVaultInventoryDownload(String vaultName, String endpointUrl, AWSCredentials glacierCreds) throws JDOMException, IOException {
 
         _log.debug("initiateVaultInventoryDownload() - BEGIN");
 
-        String myIdKey = InventoryDownload.GLACIER_INVENTORY_RETRIEVAL;
+        String downloadFileName = vaultName + INVENTORY_SUFFIX;
         long estimatedRetrievalTime = DEFAULT_GLACIER_ACCESS_DELAY;
 
         _managerLock.lock();
         try {
 
 
-            if(_inventoryDownload != null){
+            if(_activeInventoryDownloads.containsKey(vaultName)){
+                InventoryDownload inventoryDownload = _activeInventoryDownloads.get(vaultName);
 
-                estimatedRetrievalTime = _inventoryDownload.estimatedTimeRemaining();
+                estimatedRetrievalTime = inventoryDownload.estimatedTimeRemaining();
 
-                if(_inventoryDownload.jobCompleted()){
-                    _inventoryDownload.setDownloadFile(new File(_targetDir,vaultName+"-INVENTORY.json"));
-                    if(_inventoryDownload.downloadJobOutput()){
-                        File activeInventoryDownload = new File(_targetDir,_activeInventoryDownloadBackupFileName);
-                        if(activeInventoryDownload.exists()){
-                            activeInventoryDownload.delete();
-                            _log.info("initiateVaultInventoryDownload() Downloaded Inventory. Removed active Inventory download.");
-                        }
+                if(inventoryDownload.jobCompleted()){
+
+                    inventoryDownload.setDownloadFile(new File(downloadFileName));
+
+                    if(inventoryDownload.downloadJobOutput()){
+                        _log.info("Inventory job output for vault {} saved.",vaultName);
+                        _activeInventoryDownloads.remove(vaultName);
+                        _log.info("Job to retrieve the inventory for vault {} is completed.",vaultName);
+
+                        estimatedRetrievalTime = 0;
                     }
-
-                    estimatedRetrievalTime = 0;
+                    else {
+                        _log.error("ERROR! Failed to download the inventory job output for vault {}.",vaultName);
+                    }
                 }
+                else {
+                    _log.info("Job to retrieve the inventory for vault {} has not yet completed.",vaultName);
+                }
+
+
 
             }
             else {
 
                 InventoryDownload inventoryDownload = new InventoryDownload(vaultName,endpointUrl,glacierCreds,DEFAULT_GLACIER_ACCESS_DELAY);
                 if(inventoryDownload.startJob()) {
-                    _inventoryDownload = inventoryDownload;
+                    inventoryDownload.setDownloadFile(new File(downloadFileName));
+                    _activeInventoryDownloads.put(vaultName, inventoryDownload);
                     saveActiveInventoryDownload();
                     _log.debug("initiateVaultInventoryDownload() - Active downloads saved.");
                     estimatedRetrievalTime = inventoryDownload.estimatedTimeRemaining();
@@ -310,6 +326,64 @@ public class DownloadManager {
         return estimatedRetrievalTime;
     }
 
+    public boolean inventoryRetrievalJobCompleted(String vaultName) throws IOException {
+
+        _managerLock.lock();
+        try {
+            if(_activeInventoryDownloads.containsKey(vaultName)){
+                ArchiveDownload download = _activeArchiveDownloads.get(vaultName);
+                if(download.jobCompleted()){
+                    _log.info("Inventory retrieval job for vault '{}' is completed. woot.",vaultName);
+                    return true;
+                }
+                _log.info("Job to retrieve the inventory for vault {} has not yet completed.",vaultName);
+            }
+            else {
+                _log.warn("There is no active job to retrieve an inventory for vault {}.",vaultName);
+            }
+        }
+        finally {
+            _managerLock.unlock();
+        }
+        return false;
+
+    }
+
+
+    public boolean downloadInventory(String vaultName) throws IOException {
+
+        _managerLock.lock();
+        try {
+
+            if(_activeInventoryDownloads.containsKey(vaultName)){
+                InventoryDownload inventoryDownload = _activeInventoryDownloads.get(vaultName);
+                if(inventoryDownload.jobCompleted()){
+                    if(inventoryDownload.downloadJobOutput()){
+                        _log.info("Inventory job output for vault {} saved.",vaultName);
+                        _activeInventoryDownloads.remove(vaultName);
+                        _log.info("Job to retrieve the inventory for vault {} is completed.",vaultName);
+
+                        return true;
+                    }
+                    else {
+                        _log.error("ERROR! Failed to download the inventory job output for vault {}.", vaultName);
+                    }
+                }
+                else {
+                    _log.info("Job to retrieve the inventory for vault {} has not yet completed.",vaultName);
+                }
+            }
+            else {
+                _log.warn("There is no active job to retrieve an inventory for vault {}.",vaultName);
+            }
+        }
+        finally {
+            _managerLock.unlock();
+        }
+        return false;
+
+    }
+
 
 
     private void saveActiveInventoryDownload() throws IOException {
@@ -320,7 +394,7 @@ public class DownloadManager {
         FileOutputStream fos = new FileOutputStream(backup);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-        oos.writeObject(_inventoryDownload);
+        oos.writeObject(_activeInventoryDownloads);
 
 
     }
@@ -335,7 +409,7 @@ public class DownloadManager {
             ObjectInputStream ois = new ObjectInputStream(fis);
 
             try {
-                _inventoryDownload = (InventoryDownload) ois.readObject();
+                _activeInventoryDownloads = (ConcurrentHashMap<String, InventoryDownload >) ois.readObject();
             } catch (Exception e) {
                 reloadingJobsError(backup,e);
 

@@ -189,7 +189,7 @@ public abstract class Download implements Serializable {
 
     public boolean jobCompleted() throws IOException {
 
-        _log.debug("jobCompleted() - BEGIN ");
+        _log.debug("archiveRetrievalJobCompleted() - BEGIN ");
 
         if(!_started)
             throw new IOException("Glacier retrieval job has NOT been started!");
@@ -203,17 +203,17 @@ public abstract class Download implements Serializable {
 
         long timeRemaining = estimatedTimeRemaining();
 
-        _log.debug("jobCompleted() - Estimated Time Remaining: {} seconds  jobId: {}",timeRemaining,initiateJobResult.getJobId());
+        _log.debug("archiveRetrievalJobCompleted() - Estimated Time Remaining: {} seconds  jobId: {}",timeRemaining,initiateJobResult.getJobId());
 
         DescribeJobRequest djr = new DescribeJobRequest(getVaultName(),initiateJobResult.getJobId());
 
         DescribeJobResult describeJobResult = client.describeJob(djr);
 
-        _log.debug("jobCompleted() - DescribeJobResult: {}",describeJobResult.toString());
-        _log.debug("jobCompleted() - DescribeJobResult.isCompleted(): {}",describeJobResult.isCompleted());
-        _log.debug("jobCompleted() - DescribeJobResult.status(): {}",describeJobResult.getStatusCode());
+        _log.debug("archiveRetrievalJobCompleted() - DescribeJobResult: {}",describeJobResult.toString());
+        _log.debug("archiveRetrievalJobCompleted() - DescribeJobResult.isCompleted(): {}",describeJobResult.isCompleted());
+        _log.debug("archiveRetrievalJobCompleted() - DescribeJobResult.status(): {}",describeJobResult.getStatusCode());
 
-        _log.debug("jobCompleted() - END ");
+        _log.debug("archiveRetrievalJobCompleted() - END ");
 
         return describeJobResult.isCompleted();
 

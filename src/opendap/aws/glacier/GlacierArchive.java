@@ -27,6 +27,10 @@
 package opendap.aws.glacier;
 
 import opendap.aws.AwsUtil;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -37,9 +41,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,10 +60,15 @@ public class GlacierArchive implements Serializable {
 
     private String _vaultName = null;
     private String _archiveId = null;
-
     private String _resourceId;
 
-    private ConcurrentHashMap<String, Element> _metadata = null;
+    private Date _archiveCreationDate;
+    private long _size;
+    private String _sha256TreeHash;
+
+    private String _ddx;
+    private String _das;
+    private String _dds;
 
     private File _cacheFile;
 
@@ -67,25 +76,41 @@ public class GlacierArchive implements Serializable {
     public static final String DAS = "DAS";
     public static final String DDX = "DDX";
 
+    public static String AWS_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
 
     public static final Namespace GlacierRecordNameSpace = Namespace.getNamespace("gar","http://xml.opendap.org/ns/aws/glacier/ArchiveRecord/01#");
 
-
-    public GlacierArchive(String vaultName, String resourceId, String archiveId) {
+    public GlacierArchive() {
         super();
         _log = LoggerFactory.getLogger(getClass());
 
-        setVaultName(vaultName);
-        setResourceId(resourceId);
-        setArchiveId(archiveId);
-        _metadata = new ConcurrentHashMap<String, Element>();
+        _size           = -1;
+        _vaultName      = null;
+        _archiveId      = null;
+        _resourceId     = null;
+        _archiveCreationDate = null;
+        _sha256TreeHash = null;
+        _cacheFile      = null;
+        _ddx            = null;
+        _dds            = null;
+        _das            = null;
+
     }
 
 
+    public GlacierArchive(String vaultName, String resourceId, String archiveId) {
+        this();
+        setVaultName(vaultName);
+        setResourceId(resourceId);
+        setArchiveId(archiveId);
+    }
+
+
+
+
     public GlacierArchive(File archiveRecordFile) throws IOException, JDOMException {
-        super();
-        _log = LoggerFactory.getLogger(getClass());
-        _metadata = new ConcurrentHashMap<String, Element>();
+        this();
         loadArchiveRecordFromFile(archiveRecordFile);
     }
 
@@ -96,6 +121,11 @@ public class GlacierArchive implements Serializable {
         _vaultName = vaultName;
     }
 
+    /**
+     *
+     * @return  Glacier Archive ID - Mapped to resourceId
+     */
+    @JsonProperty("ArchiveId")
     public String getArchiveId(){
         return _archiveId;
     }
@@ -103,6 +133,130 @@ public class GlacierArchive implements Serializable {
     public void setArchiveId(String archiveId){
         _archiveId = archiveId;
     }
+
+    /**
+     *
+     * @return Glacier Archive Description - Mapped to resourceId
+     */
+    @JsonProperty("ArchiveDescription")
+    public String getArchiveDescription(){
+        return _resourceId;
+    }
+    public void setArchiveDescription(String archiveDescription){
+        _resourceId = archiveDescription;
+    }
+
+
+    /**
+     *
+     * @return   Creation date(in Glacier land) of archive.
+     */
+    @JsonProperty("CreationDate")
+    public String getCreationDateString(){
+
+        if(_archiveCreationDate==null)
+            return null;
+
+        SimpleDateFormat sdf = new SimpleDateFormat(AWS_DATE_FORMAT);
+        return sdf.format(_archiveCreationDate);
+    }
+
+    public void setCreationDateString(String d){
+        _log.debug("setCreationDateString({})",d);
+        if(d!=null){
+           //  2013-10-08T21:04:35Z
+            SimpleDateFormat sdf = new SimpleDateFormat(AWS_DATE_FORMAT);
+            _archiveCreationDate = sdf.parse(d, new ParsePosition(0));
+        }
+        else
+            _archiveCreationDate = null ;
+    }
+
+
+    @JsonIgnore
+    public Date getCreationDate(){
+        return _archiveCreationDate;
+    }
+
+    public void setCreationDateDate(Date d){
+        _log.debug("setCreationDate({})",d);
+        _archiveCreationDate = new Date(d.getTime()) ;
+    }
+
+
+    /**
+     *
+     * @return   Size of archive in bytes.
+     */
+    @JsonProperty("Size")
+    public long getSize(){
+        return _size;
+    }
+
+    public void setSize(long size){
+        _size = size;
+    }
+
+
+    /**
+     *
+     * @return   The SHA256TreeHash for the archived object.
+     */
+    @JsonProperty("SHA256TreeHash")
+    public String getSHA256TreeHash() {
+        return _sha256TreeHash;
+    }
+
+    public void setSHA256TreeHash(String sha256TreeHash) {
+        _sha256TreeHash = sha256TreeHash;
+    }
+
+    @JsonIgnore
+    public Element getDDXElement(){
+        Element ddxElement = new Element(DDX,GlacierRecordNameSpace);
+        ddxElement.setText(_ddx);
+        return ddxElement;
+    }
+    public String getDDX(){
+        return _ddx;
+    }
+    public void setDDX(String ddx){
+            _ddx = ddx;
+    }
+
+
+    @JsonIgnore
+    public Element getDDSElement(){
+        Element ddsElement = new Element(DDS,GlacierRecordNameSpace);
+        ddsElement.setText(_dds);
+        return ddsElement;
+    }
+    public String getDDS(){
+        return _dds;
+    }
+    public void setDDS(String dds){
+            _dds = dds;
+    }
+
+
+    @JsonIgnore
+    public Element getDASElement(){
+        Element dasElement = new Element(DAS,GlacierRecordNameSpace);
+        dasElement.setText(_das);
+        return dasElement;
+    }
+    public String getDAS(){
+        return _das;
+    }
+    public void setDAS(String das){
+            _das = das;
+    }
+
+
+    /**
+     *
+     * @return
+     */
     public String getResourceId(){
         return _resourceId;
     }
@@ -111,20 +265,8 @@ public class GlacierArchive implements Serializable {
         _resourceId = resourceId;
     }
 
-    public void addMetaDataElement(String key, Element metadata){
-        _metadata.put(key,metadata);
-    }
 
 
-    public Element getMetadataElement(String key){
-        return _metadata.get(key);
-    }
-
-    private Element[] getMetaDataElements(){
-        Element[] metadata = new Element[_metadata.size()];
-        metadata = _metadata.values().toArray(metadata);
-        return metadata;
-    }
 
 
 
@@ -136,21 +278,36 @@ public class GlacierArchive implements Serializable {
      *         archiveId="DUApQbY05dAB50FCci6NFTVkp0MpswEg_YwcYyy7x9Jn1UohMOEywbj1iMuXHNu53HKTRX1kMTNJUEbxDazAciwk5CvBCHkx66khGPxKm2TcHGsLNByPgNH6jOWroN5Yg5V9tdb9Og" />
      * @return
      */
+    @JsonIgnore
     public Element getArchiveRecordElement(){
         Element glacierRecord = new Element("GlacierArchive", GlacierRecordNameSpace);
 
         glacierRecord.setAttribute("resourceId", getResourceId());
-        glacierRecord.setAttribute("vault", getVaultName());
+        if(getVaultName()!=null)
+            glacierRecord.setAttribute("vault", getVaultName());
         glacierRecord.setAttribute("archiveId", getArchiveId());
 
         if(_cacheFile!=null)
             glacierRecord.setAttribute("cacheFile",getCacheFile().getAbsolutePath());
 
-        Element[] metadataElements = getMetaDataElements();
+        if(_archiveCreationDate!=null)
+            glacierRecord.setAttribute("creationDate", getCreationDateString());
 
-        if(metadataElements.length>0){
-            for(Element mde: metadataElements)
-                glacierRecord.addContent((Element)mde.clone());
+
+        Element e = getDDXElement();
+        if(e!=null){
+            glacierRecord.addContent(e);
+
+        }
+        e = getDDSElement();
+        if(e!=null){
+            glacierRecord.addContent(e);
+
+        }
+        e = getDASElement();
+        if(e!=null){
+            glacierRecord.addContent(e);
+
         }
 
         return glacierRecord;
@@ -167,6 +324,7 @@ public class GlacierArchive implements Serializable {
      *         archiveId="DUApQbY05dAB50FCci6NFTVkp0MpswEg_YwcYyy7x9Jn1UohMOEywbj1iMuXHNu53HKTRX1kMTNJUEbxDazAciwk5CvBCHkx66khGPxKm2TcHGsLNByPgNH6jOWroN5Yg5V9tdb9Og" />
      * @return
      */
+    @JsonIgnore
     public Document getArchiveRecordDocument(){
 
         return new Document(getArchiveRecordElement());
@@ -214,27 +372,24 @@ public class GlacierArchive implements Serializable {
 
         e = archiveRecordElement.getChild(DDS,GlacierRecordNameSpace);
         if(e!=null){
-            e.detach();
-            addMetaDataElement(DDS,e);
+            setDDS(e.getTextTrim());
         }
 
         e = archiveRecordElement.getChild(DAS,GlacierRecordNameSpace);
         if(e!=null){
-            e.detach();
-            addMetaDataElement(DAS,e);
+            setDAS(e.getTextTrim());
         }
 
         e = archiveRecordElement.getChild(DDX,GlacierRecordNameSpace);
         if(e!=null){
-            e.detach();
-            addMetaDataElement(DDX,e);
+            setDDX(e.getTextTrim());
         }
 
 
 
     }
 
-
+    @JsonIgnore
     public File getCacheFile(){
        return  _cacheFile;
     }
@@ -272,6 +427,7 @@ public class GlacierArchive implements Serializable {
 
     }
 
+    @JsonIgnore
     public long getCachedResourceLastModifiedTime(){
 
         File cacheFile = getCacheFile();
@@ -281,11 +437,57 @@ public class GlacierArchive implements Serializable {
 
         return cacheFile.lastModified();
 
+    }
 
+    public String toString(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+
+        try {
+            return mapper.writeValueAsString(this);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return e.toString();
+        }
 
 
     }
 
+
+
+    public static void main(String[] args)  {
+
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+
+
+            GlacierArchive gar = mapper.readValue(new File("single-archive.json"), GlacierArchive.class);
+
+            System.out.println(gar.toString());
+
+
+            File archiveFile = new File("/Users/ndp/scratch/glacier/foo-s3cmd.nodc.noaa.gov/archive/#2Fgdr#2Fcycle097#2FJA2_GPN_2PdP097_149_20110224_173818_20110224_183431.nc");
+
+            gar = new GlacierArchive(archiveFile);
+
+            System.out.println(gar.toString());
+
+
+            gar = mapper.readValue(gar.toString(),GlacierArchive.class);
+
+            System.out.println(gar.toString());
+
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
 
 
 }

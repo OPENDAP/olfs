@@ -298,7 +298,7 @@ public class NoaaResourceIngester {
         StringBuilder sb = new StringBuilder();
         sb.append("================================================================================\n");
         sb.append("Found Vault: ").append(dvo.getVaultName()).append("\n");
-        sb.append("    getCreationDate(): ").append(dvo.getCreationDate()).append("\n");
+        sb.append("    getCreationDateString(): ").append(dvo.getCreationDate()).append("\n");
         sb.append("    getLastInventoryDate(): ").append(dvo.getLastInventoryDate()).append("\n");
         sb.append("    getNumberOfArchives(): ").append(dvo.getNumberOfArchives()).append("\n");
         sb.append("    getSizeInBytes(): ").append(dvo.getSizeInBytes()).append("\n");

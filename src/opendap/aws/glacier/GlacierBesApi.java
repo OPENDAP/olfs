@@ -88,10 +88,10 @@ public class GlacierBesApi extends BesApi {
         }
 
         if(grec!=null){
-            Element dds = grec.getMetadataElement(GlacierArchive.DDS);
+            String dds = grec.getDDS();
 
             if(dds!=null){
-                os.write(dds.getTextTrim().getBytes());
+                os.write(dds.getBytes());
                 return true;
             }
             else {
@@ -125,10 +125,10 @@ public class GlacierBesApi extends BesApi {
         }
 
         if(grec!=null){
-            Element das = grec.getMetadataElement(GlacierArchive.DAS);
+            String das = grec.getDAS();
 
             if(das!=null){
-                os.write(das.getTextTrim().getBytes());
+                os.write(das.getBytes());
                 return true;
             }
             else {
@@ -165,16 +165,15 @@ public class GlacierBesApi extends BesApi {
         }
 
         if(grec!=null){
-            Element ddx = grec.getMetadataElement(GlacierArchive.DDX);
+            String ddx = grec.getDDX();
 
             if(ddx!=null){
-                String ddxDoc = ddx.getTextTrim();
 
-                if(ddxDoc.contains(XML_BASE_TAG))
-                    ddxDoc = ddxDoc.replace(XML_BASE_TAG,xml_base);
+                if(ddx.contains(XML_BASE_TAG))
+                    ddx = ddx.replace(XML_BASE_TAG,xml_base);
 
 
-                os.write(ddxDoc.getBytes());
+                os.write(ddx.getBytes());
                 return true;
             }
             else {
@@ -224,11 +223,9 @@ public class GlacierBesApi extends BesApi {
         }
 
         if(grec!=null){
-            Element ddx = grec.getMetadataElement(GlacierArchive.DDX);
+            String ddx = grec.getDDX();
 
             if(ddx!=null){
-                String ddxDoc = ddx.getTextTrim();
-
 
                 os.write("<html><h1>Need an XSLT to make the DDX/DMR into the HTML form.</h1></html>".getBytes());
                 return true;

@@ -341,20 +341,20 @@ public class BesMetadataExtractor {
             // -------------------------------------------
             // ------------- Retrieve DDX ----------------
             Element ddx = getDDXGlacierRecordMetadataElement(datasetFile);
-            gar.addMetaDataElement(GlacierArchive.DDX,ddx);
+
+            gar.setDDX(ddx.getTextTrim());
 
 
             // -------------------------------------------
             // ------------- Retrieve DDS ----------------
-
             Element dds = getDDSGlacierRecordMetadataElement(datasetFile);
-            gar.addMetaDataElement(GlacierArchive.DDS, dds);
+            gar.setDDS(dds.getTextTrim());
 
 
             // -------------------------------------------
             // ------------- Retrieve DAS ----------------
             Element das = getDASGlacierRecordMetadataElement(datasetFile);
-            gar.addMetaDataElement(GlacierArchive.DAS,das);
+            gar.setDAS(das.getTextTrim());
 
 
 

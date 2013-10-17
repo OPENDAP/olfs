@@ -33,11 +33,16 @@ import com.amazonaws.services.glacier.transfer.ArchiveTransferManager;
 import com.amazonaws.services.glacier.transfer.UploadResult;
 import opendap.aws.auth.Credentials;
 import org.apache.commons.cli.*;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -60,8 +65,10 @@ public class Vault {
 
     private long _nominalGlacierResponseTime;
 
-    public static final String GLACIER_ARCHIVE_RETRIEVAL = "archive-retrieval";
+    public static final String GLACIER_ARCHIVE_RETRIEVAL   = "archive-retrieval";
     public static final String GLACIER_INVENTORY_RETRIEVAL = "inventory-retrieval";
+
+    public static  String INVENTORY_SUFFIX =  "-INVENTORY.json";
 
 
     private Vault(){
@@ -83,6 +90,137 @@ public class Vault {
 
     }
 
+    public VaultInventory getInventory()throws IOException{
+
+        File inventoryFile = new File(getWorkingDir(),getVaultName()+INVENTORY_SUFFIX);
+        ObjectMapper mapper = new ObjectMapper();
+        if(inventoryFile.exists())
+            return mapper.readValue(inventoryFile, VaultInventory.class);
+
+        throw new IOException("getInventory() - Inventory file "+inventoryFile.getAbsolutePath()+" does not exist.");
+
+    }
+
+
+
+    public void showInventory()throws IOException{
+
+        VaultInventory inventory = getInventory();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+        System.out.println(mapper.writeValueAsString(inventory));
+
+
+    }
+
+    public void purgeDuplicatesOLD() throws IOException{
+
+        VaultInventory inventory = getInventory();
+
+        HashMap<String, Vector<GlacierArchive>> archives = new HashMap<String, Vector<GlacierArchive>>();
+
+        GregorianCalendar gc = new GregorianCalendar();
+
+        Vector<GlacierArchive> tuples;
+        for(GlacierArchive gar: inventory.getArchiveList()){
+            String resourceID = gar.getResourceId();
+            tuples = archives.get(resourceID);
+            if(tuples==null)
+                tuples = new Vector<GlacierArchive>();
+            tuples.add(gar);
+        }
+
+        for(Vector<GlacierArchive> archiveTuple: archives.values()){
+            if(archiveTuple.size()>1){
+                GlacierArchive newest = archiveTuple.firstElement();
+                for(GlacierArchive gar: archiveTuple){
+                    if(newest.getCreationDate().getTime() > gar.getCreationDate().getTime()){
+                        deleteArchive(gar.getArchiveId());
+                    }
+                    else {
+                        deleteArchive(newest.getArchiveId());
+                        newest = gar;
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    public void purgeDuplicates() throws IOException{
+
+        VaultInventory inventory = getInventory();
+
+        HashMap<String, GlacierArchive> uniqueArchives = new HashMap<String, GlacierArchive>();
+
+
+        // Look at all the stuff in the inventory
+        for(GlacierArchive gar: inventory.getArchiveList()){
+            gar.setVaultName(getVaultName());
+
+            String resourceID = gar.getResourceId();
+
+            // Have we encountered this resourceId?
+            GlacierArchive uniqueArchive =  uniqueArchives.get(resourceID);
+            if(uniqueArchive==null){
+                // It's a new resourceID - add it to the uniqueArchives HashMap
+                uniqueArchives.put(resourceID,gar);
+            }
+            else {
+                // It's a resourceID we've already seen. Let's compare the creation dates
+
+                _log.info("purgeDuplicates() - Found duplicate resourceID in vault.");
+                _log.info("purgeDuplicates() - resourceID: {}",resourceID);
+                _log.info("purgeDuplicates() - archiveID: {} creationDate{}",uniqueArchive.getArchiveId(),uniqueArchive.getCreationDate());
+                _log.info("purgeDuplicates() - archiveID: {} creationDate{}",gar.getArchiveId(),gar.getCreationDate());
+
+                if(uniqueArchive.getCreationDate().getTime() > gar.getCreationDate().getTime()){
+                    // ah, the candidate archive was created before the current uniqueArchive
+                    // for this resourceID. Thus - delete it.
+                    deleteArchive(gar.getArchiveId());
+                }
+                else {
+                    // Hmmm The new candidate archive was created after the current
+                    // unique archive for this resourceID.
+                    // Lets replace the uniqueArchive with the ewer one..
+                    uniqueArchives.remove(resourceID);
+                    uniqueArchives.put(resourceID,gar);
+                    // And the delete the older one from the vault.
+                    deleteArchive(uniqueArchive.getArchiveId());
+                }
+
+            }
+        }
+
+    }
+
+
+    public void purgeVault() throws IOException{
+
+        VaultInventory inventory = getInventory();
+
+        for(GlacierArchive gar: inventory.getArchiveList()){
+            deleteArchive(gar.getArchiveId());
+        }
+    }
+
+    public void deleteVault() throws IOException{
+
+        purgeVault();
+        AmazonGlacierClient client = new AmazonGlacierClient(getCredentials());
+        client.setEndpoint(getEndpoint());
+
+        DeleteVaultRequest request = new DeleteVaultRequest()
+            .withVaultName(getVaultName());
+
+        client.deleteVault(request);
+        System.out.println("Deleted vault: " + getVaultName());
+
+
+
+    }
 
 
     public AWSCredentials getCredentials(){
@@ -99,6 +237,10 @@ public class Vault {
 
     public File getWorkingDir(){
         return new File(_workingDir.getAbsolutePath());
+    }
+
+    public String getArchiveId(){
+        return _archiveId;
     }
 
 
@@ -119,21 +261,23 @@ public class Vault {
 
     }
 
-    public String describeVault(){
+
+
+    public String describeVault(String vaultName, AWSCredentials credentials){
 
         DescribeVaultResult dvo;
 
-        AmazonGlacierClient client = new AmazonGlacierClient(getCredentials());
+        AmazonGlacierClient client = new AmazonGlacierClient(credentials);
         client.setEndpoint(getEndpoint());
 
-        DescribeVaultRequest dvr = new DescribeVaultRequest(getVaultName());
+        DescribeVaultRequest dvr = new DescribeVaultRequest(vaultName);
 
         dvo = client.describeVault(dvr);
 
         StringBuilder sb = new StringBuilder();
         sb.append("================================================================================\n");
         sb.append("Found Vault: ").append(dvo.getVaultName()).append("\n");
-        sb.append("    getCreationDate(): ").append(dvo.getCreationDate()).append("\n");
+        sb.append("    getCreationDateString(): ").append(dvo.getCreationDate()).append("\n");
         sb.append("    getLastInventoryDate(): ").append(dvo.getLastInventoryDate()).append("\n");
         sb.append("    getNumberOfArchives(): ").append(dvo.getNumberOfArchives()).append("\n");
         sb.append("    getSizeInBytes(): ").append(dvo.getSizeInBytes()).append("\n");
@@ -144,6 +288,7 @@ public class Vault {
 
 
     public void deleteArchive(String archiveId){
+        _log.warn("deleteArchive() - Removing {}", archiveId);
         AmazonGlacierClient client = new AmazonGlacierClient(getCredentials());
         DeleteArchiveRequest dar = new DeleteArchiveRequest(getVaultName(),archiveId);
         client.deleteArchive(dar);
@@ -235,6 +380,9 @@ public class Vault {
                     "    startInventoryJob  - Start the inventory.\n" +
                     "    isInventoryReady   - Find out if the inventory job is done.\n" +
                     "    downloadInventory  - Download completed inventory job.\n" +
+                    "    describeVault      - Describe Vault (Simple statistics).\n" +
+                    "    purgeVault         - Remove all archives from vault.\n" +
+                    "    describeVault      - Purge vault of archives and then delete vault..\n" +
                     ""
             );
 
@@ -259,6 +407,10 @@ public class Vault {
     }
 
 
+
+
+
+
     public void performCommand(String command) throws IOException, JDOMException {
 
 
@@ -270,23 +422,36 @@ public class Vault {
             }
 
             else if(command.equalsIgnoreCase("isInventoryReady")){
-                DownloadManager.theManager().jobCompleted(InventoryDownload.GLACIER_INVENTORY_RETRIEVAL);
+                DownloadManager.theManager().inventoryRetrievalJobCompleted(getVaultName());
             }
             else if(command.equalsIgnoreCase("downloadInventory")){
-                DownloadManager.theManager().download(InventoryDownload.GLACIER_INVENTORY_RETRIEVAL);
+                DownloadManager.theManager().downloadInventory(getVaultName());
             }
+            else if(command.equalsIgnoreCase("showInventory")){
+                showInventory();
+            }
+            else if(command.equalsIgnoreCase("describeVault")){
+                describeVault(getVaultName(), getCredentials());
+            }
+            else if(command.equalsIgnoreCase("deleteArchive")){
+                deleteArchive(getArchiveId());
+            }
+            else if(command.equalsIgnoreCase("purgeVault")){
+                purgeVault();
+            }
+            else if(command.equalsIgnoreCase("purgeDuplicates")){
+                purgeDuplicates();
+            }
+            else if(command.equalsIgnoreCase("deleteVault")){
+                deleteVault();
+            }
+
 
 
         }
         finally {
             DownloadManager.theManager().destroy();
         }
-
-
-
-
-
-
 
 
     }
@@ -296,21 +461,12 @@ public class Vault {
 
     public static void main(String[] args)  {
 
-        String vaultName   = "foo-s3cmd.nodc.noaa.gov";
-        String endpointUrl = "https://glacier.us-east-1.amazonaws.com";
-
-
-
         Vault vault = new Vault();
 
         try {
             if(vault.processCommandline(args)){
-
                 vault.performCommand(vault._COMMAND);
-
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
