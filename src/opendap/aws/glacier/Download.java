@@ -36,17 +36,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Date;
 
-/**
- * Created with IntelliJ IDEA.
- * User: ndp
- * Date: 10/10/13
- * Time: 11:40 AM
- * To change this template use File | Settings | File Templates.
- */
+
+
+
 public abstract class Download implements Serializable {
-
-
-
 
     Logger _log;
 
@@ -113,7 +106,6 @@ public abstract class Download implements Serializable {
 
 
 
-    public abstract boolean startJob() throws IOException;
 
 
     public String getDownloadId() { return _identifier; }
@@ -148,8 +140,9 @@ public abstract class Download implements Serializable {
     }
 
 
+    public abstract boolean startJob() throws IOException;
 
-    public boolean startJob(JobParameters jobParameters) throws IOException {
+    protected boolean startJob(JobParameters jobParameters) throws IOException {
 
         _log.debug("startJob() - BEGIN ");
 
