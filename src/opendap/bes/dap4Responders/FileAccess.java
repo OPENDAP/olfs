@@ -76,7 +76,7 @@ public class FileAccess extends Dap4Responder {
 
         setServiceRoleId("http://services.opendap.org/dap4/file-access");
         setServiceTitle("Data File Access");
-        setServiceDescription("Simple (downloadJobOutput) access to the underlying data file.");
+        setServiceDescription("Simple download access to the underlying data file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services");
 
         setNormativeMediaType(new ServiceMediaType("*","*", getRequestSuffix()));
