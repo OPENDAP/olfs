@@ -36,14 +36,16 @@
 
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
-    <xsl:variable name="docsService">/opendap/docs</xsl:variable>
+    <xsl:variable name="serviceContext">/@SERVICE_CONTEXT@</xsl:variable>
+    <xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable>
 
     <xsl:template match="ds:DatasetServices">
         <html>
             <head>
-                <link rel='stylesheet' href='{$docsService}/css/contents.css'
-                      type='text/css'/>
                 <title>OPeNDAP Hyrax: Dataset Service Description for <xsl:value-of select="@xml:base"/></title>
+                <link rel='stylesheet' href='{$docsService}/css/contents.css' type='text/css'/>
+                <link rel='stylesheet' href='{$docsService}/css/treeView.css' type='text/css'/>
+                <script type="text/javascript" src="{$serviceContext}/js/CollapsibleLists.js">&#160;</script>
             </head>
             <body>
 
@@ -155,6 +157,7 @@
                 </h3>
 
             </body>
+            <script>CollapsibleLists.apply();</script>
         </html>
     </xsl:template>
 
@@ -163,10 +166,24 @@
 
         <tr>
             <td>
-                <xsl:value-of select="@title"/>
-                <xsl:apply-templates select="ds:link" />
+
+                <dl class="tightView">
+                    <dt>
+                        <a href="{ds:link/@href}"><xsl:value-of select="@title"/></a>
+                        <ul class="collapsibleList">
+                            <li>
+                                <div class="small">alternate media types</div>
+                                <ul>
+                                    <xsl:apply-templates select="ds:link"/>
+                                </ul>
+                            </li>
+                        </ul>
+                    </dt>
+                </dl>
+
+
             </td>
-            <td> </td>
+            <td></td>
             <td>
                 <xsl:if test="ds:Description/@href!=''">
                     <xsl:value-of select="ds:Description"/>
@@ -175,7 +192,9 @@
                     </xsl:if>
                     <br/>
                 </xsl:if>
-                    <span class="small" style="margin-left: 10px;color: lightGrey;"><xsl:value-of select="@role"/></span>
+                <span class="small" style="margin-left: 10px;color: lightGrey;">
+                    <xsl:value-of select="@role"/>
+                </span>
             </td>
         </tr>
 
@@ -184,10 +203,9 @@
 
     <xsl:template match="ds:link">
 
-        <div class="small" style="margin-left: 10px;"><a title="{@description}" href="{@href}"><xsl:value-of select="@type"/></a></div>
+        <div class="small" style="margin-left: 10px;"><li><a title="{@description}" href="{@href}"><xsl:value-of select="@type"/></a></li></div>
 
     </xsl:template>
-
 
 
 

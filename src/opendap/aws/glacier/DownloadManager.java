@@ -74,7 +74,7 @@ public class DownloadManager {
     private static DownloadManager _theManager = null;
 
     public static final long DEFAULT_GLACIER_ACCESS_DELAY = 14400; // 4 hours worth of seconds.
-    public static final long MINIMUM_GLACIER_ACCESS_DELAY = 60; // 4 hours worth of seconds.
+    public static final long MINIMUM_GLACIER_ACCESS_DELAY = 60; // 1 minute worth of seconds.
 
     private AWSCredentials _awsCredentials;
 

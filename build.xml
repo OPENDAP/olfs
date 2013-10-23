@@ -34,6 +34,8 @@
 
     <!-- Global Properties for Java-OPeNDAP software development -->
 
+    <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
+
 
 
     <!-- ********************************************* -->
@@ -125,6 +127,7 @@
         <echo level="info" message="Project File:          ${ant.file}"/>
         <echo level="info" message="Hyrax Version:         ${HYRAX_VERSION}"/>
         <echo level="info" message="Olfs Version:          ${OLFS_VERSION}"/>
+        <echo level="info" message="Deployment Context:    ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
         <echo level="info" message="    src.dir:           ${src.dir}"/>
@@ -135,7 +138,8 @@
         <echo level="info" message="Build Directories:"/>
         <echo level="info" message="    build.dir:         ${build.dir}"/>
         <echo level="info" message="    build.classes:     ${build.classes}"/>
-        <echo level="info" message="    build.doc:         ${build.doc}"/>
+        <echo level="info" message="    build.doc:         ${build.docs}"/>
+        <echo level="info" message="    build.resources:   ${build.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Ant Properties:"/>
         <echo level="info" message="    ant.file:          ${ant.file}"/>
@@ -187,11 +191,12 @@
     <!-- Build Directories -->
     <property name="build.dir" location="build"/>
     <property name="build.classes" location="${build.dir}/classes"/>
-    <property name="build.doc" location="${build.dir}/doc"/>
+    <property name="build.docs" location="${build.dir}/docs"/>
     <property name="build.dist" location="${build.dir}/dist"/>
     <property name="build.lib" location="${build.dir}/lib"/>
     <property name="build.run" location="${build.dir}/run"/>
     <property name="build.src" location="${build.dir}/src"/>
+    <property name="build.resources" location="${build.dir}/resources"/>
     <property name="build.webapp" location="${build.dir}/webapp"/>
 
 
@@ -277,7 +282,7 @@
     <target name="init" description="Prepare all build directories.">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${build.classes}"/>
-        <mkdir dir="${build.doc}"/>
+        <mkdir dir="${build.docs}"/>
         <mkdir dir="${build.dist}"/>
         <mkdir dir="${build.lib}"/>
         <mkdir dir="${build.run}"/>
@@ -285,6 +290,7 @@
 
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
+        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -312,7 +318,7 @@
 
 
     <target  name="PreProcessSourceCode"
-             depends="init"
+             depends="clean,init"
              description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
 
@@ -334,7 +340,6 @@
                 <exclude name="opendap/metacat/**"/>
 
                 <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcsGateway/**"/>
                 <exclude name="opendap/wcs/**"/>
                 <exclude name="opendap/semantics/**"/>
 
@@ -346,10 +351,34 @@
                 <!-- Exclude the Hyrax Admin Interface code  -->
                 <!-- <exclude name="opendap/hai/**"/>  -->
 
-
             </fileset>
 
         </copy>
+
+
+        <!-- Copy and filter all of the hyrax resources -->
+        <copy todir="${build.resources}" filtering="true">
+            <fileset dir="${hyraxResources.dir}"/>
+        </copy>
+
+
+        <!-- Copy and filter all of the gateway resources -->
+        <copy todir="${build.resources}/gateway" filtering="true">
+            <fileset dir="${GatewayResources.dir}"/>
+        </copy>
+
+
+        <!-- Copy and filter all of the WebStart resources -->
+        <copy todir="${build.resources}/WebStart" filtering="true">
+            <fileset dir="${WebStartResources.dir}"/>
+        </copy>
+
+
+        <!-- Copy and filter all of the ncISO resources -->
+        <copy todir="${build.resources}/ncsio" filtering="true">
+            <fileset dir="${ncISO.dir}"/>
+        </copy>
+
 
 
     </target>
@@ -429,7 +458,7 @@
             unless="JavaDocIsUpToDate"
             >
 
-        <javadoc destdir="${build.doc}/javadoc"
+        <javadoc destdir="${build.docs}/javadoc"
                  Author="true"
                  Verbose="true"
                  Version="true"
@@ -453,7 +482,7 @@
         <tar destfile="${build.dist}/${DOC_DIST}.tgz"
              compression="gzip"
                 >
-            <zipfileset dir="${build.doc}" prefix="${DOC_DIST}"/>
+            <zipfileset dir="${build.docs}" prefix="${DOC_DIST}"/>
         </tar>
 
     </target>
@@ -522,7 +551,7 @@
             description="Checks to see if the JavaDoc is out of date."
             >
         <uptodate property="JavaDocIsUpToDate"
-                  targetfile="${build.doc}/opendap/index.html">
+                  targetfile="${build.docs}/opendap/index.html">
             <srcfiles dir="${src.dir}">
                 <include name="opendap/**/*.java"/>
                 <include name="org/opendap/**/*.java"/>
@@ -668,23 +697,14 @@
 
 
         <echo level="info" message="Building Hyrax server war file."/>
-        <echo level="info" message="WebInfResources.dir: ${WebInfResources.dir}"/>
-        <echo level="info" message="build.dist: ${build.dist}"/>
+        <echo level="info" message="build.resources: ${build.resources}"/>
+        <echo level="info" message="build.dist:      ${build.dist}"/>
 
-
-        <mkdir dir="${build.dir}/webapp" />
-
-
-        <!-- Turning on filtering here allows us to inject the version number into the XSLT code -->
-        <copy todir="${build.webapp}/xsl" filtering="true" >
-            <fileset dir="${hyraxResources.dir}/xsl"/>
-        </copy>
 
 
         <war destfile="${build.dist}/opendap.war"
-             webxml="${WebInfResources.dir}/web.xml"
+             webxml="${build.resources}/WEB-INF/web.xml"
                 >
-            <zipfileset dir="${build.dir}/webapp" prefix="" />
 
             <lib dir="${lib.dir}">
                 <include name="${jdom.lib}"/>
@@ -709,25 +729,19 @@
             </lib>
             <classes dir="${build.classes}"/>
 
-            <zipfileset dir="${doc.dir}" prefix="docs" >
-                <exclude name="src.distribution.readme"/>
-            </zipfileset>
 
-
-            <zipfileset dir="${hyraxResources.dir}/admin" prefix="admin" />
-            <zipfileset dir="${hyraxResources.dir}/error" prefix="error" />
-            <zipfileset dir="${hyraxResources.dir}/jsp"   prefix="jsp" />
-            <zipfileset dir="${hyraxResources.dir}/initialContent" prefix="initialContent">
+            <zipfileset dir="${build.resources}" prefix="">
                 <include name="**/*"/>
+                <exclude name="WEB-INF/web.xml"/>
             </zipfileset>
 
-            <zipfileset dir="${WebStartResources.dir}" prefix="WebStart" />
-            <zipfileset dir="${GatewayResources.dir}" prefix="gateway" />
-            <zipfileset dir="${ncISO.dir}" prefix="nciso" />
+
+            <zipfileset dir="${doc.dir}" prefix="docs">
+                <exclude name="src.distribution.readme" />
+            </zipfileset>
 
 
-
-            <webinf dir="${WebInfResources.dir}">
+            <webinf dir="${build.resources}/WEB-INF">
                 <include name="logback-test.xml"/>
                 <include name="logback.xml"/>
                 <include name="urlrewrite.xml"/>
@@ -788,6 +802,8 @@
     <property name="build.osx" location="${build.dir}/macosx"/>
     <property name="packagemaker" location="/Developer/usr/bin/packagemaker"/>
 
+
+    <property name="CATALINA_HOME" value="CATALINA_HOME_IS_NOT_SET"/>
 
 
     <target name="osx-package"

@@ -50,6 +50,8 @@
     <property name="GLACIER_SERVICE_SOFTWARE_VERSION" value="Not.A.Release"/>
     <!-- property name="CONFIG_FILE" value="ConfigFileNotSpecified"/ -->
 
+    <property name="DEPLOYMENT_CONTEXT" value="glacier"/>
+
 
     <!-- Compiler Settings -->
 
@@ -278,6 +280,7 @@
         <mkdir dir="${build.resources}"/>
 
         <filter token="GLACIER_SERVICE_SOFTWARE_VERSION" value="${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
+        <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -288,7 +291,7 @@
 
 
     <target  name="PreProcessSourceCode"
-             depends="init"
+             depends="clean,init"
              description="Moves selected source code from the development tree into
              the build/src directory. The code text is filtered to update version numbers.">
 
@@ -304,7 +307,7 @@
                 <exclude  name="opendap/semantics/**"/>
                 <exclude  name="opendap/metacat/**"/>
                 <exclude  name="opendap/wcs/**"/>
-
+                <exclude  name="opendap/hai/**"/>
             </fileset>
 
         </copy>
@@ -318,7 +321,6 @@
         </copy>
 
         <copy todir="${build.resources}/nciso" filtering="true">
-
             <fileset dir="${nciso.resources}">
                 <!-- include all the files -->
                 <include name="xsl/**"/>
@@ -328,10 +330,14 @@
 
         <copy todir="${build.resources}" filtering="true">
             <fileset dir="${hyrax.resources}">
+                <include name="xsl/asyncResponse.xsl"/>
+                <include name="xsl/datasetServices.xsl"/>
                 <include name="xsl/addRdfId2Dap3.2.xsl"/>
                 <include name="xsl/anyXml2Rdf.xsl"/>
-                <include name="xsl/datasetServices.xsl"/>
                 <include name="xsl/xml2rdf.xsl"/>
+                <include name="xsl/version.xsl"/>
+                <include name="jsp/help.jsp"/>
+                <include name="js/CollapsibleLists.js"/>
             </fileset>
         </copy>
 

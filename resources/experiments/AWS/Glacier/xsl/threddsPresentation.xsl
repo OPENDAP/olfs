@@ -40,7 +40,8 @@
     <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
 
 
-    <xsl:variable name="docsService">/glacier/docs</xsl:variable>
+    <xsl:variable name="serviceContext">/@SERVICE_CONTEXT@</xsl:variable>
+    <xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable>
 
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
 

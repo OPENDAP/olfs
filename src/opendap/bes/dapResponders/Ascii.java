@@ -46,7 +46,7 @@ public class Ascii extends Dap4Responder {
 
     private Logger log;
 
-    private static String _defaultRequestSuffix = ".asc(ii)?";
+    private static String _defaultRequestSuffix = ".ascii";
 
 
     public Ascii(String sysPath, BesApi besApi) {

@@ -36,7 +36,8 @@
 
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>
 
-    <xsl:variable name="docsService">/opendap/docs</xsl:variable>
+    <xsl:variable name="serviceContext">/@SERVICE_CONTEXT@</xsl:variable>
+    <xsl:variable name="docsService"><xsl:value-of select="$serviceContext"/>/docs</xsl:variable>
 
 
     <xsl:variable name="expectedDelay" select="/dap:AsynchronousResponse/dap:expectedDelay" />

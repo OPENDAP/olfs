@@ -231,6 +231,7 @@ public class DapDispatcher implements DispatchHandler {
         // DAP2 Data Responses
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
+        // responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
         responders.add(new NetcdfFileOut(systemPath, besApi));
         responders.add(new XmlData(systemPath, besApi));
 
