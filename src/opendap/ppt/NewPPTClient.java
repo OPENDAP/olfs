@@ -186,7 +186,11 @@ public class NewPPTClient {
 
         try {
             byte[] inBuff = new byte[4096];
+
             int bytesRead = _rawIn.read(inBuff);
+            if(bytesRead<0){
+                throw new PPTException("PPT Connection appears to have been prematurely closed.");
+            }
             String status = new String(inBuff, 0, bytesRead);
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
                 throw new PPTException("Could not connect to server, server may be down or busy");
