@@ -112,33 +112,8 @@ public class NormativeDMR extends Dap4Responder {
 
         String xdap_accept = "3.2";
 
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DDX,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        0,
-                        xmlBase,
-                        null,
-                        null,
-                        BesApi.XML_ERRORS);
 
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-        */
-
-        if(!besApi.writeDDX(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
+        if(!besApi.writeDMR(resourceID,constraintExpression,xdap_accept,xmlBase,os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

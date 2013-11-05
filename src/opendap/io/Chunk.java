@@ -241,6 +241,7 @@ public class Chunk {
 
         log.debug("writeClosingChunkHeader(): "+new String(closingChunk));
         os.write(closingChunk);
+        os.flush();
 
     }
 

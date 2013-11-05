@@ -119,38 +119,8 @@ public class RdfDMR extends Dap4Responder {
 
         Document ddx = new Document();
 
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DDX,
-                        resourceID,
-                        null,
-                        xdap_accept,
-                        0,
-                        xmlBase,
-                        null,
-                        null,
-                        BesApi.DAP2_ERRORS);
 
-
-
-        log.debug("_besApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(resourceID,reqDoc,ddx)){
-            BESError besError = new BESError(xmlo.outputString(ddx));
-            besError.sendErrorResponse(_systemPath, context, response);
-            log.error("sendNormativeRepresentation() encountered a BESError:\n" + xmlo.outputString(ddx));
-            return;
-        }
-        ddx.getRootElement().setAttribute("dataset_id",resourceID);
-        log.debug(xmlo.outputString(ddx));
-        */
-
-
-
-
-
-        if(!besApi.getDDXDocument(resourceID,constraintExpression,xdap_accept,xmlBase,ddx)){
+        if(!besApi.getDMRDocument(resourceID,constraintExpression,xdap_accept,xmlBase,ddx)){
             BESError besError = new BESError(xmlo.outputString(ddx));
             besError.sendErrorResponse(_systemPath, context, response);
             log.error("sendNormativeRepresentation() - Encountered a BESError:\n" + xmlo.outputString(ddx));

@@ -48,6 +48,7 @@
          tag information from CVS.
     -->
     <property name="GLACIER_SERVICE_SOFTWARE_VERSION" value="Not.A.Release"/>
+    <property name="HYRAX_VERSION" value="Not.A.Release"/>
     <!-- property name="CONFIG_FILE" value="ConfigFileNotSpecified"/ -->
 
     <property name="DEPLOYMENT_CONTEXT" value="glacier"/>
@@ -120,6 +121,7 @@
 
         <echo level="info" message="Project Name:         ${ant.project.name}"/>
         <echo level="info" message="Project File:         ${ant.file}"/>
+        <echo level="info" message="HYRAX_VERSION: ${HYRAX_VERSION}"/>
         <echo level="info" message="GLACIER_SERVICE_SOFTWARE_VERSION: ${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Project Directories:"/>
@@ -279,6 +281,7 @@
         <mkdir dir="${build.src}"/>
         <mkdir dir="${build.resources}"/>
 
+        <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="GLACIER_SERVICE_SOFTWARE_VERSION" value="${GLACIER_SERVICE_SOFTWARE_VERSION}"/>
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
 

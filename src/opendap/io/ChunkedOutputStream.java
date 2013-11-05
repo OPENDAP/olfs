@@ -180,7 +180,7 @@ public class ChunkedOutputStream  extends OutputStream {
 
         flushCache();
         Chunk.writeClosingChunkHeader(_rawOS);
-        _rawOS.flush();
+        // _rawOS.flush(); moved call to flush() into  writeClosingChunkHeader() method
 
     }
 

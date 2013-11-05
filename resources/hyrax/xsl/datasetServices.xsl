@@ -80,7 +80,7 @@
                 <pre><table border="0">
                         <tr>
                             <th align="left">Service Name
-                                <div class="small" style="margin-left: 10px;">Available Representations</div>
+                                <div class="small" style="margin-left: 10px;color: lightGrey;">Alternative Representations</div>
                                 <hr size="1" noshade="noshade"/>
                             </th>
                             <th align="center"> </th>
@@ -172,7 +172,7 @@
                         <a href="{ds:link/@href}"><xsl:value-of select="@title"/></a>
                         <ul class="collapsibleList">
                             <li>
-                                <div class="small">alternate media types</div>
+                                <div class="small">alt. representations</div>
                                 <ul>
                                     <xsl:apply-templates select="ds:link"/>
                                 </ul>

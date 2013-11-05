@@ -60,6 +60,9 @@ import java.util.regex.Pattern;
  */
 public class BesApi {
 
+    public static final String DAP4_DATA  = "dap";
+    public static final String DAP4_DMR   = "dmr";
+
     public static final String DDS        = "dds";
     public static final String DAS        = "das";
     public static final String DDX        = "ddx";
@@ -150,7 +153,7 @@ public class BesApi {
     //}
 
 
-/**
+    /**
      * Writes an OPeNDAP DDX for the dataSource to the passed stream.
      *
      * @param dataSource           The requested DataSource
@@ -183,7 +186,39 @@ public class BesApi {
     }
 
     /**
-         * Writes an OPeNDAP DDX for the dataSource to the passed stream.
+     * Writes an OPeNDAP DAP4 DMR for the dataSource to the passed stream.
+     *
+     * @param dataSource           The requested DataSource
+     * @param constraintExpression The constraintElement expression to be applied to
+     *                             the request..
+     * @param xdap_accept The version of the DAP to use in building the response.
+     * @param xmlBase The request URL.
+     * @param os                   The Stream to which to write the response.
+     * @param err                  The Stream to which to errors returned by
+     *                             the BES..
+     * @return False if the BES returns an error, true otherwise.
+     * @throws opendap.bes.BadConfigurationException .
+     * @throws opendap.bes.BESError              .
+     * @throws java.io.IOException               .
+     * @throws opendap.ppt.PPTException              .
+     */
+    public boolean writeDMR(String dataSource,
+                                String constraintExpression,
+                                String xdap_accept,
+                                String xmlBase,
+                                OutputStream os,
+                                OutputStream err)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        return besTransaction(
+                dataSource,
+                getDMRRequest(dataSource,constraintExpression,xdap_accept,xmlBase),
+                os,
+                err);
+    }
+
+    /**
+         * Writes an OPeNDAP DAP4 Data response for the dataSource to the passed stream.
          *
          * @param dataSource           The requested DataSource
          * @param constraintExpression The constraintElement expression to be applied to
@@ -239,6 +274,39 @@ public class BesApi {
 
 
         boolean ret = writeDDX(dataSource,constraintExpression,xdap_accept,xmlBase,ddxString,ddxString);
+
+
+        SAXBuilder sb = new SAXBuilder();
+
+
+
+        Document ddx = sb.build(new ByteArrayInputStream(ddxString.toByteArray()));
+
+        response.detachRootElement();
+
+        response.setRootElement(ddx.detachRootElement());
+
+
+        return ret;
+
+
+    }
+
+    public boolean getDMRDocument(String dataSource,
+                                          String constraintExpression,
+                                          String xdap_accept,
+                                          String xmlBase,
+                                          Document response)
+            throws PPTException,
+            BadConfigurationException,
+            IOException,
+            JDOMException, BESError {
+
+
+        ByteArrayOutputStream ddxString = new ByteArrayOutputStream();
+
+
+        boolean ret = writeDMR(dataSource,constraintExpression,xdap_accept,xmlBase,ddxString,ddxString);
 
 
         SAXBuilder sb = new SAXBuilder();
@@ -1109,6 +1177,28 @@ public class BesApi {
      * @throws BadConfigurationException When no BES can be found to
      * service the request.
      */
+    public Document getDMRRequest(String dataSource,
+                                         String ce,
+                                         String xdap_accept,
+                                         String xmlBase)
+            throws BadConfigurationException {
+
+        return getRequestDocument(DAP4_DMR,dataSource,ce,xdap_accept,0,xmlBase,null,null,XML_ERRORS);
+
+    }
+
+    /**
+     *  Returns the DDX request document for the passed dataSource
+     *  using the passed constraint expression.
+     * @param dataSource The data set whose DDX is being requested
+     * @param ce The constraint expression to apply.
+     * @param xdap_accept The version of the dap that should be used to build the
+     * response.
+     * @param xmlBase The request URL.
+     * @return The DDX request document.
+     * @throws BadConfigurationException When no BES can be found to
+     * service the request.
+     */
     public Document getDap4DataRequest(String dataSource,
                                        String ce,
                                        String xdap_accept,
@@ -1120,7 +1210,7 @@ public class BesApi {
 
         Document reqDoc =
                 getRequestDocument(
-                        DataDDX,
+                        DAP4_DATA,
                         dataSource,
                         ce,
                         xdap_accept,

@@ -118,35 +118,6 @@ public class HtmlDMR extends Dap4Responder {
 
         }
 
-        /*
-
-
-        Document reqDoc = besApi.getRequestDocument(
-                                                        BesApi.HTML_FORM,
-                                                        resourceID,
-                                                        null,
-                                                        xdap_accept,
-                                                        0,
-                                                        null,
-                                                        xmlBase,
-                                                        null,
-                                                        BesApi.XML_ERRORS);
-
-
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        log.debug("BesApi.getRequestDocument() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-        */
-
 
 
         os.flush();

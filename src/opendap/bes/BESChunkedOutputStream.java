@@ -29,6 +29,7 @@ import opendap.io.Chunk;
 import opendap.io.ChunkedOutputStream;
 import opendap.ppt.PPTSessionProtocol;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,8 +67,7 @@ public class BESChunkedOutputStream  extends ChunkedOutputStream {
      */
     @Override
     public void close() throws IOException {
-
-
+        // Logger log = LoggerFactory.getLogger(BES.class);
 
         if(!isOpen) throw new IOException(closedMsg);
         log.debug("close() - Closing BES Connection.");
