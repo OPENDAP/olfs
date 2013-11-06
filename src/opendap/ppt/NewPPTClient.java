@@ -94,7 +94,6 @@ public class NewPPTClient {
             throw new PPTException(msg, e);
         }
 
-        initConnection();
     }
 
 
@@ -174,7 +173,7 @@ public class NewPPTClient {
 
 
 
-    private boolean initConnection() throws PPTException {
+    public boolean initConnection() throws PPTException {
 
         Logger log = LoggerFactory.getLogger(BES.class);
 
@@ -195,6 +194,7 @@ public class NewPPTClient {
 
 
             int bytesRead = _rawIn.read(inBuff);
+            /*
             int lapCounter = 1;
             while(bytesRead<0 && lapCounter <= 10){
                 log.debug("Reached End Of Stream when attempting to retrieve the PPT handshake response. Attempt: "+lapCounter);
@@ -208,6 +208,7 @@ public class NewPPTClient {
                 bytesRead = _rawIn.read(inBuff);
                 lapCounter++;
             }
+            */
             if(bytesRead<0){
                 throw new PPTException("PPT Connection appears to have been prematurely closed.");
 

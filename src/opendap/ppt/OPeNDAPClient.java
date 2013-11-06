@@ -130,6 +130,7 @@ public class OPeNDAPClient {
      */
     public void startClient(String hostStr, int portVal) throws PPTException {
         _client = new NewPPTClient(hostStr, portVal);
+        _client.initConnection();
         _isRunning = true;
     }
 
