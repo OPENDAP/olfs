@@ -196,8 +196,9 @@ public class NewPPTClient {
 
             int bytesRead = _rawIn.read(inBuff);
             int lapCounter = 1;
-            while(bytesRead<0 && lapCounter <= 10){
+            while(bytesRead<0 && lapCounter <= 100){
                 log.debug("Reached End Of Stream when attempting to retrieve the PPT handshake response. Attempt: "+lapCounter);
+                log.debug(showConnectionProperties());
                 bytesRead = _rawIn.read(inBuff);
                 lapCounter++;
             }
