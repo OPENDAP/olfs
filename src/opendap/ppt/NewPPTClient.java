@@ -25,12 +25,14 @@
  */
 package opendap.ppt;
 
+import opendap.bes.BES;
 import opendap.bes.BESChunkedOutputStream;
 import opendap.io.ChunkedInputStream;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,6 +94,7 @@ public class NewPPTClient {
             throw new PPTException(msg, e);
         }
 
+        initConnection();
     }
 
 
@@ -171,7 +174,9 @@ public class NewPPTClient {
 
 
 
-    public boolean initConnection() throws PPTException {
+    private boolean initConnection() throws PPTException {
+
+        Logger log = LoggerFactory.getLogger(BES.class);
 
         try {
             _rawOut.write(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION.getBytes());
@@ -187,10 +192,22 @@ public class NewPPTClient {
         try {
             byte[] inBuff = new byte[4096];
 
+
+
             int bytesRead = _rawIn.read(inBuff);
+            int lapCounter = 1;
+            while(bytesRead<0 && lapCounter <= 10){
+                log.debug("Reached End Of Stream when attempting to retrieve the PPT handshake response. Attempt: "+lapCounter);
+                bytesRead = _rawIn.read(inBuff);
+                lapCounter++;
+            }
             if(bytesRead<0){
                 throw new PPTException("PPT Connection appears to have been prematurely closed.");
+
             }
+
+
+
             String status = new String(inBuff, 0, bytesRead);
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
                 throw new PPTException("Could not connect to server, server may be down or busy");
