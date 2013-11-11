@@ -98,7 +98,7 @@ public class Ascii extends Dap4Responder {
 
         log.debug("sendASCII() for dataset: " + resourceID);
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ascii");
         // Commented because of a bug in the OPeNDAP C++ stuff...

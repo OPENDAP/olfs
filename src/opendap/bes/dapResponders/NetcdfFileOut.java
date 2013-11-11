@@ -106,7 +106,7 @@ public class NetcdfFileOut extends Dap4Responder {
 
         String contentDisposition = " attachment; filename=\"" +downloadFileName+"\"";
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         response.setHeader("Content-Disposition", contentDisposition);
 
         Version.setOpendapMimeHeaders(request, response, besApi);

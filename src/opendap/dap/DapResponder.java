@@ -128,7 +128,7 @@ public abstract class DapResponder extends HttpResponder  {
     }
 
 
-
+    /*
     public Element getServiceElement(String datasetUrl){
         Element service;
 
@@ -170,9 +170,12 @@ public abstract class DapResponder extends HttpResponder  {
     }
 
 
+
     public String getServiceMediaType(){
         return _serviceMediaType;
     }
+    */
+
     public String getServiceRoleId(){
         return _serviceRoleId;
     }

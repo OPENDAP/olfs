@@ -106,7 +106,7 @@ public class DDS extends Dap4Responder {
 
         log.debug("Sending DDS for dataset: " + resourceID);
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_dds");
         // Commented because of a bug in the OPeNDAP C++ stuff...

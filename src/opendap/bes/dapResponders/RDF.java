@@ -156,7 +156,7 @@ public class RDF extends Dap4Responder {
         String accepts = request.getHeader("Accepts");
 
         if(accepts!=null && accepts.equalsIgnoreCase("application/rdf+xml"))
-            response.setContentType(getServiceMediaType());
+            response.setContentType(getNormativeMediaType().getMimeType());
         else
             response.setContentType("text/xml");
 

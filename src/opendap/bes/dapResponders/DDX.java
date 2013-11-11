@@ -93,7 +93,7 @@ public class DDX extends Dap4Responder {
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         //response.setContentType("application/vnd.opendap.org.dap4.description+xml");
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_ddx");

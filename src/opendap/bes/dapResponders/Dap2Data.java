@@ -105,7 +105,7 @@ public class Dap2Data extends Dap4Responder {
         log.debug("sendNormativeRepresentation() For: " + resourceID+
                 "    CE: '" + constraintExpression + "'");
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_data");
 

@@ -64,18 +64,18 @@ public class NormativeDSR extends Dap4Responder {
     private static String defaultRequestSuffix = "";
 
 
-    private Vector<BesDapResponder> allServices = null;
+    private Vector<Dap4Responder> allServices = null;
 
 
-    public NormativeDSR(String sysPath, BesApi besApi, Vector<BesDapResponder> services) {
+    public NormativeDSR(String sysPath, BesApi besApi, Vector<Dap4Responder> services) {
         this(sysPath,null, defaultRequestSuffix,besApi,services);
     }
 
-    public NormativeDSR(String sysPath, String pathPrefix, BesApi besApi, Vector<BesDapResponder> services) {
+    public NormativeDSR(String sysPath, String pathPrefix, BesApi besApi, Vector<Dap4Responder> services) {
         this(sysPath,pathPrefix, defaultRequestSuffix,besApi,services );
     }
 
-    public NormativeDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, Vector<BesDapResponder> services) {
+    public NormativeDSR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, Vector<Dap4Responder> services) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         allServices = services;
 
@@ -153,7 +153,7 @@ public class NormativeDSR extends Dap4Responder {
 
 
         if(allServices!=null){
-            for(DapResponder service : allServices ){
+            for(Dap4Responder service : allServices ){
                  datasetServices.addContent(service.getServiceElement(datasetUrl));
             }
         }

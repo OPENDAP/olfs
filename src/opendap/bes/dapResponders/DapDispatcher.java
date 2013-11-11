@@ -68,7 +68,7 @@ public class DapDispatcher implements DispatchHandler {
 
     private String systemPath;
     private Element _config;
-    private Vector<BesDapResponder> responders;
+    private Vector<Dap4Responder> responders;
     private static boolean _allowDirectDataSourceAccess = false;
     private static boolean _useDAP2ResourceUrlResponse = false;
 
@@ -79,7 +79,7 @@ public class DapDispatcher implements DispatchHandler {
 
     public DapDispatcher() {
         log = LoggerFactory.getLogger(getClass());
-        responders = new Vector<BesDapResponder>();
+        responders = new Vector<Dap4Responder>();
 
     }
 
@@ -98,11 +98,11 @@ public class DapDispatcher implements DispatchHandler {
     }
 
 
-    protected Vector<BesDapResponder> getResponders() {
+    protected Vector<Dap4Responder> getResponders() {
         return responders;
     }
 
-    protected void addResponder(BesDapResponder r) {
+    protected void addResponder(Dap4Responder r) {
         responders.add(r);
     }
 
@@ -206,7 +206,7 @@ public class DapDispatcher implements DispatchHandler {
         systemPath = ServletUtil.getSystemPath(dispatchServlet, "");
 
 
-        BesDapResponder hr;
+        Dap4Responder hr;
 
 
 

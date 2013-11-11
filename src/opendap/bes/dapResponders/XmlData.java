@@ -101,7 +101,7 @@ public class XmlData extends Dap4Responder {
                     "    CE: '" + constraintExpression + "'");
 
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dap_xml");
         // Commented because of a bug in the OPeNDAP C++ stuff...

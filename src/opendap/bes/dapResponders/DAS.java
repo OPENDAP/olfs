@@ -94,7 +94,7 @@ public class DAS extends Dap4Responder {
 
         log.debug("sendDAS() for dataset: " + resourceID);
 
-        response.setContentType(getServiceMediaType());
+        response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
         response.setHeader("Content-Description", "dods_das");
         // Commented because of a bug in the OPeNDAP C++ stuff...

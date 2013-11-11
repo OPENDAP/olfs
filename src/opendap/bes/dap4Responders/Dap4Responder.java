@@ -52,63 +52,63 @@ import java.util.regex.Pattern;
  */
 public abstract class Dap4Responder extends BesDapResponder  {
 
-    Logger log;
+    Logger _log;
 
-    private MediaType normativeMediaType;
-    private Vector<Dap4Responder> altResponders;
-    private String combinedRequestSuffixRegex;
+    private MediaType _normativeMediaType;
+    private Vector<Dap4Responder> _altResponders;
+    private String _combinedRequestSuffixRegex;
 
 
 
     public Dap4Responder(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
-        log = LoggerFactory.getLogger(getClass().getName());
-        altResponders =  new Vector<Dap4Responder>();
+        _log = LoggerFactory.getLogger(getClass().getName());
+        _altResponders =  new Vector<Dap4Responder>();
     }
 
 
 
     public void setNormativeMediaType(MediaType mt){
-        normativeMediaType = mt;
-        combinedRequestSuffixRegex = buildRequestMatchingRegex();
-        log.debug("combinedRequestSuffixRegex: {}",combinedRequestSuffixRegex);
-        setRequestMatchRegex(combinedRequestSuffixRegex);
+        _normativeMediaType = mt;
+        _combinedRequestSuffixRegex = buildRequestMatchingRegex();
+        _log.debug("combinedRequestSuffixRegex: {}", _combinedRequestSuffixRegex);
+        setRequestMatchRegex(_combinedRequestSuffixRegex);
     }
 
 
     public MediaType getNormativeMediaType(){
-        return normativeMediaType;
+        return _normativeMediaType;
     }
 
     public Dap4Responder[] getAltRepResponders(){
-        Dap4Responder[] ars = new Dap4Responder[altResponders.size()];
-        return altResponders.toArray(ars);
+        Dap4Responder[] ars = new Dap4Responder[_altResponders.size()];
+        return _altResponders.toArray(ars);
     }
 
 
     public void addAltRepResponder(Dap4Responder altRepResponder){
-        altResponders.add(altRepResponder);
-        combinedRequestSuffixRegex = buildRequestMatchingRegex();
-        log.debug("combinedRequestSuffixRegex: {}",combinedRequestSuffixRegex);
-        setRequestMatchRegex(combinedRequestSuffixRegex);
-        for(Dap4Responder responder:altResponders){
-            responder.combinedRequestSuffixRegex = combinedRequestSuffixRegex;
+        _altResponders.add(altRepResponder);
+        _combinedRequestSuffixRegex = buildRequestMatchingRegex();
+        _log.debug("combinedRequestSuffixRegex: {}", _combinedRequestSuffixRegex);
+        setRequestMatchRegex(_combinedRequestSuffixRegex);
+        for(Dap4Responder responder: _altResponders){
+            responder._combinedRequestSuffixRegex = _combinedRequestSuffixRegex;
         }
     }
 
 
     public void clearAltResponders(){
-        altResponders.clear();
+        _altResponders.clear();
     }
 
 
 
     public String getCombinedRequestSuffixRegex(){
-        return combinedRequestSuffixRegex;
+        return _combinedRequestSuffixRegex;
     }
 
     public void setCombinedRequestSuffixRegex(String regex){
-        combinedRequestSuffixRegex = regex;
+        _combinedRequestSuffixRegex = regex;
     }
 
     public String buildRequestMatchingRegex() {
@@ -116,7 +116,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
         StringBuilder s = new StringBuilder();
         s.append(buildRequestMatchingRegexWorker(this));
         s.append("$");
-        log.debug("Request Match Regex: {}", s.toString());
+        _log.debug("Request Match Regex: {}", s.toString());
         return s.toString();
 
     }
@@ -174,7 +174,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         String acceptsHeaderValue = request.getHeader("Accept");
 
-        log.debug("Accept: {}",acceptsHeaderValue);
+        _log.debug("Accept: {}", acceptsHeaderValue);
 
         Vector<MediaType> clientMediaTypes = new Vector<MediaType>();
 
@@ -190,17 +190,17 @@ public abstract class Dap4Responder extends BesDapResponder  {
         }
 
         for(MediaType mt: clientMediaTypes){
-            log.debug("Clients accepts media type: {}",mt.toString());
+            _log.debug("Clients accepts media type: {}", mt.toString());
         }
 
         TreeSet<MediaType> matchingTypes = new TreeSet<MediaType>();
 
         for(MediaType mt: clientMediaTypes){
-            if(mt.getMimeType().equalsIgnoreCase(normativeMediaType.getMimeType())){
+            if(mt.getMimeType().equalsIgnoreCase(_normativeMediaType.getMimeType())){
                 matchingTypes.add(mt);
                 responderMap.put(mt,this);
             }
-            else if(mt.getPrimaryType().equalsIgnoreCase(normativeMediaType.getPrimaryType()) &&
+            else if(mt.getPrimaryType().equalsIgnoreCase(_normativeMediaType.getPrimaryType()) &&
                     mt.getSubType().equalsIgnoreCase("*")){
                 matchingTypes.add(mt);
                 responderMap.put(mt,this);
@@ -233,9 +233,9 @@ public abstract class Dap4Responder extends BesDapResponder  {
         MediaType bestType = matchingTypes.last();
         Dap4Responder bestResponder = responderMap.get(bestType);
 
-        log.debug("Best Matching Type:  {}", bestType);
-        log.debug("Worst Matching Type: {}", matchingTypes.first());
-        log.debug("Best Responder:      {}", bestResponder.getClass().getName());
+        _log.debug("Best Matching Type:  {}", bestType);
+        _log.debug("Worst Matching Type: {}", matchingTypes.first());
+        _log.debug("Best Responder:      {}", bestResponder.getClass().getName());
 
         return bestResponder;
 
@@ -249,10 +249,10 @@ public abstract class Dap4Responder extends BesDapResponder  {
     public void respondToHttpGetRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 
-        log.debug("respondToHttpGetRequest() - Checking Last-Modified header...");
+        _log.debug("respondToHttpGetRequest() - Checking Last-Modified header...");
 
         if (!response.containsHeader("Last-Modified")) {
-            log.debug("respondToHttpGetRequest() - Last-Modified header has not been set. Setting...");
+            _log.debug("respondToHttpGetRequest() - Last-Modified header has not been set. Setting...");
 
             Date lmt = new Date(getLastModified(request));
             //Date lmt = new Date((long)-1);
@@ -260,11 +260,11 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
             response.setHeader("Last-Modified",httpDateFormat.format(lmt));
 
-            log.debug("respondToHttpGetRequest() - Last-Modified: {}",httpDateFormat.format(lmt));
+            _log.debug("respondToHttpGetRequest() - Last-Modified: {}", httpDateFormat.format(lmt));
 
 
         } else {
-            log.debug("respondToHttpGetRequest() - Last-Modified header has already been set.");
+            _log.debug("respondToHttpGetRequest() - Last-Modified header has already been set.");
 
         }
 
@@ -283,24 +283,24 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
         boolean regexMatch = Util.matchesSuffixPattern(relativeUrl,getRequestSuffixMatchPattern());
         if(regexMatch){
-            log.debug("requestedResourceId matches RequestSuffixMatchPattern: {}",regexMatch);
+            _log.debug("requestedResourceId matches RequestSuffixMatchPattern: {}", regexMatch);
             Dap4Responder targetResponder = getBestResponderForHttpRequest(request);
 
             if(targetResponder==null){
                 //If an Accept header field is present, and if the server cannot send a response
                 // which is acceptable according to the combined Accept field value, then the server
                 // SHOULD send a 406 (not acceptable) response.
-                log.error("Server-driven content negotiation failed. Returning status 406. Client request 'Accept: {}'",
+                _log.error("Server-driven content negotiation failed. Returning status 406. Client request 'Accept: {}'",
                         Scrub.urlContent(request.getHeader("Accept")));
                 response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE);
                 return;
             }
-            log.debug("Target Responder: {} normative media-type: {}",targetResponder.getClass().getName(),targetResponder.getNormativeMediaType());
+            _log.debug("Target Responder: {} normative media-type: {}", targetResponder.getClass().getName(), targetResponder.getNormativeMediaType());
 
             targetResponder.sendNormativeRepresentation(request,response);
             return;
         }
-        log.error("Something Bad Happened. Unable to respond to request for : {}'",Scrub.urlContent(relativeUrl));
+        _log.error("Something Bad Happened. Unable to respond to request for : {}'", Scrub.urlContent(relativeUrl));
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
 
@@ -325,7 +325,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
     }
     public String getResourceId(String requestedResource, boolean checkWithBes){
 
-        Pattern suffixPattern = Pattern.compile(combinedRequestSuffixRegex, Pattern.CASE_INSENSITIVE);
+        Pattern suffixPattern = Pattern.compile(_combinedRequestSuffixRegex, Pattern.CASE_INSENSITIVE);
         return getBesApi().getBesDataSourceID(requestedResource, suffixPattern, checkWithBes);
 
     }
@@ -395,7 +395,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
 
-        log.debug("@xml:base='{}'",xmlBase);
+        _log.debug("@xml:base='{}'", xmlBase);
         return xmlBase;
     }
 
@@ -407,7 +407,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String dataSource = getResourceId(relativeUrl,true);
 
-        log.debug("getLastModified(): Determining LastModified time for resource {}",dataSource );
+        _log.debug("getLastModified(): Determining LastModified time for resource {}", dataSource);
 
         ResourceInfo ri = getResourceInfo(dataSource);
         return ri.lastModified();
@@ -421,7 +421,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
 
 
-    @Override
     public Element getServiceElement(String datasetUrl){
 
 
