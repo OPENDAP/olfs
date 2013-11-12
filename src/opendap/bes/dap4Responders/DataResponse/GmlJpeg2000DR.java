@@ -112,7 +112,7 @@ public class GmlJpeg2000DR extends Dap4Responder {
 
         Version.setOpendapMimeHeaders(request, response, besApi);
 
-        response.setHeader("Content-Description", "dap4:Dataset encoded as a GML-JPEG2000 image");
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
 
 

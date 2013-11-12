@@ -128,7 +128,7 @@ public class NormativeDSR extends Dap4Responder {
         serviceDescription.setRootElement(datasetServices);
 
         response.setContentType(getNormativeMediaType().getMimeType());
-        response.setHeader("Content-Description", "DAP Service Description");
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
 

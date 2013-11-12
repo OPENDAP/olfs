@@ -112,7 +112,7 @@ public class GeoTiffDR extends Dap4Responder {
 
         Version.setOpendapMimeHeaders(request, response, besApi);
 
-        response.setHeader("Content-Description", "dap4:Dataset encoded as a GeoTIFF image");
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
 
 

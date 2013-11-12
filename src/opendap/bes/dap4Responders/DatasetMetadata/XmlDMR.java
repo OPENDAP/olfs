@@ -94,7 +94,8 @@ public class XmlDMR extends Dap4Responder {
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
-        response.setHeader("Content-Description", "dap4:Dataset");
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
+        ;
         // Commented because of a bug in the OPeNDAP C++ stuff...
         // response.setHeader("Content-Encoding", "plain");
 

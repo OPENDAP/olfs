@@ -90,7 +90,7 @@ public class Version extends Dap4Responder {
         log.debug("respondToHttpGetRequest() - Sending Version response...");
 
         response.setContentType(getNormativeMediaType().getMimeType());
-        response.setHeader("Content-Description", "dods_version");
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
         response.setStatus(HttpServletResponse.SC_OK);
 

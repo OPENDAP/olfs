@@ -135,7 +135,7 @@ public class HtmlDSR extends Dap4Responder {
         ServletOutputStream os = response.getOutputStream();
 
         response.setContentType(getNormativeMediaType().getMimeType());
-        response.setHeader("Content-Description", "DAP Service Description");
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
 
 
         // Transform the DSR into an HTML page.
