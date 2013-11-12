@@ -33,7 +33,6 @@ import opendap.bes.dapResponders.BesApi;
 import opendap.dap.Dap2Error;
 import opendap.dap4.Dap4Error;
 import opendap.ppt.PPTException;
-import org.jdom.Element;
 import org.jdom.JDOMException;
 
 import javax.servlet.http.HttpServletResponse;

@@ -28,14 +28,10 @@
 ]>
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
-                xmlns:wcs="http://www.opengis.net/wcs"
-                xmlns:gml="http://www.opengis.net/gml"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
-                xmlns:ncml="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
 
-                >
+        >
     <xsl:import href="version.xsl"/>
     <xsl:output method='html'  encoding='UTF-8' indent='yes'/>
 

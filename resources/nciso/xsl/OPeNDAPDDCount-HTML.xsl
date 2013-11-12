@@ -26,7 +26,7 @@
   -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-                xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#">
+        >
     <xsl:import href="ddx2iso-score-components.xsl"/>
     <xd:doc xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" scope="stylesheet">
         <xd:desc>

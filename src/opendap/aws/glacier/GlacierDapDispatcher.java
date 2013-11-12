@@ -28,7 +28,6 @@ package opendap.aws.glacier;
 
 import opendap.async.DocFactory;
 import opendap.async.HttpHeaders;
-import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.ReqInfo;
@@ -122,7 +121,7 @@ public class GlacierDapDispatcher extends DapDispatcher{
 
         log.debug("The client requested this resource: {}",relativeUrl);
 
-        for (BesDapResponder r : getResponders()) {
+        for (Dap4Responder r : getResponders()) {
             log.debug("Checking responder: "+ r.getClass().getSimpleName()+ " (pathPrefix: "+r.getPathPrefix()+")");
 
             // see if the relative URL matches a responders regex, if so we'll check for it int he resource table.
@@ -400,7 +399,7 @@ public class GlacierDapDispatcher extends DapDispatcher{
             return -1;
 
 
-        for (BesDapResponder r : getResponders()) {
+        for (Dap4Responder r : getResponders()) {
             if (r.matches(relativeUrl,false)) {
                 log.info("The relative URL: " + relativeUrl + " matches " +
                         "the pattern: \"" + r.getRequestMatchRegexString() + "\"");

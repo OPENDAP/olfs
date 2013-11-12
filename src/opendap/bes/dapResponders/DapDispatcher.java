@@ -26,7 +26,6 @@
 
 package opendap.bes.dapResponders;
 
-import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.DataResponse.GeoTiffDR;
 import opendap.bes.dap4Responders.DataResponse.GmlJpeg2000DR;
@@ -42,7 +41,6 @@ import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.ServletUtil;
-import opendap.dap.DapResponder;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -28,7 +28,9 @@ package opendap.aws.glacier;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.glacier.AmazonGlacierClient;
-import com.amazonaws.services.glacier.model.*;
+import com.amazonaws.services.glacier.model.DescribeVaultOutput;
+import com.amazonaws.services.glacier.model.ListVaultsRequest;
+import com.amazonaws.services.glacier.model.ListVaultsResult;
 import opendap.aws.auth.Credentials;
 import opendap.aws.s3.S3Object;
 import opendap.coreServlet.Util;

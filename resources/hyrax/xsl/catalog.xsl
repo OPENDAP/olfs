@@ -30,11 +30,10 @@
 ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
-                >
+        >
     <xsl:param name="dapService"/>
     <xsl:param name="allowDirectDataSourceAccess"/>
     <xsl:param name="useDAP2ResourceUrlResponse"/>

@@ -28,13 +28,10 @@ package opendap.dap;
 
 import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.Util;
-import opendap.namespaces.DAP;
-import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**

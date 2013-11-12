@@ -28,8 +28,6 @@
 package opendap.experiments;
 
 import opendap.coreServlet.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -31,7 +31,8 @@ To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
 or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
 License: http://rhizomik.upf.edu/redefer/xsd2owl.xsl.rdf
 -->
-<xsl:stylesheet version="2.0" xmlns:xo="http://rhizomik.net/redefer/xsl/xsd2owl-functions.xsl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+<xsl:stylesheet version="2.0" xmlns:xo="http://rhizomik.net/redefer/xsl/xsd2owl-functions.xsl"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<!-- Generates URI reference from element namespace and local name using entity -->		
 	<xsl:function name="xo:rdfUri" as="xsd:string">

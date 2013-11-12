@@ -31,7 +31,6 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:wcs="http://www.opengis.net/wcs/1.1"
                 xmlns:ows="http://www.opengis.net/ows/1.1"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:param name="ServicePrefix" />
     <xsl:param name="UpdateIsRunning"/>

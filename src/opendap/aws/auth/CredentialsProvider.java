@@ -28,7 +28,6 @@ package opendap.aws.auth;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import opendap.aws.auth.Credentials;
 
 public class CredentialsProvider implements AWSCredentialsProvider {
 

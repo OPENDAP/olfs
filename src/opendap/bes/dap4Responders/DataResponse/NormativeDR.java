@@ -33,9 +33,6 @@ import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +71,7 @@ public class NormativeDR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
 
-        setNormativeMediaType(new ServiceMediaType("application","vnd.org.opendap.dap4.data", getRequestSuffix()));
+        setNormativeMediaType(new ServiceMediaType("application","vnd.opendap.dap4.data", getRequestSuffix()));
 
         addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new XmlDR(sysPath, pathPrefix, besApi));

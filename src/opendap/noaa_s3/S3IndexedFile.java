@@ -27,11 +27,6 @@
 package opendap.noaa_s3;
 
 import opendap.aws.s3.S3Object;
-import org.jdom.Element;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  *   <file name="JA2_GPN_2PdP097_015_20110219_120533_20110219_130146.nc" last-modified="2013-07-02T20:00:54.000Z" size="6386228"/>

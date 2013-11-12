@@ -28,12 +28,6 @@
 package opendap.aws;
 
 
-
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -55,6 +49,10 @@ import com.amazonaws.services.simpledb.model.DomainMetadataResult;
 import com.amazonaws.services.simpledb.model.ListDomainsRequest;
 import com.amazonaws.services.simpledb.model.ListDomainsResult;
 import opendap.aws.auth.CredentialsProvider;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Welcome to your new AWS Java SDK based project!

@@ -32,12 +32,10 @@ saxon 9.
 -->
 
 <xsl:stylesheet exclude-result-prefixes="xs" version="2.0"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace" 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    xmlns:dap="http://xml.opendap.org/ns/DAP2">
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:fn="http://www.w3.org/2005/xpath-functions"
+                xmlns:dap="http://xml.opendap.org/ns/DAP2">
 
     <!-- The start and end date for the discrete URLs in the dataset. Passed
     as an individual param to simplify parsing -->

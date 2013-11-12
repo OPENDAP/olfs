@@ -26,7 +26,6 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                xmlns:xml="http://www.w3.org/XML/1998/namespace"
         >
 
     <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>

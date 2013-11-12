@@ -1,4 +1,3 @@
-<%@ page import="opendap.coreServlet.Util" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.

@@ -27,14 +27,6 @@
 package opendap.aws.s3;
 
 
-
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
@@ -56,6 +48,12 @@ import opendap.noaa_s3.S3Index;
 import opendap.noaa_s3.S3IndexedFile;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * Welcome to your new AWS Java SDK based project!

@@ -27,7 +27,6 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.logging.*;
 import opendap.logging.Timer;
 import opendap.ppt.OPeNDAPClient;
 import opendap.ppt.PPTException;

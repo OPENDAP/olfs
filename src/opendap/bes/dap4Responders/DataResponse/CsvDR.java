@@ -33,7 +33,6 @@ import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
-import org.jdom.Document;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;

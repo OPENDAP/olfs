@@ -25,12 +25,12 @@
  */
 package opendap.nciso;
 
-import opendap.bes.BESResource;
 import opendap.bes.BESError;
+import opendap.bes.BESResource;
 import opendap.bes.Version;
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.ServletUtil;
 import opendap.xml.Transformer;
 import org.jdom.Document;

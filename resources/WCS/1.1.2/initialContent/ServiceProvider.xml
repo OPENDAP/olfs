@@ -28,9 +28,9 @@
 <!-- ************************************************************ -->
 <!-- * SERVICE PROVIDER SECTION                                 * -->
 <!-- ************************************************************ -->
-<ows:ServiceProvider  xmlns="http://www.opengis.net/wcs/1.1"
-xmlns:ows="http://www.opengis.net/ows/1.1"
-xmlns:xlink="http://www.w3.org/1999/xlink">
+<ows:ServiceProvider
+        xmlns:ows="http://www.opengis.net/ows/1.1"
+        xmlns:xlink="http://www.w3.org/1999/xlink">
   <ows:ProviderName>OPeNDAP Inc.</ows:ProviderName>
   <ows:ProviderSite xlink:href="http://www.opendap.org"/>
   <ows:ServiceContact>

@@ -27,8 +27,6 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:ows="http://www.opengis.net/ows/2.0"
-                xmlns:wcs="http://www.opengis.net/wcs/2.0"
-                xmlns:gml="http://www.opengis.net/gml/3.2"
         >
 
     <xsl:template match="/ows:WcsExceptionReport">

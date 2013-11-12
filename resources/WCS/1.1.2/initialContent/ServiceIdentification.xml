@@ -28,9 +28,9 @@
 <!-- ************************************************************ -->
 <!-- * SERVICE IDENTIFICATION SECTION                           * -->
 <!-- ************************************************************ -->
-<ows:ServiceIdentification xmlns="http://www.opengis.net/wcs/1.1"
-xmlns:ows="http://www.opengis.net/ows/1.1"
-xmlns:xlink="http://www.w3.org/1999/xlink" >
+<ows:ServiceIdentification
+        xmlns:ows="http://www.opengis.net/ows/1.1"
+        >
   <ows:Title>OPeNDAP WCS Service</ows:Title>
   <ows:Abstract>A WCS server intended to provide WCS 1.1 (1.1.2) access to DAP datasets</ows:Abstract>
   <ows:Keywords>

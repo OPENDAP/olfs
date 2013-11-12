@@ -31,9 +31,7 @@
         xmlns='http://www.opengis.net/gml/3.2'
         xmlns:swe='http://www.opengis.net/swe/2.0'
         xmlns:gmlcov='http://www.opengis.net/gmlcov/1.0'
-        xmlns:gmlwcs='http://www.opengis.net/gmlcov/1.0'
-        xsi:schemaLocation='http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd
-                        http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd'
+        xsi:schemaLocation="http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
         gml:id="ioos_002f2F200803061600__HFRadar__USEGC__6km__rtv__SIO.nc">
     <gml:boundedBy>
         <gml:Envelope srsName="http://www.opengis.net/def/crs/EPSG/0/4326" axisLabels="latitude longitude"

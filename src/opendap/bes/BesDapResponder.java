@@ -27,8 +27,8 @@
 package opendap.bes;
 
 import opendap.bes.dapResponders.BesApi;
-import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.dap.DapResponder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public abstract class BesDapResponder extends DapResponder {
     public BesDapResponder(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi) {
         super(sysPath, pathPrefix, requestSuffix);
 
-        log = LoggerFactory.getLogger(DapResponder.class);
+        log = LoggerFactory.getLogger(BesDapResponder.class);
 
         _besApi = besApi;
 

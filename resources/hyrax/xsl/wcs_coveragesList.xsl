@@ -29,12 +29,11 @@
 ]>
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fn="http://www.w3.org/2005/02/xpath-functions"
                 xmlns:wcs="http://www.opengis.net/wcs"
                 xmlns:gml="http://www.opengis.net/gml"
                 xmlns:dapwcs="http://www.opendap.org/ns/dapwcs"
 
-                >
+        >
     <xsl:param name="dapService"/>
     <xsl:param name="docsService"/>
     <xsl:output method='html' version='1.0' encoding='UTF-8' indent='yes'/>

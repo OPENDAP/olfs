@@ -26,8 +26,6 @@
 
 package opendap.noaa_s3;
 
-import opendap.aws.AwsUtil;
-import opendap.bes.BesDapResponder;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dapResponders.DapDispatcher;
@@ -41,7 +39,6 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**

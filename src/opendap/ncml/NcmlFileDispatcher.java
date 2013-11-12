@@ -25,13 +25,13 @@
  */
 package opendap.ncml;
 
-import opendap.bes.BESResource;
 import opendap.bes.BESError;
+import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
-import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.ResourceInfo;
 import opendap.ppt.PPTException;
 import org.jdom.Document;
 import org.jdom.Element;

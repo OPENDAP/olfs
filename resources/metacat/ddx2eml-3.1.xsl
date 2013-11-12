@@ -30,17 +30,16 @@
 saxon 9. -->
 
 <xsl:stylesheet exclude-result-prefixes="xs"
-    version="2.0" 
-    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_1_0/eml.xsd"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace"
+                version="2.0"
+                xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_1_0/eml.xsd"
 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:fn="http://www.w3.org/2005/xpath-functions" 
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:fn="http://www.w3.org/2005/xpath-functions"
 
-    xmlns:dap="http://xml.opendap.org/ns/DAP2"
-    xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
+                xmlns:dap="http://xml.opendap.org/ns/DAP2"
+                xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
 
     <!-- EML's PackageId should be something that's likely to be unique 
         and also be machine and location independent. I'm going to 

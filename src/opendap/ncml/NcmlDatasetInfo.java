@@ -28,8 +28,6 @@ package opendap.ncml;
 
 import opendap.coreServlet.ResourceInfo;
 
-import java.util.Date;
-
 /**
  * Created by IntelliJ IDEA.
  * User: ndp

@@ -26,7 +26,6 @@
 
 package opendap.noaa_s3;
 
-import opendap.aws.s3.S3Object;
 import org.jdom.JDOMException;
 import org.slf4j.LoggerFactory;
 

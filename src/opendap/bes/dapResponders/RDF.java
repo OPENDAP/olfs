@@ -25,7 +25,6 @@
  */
 package opendap.bes.dapResponders;
 
-import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.ServiceMediaType;

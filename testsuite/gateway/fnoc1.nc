@@ -7,7 +7,7 @@
   <ds:ServerSoftwareVersion>Hyrax-@HyraxVersion@</ds:ServerSoftwareVersion>
   <ds:Service title="DAP4 Data Response" role="http://services.opendap.org/dap4/data">
     <ds:Description href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service">DAP4 Data Response object.</ds:Description>
-    <ds:link type="application/vnd.org.opendap.dap4.data" href="http://localhost:8080/opendap/hyrax/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65.dap" description="The normative form of the DAP4 Data Response">
+    <ds:link type="application/vnd.opendap.dap4.data" href="http://localhost:8080/opendap/hyrax/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65.dap" description="The normative form of the DAP4 Data Response">
       <ds:alt type="text/plain" />
       <ds:alt type="text/xml" />
       <ds:alt type="application/x-netcdf" />
@@ -22,7 +22,7 @@
   </ds:Service>
   <ds:Service title="Dataset Metadata Response" role="http://services.opendap.org/dap4/dataset-metadata">
     <ds:Description href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata">DAP4 Dataset Description and Attribute XML Document.</ds:Description>
-    <ds:link type="application/vnd.org.opendap.dap4.dataset-metadata+xml" href="http://localhost:8080/opendap/hyrax/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65.dmr" description="The normative form of the Dataset Metadata Response">
+    <ds:link type="application/vnd.opendap.dap4.dataset-metadata+xml" href="http://localhost:8080/opendap/hyrax/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65.dmr" description="The normative form of the Dataset Metadata Response">
       <ds:alt type="text/xml" />
       <ds:alt type="text/html" />
       <ds:alt type="application/rdf+xml" />
@@ -40,7 +40,7 @@
   </ds:Service>
   <ds:Service title="Dataset Services Response" role="http://services.opendap.org/dap4/dataset-services">
     <ds:Description href="http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service">An XML document itemizing the Services available for this dataset.</ds:Description>
-    <ds:link type="application/vnd.org.opendap.dap4.dataset-services+xml" href="http://localhost:8080/opendap/hyrax/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65" description="The normative form of the Dataset Services Response">
+    <ds:link type="application/vnd.opendap.dap4.dataset-services+xml" href="http://localhost:8080/opendap/hyrax/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65" description="The normative form of the Dataset Services Response">
       <ds:alt type="text/html" />
       <ds:alt type="text/xml" />
     </ds:link>

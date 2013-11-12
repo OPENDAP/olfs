@@ -30,21 +30,13 @@
 saxon 9. -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xs" version="1.0"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace"
-        
-    xmlns:dap="http://xml.opendap.org/ns/DAP2"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
-    xsi:schemaLocation="//ecoinformatics.org/eml-2.0.1 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_0_1/eml.xsd"
-    xmlns:eml="eml://ecoinformatics.org/eml-2.0.1"
-    xmlns:res="eml://ecoinformatics.org/resource-2.0.1"
-    xmlns:doc="eml://ecoinformatics.org/documentation-2.0.1"
-    xmlns:cit="eml://ecoinformatics.org/literature-2.0.1"
-    xmlns:prot="eml://ecoinformatics.org/protocol-2.0.1"
-    xmlns:stmml="http://www.xml-cml.org/schema/stmml"
-    xmlns:sw="eml://ecoinformatics.org/software-2.0.1"
-    xmlns:ds="eml://ecoinformatics.org/dataset-2.0.1">
+                xmlns:dap="http://xml.opendap.org/ns/DAP2"
+
+                xmlns:eml="eml://ecoinformatics.org/eml-2.0.1"
+        >
     
     <xsl:param name="datasetId"/>
     <xsl:param name="XML_BASE"/>

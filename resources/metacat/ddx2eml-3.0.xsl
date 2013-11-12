@@ -35,12 +35,11 @@
 saxon 9. -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" exclude-result-prefixes="xs"
-    version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xml="http://www.w3.org/XML/1998/namespace"
-    xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:dap="http://xml.opendap.org/ns/DAP2"
-    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_1_0/eml.xsd"
-    xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
+                version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:dap="http://xml.opendap.org/ns/DAP2"
+                xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.0 https://code.ecoinformatics.org/code/eml/tags/RELEASE_EML_2_1_0/eml.xsd"
+                xmlns:eml="eml://ecoinformatics.org/eml-2.1.0">
 
     <!-- This odd variable definition is how you get a newline in the output
         which goes a long way toward making the result readable -->

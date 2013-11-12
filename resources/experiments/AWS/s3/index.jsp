@@ -49,14 +49,8 @@
   ~ // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
-<%@ page import="opendap.hai.Util" %>
-<%@ page import="opendap.ppt.OPeNDAPClient" %>
-<%@ page import="java.util.Enumeration" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.Vector" %>
-<%@ page import="opendap.bes.*" %>
 <%@ page import="opendap.noaa_s3.S3CatalogManager" %>
+<%@ page import="java.util.Enumeration" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% String contextPath = request.getContextPath(); %>
 <% String catalogServiceContextPath = S3CatalogManager.theManager().getCatalogServiceContext(); %>

@@ -26,7 +26,7 @@
 package opendap.gateway;
 
 import opendap.coreServlet.ResourceInfo;
-import opendap.dap.DapResponder;
+import opendap.coreServlet.HttpResponder;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  * Time: 11:54 AM
  * To change this template use File | Settings | File Templates.
  */
-public class GatewayForm extends DapResponder {
+public class GatewayForm extends HttpResponder {
 
 
 

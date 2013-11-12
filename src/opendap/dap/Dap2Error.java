@@ -41,7 +41,10 @@
 package opendap.dap;
 
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 /**
  * Holds an exception thrown by OPeNDAP server to a client.

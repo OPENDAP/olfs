@@ -30,7 +30,6 @@
 <xsl:stylesheet version="1.0"
                 xmlns:ds="http://xml.opendap.org/ns/DAP/4.0/dataset-services#"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
         >
     <xsl:import href="version.xsl" />
 

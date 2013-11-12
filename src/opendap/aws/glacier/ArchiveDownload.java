@@ -27,10 +27,11 @@
 package opendap.aws.glacier;
 
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.services.glacier.model.*;
+import com.amazonaws.services.glacier.model.JobParameters;
 import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 
 public class ArchiveDownload extends Download implements  Serializable {
 

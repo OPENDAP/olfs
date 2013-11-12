@@ -25,7 +25,12 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 
-<Dataset name="dodsH7ssR1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.opendap.org/ns/DAP/3.2# http://xml.opendap.org/dap/dap3.2.xsd" xmlns:grddl="http://www.w3.org/2003/g/data-view#" grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl" xmlns="http://xml.opendap.org/ns/DAP/3.2#" xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#" dapVersion="3.2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:base="http://localhost:8080/opendap/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65">
+<Dataset name="dodsH7ssR1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:grddl="http://www.w3.org/2003/g/data-view#"
+         grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl"
+         xmlns="http://xml.opendap.org/ns/DAP/3.2#"
+         dapVersion="3.2" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+         xml:base="http://localhost:8080/opendap/gateway/687474703A2F2F6C6F63616C686F73743A383038302F6F70656E6461702F646174612F6E632F666E6F63312E6E632E66696C65">
     <Attribute name="NC_GLOBAL" type="Container">
         <Attribute name="base_time" type="String">
             <value>88- 10-00:00:00</value>
