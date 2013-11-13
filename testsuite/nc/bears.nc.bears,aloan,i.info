@@ -5,7 +5,7 @@
 <table>
 
 <tr><td align=right valign=top><b>history</b>:</td>
-<td align=left>This is an example of a multi-line global\\012attribute.  It could be used for representing the\\012processing history of the data, for example.<br></td></tr>
+<td align=left>This is an example of a multi-line global\012attribute.  It could be used for representing the\012processing history of the data, for example.<br></td></tr>
 
 <tr><td align=right valign=top><b>Unlimited_Dimension</b>:</td>
 <td align=left>k<br></td></tr>
@@ -17,7 +17,7 @@
 <center>
 <table>
 <tr><td align=right valign=top><b>bears</b>:</td>
-<td align=left valign=top>Grid<br>act: text string\\012\\011123<br>
+<td align=left valign=top>Grid<br>act: text string\012\011123<br>
 acs: -40<br>
 acl: 17000<br>
 acf: -2.00000000, 1.00000000, 0.00000000<br>
@@ -25,7 +25,7 @@ acd: -1.000000000000000, 0.7500000000000000<br>
 string_length: 3<br>
 <table>
 <td align=right valign=top><b>bears</b>:</td>
-<td align=left valign=top>Array of Strings [i = 0..1][j = 0..2]<br>act: text string\\012\\011123<br>
+<td align=left valign=top>Array of Strings [i = 0..1][j = 0..2]<br>act: text string\012\011123<br>
 acs: -40<br>
 acl: 17000<br>
 acf: -2.00000000, 1.00000000, 0.00000000<br>

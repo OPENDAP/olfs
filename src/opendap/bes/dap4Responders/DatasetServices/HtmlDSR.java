@@ -75,7 +75,7 @@ public class HtmlDSR extends Dap4Responder {
         setServiceTitle("HTML Dataset Services Response");
         setServiceDescription("The HTML representation of the DSR.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
-        setPreferredServiceSuffix(getRequestSuffix());
+        //setPreferredServiceSuffix(getRequestSuffix());
 
         setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
 

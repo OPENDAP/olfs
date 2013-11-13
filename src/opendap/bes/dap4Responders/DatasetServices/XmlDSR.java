@@ -74,7 +74,7 @@ public class XmlDSR extends Dap4Responder {
         setServiceTitle("XML Dataset Services Response");
         setServiceDescription("The XML representation of the DSR.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
-        setPreferredServiceSuffix(defaultRequestSuffix);
+        //setPreferredServiceSuffix(defaultRequestSuffix);
 
         setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
 

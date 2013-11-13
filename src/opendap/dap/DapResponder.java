@@ -171,6 +171,10 @@ public abstract class DapResponder extends HttpResponder  {
     public String getServiceMediaType(){
         return _serviceMediaType;
     }
+    protected void setServiceMediaType(String mediaType){
+        _serviceMediaType = mediaType;
+    }
+
     */
 
     public String getServiceRoleId(){
@@ -185,9 +189,6 @@ public abstract class DapResponder extends HttpResponder  {
     public String getServiceDescriptionLink(){
         return _serviceDescriptionLink;
     }
-    public String getPreferredServiceSuffix(){
-        return _preferredServiceSuffix;
-    }
 
     protected void setServiceRoleId(String serviceRoleId){
         _serviceRoleId = serviceRoleId;
@@ -201,13 +202,16 @@ public abstract class DapResponder extends HttpResponder  {
     protected void setServiceDescriptionLink(String serviceDescriptionLink){
         _serviceDescriptionLink =  serviceDescriptionLink;
     }
+
+    /*
+    public String getPreferredServiceSuffix(){
+        return _preferredServiceSuffix;
+    }
     protected void setPreferredServiceSuffix(String preferredServiceSuffix){
         _preferredServiceSuffix = preferredServiceSuffix;
     }
 
-    protected void setServiceMediaType(String mediaType){
-        _serviceMediaType = mediaType;
-    }
+      */
 
 
     public abstract boolean isMetadataResponder();
