@@ -29,7 +29,7 @@ package opendap.bes.dap4Responders.DatasetMetadata;
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.xml.Transformer;
@@ -76,7 +76,7 @@ public class RdfDMR extends Dap4Responder {
         setServiceDescription("RDF representation of the Dataset Metadata Response document.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("application","rdf+xml", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("application","rdf+xml", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

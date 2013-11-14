@@ -182,7 +182,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
             String[] mimeTypes = acceptsHeaderValue.split(",");
 
             for(String mimeType: mimeTypes){
-                clientMediaTypes.add(new ClientMediaType(mimeType));
+                clientMediaTypes.add(new MediaType(mimeType));
             }
         }
         else {

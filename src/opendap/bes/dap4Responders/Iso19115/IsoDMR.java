@@ -30,7 +30,6 @@ import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
-import opendap.bes.dap4Responders.ServiceMediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.xml.Transformer;
@@ -73,7 +72,7 @@ public class IsoDMR extends Dap4Responder {
         setServiceDescription("ISO-19115 metadata extracted form the normative DMR.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
 
         IsoRubricDMR rubric =  new IsoRubricDMR(sysPath, pathPrefix, besApi);
 

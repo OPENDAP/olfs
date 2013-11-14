@@ -27,7 +27,7 @@
 package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -77,7 +77,7 @@ public class HtmlDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
         //setPreferredServiceSuffix(getRequestSuffix());
 
-        setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
 
         normDSR = dsr;
 

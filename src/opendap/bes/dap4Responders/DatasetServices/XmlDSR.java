@@ -27,7 +27,7 @@
 package opendap.bes.dap4Responders.DatasetServices;
 
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -76,7 +76,7 @@ public class XmlDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
         //setPreferredServiceSuffix(defaultRequestSuffix);
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
 
         normDSR = dsr;
 

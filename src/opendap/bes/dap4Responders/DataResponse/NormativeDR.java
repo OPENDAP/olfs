@@ -28,7 +28,7 @@ package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
@@ -71,7 +71,7 @@ public class NormativeDR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
 
-        setNormativeMediaType(new ServiceMediaType("application","vnd.opendap.dap4.data", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.data", getRequestSuffix()));
 
         addAltRepResponder(new CsvDR(sysPath, pathPrefix, besApi));
         addAltRepResponder(new XmlDR(sysPath, pathPrefix, besApi));

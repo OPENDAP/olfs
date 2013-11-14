@@ -79,7 +79,7 @@ public class FileAccess extends Dap4Responder {
         setServiceDescription("Simple download access to the underlying data file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services");
 
-        setNormativeMediaType(new ServiceMediaType("*","*", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("*","*", getRequestSuffix()));
 
         log.debug("defaultRequestSuffix:             '{}'", defaultRequestSuffix);
 

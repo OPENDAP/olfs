@@ -29,7 +29,7 @@ package opendap.bes.dap4Responders.DataResponse;
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
@@ -73,7 +73,7 @@ public class CsvDR extends Dap4Responder {
         setServiceDescription("A comma separated values (CSV) representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
-        setNormativeMediaType(new ServiceMediaType("text","plain", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","plain", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

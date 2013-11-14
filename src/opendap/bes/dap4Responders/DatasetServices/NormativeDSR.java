@@ -29,7 +29,7 @@ package opendap.bes.dap4Responders.DatasetServices;
 import opendap.bes.BESManager;
 import opendap.bes.BesGroup;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.namespaces.DAP;
 import opendap.namespaces.XML;
@@ -87,7 +87,7 @@ public class NormativeDSR extends Dap4Responder {
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Services_Description_Service");
         //setPreferredServiceSuffix("");
 
-        setNormativeMediaType(new ServiceMediaType("application","vnd.opendap.dap4.dataset-services+xml", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("application","vnd.opendap.dap4.dataset-services+xml", getRequestSuffix()));
 
         addAltRepResponder(new HtmlDSR(sysPath, pathPrefix, besApi, this));
         addAltRepResponder(new XmlDSR(sysPath, pathPrefix, besApi, this));

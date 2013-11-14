@@ -28,7 +28,7 @@ package opendap.bes.dap4Responders.DatasetMetadata;
 
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class XmlDMR extends Dap4Responder {
         setServiceDescription("Normative representation of the Dataset Metadata Response document with a generic content type.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

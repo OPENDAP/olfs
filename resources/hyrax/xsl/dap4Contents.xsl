@@ -96,7 +96,7 @@
                             <th align="left">Name</th>
                             <th align="center">Last Modified</th>
                             <th align="center">Size</th>
-                            <!-- <th align="center">DAP Response Links</th> -->
+                            <th align="center">DAP Response Links</th>
                             <th align="center">Webstart</th>
                         </tr>
                         <tr>
@@ -211,9 +211,46 @@
         </xsl:choose>
     </xsl:template>
 
-
-
     <xsl:template name="DapServiceLinks" >
+        <td align="left">
+            <b><a href="{../@name}.html">
+                <xsl:value-of select="../@name"/>
+            </a>
+            </b>
+        </td>
+
+        <td align="center" nowrap="nowrap">
+            <xsl:value-of select="../@lastModified" />
+        </td>
+
+        <td align="right">
+            <xsl:value-of select="../@size"/>
+        </td>
+
+
+        <td align="center">
+            <table>
+                <tr>
+                    <td> <a href="{../@name}.dsr">dsr</a>&NBSP;</td>
+                    <td> <a href="{../@name}.dmr">dmr</a>&NBSP;</td>
+                    <td> <a href="{../@name}.dap">dap</a>&NBSP;</td>
+                    <td> <a href="{../@name}.dmr.html">html</a>&NBSP;</td>
+                    <td> <a href="{../@name}.dmr.rdf">rdf</a>&NBSP;</td>
+                    <xsl:if test="$allowDirectDataSourceAccess='true'">
+                        <td> <a href="{../@name}.file">file</a>&NBSP;</td>
+                    </xsl:if>
+                    <td> <del><a href="{../@name}.ddx">ddx</a></del>&NBSP;</td>
+                    <td> <a href="{../@name}.dds">dds</a>&NBSP;</td>
+                    <td> <a href="{../@name}.das">das</a>&NBSP;</td>
+                    <td> <a href="{../@name}.info">info</a>&NBSP;</td>
+                </tr>
+            </table>
+        </td>
+        <xsl:call-template name="WebStartLinks"/>
+    </xsl:template>
+
+
+    <xsl:template name="DapServiceLinksOLD" >
         <td align="left">
             <b><a href="{../@name}">
                 <xsl:value-of select="../@name"/>

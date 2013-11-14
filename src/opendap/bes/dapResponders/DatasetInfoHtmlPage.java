@@ -28,7 +28,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import org.slf4j.Logger;
 
@@ -70,7 +70,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
         setServiceDescription("DAP2 Dataset Information HTML Page.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP2:_Info_Service");
 
-        setNormativeMediaType(new ServiceMediaType("text","html", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","html", getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 

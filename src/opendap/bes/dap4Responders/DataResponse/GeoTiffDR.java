@@ -28,7 +28,7 @@ package opendap.bes.dap4Responders.DataResponse;
 
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
@@ -72,7 +72,7 @@ public class GeoTiffDR extends Dap4Responder {
         setServiceDescription("GeoTIFF representation of the DAP4 Data Response object.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Data_Service");
 
-        setNormativeMediaType(new ServiceMediaType("image","tiff;application=geotiff", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("image","tiff;application=geotiff", getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());

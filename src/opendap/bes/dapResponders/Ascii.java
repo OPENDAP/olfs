@@ -28,7 +28,7 @@ package opendap.bes.dapResponders;
 import opendap.bes.BESError;
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class Ascii extends Dap4Responder {
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
         setServiceRoleId("http://services.opendap.org/dap2/ascii");
-        setNormativeMediaType(new ServiceMediaType("text", "plain", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text", "plain", getRequestSuffix()));
         setServiceTitle("DAP2 ASCII Data");
         setServiceDescription("The DAP2 Data response in ASCII form.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_ASCII_Data_Service");

@@ -26,6 +26,8 @@
 
 package opendap.bes.dap4Responders;
 
+import java.util.HashMap;
+
 /**
  *
  *
@@ -36,37 +38,38 @@ package opendap.bes.dap4Responders;
 
 public class MediaType implements Comparable {
 
-    protected String mimeType;
-    protected String mediaSuffix;
-    protected String primaryType;
-    protected String subType;
-    protected Double quality;
-    protected String wildcard = "*";
-    protected boolean twc, stwc;
+    protected String _mimeType;
+    protected String _mediaSuffix;
+    protected String _primaryType;
+    protected String _subType;
+    protected Double _quality;
+    protected String _wildcard = "*";
+    
+    protected boolean _ptwc, _stwc;
     protected double score;
 
 
 
 
-    public String getMimeType(){ return mimeType;}
-    public String getPrimaryType() { return primaryType;}
-    public String getSubType() { return subType;}
-    public double getQuality(){ return quality;}
+    public String getMimeType(){ return _mimeType;}
+    public String getPrimaryType() { return _primaryType;}
+    public String getSubType() { return _subType;}
+    public double getQuality(){ return _quality;}
     public double getScore(){ return score;}
     public void   setScore(double s){ score=s;}
 
-    public String getMediaSuffix(){ return mediaSuffix;}
+    public String getMediaSuffix(){ return _mediaSuffix;}
 
-    public boolean isWildcardSubtype(){ return stwc; }
-    public boolean isWildcardType(){ return twc; }
+    public boolean isWildcardSubtype(){ return _stwc; }
+    public boolean isWildcardType(){ return _ptwc; }
 
 
     public int compareTo(Object o) throws ClassCastException {
         MediaType otherType = (MediaType)o;
-        if(quality>otherType.quality)
+        if(_quality >otherType._quality)
             return 1;
 
-        if(quality<otherType.quality)
+        if(_quality <otherType._quality)
             return -1;
 
         return 0;
@@ -76,12 +79,62 @@ public class MediaType implements Comparable {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append(primaryType).append("/").append(subType).append(";q=").append(quality).
-                append("  mediaSuffix: ").append(mediaSuffix).
+        s.append(_primaryType).append("/").append(_subType).append(";q=").append(_quality).
+                append("  mediaSuffix: ").append(_mediaSuffix).
                 append("  score: ").append(score).
                 append("");
 
         return s.toString();
     }
+    
+    public MediaType(String primaryType, String subType, String suffix){
+        _mimeType = primaryType + "/" + subType;
+        _primaryType = primaryType;
+        _subType = subType;
+        _ptwc = primaryType.equals(_wildcard);
+        _stwc = _subType.equals(_wildcard);
+        _quality = 1.0;
+        score = 0.0;
+        _mediaSuffix = suffix;
+    }
+    
+    public MediaType(String acceptMediaType){
+        HashMap<String,String> params = new HashMap<String,String>();
+        String[] parts = acceptMediaType.split(";");
+
+        this._quality =1.0;
+        if(parts.length>1){
+            for(int i=1; i<parts.length; i++){
+                String[] param = parts[1].split("=");
+                if(param.length==2){
+                    params.put(param[0],param[1]);
+                }
+            }
+            if(params.containsKey("q") && params.get("q")!=null){
+                try {
+                    double value = Double.parseDouble(params.get("q"));
+                    if(0<value && value<=1.0)
+                        this._quality = value;
+                }
+                catch(NumberFormatException e){
+                    // Ignore and move on...
+                }
+
+            }
+
+        }
+        this._mimeType =parts[0];
+        String[] types = parts[0].split("/");
+        if(types.length==2){
+            this._primaryType = types[0];
+            this._subType = types[1];
+        }
+        else {
+            this._primaryType = parts[0];
+            this._subType = "";
+        }
+
+    }
+    
 
 }

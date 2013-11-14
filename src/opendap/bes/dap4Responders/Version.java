@@ -69,7 +69,7 @@ public class Version extends Dap4Responder {
         setServiceDescription("An XML document containing detailed software version information for this server.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_Dataset_Service_-_The_metadata");
 
-        setNormativeMediaType(new ServiceMediaType("text","xml", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("text","xml", getRequestSuffix()));
 
         log.debug("defaultRequestSuffix: '{}'", defaultRequestSuffix);
 

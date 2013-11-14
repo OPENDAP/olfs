@@ -27,7 +27,7 @@ package opendap.bes.dapResponders;
 
 import opendap.bes.Version;
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.ServiceMediaType;
+import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
@@ -70,7 +70,7 @@ public class NetcdfFileOut extends Dap4Responder {
         setServiceDescription("DAP2 data returned in a NetCDF-3 file.");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4_Web_Services#DAP4:_NetCDF_File-out_Service");
 
-        setNormativeMediaType(new ServiceMediaType("application","x-netcdf", getRequestSuffix()));
+        setNormativeMediaType(new MediaType("application","x-netcdf", getRequestSuffix()));
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
 
@@ -120,7 +120,7 @@ public class NetcdfFileOut extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        if(!besApi.writeDap2Data(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+        if(!besApi.writeNetcdf3FileOut(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
