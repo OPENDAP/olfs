@@ -163,9 +163,21 @@ echo $summary | sed "s/;/    \\
 init
 
 junit
+junit_tests=$?
 
 chunkedOutputStream
+cos_tests=$?
 
 dejaGnu
+reg_tests=$?
 
 summary
+
+if test "x$junit_tests" == "x0" -a "x$cos_tests" == "x0" \
+        -a "x$reg_tests" == "x0"
+then
+    exit 0;
+else
+    exit 1;
+fi
+
