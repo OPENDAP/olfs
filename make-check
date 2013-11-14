@@ -173,8 +173,8 @@ reg_tests=$?
 
 summary
 
-if test "x$junit_tests" == "x0" -a "x$cos_tests" == "x0" \
-        -a "x$reg_tests" == "x0"
+if test "x$junit_tests" = "x0" -a "x$cos_tests" = "x0" \
+    -a "x$reg_tests" = "x0"
 then
     exit 0;
 else
