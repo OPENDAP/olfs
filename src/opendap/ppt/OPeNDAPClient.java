@@ -591,7 +591,7 @@ public class OPeNDAPClient {
                             done = true;
                         }
                         catch(PPTEndOfStreamException e){
-                            log.error("Caught PPTEndOfStreamException - the BES if screwed. Retrying...");
+                            log.error("Caught PPTEndOfStreamException - This BES connection is screwed. Retrying...");
                         }
 
                     }

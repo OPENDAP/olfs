@@ -191,9 +191,9 @@ public class NewPPTClient {
 
         log.debug("initConnection() -  Sent '"+PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION+"' to server.");
 
-            byte[] inBuff = new byte[4096];
+        byte[] inBuff = new byte[4096];
+        int bytesRead;
 
-        int bytesRead = 0;
         try {
 
             bytesRead = _rawIn.read(inBuff);
@@ -214,8 +214,9 @@ public class NewPPTClient {
             */
         }
         catch (IOException e) {
-           String msg = "Failed to receive initialization response from server.  ";
+           String msg = "Caught "+e.getClass().getSimpleName()+" attempting to read initialization response from server.  Message: ";
            msg += e.getMessage();
+           log.error(msg);
            closeConnection(true);
            throw new PPTException(msg, e);
         }
@@ -242,8 +243,6 @@ public class NewPPTClient {
                 long skipped = _rawIn.skip(_rawIn.available());
                 log.warn("Skipped "+skipped+" bytes in the input stream.");
             }
-
-
 
         }
         catch (IOException e) {
