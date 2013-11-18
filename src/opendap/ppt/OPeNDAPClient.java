@@ -632,7 +632,7 @@ public class OPeNDAPClient {
             log.info("Using BES at "+hostName+":"+portNum);
 
             log.info("Sent a total of "+cmdsSent+" commands.");
-            log.info("Made a total of " + connectionsMade + " connections to the BES.");
+            log.info("Made a total of " + connectionsMade + " connection"+(reps>1?"s":"")+" to the BES.");
         }
 
     }
