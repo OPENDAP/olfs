@@ -153,9 +153,6 @@
     <property name="src.dir" location="src"/>
     <property name="doc.dir" location="doc"/>
     <property name="lib.dir" location="lib"/>
-    <property name="glacier.resources" location="resources/experiments/AWS/Glacier"/>
-    <property name="nciso.resources"   location="resources/nciso"/>
-    <property name="hyrax.resources"   location="resources/hyrax"/>
 
 
 
@@ -237,9 +234,6 @@
 
 
         </fileset>
-        <fileset dir="${glacier.resources}/lib">
-            <include name="**"/>
-        </fileset>
 
     </path>
 
@@ -304,9 +298,9 @@
     <target
             name="compile"
             depends="PreProcessSourceCode"
-            description="Compiles the Glacier Service software."
+            description="Compiles the BES Client software."
             >
-        <echo level="info" message="AntFile: ${ant.file} Compiling Glacier Service"/>
+        <echo level="info" message="AntFile: ${ant.file} Compiling BES Client"/>
         <echo level="info"
               message="Using the ${build.compiler} javac compiler"/>
         <echo level="info" message=""/>
@@ -332,12 +326,9 @@
 
     <!-- *******************************************************
 
-            NOAA S3 Resource Ingester -
+            BES Client
 
-            Given an S3 Bucket that contains an index/catalog as defined by Relph and Ogata along with the associated
-            data files the application will retrieve the S3 contents, create a local catalog, upload all of the data into a
-            glacier vault (with the same smae as the s3 bucket) and inter the dataset metadata locally in the process.
-
+            Send commands to the BES
     -->
 
     <property name="host"     value="localhost"/>
