@@ -595,8 +595,9 @@ public class OPeNDAPClient {
 
 
         }
-        catch(Exception e){
-            e.printStackTrace();
+        catch(Throwable t){
+            log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
+            log.error(org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
         }
 
     }
