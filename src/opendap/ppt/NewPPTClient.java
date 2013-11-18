@@ -221,15 +221,18 @@ public class NewPPTClient {
 
             String status = new String(inBuff, 0, bytesRead);
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
+                log.error("initConnection() -  Received '"+PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED+"' from server. That's a bad thing!");
                 throw new PPTException("Could not connect to server, server may be down or busy");
             }
             if (status.compareTo(PPTSessionProtocol.PPTSERVER_CONNECTION_OK) != 0) {
-                throw new PPTException("Server reported an invalid connection, \"" + status + "\"");
+                log.error("initConnection() -  Received unrecognized status '"+status+"' from server. That's a bummer man...");
+                throw new PPTException("Server reported an invalid connection status , \"" + status + "\"");
             }
+            log.debug("initConnection() -  Received '"+PPTSessionProtocol.PPTSERVER_CONNECTION_OK+"' from server.");
 
             if(_rawIn.available()>0){
                 long skipped = _rawIn.skip(_rawIn.available());
-                log.debug("Skipped "+skipped+" bytes in the input stream.");
+                log.warn("Skipped "+skipped+" bytes in the input stream.");
             }
 
 
