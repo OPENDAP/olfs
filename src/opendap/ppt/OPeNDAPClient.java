@@ -28,10 +28,7 @@
 package opendap.ppt;
 
 import opendap.xml.Util;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
@@ -454,21 +451,27 @@ public class OPeNDAPClient {
         Options options = new Options();
 
 
-        options.addOption("r", "reps",    true, "Number of times to send the command.");
-        options.addOption("c", "maxCmds", true, "Number of commands to send before closing the connection and open a new one.");
-        options.addOption("i", "besCmd",  true, "Name of file containing the command.");
-        options.addOption("p", "port",    true, "Port number of BES.");
-        options.addOption("h", "host",    true, "Hostname of BES.");
-        options.addOption("o", "outFile", true, "Name of file to which to write BES output.");
-        options.addOption("e", "errFile", true, "Name of file to which to write BES errors.");
-        options.addOption("h", "help",    true, "Print usage statement.");
+        options.addOption("r", "reps",    true, "Number of times to send the command. default: 1");
+        options.addOption("c", "maxCmds", true, "Number of commands to send before closing the BES connection and opening a new one. default: 1");
+        options.addOption("i", "besCmd",  true, "Name of file containing the BES command to use. default: \"bes.cmd\"");
+        options.addOption("p", "port",    true, "Port number of BES. default: 10022");
+        options.addOption("n", "host",    true, "Hostname of BES. default \"localhost\"");
+        options.addOption("o", "outFile", true, "File into which to log BES responses. default: stdout");
+        options.addOption("e", "errFile", true, "File into which to log BES errors. default: stderr");
+        options.addOption("h", "help",    false, "Print this usage statement.");
 
         return options;
 
     }
 
-    private static void printUsage(PrintStream ps){
+    private static void printUsage(PrintStream ps, Options options){
 
+        HelpFormatter formatter = new HelpFormatter();
+
+        formatter.setWidth(120);
+        formatter.printHelp( "OPeNDAPClient", options );
+
+           /*
         ps.println("Usage:  ");
         ps.println("");
         ps.println("        OPeNDAPClient  [-i commandFileName] [-r #TimesToSendCommand] [-c numberOfCommandsPerConnection] ");
@@ -482,13 +485,13 @@ public class OPeNDAPClient {
         ps.println("     --reps     Number of times to send command. default: 1");
         ps.println("     --maxCmds  Number of commands to send before closing connection and making " +
                 "and opening a new one. default: 1");
-        ps.println("     --outFile  File into which to log BES responses. default: stdout)");
-        ps.println("     --errFile  File into which to log BES errors. default: stderr)");
+        ps.println("     --outFile  File into which to log BES responses. default: stdout");
+        ps.println("     --errFile  File into which to log BES errors. default: stderr");
         ps.println("     --host     BES hostname. default: \"localhost\"");
         ps.println("     --port     BES port number: default: 10022");
         ps.println("     --help     Prints this usage information.");
         ps.println("");
-
+       */
 
     }
 
@@ -521,7 +524,7 @@ public class OPeNDAPClient {
             //---------------------------
             // Command File
             if (cmd.hasOption("h")) {
-                printUsage(System.out);
+                printUsage(System.out,options);
                 return;
             }
 
@@ -574,8 +577,8 @@ public class OPeNDAPClient {
 
             //---------------------------
             // Hostname
-            if (cmd.hasOption("h")) {
-                hostName = cmd.getOptionValue("h");
+            if (cmd.hasOption("n")) {
+                hostName = cmd.getOptionValue("n");
             }
 
             //---------------------------
@@ -629,7 +632,7 @@ public class OPeNDAPClient {
             log.info("Using BES at "+hostName+":"+portNum);
 
             log.info("Sent a total of "+cmdsSent+" commands.");
-            log.info("Made a total of "+connectionsMade+" connections to the BES.");
+            log.info("Made a total of " + connectionsMade + " connections to the BES.");
         }
 
     }
