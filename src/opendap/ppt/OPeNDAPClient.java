@@ -450,7 +450,6 @@ public class OPeNDAPClient {
 
         Options options = new Options();
 
-
         options.addOption("r", "reps",    true, "Number of times to send the command. default: 1");
         options.addOption("c", "maxCmds", true, "Number of commands to send before closing the BES connection and opening a new one. default: 1");
         options.addOption("i", "besCmd",  true, "Name of file containing the BES command to use. default: \"bes.cmd\"");
@@ -464,36 +463,6 @@ public class OPeNDAPClient {
 
     }
 
-    private static void printUsage(PrintStream ps, Options options){
-
-        HelpFormatter formatter = new HelpFormatter();
-
-        formatter.setWidth(120);
-        formatter.printHelp( "OPeNDAPClient", options );
-
-           /*
-        ps.println("Usage:  ");
-        ps.println("");
-        ps.println("        OPeNDAPClient  [-i commandFileName] [-r #TimesToSendCommand] [-c numberOfCommandsPerConnection] ");
-        ps.println("");
-        ps.println("Summary:");
-        ps.println("");
-        ps.println("");
-        ps.println("Options:");
-        ps.println("");
-        ps.println("     --besCmd   Filename for the BES command. default: \"bes.cmd\"");
-        ps.println("     --reps     Number of times to send command. default: 1");
-        ps.println("     --maxCmds  Number of commands to send before closing connection and making " +
-                "and opening a new one. default: 1");
-        ps.println("     --outFile  File into which to log BES responses. default: stdout");
-        ps.println("     --errFile  File into which to log BES errors. default: stderr");
-        ps.println("     --host     BES hostname. default: \"localhost\"");
-        ps.println("     --port     BES port number: default: 10022");
-        ps.println("     --help     Prints this usage information.");
-        ps.println("");
-       */
-
-    }
 
     /**
      *
@@ -524,7 +493,9 @@ public class OPeNDAPClient {
             //---------------------------
             // Command File
             if (cmd.hasOption("h")) {
-                printUsage(System.out,options);
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.setWidth(120);
+                formatter.printHelp( "OPeNDAPClient", options );
                 return;
             }
 
