@@ -121,7 +121,6 @@
         <echo level="info" message="    src.dir:       ${src.dir}"/>
         <echo level="info" message="    doc.dir:       ${doc.dir}"/>
         <echo level="info" message="    lib.dir:       ${lib.dir}"/>
-        <echo level="info" message="    resources.dir: ${glacier.resources}"/>
         <echo level="info" message=""/>
         <echo level="info" message="Build Directories:"/>
         <echo level="info" message="    build.dir:      ${build.dir}"/>

@@ -578,12 +578,24 @@ public class OPeNDAPClient {
             OPeNDAPClient oc = new OPeNDAPClient();
             oc.startClient(hostName,portNum);
             connectionsMade++;
-            for(int r=0; r<reps ;r++){
+            for(int r=0; reps==0 || r<reps ;r++){
 
                 if(r>0 && r%maxCmds==0){
                     oc.shutdownClient();
-                    oc = new OPeNDAPClient();
-                    oc.startClient(hostName,portNum);
+
+                    boolean done = false;
+                    while(!done){
+                        oc = new OPeNDAPClient();
+                        try {
+                            oc.startClient(hostName,portNum);
+                            done = true;
+                        }
+                        catch(PPTEndOfStreamException e){
+                            log.error("Caught PPTEndOfStreamException - the BES if screwed. Retrying...");
+                        }
+
+                    }
+
                     connectionsMade++;
                 }
                 oc.executeCommand(cmdString,besOut,besErr);

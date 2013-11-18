@@ -191,12 +191,12 @@ public class NewPPTClient {
 
         log.debug("initConnection() -  Sent '"+PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION+"' to server.");
 
-        try {
             byte[] inBuff = new byte[4096];
 
+        int bytesRead = 0;
+        try {
 
-
-            int bytesRead = _rawIn.read(inBuff);
+            bytesRead = _rawIn.read(inBuff);
             /*
             int lapCounter = 1;
             while(bytesRead<0 && lapCounter <= 10){
@@ -212,13 +212,21 @@ public class NewPPTClient {
                 lapCounter++;
             }
             */
-            if(bytesRead<0){
-                log.error("initConnection() -  Encountered End Of Stream when attempting to read server handshake response!");
-                throw new PPTException("PPT Connection appears to have been prematurely closed.");
-            }
+        }
+        catch (IOException e) {
+           String msg = "Failed to receive initialization response from server.  ";
+           msg += e.getMessage();
+           closeConnection(true);
+           throw new PPTException(msg, e);
+        }
+
+        if(bytesRead<0){
+            log.error("initConnection() -  Encountered End Of Stream when attempting to read server handshake response!");
+            throw new PPTEndOfStreamException("PPT Connection encounter a premature End Of Stream - The connection appears to have been prematurely closed.");
+        }
 
 
-
+        try {
             String status = new String(inBuff, 0, bytesRead);
             if (status.compareTo(PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED) == 0) {
                 log.error("initConnection() -  Received '"+PPTSessionProtocol.PPT_PROTOCOL_UNDEFINED+"' from server. That's a bad thing!");
