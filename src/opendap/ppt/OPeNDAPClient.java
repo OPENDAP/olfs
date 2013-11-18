@@ -499,13 +499,25 @@ public class OPeNDAPClient {
 
         Logger log = LoggerFactory.getLogger("OPeNDAPClient-MAIN");
 
+
+        String besCmdFileName = "bes.cmd";
+
+        String cmdString;
+        int reps = 1;
+        int maxCmds = 1;
+
+        OutputStream besOut = System.out;
+        OutputStream besErr = System.err;
+        String hostName = "localhost";
+        int portNum = 10022;
+
         try {
             Options options = createCmdLineOptions();
 
             CommandLineParser parser = new PosixParser();
             CommandLine cmd = parser.parse(options, args);
 
-                        //---------------------------
+            //---------------------------
             // Command File
             if (cmd.hasOption("h")) {
                 printUsage(System.out);
@@ -514,39 +526,31 @@ public class OPeNDAPClient {
 
             //---------------------------
             // Command File
-            if (!cmd.hasOption("i")) {
-                printUsage(System.err);
-                return;
+            if (cmd.hasOption("i")) {
+                besCmdFileName = cmd.getOptionValue("i");
             }
-            Document cmdDoc = Util.getDocument(cmd.getOptionValue("i"));
-            String cmdString = new XMLOutputter(Format.getPrettyFormat()).outputString(cmdDoc);
+            log.info("BES Command Filename: "+besCmdFileName);
+            Document cmdDoc = Util.getDocument(besCmdFileName);
+            cmdString = new XMLOutputter(Format.getPrettyFormat()).outputString(cmdDoc);
             log.info("BES command has been read and parsed.");
 
             //---------------------------
             // Command reps
-            int reps    = 1;
             if (cmd.hasOption("r")) {
-
                 reps = Integer.parseInt(cmd.getOptionValue("r"));
-
             }
             log.info("BES command will sent "+reps+" time" + (reps>1?"s.":"."));
 
             //---------------------------
             // Max commands per client
-            int maxCmds = 1;
             if (cmd.hasOption("c")) {
                 maxCmds = Integer.parseInt(cmd.getOptionValue("c"));
             }
             log.info("The connection to the BES will be dropped and a new one opened after every "
                     + maxCmds+" command" + (maxCmds>1?"s.":"."));
 
-
-
-
             //---------------------------
             // BES output file
-            OutputStream besOut = System.out;
             if (cmd.hasOption("o")) {
                 File besOutFile = new File(cmd.getOptionValue("o"));
                 besOut = new FileOutputStream(besOutFile);
@@ -558,59 +562,73 @@ public class OPeNDAPClient {
 
             //---------------------------
             // BES error file
-            OutputStream besErr = System.err;
             if (cmd.hasOption("e")) {
                 File besErrFile = new File(cmd.getOptionValue("e"));
                 besErr = new FileOutputStream(besErrFile);
-                log.info("BES erros will be written to "+besErrFile.getAbsolutePath());
+                log.info("BES errors will be written to "+besErrFile.getAbsolutePath());
             }
             else {
-                log.info("BES output will be written to stderr");
+                log.info("BES errors will be written to stderr");
             }
 
             //---------------------------
             // Hostname
-            String hostName = "localhost";
             if (cmd.hasOption("h")) {
                 hostName = cmd.getOptionValue("h");
             }
 
             //---------------------------
             // Port Number
-            int portNum = 10022;
             if (cmd.hasOption("p")) {
                 portNum = Integer.parseInt(cmd.getOptionValue("p"));
             }
             log.info("Using BES at "+hostName+":"+portNum);
-
-            log.info("-------------------------------------------------------------------------------");
-            log.info("-------------------------------------------------------------------------------");
-            log.info("Starting... \n\n\n");
-
-
-
-
-            OPeNDAPClient oc = new OPeNDAPClient();
-            oc.startClient(hostName,portNum);
-            for(int r=0; r<reps ;r++){
-
-                if(r>0 && r%maxCmds==0){
-                    oc.shutdownClient();
-                    oc = new OPeNDAPClient();
-                    oc.startClient(hostName,portNum);
-                }
-                oc.executeCommand(cmdString,besOut,besErr);
-
-            }
-
-
-
 
 
         }
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
             log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
+            return;
+        }
+
+        int cmdsSent = 0;
+        int connectionsMade = 0;
+        try {
+
+            log.info("-------------------------------------------------------------------------------");
+            log.info("-------------------------------------------------------------------------------");
+            log.info("Starting... \n\n\n");
+
+            OPeNDAPClient oc = new OPeNDAPClient();
+            oc.startClient(hostName,portNum);
+            connectionsMade++;
+            for(int r=0; r<reps ;r++){
+
+                if(r>0 && r%maxCmds==0){
+                    oc.shutdownClient();
+                    oc = new OPeNDAPClient();
+                    oc.startClient(hostName,portNum);
+                    connectionsMade++;
+                }
+                oc.executeCommand(cmdString,besOut,besErr);
+                cmdsSent++;
+            }
+
+        }
+        catch(Throwable t){
+            log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
+            log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
+        }
+        finally {
+            log.info("BES Command Filename: "+besCmdFileName);
+            log.info("BES command will sent "+reps+" time" + (reps>1?"s.":"."));
+            log.info("The connection to the BES will be dropped and a new one opened after every "
+                    + maxCmds+" command" + (maxCmds>1?"s.":"."));
+            log.info("Using BES at "+hostName+":"+portNum);
+
+            log.info("Sent a total of "+cmdsSent+" commands.");
+            log.info("Made a total of "+connectionsMade+" connections to the BES.");
         }
 
     }
