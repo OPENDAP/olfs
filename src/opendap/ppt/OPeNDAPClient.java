@@ -461,6 +461,7 @@ public class OPeNDAPClient {
         options.addOption("h", "host",    true, "Hostname of BES.");
         options.addOption("o", "outFile", true, "Name of file to which to write BES output.");
         options.addOption("e", "errFile", true, "Name of file to which to write BES errors.");
+        options.addOption("h", "help",    true, "Print usage statement.");
 
         return options;
 
@@ -477,9 +478,14 @@ public class OPeNDAPClient {
         ps.println("");
         ps.println("Options:");
         ps.println("");
-        ps.println("     -i   filename for BES command");
-        ps.println("     -r   Number of times to send command");
-        ps.println("     -c   Number of commands to send before closing connection and making and opening a new one");
+        ps.println("     --besCmd   Filename for the BES command");
+        ps.println("     --reps     Number of times to send command");
+        ps.println("     --maxCmds  Number of commands to send before closing connection and making and opening a new one");
+        ps.println("     --outFile  File to write BES output to (defaults to stdout)");
+        ps.println("     --errFile  File to write BES error output to (defaults to stderr)");
+        ps.println("     --host     BES hostname (defaults to localhost)");
+        ps.println("     --port     BES port number  (defaults to 10022)");
+        ps.println("     --help     Prints this usage information.");
         ps.println("");
 
 
@@ -498,6 +504,13 @@ public class OPeNDAPClient {
 
             CommandLineParser parser = new PosixParser();
             CommandLine cmd = parser.parse(options, args);
+
+                        //---------------------------
+            // Command File
+            if (cmd.hasOption("h")) {
+                printUsage(System.out);
+                return;
+            }
 
             //---------------------------
             // Command File
