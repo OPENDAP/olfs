@@ -605,7 +605,12 @@ public class OPeNDAPClient {
         }
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
+            try {
             log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
+            }
+            catch (Throwable tt){
+                log.error("FAILED TO GENERATE STACK TRACE!");
+            }
         }
         finally {
             log.info("BES Command Filename: "+besCmdFileName);
