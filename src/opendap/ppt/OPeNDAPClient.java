@@ -631,8 +631,8 @@ public class OPeNDAPClient {
                     + maxCmds+" command" + (maxCmds>1?"s.":"."));
             log.info("Using BES at "+hostName+":"+portNum);
 
-            log.info("Sent a total of "+cmdsSent+" commands.");
-            log.info("Made a total of " + connectionsMade + " connection"+(reps>1?"s":"")+" to the BES.");
+            log.info("Sent a total of "+cmdsSent+" command"+(connectionsMade>1?"s.":"."));
+            log.info("Made a total of " + connectionsMade + " connection"+(connectionsMade>1?"s":"")+" to the BES.");
         }
 
     }
