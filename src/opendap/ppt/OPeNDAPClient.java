@@ -27,9 +27,17 @@
 
 package opendap.ppt;
 
+import opendap.xml.Util;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.PosixParser;
 import org.jdom.Document;
 import org.jdom.JDOMException;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
@@ -438,5 +446,158 @@ public class OPeNDAPClient {
             throw (new PPTException(e.getMessage(), e));
         }
     }
-}
 
+
+
+    private static Options createCmdLineOptions(){
+
+        Options options = new Options();
+
+
+        options.addOption("r", "reps",    true, "Number of times to send the command.");
+        options.addOption("c", "maxCmds", true, "Number of commands to send before closing the connection and open a new one.");
+        options.addOption("i", "besCmd",  true, "Name of file containing the command.");
+        options.addOption("p", "port",    true, "Port number of BES.");
+        options.addOption("h", "host",    true, "Hostname of BES.");
+        options.addOption("o", "outFile", true, "Name of file to which to write BES output.");
+        options.addOption("e", "errFile", true, "Name of file to which to write BES errors.");
+
+        return options;
+
+    }
+
+    private static void printUsage(PrintStream ps){
+
+        ps.println("Usage:  ");
+        ps.println("");
+        ps.println("        OPeNDAPClient  -i commandFileName [-r #TimesToSendCommand] [-c numberOfCommandsPerConnection] ");
+        ps.println("");
+        ps.println("Summary:");
+        ps.println("");
+        ps.println("");
+        ps.println("Options:");
+        ps.println("");
+        ps.println("     -i   filename for BES command");
+        ps.println("     -r   Number of times to send command");
+        ps.println("     -c   Number of commands to send before closing connection and making and opening a new one");
+        ps.println("");
+
+
+    }
+
+    /**
+     *
+     * @param args  Command line arguments as defined by  createCmdLineOptions()
+     */
+    public static void main(String[] args) {
+
+        Logger log = LoggerFactory.getLogger("OPeNDAPClient-MAIN");
+
+        try {
+            Options options = createCmdLineOptions();
+
+            CommandLineParser parser = new PosixParser();
+            CommandLine cmd = parser.parse(options, args);
+
+            //---------------------------
+            // Command File
+            if (!cmd.hasOption("i")) {
+                printUsage(System.err);
+                return;
+            }
+            Document cmdDoc = Util.getDocument(cmd.getOptionValue("i"));
+            String cmdString = new XMLOutputter(Format.getPrettyFormat()).outputString(cmdDoc);
+            log.info("BES command has been read and parsed.");
+
+            //---------------------------
+            // Command reps
+            int reps    = 1;
+            if (cmd.hasOption("r")) {
+
+                reps = Integer.parseInt(cmd.getOptionValue("r"));
+
+            }
+            log.info("BES command will sent "+reps+" time" + (reps>1?"s.":"."));
+
+            //---------------------------
+            // Max commands per client
+            int maxCmds = 1;
+            if (cmd.hasOption("c")) {
+                maxCmds = Integer.parseInt(cmd.getOptionValue("c"));
+            }
+            log.info("The connection to the BES will be dropped and a new one opened after every "
+                    + maxCmds+" command" + (maxCmds>1?"s.":"."));
+
+
+
+
+            //---------------------------
+            // BES output file
+            OutputStream besOut = System.out;
+            if (cmd.hasOption("o")) {
+                File besOutFile = new File(cmd.getOptionValue("o"));
+                besOut = new FileOutputStream(besOutFile);
+                log.info("BES output will be written to "+besOutFile.getAbsolutePath());
+            }
+            else {
+                log.info("BES output will be written to stdout");
+            }
+
+            //---------------------------
+            // BES error file
+            OutputStream besErr = System.err;
+            if (cmd.hasOption("e")) {
+                File besErrFile = new File(cmd.getOptionValue("e"));
+                besErr = new FileOutputStream(besErrFile);
+                log.info("BES erros will be written to "+besErrFile.getAbsolutePath());
+            }
+            else {
+                log.info("BES output will be written to stderr");
+            }
+
+            //---------------------------
+            // Hostname
+            String hostName = "localhost";
+            if (cmd.hasOption("h")) {
+                hostName = cmd.getOptionValue("h");
+            }
+
+            //---------------------------
+            // Port Number
+            int portNum = 10022;
+            if (cmd.hasOption("p")) {
+                portNum = Integer.parseInt(cmd.getOptionValue("p"));
+            }
+            log.info("Using BES at "+hostName+":"+portNum);
+
+            log.info("-------------------------------------------------------------------------------");
+            log.info("-------------------------------------------------------------------------------");
+            log.info("Starting... \n\n\n");
+
+
+
+
+            OPeNDAPClient oc = new OPeNDAPClient();
+            oc.startClient(hostName,portNum);
+            for(int r=0; r<reps ;r++){
+
+                if(r>0 && r%maxCmds==0){
+                    oc.shutdownClient();
+                    oc = new OPeNDAPClient();
+                    oc.startClient(hostName,portNum);
+                }
+                oc.executeCommand(cmdString,besOut,besErr);
+
+            }
+
+
+
+
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+}

@@ -571,7 +571,6 @@
              manifest="resources/META-INF/BESclient.MANIFEST.MF">
             <fileset dir="${build.classes}">
                 <include name="opendap/ppt/**/*.class"/>
-                <include name="hao/**/*.class"/>
             </fileset>
         </jar>
 

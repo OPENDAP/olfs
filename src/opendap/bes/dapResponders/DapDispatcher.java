@@ -27,9 +27,7 @@
 package opendap.bes.dapResponders;
 
 import opendap.bes.dap4Responders.Dap4Responder;
-import opendap.bes.dap4Responders.DataResponse.GeoTiffDR;
-import opendap.bes.dap4Responders.DataResponse.GmlJpeg2000DR;
-import opendap.bes.dap4Responders.DataResponse.NormativeDR;
+import opendap.bes.dap4Responders.DataResponse.*;
 import opendap.bes.dap4Responders.DatasetMetadata.HtmlDMR;
 import opendap.bes.dap4Responders.DatasetMetadata.NormativeDMR;
 import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
@@ -229,8 +227,9 @@ public class DapDispatcher implements DispatchHandler {
         // DAP2 Data Responses
         responders.add(new Dap2Data(systemPath, besApi));
         responders.add(new Ascii(systemPath, besApi));
-        // responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
-        responders.add(new NetcdfFileOut(systemPath, besApi));
+        //responders.add(new Ascii(systemPath, null, ".asc", besApi)); // We can uncomment this if we want to support both the dap2 ".ascii" suffix and ".asc"
+        responders.add(new Netcdf3DR(systemPath, besApi));
+        //responders.add(new Netcdf4DR(systemPath, besApi)); // Uncomment this line to enable netcdf4 responses via the DAP2 resource URL scheme.
         responders.add(new XmlData(systemPath, besApi));
 
         Dap4Responder geoTiff = new GeoTiffDR(systemPath, null, ".tiff", besApi);
