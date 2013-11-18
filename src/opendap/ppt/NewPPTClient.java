@@ -175,7 +175,8 @@ public class NewPPTClient {
 
     public boolean initConnection() throws PPTException {
 
-        Logger log = LoggerFactory.getLogger(BES.class);
+        //Logger log = LoggerFactory.getLogger(BES.class);
+        log.debug("initConnection() -  START");
 
         try {
             _rawOut.write(PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION.getBytes());
@@ -187,6 +188,8 @@ public class NewPPTClient {
             closeConnection(true);
             throw new PPTException(msg, e);
         }
+
+        log.debug("initConnection() -  Sent '"+PPTSessionProtocol.PPTCLIENT_TESTING_CONNECTION+"' to server.");
 
         try {
             byte[] inBuff = new byte[4096];
@@ -210,8 +213,8 @@ public class NewPPTClient {
             }
             */
             if(bytesRead<0){
+                log.error("initConnection() -  Encountered End Of Stream when attempting to read server handshake response!");
                 throw new PPTException("PPT Connection appears to have been prematurely closed.");
-
             }
 
 
@@ -243,6 +246,8 @@ public class NewPPTClient {
 
 
         _in = new ChunkedInputStream(_rawIn, new PPTSessionProtocol());
+
+        log.debug("initConnection() -  END");
 
         return true;
     }
