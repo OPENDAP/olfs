@@ -471,20 +471,21 @@ public class OPeNDAPClient {
 
         ps.println("Usage:  ");
         ps.println("");
-        ps.println("        OPeNDAPClient  -i commandFileName [-r #TimesToSendCommand] [-c numberOfCommandsPerConnection] ");
+        ps.println("        OPeNDAPClient  [-i commandFileName] [-r #TimesToSendCommand] [-c numberOfCommandsPerConnection] ");
         ps.println("");
         ps.println("Summary:");
         ps.println("");
         ps.println("");
         ps.println("Options:");
         ps.println("");
-        ps.println("     --besCmd   Filename for the BES command");
-        ps.println("     --reps     Number of times to send command");
-        ps.println("     --maxCmds  Number of commands to send before closing connection and making and opening a new one");
-        ps.println("     --outFile  File to write BES output to (defaults to stdout)");
-        ps.println("     --errFile  File to write BES error output to (defaults to stderr)");
-        ps.println("     --host     BES hostname (defaults to localhost)");
-        ps.println("     --port     BES port number  (defaults to 10022)");
+        ps.println("     --besCmd   Filename for the BES command. default: \"bes.cmd\"");
+        ps.println("     --reps     Number of times to send command. default: 1");
+        ps.println("     --maxCmds  Number of commands to send before closing connection and making " +
+                "and opening a new one. default: 1");
+        ps.println("     --outFile  File into which to log BES responses. default: stdout)");
+        ps.println("     --errFile  File into which to log BES errors. default: stderr)");
+        ps.println("     --host     BES hostname. default: \"localhost\"");
+        ps.println("     --port     BES port number: default: 10022");
         ps.println("     --help     Prints this usage information.");
         ps.println("");
 
