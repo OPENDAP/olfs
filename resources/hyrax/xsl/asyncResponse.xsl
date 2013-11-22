@@ -184,7 +184,7 @@
         <div class="large_bold">The server has indicated the its response will be asynchronous.</div>
         <br/>
         <div class="medium">
-          I estimate that your data may be accessed in roughly <xsl:value-of select="$expectedDelay"/> ms.
+          I estimate that your data may be accessed in roughly <xsl:value-of select="$expectedDelay"/> seconds.
         </div>
         <br/>
         <div class="medium">
