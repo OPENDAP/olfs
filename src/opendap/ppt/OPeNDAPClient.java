@@ -606,10 +606,10 @@ public class OPeNDAPClient {
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
             try {
-            log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
+                log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
             }
             catch (Throwable tt){
-                log.error("FAILED TO GENERATE STACK TRACE!");
+                log.error("**** FAILED TO GENERATE STACK TRACE! ****");
             }
         }
         finally {

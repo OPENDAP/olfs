@@ -206,6 +206,62 @@ public class GlacierBesApi extends BesApi {
 
     }
 
+    @Override
+     public boolean writeDMR(String dataSource, String constraintExpression, String xdap_accept,  String xml_base, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
+
+
+         dataSource = AwsUtil.decodeFileSystemNameForKey(dataSource);
+
+         GlacierArchive grec;
+         try {
+             grec = GlacierManager.theManager().getArchiveRecord(dataSource);
+         } catch (JDOMException e) {
+             throw new IOException("Unable to parse Glacier Record object. msg: "+e.getMessage(), e);
+         }
+
+         if(grec!=null){
+             String ddx = grec.getDDX();
+
+             if(ddx!=null){
+
+                 if(ddx.contains(XML_BASE_TAG))
+                     ddx = ddx.replace(XML_BASE_TAG,xml_base);
+
+
+                 os.write(ddx.getBytes());
+                 return true;
+             }
+             else {
+                 String errMsg = "ERROR: The Glacier Archive Record for resource "+dataSource+" is missing cached DMR metadata.";
+
+                 Dap4Error error  = new Dap4Error();
+
+                 error.setMessage(errMsg);
+                 error.setContext("Glacier Service");
+                 error.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                 err.write(error.toString().getBytes());
+
+             }
+
+         }
+         else {
+             String errMsg = "ERROR: No such resource:  "+dataSource;
+
+             Dap4Error error  = new Dap4Error();
+
+             error.setMessage(errMsg);
+             error.setContext("Glacier Service");
+             error.setHttpCode(HttpServletResponse.SC_NOT_FOUND);
+
+             err.write(error.toString().getBytes());
+         }
+
+         return false;
+
+
+     }
+
 
     @Override
     public boolean writeHTMLForm(String dataSource, String xdap_accept, String url, OutputStream os, OutputStream err) throws BadConfigurationException, BESError, IOException, PPTException {
