@@ -231,8 +231,8 @@
         <td align="center">
             <table>
                 <tr>
-                    <td> <a href="{../@name}.dsr">dsr</a>&NBSP;</td>
-                    <td> <a href="{../@name}.dmr">dmr</a>&NBSP;</td>
+                    <td> <a href="{../@name}.xml">dsr</a>&NBSP;</td>
+                    <td> <a href="{../@name}.dmr.xml">dmr</a>&NBSP;</td>
                     <td> <a href="{../@name}.dap">dap</a>&NBSP;</td>
                     <td> <a href="{../@name}.dmr.html">html</a>&NBSP;</td>
                     <td> <a href="{../@name}.dmr.rdf">rdf</a>&NBSP;</td>

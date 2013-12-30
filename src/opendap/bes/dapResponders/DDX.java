@@ -98,7 +98,7 @@ public class DDX extends Dap4Responder {
         //response.setHeader("Content-Encoding", "plain");
 
         response.setStatus(HttpServletResponse.SC_OK);
-        String xdap_accept = request.getHeader("XDAP-Accept");
+        String xdap_accept = "3.2"; //request.getHeader("XDAP-Accept");
 
 
 
