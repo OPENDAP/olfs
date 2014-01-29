@@ -33,6 +33,7 @@ import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +51,8 @@ import java.io.OutputStream;
 public class NormativeDR extends Dap4Responder {
     private Logger log;
     private static String defaultRequestSuffix = ".dap";
+
+    private String storedResultPrefix = "storedResults/";
 
 
     public NormativeDR(String sysPath, BesApi besApi) {
@@ -94,7 +97,7 @@ public class NormativeDR extends Dap4Responder {
 
 
 
-    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void sendNormativeRepresentation_OLD(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String constraintExpression = ReqInfo.getConstraintExpression(request);
@@ -154,6 +157,7 @@ public class NormativeDR extends Dap4Responder {
                 user.getMaxResponseSize(),
                 xmlBase,startID,
                 mb.getBoundary(),
+                null,
                 os,
                 erros);
 
@@ -175,6 +179,80 @@ public class NormativeDR extends Dap4Responder {
 
 
     }
+
+
+    public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String relativeUrl = ReqInfo.getLocalUrl(request);
+        String xmlBase = getXmlBase(request);
+        String resourceID = getResourceId(relativeUrl, false);
+
+        String constraintExpression = request.getParameter(QueryParameters.CONSTRAINT_EXPRESSION);
+
+        String storeAs = null;
+        if(request.getParameter(QueryParameters.STORE_RESULT)!=null){
+            storeAs = ReqInfo.getServiceUrl(request);
+        }
+
+
+        BesApi besApi = getBesApi();
+
+        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
+
+        response.setContentType(getNormativeMediaType().getMimeType());
+        Version.setOpendapMimeHeaders(request, response, besApi);
+        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
+        // Commented because of a bug in the OPeNDAP C++ stuff...
+        //response.setHeader("Content-Encoding", "plain");
+
+        String xdap_accept = request.getHeader("XDAP-Accept");
+
+
+        MimeBoundary mb = new MimeBoundary();
+        String startID = mb.newContentID();
+
+        User user = new User(request);
+
+
+
+        OutputStream os = response.getOutputStream();
+        ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+
+
+
+        boolean worked = besApi.writeDap4Data(
+                resourceID,
+                constraintExpression,
+                xdap_accept,
+                user.getMaxResponseSize(),
+                xmlBase,startID,
+                mb.getBoundary(),
+                storeAs,
+                os,
+                erros);
+
+
+        if(!worked){
+            String msg = new String(erros.toByteArray());
+            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
+            os.write(msg.getBytes());
+
+        }
+
+
+
+
+
+        os.flush();
+        log.info("Sent {}.",getServiceTitle());
+
+
+
+
+    }
+
+
 
 
 }

@@ -86,6 +86,9 @@ public class BesApi {
     public static final String DAP2_ERRORS     = "dap2";
     public static final String XMLBASE_CONTEXT = "xml:base";
 
+    public static final String STORE_RESULT_CONTEXT  = "store_result";
+
+
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
     public static final String DEFAULT_XDAP_ACCEPT = "2.0";
 
@@ -241,6 +244,7 @@ public class BesApi {
                                     String xmlBase,
                                     String contentID,
                                     String mimeBoundary,
+                                    String storeResult,
                                     OutputStream os,
                                     OutputStream err)
                 throws BadConfigurationException, BESError, IOException, PPTException {
@@ -253,7 +257,8 @@ public class BesApi {
                             maxResponseSize,
                             xmlBase,
                             contentID,
-                            mimeBoundary),
+                            mimeBoundary,
+                            storeResult),
                     os,
                     err);
         }
@@ -1205,7 +1210,8 @@ public class BesApi {
                                        int maxResponseSize,
                                        String xmlBase,
                                        String contentID,
-                                       String mimeBoundary)
+                                       String mimeBoundary,
+                                       String storeResult)
             throws BadConfigurationException {
 
         Document reqDoc =
@@ -1222,17 +1228,19 @@ public class BesApi {
 
         Element req = reqDoc.getRootElement();
 
+        if(storeResult!=null){
+            req.addContent(0,setContextElement(STORE_RESULT_CONTEXT,storeResult));
+        }
+
         Element getReq = req.getChild("get",BES_NS);
 
         Element e = new Element("contentStartId",BES_NS);
         e.setText(contentID);
         getReq.addContent(e);
 
-
         e = new Element("mimeBoundary",BES_NS);
         e.setText(mimeBoundary);
         getReq.addContent(e);
-
 
         return reqDoc;
 
