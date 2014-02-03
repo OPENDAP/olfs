@@ -47,6 +47,9 @@
                     <!-- The port number for this BES -->
                     <port>10022</port>
 
+                    <!-- Timeout (in seconds) for this BES, defaults to 300 seconds-->
+                    <!-- timeOut>300</timeOut -->
+
                     <!-- The Administration port number for this BES -->
                     <!-- <adminPort>11002</adminPort> -->
 
