@@ -128,13 +128,15 @@ public class OPeNDAPClient {
      *                running.
      * @param portVal The port on which the server on the host hostStr is
      *                listening for requests.
+     * @param timeOut The number of milliseconds for the client to wait for the BES
+     *                to reply before timing out.
      * @throws PPTException Thrown if unable to connect to the specified host
      *                      machine given the specified port.
      * @see String
      * @see PPTException
      */
-    public void startClient(String hostStr, int portVal) throws PPTException {
-        _client = new NewPPTClient(hostStr, portVal);
+    public void startClient(String hostStr, int portVal, int timeOut) throws PPTException {
+        _client = new NewPPTClient(hostStr, portVal, timeOut);
         _client.initConnection();
         _isRunning = true;
     }
@@ -454,6 +456,7 @@ public class OPeNDAPClient {
         options.addOption("c", "maxCmds", true, "Number of commands to send before closing the BES connection and opening a new one. default: 1");
         options.addOption("i", "besCmd",  true, "Name of file containing the BES command to use. default: \"bes.cmd\"");
         options.addOption("p", "port",    true, "Port number of BES. default: 10022");
+        options.addOption("t", "timeOut", true, "Timeout (in seconds) for the BES connection. (300)");
         options.addOption("n", "host",    true, "Hostname of BES. default \"localhost\"");
         options.addOption("o", "outFile", true, "File into which to log BES responses. default: stdout");
         options.addOption("e", "errFile", true, "File into which to log BES errors. default: stderr");
@@ -483,6 +486,7 @@ public class OPeNDAPClient {
         OutputStream besErr = System.err;
         String hostName = "localhost";
         int portNum = 10022;
+        int timeOut = 300000; // 5 minutes in ms
 
         try {
             Options options = createCmdLineOptions();
@@ -559,6 +563,13 @@ public class OPeNDAPClient {
             }
             log.info("Using BES at "+hostName+":"+portNum);
 
+            //---------------------------
+            // TimeOut
+            if (cmd.hasOption("t")) {
+                timeOut = Integer.parseInt(cmd.getOptionValue("t")) * 1000;
+            }
+            log.info("BES timeout set to at "+timeOut/1000+ " seconds");
+
 
         }
         catch(Throwable t){
@@ -576,7 +587,7 @@ public class OPeNDAPClient {
             log.info("Starting... \n\n\n");
 
             OPeNDAPClient oc = new OPeNDAPClient();
-            oc.startClient(hostName,portNum);
+            oc.startClient(hostName,portNum,timeOut);
             connectionsMade++;
             for(int r=0; reps==0 || r<reps ;r++){
 
@@ -587,7 +598,7 @@ public class OPeNDAPClient {
                     while(!done){
                         oc = new OPeNDAPClient();
                         try {
-                            oc.startClient(hostName,portNum);
+                            oc.startClient(hostName,portNum,timeOut);
                             done = true;
                         }
                         catch(PPTEndOfStreamException e){

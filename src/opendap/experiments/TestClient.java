@@ -51,7 +51,7 @@ public class TestClient {
         OutputStream out = System.out;
         OutputStream err = System.err;
 
-        // jhrg int timeoutVal = 0;
+        int timeoutVal = 300000; // 5 minutes of ms
         // jhrg boolean debug = false;
 
         PosixParser pp = new PosixParser();
@@ -98,7 +98,7 @@ public class TestClient {
             }
 
             if (timeoutStr != null) {
-                // jhrg timeoutVal = Integer.valueOf(timeoutStr).intValue();
+                timeoutVal = Integer.valueOf(timeoutStr).intValue();
             }
         }
         catch (ParseException pe) {
@@ -155,7 +155,7 @@ public class TestClient {
         OPeNDAPClient client = null;
         try {
             client = new OPeNDAPClient();
-            client.startClient(hostStr, portVal);
+            client.startClient(hostStr, portVal, timeoutVal   );
         }
         catch (PPTException e) {
             System.err.println("error starting the client");

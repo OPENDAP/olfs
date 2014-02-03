@@ -56,7 +56,7 @@ public class NewPPTClient {
 
     private Logger log;
 
-    NewPPTClient(String hostStr, int portVal) throws PPTException {
+    NewPPTClient(String hostStr, int portVal, int timeOut) throws PPTException {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -74,7 +74,7 @@ public class NewPPTClient {
 
         try {
             _mySock = new Socket(addr, portVal);
-            _mySock.setSoTimeout(300000);
+            _mySock.setSoTimeout(timeOut);
         }
         catch (IOException e) {
             String msg = "Could not connect to host " + hostStr + " on port " + portVal + ".  ";

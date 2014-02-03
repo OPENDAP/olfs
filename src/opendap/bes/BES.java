@@ -179,6 +179,10 @@ public class BES {
         return _config.getHost();
     }
 
+    public int getTimeout() {
+        return _config.getTimeOut();
+    }
+
     public String getPrefix() {
         return _config.getPrefix();
     }
@@ -368,7 +372,7 @@ public class BES {
             admin = new OPeNDAPClient();
             log.debug("Starting new admin client. Host: {} Port: {}", getHost(), getAdminPort());
 
-            admin.startClient(getHost(), getAdminPort());
+            admin.startClient(getHost(), getAdminPort(), getTimeout());
             log.debug("BES admin client started, sending command:\n{}", besCmd);
 
 
@@ -1021,7 +1025,7 @@ public class BES {
 
         // Start the client by opening the PPT connection to the BES.
         try {
-            besClient.startClient(getHost(), getPort());
+            besClient.startClient(getHost(), getPort(), getTimeout());
             log.debug("getNewClient() - BES Client started.");
 
         }

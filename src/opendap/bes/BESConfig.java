@@ -55,6 +55,7 @@ public class BESConfig  {
     private  int     _BesMaxCommands;
     private  int     _BesMaxResponseSize;
     private  String  _BesPrefix;
+    private  int     _BesTimeOut;  // in ms
 
     private  String  _BesNickName;
 
@@ -74,6 +75,7 @@ public class BESConfig  {
         _BesPrefix = "/";
         _BesMaxResponseSize = 0;
         _BesNickName = null;
+        _BesTimeOut = 300000; // 5 minutes in ms
     }
 
     public BESConfig(Document besConfiguration) throws Exception{
@@ -103,6 +105,7 @@ public class BESConfig  {
         copy._BesMaxCommands     = _BesMaxCommands;
         copy._BesPrefix          = _BesPrefix;
         copy._BesNickName        = _BesNickName;
+        copy._BesTimeOut         = _BesTimeOut;
 
         return copy;
     }
@@ -211,6 +214,12 @@ public class BESConfig  {
         Element maxResponseSize = besConfig.getChild("maxResponseSize");
         if( maxResponseSize!=null ){
             setMaxResponseSize(maxResponseSize.getTextTrim());
+            log.info("BES '{}' maxResponseSize set to {}",getPrefix(), getMaxResponseSize());
+        }
+
+        Element timeOut = besConfig.getChild("timeOut");
+        if( timeOut!=null ){
+            setTimeOut(timeOut.getTextTrim());
             log.info("BES '{}' maxResponseSize set to {}",getPrefix(), getMaxResponseSize());
         }
 
@@ -373,17 +382,35 @@ public class BESConfig  {
     public String getHost(){ return _BesHost; }
 
 
-    public void setPort(String port){ _BesPort = Integer.parseInt(port); }
+    public void setPort(String port){setPort(Integer.parseInt(port)); }
     public void setPort(int port){ _BesPort = port; }
     public int getPort() { return _BesPort; }
 
-    public void setAdminPort(String port){ _BesAdminPort = Integer.parseInt(port); }
+    public void setAdminPort(String port){ setAdminPort(Integer.parseInt(port)); }
     public void setAdminPort(int port){ _BesAdminPort = port; }
     public int getAdminPort() { return _BesAdminPort; }
 
-    public void setMaxResponseSize(String maxResponseSize){ _BesMaxResponseSize = Integer.parseInt(maxResponseSize); }
+    public void setMaxResponseSize(String maxResponseSize){ setMaxResponseSize(Integer.parseInt(maxResponseSize)); }
     public void setMaxResponseSize(int maxResponseSize){ _BesMaxResponseSize = maxResponseSize; }
     public int getMaxResponseSize() { return _BesMaxResponseSize; }
+
+    /**
+     *
+     * @param timeOut  Number of seconds for the client to wait for the BES to respond
+     */
+    public void setTimeOut(String timeOut){setTimeOut(Integer.parseInt(timeOut)); }
+
+    /**
+     *
+     * @param timeOut  Number of seconds for the client to wait for the BES to respond
+     */
+    public void setTimeOut(int timeOut){ _BesTimeOut = timeOut * 1000; }
+
+    /**
+     *
+     * @return   Number of milliseconds for the client to wait for the BES to respond
+     */
+    public int getTimeOut() { return _BesTimeOut; }
 
 
     public void setPrefix(String prefix){ _BesPrefix = prefix; }
@@ -391,7 +418,7 @@ public class BESConfig  {
 
 
 
-    public void setMaxClients(String i){ _BesMaxClients = Integer.parseInt(i);   }
+    public void setMaxClients(String i){ setMaxClients(Integer.parseInt(i));   }
     public void setMaxClients(int i){ _BesMaxClients = i;   }
     public int getMaxClients(){ return _BesMaxClients;  }
 
@@ -404,6 +431,7 @@ public class BESConfig  {
         s += "        Prefix:     " + getPrefix() + "\n";
         s += "        Host:       " + getHost() + "\n";
         s += "        Port:       " + getPort() + "\n";
+        s += "        Timeout:    " + getTimeOut() + " ms\n";
         s += "        adminPort:  " + getAdminPort() + "\n";
         s += "        MaxClients: " + getMaxClients() + "\n";
         s += "        MaxCommands/client: " + getMaxCommands() + "\n";
@@ -560,6 +588,22 @@ public class BESConfig  {
             }
             else if(bc.getPort()==-1)
                 System.out.println("You must enter a port number.\n\n");
+            else
+                done = true;
+        }
+
+
+        done = false;
+        while(!done){
+            System.out.print("\nEnter the time out time (in seconds) for the BES host "+bc.getHost()+"   ");
+            System.out.print("[" + bc.getTimeOut()/1000 + "]: ");
+            k = kybrd.readLine();
+            if (k!=null && !k.equals("")){
+                bc.setTimeOut(k);
+                done = true;
+            }
+            else if(bc.getTimeOut()==-1)
+                System.out.println("You must enter a timeOut number.\n\n");
             else
                 done = true;
         }
