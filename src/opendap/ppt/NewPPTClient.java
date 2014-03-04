@@ -222,7 +222,7 @@ public class NewPPTClient {
            String msg = "Caught "+e.getClass().getSimpleName()+" attempting to read initialization response from server.  Message: ";
            msg += e.getMessage();
            log.error(msg);
-           closeConnection(true);
+           closeConnection(false);
            throw new PPTException(msg, e);
         }
 
@@ -253,7 +253,7 @@ public class NewPPTClient {
         catch (IOException e) {
             String msg = "Failed to receive initialization response from server.  ";
             msg += e.getMessage();
-            closeConnection(true);
+            closeConnection(false);
             throw new PPTException(msg, e);
         }
 
