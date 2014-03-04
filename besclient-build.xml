@@ -365,6 +365,29 @@
 
     </target>
 
+    <target  name="run_besclient">
+
+        <java classname="opendap.ppt.OPeNDAPClient"
+              fork="true"
+              maxmemory="1024m"
+              dir="${build.run}"
+                >
+            <classpath refid="compile.classpath"/>
+
+            <arg line="--host=${host}" />
+            <arg line="--port=${port}" />
+
+            <arg line="--reps=${reps}" />
+            <arg line="--maxCmds=${maxCmds}" />
+
+            <arg line="--outFile=${outFile}" />
+
+            <arg line="--errFile=${errFile}" />
+            <arg line="--besCmd=${besCmd}" />
+        </java>
+
+    </target>
+
 
 
 
