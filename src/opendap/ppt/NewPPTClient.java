@@ -37,10 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 
 /**
  * User: ndp
@@ -60,10 +57,13 @@ public class NewPPTClient {
 
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
-        InetAddress addr;
+        InetAddress host;
+
+        InetSocketAddress address;
 
         try {
-            addr = InetAddress.getByName(hostStr);
+            host = InetAddress.getByName(hostStr);
+            address = new InetSocketAddress(host,portVal);
         }
         catch (UnknownHostException e) {
             String msg = "Don't know about host: " + hostStr + "\n";
@@ -73,7 +73,8 @@ public class NewPPTClient {
         }
 
         try {
-            _mySock = new Socket(addr, portVal);
+            _mySock = new Socket();
+            _mySock.connect(address,timeOut);
             _mySock.setSoTimeout(timeOut);
         }
         catch (IOException e) {
