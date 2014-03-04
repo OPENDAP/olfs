@@ -87,8 +87,8 @@ public class NewPPTClient {
             _rawOut = _mySock.getOutputStream();
             _rawIn = _mySock.getInputStream();
 
-            log.error("NewPPTClient() -  Using '"+_rawIn.getClass().getSimpleName()+"' InputStream implementation.");
-            log.error("NewPPTClient() -  Using '"+_rawOut.getClass().getSimpleName()+"' OutputStream implementation.");
+            log.debug("NewPPTClient() -  Using '"+_rawIn.getClass().getSimpleName()+"' InputStream implementation.");
+            log.debug("NewPPTClient() -  Using '"+_rawOut.getClass().getSimpleName()+"' OutputStream implementation.");
 
 
         }
