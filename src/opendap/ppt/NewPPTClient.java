@@ -86,6 +86,11 @@ public class NewPPTClient {
         try {
             _rawOut = _mySock.getOutputStream();
             _rawIn = _mySock.getInputStream();
+
+            log.error("NewPPTClient() -  Using '"+_rawIn.getClass().getSimpleName()+"' InputStream implementation.");
+            log.error("NewPPTClient() -  Using '"+_rawOut.getClass().getSimpleName()+"' OutputStream implementation.");
+
+
         }
         catch (IOException e) {
             String msg = "Couldn't get I/O for the connection to: " + hostStr + ".  ";
