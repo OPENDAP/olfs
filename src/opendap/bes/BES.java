@@ -1036,7 +1036,7 @@ public class BES {
             StringBuilder msg = new StringBuilder().append("BES Client Failed To Start.");
             msg.append(" msg: '").append(ppte.getMessage()).append("'");
             besClient.setID(new Date().toString() + msg);
-            msg.insert(0, "getClient() - ");
+            msg.insert(0, "getNewClient() - ");
             log.error(msg.toString());
             throw new PPTException(msg.toString(),ppte);
         }
