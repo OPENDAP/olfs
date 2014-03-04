@@ -58,7 +58,6 @@ public class NewPPTClient {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
 
         InetAddress host;
-
         InetSocketAddress address;
 
         try {
