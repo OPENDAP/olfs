@@ -613,6 +613,9 @@ public class OPeNDAPClient {
                 cmdsSent++;
             }
 
+            if(oc.isRunning()){
+                oc.shutdownClient();
+            }
         }
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
