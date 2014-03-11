@@ -110,15 +110,15 @@ public class BesGatewayApi extends BesApi {
      * @see opendap.bes.dapResponders.BesApi
      */
     @Override
-    public Document getRequestDocument(String type,
-                                                String remoteDataSourceUrl,
-                                                String ce,
-                                                String xdap_accept,
-                                                int maxResponseSize,
-                                                String xmlBase,
-                                                String formURL,
-                                                String returnAs,
-                                                String errorContext)
+    public Document getDap2RequestDocument(String type,
+                                           String remoteDataSourceUrl,
+                                           String ce,
+                                           String xdap_accept,
+                                           int maxResponseSize,
+                                           String xmlBase,
+                                           String formURL,
+                                           String returnAs,
+                                           String errorContext)
                 throws BadConfigurationException {
 
 
@@ -240,7 +240,7 @@ public class BesGatewayApi extends BesApi {
                                        String mimeBoundary)
             throws BadConfigurationException {
 
-        Document reqDoc = getRequestDocument(DataDDX,dataSource,ce,xdap_accept,maxResponseSize,xmlBase,null,null,XML_ERRORS);
+        Document reqDoc = getDap2RequestDocument(DataDDX, dataSource, ce, xdap_accept, maxResponseSize, xmlBase, null, null, XML_ERRORS);
 
         Element req = reqDoc.getRootElement();
 
@@ -331,7 +331,7 @@ public class BesGatewayApi extends BesApi {
 
 
     @Override
-    public boolean getCatalog(String dataSourceUrl, Document response) throws
+    public boolean getBesCatalog(String dataSourceUrl, Document response) throws
             PPTException,
             BadConfigurationException,
             IOException,

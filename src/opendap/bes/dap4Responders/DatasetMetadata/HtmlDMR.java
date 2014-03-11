@@ -108,7 +108,7 @@ public class HtmlDMR extends Dap4Responder {
 
 
 
-        if(!besApi.writeHTMLForm(resourceID,xdap_accept,xmlBase,os,erros)){
+        if(!besApi.writeDap2HTMLForm(resourceID, xdap_accept, xmlBase, os, erros)){
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());

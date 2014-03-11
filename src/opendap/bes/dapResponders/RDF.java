@@ -118,7 +118,7 @@ public class RDF extends Dap4Responder {
 */
         Document ddx = new Document();
 
-        besApi.getDDXDocument(resourceID,constraintExpression,xdap_accept,xmlBase,ddx);
+        besApi.getDDXDocument(resourceID, constraintExpression, xdap_accept, xmlBase, ddx);
 
         ddx.getRootElement().setAttribute("dataset_id",resourceID);
 

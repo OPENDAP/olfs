@@ -891,7 +891,7 @@ public class BES {
 
         BesApi besApi = new BesApi();
 
-        if (besApi.getVersion(getPrefix(), version)) {
+        if (besApi.getBesVersion(getPrefix(), version)) {
 
 
             Element ver = version.getRootElement().getChild("showVersion", BES_NS);

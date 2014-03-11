@@ -178,7 +178,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         Document showCatalogDoc = new Document();
 
-        if (_besApi.getCatalog(besCatalogName, showCatalogDoc)) {
+        if (_besApi.getBesCatalog(besCatalogName, showCatalogDoc)) {
 
 
             _log.debug(xmlo.outputString(showCatalogDoc));

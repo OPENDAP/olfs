@@ -133,7 +133,7 @@ public class DatasetInfoHtmlPage extends Dap4Responder {
 
 
 
-        if(!besApi.writeHtmlInfoPage(resourceID,xdap_accept,os,erros)){
+        if(!besApi.writeDap2HtmlInfoPage(resourceID, xdap_accept, os, erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath, context, response);

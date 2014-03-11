@@ -144,7 +144,7 @@ public class CsvDR extends Dap4Responder {
         */
 
 
-        if(!besApi.writeASCII(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+        if(!besApi.writeDap2AsciiData(resourceID, constraintExpression, xdap_accept, user.getMaxResponseSize(), os, erros)){
 
             BESError besError = new BESError(new ByteArrayInputStream(erros.toByteArray()));
             besError.sendErrorResponse(_systemPath,context, response);

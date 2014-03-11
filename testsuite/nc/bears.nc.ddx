@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Dataset name="bears.nc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xml.opendap.org/ns/DAP2" xsi:schemaLocation="http://xml.opendap.org/ns/DAP2 http://xml.opendap.org/dap/dap2.xsd">
+<Dataset name="bears.nc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.opendap.org/ns/DAP/3.2# http://xml.opendap.org/dap/dap3.2.xsd" xmlns:grddl="http://www.w3.org/2003/g/data-view#" grddl:transformation="http://xml.opendap.org/transforms/ddxToRdfTriples.xsl" xmlns="http://xml.opendap.org/ns/DAP/3.2#" xmlns:dap="http://xml.opendap.org/ns/DAP/3.2#" dapVersion="3.2" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:base="http://localhost:8080/opendap/data/nc/bears.nc">
     <Attribute name="NC_GLOBAL" type="Container">
         <Attribute name="history" type="String">
             <value>This is an example of a multi-line global\012attribute.  It could be used for representing the\012processing history of the data, for example.</value>
@@ -201,36 +201,9 @@
             <dimension name="j" size="3"/>
         </Map>
     </Grid>
-    <Array name="i">
-        <Attribute name="attr1" type="String">
-            <value>1</value>
-        </Attribute>
-        <Attribute name="attr2" type="String">
-            <value>1</value>
-            <value>2</value>
-            <value>3</value>
-            <value>4</value>
-        </Attribute>
-        <Attribute name="i_1" type="Container">
-            <Attribute name="attr3_1" type="String">
-                <value>17</value>
-            </Attribute>
-            <Attribute name="attr3_2" type="Float64">
-                <value>19</value>
-                <value>23</value>
-                <value>27</value>
-            </Attribute>
-        </Attribute>
-        <Int32/>
-        <dimension name="i" size="2"/>
-    </Array>
-    <Array name="j">
-        <Float32/>
-        <dimension name="j" size="3"/>
-    </Array>
     <Array name="l">
         <Int16/>
         <dimension name="l" size="3"/>
     </Array>
-    <dataBLOB href=""/>
+    <blob href="cid:"/>
 </Dataset>

@@ -32,6 +32,7 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -93,7 +94,8 @@ public class XmlDR extends Dap4Responder{
 
         String requestedResourceId = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+        QueryParameters qp = new  QueryParameters(request);
 
         String resourceID = getResourceId(requestedResourceId, false);
 
@@ -120,10 +122,10 @@ public class XmlDR extends Dap4Responder{
 
 
         Document reqDoc =
-                besApi.getRequestDocument(
+                besApi.getDap4RequestDocument(
                         BesApi.XML_DATA,
                         resourceID,
-                        constraintExpression,
+                        qp,
                         xdap_accept,
                         user.getMaxResponseSize(),
                         xmlBase,

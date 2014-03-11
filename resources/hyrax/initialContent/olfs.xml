@@ -101,11 +101,6 @@
                 <prefix>gateway</prefix>
             </Handler>
 
-            <Handler className="opendap.async.AsyncDispatcher">
-                <prefix>async</prefix>
-                <cachePersistTime>10000</cachePersistTime>
-                <responseDelay>5000</responseDelay>
-            </Handler>
 
             <Handler className="opendap.bes.dapResponders.DapDispatcher" >
 
@@ -133,8 +128,6 @@
             </Handler>
 
             <Handler className="opendap.bes.DirectoryDispatchHandler" />
-
-            <Handler className="opendap.bes.FileDispatchHandler" />
 
             <Handler className="opendap.bes.BESThreddsDispatchHandler" />
 

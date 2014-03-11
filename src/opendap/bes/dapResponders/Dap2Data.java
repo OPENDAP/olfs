@@ -31,16 +31,13 @@ import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Scrub;
 import opendap.dap.User;
+import opendap.dap4.QueryParameters;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-
-
-
-
 
 
 public class Dap2Data extends Dap4Responder {
@@ -85,6 +82,10 @@ public class Dap2Data extends Dap4Responder {
 
 
 
+
+
+
+
     @Override
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -95,14 +96,16 @@ public class Dap2Data extends Dap4Responder {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String resourceID = getResourceId(relativeUrl,false);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
+
+        QueryParameters qp = new  QueryParameters(request);
+
+        String dap2CE = qp.getQueryRemainder();
 
         User user = new User(request);
-        int maxRS = user.getMaxResponseSize();
 
 
         log.debug("sendNormativeRepresentation() For: " + resourceID+
-                "    CE: '" + constraintExpression + "'");
+                "    CE: '" + dap2CE + "'");
 
         response.setContentType(getNormativeMediaType().getMimeType());
         Version.setOpendapMimeHeaders(request,response,besApi);
@@ -121,30 +124,7 @@ public class Dap2Data extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-
-        /*
-        Document reqDoc =
-                besApi.getRequestDocument(
-                        BesApi.DAP2_DATA,
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        maxRS,
-                        null,
-                        null,
-                        null,
-                        BesApi.DAP2_ERRORS);
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-*/
-
-        if(!besApi.writeDap2Data(resourceID,constraintExpression,xdap_accept,user.getMaxResponseSize(),os,erros)){
+        if(!besApi.writeDap2Data(resourceID,dap2CE,qp.getAsync(),qp.getStoreResultRequestServiceUrl(),xdap_accept,user.getMaxResponseSize(),os,erros)){
             String msg = new String(erros.toByteArray());
             log.error("sendNormativeRepresentation() encountered a BESError: "+msg);
             os.write(msg.getBytes());

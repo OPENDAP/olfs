@@ -258,7 +258,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         Document showCatalogDoc = new Document();
 
-        if(_besApi.getCatalog(collectionName,showCatalogDoc)){
+        if(_besApi.getBesCatalog(collectionName, showCatalogDoc)){
 
             log.debug("Catalog from BES:\n"+xmlo.outputString(showCatalogDoc));
 

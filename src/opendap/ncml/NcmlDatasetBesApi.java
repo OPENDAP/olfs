@@ -77,15 +77,15 @@ public class NcmlDatasetBesApi extends BesApi {
      * @see opendap.bes.dapResponders.BesApi
      */
     @Override
-    public  Document getRequestDocument(String type,
-                                                String localDataSourceId,
-                                                String ce,
-                                                String xdap_accept,
-                                                int maxResponseSize,
-                                                String xmlBase,
-                                                String formURL,
-                                                String returnAs,
-                                                String errorContext)
+    public  Document getDap2RequestDocument(String type,
+                                            String localDataSourceId,
+                                            String ce,
+                                            String xdap_accept,
+                                            int maxResponseSize,
+                                            String xmlBase,
+                                            String formURL,
+                                            String returnAs,
+                                            String errorContext)
                 throws BadConfigurationException {
 
 

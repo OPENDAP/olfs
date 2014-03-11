@@ -420,7 +420,7 @@ public class BesMetadataExtractor {
                 break;
 
             case DDX:
-                bescmd = besApi.getDDXRequest(resourceID, "", "3.2","#XML_BASE#");
+                bescmd = besApi.getDDXRequest(resourceID, "", "3.2", "#XML_BASE#");
                 break;
 
             default:

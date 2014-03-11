@@ -99,7 +99,7 @@ public class BESResource implements ResourceInfo {
 
 
 
-        if(besApi.getCatalog(dataSourceName,info)){
+        if(besApi.getBesCatalog(dataSourceName, info)){
 
             exists      = true;
             accessible  = true;

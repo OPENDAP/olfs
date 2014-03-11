@@ -118,14 +118,14 @@ public class XmlData extends Dap4Responder {
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
 
 
-        boolean result = besApi.writeXmlDataResponse(
-                        resourceID,
-                        constraintExpression,
-                        xdap_accept,
-                        user.getMaxResponseSize(),
-                        xmlBase,
-                        os,
-                        erros);
+        boolean result = besApi.writeDap2XmlDataResponse(
+                resourceID,
+                constraintExpression,
+                xdap_accept,
+                user.getMaxResponseSize(),
+                xmlBase,
+                os,
+                erros);
 
 
         if(!result){

@@ -97,102 +97,13 @@ public class NormativeDR extends Dap4Responder {
 
 
 
-    public void sendNormativeRepresentation_OLD(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String constraintExpression = ReqInfo.getConstraintExpression(request);
-        String xmlBase = getXmlBase(request);
-
-        String resourceID = getResourceId(relativeUrl, false);
-
-
-        BesApi besApi = getBesApi();
-
-        log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
-
-        response.setContentType(getNormativeMediaType().getMimeType());
-        Version.setOpendapMimeHeaders(request, response, besApi);
-        response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
-        // Commented because of a bug in the OPeNDAP C++ stuff...
-        //response.setHeader("Content-Encoding", "plain");
-
-        String xdap_accept = request.getHeader("XDAP-Accept");
-
-
-        MimeBoundary mb = new MimeBoundary();
-        String startID = mb.newContentID();
-
-        User user = new User(request);
-
-
-
-        OutputStream os = response.getOutputStream();
-        ByteArrayOutputStream erros = new ByteArrayOutputStream();
-
-        /*
-        Document reqDoc = besApi.getDap4DataRequest(resourceID,
-                constraintExpression,
-                xdap_accept,
-                user.getMaxResponseSize(),
-                xmlBase,
-                startID,
-                mb.getBoundary());
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        log.debug("BesApi.getDap4DataRequest() returned:\n "+xmlo.outputString(reqDoc));
-
-        if(!besApi.besTransaction(resourceID,reqDoc,os,erros)){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-        */
-
-
-        boolean worked = besApi.writeDap4Data(
-                resourceID,
-                constraintExpression,
-                xdap_accept,
-                user.getMaxResponseSize(),
-                xmlBase,startID,
-                mb.getBoundary(),
-                null,
-                os,
-                erros);
-
-
-        if(!worked){
-            String msg = new String(erros.toByteArray());
-            log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
-            os.write(msg.getBytes());
-
-        }
-
-
-
-
-        os.flush();
-        log.info("Sent {}.",getServiceTitle());
-
-
-
-
-    }
-
-
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
         String xmlBase = getXmlBase(request);
         String resourceID = getResourceId(relativeUrl, false);
 
-        String constraintExpression = request.getParameter(QueryParameters.CONSTRAINT_EXPRESSION);
-
-        String storeAs = null;
-        if(request.getParameter(QueryParameters.STORE_RESULT)!=null){
-            storeAs = ReqInfo.getServiceUrl(request);
-        }
+        QueryParameters qp = new  QueryParameters(request);
 
 
         BesApi besApi = getBesApi();
@@ -223,12 +134,12 @@ public class NormativeDR extends Dap4Responder {
 
         boolean worked = besApi.writeDap4Data(
                 resourceID,
-                constraintExpression,
+                qp,
                 xdap_accept,
                 user.getMaxResponseSize(),
-                xmlBase,startID,
+                xmlBase,
+                startID,
                 mb.getBoundary(),
-                storeAs,
                 os,
                 erros);
 
