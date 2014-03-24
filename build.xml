@@ -347,6 +347,9 @@
                 <exclude name="opendap/aws/**"/>
                 <exclude name="opendap/noaa_s3/**"/>
 
+                <!-- Exclude async test code -->
+                <exclude name="opendap/async/**"/>
+
 
                 <!-- Exclude the Hyrax Admin Interface code  -->
                 <!-- <exclude name="opendap/hai/**"/>  -->
