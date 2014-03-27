@@ -179,6 +179,11 @@
     </logger>
 
 
+    <logger name="JavaServerPages" level="all">
+             <appender-ref ref="stdout"/>
+    </logger>
+
+
 
 <!--
 

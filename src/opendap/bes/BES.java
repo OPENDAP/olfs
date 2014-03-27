@@ -394,7 +394,7 @@ public class BES {
         } finally {
             if (admin != null) {
                 try {
-                    admin.shutdownClient();
+                    admin.shutdownClient(false);
                 } catch (PPTException e) {
                     sb.append("FAILED TO SHUTDOWN CLIENT! Msg: ").append(e.getMessage());
                     admin.killClient();

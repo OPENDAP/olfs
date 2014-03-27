@@ -29,11 +29,17 @@
 <%@ page import="opendap.hai.Util" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
+<%@ page import="org.slf4j.Logger" %>
 <html>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
 
+    Logger log = LoggerFactory.getLogger("JavaServerPages");
+    RequestCache.openThreadCache();
+
     String contextPath = request.getContextPath();
+    log.debug("olfsLogView.jsp -  contextPath: "+contextPath);
 
     HashMap<String, String> kvp = Util.processQuery(request);
 
@@ -46,12 +52,15 @@
     BES bes = BESManager.getBES(currentPrefix);
 
     currentPrefix = bes.getPrefix();
+    log.debug("olfsLogView.jsp - currentPrefix: "+currentPrefix);
 
     String olfsCtlApi = contextPath+"/hai/olfsctl";
+    log.debug("olfsLogView.jsp - olfsCtlApi: "+olfsCtlApi);
 
 
     StringBuilder status = new StringBuilder();
     status.append(" OK ");
+    log.debug("olfsLogView.jsp - status: " + status);
 
 
 
@@ -181,3 +190,6 @@
 
 </body>
 </html>
+<%
+    RequestCache.closeThreadCache();
+%>

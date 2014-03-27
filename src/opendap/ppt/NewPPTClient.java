@@ -279,8 +279,7 @@ public class NewPPTClient {
             _out = null;
         }
         catch (IOException e) {
-            log.error("closeConnection(): Unable to inform server that client is exiting, continuing.");
-            log.error(e.getMessage());
+            log.error("closeConnection(): Unable to inform server that client is exiting, continuing. Base message: '" + e.getMessage()+"'");
         }
 
         try {
@@ -289,8 +288,7 @@ public class NewPPTClient {
             _in = null;
         }
         catch (IOException e) {
-            log.error("closeConnection(): Unable to close input stream, continuing");
-            log.error(e.getMessage());
+            log.error("closeConnection(): Unable to close input stream, continuing. Base message: '" + e.getMessage()+"'");
         }
 
         try {
@@ -299,8 +297,7 @@ public class NewPPTClient {
             _mySock = null;
         }
         catch (IOException e) {
-            log.error("closeConnection(): Unable to close socket, continuing");
-            log.error(e.getMessage());
+            log.error("closeConnection(): Unable to close socket, continuing. Base message: '" + e.getMessage()+"'");
         }
     }
 

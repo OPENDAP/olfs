@@ -142,7 +142,7 @@ public class OPeNDAPClient {
     }
 
     /**
-     * Closes the connection to the OpeNDAP server and closes the output stream.
+     * Closes the connection to the Back End Server and closes the output stream.
      *
      * @throws PPTException Thrown if unable to close the connection or close
      *                      the output stream.
@@ -152,8 +152,22 @@ public class OPeNDAPClient {
      */
     public void shutdownClient() throws PPTException {
 
+        shutdownClient(true);
+    }
+
+    /**
+     * Closes the connection to the Back End Server and closes the output stream.
+     *
+     * @throws PPTException Thrown if unable to close the connection or close
+     *                      the output stream.
+     *                      machine given the specified port.
+     * @see OutputStream
+     * @see PPTException
+     */
+    public void shutdownClient(boolean beNice) throws PPTException {
+
         if(_client!=null)
-            _client.closeConnection(true);
+            _client.closeConnection(beNice);
 
         if (_stream != null) {
             try {

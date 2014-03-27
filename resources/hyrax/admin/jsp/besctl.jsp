@@ -33,10 +33,17 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="org.slf4j.Logger" %>
 <html>
 <%
 
+    Logger log = LoggerFactory.getLogger("JavaServerPages");
+    RequestCache.openThreadCache();
+
     String contextPath = request.getContextPath();
+    log.debug("besctl.jsp -  contextPath: "+contextPath);
 
     HashMap<String, String> kvp = Util.processQuery(request);
 
@@ -45,20 +52,28 @@
     if (currentPrefix == null)
         currentPrefix = "/";
 
+    log.debug("besctl.jsp -  currentPrefix: "+currentPrefix);
 
     String currentClientId = kvp.get("clientId");
+    log.debug("besctl.jsp -  currentClientId: "+currentClientId);
+
+
 
     String currentBesTask = kvp.get("task");
     if (currentBesTask == null)
         currentBesTask = "";
 
+    log.debug("besctl.jsp -  currentBesTask: "+currentBesTask);
 
     String currentModuleId = kvp.get("module");
+    log.debug("besctl.jsp -  currentModuleId: "+currentModuleId);
 
     String currentBesName  = kvp.get("besName");
+    log.debug("besctl.jsp -  currentBesName: "+currentBesName);
 
 
     BesGroup currentPrefixBesGroup = BESManager.getBesGroup(currentPrefix);
+    log.debug("besctl.jsp -  currentPrefixBesGroup: "+currentPrefixBesGroup);
 
 
     BES bes = null;
@@ -67,26 +82,21 @@
         currentBesName = currentPrefixBesGroup.get(0).getNickName();
     }
 
+    log.debug("besctl.jsp -  currentBesName: "+currentBesName);
+
+
     bes = currentPrefixBesGroup.get(currentBesName);
 
 
 
     String besCtlApi = contextPath + "/hai/besctl";
 
+    log.debug("besctl.jsp -  besCtlApi: "+besCtlApi);
 
     StringBuffer status = new StringBuffer();
     status.append(" OK ");
+    log.debug("besctl.jsp -  status: "+status);
 
-    /*
-    System.out.println("contextPath: "+contextPath);
-    System.out.println("currentPrefix: "+currentPrefix);
-    //System.out.println("bes('"+currentPrefix+"').isAdminConfigured(): "+bes.isAdminPortConfigured());
-    System.out.println("currentClientId: "+currentClientId);
-    System.out.println("currentBesTask: "+currentBesTask);
-    System.out.println("currentModuleId: "+currentModuleId);
-    System.out.println("besCtlApi: "+besCtlApi);
-    System.out.println("status: "+status);
-    */
 
 
 %>
@@ -707,3 +717,6 @@
 </h3>
 </body>
 </html>
+<%
+    RequestCache.closeThreadCache();
+%>
