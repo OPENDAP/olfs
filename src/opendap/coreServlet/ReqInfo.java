@@ -286,25 +286,30 @@ public class ReqInfo {
             if(contentType!=null && contentType.equalsIgnoreCase("application/x-www-form-urlencoded")){
                 Map paramMap = req.getParameterMap();
 
-                String[] bodyCEValues = (String[]) paramMap.get("ce");
-                if(bodyCEValues!=null){
-                    for(String ceValue: bodyCEValues){
-                        if(bodyCE.length()!=0){
-                            bodyCE.append(",");
+                if(paramMap!=null){
+
+                    String[] bodyCEValues = (String[]) paramMap.get("ce");
+                    if(bodyCEValues!=null){
+                        for(String ceValue: bodyCEValues){
+                            if(bodyCE.length()!=0){
+                                bodyCE.append(",");
+                            }
+                            bodyCE.append(ceValue);
                         }
-                        bodyCE.append(ceValue);
                     }
+
+                    bodyCEValues = (String[]) paramMap.get("dap4:ce");
+                    if(bodyCEValues!=null){
+                        for(String ceValue: bodyCEValues){
+                            if(bodyCE.length()!=0){
+                                bodyCE.append(",");
+                            }
+                            bodyCE.append(ceValue);
+                        }
+                    }
+
                 }
 
-                bodyCEValues = (String[]) paramMap.get("dap4:ce");
-                if(bodyCEValues!=null){
-                    for(String ceValue: bodyCEValues){
-                        if(bodyCE.length()!=0){
-                            bodyCE.append(",");
-                        }
-                        bodyCE.append(ceValue);
-                    }
-                }
 
 
             }

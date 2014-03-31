@@ -183,8 +183,8 @@ public class Dap2Data extends Dap4Responder {
             doc = sb.build(new ByteArrayInputStream(besResponse.toByteArray()));
 
         } catch (JDOMException e) {
-            String msg = "Failed to parse asynchronous response from BES! Cause: " + e.getMessage();
-            log.error("handleStoreResultResponse() - "+msg);
+            String msg = "Failed to parse asynchronous response from BES!";
+            log.error("handleStoreResultResponse() - " + msg + " Message: " + e.getMessage());
             Dap4Error d4e = new Dap4Error();
             d4e.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);

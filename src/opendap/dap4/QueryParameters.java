@@ -130,57 +130,69 @@ public class QueryParameters {
      */
     public void ingestDap4Query(HttpServletRequest req) throws IOException {
 
-        Map<String,String> params = req.getParameterMap();
+        Map<String,String[]> params = req.getParameterMap();
+
+        if(params !=null ){
+            String asyncHttpHeader = req.getHeader("X-DAP-Async-Accept");
 
 
-        String asyncHttpHeader = req.getHeader("X-DAP-Async-Accept");
+            Vector<String> dropList = new Vector<String>();
+            for(String key: params.keySet()){
 
+                if(key.equals(STORE_RESULT)){
+                    setIsStoreResultRequest(true);
+                    setStoreResultRequestServiceUrl(ReqInfo.getServiceUrl(req));
+                    dropList.add(key);
+                }
+                if(key.equals(CONSTRAINT_EXPRESSION)){
+                    setCe(req.getParameter(key));
+                    dropList.add(key);
+                }
+                if(key.equals(FUNC)){
+                    setFunc(req.getParameter(key));
+                    dropList.add(key);
+                }
+                if(key.equals(ASYNC)){
+                    setAsync(req.getParameter(key));
+                    dropList.add(key);
+                }
+                else if (asyncHttpHeader!=null){
+                    setAsync(asyncHttpHeader);
+                }
 
-        Vector<String> dropList = new Vector<String>();
-        for(String key: params.keySet()){
-
-            if(key.equals(STORE_RESULT)){
-                setIsStoreResultRequest(true);
-                setStoreResultRequestServiceUrl(ReqInfo.getServiceUrl(req));
-                dropList.add(key);
             }
-            if(key.equals(CONSTRAINT_EXPRESSION)){
-                setCe(req.getParameter(key));
-                dropList.add(key);
-            }
-            if(key.equals(FUNC)){
-                setFunc(req.getParameter(key));
-                dropList.add(key);
-            }
-            if(key.equals(ASYNC)){
-                setAsync(req.getParameter(key));
-                dropList.add(key);
-            }
-            else if (asyncHttpHeader!=null){
-                setAsync(asyncHttpHeader);
-            }
 
-        }
+            for(String droppedParam: dropList){
+                params.remove(droppedParam);
 
-        for(String droppedParam: dropList){
-            params.remove(droppedParam);
+            }
+            StringBuilder ce = new StringBuilder();
 
-        }
-        StringBuilder ce = new StringBuilder();
-
-        for(String key: params.keySet()){
-            String values[] =  req.getParameterValues(key);
-            for(String value: values){
-                if(ce.length()>0)
-                    ce.append("&");
-                ce.append(key);
-                if(!value.isEmpty()){
-                    ce.append("=").append(value);
+            for(String key: params.keySet()){
+                String values[] =  req.getParameterValues(key);
+                if(values!=null){
+                    for(String value: values){
+                        if(ce.length()>0)
+                            ce.append("&");
+                        ce.append(key);
+                        if(!value.isEmpty()){
+                            ce.append("=").append(value);
+                        }
+                    }
                 }
             }
+
+            queryRemainder = ce.toString();
+
+        }
+        else {
+            String qs = req.getQueryString();
+            if(qs==null){
+                qs = "";
+            }
+            queryRemainder = qs;
         }
 
-        queryRemainder = ce.toString();
 
     }
 

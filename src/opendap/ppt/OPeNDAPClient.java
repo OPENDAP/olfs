@@ -589,6 +589,22 @@ public class OPeNDAPClient {
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
             log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
+
+            try {
+                if(besOut!=null){
+                    besOut.close();
+                }
+            } catch (IOException e) {
+                log.error("FAILED TO CLOSE OUTPUT LOG.");
+            }
+            try {
+                if(besErr!=null){
+                    besErr.close();
+                }
+            } catch (IOException e) {
+                log.error("FAILED TO CLOSE ERROR LOG.");
+            }
+
             return;
         }
 
@@ -649,7 +665,24 @@ public class OPeNDAPClient {
 
             log.info("Sent a total of "+cmdsSent+" command"+(connectionsMade>1?"s.":"."));
             log.info("Made a total of " + connectionsMade + " connection"+(connectionsMade>1?"s":"")+" to the BES.");
+
         }
+
+        try {
+            if(besOut!=null){
+                besOut.close();
+            }
+        } catch (IOException e) {
+            log.error("FAILED TO CLOSE OUTPUT LOG.");
+        }
+        try {
+            if(besErr!=null){
+                besErr.close();
+            }
+        } catch (IOException e) {
+            log.error("FAILED TO CLOSE ERROR LOG.");
+        }
+
 
     }
 }

@@ -345,8 +345,8 @@
 
         <user-data-constraint>
             <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
-            <!-- transport-guarantee>CONFIDENTIAL</transport-guarantee -->
-            <transport-guarantee>NONE</transport-guarantee>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+            <!-- transport-guarantee>NONE</transport-guarantee  -->
         </user-data-constraint>
     </security-constraint>
 
