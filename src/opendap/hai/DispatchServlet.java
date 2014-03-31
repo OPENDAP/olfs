@@ -336,6 +336,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             throws javax.servlet.ServletException, java.io.IOException {
 
         if (!req.isSecure()) {
+            log.error("Connection is NOT secure. Protocol: "+req.getProtocol());
             resp.sendError(403);
         }
         else {

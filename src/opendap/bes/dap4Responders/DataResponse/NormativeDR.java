@@ -33,12 +33,20 @@ import opendap.bes.dapResponders.BesApi;
 import opendap.coreServlet.MimeBoundary;
 import opendap.coreServlet.ReqInfo;
 import opendap.dap.User;
+import opendap.dap4.Dap4Error;
 import opendap.dap4.QueryParameters;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -126,8 +134,19 @@ public class NormativeDR extends Dap4Responder {
 
 
 
-        OutputStream os = response.getOutputStream();
+        OutputStream os;
+        ByteArrayOutputStream srr = null;
         ByteArrayOutputStream erros = new ByteArrayOutputStream();
+
+
+
+        if(qp.isStoreResultRequest()){
+            srr = new ByteArrayOutputStream();
+            os = srr;
+        }
+        else {
+            os = response.getOutputStream();
+        }
 
 
 
@@ -145,20 +164,71 @@ public class NormativeDR extends Dap4Responder {
 
 
         if(!worked){
+            if(!response.isCommitted())
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
             String msg = new String(erros.toByteArray());
             log.error("respondToHttpGetRequest() encountered a BESError: "+msg);
             os.write(msg.getBytes());
 
         }
+        else if(qp.isStoreResultRequest()){
+
+            handleStoreResultResponse(srr, response);
+        }
+        else {
+            os.flush();
+        }
 
 
-
-
-
-        os.flush();
         log.info("Sent {}.",getServiceTitle());
 
 
+
+
+    }
+
+
+    public void handleStoreResultResponse(ByteArrayOutputStream besResponse,  HttpServletResponse resp) throws IOException {
+
+
+        ServletOutputStream sos = resp.getOutputStream();
+
+        SAXBuilder sb = new SAXBuilder();
+        Document doc;
+        try {
+            doc = sb.build(new ByteArrayInputStream(besResponse.toByteArray()));
+
+        } catch (JDOMException e) {
+            String msg = "Failed to parse asynchronous response from BES! Cause: " + e.getMessage();
+            log.error("handleStoreResultResponse() - "+msg);
+            Dap4Error d4e = new Dap4Error();
+            d4e.setHttpCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            d4e.setMessage(msg);
+            d4e.setOtherInformation(besResponse.toString());
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sos.print(d4e.toString());
+            sos.flush();
+            return;
+        }
+
+        Element asyncResponse = doc.getRootElement();
+        String status = asyncResponse.getAttributeValue("status");
+
+        if(status.equalsIgnoreCase("required")){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setHeader("X-DAP-Async-Required", "true");
+        }
+        else if (status.equalsIgnoreCase("accepted")){
+            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+            resp.setHeader("X-DAP-Async-Accepted", "true");
+        }
+        else if(status.equalsIgnoreCase("rejected")){
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+        }
+
+        sos.write(besResponse.toByteArray());
+        sos.flush();
 
 
     }

@@ -48,6 +48,7 @@ public class QueryParameters {
 
     private String async;
     private String storeResultServiceUrl;
+    private boolean isStoreResultRequest;
     private String func;
     private String ce;
     private String queryRemainder;
@@ -56,6 +57,7 @@ public class QueryParameters {
     public QueryParameters() {
         async = null;
         storeResultServiceUrl = null;
+        isStoreResultRequest = false;
         func = null;
         ce = null;
         queryRemainder = null;
@@ -79,6 +81,14 @@ public class QueryParameters {
 
     public String getStoreResultRequestServiceUrl(){
         return storeResultServiceUrl;
+    }
+
+    public void setIsStoreResultRequest(boolean  value){
+        isStoreResultRequest = value;
+    }
+
+    public boolean isStoreResultRequest(){
+        return isStoreResultRequest;
     }
 
 
@@ -130,6 +140,7 @@ public class QueryParameters {
         for(String key: params.keySet()){
 
             if(key.equals(STORE_RESULT)){
+                setIsStoreResultRequest(true);
                 setStoreResultRequestServiceUrl(ReqInfo.getServiceUrl(req));
                 dropList.add(key);
             }
