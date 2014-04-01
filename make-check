@@ -17,13 +17,10 @@ then
 fi    
 
 export myclasspath="build/classes:\
-lib/apache-commons-cli-1.0.jar:\
-lib/jdom-1.0.jar:\
+lib/apache-commons-cli-1.2.jar:\
+lib/jdom-1.1.1.jar:\
 lib/junit-4.4.jar:\
-lib/netcdf-2.2.20.jar:\
-lib/nlog4j-1.2.21.jar:\
-lib/tomcat-5.5.0-servlet.jar:\
-lib/tsf-3.16.22.jar:\
+lib/slf4j-api-1.6.1.jar:\
 lib/xercesImpl-2.8.1.jar:\
 lib/xml-apis-2.8.1.jar"
 
