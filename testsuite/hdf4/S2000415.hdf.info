@@ -233,7 +233,7 @@ valid_range: 0, 4<br>
 </tr><tr><td align=right valign=top><b>vdata_NSCAT_Rev_20_SwathIndex_vdf_begin</b>:</td>
 <td align=left valign=top>Array of 16 bit Integers [VDFDim0_vdata_NSCAT_Rev_20_SwathIndex_vdf_begin = 0..819]<br></td>
 </tr><tr><td align=right valign=top><b>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time</b>:</td>
-<td align=left valign=top>Array of Bytes [VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = 0..457][VDFDim1_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = 0..23]<br></td>
+<td align=left valign=top>Array of Strings [VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Mean_Time = 0..457]<br></td>
 </tr><tr><td align=right valign=top><b>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag</b>:</td>
 <td align=left valign=top>Array of 32 bit Unsigned integers [VDFDim0_vdata_NSCAT_Rev_20_NSCAT_L2_vdf_Low_Wind_Speed_Flag = 0..457]<br></td>
 </tr><tr><td align=right valign=top><b>vdata_NSCAT_Rev_20_NSCAT_L2_vdf_High_Wind_Speed_Flag</b>:</td>
