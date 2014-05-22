@@ -1,3 +1,8 @@
+Version 1.11.1 (22 May 2014)
+
+Fixed a bug in the WebStart system.
+
+
 Version 1.11.0 (1 April 2014)
 
 Internal (but as yet not fully released support) for DAP4 responses,

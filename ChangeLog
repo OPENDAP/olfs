@@ -1,3 +1,26 @@
+2014-05-22  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed bug in WebStartServlet.
+
+2014-05-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated baselines for changes in hdf4_handler
+
+2014-04-24  Nathan Potter <ndp@opendap.org>
+
+	olfs: Prerelease check in for version 1.11.0
+
+2014-04-01  Nathan Potter <ndp@opendap.org>
+
+	olfs: Updated README, ChangeLog, News
+
+2014-03-31  Nathan Potter <ndp@opendap.org>
+
+	olfs: Fixed test classpath
+
+;; Local Variables:
+;; coding: utf-8
+;; End:
 2014-04-01  Nathan Potter <ndp@opendap.org>
 
 	olfs: Updated README, ChangeLog, News
