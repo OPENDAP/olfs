@@ -316,6 +316,8 @@ public class WebStartServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
+        RequestCache.openThreadCache();
+
         LogUtil.logServerAccessStart(req, "WebStartServletAccess", "GET", Integer.toString(reqNumber.incrementAndGet()));
 
 
@@ -329,7 +331,6 @@ public class WebStartServlet extends HttpServlet {
         String query = req.getQueryString();
         HashMap<String, String> params = new HashMap<String, String>();
 
-        RequestCache.openThreadCache();
         try {
 
 
