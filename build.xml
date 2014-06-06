@@ -378,7 +378,7 @@
 
 
         <!-- Copy and filter all of the ncISO resources -->
-        <copy todir="${build.resources}/ncsio" filtering="true">
+        <copy todir="${build.resources}/nciso" filtering="true">
             <fileset dir="${ncISO.dir}"/>
         </copy>
 
