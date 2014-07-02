@@ -32,8 +32,6 @@ import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
-import opendap.services.Service;
-import opendap.services.ServicesRegistry;
 import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -190,20 +188,6 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
             showCatalogToThreddsCatalog.setParameter("dapService",oreq.getDapServiceLocalID());
-
-
-            String base = null;
-
-            Service s = ServicesRegistry.getServiceById("wms");
-            if(s!=null){
-                base  = s.getBase();
-                showCatalogToThreddsCatalog.setParameter("wmsService",base);
-            }
-            _log.debug("WMS service base:"+base);
-
-
-
-
             if(DapDispatcher.allowDirectDataSourceAccess())
                 showCatalogToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 

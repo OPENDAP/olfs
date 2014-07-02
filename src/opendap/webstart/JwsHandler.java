@@ -25,7 +25,6 @@
  */
 package opendap.webstart;
 
-import opendap.services.Service;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -33,11 +32,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-public abstract class JwsHandler implements Service {
+public abstract class JwsHandler {
 
     public abstract void init(Element config, String resourcesDirectory);
     
-    public abstract String getName();
+    public abstract String getApplicationName();
 
     public abstract String getServiceId();
 

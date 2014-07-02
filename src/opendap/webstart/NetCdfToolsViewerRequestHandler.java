@@ -48,7 +48,6 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
     private String HTTP = "http://";
 
     private String _serviceId = "ToolsUI";
-    private String _base = "/opendap/viewers/ToolsUI";
     private String _applicationName = "NetCDF Tools User Interface";
     private String _jnlpFileName = _serviceId+".jnlp";
 
@@ -70,14 +69,11 @@ public class NetCdfToolsViewerRequestHandler extends JwsHandler {
     }
 
 
-    public String getName(){
+    public String getApplicationName(){
         return _applicationName;
     }
     public String getServiceId(){
         return _serviceId;
-    }
-    public String getBase(){
-        return _base;
     }
 
 

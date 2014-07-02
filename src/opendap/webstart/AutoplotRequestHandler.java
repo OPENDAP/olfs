@@ -48,15 +48,14 @@ import java.util.Set;
  * <a href="http://autoplot.org/">Autoplot</a>data viewer.
  *
  */
-public class AutoplotRequestHandler  extends JwsHandler {
+public class AutoplotRequestHandler 
+    extends JwsHandler {
 
     private Logger log;
     private Element config;
 
     private String _serviceId = "Autoplot";
-    private String _applicationName = "Autoplot Data Viewer";
-
-    private String _base = "/opendap/viewers/Autoplot";
+    private String _applicationName = "Autoplot";
 
 
     public void init(Element config, String resourcesDirectory) {
@@ -67,7 +66,7 @@ public class AutoplotRequestHandler  extends JwsHandler {
     }
 
 
-    public String getName(){
+    public String getApplicationName(){
         return _applicationName;
     }
 
@@ -75,12 +74,6 @@ public class AutoplotRequestHandler  extends JwsHandler {
     public String getServiceId(){
         return _serviceId;
     }
-
-    public String getBase(){
-        return _base;
-    }
-
-
 
 
     /**

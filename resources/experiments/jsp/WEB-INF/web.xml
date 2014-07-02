@@ -167,7 +167,7 @@
     <servlet>
         <servlet-name>webstart</servlet-name>
 
-        <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
+        <servlet-class>opendap.webstart.WebStartServlet</servlet-class>
 
         <init-param>
             <param-name>WebStartConfigFileName</param-name>

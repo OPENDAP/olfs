@@ -35,7 +35,7 @@
 
     <xsl:param name="dapService" />
     <xsl:param name="docsService" />
-    <xsl:param name="viewersService" />
+    <xsl:param name="webStartService" />
     <xsl:param name="allowDirectDataSourceAccess" />
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes' />
@@ -97,7 +97,7 @@
                             <th align="center">Last Modified</th>
                             <th align="center">Size</th>
                             <th align="center">DAP Response Links</th>
-                            <th align="center">Dataset Viewers</th>
+                            <th align="center">Webstart</th>
                         </tr>
                         <tr>
                             <td>
@@ -245,13 +245,13 @@
                 </tr>
             </table>
         </td>
-        <xsl:call-template name="DatasetViewers"/>
+        <xsl:call-template name="WebStartLinks"/>
     </xsl:template>
 
 
 
 
-    <xsl:template name="DatasetViewers" >
+    <xsl:template name="WebStartLinks" >
         <xsl:variable name="datasetID">
             <xsl:choose>
                 <xsl:when test="../../@name='/'">
@@ -266,8 +266,7 @@
 
 
         <td align="center">
-            <xsl:comment>viewersService: <xsl:value-of select="$viewersService"/></xsl:comment>
-              <a href="{$viewersService}/viewers?dapService={$dapService}&#38;datasetID={$datasetID}">viewers</a>
+              <a href="{$webStartService}/viewers?dapService={$dapService}&#38;datasetID={$datasetID}">viewers</a>
         </td>
         
     </xsl:template>
