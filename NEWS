@@ -1,3 +1,16 @@
+
+Version 1.11.3 (02 July 2014)
+
+Repaired bug that was breaking Hyrax's ability to 
+serve plain files (not otherwise recognized as 
+'data' by the BES)".
+
+
+Version 1.11.2 (06 June 2014)
+
+Repaired broken nciso production rule.
+
+
 Version 1.11.1 (22 May 2014)
 
 Fixed a bug in the WebStart system.

@@ -42,6 +42,7 @@ public class IdvViewerRequestHandler extends JwsHandler {
     private Element config;
 
     private String _serviceId = "idv";
+    private String _base = "/opendap/viewers/idv";
     private String _applicationName = "Integrated Data Viewer";
     private String _jnlpFileName = _serviceId+".jnlp";
 
@@ -61,12 +62,16 @@ public class IdvViewerRequestHandler extends JwsHandler {
 
     }
 
-    public String getApplicationName(){
+    public String getName(){
         return _applicationName;
     }
 
     public String getServiceId(){
         return _serviceId;
+    }
+
+    public String getBase(){
+        return _base;
     }
 
 

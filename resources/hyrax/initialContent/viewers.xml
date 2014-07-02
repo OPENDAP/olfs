@@ -25,7 +25,7 @@
   ~ /////////////////////////////////////////////////////////////////////////////
   -->
 
-<WebStartConfig>
+<ViewersConfig>
 
     <JwsHandler className="opendap.webstart.IdvViewerRequestHandler">
         <JnlpFileName>idv.jnlp</JnlpFileName>
@@ -37,5 +37,17 @@
 
     <JwsHandler className="opendap.webstart.AutoplotRequestHandler" />
 
-</WebStartConfig>
+    <WebServiceHandler className="opendap.viewers.WmsDapWebService" serviceId="wms" >
+        <applicationName>Web Mapping Servce</applicationName>
+        <WmsService href="http://localhost:8080/wms/wms/hyrax" base="/wms/wms/hyrax"/>
+    </WebServiceHandler>
+
+    <WebServiceHandler className="opendap.viewers.GodivaWebService" serviceId="godiva" >
+        <applicationName>Godiva WMS GUI</applicationName>
+        <WmsService href="http://localhost:8080/wms/wms/hyrax" />
+        <Godiva href="/wms/godiva2.html" base="/wms/godiva2.html"/>
+    </WebServiceHandler>
+
+
+</ViewersConfig>
 

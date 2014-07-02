@@ -26,6 +26,9 @@
 
 package opendap.dap;
 
+import opendap.services.Service;
+import opendap.services.ServicesRegistry;
+import opendap.viewers.ViewersServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,17 +97,6 @@ public class Request {
     }
 
 
-    public String getWebStartServiceLocalID(){
-
-        String contextName = _request.getContextPath();
-
-        String webStartService = contextName + "/webstart";
-
-        log.debug("getWebStartServiceLocalID(): "+webStartService);
-
-        return webStartService;
-
-    }
 
 
 

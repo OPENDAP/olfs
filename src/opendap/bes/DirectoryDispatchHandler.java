@@ -30,6 +30,7 @@ import opendap.bes.dapResponders.BesApi;
 import opendap.bes.dapResponders.DapDispatcher;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -273,12 +274,13 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
             transformer.setParameter("dapService",oreq.getDapServiceLocalID());
             transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
-            transformer.setParameter("webStartService",oreq.getWebStartServiceLocalID());
+            transformer.setParameter("viewersService", ViewersServlet.getServiceId());
             if(DapDispatcher.allowDirectDataSourceAccess())
                 transformer.setParameter("allowDirectDataSourceAccess","true");
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(besCatalog, response.getOutputStream());
+            transformer.transform(besCatalog, System.out);
 
 
 
