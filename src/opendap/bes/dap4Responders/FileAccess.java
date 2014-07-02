@@ -58,7 +58,7 @@ public class FileAccess extends Dap4Responder {
 
     private Logger log;
     private static String defaultRequestSuffix = ".file";
-    private boolean allowDirectDataSourceAccess = true;
+    private boolean allowDirectDataSourceAccess = false;
 
 
 

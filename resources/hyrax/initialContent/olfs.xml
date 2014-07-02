@@ -132,6 +132,8 @@
 
             <Handler className="opendap.bes.BESThreddsDispatchHandler" />
 
+            <Handler className="opendap.bes.FileDispatchHandler" />
+
 
         </HttpGetHandlers>
 

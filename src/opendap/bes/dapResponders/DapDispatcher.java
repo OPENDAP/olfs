@@ -34,6 +34,7 @@ import opendap.bes.dap4Responders.DatasetServices.NormativeDSR;
 import opendap.bes.dap4Responders.FileAccess;
 import opendap.bes.dap4Responders.Iso19115.IsoDMR;
 import opendap.bes.dap4Responders.Iso19115.IsoRubricDMR;
+//import opendap.bes.dap4Responders.DataResponse.JsonDR;
 import opendap.bes.dap4Responders.Version;
 import opendap.coreServlet.DispatchHandler;
 import opendap.coreServlet.HttpResponder;
@@ -243,6 +244,11 @@ public class DapDispatcher implements DispatchHandler {
         jp2.setCombinedRequestSuffixRegex(jp2.buildRequestMatchingRegex());
         responders.add(jp2);
 
+        //Dap4Responder json = new JsonDR(systemPath, null, ".json", besApi);
+        //json.clearAltResponders();
+        //json.setCombinedRequestSuffixRegex(json.buildRequestMatchingRegex());
+        //responders.add(json);
+
 
         // DAP2 Metadata responses
         hr = new DDX(systemPath, besApi);
@@ -274,9 +280,10 @@ public class DapDispatcher implements DispatchHandler {
             htmlForm.setCombinedRequestSuffixRegex(htmlForm.buildRequestMatchingRegex());
             responders.add(htmlForm);
 
-            Dap4Responder d4fa = new FileAccess(systemPath, null, "", besApi);
+            FileAccess d4fa = new FileAccess(systemPath, null, "", besApi);
             d4fa.clearAltResponders();
             d4fa.setCombinedRequestSuffixRegex(d4fa.buildRequestMatchingRegex());
+            d4fa.setAllowDirectDataSourceAccess(_allowDirectDataSourceAccess);
             responders.add(d4fa);
         }
 

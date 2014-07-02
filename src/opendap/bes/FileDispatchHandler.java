@@ -40,10 +40,8 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 /**
- * User: ndp
- * Date: Apr 16, 2007
- * Time: 4:17:12 PM
- * @deprecated
+ * Provides access to files held in the BES that the BES does not recognize as data.
+ *
  */
 public class FileDispatchHandler implements DispatchHandler {
 
@@ -60,26 +58,12 @@ public class FileDispatchHandler implements DispatchHandler {
     }
 
 
-    //public static boolean allowDirectDataSourceAccess(){
-    //    return allowDirectDataSourceAccess;
-    //}
-
 
     public void init(HttpServlet servlet,Element config) throws Exception {
 
         if(initialized) return;
 
-
-        //Element dv = config.getChild("AllowDirectDataSourceAccess");
-        //if(dv!=null){
-        //    allowDirectDataSourceAccess = true;
-        //}
-
-
         _besApi = new BesApi();
-
-
-        //log.info("Initialized. Direct Data Source Access: " + (allowDirectDataSourceAccess?"Enabled":"Disabled") );
 
 
         initialized = true;
@@ -160,10 +144,12 @@ public class FileDispatchHandler implements DispatchHandler {
                 isFileResponse = true;
                 if (sendResponse) {
                     if(dsi.sourceIsAccesible()){
-                        if (!dsi.isDataset() ){ // || allowDirectDataSourceAccess) {
+                        if (!dsi.isDataset() ){
                             sendFile(request, response);
                         } else {
-                            sendDirectAccessDenied(request, response);
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+
+//                            sendDirectAccessDenied(request, response);
                         }
                     }
                     else {
